@@ -1,0 +1,8 @@
+{
+  "name": "asika/windwalker-phinex",
+  "autoload": {
+    "psr-4": {
+      "Windwalker\\Phenix\\": "src/"
+    }
+  }
+}
