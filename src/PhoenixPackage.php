@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Riki;
+namespace Phoenix;
 
 use Phoenix\Provider\AssetProvider;
 use Windwalker\Core\Package\AbstractPackage;
