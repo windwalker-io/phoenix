@@ -2,7 +2,7 @@
   "name": "asika/windwalker-phenix",
   "autoload": {
     "psr-4": {
-      "Windwalker\\Phenix\\": "src/"
+      "Windwalker\\Phoenix\\": "src/"
     }
   }
 }
