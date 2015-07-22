@@ -8,8 +8,7 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Command\Phoenix\AssetCommand;
-use Phoenix\Command\Phoenix\FormCommand;
+use Phoenix\Command\Muse;
 use Windwalker\Console\Command\Command;
 
 /**
@@ -17,21 +16,21 @@ use Windwalker\Console\Command\Command;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class PhoenixCommand extends Command
+class MuseCommand extends Command
 {
 	/**
 	 * Property name.
 	 *
 	 * @var  string
 	 */
-	protected $name = 'phoenix';
+	protected $name = 'muse';
 
 	/**
 	 * Property description.
 	 *
 	 * @var  string
 	 */
-	protected $description = 'The Phoenix RAD package.';
+	protected $description = 'The template generator.';
 
 	/**
 	 * initialise
@@ -40,7 +39,6 @@ class PhoenixCommand extends Command
 	 */
 	protected function initialise()
 	{
-		$this->addCommand(new AssetCommand);
-		$this->addCommand(new FormCommand);
+		$this->addCommand(new Muse\LinkCommand);
 	}
 }

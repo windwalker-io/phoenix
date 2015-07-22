@@ -28,6 +28,13 @@ class SyncCommand extends Command
 	protected $name = 'sync';
 
 	/**
+	 * Property usage.
+	 *
+	 * @var  string
+	 */
+	protected $usage = '%s <cmd><package></cmd> <cmd><target></cmd> <option>[option]</option>';
+
+	/**
 	 * Property description.
 	 *
 	 * @var  string
@@ -64,7 +71,7 @@ class SyncCommand extends Command
 		$packageName = $this->getArgument(0);
 
 		/** @var AbstractPackage $package */
-		$package = $this->app->getPackage($packageName);
+		$package = $this->app->getPackage($packageName, 'phoenix');
 
 		if ($package)
 		{
@@ -79,8 +86,6 @@ class SyncCommand extends Command
 
 		$target = $this->app->get('path.public') . '/media/' . $target;
 
-		$symlink = new Symlink;
-
 		if (is_link($target))
 		{
 			throw new \RuntimeException('Link ' . $target . ' already created.');
@@ -94,7 +99,7 @@ class SyncCommand extends Command
 		}
 		else
 		{
-			$this->out($symlink->make($dir, $target));
+			$this->out(Symlink::make($dir, $target));
 		}
 
 		return true;

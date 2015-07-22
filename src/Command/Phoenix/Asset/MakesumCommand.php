@@ -48,13 +48,13 @@ class MakesumCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		Folder::create(WINDWALKER_CACHE . '/riki');
+		Folder::create(WINDWALKER_CACHE . '/phoenix');
 
 		$sum = md5(uniqid());
 
-		file_put_contents(WINDWALKER_CACHE . '/riki/MD5SUM', $sum);
+		file_put_contents(WINDWALKER_CACHE . '/phoenix/MD5SUM', $sum);
 
-		$this->out('Create SUM: <info>' . $sum . '</info> at <info>' . WINDWALKER_CACHE . '/riki/MD5SUM</info>');
+		$this->out('Create SUM: <info>' . $sum . '</info> at <info>' . WINDWALKER_CACHE . '/phoenix/MD5SUM</info>');
 
 		return true;
 	}

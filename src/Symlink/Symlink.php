@@ -25,11 +25,11 @@ class Symlink
 	 *
 	 * @return  string
 	 */
-	public function make($src, $dest)
+	public static function make($src, $dest)
 	{
 		$windows = ServerHelper::isWindows();
 
-		$src    = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $src);
+		$src  = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $src);
 		$dest = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $dest);
 
 		if ($windows)

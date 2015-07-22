@@ -18,6 +18,9 @@ use Windwalker\Ioc;
  */
 class Uri extends \Windwalker\Uri\Uri
 {
+	const RELATIVE = true;
+	const ABSOLUTE = false;
+
 	/**
 	 * Property app.
 	 *
@@ -28,13 +31,13 @@ class Uri extends \Windwalker\Uri\Uri
 	/**
 	 * root
 	 *
-	 * @param bool $path
+	 * @param bool $relative
 	 *
 	 * @return  string
 	 */
-	public static function root($path = false)
+	public static function root($relative = self::ABSOLUTE)
 	{
-		if ($path)
+		if ($relative == static::RELATIVE)
 		{
 			return static::getApplication()->get('uri.base.path');
 		}
@@ -57,13 +60,13 @@ class Uri extends \Windwalker\Uri\Uri
 	/**
 	 * current
 	 *
-	 * @param bool $path
+	 * @param bool $relative
 	 *
 	 * @return  string
 	 */
-	public static function current($path = false)
+	public static function current($relative = self::ABSOLUTE)
 	{
-		if ($path)
+		if ($relative == static::RELATIVE)
 		{
 			return static::getApplication()->get('uri.route');
 		}
@@ -96,13 +99,13 @@ class Uri extends \Windwalker\Uri\Uri
 	/**
 	 * media
 	 *
-	 * @param bool $path
+	 * @param bool $relative
 	 *
 	 * @return  string
 	 */
-	public static function media($path = false)
+	public static function media($relative = self::ABSOLUTE)
 	{
-		if ($path)
+		if ($relative == static::RELATIVE)
 		{
 			return static::getApplication()->get('uri.media.path');
 		}

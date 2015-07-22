@@ -244,7 +244,7 @@ class AssetManager
 			return $this->version;
 		}
 
-		$sumFile = WINDWALKER_CACHE . '/riki/MD5SUM';
+		$sumFile = WINDWALKER_CACHE . '/phoenix/MD5SUM';
 
 		if (WINDWALKER_DEBUG || !is_file($sumFile))
 		{

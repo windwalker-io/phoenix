@@ -42,13 +42,5 @@ class AssetCommand extends Command
 	{
 		$this->addCommand(new SyncCommand);
 		$this->addCommand(new MakesumCommand);
-
-		$this->addGlobalOption('d')
-			->alias('dir')
-			->description('Set migration file directory.');
-
-		$this->addGlobalOption('p')
-			->alias('package')
-			->description('Package to run migration.');
 	}
 }

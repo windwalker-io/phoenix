@@ -12,6 +12,10 @@ use Phoenix\Provider\AssetProvider;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
 
+define('PHOENIX_ROOT', dirname(__DIR__));
+define('PHOENIX_SOURCE', PHOENIX_ROOT . '/src');
+define('PHOENIX_TEMPLATES', PHOENIX_ROOT . '/templates');
+
 /**
  * The SimpleRADPackage class.
  * 
@@ -19,6 +23,16 @@ use Windwalker\DI\Container;
  */
 class PhoenixPackage extends AbstractPackage
 {
+	/**
+	 * initialise
+	 *
+	 * @return  void
+	 */
+	public function initialise()
+	{
+		parent::initialise();
+	}
+
 	/**
 	 * registerProviders
 	 *
