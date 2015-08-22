@@ -8,12 +8,14 @@
 
 namespace {@package.namespace@}{@package.name.cap@}\Model;
 
+use Windwalker\Core\Model\DatabaseModel;
+
 /**
  * The {@controller.item.name.cap@}Model class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class {@controller.item.name.cap@}Model
+class {@controller.item.name.cap@}Model extends DatabaseModel
 {
-
+	// Implement your methods
 }
