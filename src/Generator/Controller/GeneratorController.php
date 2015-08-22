@@ -54,6 +54,20 @@ class GeneratorController extends AbstractController
 	protected $template = null;
 
 	/**
+	 * Property tagVariables.
+	 *
+	 * @var  array
+	 */
+	protected $tagVariables = array('{@', '@}');
+
+	/**
+	 * Property command.
+	 *
+	 * @var  Command
+	 */
+	protected $command;
+
+	/**
 	 * constructor.
 	 *
 	 * @param Command     $command
@@ -68,7 +82,7 @@ class GeneratorController extends AbstractController
 
 		$this->container = $container;
 
-		$container->registerServiceProvider(new MuseProvider($command));
+		$container->registerServiceProvider(new MuseProvider($this));
 
 		$io = $io ? : $container->get('io');
 
@@ -148,6 +162,54 @@ class GeneratorController extends AbstractController
 		}
 
 		$this->task = $task;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property TagVariables
+	 *
+	 * @return  array
+	 */
+	public function getTagVariables()
+	{
+		return $this->tagVariables;
+	}
+
+	/**
+	 * Method to set property tagVariables
+	 *
+	 * @param   array $tagVariables
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setTagVariables($tagVariables)
+	{
+		$this->tagVariables = $tagVariables;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Command
+	 *
+	 * @return  Command
+	 */
+	public function getCommand()
+	{
+		return $this->command;
+	}
+
+	/**
+	 * Method to set property command
+	 *
+	 * @param   Command $command
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setCommand($command)
+	{
+		$this->command = $command;
 
 		return $this;
 	}

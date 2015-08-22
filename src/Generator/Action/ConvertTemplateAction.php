@@ -8,6 +8,7 @@
 
 namespace Phoenix\Generator\Action;
 
+use Phoenix\Generator\FileOperator\ConvertOperator;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -28,26 +29,27 @@ class ConvertTemplateAction extends AbstractAction
 	{
 		$replace = ArrayHelper::flatten($this->replace);
 
-		show($replace);die;
-
 		// Flip replace array because we want to convert template.
 		$replace = array_flip($replace);
 
 		foreach ($replace as &$val)
 		{
-			$val = '{{' . $val . '}}';
+			$val = '{@' . $val . '@}';
 		}
 
 		// Flip src and dest because we want to convert template.
 		$src  = $this->config['dir.src'];
 		$dest = $this->config['dir.dest'];
 
-		if (is_dir($src))
+		if (is_dir($dest))
 		{
 			// Remove dir first
 			Folder::delete($dest);
 		}
 
-		$this->container->get('operator.convert')->copy($src, $dest, $replace);
+		/** @var ConvertOperator $operator */
+		$operator = $this->container->get('operator.factory')->getOperator('convert');
+
+		$operator->copy($src, $dest, $replace);
 	}
 }

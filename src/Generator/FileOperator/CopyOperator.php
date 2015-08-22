@@ -30,7 +30,7 @@ class CopyOperator extends \Muse\FileOperator\CopyOperator
 	protected function copyFile($src, $dest, $replace = array())
 	{
 		// Replace dest file name.
-		$dest = StringHelper::parseVariable($dest, $replace);
+		$dest = StringHelper::parseVariable($dest, $replace, $this->tagVariable);
 
 		if (is_file($dest))
 		{
@@ -38,7 +38,7 @@ class CopyOperator extends \Muse\FileOperator\CopyOperator
 		}
 		else
 		{
-			$content = StringHelper::parseVariable(file_get_contents($src), $replace);
+			$content = StringHelper::parseVariable(file_get_contents($src), $replace, $this->tagVariable);
 			if (File::write($dest, $content))
 			{
 				$this->io->out('File created: ' . $dest);

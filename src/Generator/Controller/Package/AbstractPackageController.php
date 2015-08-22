@@ -59,9 +59,11 @@ abstract class AbstractPackageController extends AbstractTaskController
 		list($itemName, $listName) = $ctrl;
 
 		// Prepare package name
-		$class = str_replace('/', '\\', $config['name']);
-		$name = array_pop(explode('\\', $class));
-		$class = StringNormalise::toClassNamespace($class);
+		$class = explode('\\', str_replace('/', '\\', $config['name']));
+		$name = array_pop($class);
+
+		$class = StringNormalise::toClassNamespace(implode('\\', $class));
+		$class = $class ? $class . '\\' : null;
 
 		$config['package.name'] = $name;
 		$config['package.namespace'] = $class;
@@ -86,7 +88,7 @@ abstract class AbstractPackageController extends AbstractTaskController
 		$config->mergeTo('replace', $this->replace);
 
 		// Set copy dir.
-		$config->set('dir.dest', WINDWALKER_SOURCE . '/' . $this->replace['package.namespace']);
+		$config->set('dir.dest', WINDWALKER_SOURCE . '/' . $this->replace['package.namespace'] . $this->replace['package.name.cap']);
 
 		$config->set('dir.tmpl', PHOENIX_TEMPLATES . '/package/' . $config['template']);
 

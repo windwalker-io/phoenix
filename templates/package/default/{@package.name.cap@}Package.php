@@ -6,15 +6,15 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Flower;
+namespace {@package.namespace@}{@package.name.cap@};
 
 use Windwalker\Core\Package\AbstractPackage;
 
 /**
- * The FlowerPackage class.
+ * The {@package.name.cap@}Package class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class FlowerPackage extends AbstractPackage
+class {@package.name.cap@}Package extends AbstractPackage
 {
 }

@@ -9,6 +9,7 @@
 namespace Phoenix\Generator\Provider;
 
 use Muse\Windwalker\IO;
+use Phoenix\Generator\Controller\GeneratorController;
 use Phoenix\Generator\FileOperator\OperatorFactory;
 use Windwalker\Console\Command\Command;
 use Windwalker\DI\Container;
@@ -26,16 +27,16 @@ class MuseProvider implements ServiceProviderInterface
 	 *
 	 * @var Command
 	 */
-	protected $command;
+	protected $controller;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Command $command
+	 * @param GeneratorController $controller
 	 */
-	public function __construct(Command $command)
+	public function __construct(GeneratorController $controller)
 	{
-		$this->command = $command;
+		$this->controller = $controller;
 	}
 
 	/**
@@ -54,14 +55,14 @@ class MuseProvider implements ServiceProviderInterface
 		$container->alias('io', $ioClass)
 			->alias('Muse\IO\IO', $ioClass)
 			->alias('Muse\IO\IOInterface', $ioClass)
-			->share($ioClass, new IO($this->command));
+			->share($ioClass, new IO($this->controller->getCommand()));
 
 		$container->alias('operator.copy', 'Phoenix\Generaotr\FileOperator\CopyOperator')
 			->createObject('Phoenix\Generaotr\FileOperator\CopyOperator');
 
 		$closure = function(Container $container)
 		{
-			return new OperatorFactory($container->get('io'), array('{{', '}}'));
+			return new OperatorFactory($container->get('io'), $this->controller->getTagVariables());
 		};
 
 		$container->share('operator.factory', $closure);
