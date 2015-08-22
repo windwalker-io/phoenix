@@ -8,11 +8,13 @@
 
 namespace Phoenix\Model;
 
+use Phoenix\Model\Filter\FilterHelper;
+use Phoenix\Model\Filter\FilterHelperInterface;
+use Phoenix\Model\Filter\SearchHelper;
 use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
-use Windwalker\Ioc;
 use Windwalker\Query\Query;
 
 /**
@@ -41,7 +43,21 @@ abstract class AbstractListModel extends DatabaseModel
 	 *
 	 * @var  QueryHelper
 	 */
-	protected $queryHelper = null;
+	protected $queryHelper;
+
+	/**
+	 * Property filterHelper.
+	 *
+	 * @var  FilterHelperInterface
+	 */
+	protected $filterHelper;
+
+	/**
+	 * Property searchHelper.
+	 *
+	 * @var  FilterHelperInterface
+	 */
+	protected $searchHelper;
 
 	/**
 	 * prepareState
@@ -52,10 +68,12 @@ abstract class AbstractListModel extends DatabaseModel
 	{
 	}
 
-	protected function configureTables()
-	{
-		// Implement it.
-	}
+	/**
+	 * configureTables
+	 *
+	 * @return  void
+	 */
+	abstract protected function configureTables();
 
 	/**
 	 * getItems
@@ -311,7 +329,7 @@ abstract class AbstractListModel extends DatabaseModel
 	{
 		$filters = $filters ? : $this->state->get('filter', array());
 
-		$filterHelper = $this->container->get('model.' . strtolower($this->name) . '.filter', Container::FORCE_NEW);
+		$filterHelper = $this->getFilterHelper();
 
 		$this->configureFilters($filterHelper);
 
@@ -353,7 +371,7 @@ abstract class AbstractListModel extends DatabaseModel
 	{
 		$searches = $searches ? : $this->state->get('search', array());
 
-		$searchHelper = $this->container->get('model.' . strtolower($this->name) . '.search', Container::FORCE_NEW);
+		$searchHelper = $this->getSearchHelper();
 
 		$this->configureSearches($searchHelper);
 
@@ -426,5 +444,63 @@ abstract class AbstractListModel extends DatabaseModel
 		$ordering = implode(', ', $ordering);
 
 		$query->order($ordering . ' ' . $direction);
+	}
+
+	/**
+	 * Method to get property FilterHelper
+	 *
+	 * @return  FilterHelper
+	 */
+	public function getFilterHelper()
+	{
+		if (!$this->filterHelper)
+		{
+			$this->filterHelper = new FilterHelper;
+		}
+
+		return $this->filterHelper;
+	}
+
+	/**
+	 * Method to set property filterHelper
+	 *
+	 * @param   FilterHelperInterface $filterHelper
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setFilterHelper(FilterHelperInterface $filterHelper)
+	{
+		$this->filterHelper = $filterHelper;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property SearchHelper
+	 *
+	 * @return  SearchHelper
+	 */
+	public function getSearchHelper()
+	{
+		if (!$this->searchHelper)
+		{
+			$this->searchHelper = new SearchHelper;
+		}
+
+		return $this->searchHelper;
+	}
+
+	/**
+	 * Method to set property searchHelper
+	 *
+	 * @param   FilterHelperInterface $searchHelper
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setSearchHelper(FilterHelperInterface $searchHelper)
+	{
+		$this->searchHelper = $searchHelper;
+
+		return $this;
 	}
 }

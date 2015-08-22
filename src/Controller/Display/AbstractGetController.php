@@ -10,6 +10,7 @@ namespace Phoenix\Controller\Display;
 
 use Phoenix\Controller\AbstractRadController;
 use Windwalker\Core\Model\DatabaseModel;
+use Windwalker\Core\Model\Model;
 use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\HtmlView;
 
@@ -18,7 +19,7 @@ use Windwalker\Core\View\HtmlView;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class AbstractGetController extends AbstractRadController
+abstract class AbstractGetController extends AbstractRadController
 {
 	/**
 	 * Property model.
@@ -45,7 +46,6 @@ class AbstractGetController extends AbstractRadController
 		$this->view = $this->getView();
 	}
 
-
 	/**
 	 * doExecute
 	 *
@@ -53,6 +53,8 @@ class AbstractGetController extends AbstractRadController
 	 */
 	protected function doExecute()
 	{
+		$this->prepareUserState($this->model);
+
 		$this->view->setModel($this->model);
 
 		$this->assignModels($this->view);
@@ -70,5 +72,16 @@ class AbstractGetController extends AbstractRadController
 	protected function assignModels(HtmlView $view)
 	{
 		// Implement it.
+	}
+
+	/**
+	 * prepareUserState
+	 *
+	 * @param   Model $model
+	 *
+	 * @return  void
+	 */
+	protected function prepareUserState(Model $model)
+	{
 	}
 }

@@ -127,9 +127,9 @@ abstract class AbstractRadController extends Controller
 	public function getUserStateFromInput($name, $inputName, $default = null, $filter = InputFilter::STRING, $namespace = 'default')
 	{
 		$oldState = $this->getUserState($name, $default, $namespace);
-		$newState = $this->input->get($inputName, $filter);
+		$newState = $this->input->get($inputName, null, $filter);
 
-		if ($newState)
+		if ($newState !== null)
 		{
 			$this->setUserState($name, $newState, $namespace);
 
@@ -137,5 +137,24 @@ abstract class AbstractRadController extends Controller
 		}
 
 		return $oldState;
+	}
+
+	/**
+	 * getContext
+	 *
+	 * @param   string $task
+	 *
+	 * @return  string
+	 */
+	public function getContext($task = null)
+	{
+		$context = $this->package->getName() . '.' . $this->getName();
+
+		if ($task)
+		{
+			$context .= '.' . $task;
+		}
+
+		return $context;
 	}
 }

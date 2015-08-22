@@ -9,6 +9,8 @@
 namespace Phoenix\Controller\Display;
 
 use Phoenix\Model\AbstractListModel;
+use Windwalker\Core\Model\Model;
+use Windwalker\Filter\InputFilter;
 
 /**
  * The ListGetController class.
@@ -25,12 +27,17 @@ class ListGetController extends AbstractGetController
 	protected $model;
 
 	/**
-	 * doExecute
+	 * prepareUserState
 	 *
-	 * @return  mixed
+	 * @param   Model  $model
+	 *
+	 * @return  void
 	 */
-	protected function doExecute()
+	protected function prepareUserState(Model $model)
 	{
-
+		$model['list.limit'] = $this->app->get('list.limit', 15);
+		$model['list.page']  = $this->getUserStateFromInput($this->getContext('list.page'), 'page', 1, InputFilter::INTEGER);
+		$model['list.page']  = $model['list.page'] < 1 ? 1 : $model['list.page'];
+		$model['list.start'] = ($model['list.page'] - 1) * $model['list.limit'];
 	}
 }

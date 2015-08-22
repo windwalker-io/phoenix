@@ -15,15 +15,5 @@ namespace Phoenix\Controller\Display;
  */
 class ItemGetController extends AbstractGetController
 {
-	/**
-	 * doExecute
-	 *
-	 * @return  mixed
-	 */
-	protected function doExecute()
-	{
-		$this->view->setModel($this->model);
 
-		return $this->view->render();
-	}
 }
