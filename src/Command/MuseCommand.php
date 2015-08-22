@@ -40,5 +40,16 @@ class MuseCommand extends Command
 	protected function initialise()
 	{
 		$this->addCommand(new Muse\LinkCommand);
+		$this->addCommand(new Muse\InitCommand);
+		$this->addCommand(new Muse\ConvertCommand);
+
+		$this->addGlobalOption('type')
+			->description('Generate type.')
+			->defaultValue('package');
+
+		$this->addGlobalOption('t')
+			->alias('tmpl')
+			->defaultValue('default')
+			->description('Using template.');
 	}
 }

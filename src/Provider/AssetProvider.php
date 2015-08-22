@@ -33,6 +33,11 @@ class AssetProvider implements ServiceProviderInterface
 			return new AssetManager;
 		};
 
-		$container->getParent()->share('phoenix.asset', $closure);
+		if ($container->getParent())
+		{
+			$container = $container->getParent();
+		}
+
+		$container->share('phoenix.asset', $closure);
 	}
 }

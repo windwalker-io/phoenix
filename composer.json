@@ -1,8 +1,12 @@
 {
-  "name": "asika/windwalker-phoenix",
-  "autoload": {
-    "psr-4": {
-      "Phoenix\\": "src/"
+    "name": "asika/windwalker-phoenix",
+    "require": {
+        "illuminate/view": "~5.0",
+        "asika/muse": "~1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phoenix\\": "src/"
+        }
     }
-  }
 }
