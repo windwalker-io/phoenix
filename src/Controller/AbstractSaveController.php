@@ -13,6 +13,7 @@ use Phoenix\Session\CSRFToken;
 use Windwalker\Core\Controller\Controller;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Model\Exception\ValidFailException;
+use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Data\Data;
 
 /**
@@ -50,8 +51,6 @@ abstract class AbstractSaveController extends Controller
 	 */
 	protected function prepareExecute()
 	{
-		CSRFToken::validate();
-
 		$this->model = $this->getModel();
 		$this->data = $this->input->getVar(strtolower($this->getName()));
 		$this->data['id'] = $this->input->get('id');
@@ -68,9 +67,7 @@ abstract class AbstractSaveController extends Controller
 		$session = \Windwalker\Ioc::getSession();
 		$data = new Data($this->data);
 
-		$trans = Ioc::getDatabase()->getTransaction();
-
-		$this->useTransition ? $trans->start() : null;
+		!$this->useTransition or $this->model->transactionStart();
 
 		try
 		{
@@ -86,7 +83,7 @@ abstract class AbstractSaveController extends Controller
 		}
 		catch (ValidFailException $e)
 		{
-			$this->useTransition ? $trans->rollback() : null;
+			!$this->useTransition or $this->model->transactionRollback();
 
 			$session->set($this->getName() . '.edit.data' . $data->id, $this->data);
 
@@ -96,7 +93,7 @@ abstract class AbstractSaveController extends Controller
 		}
 		catch (\Exception $e)
 		{
-			$this->useTransition ? $trans->rollback() : null;
+			!$this->useTransition or $this->model->transactionRollback();
 
 			$session->set($this->getName() . '.edit.data' . $data->id, $this->data);
 
@@ -110,7 +107,7 @@ abstract class AbstractSaveController extends Controller
 			return false;
 		}
 
-		$this->useTransition ? $trans->commit() : null;
+		!$this->useTransition or $this->model->transactionCommit();
 
 		$session->remove($this->getName() . '.edit.data' . $data->id);
 
@@ -214,7 +211,7 @@ abstract class AbstractSaveController extends Controller
 	 */
 	protected function getFailRedirect(Data $data)
 	{
-		return $this->package->router->buildHttp($this->getName(), ['id' => $data->id]);
+		return $this->package->router->buildHttp($this->getName(), array('id' => $data->id));
 	}
 
 	/**
@@ -226,6 +223,6 @@ abstract class AbstractSaveController extends Controller
 	 */
 	protected function getSuccessRedirect(Data $data)
 	{
-		return $this->package->router->buildHttp($this->getName(), ['id' => $data->id]);
+		return $this->package->router->buildHttp($this->getName(), array('id' => $data->id));
 	}
 }

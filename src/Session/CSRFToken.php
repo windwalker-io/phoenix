@@ -8,7 +8,6 @@
 
 namespace Phoenix\Session;
 
-use Windwalker\Core\Authenticate\User;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Filter\InputFilter;
 use Windwalker\Ioc;
