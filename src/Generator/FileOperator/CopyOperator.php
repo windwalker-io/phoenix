@@ -32,6 +32,11 @@ class CopyOperator extends \Muse\FileOperator\CopyOperator
 		// Replace dest file name.
 		$dest = StringHelper::parseVariable($dest, $replace, $this->tagVariable);
 
+		if (substr($dest, -4) == '.tpl')
+		{
+			$dest = substr($dest, 0, -4);
+		}
+
 		if (is_file($dest))
 		{
 			$this->io->out('File exists: ' . $dest);
@@ -44,5 +49,29 @@ class CopyOperator extends \Muse\FileOperator\CopyOperator
 				$this->io->out('File created: ' . $dest);
 			}
 		}
+	}
+
+	/**
+	 * Method to get property TagVariable
+	 *
+	 * @return  array
+	 */
+	public function getTagVariable()
+	{
+		return $this->tagVariable;
+	}
+
+	/**
+	 * Method to set property tagVariable
+	 *
+	 * @param   array $tagVariable
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setTagVariable($tagVariable)
+	{
+		$this->tagVariable = $tagVariable;
+
+		return $this;
 	}
 }

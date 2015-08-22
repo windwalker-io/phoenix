@@ -10,6 +10,7 @@ namespace Phoenix\Generator\Action;
 
 use Phoenix\Generator\FileOperator\ConvertOperator;
 use Windwalker\Filesystem\Folder;
+use Windwalker\String\StringHelper;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -27,6 +28,9 @@ class ConvertTemplateAction extends AbstractAction
 	 */
 	protected function doExecute()
 	{
+		/** @var ConvertOperator $operator */
+		$operator = $this->container->get('operator.factory')->getOperator('convert');
+
 		$replace = ArrayHelper::flatten($this->replace);
 
 		// Flip replace array because we want to convert template.
@@ -34,7 +38,7 @@ class ConvertTemplateAction extends AbstractAction
 
 		foreach ($replace as &$val)
 		{
-			$val = '{@' . $val . '@}';
+			$val = StringHelper::quote($val, $operator->getTagVariable());
 		}
 
 		// Flip src and dest because we want to convert template.
@@ -46,9 +50,6 @@ class ConvertTemplateAction extends AbstractAction
 			// Remove dir first
 			Folder::delete($dest);
 		}
-
-		/** @var ConvertOperator $operator */
-		$operator = $this->container->get('operator.factory')->getOperator('convert');
 
 		$operator->copy($src, $dest, $replace);
 	}

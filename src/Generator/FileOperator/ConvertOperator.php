@@ -31,6 +31,8 @@ class ConvertOperator extends CopyOperator
 		// Replace dest file name.
 		$dest = strtr($dest, $replace);
 
+		$dest .= '.tpl';
+
 		if (is_file($dest))
 		{
 			$this->io->out('File exists: ' . $dest);
@@ -44,5 +46,29 @@ class ConvertOperator extends CopyOperator
 				$this->io->out('File created: ' . $dest);
 			}
 		}
+	}
+
+	/**
+	 * Method to get property TagVariable
+	 *
+	 * @return  array
+	 */
+	public function getTagVariable()
+	{
+		return $this->tagVariable;
+	}
+
+	/**
+	 * Method to set property tagVariable
+	 *
+	 * @param   array $tagVariable
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setTagVariable($tagVariable)
+	{
+		$this->tagVariable = $tagVariable;
+
+		return $this;
 	}
 }

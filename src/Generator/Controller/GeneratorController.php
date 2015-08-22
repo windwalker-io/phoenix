@@ -58,7 +58,7 @@ class GeneratorController extends AbstractController
 	 *
 	 * @var  array
 	 */
-	protected $tagVariables = array('{@', '@}');
+	protected $tagVariables = array('{$', '$}');
 
 	/**
 	 * Property command.
