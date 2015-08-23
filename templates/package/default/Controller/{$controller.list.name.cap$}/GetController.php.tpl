@@ -8,51 +8,33 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}Model;
-use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
-use Windwalker\Core\Controller\Controller;
+use Phoenix\Controller\Display\ListGetController;
 
 /**
  * The GetController class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class GetController extends Controller
+class GetController extends ListGetController
 {
 	/**
-	 * Property model.
+	 * Property name.
 	 *
-	 * @var  {$controller.list.name.cap$}Model
+	 * @var  string
 	 */
-	protected $model;
+	protected $name = '{$controller.list.name.lower$}';
 
 	/**
-	 * Property view.
+	 * Property itemName.
 	 *
-	 * @var  {$controller.list.name.cap$}HtmlView
+	 * @var  string
 	 */
-	protected $view;
+	protected $itemName = '{$controller.item.name.lower$}';
 
 	/**
-	 * prepareExecute
+	 * Property listName.
 	 *
-	 * @return  void
+	 * @var  string
 	 */
-	protected function prepareExecute()
-	{
-		$this->model = $this->getModel();
-		$this->view = $this->getView();
-	}
-
-	/**
-	 * doExecute
-	 *
-	 * @return  mixed
-	 */
-	protected function doExecute()
-	{
-		$this->view->setModel($this->model);
-
-		return $this->view->render();
-	}
+	protected $listName = '{$controller.list.name.lower$}';
 }

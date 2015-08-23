@@ -9,6 +9,7 @@
 namespace Phoenix\Provider;
 
 use Phoenix\Asset\AssetManager;
+use Phoenix\Html\DocumentManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -17,7 +18,7 @@ use Windwalker\DI\ServiceProviderInterface;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class AssetProvider implements ServiceProviderInterface
+class PhoenixProvider implements ServiceProviderInterface
 {
 	/**
 	 * Registers the service provider with a DI container.
@@ -28,15 +29,24 @@ class AssetProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$closure = function(Container $container)
-		{
-			return new AssetManager;
-		};
-
 		if ($container->getParent())
 		{
 			$container = $container->getParent();
 		}
+
+		// Html document
+		$closure = function(Container $container)
+		{
+			return new DocumentManager;
+		};
+
+		$container->share('phoenix.document', $closure);
+
+		// Asset
+		$closure = function(Container $container)
+		{
+			return new AssetManager;
+		};
 
 		$container->share('phoenix.asset', $closure);
 	}

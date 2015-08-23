@@ -8,7 +8,7 @@
 
 namespace Phoenix;
 
-use Phoenix\Provider\AssetProvider;
+use Phoenix\Provider\PhoenixProvider;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
 
@@ -42,6 +42,6 @@ class PhoenixPackage extends AbstractPackage
 	 */
 	public function registerProviders(Container $container)
 	{
-		$container->registerServiceProvider(new AssetProvider);
+		$container->registerServiceProvider(new PhoenixProvider);
 	}
 }

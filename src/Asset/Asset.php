@@ -8,7 +8,7 @@
 
 namespace Phoenix\Asset;
 
-use Windwalker\Core\Facade\Facade;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 
 /**
  * The Asset class.
@@ -27,12 +27,12 @@ use Windwalker\Core\Facade\Facade;
  *
  * @since  {DEPLOY_VERSION}
  */
-class Asset extends Facade
+abstract class Asset extends AbstractProxyFacade
 {
 	/**
 	 * Property key.
 	 *
 	 * @var  string
 	 */
-	protected static $key = 'phoenix.asset';
+	protected static $_key = 'phoenix.asset';
 }

@@ -8,6 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
+use Phoenix\Html\Document;
 use Windwalker\Core\View\BladeHtmlView;
 
 /**
@@ -26,6 +27,8 @@ class {$controller.list.name.cap$}HtmlView extends BladeHtmlView
 	 */
 	protected function prepareData($data)
 	{
-		$data->items = $this->model->getSomething();
+		$data->items = $this->model->getItems();
+
+		Document::setTitle('{$controller.list.name.cap$}');
 	}
 }
