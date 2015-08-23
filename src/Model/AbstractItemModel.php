@@ -15,8 +15,6 @@ use Windwalker\DataMapper\DataMapper;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Ioc;
-use Windwalker\Record\Record;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The AbstractFormModel class.
@@ -34,63 +32,57 @@ abstract class AbstractFormModel extends DatabaseModel
 	 */
 	public function getItem($pk = null)
 	{
-		$state = $this->state;
-
-		return $this->fetch('item', function() use ($pk, $state)
+		return $this->fetch('item', function() use ($pk)
 		{
-			$pk = $pk ? : $state['item.id'];
+			$pk = $pk ? : $this['item.id'];
 
 			if (!$pk)
 			{
 				return new Data;
 			}
 
-			$item = $this->getRecord();
+			$item = $this->getDataMapper()->findOne($pk);
 
-			try
+			if (!$item)
 			{
-				$item->load($pk);
-			}
-			catch (\RuntimeException $e)
-			{
-				return new Data;
+				return $item;
 			}
 
 			$this->postGetItem($item);
 
-			return new Data($item->toArray());
+			return $item;
 		});
 	}
 
 	/**
-	 * getRecord
+	 * getDataMapper
 	 *
-	 * @param   string $name
+	 * @param   string $table
 	 *
-	 * @return  Record
+	 * @return  DataMapper
 	 */
-	public function getRecord($name = null)
+	public function getDataMapper($table = null)
 	{
-		$name = $name ? : $this->getName();
+		$table = $table ? : $this->getDefaultTable();
 
-		$class = sprintf('%s\Record\%sRecord', ReflectionHelper::getNamespace($this), ucfirst($name));
-
-		if (!class_exists($class))
-		{
-			throw new \DomainException($class . ' not exists.');
-		}
-
-		return new $class($this->db);
+		return new DataMapper($table);
 	}
+
+	/**
+	 * getDefaultTable
+	 *
+	 * @return  string
+	 */
+	abstract public function getDefaultTable();
 
 	/**
 	 * postGetItem
 	 *
-	 * @param Record $item
+	 * @param Data $item
 	 *
 	 * @return  void
 	 */
-	protected function postGetItem(Record $item)
+	protected function postGetItem(Data $item)
 	{
 	}
 

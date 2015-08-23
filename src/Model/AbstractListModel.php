@@ -337,6 +337,7 @@ abstract class AbstractListModel extends DatabaseModel
 
 		return $query;
 	}
+
 	/**
 	 * Configure the filter handlers.
 	 *
@@ -359,6 +360,7 @@ abstract class AbstractListModel extends DatabaseModel
 	{
 		// Override this method.
 	}
+
 	/**
 	 * Process the search query.
 	 *
@@ -502,5 +504,10 @@ abstract class AbstractListModel extends DatabaseModel
 		$this->searchHelper = $searchHelper;
 
 		return $this;
+	}
+
+	public function getFilterForm()
+	{
+
 	}
 }
