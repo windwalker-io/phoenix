@@ -304,7 +304,7 @@ abstract class AbstractListModel extends DatabaseModel
 			{
 				$query = clone $query;
 
-				$query->clear('select')->clear('order')->select('COUNT(*)');
+				$query->clear('select')->clear('order')->clear('limit')->select('COUNT(*)');
 
 				return (int) $this->db->setQuery($query)->loadResult();
 			}
