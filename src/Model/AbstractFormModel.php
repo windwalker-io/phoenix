@@ -9,12 +9,9 @@
 namespace Phoenix\Model;
 
 use Windwalker\Core\Model\DatabaseModel;
-use Windwalker\Data\Data;
 use Windwalker\Database\Query\QueryHelper;
-use Windwalker\DataMapper\DataMapper;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
-use Windwalker\Ioc;
 use Windwalker\Record\Record;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
@@ -26,40 +23,15 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 abstract class AbstractFormModel extends DatabaseModel
 {
 	/**
-	 * getItem
+	 * getDefaultData
 	 *
-	 * @param   mixed  $pk
+	 * @param mixed $conditions
 	 *
-	 * @return  Data
+	 * @return array
 	 */
-	public function getItem($pk = null)
+	public function getDefaultData($conditions = null)
 	{
-		$state = $this->state;
-
-		return $this->fetch('item', function() use ($pk, $state)
-		{
-			$pk = $pk ? : $state['item.id'];
-
-			if (!$pk)
-			{
-				return new Data;
-			}
-
-			$item = $this->getRecord();
-
-			try
-			{
-				$item->load($pk);
-			}
-			catch (\RuntimeException $e)
-			{
-				return new Data;
-			}
-
-			$this->postGetItem($item);
-
-			return new Data($item->toArray());
-		});
+		return array();
 	}
 
 	/**
@@ -97,22 +69,21 @@ abstract class AbstractFormModel extends DatabaseModel
 	/**
 	 * getForm
 	 *
-	 * @param bool $loadData
+	 * @param string $control
+	 * @param bool   $loadData
+	 * @param string $definition
 	 *
 	 * @return Form
 	 */
-	public function getForm($loadData = false)
+	public function getForm($control = null, $loadData = false, $definition = null)
 	{
-		$form = new Form($this->getName());
+		$form = new Form($control);
 
-		$form->defineFormFields($this->getFieldDefinition());
+		$form->defineFormFields($this->getFieldDefinition($definition));
 
 		if ($loadData)
 		{
-			$session = Ioc::getSession();
-
-			$data = $session->get($this->getName() . '.edit.data' . $this['item.id']);
-			$data = $data ? : $this->getItem();
+			$data = $this->getDefaultData();
 
 			$form->bind($data);
 		}
@@ -123,9 +94,11 @@ abstract class AbstractFormModel extends DatabaseModel
 	/**
 	 * getFieldDefinition
 	 *
-	 * @return  FieldDefinitionInterface
+	 * @param string $definition
+	 *
+	 * @return FieldDefinitionInterface
 	 */
-	abstract protected function getFieldDefinition();
+	abstract protected function getFieldDefinition($definition = null);
 
 	/**
 	 * reorder

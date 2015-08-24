@@ -10,6 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.
 
 use Phoenix\Html\Document;
 use Windwalker\Core\View\BladeHtmlView;
+use Windwalker\Core\Widget\BladeWidget;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
@@ -27,7 +28,12 @@ class {$controller.list.name.cap$}HtmlView extends BladeHtmlView
 	 */
 	protected function prepareData($data)
 	{
-		$data->items = $this->model->getItems();
+		$data->items      = $this->model->getItems();
+		$data->pagination = $this->model->getPagination()->render($this->getPackage()->getName() . ':{$controller.list.name.lower$}');
+		$data->filterForm = $this->model->getForm('filter', true, 'filter');
+
+		// Widget
+		$data->filterBar = new BladeWidget('phoenix.grid.filterbar', $this->package->getName());
 
 		Document::setTitle('{$controller.list.name.cap$}');
 	}

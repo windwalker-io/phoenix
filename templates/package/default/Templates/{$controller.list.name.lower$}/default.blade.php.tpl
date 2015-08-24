@@ -4,75 +4,91 @@
 
 @section('body')
 
-<div class="{$controller.item.name.lower$}-items">
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            {{-- SORT --}}
-            <th>
-                #
-            </th>
+<form name="admin-form" id="admin-form" action="{{ $router->html('{$controller.list.name.lower$}', array('_method' => 'PUT')) }}" method="POST" enctype="multipart/form-data">
 
-            {{-- CHECKBOX --}}
-            <th>
-                #
-            </th>
+    <div class="{$controller.item.name.lower$}-items">
 
-            {{-- TITLE --}}
-            <th>
-                Title
-            </th>
+        <div class="filter-bar">
+            {{ $filterBar->render(array('form' => $filterForm)) }}
+        </div>
 
-            {{-- AUTHOR --}}
-            <th>
-                Author
-            </th>
-
-            {{-- CREATED --}}
-            <th>
-                Created
-            </th>
-
-            {{-- LANGUAGE --}}
-            <th>
-                Language
-            </th>
-
-            {{-- ID --}}
-            <th>
-                ID
-            </th>
-        </tr>
-        </thead>
-
-        <tbody>
-        @foreach ($items as $item)
+        <table class="table table-bordered">
+            <thead>
             <tr>
-                <td>
+                {{-- SORT --}}
+                <th>
+                    #
+                </th>
 
-                </td>
-                <td>
+                {{-- CHECKBOX --}}
+                <th>
+                    #
+                </th>
 
-                </td>
-                <td>
-                    {{{ $item->title }}}
-                </td>
-                <td>
-                    {{{ $item->created_by }}}
-                </td>
-                <td>
-                    {{{ $item->created }}}
-                </td>
-                <td>
-                    {{{ $item->language }}}
-                </td>
-                <td>
-                    {{{ $item->id }}}
+                {{-- TITLE --}}
+                <th>
+                    Title
+                </th>
+
+                {{-- AUTHOR --}}
+                <th>
+                    Author
+                </th>
+
+                {{-- CREATED --}}
+                <th>
+                    Created
+                </th>
+
+                {{-- LANGUAGE --}}
+                <th>
+                    Language
+                </th>
+
+                {{-- ID --}}
+                <th>
+                    ID
+                </th>
+            </tr>
+            </thead>
+
+            <tbody>
+            @foreach ($items as $item)
+                <tr>
+                    <td>
+
+                    </td>
+                    <td>
+
+                    </td>
+                    <td>
+                        {{{ $item->title }}}
+                    </td>
+                    <td>
+                        {{{ $item->created_by }}}
+                    </td>
+                    <td>
+                        {{{ $item->created }}}
+                    </td>
+                    <td>
+                        {{{ $item->language }}}
+                    </td>
+                    <td>
+                        {{{ $item->id }}}
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <td colspan="25">
+                    {{ $pagination }}
                 </td>
             </tr>
-        @endforeach
-        </tbody>
-    </table>
-</div>
+            </tfoot>
+        </table>
+    </div>
 
+</form>
 @stop

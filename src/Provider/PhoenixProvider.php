@@ -10,8 +10,10 @@ namespace Phoenix\Provider;
 
 use Phoenix\Asset\AssetManager;
 use Phoenix\Html\DocumentManager;
+use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Utilities\Queue\Priority;
 
 /**
  * The AssetProvider class.
@@ -49,5 +51,7 @@ class PhoenixProvider implements ServiceProviderInterface
 		};
 
 		$container->share('phoenix.asset', $closure);
+
+		RendererHelper::addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', Priority::BELOW_NORMAL);
 	}
 }

@@ -30,8 +30,6 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 	 */
 	public function doExecute()
 	{
-		$this->command->out('Start import ' . __CLASS__);
-
 		$faker = Factory::create();
 
 		$mapper = new {$controller.item.name.cap$}Mapper;
@@ -60,8 +58,6 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 
 			$this->command->out('.', false);
 		}
-
-		$this->command->out()->out('Seeder: ' . __CLASS__ . ' import complete.')->out();
 	}
 
 	/**

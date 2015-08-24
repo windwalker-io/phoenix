@@ -8,21 +8,24 @@
 
 namespace Phoenix\Model;
 
+use Phoenix\Form\NullFiledDefinition;
 use Phoenix\Model\Filter\FilterHelper;
 use Phoenix\Model\Filter\FilterHelperInterface;
 use Phoenix\Model\Filter\SearchHelper;
-use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Pagination\Pagination;
+use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
+use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Query\Query;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The ListModel class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractListModel extends DatabaseModel
+abstract class AbstractListModel extends AbstractFormModel
 {
 	/**
 	 * Property allowFields.
@@ -506,8 +509,31 @@ abstract class AbstractListModel extends DatabaseModel
 		return $this;
 	}
 
-	public function getFilterForm()
+	/**
+	 * getFieldDefinition
+	 *
+	 * @param string $definition
+	 * @param string $name
+	 *
+	 * @return FieldDefinitionInterface
+	 */
+	protected function getFieldDefinition($definition = null, $name = null)
 	{
+		$name = $name ? : $this->getName();
 
+		$class = sprintf(
+			'%s\Field\%s\%s%sDefinition',
+			MvcHelper::getPackageNamespace($this, 2),
+			ucfirst($name),
+			ucfirst($name),
+			ucfirst($definition)
+		);
+
+		if (!class_exists($class))
+		{
+			return new NullFiledDefinition;
+		}
+
+		return new $class;
 	}
 }
