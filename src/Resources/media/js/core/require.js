@@ -735,7 +735,7 @@ var requirejs, require, define;
 		};
 
 		Module.prototype = {
-			init: function (depMaps, factory, errback, options) {
+			registerEvents: function (depMaps, factory, errback, options) {
 				options = options || {};
 
 				//Do not do more inits if already done. Can happen if there
@@ -1175,7 +1175,7 @@ var requirejs, require, define;
 		function callGetModule(args) {
 			//Skip modules already defined.
 			if (!hasProp(defined, args[0])) {
-				getModule(makeModuleMap(args[0], null, true)).init(args[1], args[2]);
+				getModule(makeModuleMap(args[0], null, true)).registerEvents(args[1], args[2]);
 			}
 		}
 
@@ -1300,7 +1300,7 @@ var requirejs, require, define;
 								deps: value
 							};
 						}
-						if ((value.exports || value.init) && !value.exportsFn) {
+						if ((value.exports || value.registerEvents) && !value.exportsFn) {
 							value.exportsFn = context.makeShimExports(value);
 						}
 						shim[id] = value;
@@ -1355,8 +1355,8 @@ var requirejs, require, define;
 			makeShimExports: function (value) {
 				function fn() {
 					var ret;
-					if (value.init) {
-						ret = value.init.apply(global, arguments);
+					if (value.registerEvents) {
+						ret = value.registerEvents.apply(global, arguments);
 					}
 					return ret || (value.exports && getGlobal(value.exports));
 				}
@@ -1421,7 +1421,7 @@ var requirejs, require, define;
 						//call for dependencies.
 						requireMod.skipMap = options.skipMap;
 
-						requireMod.init(deps, callback, errback, {
+						requireMod.registerEvents(deps, callback, errback, {
 							enabled: true
 						});
 

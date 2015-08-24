@@ -2,6 +2,16 @@
 
 @extends('_global.admin')
 
+@section('script')
+    <script src="{{ $uri['media.path'] }}phoenix/js/grid.js"></script>
+    <script>
+        jQuery(document).ready(function($)
+        {
+           $('#admin-form').grid();
+        });
+    </script>
+@stop
+
 @section('body')
 
 <form name="admin-form" id="admin-form" action="{{ $router->html('{$controller.list.name.lower$}', array('_method' => 'PUT')) }}" method="POST" enctype="multipart/form-data">

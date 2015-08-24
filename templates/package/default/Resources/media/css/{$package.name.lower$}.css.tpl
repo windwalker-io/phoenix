@@ -16,3 +16,6 @@ body {
 .admin-header.jumbotron h1 {
   font-size: 48px;
 }
+.filter-container {
+  margin-top: 15px;
+}

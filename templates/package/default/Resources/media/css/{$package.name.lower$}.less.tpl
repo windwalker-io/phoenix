@@ -22,3 +22,8 @@ body {
 		font-size: 48px;
 	}
 }
+
+// Filter Bar
+.filter-container {
+	margin-top: 15px;
+}
