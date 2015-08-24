@@ -30,7 +30,7 @@ class {$controller.list.name.cap$}HtmlView extends BladeHtmlView
 	{
 		$data->items      = $this->model->getItems();
 		$data->pagination = $this->model->getPagination()->render($this->getPackage()->getName() . ':{$controller.list.name.lower$}');
-		$data->filterForm = $this->model->getForm('filter', true, 'filter');
+		$data->filterForm = $this->model->getForm(null, true, 'filter');
 
 		// Widget
 		$data->filterBar = new BladeWidget('phoenix.grid.filterbar', $this->package->getName());
