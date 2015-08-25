@@ -11,8 +11,10 @@ namespace {$package.namespace$}{$package.name.cap$}\Model;
 use {$package.namespace$}{$package.name.cap$}\Mapper\{$controller.item.name.cap$}Mapper;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Phoenix\Model\AbstractListModel;
+use Phoenix\Model\Filter\FilterHelperInterface;
 use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Data\DataSet;
+use Windwalker\Query\Query;
 
 /**
  * The {$controller.list.name.cap$}Model class.
@@ -36,5 +38,17 @@ class {$controller.list.name.cap$}Model extends AbstractListModel
 	protected function configureTables()
 	{
 		$this->addTable('{$controller.item.name.lower$}', Table::{$controller.list.name.upper$});
+	}
+
+	/**
+	 * configureFilters
+	 *
+	 * @param FilterHelperInterface $filterHelper
+	 *
+	 * @return  void
+	 */
+	protected function configureFilters(FilterHelperInterface $filterHelper)
+	{
+		//
 	}
 }

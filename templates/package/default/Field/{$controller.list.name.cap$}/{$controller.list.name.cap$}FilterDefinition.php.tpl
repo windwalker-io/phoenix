@@ -34,6 +34,7 @@ class {$controller.list.name.cap$}FilterDefinition implements FieldDefinitionInt
 		{
 			$form->add('field', new ListField)
 				->set('class', '')
+				->addOption(new Option('All', '*'))
 				->addOption(new Option('Title', '{$controller.item.name.lower$}.title'))
 				->addOption(new Option('Alias', '{$controller.item.name.lower$}.alias'));
 

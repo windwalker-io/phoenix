@@ -41,10 +41,11 @@ class ListGetController extends AbstractGetController
 		$model['list.page']  = $model['list.page'] < 1 ? 1 : $model['list.page'];
 		$model['list.start'] = ($model['list.page'] - 1) * $model['list.limit'];
 
-		$search = $this->getUserStateFromInput($this->getContext('list.search'), 'search', array(), InputFilter::ARRAY_TYPE);
+		$model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', array(), InputFilter::ARRAY_TYPE);
+		$model['input.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', array(), InputFilter::ARRAY_TYPE);
 
-		$model['list.search'] = $this->handleSearches($search);
-		$model['list.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', array(), InputFilter::ARRAY_TYPE);
+		$model['list.search'] = $this->handleSearches($model['input.search']);
+		$model['list.filter'] = $model['input.filter'];
 	}
 
 	/**
@@ -63,6 +64,7 @@ class ListGetController extends AbstractGetController
 
 		if ($search['field'] == '*' && isset($search['content']))
 		{
+			// Get search fields
 			$form = new Form;
 			$form->defineFormFields($this->model->getFieldDefinition('filter', $this->getName()));
 

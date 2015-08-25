@@ -25,11 +25,9 @@ abstract class AbstractFormModel extends DatabaseModel
 	/**
 	 * getDefaultData
 	 *
-	 * @param mixed $conditions
-	 *
 	 * @return array
 	 */
-	public function getDefaultData($conditions = null)
+	public function getDefaultData()
 	{
 		return array();
 	}

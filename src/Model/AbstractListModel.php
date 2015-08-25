@@ -129,6 +129,19 @@ abstract class AbstractListModel extends AbstractFormModel
 	}
 
 	/**
+	 * getDefaultData
+	 *
+	 * @return  array
+	 */
+	public function getDefaultData()
+	{
+		return array(
+			'search' => $this['input.search'],
+			'filter' => $this['input.filter']
+		);
+	}
+
+	/**
 	 * getListQuery
 	 *
 	 * @param Query $query
@@ -405,11 +418,11 @@ abstract class AbstractListModel extends AbstractFormModel
 	 * );
 	 * ```
 	 *
-	 * @param FilterHelper $filterHelper The filter helper object.
+	 * @param FilterHelperInterface $filterHelper The filter helper object.
 	 *
 	 * @return  void
 	 */
-	protected function configureFilters($filterHelper)
+	protected function configureFilters(FilterHelperInterface $filterHelper)
 	{
 		// Override this method.
 	}
@@ -451,11 +464,11 @@ abstract class AbstractListModel extends AbstractFormModel
 	 * );
 	 * ```
 	 *
-	 * @param SearchHelper $searchHelper The search helper object.
+	 * @param FilterHelperInterface $searchHelper The search helper object.
 	 *
 	 * @return  void
 	 */
-	protected function configureSearches($searchHelper)
+	protected function configureSearches(FilterHelperInterface $searchHelper)
 	{
 		// Override this method.
 	}

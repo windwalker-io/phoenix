@@ -1,10 +1,9 @@
 
 <div class="search-container form-inline">
-    <div class="form-group">
-        {{ $form->getField('field', 'search')->appendAttribute('class', 'form-control')->renderInput() }}
-    </div>
+    {{ $form->getField('field', 'search')->appendAttribute('class', ' form-control')->renderInput() }}
+
     <div class="input-group">
-        {{ $form->getField('content', 'search')->appendAttribute('class', 'form-control')->renderInput() }}
+        {{ $form->getField('content', 'search')->appendAttribute('class', ' form-control')->renderInput() }}
         <span class="input-group-btn">
             <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
         </span>
