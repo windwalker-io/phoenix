@@ -11,6 +11,7 @@ namespace Phoenix\Controller\Display;
 use Phoenix\Model\AbstractListModel;
 use Windwalker\Core\Model\Model;
 use Windwalker\Filter\InputFilter;
+use Windwalker\Form\Form;
 
 /**
  * The ListGetController class.
@@ -39,5 +40,51 @@ class ListGetController extends AbstractGetController
 		$model['list.page']  = $this->getUserStateFromInput($this->getContext('list.page'), 'page', 1, InputFilter::INTEGER);
 		$model['list.page']  = $model['list.page'] < 1 ? 1 : $model['list.page'];
 		$model['list.start'] = ($model['list.page'] - 1) * $model['list.limit'];
+
+		$search = $this->getUserStateFromInput($this->getContext('list.search'), 'search', array(), InputFilter::ARRAY_TYPE);
+
+		$model['list.search'] = $this->handleSearches($search);
+		$model['list.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', array(), InputFilter::ARRAY_TYPE);
+	}
+
+	/**
+	 * handleSearches
+	 *
+	 * @param   array  $search
+	 *
+	 * @return  array
+	 */
+	protected function handleSearches($search)
+	{
+		if (!isset($search['field']) || !isset($search['content']))
+		{
+			return array();
+		}
+
+		if ($search['field'] == '*' && isset($search['content']))
+		{
+			$form = new Form;
+			$form->defineFormFields($this->model->getFieldDefinition('filter', $this->getName()));
+
+			$searchField = $form->getField('field', 'search');
+
+			if (!$searchField)
+			{
+				return array();
+			}
+
+			$options = $searchField->getOptions();
+
+			$fields = array();
+
+			foreach ($options as $option)
+			{
+				$fields[$option->getValue()] = $search['content'];
+			}
+
+			return $fields;
+		}
+
+		return array($search['field'] => $search['content']);
 	}
 }

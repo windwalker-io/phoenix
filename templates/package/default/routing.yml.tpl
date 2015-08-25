@@ -4,3 +4,7 @@
 {$controller.list.name.lower$}:
     pattern: /{$controller.list.name.lower$}(/page)
     controller: {$controller.list.name.cap$}
+    action:
+        post: CopyController
+        patch: UpdateController
+        put: FilterController

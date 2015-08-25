@@ -14,7 +14,7 @@
 
 @section('body')
 
-<form name="admin-form" id="admin-form" action="{{ $router->html('{$controller.list.name.lower$}', array('_method' => 'PUT')) }}" method="POST" enctype="multipart/form-data">
+<form name="admin-form" id="admin-form" action="{{ $router->html('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
 
     <div class="{$controller.item.name.lower$}-items">
 
@@ -100,5 +100,8 @@
         </table>
     </div>
 
+    <div class="hidden-inputs">
+        <input type="hidden" name="_method" value="PUT" />
+    </div>
 </form>
 @stop

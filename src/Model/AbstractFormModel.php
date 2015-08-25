@@ -98,7 +98,7 @@ abstract class AbstractFormModel extends DatabaseModel
 	 *
 	 * @return FieldDefinitionInterface
 	 */
-	abstract protected function getFieldDefinition($definition = null);
+	abstract public function getFieldDefinition($definition = null);
 
 	/**
 	 * reorder

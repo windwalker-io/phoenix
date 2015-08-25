@@ -79,6 +79,33 @@ abstract class AbstractListModel extends AbstractFormModel
 	abstract protected function configureTables();
 
 	/**
+	 * getAllowFields
+	 *
+	 * @return  array
+	 */
+	public function getAllowFields()
+	{
+		if ($this->hasCache('allow.fields'))
+		{
+			return $this->getCache('allow.fields');
+		}
+
+		$fields = $this->allowFields;
+
+		$tables = $this->getQueryHelper()->getTables();
+
+		foreach ($tables as $alias => $table)
+		{
+			foreach ($this->db->getTable($table['name'])->getColumns() as $column)
+			{
+				$fields[] = $alias . '.' . $column;
+			}
+		}
+
+		return $this->setCache('allow.fields', array_unique($fields));
+	}
+
+	/**
 	 * getItems
 	 *
 	 * @return  DataSet
@@ -123,10 +150,10 @@ abstract class AbstractListModel extends AbstractFormModel
 		$this->prepareGetQuery($query);
 
 		// Build filter query
-		$this->processFilters($query, (array) $this['filter']);
+		$this->processFilters($query, (array) $this['list.filter']);
 
 		// Build search query
-		$this->processSearches($query, (array) $this['search']);
+		$this->processSearches($query, (array) $this['list.search']);
 
 		// Ordering
 		$this->processOrdering($query);
@@ -212,15 +239,36 @@ abstract class AbstractListModel extends AbstractFormModel
 	 */
 	public function filterField($field, $default = null)
 	{
-		foreach ($this->allowFields as $allow)
+		if (in_array($field, $this->getAllowFields()))
 		{
-			if ($allow == $field)
-			{
-				return $field;
-			}
+			return $field;
 		}
 
 		return $default;
+	}
+
+	/**
+	 * filterFields
+	 *
+	 * @param  array $data
+	 *
+	 * @return  array
+	 */
+	public function filterDataFields(array $data)
+	{
+		$allowFields = $this->getAllowFields();
+
+		$return = array();
+
+		foreach ($data as $field => $value)
+		{
+			if (in_array($field, $allowFields))
+			{
+				$return[$field] = $value;
+			}
+		}
+
+		return $return;
 	}
 
 	/**
@@ -330,7 +378,9 @@ abstract class AbstractListModel extends AbstractFormModel
 	 */
 	protected function processFilters(Query $query, $filters = array())
 	{
-		$filters = $filters ? : $this->state->get('filter', array());
+		$filters = $filters ? : $this->state->get('list.filter', array());
+
+		$filters = $this->filterDataFields($filters);
 
 		$filterHelper = $this->getFilterHelper();
 
@@ -374,7 +424,9 @@ abstract class AbstractListModel extends AbstractFormModel
 	 */
 	protected function processSearches(Query $query, $searches = array())
 	{
-		$searches = $searches ? : $this->state->get('search', array());
+		$searches = $searches ? : $this->state->get('list.search', array());
+
+		$searches = $this->filterDataFields($searches);
 
 		$searchHelper = $this->getSearchHelper();
 
@@ -517,7 +569,7 @@ abstract class AbstractListModel extends AbstractFormModel
 	 *
 	 * @return FieldDefinitionInterface
 	 */
-	protected function getFieldDefinition($definition = null, $name = null)
+	public function getFieldDefinition($definition = null, $name = null)
 	{
 		$name = $name ? : $this->getName();
 

@@ -22,6 +22,13 @@ use Windwalker\Data\DataSet;
 class {$controller.list.name.cap$}Model extends AbstractListModel
 {
 	/**
+	 * Property allowFields.
+	 *
+	 * @var  array
+	 */
+	protected $allowFields = array();
+
+	/**
 	 * configureTables
 	 *
 	 * @return  void
