@@ -484,7 +484,7 @@ abstract class AbstractListModel extends AbstractFormModel
 	 */
 	protected function processOrdering(Query $query, $ordering = null, $direction = null)
 	{
-		$ordering  = $ordering  ? : $this->state->get('list.ordering'/* , $this->Viewitem . '.ordering'*/);
+		$ordering  = $ordering  ? : $this->state->get('list.ordering');
 
 		// If no ordering set, ignore this function.
 		if (!$ordering)
@@ -492,26 +492,43 @@ abstract class AbstractListModel extends AbstractFormModel
 			return;
 		}
 
+		$self = $this;
+
 		$direction = $direction ? : $this->state->get('list.direction', 'ASC');
 
 		$ordering  = explode(',', $ordering);
 
 		// Add quote
 		$ordering = array_map(
-			function($value) use($query)
+			function($value) use($query, $self)
 			{
 				$value = explode(' ', trim($value));
+
+				// Check it is an allowed field.
+				if (!$self->filterField($value[0]))
+				{
+					return '';
+				}
+
 				// $value[1] is direction
 				if (isset($value[1]))
 				{
 					return $query->quoteName($value[0]) . ' ' . $value[1];
 				}
+
 				return $query->quoteName($value[0]);
 			},
 			$ordering
 		);
 
+		$ordering = array_filter($ordering, 'strlen');
+
 		$ordering = implode(', ', $ordering);
+
+		if (!$ordering)
+		{
+			return;
+		}
 
 		$query->order($ordering . ' ' . $direction);
 	}

@@ -9,14 +9,14 @@
 {
 	"use strict";
 
-	window.RikiForm = window.RikiForm || {
+	window.Phoenix = window.Phoenix || {
 
 		post: function (url, method)
 		{
 			method = method || 'post';
 
-			var form = $('#adminForm'),
-				methodInput = $('#adminForm input[name="_method"]');
+			var form = $('#admin-form'),
+				methodInput = form.find('input[name="_method"]');
 
 			if(!methodInput.length)
 			{
@@ -27,12 +27,6 @@
 
 			methodInput.val(method);
 			form.attr('action', url).attr('method', 'post');
-
-			// Cancel change confirm
-			if (window.RikiEdit)
-			{
-				window.RikiEdit.changed(false);
-			}
 
 			form.submit();
 

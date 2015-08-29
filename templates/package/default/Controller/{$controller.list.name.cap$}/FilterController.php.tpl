@@ -27,8 +27,10 @@ class FilterController extends AbstractRadController
 	{
 		$model['list.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', array(), InputFilter::ARRAY_TYPE);
 		$model['list.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', array(), InputFilter::ARRAY_TYPE);
+		$model['list.ordering']  = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering');
+		$model['list.direction'] = $this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction');
 
-		$this->setRedirect($this->router->http($this->app->get('route.matched')));
+		$this->setRedirect($this->router->http($this->app->get('route.matched'), array('page' => $this->getUserState($this->getContext('list.page')))));
 
 		return true;
 	}

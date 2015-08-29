@@ -3,11 +3,12 @@
 @extends('_global.admin')
 
 @section('script')
-    <script src="{{ $uri['media.path'] }}phoenix/js/grid.js"></script>
+    <script src="{{ $uri['media.path'] }}phoenix/js/phoenix.js"></script>
+    <script src="{{ $uri['media.path'] }}phoenix/js/filterbar.js"></script>
     <script>
         jQuery(document).ready(function($)
         {
-           $('#admin-form').grid();
+           $('#admin-form').filterbar();
         });
     </script>
 @stop
@@ -37,27 +38,27 @@
 
                 {{-- TITLE --}}
                 <th>
-                    Title
+                    {{ $grid->sortTitle('Title', '{$controller.item.name.lower$}.title') }}
                 </th>
 
                 {{-- AUTHOR --}}
                 <th>
-                    Author
+                    {{ $grid->sortTitle('Author', '{$controller.item.name.lower$}.created_by') }}
                 </th>
 
                 {{-- CREATED --}}
                 <th>
-                    Created
+                    {{ $grid->sortTitle('Created', '{$controller.item.name.lower$}.created') }}
                 </th>
 
                 {{-- LANGUAGE --}}
                 <th>
-                    Language
+                    {{ $grid->sortTitle('Language', '{$controller.item.name.lower$}.language') }}
                 </th>
 
                 {{-- ID --}}
                 <th>
-                    ID
+                    {{ $grid->sortTitle('ID', '{$controller.item.name.lower$}.id') }}
                 </th>
             </tr>
             </thead>

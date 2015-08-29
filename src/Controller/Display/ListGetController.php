@@ -28,6 +28,20 @@ class ListGetController extends AbstractGetController
 	protected $model;
 
 	/**
+	 * Property ordering.
+	 *
+	 * @var  string
+	 */
+	protected $defaultOrdering = 'id';
+
+	/**
+	 * Property direction.
+	 *
+	 * @var  string
+	 */
+	protected $defaultDirection = 'DESC';
+
+	/**
 	 * prepareUserState
 	 *
 	 * @param   Model  $model
@@ -36,16 +50,22 @@ class ListGetController extends AbstractGetController
 	 */
 	protected function prepareUserState(Model $model)
 	{
+		// Pagination
 		$model['list.limit'] = $this->app->get('list.limit', 15);
 		$model['list.page']  = $this->getUserStateFromInput($this->getContext('list.page'), 'page', 1, InputFilter::INTEGER);
 		$model['list.page']  = $model['list.page'] < 1 ? 1 : $model['list.page'];
 		$model['list.start'] = ($model['list.page'] - 1) * $model['list.limit'];
 
+		// Filter & Search
 		$model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', array(), InputFilter::ARRAY_TYPE);
 		$model['input.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', array(), InputFilter::ARRAY_TYPE);
 
 		$model['list.search'] = $this->handleSearches($model['input.search']);
 		$model['list.filter'] = $model['input.filter'];
+
+		// Ordering
+		$model['list.ordering'] = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering', $this->defaultOrdering);
+		$model['list.direction'] = $this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction', $this->defaultDirection);
 	}
 
 	/**
