@@ -6,14 +6,19 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\View;
+namespace Phoenix\Toolbar\Button;
 
 /**
- * The ListHtmlView class.
+ * The UpdateItemsButton class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ListView extends AbstractRadHtmView
+class BatchUpdateButton extends AbstractButton
 {
-
+	/**
+	 * Property type.
+	 *
+	 * @var  string
+	 */
+	protected $type = 'batch_update';
 }

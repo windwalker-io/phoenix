@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
-use Phoenix\View\ListView;
+use Phoenix\View\GridView;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class {$controller.list.name.cap$}HtmlView extends ListView
+class {$controller.list.name.cap$}HtmlView extends GridView
 {
 	/**
 	 * prepareData

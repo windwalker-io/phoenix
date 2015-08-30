@@ -8,6 +8,13 @@
 
 namespace Phoenix\View;
 
+use Phoenix\Html\Document;
+use Phoenix\Toolbar\Button\NewButton;
+use Phoenix\Toolbar\Toolbar;
+use Phoenix\View\Helper\GridHelper;
+use Windwalker\Core\Widget\BladeWidget;
+use Windwalker\Ioc;
+
 /**
  * The GridView class.
  *
@@ -15,5 +22,57 @@ namespace Phoenix\View;
  */
 class GridView extends ListView
 {
+	/**
+	 * Property gridHelper.
+	 *
+	 * @var  GridHelper
+	 */
+	protected $gridHelper;
 
+	/**
+	 * prepareData
+	 *
+	 * @param \Windwalker\Data\Data $data
+	 *
+	 * @return  void
+	 */
+	protected function prepareRender($data)
+	{
+		$data->items      = $this->model->getItems();
+		$data->pagination = $this->model->getPagination()->render($this->getPackage()->getName() . ':sakuras');
+		$data->filterForm = $this->model->getForm(null, true, 'filter');
+		$data->state      = $this->model->getState();
+
+		// Widget
+		$data->filterBar = new BladeWidget('phoenix.grid.filterbar', $this->package->getName());
+
+		// Grid
+		$data->grid = $this->getGridHelper();
+		$data->toolbar = new Toolbar;
+
+		$this->configureToolbar($data->toolbar);
+
+		Document::setTitle(ucfirst($this->getName()));
+	}
+
+	/**
+	 * getGridHelper
+	 *
+	 * @param array $options
+	 *
+	 * @return  GridHelper
+	 */
+	public function getGridHelper($options = array())
+	{
+		if (!$this->gridHelper)
+		{
+			$this->gridHelper = new GridHelper($this, $options);
+		}
+
+		return $this->gridHelper;
+	}
+
+	public function configureToolbar(Toolbar $toolbar)
+	{
+	}
 }

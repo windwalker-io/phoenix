@@ -21,7 +21,7 @@ use Windwalker\Data\Data;
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractSaveController extends Controller
+abstract class AbstractSaveController extends AbstractDataHandlingController
 {
 	/**
 	 * Property model.
@@ -36,13 +36,6 @@ abstract class AbstractSaveController extends Controller
 	 * @var  array
 	 */
 	protected $data;
-
-	/**
-	 * Property useTransition.
-	 *
-	 * @var  boolean
-	 */
-	protected $useTransition = true;
 
 	/**
 	 * prepareExecute
@@ -67,7 +60,7 @@ abstract class AbstractSaveController extends Controller
 		$session = \Windwalker\Ioc::getSession();
 		$data = new Data($this->data);
 
-		!$this->useTransition or $this->model->transactionStart();
+		!$this->useTransaction or $this->model->transactionStart();
 
 		try
 		{
@@ -83,7 +76,7 @@ abstract class AbstractSaveController extends Controller
 		}
 		catch (ValidFailException $e)
 		{
-			!$this->useTransition or $this->model->transactionRollback();
+			!$this->useTransaction or $this->model->transactionRollback();
 
 			$session->set($this->getName() . '.edit.data' . $data->id, $this->data);
 
@@ -93,7 +86,7 @@ abstract class AbstractSaveController extends Controller
 		}
 		catch (\Exception $e)
 		{
-			!$this->useTransition or $this->model->transactionRollback();
+			!$this->useTransaction or $this->model->transactionRollback();
 
 			$session->set($this->getName() . '.edit.data' . $data->id, $this->data);
 
@@ -107,7 +100,7 @@ abstract class AbstractSaveController extends Controller
 			return false;
 		}
 
-		!$this->useTransition or $this->model->transactionCommit();
+		!$this->useTransaction or $this->model->transactionCommit();
 
 		$session->remove($this->getName() . '.edit.data' . $data->id);
 
@@ -190,39 +183,5 @@ abstract class AbstractSaveController extends Controller
 				throw new ValidFailException(implode('<br>', $msg));
 			}
 		}
-	}
-
-	/**
-	 * checkToken
-	 *
-	 * @return  boolean
-	 */
-	protected function checkToken()
-	{
-		return true;
-	}
-
-	/**
-	 * getFailRedirect
-	 *
-	 * @param  Data $data
-	 *
-	 * @return  string
-	 */
-	protected function getFailRedirect(Data $data)
-	{
-		return $this->package->router->buildHttp($this->getName(), array('id' => $data->id));
-	}
-
-	/**
-	 * getSuccessRedirect
-	 *
-	 * @param  Data $data
-	 *
-	 * @return  string
-	 */
-	protected function getSuccessRedirect(Data $data)
-	{
-		return $this->package->router->buildHttp($this->getName(), array('id' => $data->id));
 	}
 }

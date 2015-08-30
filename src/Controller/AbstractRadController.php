@@ -23,6 +23,16 @@ use Windwalker\String\StringInflector;
  */
 abstract class AbstractRadController extends Controller
 {
+	const SINGULAR = 'singular';
+	const PLURAL   = 'plural';
+
+	/**
+	 * Property inflection.
+	 *
+	 * @var  string
+	 */
+	protected $inflection = null;
+
 	/**
 	 * Property itemName.
 	 *
@@ -54,13 +64,14 @@ abstract class AbstractRadController extends Controller
 		// Guess name
 		$inflector = StringInflector::getInstance();
 
-		if ($inflector->isSingular($name))
+		if ($this->inflection == self::SINGULAR)
 		{
 			$this->config['item_name'] = $this->itemName ? : $name;
 			$this->config['list_name'] = $this->listName ? : $inflector->toPlural($this->config['item_name']);
 		}
-		elseif ($inflector->isPlural($name))
+		elseif ($this->inflection == self::PLURAL)
 		{
+
 			$this->config['list_name'] = $this->listName ? : $name;
 			$this->config['item_name'] = $this->itemName ? : $inflector->toSingular($this->config['list_name']);
 		}
@@ -156,5 +167,15 @@ abstract class AbstractRadController extends Controller
 		}
 
 		return $context;
+	}
+
+	/**
+	 * checkToken
+	 *
+	 * @return  boolean
+	 */
+	protected function checkToken()
+	{
+		return true;
 	}
 }

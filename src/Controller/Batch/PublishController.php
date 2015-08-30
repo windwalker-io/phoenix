@@ -6,14 +6,21 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\View;
+namespace Phoenix\Controller\Batch;
 
 /**
- * The ListHtmlView class.
+ * The PublishController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ListView extends AbstractRadHtmView
+class PublishController extends AbstractBatchController
 {
-
+	/**
+	 * Property data.
+	 *
+	 * @var  array
+	 */
+	protected $data = array(
+		'state' => 1
+	);
 }

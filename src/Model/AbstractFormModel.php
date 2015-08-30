@@ -20,7 +20,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractFormModel extends DatabaseModel
+abstract class AbstractFormModel extends AbstractRadModel
 {
 	/**
 	 * getDefaultData
@@ -30,27 +30,6 @@ abstract class AbstractFormModel extends DatabaseModel
 	public function getDefaultData()
 	{
 		return array();
-	}
-
-	/**
-	 * getRecord
-	 *
-	 * @param   string $name
-	 *
-	 * @return  Record
-	 */
-	public function getRecord($name = null)
-	{
-		$name = $name ? : $this->getName();
-
-		$class = sprintf('%s\Record\%sRecord', ReflectionHelper::getNamespace($this), ucfirst($name));
-
-		if (!class_exists($class))
-		{
-			throw new \DomainException($class . ' not exists.');
-		}
-
-		return new $class($this->db);
 	}
 
 	/**
@@ -97,57 +76,4 @@ abstract class AbstractFormModel extends DatabaseModel
 	 * @return FieldDefinitionInterface
 	 */
 	abstract public function getFieldDefinition($definition = null);
-
-	/**
-	 * reorder
-	 *
-	 * @param array $conditions
-	 *
-	 * @return  boolean
-	 */
-	public function reorder($conditions = array())
-	{
-		$mapper = $this->getDataMapper();
-
-		$dataset = $mapper->find($conditions);
-
-		$ordering = $dataset->ordering;
-
-		asort($ordering);
-
-		$i = 1;
-
-		foreach ($ordering as $k => $order)
-		{
-			$dataset[$k]->ordering = $i;
-
-			$i++;
-		}
-
-		$mapper->update($dataset);
-
-		return true;
-	}
-
-	/**
-	 * getMaxOrdering
-	 *
-	 * @param array $conditions
-	 *
-	 * @return  int
-	 */
-	public function getMaxOrdering($conditions = array())
-	{
-		$query = $this->db->getQuery(true)
-			->select(sprintf('MAX(%s)', 'ordering'))
-			->from($this->getDefaultTable());
-
-		// Condition should be an array.
-		if (count($conditions))
-		{
-			QueryHelper::buildWheres($query, $conditions);
-		}
-
-		return $this->db->setQuery($query)->loadResult();
-	}
 }

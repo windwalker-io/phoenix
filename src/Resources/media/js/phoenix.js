@@ -9,40 +9,184 @@
 {
 	"use strict";
 
-	window.Phoenix = window.Phoenix || {
+	var defaultOptions = {
 
-		post: function (url, method)
+	};
+
+	/**
+	 * Class init.
+	 *
+	 * @param {Element} form
+	 * @param {Object}  options
+	 *
+	 * @constructor
+	 */
+	var PhoenixCore = function(form, options)
+	{
+		if (typeof form == 'string')
 		{
-			method = method || 'post';
+			form = $(form);
+		}
 
-			var form = $('#admin-form'),
-				methodInput = form.find('input[name="_method"]');
+		options = $.extend({}, defaultOptions, options);
 
-			if(!methodInput.length)
+		this.form = form;
+		this.options = options;
+	};
+
+	PhoenixCore.prototype = {
+
+		/**
+		 * Make a request.
+		 *
+		 * @param  {String} url
+		 * @param  {Object} queries
+         * @param  {String} method
+		 * @param  {String} customMethod
+		 *
+		 * @returns {boolean}
+		 */
+		submit: function(url, queries, method, customMethod)
+		{
+			var form = this.form;
+
+			if (customMethod)
 			{
-				methodInput = $('<input name="_method" type="hidden">');
+				var methodInput = form.find('input[name="_method"]');
 
-				form.append(methodInput);
+				if(!methodInput.length)
+				{
+					methodInput = $('<input name="_method" type="hidden">');
+
+					form.append(methodInput);
+				}
+
+				methodInput.val(customMethod);
 			}
 
-			methodInput.val(method);
-			form.attr('action', url).attr('method', 'post');
+			// Set queries into form.
+			if (queries)
+			{
+				var input;
+
+				$.each(queries, function(key, value)
+				{
+					input = form.find('input[name="' + key + '"]');
+
+					if (!input.length)
+					{
+						input = $('<input name="' + key + '" type="hidden">');
+
+						form.append(input);
+					}
+
+					input.val(value);
+				});
+			}
+
+			if (url)
+			{
+				form.attr('action', url);
+			}
+
+			if (method)
+			{
+				form.attr('method', method);
+			}
 
 			form.submit();
 
 			return true;
 		},
 
-		deleteItem: function(url, msg)
+		/**
+		 * Make a GET request.
+		 *
+		 * @param  {String} url
+		 * @param  {Object} queries
+		 * @param  {String} customMethod
+		 *
+		 * @returns {boolean}
+		 */
+		get: function(url, queries, customMethod)
 		{
-			msg = msg || '你確定嗎？ 這個動作無法還原。';
+			return this.submit(url, queries, 'GET', customMethod);
+		},
+
+		/**
+		 * Post form.
+		 *
+		 * @param  {String} url
+		 * @param  {Object} queries
+		 * @param  {String} customMethod
+		 *
+		 * @returns {boolean}
+		 */
+		post: function (url, queries, customMethod)
+		{
+			return this.submit(url, queries, 'POST', customMethod);
+		},
+
+		/**
+		 * Make a PUT request.
+		 *
+		 * @param  {String} url
+		 * @param  {Object} queries
+		 *
+		 * @returns {boolean}
+		 */
+		put: function(url, queries)
+		{
+			return this.post(url, queries, 'PUT');
+		},
+
+		/**
+		 * Make a PATCH request.
+		 *
+		 * @param  {String} url
+		 * @param  {Object} queries
+		 *
+		 * @returns {boolean}
+		 */
+		patch: function(url, queries)
+		{
+			return this.post(url, queries, 'PATCH');
+		},
+
+		/**
+		 * Make a DELETE request.
+		 *
+		 * @param  {String} url
+		 * @param  {Object} queries
+		 *
+		 * @returns {boolean}
+		 */
+		delete: function(url, queries)
+		{
+			return this.post(url, queries, 'DELETE');
+		},
+
+		/**
+		 * Make a DELETE request.
+		 *
+		 * @param  {String} url
+		 * @param  {Object} queries
+		 * @param  {String} msg
+		 *
+		 * @returns {boolean}
+		 */
+		deleteItem: function(url, queries, msg)
+		{
+			msg = msg || 'Are you sure';
 
 			if (!confirm(msg))
 			{
 				return false;
 			}
 
-			return this.post(url, 'delete');
+			return this.delete(url, queries);
 		}
-	}
+	};
+
+	window.PhoenixCore = PhoenixCore;
 })(jQuery);

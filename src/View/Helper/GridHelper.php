@@ -16,6 +16,13 @@ use Windwalker\Registry\Registry;
 /**
  * The GridHelper class.
  *
+ * @property-read  HtmlView  $view
+ * @property-read  Registry  $config
+ * @property-read  Registry  $state
+ * @property-read  Data      $current
+ * @property-read  Data      $item
+ * @property-read  integer   $row
+ *
  * @since  {DEPLOY_VERSION}
  */
 class GridHelper
@@ -25,21 +32,21 @@ class GridHelper
 	 *
 	 * @var HtmlView
 	 */
-	public $view;
+	protected $view;
 
 	/**
 	 * Config object.
 	 *
 	 * @var Registry
 	 */
-	public $config = array();
+	protected $config = array();
 
 	/**
 	 * The fields mapper.
 	 *
 	 * @var array
 	 */
-	public $fields = array(
+	protected $fields = array(
 		'pk'               => 'id',
 		'title'            => 'title',
 		'alias'            => 'alias',
@@ -56,21 +63,21 @@ class GridHelper
 	 *
 	 * @var Registry
 	 */
-	public $state;
+	protected $state;
 
 	/**
 	 * The current item object.
 	 *
 	 * @var object
 	 */
-	public $current;
+	protected $current;
 
 	/**
 	 * The row count.
 	 *
 	 * @var integer
 	 */
-	public $row;
+	protected $row;
 
 	/**
 	 * Constructor.
@@ -192,6 +199,16 @@ class GridHelper
 	}
 
 	/**
+	 * Method to get property Current
+	 *
+	 * @return  object
+	 */
+	public function getItem()
+	{
+		return $this->current;
+	}
+
+	/**
 	 * Drag sort symbol.
 	 *
 	 * @return string
@@ -241,7 +258,11 @@ HTML;
 	{
 		$pkName = $this->config->get('field.pk');
 
-		return \JHtmlGrid::id($this->row, $this->current->$pkName);
+		return WidgetHelper::render('phoenix.grid.table.checkbox', array(
+			'pkName' => $pkName,
+			'item'   => $this->current,
+			'row'    => $this->row
+		), WidgetHelper::ENGINE_BLADE);
 	}
 
 	/**
@@ -465,5 +486,131 @@ HTML;
 	{
 		// Escape the output.
 		return htmlspecialchars($output, ENT_COMPAT, 'UTF-8');
+	}
+
+	/**
+	 * Method to get property Row
+	 *
+	 * @return  int
+	 */
+	public function getRow()
+	{
+		return $this->row;
+	}
+
+	/**
+	 * Method to set property row
+	 *
+	 * @param   int $row
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setRow($row)
+	{
+		$this->row = $row;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property State
+	 *
+	 * @return  Registry
+	 */
+	public function getState()
+	{
+		return $this->state;
+	}
+
+	/**
+	 * Method to set property state
+	 *
+	 * @param   Registry $state
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setState(Registry $state)
+	{
+		$this->state = $state;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Config
+	 *
+	 * @return  Registry
+	 */
+	public function getConfig()
+	{
+		return $this->config;
+	}
+
+	/**
+	 * Method to set property config
+	 *
+	 * @param   Registry $config
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setConfig(Registry $config)
+	{
+		$this->config = $config;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property View
+	 *
+	 * @return  HtmlView
+	 */
+	public function getView()
+	{
+		return $this->view;
+	}
+
+	/**
+	 * Method to set property view
+	 *
+	 * @param   HtmlView $view
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setView($view)
+	{
+		$this->view = $view;
+
+		return $this;
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  mixed
+	 */
+	public function __get($name)
+	{
+		$allowFields = array(
+			'view',
+			'config',
+			'state',
+			'current',
+			'row'
+		);
+
+		if (in_array($name, $allowFields))
+		{
+			return $this->$name;
+		}
+
+		if ($name == 'item')
+		{
+			return $this->current;
+		}
+
+		throw new \OutOfRangeException('Property ' . $name . ' not exists.');
 	}
 }

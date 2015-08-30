@@ -8,9 +8,17 @@
     <script>
         jQuery(document).ready(function($)
         {
-           $('#admin-form').filterbar();
+            var form = $('#admin-form');
+
+            window.Phoenix = new PhoenixCore(form, {});
+
+            form.filterbar();
         });
     </script>
+@stop
+
+@section('toolbar')
+    @include('toolbar')
 @stop
 
 @section('body')
@@ -34,6 +42,10 @@
                 {{-- CHECKBOX --}}
                 <th>
                     #
+                </th>
+
+                <th>
+                    {{ $grid->sortTitle('State', '{$controller.item.name.lower$}.state') }}
                 </th>
 
                 {{-- TITLE --}}
@@ -64,13 +76,20 @@
             </thead>
 
             <tbody>
-            @foreach ($items as $item)
+            @foreach ($items as $i => $item)
+                <?php
+                /**  @var \Phoenix\View\Helper\GridHelper $grid */
+                $grid->setItem($item, $i);
+                ?>
                 <tr>
                     <td>
 
                     </td>
                     <td>
-
+                        {{ $grid->checkbox() }}
+                    </td>
+                    <td>
+                        {{ $item->state }}
                     </td>
                     <td>
                         {{{ $item->title }}}

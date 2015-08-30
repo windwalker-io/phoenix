@@ -10,6 +10,7 @@
     @yield('meta')
 
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ $uri['media.path'] }}phoenix/css/phoenix.css" />
     <link rel="stylesheet" href="{{ $uri['media.path'] }}{{ $package->getName() }}/css/{$package.name.lower$}.css" />
     @yield('style')
 

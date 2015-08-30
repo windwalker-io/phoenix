@@ -1,0 +1,10 @@
+.jumbotron.admin-header {
+  margin-bottom: 0;
+}
+#admin-area {
+  margin-top: 30px;
+}
+#admin-toolbar {
+  background-color: #f6f6f6;
+  padding: 7px 25px;
+}

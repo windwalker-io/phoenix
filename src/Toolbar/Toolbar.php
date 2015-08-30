@@ -1,127 +1,75 @@
 <?php
 /**
- * Part of asukademy project. 
+ * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
- * @license    GNU General Public License version 2 or later;
+ * @license    GNU General Public License version 2 or later.
  */
 
 namespace Phoenix\Toolbar;
 
-use Windwalker\Core\Router\Router;
+use Windwalker\Dom\HtmlElement;
+use Windwalker\Dom\HtmlElements;
 
 /**
  * The Toolbar class.
- * 
+ *
  * @since  {DEPLOY_VERSION}
  */
-class Toolbar
+class Toolbar extends HtmlElements
 {
 	/**
-	 * add
+	 * addButton
 	 *
-	 * @param string $name
-	 * @param string $route
-	 * @param array  $queries
+	 * @param   string       $name
+	 * @param   HtmlElement  $button
 	 *
-	 * @return  string
+	 * @return  static
 	 */
-	public static function add($name, $route = 'admin:new', $queries = [], $class = '')
+	public function addButton($name, HtmlElement $button)
 	{
-		$queries['name'] = $name;
+		$this->elements[$name] = $button;
 
-		$url = Router::buildHtml($route, $queries);
-
-		return <<<HTML
-<a class="btn btn-success $class" href="$url">
-	<span class="glyphicon glyphicon-plus"></span> New
-</a>
-HTML;
+		return $this;
 	}
 
 	/**
-	 * cancel
+	 * Method to get property Buttons
 	 *
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $class
-	 *
-	 * @return string
+	 * @return  array
 	 */
-	public static function cancel($route, $queries = [], $class = '')
+	public function getButtons()
 	{
-		$url = Router::buildHtml($route, $queries);
-
-		return <<<HTML
-<a class="btn btn-default $class" href="$url">
-	<span class="glyphicon glyphicon-remove"></span> Close
-</a>
-HTML;
+		return $this->elements;
 	}
 
 	/**
-	 * edit
+	 * Method to set property buttons
 	 *
-	 * @param string $title
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $class
+	 * @param   HtmlElement[] $buttons
 	 *
-	 * @return  string
+	 * @return  static  Return self to support chaining.
 	 */
-	public static function edit($title, $id, $route, $queries = [], $class = '')
+	public function setButtons(array $buttons)
 	{
-		$queries['id'] = $id;
+		foreach ($buttons as $name => $button)
+		{
+			$this->addButton($name, $button);
+		}
 
-		$url = Router::buildHtml($route, $queries);
-
-		return <<<HTML
-<a class="$class" href="$url">$title</a>
-HTML;
+		return $this;
 	}
 
 	/**
-	 * apply
+	 * Offset to set
 	 *
-	 * @param string $class
+	 * @param mixed $offset The offset to assign the value to.
+	 * @param mixed $value  The value to set.
 	 *
-	 * @return  string
+	 * @return void
 	 */
-	public static function apply($route, $queries = [], $class = '')
+	public function offsetSet($offset, $value)
 	{
-		$queries['apply'] = 1;
-
-		return static::save($route, $queries, $class);
-	}
-
-	/**
-	 * save
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $class
-	 *
-	 * @return  string
-	 */
-	public static function save($route, $queries = [], $class = '')
-	{
-		$url = Router::buildHtml($route, $queries);
-
-		return <<<HTML
-<a class="btn btn-success $class" href="#" onclick="RikiForm.post('$url')">
-	<span class="glyphicon glyphicon-ok"></span> Save
-</a>
-HTML;
-	}
-
-	public static function reorder($route, $queries = [], $class = '')
-	{
-		$url = Router::buildHtml($route, $queries);
-
-		return <<<HTML
-<a class="btn btn-default $class" href="#" onclick="RikiForm.post('$url')">
-	<span class="glyphicon glyphicon-refresh"></span> Reorder
-</a>
-HTML;
+		$this->addButton($offset, $value);
 	}
 }

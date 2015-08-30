@@ -6,14 +6,14 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\View;
+namespace {$package.namespace$}{$package.name.cap$}\Controller\Redirect;
 
 /**
- * The ListHtmlView class.
+ * The RedirectController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ListView extends AbstractRadHtmView
+class RedirectController
 {
 
 }

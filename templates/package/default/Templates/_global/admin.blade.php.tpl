@@ -8,6 +8,9 @@
         <h1>{{{ \Phoenix\Html\Document::getTitle() }}}</h1>
     </div>
 </section>
+<aside id="admin-toolbar" class="text-right">
+    @yield('toolbar')
+</aside>
 <section id="admin-area">
     <div class="container-fluid">
         <div class="col-md-2">
