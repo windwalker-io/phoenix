@@ -8,9 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
-use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
 use Phoenix\Controller\AbstractSaveController;
-use Windwalker\Data\Data;
 
 /**
  * The SaveController class.
@@ -19,19 +17,5 @@ use Windwalker\Data\Data;
  */
 class SaveController extends AbstractSaveController
 {
-	/**
-	 * doSave
-	 *
-	 * @param Data $data
-	 *
-	 * @return void
-	 */
-	protected function doSave(Data $data)
-	{
-		$record = new {$controller.item.name.cap$}Record;
 
-		$record->bind($data->dump())
-			->check()
-			->store($record::UPDATE_NULLS);
-	}
 }

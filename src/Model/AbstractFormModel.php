@@ -8,12 +8,13 @@
 
 namespace Phoenix\Model;
 
-use Windwalker\Core\Model\DatabaseModel;
-use Windwalker\Database\Query\QueryHelper;
+use Phoenix\Form\NullFiledDefinition;
+use Windwalker\Core\Model\Exception\ValidFailException;
+use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Data\Data;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Record\Record;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The AbstractFormModel class.
@@ -23,13 +24,57 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 abstract class AbstractFormModel extends AbstractRadModel
 {
 	/**
+	 * getItem
+	 *
+	 * @param   mixed  $pk
+	 *
+	 * @return  Data
+	 */
+	public function getItem($pk = null)
+	{
+		$state = $this->state;
+
+		return $this->fetch('item', function() use ($pk, $state)
+		{
+			$pk = $pk ? : $state['item.pk'];
+
+			if (!$pk)
+			{
+				return new Data;
+			}
+
+			$item = $this->getRecord();
+
+			try
+			{
+				$item->load($pk);
+			}
+			catch (\RuntimeException $e)
+			{
+				return new Data;
+			}
+
+			$this->postGetItem($item);
+
+			return new Data($item->toArray());
+		});
+	}
+
+	/**
 	 * getDefaultData
 	 *
 	 * @return array
 	 */
 	public function getDefaultData()
 	{
-		return array();
+		$item = $this->getItem();
+
+		if ($item->notNull())
+		{
+			return $item->dump();
+		}
+
+		return $this['form.data'];
 	}
 
 	/**
@@ -46,13 +91,13 @@ abstract class AbstractFormModel extends AbstractRadModel
 	/**
 	 * getForm
 	 *
+	 * @param string $definition
 	 * @param string $control
 	 * @param bool   $loadData
-	 * @param string $definition
 	 *
 	 * @return Form
 	 */
-	public function getForm($control = null, $loadData = false, $definition = null)
+	public function getForm($definition = null, $control = null, $loadData = false)
 	{
 		$form = new Form($control);
 
@@ -72,8 +117,58 @@ abstract class AbstractFormModel extends AbstractRadModel
 	 * getFieldDefinition
 	 *
 	 * @param string $definition
+	 * @param string $name
 	 *
 	 * @return FieldDefinitionInterface
 	 */
-	abstract public function getFieldDefinition($definition = null);
+	public function getFieldDefinition($definition = null, $name = null)
+	{
+		$name = $name ? : $this->getName();
+
+		$class = sprintf(
+			'%s\Field\%s\%sDefinition',
+			MvcHelper::getPackageNamespace($this, 2),
+			ucfirst($name),
+			ucfirst($definition)
+		);
+
+		if (!class_exists($class))
+		{
+			return new NullFiledDefinition;
+		}
+
+		return new $class;
+	}
+
+	/**
+	 * validate
+	 *
+	 * @param   array  $data
+	 *
+	 * @return  boolean
+	 *
+	 * @throws  ValidFailException
+	 */
+	public function validate($data)
+	{
+		$form = $this->getForm('edit');
+
+		$form->bind($data);
+
+		if ($form->validate())
+		{
+			return true;
+		}
+
+		$errors = $form->getErrors();
+
+		$msg = array();
+
+		foreach ($errors as $error)
+		{
+			$msg[] = $error->getMessage();
+		}
+
+		throw new ValidFailException($msg);
+	}
 }

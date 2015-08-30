@@ -39,10 +39,10 @@
 		/**
 		 * Make a request.
 		 *
-		 * @param  {String} url
+		 * @param  {string} url
 		 * @param  {Object} queries
-         * @param  {String} method
-		 * @param  {String} customMethod
+         * @param  {string} method
+		 * @param  {string} customMethod
 		 *
 		 * @returns {boolean}
 		 */
@@ -102,9 +102,9 @@
 		/**
 		 * Make a GET request.
 		 *
-		 * @param  {String} url
+		 * @param  {string} url
 		 * @param  {Object} queries
-		 * @param  {String} customMethod
+		 * @param  {string} customMethod
 		 *
 		 * @returns {boolean}
 		 */
@@ -116,9 +116,9 @@
 		/**
 		 * Post form.
 		 *
-		 * @param  {String} url
+		 * @param  {string} url
 		 * @param  {Object} queries
-		 * @param  {String} customMethod
+		 * @param  {string} customMethod
 		 *
 		 * @returns {boolean}
 		 */
@@ -130,7 +130,7 @@
 		/**
 		 * Make a PUT request.
 		 *
-		 * @param  {String} url
+		 * @param  {string} url
 		 * @param  {Object} queries
 		 *
 		 * @returns {boolean}
@@ -143,7 +143,7 @@
 		/**
 		 * Make a PATCH request.
 		 *
-		 * @param  {String} url
+		 * @param  {string} url
 		 * @param  {Object} queries
 		 *
 		 * @returns {boolean}
@@ -156,7 +156,7 @@
 		/**
 		 * Make a DELETE request.
 		 *
-		 * @param  {String} url
+		 * @param  {string} url
 		 * @param  {Object} queries
 		 *
 		 * @returns {boolean}
@@ -169,9 +169,9 @@
 		/**
 		 * Make a DELETE request.
 		 *
-		 * @param  {String} url
+		 * @param  {string} url
 		 * @param  {Object} queries
-		 * @param  {String} msg
+		 * @param  {string} msg
 		 *
 		 * @returns {boolean}
 		 */
@@ -185,6 +185,73 @@
 			}
 
 			return this.delete(url, queries);
+		},
+
+		/**
+		 * Update a row.
+		 *
+		 * @param  {number} row
+		 * @param  {string} url
+		 * @param  {Object} queries
+		 */
+		updateRow: function(row, url, queries)
+		{
+			var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
+
+			if (!ch.length)
+			{
+				throw new Error('Checkbox of row: ' + row + ' not found.');
+			}
+
+
+			ch[0].checked = true;
+
+			this.patch(url, queries);
+		},
+
+		toogleAll: function(element)
+		{
+			var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
+
+			$.each(checkboxes, function(i, e)
+			{
+				e.checked = element.checked;
+			});
+		},
+
+		countChecked: function()
+		{
+			return this.getChecked().length;
+		},
+
+		getChecked: function()
+		{
+			var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]'),
+				result = [];
+
+			$.each(checkboxes, function(i, e)
+			{
+				if (e.checked)
+				{
+					result.push(e);
+				}
+			});
+
+			return result;
+		},
+
+		validateChecked: function(msg)
+		{
+			msg = msg || 'Please check one or more items.';
+
+			if (!this.countChecked())
+			{
+				alert(msg);
+
+				throw new Error(msg);
+			}
+
+			return this;
 		}
 	};
 

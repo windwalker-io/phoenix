@@ -11,6 +11,7 @@ namespace Phoenix\Controller;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\Controller;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;
@@ -176,6 +177,6 @@ abstract class AbstractRadController extends Controller
 	 */
 	protected function checkToken()
 	{
-		return true;
+		return CsrfProtection::checkToken();
 	}
 }

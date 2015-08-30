@@ -8,15 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
-use Phoenix\Model\AbstractRadModel;
-use Windwalker\Core\Model\DatabaseModel;
+use Phoenix\Model\AbstractAdminModel;
 
 /**
  * The {$controller.item.name.cap$}Model class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class {$controller.item.name.cap$}Model extends AbstractRadModel
+class {$controller.item.name.cap$}Model extends AbstractAdminModel
 {
-	// Implement your methods
+
 }

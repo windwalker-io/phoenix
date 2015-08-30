@@ -8,14 +8,15 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
 
-use Windwalker\Core\View\BladeHtmlView;
+use Phoenix\Html\Document;
+use Phoenix\View\EditView;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class {$controller.item.name.cap$}HtmlView extends BladeHtmlView
+class {$controller.item.name.cap$}HtmlView extends EditView
 {
 	/**
 	 * prepareData
@@ -26,6 +27,6 @@ class {$controller.item.name.cap$}HtmlView extends BladeHtmlView
 	 */
 	protected function prepareData($data)
 	{
-		$data->item = $this->model->getSomething();
+		Document::setTitle('{$controller.item.name.cap$} Edit');
 	}
 }

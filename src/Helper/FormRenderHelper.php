@@ -27,7 +27,7 @@ class FormRenderHelper
 	 *
 	 * @return string
 	 */
-	public static function render(array $fields, $labelCols = 'col-md-2', $inputCols = 'col-md-10', $tmpl = 'admin.form.fields')
+	public static function render(array $fields, $labelCols = 'col-md-2', $inputCols = 'col-md-10', $tmpl = 'phoenix.admin.form.fields')
 	{
 		return (new BladeWidget($tmpl))->render([
 			'fields' => $fields,

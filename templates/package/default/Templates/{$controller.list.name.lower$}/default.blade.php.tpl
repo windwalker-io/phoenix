@@ -41,7 +41,7 @@
 
                 {{-- CHECKBOX --}}
                 <th>
-                    #
+                    {{ $grid->checkAll() }}
                 </th>
 
                 <th>
@@ -89,7 +89,7 @@
                         {{ $grid->checkbox() }}
                     </td>
                     <td>
-                        {{ $item->state }}
+                        {{ $grid->state($item->state) }}
                     </td>
                     <td>
                         {{{ $item->title }}}

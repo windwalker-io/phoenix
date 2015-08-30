@@ -8,12 +8,10 @@
 
 namespace Phoenix\Controller;
 
+use Phoenix\Model\AbstractCrudModel;
 use Phoenix\Model\AbstractFormModel;
-use Phoenix\Session\CSRFToken;
-use Windwalker\Core\Controller\Controller;
-use Windwalker\Core\Ioc;
+use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Model\Exception\ValidFailException;
-use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Data\Data;
 
 /**
@@ -23,6 +21,13 @@ use Windwalker\Data\Data;
  */
 abstract class AbstractSaveController extends AbstractDataHandlingController
 {
+	/**
+	 * Property inflection.
+	 *
+	 * @var  string
+	 */
+	protected $inflection = self::SINGULAR;
+
 	/**
 	 * Property model.
 	 *
@@ -38,6 +43,20 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	protected $data;
 
 	/**
+	 * Property task.
+	 *
+	 * @var  string
+	 */
+	protected $task;
+
+	/**
+	 * Property pkName.
+	 *
+	 * @var  string
+	 */
+	protected $pkName = 'id';
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
@@ -45,8 +64,27 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	protected function prepareExecute()
 	{
 		$this->model = $this->getModel();
-		$this->data = $this->input->getVar(strtolower($this->getName()));
-		$this->data['id'] = $this->input->get('id');
+		$this->data = $this->input->getVar('item');
+		$this->task = $this->input->get('task');
+	}
+
+	/**
+	 * doSave
+	 *
+	 * @param Data $data
+	 *
+	 * @return void
+	 */
+	protected function doSave(Data $data)
+	{
+		$this->validate($data);
+
+		if (!$this->model instanceof AbstractCrudModel)
+		{
+			throw new \UnexpectedValueException('You have to use AbstractCrudModel to make a save operation.');
+		}
+
+		$this->model->save($data);
 	}
 
 	/**
@@ -57,18 +95,18 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function doExecute()
 	{
-		$session = \Windwalker\Ioc::getSession();
 		$data = new Data($this->data);
 
 		!$this->useTransaction or $this->model->transactionStart();
 
 		try
 		{
-			$this->checkToken();
+			if (!$this->checkToken())
+			{
+				throw new \RuntimeException('Invalid Token');
+			}
 
 			$this->preSave($data);
-
-			$this->validate($data);
 
 			$this->doSave($data);
 
@@ -78,9 +116,9 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 		{
 			!$this->useTransaction or $this->model->transactionRollback();
 
-			$session->set($this->getName() . '.edit.data' . $data->id, $this->data);
+			$this->setUserState($this->getContext('edit.data'), $this->data);
 
-			$this->setRedirect($this->getFailRedirect($data), $e->getMessage(), 'warning');
+			$this->setRedirect($this->getFailRedirect($data), $e->getMessages(), Bootstrap::MSG_DANGER);
 
 			return false;
 		}
@@ -88,37 +126,25 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 		{
 			!$this->useTransaction or $this->model->transactionRollback();
 
-			$session->set($this->getName() . '.edit.data' . $data->id, $this->data);
+			$this->setUserState($this->getContext('edit.data'), $this->data);
 
 			if (WINDWALKER_DEBUG)
 			{
 				throw $e;
 			}
 
-			$this->setRedirect($this->getFailRedirect($data), $e->getMessage(), 'warning');
+			$this->setRedirect($this->getFailRedirect($data), $e->getMessage(), Bootstrap::MSG_DANGER);
 
 			return false;
 		}
 
 		!$this->useTransaction or $this->model->transactionCommit();
 
-		$session->remove($this->getName() . '.edit.data' . $data->id);
+		$this->removeUserState($this->getContext('edit.data'));
 
-		$this->setRedirect($this->getSuccessRedirect($data), 'Save success', 'success');
+		$this->setRedirect($this->getSuccessRedirect($data), 'Save success', Bootstrap::MSG_SUCCESS);
 
 		return true;
-	}
-
-	/**
-	 * postExecute
-	 *
-	 * @param mixed $result
-	 *
-	 * @return  mixed
-	 */
-	protected function postExecute($result = null)
-	{
-		return parent::postExecute($result);
 	}
 
 	/**
@@ -131,15 +157,6 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	protected function preSave(Data $data)
 	{
 	}
-
-	/**
-	 * doSave
-	 *
-	 * @param Data $data
-	 *
-	 * @return void
-	 */
-	abstract protected function doSave(Data $data);
 
 	/**
 	 * postSave
@@ -165,23 +182,48 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	{
 		if ($this->model instanceof AbstractFormModel)
 		{
-			$form = $this->model->getForm();
+			$this->model->validate($data->dump());
+		}
+	}
 
-			$form->bind($data);
+	/**
+	 * getFailRedirect
+	 *
+	 * @param  Data $data
+	 *
+	 * @return  string
+	 */
+	protected function getFailRedirect(Data $data)
+	{
+		$pk = $this->model['item.pk'];
 
-			if (!$form->validate())
-			{
-				$errors = $form->getErrors();
+		return $this->router->http($this->getName(), array($this->pkName => $pk));
+	}
 
-				$msg = [];
+	/**
+	 * getSuccessRedirect
+	 *
+	 * @param  Data $data
+	 *
+	 * @return  string
+	 */
+	protected function getSuccessRedirect(Data $data)
+	{
+		switch ($this->task)
+		{
+			case 'save2close':
+				return $this->router->http($this->config['list_name']);
 
-				foreach ($errors as $error)
-				{
-					$msg[] = $error->getMessage();
-				}
+			case 'save2new':
+				return $this->router->http($this->getName(), array('new' => ''));
 
-				throw new ValidFailException(implode('<br>', $msg));
-			}
+			case 'save2copy':
+				return $this->router->http($this->getName());
+
+			default:
+				$pk = $this->model['item.pk'];
+
+				return $this->router->http($this->getName(), array($this->pkName => $pk));
 		}
 	}
 }

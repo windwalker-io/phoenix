@@ -19,7 +19,7 @@ use Windwalker\Html\Option;
  *
  * @since  {DEPLOY_VERSION}
  */
-class {$controller.list.name.cap$}FilterDefinition implements FieldDefinitionInterface
+class FilterDefinition implements FieldDefinitionInterface
 {
 	/**
 	 * Define the form fields.

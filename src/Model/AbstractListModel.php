@@ -590,32 +590,4 @@ abstract class AbstractListModel extends AbstractFormModel
 
 		return $this;
 	}
-
-	/**
-	 * getFieldDefinition
-	 *
-	 * @param string $definition
-	 * @param string $name
-	 *
-	 * @return FieldDefinitionInterface
-	 */
-	public function getFieldDefinition($definition = null, $name = null)
-	{
-		$name = $name ? : $this->getName();
-
-		$class = sprintf(
-			'%s\Field\%s\%s%sDefinition',
-			MvcHelper::getPackageNamespace($this, 2),
-			ucfirst($name),
-			ucfirst($name),
-			ucfirst($definition)
-		);
-
-		if (!class_exists($class))
-		{
-			return new NullFiledDefinition;
-		}
-
-		return new $class;
-	}
 }

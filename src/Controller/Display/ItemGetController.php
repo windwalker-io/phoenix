@@ -15,5 +15,27 @@ namespace Phoenix\Controller\Display;
  */
 class ItemGetController extends AbstractGetController
 {
+	/**
+	 * Property inflection.
+	 *
+	 * @var  string
+	 */
+	protected $inflection = self::SINGULAR;
 
+	/**
+	 * Property pkName.
+	 *
+	 * @var  string
+	 */
+	protected $pkName = 'id';
+
+	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareUserState()
+	{
+		$this->model['item.pk'] = $this->input->get($this->pkName);
+	}
 }

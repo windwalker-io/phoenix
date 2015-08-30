@@ -8,15 +8,22 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use Windwalker\Core\Controller\Controller;
+use Phoenix\Controller\AbstractRadController;
 
 /**
  * The SaveController class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class SaveController extends Controller
+class SaveController extends AbstractRadController
 {
+	/**
+	 * Property inflection.
+	 *
+	 * @var  string
+	 */
+	protected $inflection = self::PLURAL;
+
 	/**
 	 * doExecute
 	 *

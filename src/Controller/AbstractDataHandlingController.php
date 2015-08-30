@@ -33,7 +33,7 @@ abstract class AbstractDataHandlingController extends AbstractRadController
 	 */
 	protected function getFailRedirect(Data $data)
 	{
-		return $this->package->router->buildHttp($this->getName(), array('id' => $data->id));
+		return $this->router->http($this->getName());
 	}
 
 	/**
@@ -45,7 +45,7 @@ abstract class AbstractDataHandlingController extends AbstractRadController
 	 */
 	protected function getSuccessRedirect(Data $data)
 	{
-		return $this->package->router->buildHttp($this->getName(), array('id' => $data->id));
+		return $this->router->http($this->getName());
 	}
 
 	/**

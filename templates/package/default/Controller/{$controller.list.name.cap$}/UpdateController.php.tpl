@@ -45,8 +45,8 @@ class UpdateController extends AbstractRadController
 		/** @var Controller $controller */
 		$controller = new $class;
 		$controller->setName($this->getName());
-		$controller->config['item_name'] = $this->config['item_name'];
-		$controller->config['list_name'] = $this->config['list_name'];
+		$controller->config->set('item_name', $this->config['item_name']);
+		$controller->config->set('list_name', $this->config['list_name']);
 
 		$result = $this->hmvc($controller, array(
 			'cid'  => $this->input->getVar('cid'),

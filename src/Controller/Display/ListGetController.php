@@ -21,6 +21,13 @@ use Windwalker\Form\Form;
 class ListGetController extends AbstractGetController
 {
 	/**
+	 * Property inflection.
+	 *
+	 * @var  string
+	 */
+	protected $inflection = self::PLURAL;
+
+	/**
 	 * Property model.
 	 *
 	 * @var  AbstractListModel

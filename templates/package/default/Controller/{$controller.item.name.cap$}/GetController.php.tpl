@@ -8,17 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
-use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
-use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
-use Phoenix\Controller\Display\ItemGetController;
-use Windwalker\Core\Controller\Controller;
+use Phoenix\Controller\Display\EditGetController;
 
 /**
  * The GetController class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class GetController extends ItemGetController
+class GetController extends EditGetController
 {
 	/**
 	 * Property name.

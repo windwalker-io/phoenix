@@ -19,6 +19,13 @@ use Windwalker\Filter\InputFilter;
 class FilterController extends AbstractRadController
 {
 	/**
+	 * Property inflection.
+	 *
+	 * @var  string
+	 */
+	protected $inflection = self::PLURAL;
+
+	/**
 	 * doExecute
 	 *
 	 * @return  mixed

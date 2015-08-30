@@ -249,6 +249,11 @@ HTML;
 		return $html;
 	}
 
+	public function checkAll()
+	{
+		return WidgetHelper::render('phoenix.grid.table.checkall', array(), WidgetHelper::ENGINE_BLADE);
+	}
+
 	/**
 	 * Checkbox input.
 	 *
@@ -361,23 +366,6 @@ HTML;
 	}
 
 	/**
-	 * State button.
-	 *
-	 * @param string $taskPrefix The task prefix.
-	 *
-	 * @return string State button html code.
-	 */
-	public function state($taskPrefix = null)
-	{
-		$item       = $this->current;
-		$canChange  = $this->state->get('access.canChange', true);
-		$taskPrefix = $taskPrefix ? : $this->config->get('view_list') . '.state.';
-		$field      = $this->config->get('field.state', 'state');
-
-		return \JHtmlJGrid::published($item->$field, $this->row, $taskPrefix, $canChange, 'cb', $item->publish_up, $item->publish_down);
-	}
-
-	/**
 	 * Check-out button.
 	 *
 	 * @param string $taskPrefix The task prefix.
@@ -444,19 +432,77 @@ HTML;
 	}
 
 	/**
+	 * publishButton
+	 *
+	 * @param mixed $value
+	 * @param array $options
+	 *
+	 * @return  string
+	 */
+	public function state($value, $options = array())
+	{
+		$iconMapping = array(
+			-1 => 'trash',
+			0 => 'remove text-danger',
+			1 => 'ok text-success'
+		);
+
+		$taskMapping = array(
+			-1 => 'publish',
+			0 => 'publish',
+			1 => 'unpublish'
+		);
+
+		return $this->stateButton($value, $taskMapping, $iconMapping, $options);
+	}
+
+	/**
+	 * booleanButton
+	 *
+	 * @param string $value
+	 * @param array  $options
+	 *
+	 * @return  string
+	 */
+	public function booleanButton($value, $options = array())
+	{
+		$iconMapping = array(
+			0 => 'remove text-danger',
+			1 => 'ok text-success'
+		);
+
+		$taskMapping = array(
+			0 => 'publish',
+			1 => 'unpublish'
+		);
+
+		return $this->stateButton($value, $taskMapping, $iconMapping, $options);
+	}
+
+	/**
 	 * Show a boolean icon.
 	 *
-	 * @param   mixed  $value   A variable has value or not.
-	 * @param   string $task    Click to call a component task. Not available yet.
-	 * @param   array  $options Some options.
+	 * @param   mixed  $value       A variable has value or not.
+	 * @param   string $taskMapping Click to call a component task. Not available yet.
+	 * @param   array  $iconMapping The state to icon mapping.
+	 * @param   array  $options     Some options.
 	 *
-	 * @return  string  A boolean icon HTML string.
+	 * @return string A boolean icon HTML string.
 	 */
-	public function booleanIcon($value, $task = '', $options = array())
+	public function stateButton($value, $taskMapping = '', $iconMapping = array(), $options = array())
 	{
-		$class = $value ? 'icon-publish' : 'icon-unpublish';
+		$options = new Data($options);
 
-		return "<i class=\"{$class}\"></i>";
+		$options['titleMapping'] = new Data((array) $options['titleMapping']);
+
+		return WidgetHelper::render('phoenix.grid.table.icon-button', array(
+			'value' => $value,
+			'taskMapping' => new Data($taskMapping),
+			'iconMapping' => new Data($iconMapping),
+			'item' => $this->current,
+			'row'  => $this->row,
+			'options' => $options
+		), WidgetHelper::ENGINE_BLADE);
 	}
 
 	/**

@@ -7,13 +7,12 @@
  */
 
 namespace Phoenix\Model;
-
 /**
  * The AbstractAdminModel class.
  *
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractAdminModel extends AbstractFormModel
+abstract class AbstractAdminModel extends AbstractCrudModel
 {
 	/**
 	 * reorder
