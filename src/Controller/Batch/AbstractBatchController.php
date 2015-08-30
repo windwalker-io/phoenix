@@ -115,7 +115,7 @@ class AbstractBatchController extends AbstractDataHandlingController
 
 		!$this->useTransaction or $this->model->transactionCommit();
 
-		$this->setRedirect($this->getSuccessRedirect($data), 'Save success', 'success');
+		$this->setRedirect($this->getSuccessRedirect(), 'Save success', 'success');
 
 		return true;
 	}

@@ -35,8 +35,8 @@
             <thead>
             <tr>
                 {{-- SORT --}}
-                <th>
-                    #
+                <th width="5%">
+
                 </th>
 
                 {{-- CHECKBOX --}}
@@ -51,6 +51,11 @@
                 {{-- TITLE --}}
                 <th>
                     {{ $grid->sortTitle('Title', '{$controller.item.name.lower$}.title') }}
+                </th>
+
+                {{-- ORDERING --}}
+                <th width="5%">
+                    {{ $grid->sortTitle('Order', '{$controller.item.name.lower$}.ordering') }}
                 </th>
 
                 {{-- AUTHOR --}}
@@ -95,6 +100,9 @@
                         <a href="{{{ $router->html('{$controller.item.name.lower$}', array('id' => $item->id)) }}}">
                             {{{ $item->title }}}
                         </a>
+                    </td>
+                    <td>
+                        {{ $grid->orderButton() }}
                     </td>
                     <td>
                         {{{ $item->created_by }}}

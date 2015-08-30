@@ -49,8 +49,9 @@ class AbstractBatchDelegatingController extends AbstractRadController
 		$controller->config->set('list_name', $this->config['list_name']);
 
 		$result = $this->hmvc($controller, array(
-			'cid'  => $this->input->getVar('cid'),
-			'batch' => $this->input->getVar('batch')
+			'cid'      => $this->input->getVar('cid'),
+			'batch'    => $this->input->getVar('batch'),
+			'ordering' => $this->input->getVar('ordering'),
 		));
 
 		list($url, $msg, $type) = $controller->getRedirect(true);

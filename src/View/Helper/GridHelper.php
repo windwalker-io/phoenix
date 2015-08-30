@@ -47,15 +47,16 @@ class GridHelper
 	 * @var array
 	 */
 	protected $fields = array(
-		'pk'               => 'id',
-		'title'            => 'title',
-		'alias'            => 'alias',
-		'state'            => 'state',
-		'author'           => 'created_by',
-		'author_name'      => 'user_name',
-		'created'          => 'created',
-		'language'         => 'language',
-		'lang_title'       => 'lang_title'
+		'pk'          => 'id',
+		'title'       => 'title',
+		'alias'       => 'alias',
+		'state'       => 'state',
+		'ordering'    => 'ordering',
+		'author'      => 'created_by',
+		'author_name' => 'user_name',
+		'created'     => 'created',
+		'language'    => 'language',
+		'lang_title'  => 'lang_title'
 	);
 
 	/**
@@ -96,7 +97,7 @@ class GridHelper
 
 		$fields = array_merge($this->fields, (array) $fields);
 
-		$this->config->set('field', (object) $fields);
+		$this->config->set('field', $fields);
 
 		// Access context
 		$this->context = $this->config->get('option') . '.' . $this->config->get('view_item');
@@ -249,6 +250,24 @@ HTML;
 		return $html;
 	}
 
+	public function orderButton()
+	{
+		$pkName = $this->config->get('field.pk');
+		$orderField = $this->config['field.ordering'];
+
+		return WidgetHelper::render('phoenix.grid.table.order-button', array(
+			'item' => $this->current,
+			'row'  => $this->row,
+			'pkName' => $pkName,
+			'orderField' => $orderField
+		), WidgetHelper::ENGINE_BLADE);
+	}
+
+	/**
+	 * checkboxesToggle
+	 *
+	 * @return  string
+	 */
 	public function checkboxesToggle()
 	{
 		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', array(), WidgetHelper::ENGINE_BLADE);

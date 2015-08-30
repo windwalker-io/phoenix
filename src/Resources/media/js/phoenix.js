@@ -250,6 +250,38 @@
 			}
 
 			return this;
+		},
+
+		reorder: function(url, queries)
+		{
+			this.toggleAll(true);
+
+			queries = queries || {};
+			queries['task'] = queries['task'] || 'reorder';
+
+			return this.patch(url, queries);
+		},
+
+		setOrder: function(row, offset, url, queries)
+		{
+			var input = this.form.find('input[data-order-row=' + row + ']');
+
+			input.val(parseInt(input.val()) + parseFloat(offset));
+
+			if (offset > 0)
+			{
+				row++;
+			}
+			else if (offset < 0)
+			{
+				row--;
+			}
+
+			var input2 = this.form.find('input[data-order-row=' + row + ']');
+
+			input2.val(parseInt(input2.val()) - parseFloat(offset));
+
+			return this.reorder(url, queries);
 		}
 	};
 

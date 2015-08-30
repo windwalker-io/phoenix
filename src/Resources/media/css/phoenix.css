@@ -8,3 +8,13 @@
   background-color: #f6f6f6;
   padding: 7px 25px;
 }
+.ordering-control {
+  max-width: 90px;
+}
+.ordering-control input {
+  min-width: 40px;
+}
+.input-xs {
+  height: 22px;
+  padding: 0 5px;
+}
