@@ -249,9 +249,9 @@ HTML;
 		return $html;
 	}
 
-	public function checkAll()
+	public function checkboxesToggle()
 	{
-		return WidgetHelper::render('phoenix.grid.table.checkall', array(), WidgetHelper::ENGINE_BLADE);
+		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', array(), WidgetHelper::ENGINE_BLADE);
 	}
 
 	/**

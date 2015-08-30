@@ -6,5 +6,5 @@
     controller: {$controller.list.name.cap$}
     action:
         post: CopyController
-        patch: UpdateController
+        patch: BatchController
         put: FilterController

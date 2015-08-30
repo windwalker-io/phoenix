@@ -13,7 +13,7 @@ namespace Phoenix\Controller\Batch;
  *
  * @since  {DEPLOY_VERSION}
  */
-class BatchController extends AbstractBatchController
+class MoveController extends AbstractBatchController
 {
 	/**
 	 * prepareExecute

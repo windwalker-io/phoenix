@@ -9,6 +9,7 @@
 namespace Phoenix\Model;
 
 use Windwalker\Data\Data;
+use Windwalker\Record\Record;
 
 /**
  * The AbstractCrudModel class.
@@ -27,17 +28,57 @@ abstract class AbstractCrudModel extends AbstractFormModel
 	public function save(Data $data)
 	{
 		$record = $this->getRecord();
-
-		$record->bind($data->dump())
-			->check()
-			->store($record::UPDATE_NULLS);
-
 		$key = $record->getKeyName();
 
-		$this['item.pk'] = $data->$key = $record->$key;
-		$this['pk_name'] = $key;
+		$isNew = true;
+		$pk    = $data->$key;
+
+		if ($pk)
+		{
+			$record->load($pk);
+			$isNew = false;
+		}
+
+		$record->bind($data->dump());
+
+		$this->prepareRecord($record);
+
+		$record->check()
+			->store();
+
+		if ($record->$key)
+		{
+			$this['item.pk'] = $data->$key = $record->$key;
+		}
+
+		$this['item.new'] = $isNew;
+		$this['item.pkName'] = $key;
+
+		$this->postSaveHook($record);
 
 		return true;
+	}
+
+	/**
+	 * postSaveHook
+	 *
+	 * @param Record $record
+	 *
+	 * @return  void
+	 */
+	protected function postSaveHook(Record $record)
+	{
+	}
+
+	/**
+	 * prepareRecord
+	 *
+	 * @param Record $record
+	 *
+	 * @return  void
+	 */
+	protected function prepareRecord(Record $record)
+	{
 	}
 
 	/**

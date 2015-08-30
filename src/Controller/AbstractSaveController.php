@@ -8,7 +8,6 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\AbstractCrudModel;
 use Phoenix\Model\AbstractFormModel;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Model\Exception\ValidFailException;
@@ -29,32 +28,11 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	protected $inflection = self::SINGULAR;
 
 	/**
-	 * Property model.
+	 * Property isNew.
 	 *
-	 * @var  \Windwalker\Core\Model\DatabaseModel
+	 * @var  boolean
 	 */
-	protected $model;
-
-	/**
-	 * Property data.
-	 *
-	 * @var  array
-	 */
-	protected $data;
-
-	/**
-	 * Property task.
-	 *
-	 * @var  string
-	 */
-	protected $task;
-
-	/**
-	 * Property pkName.
-	 *
-	 * @var  string
-	 */
-	protected $pkName = 'id';
+	protected $isNew = true;
 
 	/**
 	 * prepareExecute
@@ -63,9 +41,9 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function prepareExecute()
 	{
-		$this->model = $this->getModel();
+		parent::prepareExecute();
+
 		$this->data = $this->input->getVar('item');
-		$this->task = $this->input->get('task');
 	}
 
 	/**
@@ -79,11 +57,6 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	{
 		$this->validate($data);
 
-		if (!$this->model instanceof AbstractCrudModel)
-		{
-			throw new \UnexpectedValueException('You have to use AbstractCrudModel to make a save operation.');
-		}
-
 		$this->model->save($data);
 	}
 
@@ -96,6 +69,8 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	protected function doExecute()
 	{
 		$data = new Data($this->data);
+
+		$this->isNew = !(bool) $data->{$this->pkName};
 
 		!$this->useTransaction or $this->model->transactionStart();
 
@@ -193,7 +168,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 *
 	 * @return  string
 	 */
-	protected function getFailRedirect(Data $data)
+	protected function getFailRedirect(Data $data = null)
 	{
 		$pk = $this->model['item.pk'];
 
@@ -207,7 +182,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 *
 	 * @return  string
 	 */
-	protected function getSuccessRedirect(Data $data)
+	protected function getSuccessRedirect(Data $data = null)
 	{
 		switch ($this->task)
 		{

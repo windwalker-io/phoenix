@@ -9,6 +9,7 @@
 namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractDataHandlingController;
+use Phoenix\Model\AbstractCrudModel;
 use Phoenix\Model\AbstractRadModel;
 use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Data\Data;
@@ -21,25 +22,18 @@ use Windwalker\Data\Data;
 class AbstractBatchController extends AbstractDataHandlingController
 {
 	/**
-	 * Property data.
+	 * Property inflection.
 	 *
-	 * @var  array
+	 * @var  string
 	 */
-	protected $data = array();
+	protected $inflection = self::PLURAL;
 
 	/**
 	 * Property cid.
 	 *
 	 * @var  array
 	 */
-	protected $cid = array();
-
-	/**
-	 * Property useTransaction.
-	 *
-	 * @var  boolean
-	 */
-	protected $useTransaction = true;
+	protected $pks = array();
 
 	/**
 	 * prepareExecute
@@ -48,9 +42,24 @@ class AbstractBatchController extends AbstractDataHandlingController
 	 */
 	protected function prepareExecute()
 	{
-		$this->model = $this->getModel($this->config['item_name']);
+		parent::prepareExecute();
 
-		$this->cid = $this->input->getVar('cid');
+		$this->pks = $this->input->getVar('cid');
+	}
+
+	/**
+	 * save
+	 *
+	 * @param   string|int $pk
+	 * @param   Data       $data
+	 *
+	 * @return  mixed
+	 */
+	protected function save($pk, Data $data)
+	{
+		$data->{$this->pkName} = $pk;
+
+		$this->model->save($data);
 	}
 
 	/**
@@ -65,7 +74,10 @@ class AbstractBatchController extends AbstractDataHandlingController
 
 		try
 		{
-			$this->checkToken();
+			if (!$this->checkToken())
+			{
+				throw new \RuntimeException('Invalid Token');
+			}
 
 			if (!$this->data)
 			{
@@ -74,30 +86,16 @@ class AbstractBatchController extends AbstractDataHandlingController
 
 			$data = new Data($this->data);
 
-			$model = $this->model;
-
-			if (!$model instanceof AbstractRadModel)
+			foreach ((array) $this->pks as $pk)
 			{
-				throw new \LogicException('The model used for batch handling should be AbstractRadModel.');
-			}
-
-			$record = $model->getRecord($this->config['item_name']);
-
-			foreach ((array) $this->cid as $id)
-			{
-				$record->load($id)
-					->bind($this->data)
-					->check()
-					->store();
-
-				$record->reset(true);
+				$this->save($pk, $data);
 			}
 		}
 		catch (ValidFailException $e)
 		{
 			!$this->useTransaction or $this->model->transactionRollback();
 
-			$this->setRedirect($this->getFailRedirect($data), $e->getMessage(), 'warning');
+			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), 'warning');
 
 			return false;
 		}
@@ -110,7 +108,7 @@ class AbstractBatchController extends AbstractDataHandlingController
 				throw $e;
 			}
 
-			$this->setRedirect($this->getFailRedirect($data), $e->getMessage(), 'warning');
+			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), 'warning');
 
 			return false;
 		}

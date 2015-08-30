@@ -9,7 +9,9 @@
 namespace Phoenix\Controller;
 
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\String\StringNormalise;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The ControllerResolver class.
@@ -21,12 +23,13 @@ class ControllerResolver extends \Windwalker\Core\Controller\ControllerResolver
 	/**
 	 * getController
 	 *
-	 * @param   AbstractPackage|string  $package
-	 * @param   string                  $controller
+	 * @param   AbstractPackage|string $package
+	 * @param   string                 $controller
+	 * @param   string                 $name
 	 *
 	 * @return  mixed
 	 */
-	public static function getController($package, $controller)
+	public static function getController($package, $controller, $name = null)
 	{
 		$controller = str_replace(array('.', '/'), '\\', $controller);
 		$controller = StringNormalise::toClassNamespace($controller);
@@ -37,11 +40,16 @@ class ControllerResolver extends \Windwalker\Core\Controller\ControllerResolver
 		}
 		catch (\UnexpectedValueException $e)
 		{
-			$class = sprintf('%s\%sController', __NAMESPACE__, ucfirst($controller));
+			if (!$package instanceof AbstractPackage)
+			{
+				$package = PackageHelper::getPackage($package);
+			}
+
+			$class = sprintf('%s\Controller\$s\%sController', ReflectionHelper::getNamespaceName($package), ucfirst($name), $controller);
 
 			if (!class_exists($class))
 			{
-				$class = sprintf('Phoenix\Controller\%sController', ucfirst($controller));
+				$class = sprintf('Phoenix\Controller\%sController', $controller);
 			}
 
 			if (!class_exists($class))

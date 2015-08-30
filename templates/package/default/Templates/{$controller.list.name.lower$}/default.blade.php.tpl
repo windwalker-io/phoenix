@@ -41,7 +41,7 @@
 
                 {{-- CHECKBOX --}}
                 <th>
-                    {{ $grid->checkAll() }}
+                    {{ $grid->checkboxesToggle() }}
                 </th>
 
                 <th>
@@ -92,7 +92,9 @@
                         {{ $grid->state($item->state) }}
                     </td>
                     <td>
-                        {{{ $item->title }}}
+                        <a href="{{{ $router->html('{$controller.item.name.lower$}', array('id' => $item->id)) }}}">
+                            {{{ $item->title }}}
+                        </a>
                     </td>
                     <td>
                         {{{ $item->created_by }}}
@@ -122,6 +124,9 @@
 
     <div class="hidden-inputs">
         <input type="hidden" name="_method" value="PUT" />
+        {{ \Windwalker\Core\Security\CsrfProtection::input() }}
     </div>
+
+    @include('batch')
 </form>
 @stop

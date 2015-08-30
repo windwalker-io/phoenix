@@ -8,7 +8,9 @@
 
 namespace Phoenix\Controller;
 
+use Phoenix\Model\AbstractCrudModel;
 use Windwalker\Data\Data;
+use Windwalker\Record\Record;
 
 /**
  * The AbstractAdminController class.
@@ -18,11 +20,72 @@ use Windwalker\Data\Data;
 abstract class AbstractDataHandlingController extends AbstractRadController
 {
 	/**
+	 * Property model.
+	 *
+	 * @var  AbstractCrudModel
+	 */
+	protected $model;
+
+	/**
+	 * Property data.
+	 *
+	 * @var  array
+	 */
+	protected $data;
+
+	/**
+	 * Property task.
+	 *
+	 * @var  string
+	 */
+	protected $task;
+
+	/**
+	 * Property record.
+	 *
+	 * @var  Record
+	 */
+	protected $record;
+
+	/**
+	 * Property pkName.
+	 *
+	 * @var  string
+	 */
+	protected $pkName = 'id';
+
+	/**
 	 * Property useTransition.
 	 *
 	 * @var  boolean
 	 */
 	protected $useTransaction = true;
+
+	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+		parent::prepareExecute();
+
+		$this->model  = $this->getModel($this->config['item_name']);
+		$this->record = $this->model->getRecord($this->config['item_name']);
+		$this->task   = $this->input->get('task');
+
+		// Determine model
+		if (!$this->model instanceof AbstractCrudModel)
+		{
+			throw new \UnexpectedValueException(sprintf('%s model need extend to CrudModel', $this->getName()));
+		}
+
+		// Determine the name of the primary key for the data.
+		if (empty($this->pkName))
+		{
+			$this->pkName = $this->record->getKeyName();
+		}
+	}
 
 	/**
 	 * getFailRedirect
@@ -31,7 +94,7 @@ abstract class AbstractDataHandlingController extends AbstractRadController
 	 *
 	 * @return  string
 	 */
-	protected function getFailRedirect(Data $data)
+	protected function getFailRedirect(Data $data = null)
 	{
 		return $this->router->http($this->getName());
 	}
@@ -43,7 +106,7 @@ abstract class AbstractDataHandlingController extends AbstractRadController
 	 *
 	 * @return  string
 	 */
-	protected function getSuccessRedirect(Data $data)
+	protected function getSuccessRedirect(Data $data = null)
 	{
 		return $this->router->http($this->getName());
 	}

@@ -50,19 +50,16 @@
 		{
 			var form = this.form;
 
-			if (customMethod)
+			var methodInput = form.find('input[name="_method"]');
+
+			if(!methodInput.length)
 			{
-				var methodInput = form.find('input[name="_method"]');
+				methodInput = $('<input name="_method" type="hidden">');
 
-				if(!methodInput.length)
-				{
-					methodInput = $('<input name="_method" type="hidden">');
-
-					form.append(methodInput);
-				}
-
-				methodInput.val(customMethod);
+				form.append(methodInput);
 			}
+
+			methodInput.val(customMethod);
 
 			// Set queries into form.
 			if (queries)
@@ -196,6 +193,8 @@
 		 */
 		updateRow: function(row, url, queries)
 		{
+			this.toggleAll(false);
+
 			var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
 
 			if (!ch.length)
@@ -203,19 +202,18 @@
 				throw new Error('Checkbox of row: ' + row + ' not found.');
 			}
 
-
 			ch[0].checked = true;
 
 			this.patch(url, queries);
 		},
 
-		toogleAll: function(element)
+		toggleAll: function(value)
 		{
 			var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
 
 			$.each(checkboxes, function(i, e)
 			{
-				e.checked = element.checked;
+				e.checked = value;
 			});
 		},
 

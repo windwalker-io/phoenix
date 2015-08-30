@@ -15,3 +15,6 @@
     {{ \Windwalker\Core\Language\Translator::translate('phoenix.toolbar.button.unpublish') }}
 </button>
 
+<button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#batch-modal">
+    Batch
+</button>

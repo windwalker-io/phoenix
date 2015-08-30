@@ -41,6 +41,7 @@ class GridView extends ListView
 		$data->items      = $this->model->getItems();
 		$data->pagination = $this->model->getPagination()->render($this->getPackage()->getName() . ':sakuras');
 		$data->filterForm = $this->model->getForm('filter', null, true);
+		$data->batchForm  = $this->model->getForm('batch', null, true);
 		$data->state      = $this->model->getState();
 
 		// Widget

@@ -6,18 +6,18 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
+namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractRadController;
 use Phoenix\Controller\ControllerResolver as PhoenixControllerResolver;
 use Windwalker\Core\Controller\Controller;
 
 /**
- * The UpdateController class.
+ * The AbstractBatchDelegatingController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class UpdateController extends AbstractRadController
+class AbstractBatchDelegatingController extends AbstractRadController
 {
 	/**
 	 * Property inflection.
@@ -33,14 +33,14 @@ class UpdateController extends AbstractRadController
 	 */
 	protected function doExecute()
 	{
-		$task = $this->input->get('task', 'Batch');
+		$task = $this->input->get('task', 'Move');
 
 		if (!$task)
 		{
 			throw new \InvalidArgumentException('Task of: ' . __CLASS__ . ' should not be empty.');
 		}
 
-		$class = PhoenixControllerResolver::getController($this->package, 'Batch\\' . $task);
+		$class = PhoenixControllerResolver::getController($this->package, 'Batch\\' . $task, $this->getName());
 
 		/** @var Controller $controller */
 		$controller = new $class;
