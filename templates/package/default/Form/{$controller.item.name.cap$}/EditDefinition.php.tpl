@@ -6,8 +6,9 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$};
+namespace {$package.namespace$}{$package.name.cap$}\Form\{$controller.item.name.cap$};
 
+use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ListField;
 use Phoenix\Field\CalendarField;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Field\ListField;
@@ -51,6 +52,13 @@ class EditDefinition implements FieldDefinitionInterface
 			$form->add('url', new TextField)
 				->label('URL')
 				->setValidator(new UrlValidator);
+
+			$form->add('{$controller.item.name.lower$}', new {$controller.item.name.cap$}ListField)
+				->label('{$controller.item.name.cap$}')
+				->set('select', 'language, created')
+				->set('text_field', 'created')
+				->set('value_field', 'language')
+				->set('published', true);
 		});
 
 		$form->wrap('text', null, function(Form $form)

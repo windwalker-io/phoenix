@@ -14,6 +14,7 @@ use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
 use Windwalker\Dom\HtmlElement;
+use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
 
 /**
@@ -424,14 +425,12 @@ HTML;
 	 */
 	public function stateButton($value, $taskMapping = '', $iconMapping = array(), $options = array())
 	{
-		$options = new Data($options);
-
-		$options['titleMapping'] = new Data((array) $options['titleMapping']);
+		$options['titleMapping'] = isset($options['titleMapping']) ? (array) $options['titleMapping'] : array();
 
 		return WidgetHelper::render('phoenix.grid.table.icon-button', array(
 			'value' => $value,
-			'taskMapping' => new Data($taskMapping),
-			'iconMapping' => new Data($iconMapping),
+			'taskMapping' => $taskMapping,
+			'iconMapping' => $iconMapping,
 			'item' => $this->current,
 			'row'  => $this->row,
 			'options' => $options

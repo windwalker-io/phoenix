@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Field\{$controller.list.name.cap$};
+namespace {$package.namespace$}{$package.name.cap$}\Form\{$controller.list.name.cap$};
 
 use Windwalker\Form\Field\ListField;
 use Windwalker\Form\Field\TextField;

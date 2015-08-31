@@ -126,7 +126,7 @@ abstract class AbstractFormModel extends AbstractRadModel
 		$name = $name ? : $this->getName();
 
 		$class = sprintf(
-			'%s\Field\%s\%sDefinition',
+			'%s\Form\%s\%sDefinition',
 			MvcHelper::getPackageNamespace($this, 2),
 			ucfirst($name),
 			ucfirst($definition)

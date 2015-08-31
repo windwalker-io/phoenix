@@ -238,13 +238,16 @@
 			return result;
 		},
 
-		validateChecked: function(msg)
+		validateChecked: function(msg, event)
 		{
 			msg = msg || 'Please check one or more items.';
 
 			if (!this.countChecked())
 			{
 				alert(msg);
+
+				event.stopPropagation();
+				event.preventDefault();
 
 				throw new Error(msg);
 			}

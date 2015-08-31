@@ -15,7 +15,7 @@
     {{ \Windwalker\Core\Language\Translator::translate('phoenix.toolbar.unpublish') }}
 </button>
 
-<button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#batch-modal">
+<button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#batch-modal" onclick="Phoenix.validateChecked(null, event);">
     <span class="glyphicon glyphicon-modal-window"></span>
     {{ \Windwalker\Core\Language\Translator::translate('phoenix.toolbar.batch') }}
 </button>
