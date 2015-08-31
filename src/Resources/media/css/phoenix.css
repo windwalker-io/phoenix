@@ -1,3 +1,6 @@
+.nowrap {
+  white-space: nowrap;
+}
 .jumbotron.admin-header {
   margin-bottom: 0;
 }

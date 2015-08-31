@@ -54,8 +54,8 @@
                 </th>
 
                 {{-- ORDERING --}}
-                <th width="5%">
-                    {{ $grid->sortTitle('Order', '{$controller.item.name.lower$}.ordering') }}
+                <th width="5%" class="nowrap">
+                    {{ $grid->sortTitle('Order', '{$controller.item.name.lower$}.ordering') }} {{ $grid->saveorderButton() }}
                 </th>
 
                 {{-- AUTHOR --}}

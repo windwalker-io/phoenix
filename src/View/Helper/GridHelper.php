@@ -8,9 +8,12 @@
 
 namespace Phoenix\View\Helper;
 
+use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
+use Windwalker\Dom\HtmlElement;
 use Windwalker\Registry\Registry;
 
 /**
@@ -103,11 +106,11 @@ class GridHelper
 		$this->context = $this->config->get('option') . '.' . $this->config->get('view_item');
 
 		// Ordering
-		$listOrder = $state->get('list.ordering');
-		$orderCol  = $state->get('list.orderCol', $config->get('order_column'));
-		$listDirn  = $this->state->get('list.direction');
+		$listOrder   = $state->get('list.ordering');
+		$orderColumn = $state->get('list.orderColumn', $config->get('order_column'));
+		$listDirn    = $this->state->get('list.direction');
 
-		$state->set('list.saveorder', ($listOrder == $orderCol) && strtoupper($listDirn) == 'ASC');
+		$state->set('list.saveorder', ($listOrder == $orderColumn) && strtoupper($listDirn) == 'ASC');
 	}
 
 	/**
@@ -172,9 +175,9 @@ class GridHelper
 	 */
 	public function orderTitle()
 	{
-		$orderCol = $this->state->get('list.orderCol', $this->config->get('order_column'));
+		$orderColumn = $this->state->get('list.orderColumn', $this->config->get('order_column'));
 
-		return $this->sortTitle('', $orderCol, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2');
+		return $this->sortTitle('', $orderColumn, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2');
 	}
 
 	/**
@@ -254,13 +257,25 @@ HTML;
 	{
 		$pkName = $this->config->get('field.pk');
 		$orderField = $this->config['field.ordering'];
+		$saveOrder = $this->state->get('list.saveorder');
 
 		return WidgetHelper::render('phoenix.grid.table.order-button', array(
-			'item' => $this->current,
-			'row'  => $this->row,
+			'item'   => $this->current,
+			'row'    => $this->row,
 			'pkName' => $pkName,
-			'orderField' => $orderField
+			'orderField'  => $orderField,
+			'saveOrder' => $saveOrder
 		), WidgetHelper::ENGINE_BLADE);
+	}
+
+	public function saveOrderButton()
+	{
+		if ($this->state->get('list.saveorder'))
+		{
+			return WidgetHelper::render('phoenix.grid.table.saveorder-button', array(), WidgetHelper::ENGINE_BLADE);
+		}
+
+		return '';
 	}
 
 	/**
@@ -290,144 +305,42 @@ HTML;
 	}
 
 	/**
-	 * Build the edit link.
-	 *
-	 * @param   string  $title    Title of link, default is an icon.
-	 * @param   string  $task     View name to build task: `{view}.edit.edit`.
-	 * @param   int     $id       Edit id.
-	 * @param   array   $query    URL query array.
-	 * @param   array   $attribs  Link element attributes.
-	 *
-	 * @return string
-	 */
-	public function editTitle($title = null, $task = null, $id = null, $query = array(), $attribs = array())
-	{
-		$canEdit    = $this->state->get('access.canEdit', true);
-		$canEditOwn = $this->state->get('access.canEditOwn', true);
-
-		$item       = $this->current;
-		$pkName     = $this->config->get('field.pk');
-		$titleField = $this->config->get('field.title');
-
-		$title = $title ? : $this->escape($item->$titleField);
-
-		$defaultQuery = array(
-			'option' => $this->config->get('option'),
-			'task'   => $task ? : $this->config->get('view_item') . '.edit.edit',
-			$pkName  => $id ? : $this->current->$pkName
-		);
-
-		$query = array_merge($defaultQuery, $query);
-
-		$uri = new \JUri;
-
-		$uri->setQuery($query);
-
-		if ($canEdit || $canEditOwn)
-		{
-			return \JHtml::link($uri, $title, $attribs);
-		}
-		else
-		{
-			return $item->$titleField;
-		}
-	}
-
-	/**
-	 * For some list page to quickly build edit link button.
-	 *
-	 * Usage: `echo $grid->editButton('address', $id);`
-	 *
-	 * @param   string  $title    Title of link, default is an icon.
-	 * @param   string  $task     View name to build task: `{view}.edit.edit`.
-	 * @param   int     $id       Edit id.
-	 * @param   array   $query    URL query array.
-	 * @param   array   $attribs  Link element attributes.
-	 *
-	 * @return  string  Link element.
-	 */
-	public function editButton($title = null, $task = null, $id = null, $query = array(), $attribs = array())
-	{
-		$title = $title ? : new HtmlElement('span', null, array('class' => 'icon-edit icon-white glyphicon glyphicon-edit'));
-
-		$attribs['class'] = !empty($attribs['class']) ? $attribs['class'] : 'btn btn-mini';
-
-		return $this->editTitle($title, $task, $id, $query, $attribs);
-	}
-
-	/**
 	 * Make a link to direct to foreign table item.
 	 * Note that the ordering or id and title are different from `editButton()`, but others are same.
 	 *
 	 * Usage: `echo $grid->foreignLink('customer', $item->customer_name, $item->customer_id);`
 	 *
 	 * @param   string  $title    Title of link, default is an icon.
-	 * @param   string  $task     View name to build task: `{view}.edit.edit`.
-	 * @param   int     $fk       Edit foreign id.
-	 * @param   array   $query    URL query array.
+	 * @param   string  $url      URL to link.
 	 * @param   array   $attribs  Link element attributes.
 	 *
 	 * @return  string  Link element.
 	 */
-	public function foreignLink($title = null, $task = null, $fk = null, $query = array(), $attribs = array())
+	public function foreignLink($title = null, $url, $attribs = array())
 	{
-		if (!$fk)
-		{
-			return '';
-		}
+		$title = $title . ' <small class="icon-out-2 glyphicon glyphicon-share fa fa-share-square-o"></small>';
 
-		$title = $title . ' <small class="icon-out-2 glyphicon glyphicon-share"></small>';
+		$defaultAttribs['href']   = $url;
+		$defaultAttribs['class']  = 'text-muted muted';
+		$defaultAttribs['target'] = '_blank';
 
-		$attribs['class'] = 'text-muted muted';
-		$attribs['target'] = '_blank';
-
-		return $this->editTitle($title, $task, $fk, $query, $attribs);
-	}
-
-	/**
-	 * Check-out button.
-	 *
-	 * @param string $taskPrefix The task prefix.
-	 *
-	 * @return string Check-out button html code.
-	 */
-	public function checkoutButton($taskPrefix = null)
-	{
-		$item  = $this->current;
-		$field = $this->config->get('field.checked_out', 'checked_out');
-
-		$authorNameField = $this->config->get('field.author_name');
-		$chkTimeField    = $this->config->get('field.checked_out_time');
-		$canCheckin      = $this->state->get('access.canCheckin', true);
-		$taskPrefix      = $taskPrefix ? : $this->config->get('view_list') . '.check.';
-
-		if (!$item->$field)
-		{
-			return '';
-		}
-
-		return \JHtmlJGrid::checkedout(
-			$this->row,
-			$item->$authorNameField,
-			$item->$chkTimeField,
-			$taskPrefix,
-			$canCheckin
-		);
+		return new HtmlElement('a', $title, array_merge($defaultAttribs, $attribs));
 	}
 
 	/**
 	 * Created date.
 	 *
 	 * @param string $format The date format.
+	 * @param bool   $local  Use local timezone.
 	 *
-	 * @return  string Date string.
+	 * @return string Date string.
 	 */
-	public function createdDate($format = '')
+	public function createdDate($format = '', $local = false)
 	{
 		$field = $this->config->get('field.created', 'created');
-		$format  = $format ? : JText::_('DATE_FORMAT_LC4');
+		$format  = $format ? : DateTime::$format;
 
-		return JHtml::date($this->current->$field, $format);
+		return DateTime::create($this->current->$field, $local)->format($format, true);
 	}
 
 	/**
@@ -439,14 +352,15 @@ HTML;
 	{
 		$field = $this->config->get('field.language', 'language');
 		$title = $this->config->get('field.lang_title', 'lang_title');
+		$all   = $this->config->get('lang.all', 'phoenix.all');
 
 		if ($this->current->$field == '*')
 		{
-			return JText::alt('JALL', 'language');
+			return Translator::translate($all);
 		}
 		else
 		{
-			return $this->current->$title ? $this->escape($this->current->$title) : JText::_('JUNDEFINED');
+			return $this->current->$title ? $this->escape($this->current->$title) : '-';
 		}
 	}
 

@@ -18,6 +18,13 @@ use Phoenix\View\GridView;
 class {$controller.list.name.cap$}HtmlView extends GridView
 {
 	/**
+	 * Property orderField.
+	 *
+	 * @var  string
+	 */
+	protected $orderColumn = '{$controller.item.name.lower$}.ordering';
+
+	/**
 	 * prepareData
 	 *
 	 * @param \Windwalker\Data\Data $data

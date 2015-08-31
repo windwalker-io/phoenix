@@ -30,6 +30,13 @@ class GridView extends ListView
 	protected $gridHelper;
 
 	/**
+	 * Property orderField.
+	 *
+	 * @var  string
+	 */
+	protected $orderColumn = null;
+
+	/**
 	 * prepareData
 	 *
 	 * @param \Windwalker\Data\Data $data
@@ -67,7 +74,11 @@ class GridView extends ListView
 	{
 		if (!$this->gridHelper)
 		{
-			$this->gridHelper = new GridHelper($this, $options);
+			$defaultOptions = array(
+				'order_column' => $this->orderColumn
+			);
+
+			$this->gridHelper = new GridHelper($this, array_merge($defaultOptions, $options));
 		}
 
 		return $this->gridHelper;

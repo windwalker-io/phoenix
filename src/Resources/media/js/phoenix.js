@@ -252,36 +252,49 @@
 			return this;
 		},
 
-		reorder: function(url, queries)
+		reorderAll: function(url, queries)
 		{
-			this.toggleAll(true);
-
 			queries = queries || {};
 			queries['task'] = queries['task'] || 'reorder';
 
 			return this.patch(url, queries);
 		},
 
-		setOrder: function(row, offset, url, queries)
+		reorder: function(row, offset, url, queries)
 		{
 			var input = this.form.find('input[data-order-row=' + row + ']');
+			var tr    = input.parents('tr');
+			var group = tr.attr('data-order-group');
+			var input2;
 
 			input.val(parseInt(input.val()) + parseFloat(offset));
 
 			if (offset > 0)
 			{
-				row++;
+				if (group)
+				{
+					input2 = tr.nextAll('tr[data-order-group=' + group + ']').first().find('input[data-order-row]');
+				}
+				else
+				{
+					input2 = tr.next().find('input[data-order-row]');
+				}
 			}
 			else if (offset < 0)
 			{
-				row--;
+				if (group)
+				{
+					input2 = tr.prevAll('tr[data-order-group=' + group + ']').first().find('input[data-order-row]');
+				}
+				else
+				{
+					input2 = tr.prev().find('input[data-order-row]');
+				}
 			}
-
-			var input2 = this.form.find('input[data-order-row=' + row + ']');
 
 			input2.val(parseInt(input2.val()) - parseFloat(offset));
 
-			return this.reorder(url, queries);
+			return this.reorderAll(url, queries);
 		}
 	};
 
