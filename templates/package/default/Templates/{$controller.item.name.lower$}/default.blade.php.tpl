@@ -2,18 +2,6 @@
 
 @extends('_global.admin-edit')
 
-@section('script')
-    <script src="{{ $uri['media.path'] }}phoenix/js/phoenix.js"></script>
-    <script>
-        jQuery(document).ready(function($)
-        {
-            var form = $('#admin-form');
-
-            window.Phoenix = new PhoenixCore(form, {});
-        });
-    </script>
-@stop
-
 @section('toolbar')
     @include('toolbar')
 @stop

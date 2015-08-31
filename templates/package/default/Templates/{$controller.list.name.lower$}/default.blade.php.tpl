@@ -2,27 +2,11 @@
 
 @extends('_global.admin')
 
-@section('script')
-    <script src="{{ $uri['media.path'] }}phoenix/js/phoenix.js"></script>
-    <script src="{{ $uri['media.path'] }}phoenix/js/filterbar.js"></script>
-    <script>
-        jQuery(document).ready(function($)
-        {
-            var form = $('#admin-form');
-
-            window.Phoenix = new PhoenixCore(form, {});
-
-            form.filterbar();
-        });
-    </script>
-@stop
-
 @section('toolbar')
     @include('toolbar')
 @stop
 
 @section('body')
-
 <form name="admin-form" id="admin-form" action="{{ $router->html('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
 
     <div class="{$controller.item.name.lower$}-items">

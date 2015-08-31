@@ -8,6 +8,9 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
+use Phoenix\Asset\Asset;
+use Phoenix\Script\BootstrapScript;
+use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
 
 /**
@@ -33,6 +36,8 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	 */
 	protected function prepareData($data)
 	{
-
+		BootstrapScript::css();
+		BootstrapScript::script();
+		PhoenixScript::filterbar();
 	}
 }

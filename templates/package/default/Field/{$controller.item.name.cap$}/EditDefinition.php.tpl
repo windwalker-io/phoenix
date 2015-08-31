@@ -8,6 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$};
 
+use Phoenix\Field\CalendarField;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Field\ListField;
 use Windwalker\Form\Field\TextareaField;
@@ -73,10 +74,10 @@ class EditDefinition implements FieldDefinitionInterface
 			$form->add('version', new TextField)
 				->label('Version');
 
-			$form->add('created', new TextField)
+			$form->add('created', new CalendarField)
 				->label('Created Time');
 
-			$form->add('modified', new TextField)
+			$form->add('modified', new CalendarField)
 				->label('Modified Time');
 
 			$form->add('created_by', new TextField)

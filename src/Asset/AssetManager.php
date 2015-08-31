@@ -8,7 +8,13 @@
 
 namespace Phoenix\Asset;
 
+use Phoenix\Uri\Uri;
 use Windwalker\Dom\HtmlElement;
+use Windwalker\Environment\ServerHelper;
+use Windwalker\Filesystem\File;
+use Windwalker\Filesystem\Filesystem;
+use Windwalker\Ioc;
+use Windwalker\String\StringHelper;
 
 /**
  * The AssetManager class.
@@ -76,7 +82,7 @@ class AssetManager
 		}
 
 		$file = array(
-			'url' => $url,
+			'url' => $this->handleUri($url),
 			'attribs' => $attribs,
 			'version' => $version
 		);
@@ -103,7 +109,7 @@ class AssetManager
 		}
 
 		$file = array(
-			'url' => $url,
+			'url' => $this->handleUri($url),
 			'attribs' => $attribs,
 			'version' => $version
 		);
@@ -152,6 +158,12 @@ class AssetManager
 	{
 		$html = array();
 
+		Ioc::getApplication()->triggerEvent('onPhoenixRenderStyles', array(
+			'asset' => $this,
+			'withInternal' => &$withInternal,
+			'html' => &$html
+		));
+
 		foreach ($this->styles as $url => $style)
 		{
 			$defaultAttribs = array(
@@ -171,7 +183,7 @@ class AssetManager
 
 		if ($withInternal && $this->internalStyles)
 		{
-			$html[] = (string) new HtmlElement('style', $this->renderInternalStyles());
+			$html[] = (string) new HtmlElement('style', "\n" . $this->renderInternalStyles() . "\n" . $this->indents);
 		}
 
 		return implode("\n" . $this->indents, $html);
@@ -187,6 +199,12 @@ class AssetManager
 	public function renderScripts($withInternal = false)
 	{
 		$html = array();
+
+		Ioc::getApplication()->triggerEvent('onPhoenixRenderScripts', array(
+			'asset' => $this,
+			'withInternal' => &$withInternal,
+			'html' => &$html
+		));
 
 		foreach ($this->scripts as $url => $script)
 		{
@@ -206,7 +224,7 @@ class AssetManager
 
 		if ($withInternal && $this->internalScripts)
 		{
-			$html[] = (string) new HtmlElement('script', $this->renderInternalScripts());
+			$html[] = (string) new HtmlElement('script', "\n" . $this->renderInternalScripts() . "\n" . $this->indents);
 		}
 
 		return implode("\n" . $this->indents, $html);
@@ -244,14 +262,49 @@ class AssetManager
 			return $this->version;
 		}
 
-		$sumFile = WINDWALKER_CACHE . '/phoenix/MD5SUM';
+		$sumFile = WINDWALKER_CACHE . '/phoenix/asset/MD5SUM';
 
-		if (WINDWALKER_DEBUG || !is_file($sumFile))
+		if (!is_file($sumFile))
 		{
-			return $this->version = md5(uniqid());
+			if (WINDWALKER_DEBUG)
+			{
+				return $this->version = md5(uniqid());
+			}
+			else
+			{
+				return $this->detectVersion();
+			}
 		}
 
 		return $this->version = trim(file_get_contents($sumFile));
+	}
+
+	/**
+	 * detectVersion
+	 *
+	 * @return  string
+	 */
+	protected function detectVersion()
+	{
+		static $version;
+
+		if ($version)
+		{
+			return $version;
+		}
+
+		$media = Ioc::getEnvironment()->server->getServerPublicRoot() . '/' . Uri::media(Uri::RELATIVE);
+
+		$time = '';
+		$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($media, \FilesystemIterator::FOLLOW_SYMLINKS));
+
+		/** @var \SplFileInfo $file */
+		foreach ($files as $file)
+		{
+			$time .= $file->getMTime();
+		}
+
+		return $version = md5(Ioc::getConfig()->get('system.secret') . $time);
 	}
 
 	/**
@@ -386,5 +439,55 @@ class AssetManager
 	public function getIndents()
 	{
 		return $this->indents;
+	}
+
+	/**
+	 * handleUri
+	 *
+	 * @param   string  $uri
+	 *
+	 * @return  string
+	 */
+	protected function handleUri($uri)
+	{
+		// Check has .min
+		$uri = Uri::addBase($uri, 'media.path');
+
+		if (strpos('http', $uri) === 0 || strpos('//', $uri) === 0)
+		{
+			return $uri;
+		}
+
+		$ext = File::getExtension($uri);
+		$root = Ioc::getEnvironment()->server->getServerPublicRoot();
+
+		// Add min
+		if (WINDWALKER_DEBUG)
+		{
+			// Uri has .min and uncompressed file exists, use uncompressed file in debug mode
+			if (StringHelper::endsWith($uri, '.min.' . $ext))
+			{
+				$assetFile = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
+
+				if (is_file($root . '/' . $assetFile))
+				{
+					return $assetFile;
+				}
+			}
+		}
+		else
+		{
+			if (!StringHelper::endsWith($uri, '.min.' . $ext))
+			{
+				$assetMinFile = substr($uri, 0, -strlen('.' . $ext)) . '.min.' . $ext;
+
+				if (is_file($root . '/' . $assetMinFile))
+				{
+					return $assetMinFile;
+				}
+			}
+		}
+
+		return $uri;
 	}
 }

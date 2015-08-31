@@ -9,15 +9,13 @@
     <meta name="generator" content="Windwalker Framework" />
     @yield('meta')
 
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    {{ \Phoenix\Asset\Asset::renderStyles(true); }}
     <link rel="stylesheet" href="{{ $uri['media.path'] }}phoenix/css/phoenix.css" />
-    <link rel="stylesheet" href="{{ $uri['media.path'] }}{{ $package->getName() }}/css/{$package.name.lower$}.css" />
     @yield('style')
 
-    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    {{ \Phoenix\Asset\Asset::renderScripts(true); }}
     @yield('script')
+
 </head>
 <body>
 @section('navbar')

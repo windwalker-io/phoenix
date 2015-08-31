@@ -21,3 +21,18 @@
   height: 22px;
   padding: 0 5px;
 }
+#phoenix-iframe-modal .modal-dialog {
+  min-width: 900px;
+}
+#phoenix-iframe-modal .modal-body iframe {
+  height: 500px;
+}
+.chosen-container-multi .chosen-choices .search-choice {
+  background: #eee;
+  padding: 4px 25px 4px 14px;
+  background-image: none;
+}
+.chosen-container-multi .chosen-choices .search-choice .search-choice-close {
+  top: 7px;
+  right: 6px;
+}

@@ -8,6 +8,8 @@
 
 namespace {$package.namespace$}{$package.name.cap$};
 
+use Phoenix\Asset\Asset;
+use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Package\AbstractPackage;
 
 /**
@@ -17,4 +19,15 @@ use Windwalker\Core\Package\AbstractPackage;
  */
 class {$package.name.cap$}Package extends AbstractPackage
 {
+	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+		BootstrapScript::css();
+		Asset::addStyle('phoenix/css/phoenix.css');
+		Asset::addStyle('{$package.name.lower$}/css/{$package.name.lower$}.css');
+	}
 }

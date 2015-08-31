@@ -13,6 +13,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 /**
  * The Asset class.
  *
+ * @see AssetManager
+ *
  * @method  static  AssetManager  addStyle()                addStyle($url, $version = null, $attribs = array())
  * @method  static  AssetManager  addScript()               addScript($url, $version = null, $attribs = array())
  * @method  static  AssetManager  internalStyle()           internalStyle($content)

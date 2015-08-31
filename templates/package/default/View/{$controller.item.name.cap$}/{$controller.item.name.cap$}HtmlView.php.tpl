@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
 
 use Phoenix\Html\Document;
+use Phoenix\Script\PhoenixScript;
 use Phoenix\View\EditView;
 
 /**
@@ -28,5 +29,8 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	protected function prepareData($data)
 	{
 		Document::setTitle('{$controller.item.name.cap$} Edit');
+
+		PhoenixScript::chosen();
+		PhoenixScript::core();
 	}
 }

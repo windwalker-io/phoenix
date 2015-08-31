@@ -116,6 +116,24 @@ class Uri extends \Windwalker\Uri\Uri
 	}
 
 	/**
+	 * addBase
+	 *
+	 * @param string $uri
+	 * @param string $path
+	 *
+	 * @return  string
+	 */
+	public static function addBase($uri, $path = 'base.full')
+	{
+		if (strpos($uri, 'http') !== 0 && strpos($uri, '/') !== 0)
+		{
+			$uri = static::getApplication()->get('uri.' . $path) . $uri;
+		}
+
+		return $uri;
+	}
+
+	/**
 	 * Method to get property Application
 	 *
 	 * @return  mixed
