@@ -46,6 +46,10 @@
 }
 
 // Chosen
+.chosen-container {
+	cursor: pointer;
+}
+
 .chosen-container-multi .chosen-choices {
 	.search-choice {
 		background: #eee;
@@ -57,5 +61,51 @@
 			top: 7px;
 			right: 6px;
 		}
+	}
+}
+
+// Chosen in modal will be 0px, force it's width
+.modal .chosen-container {
+	min-width: 100%;
+}
+
+// Bootstrap Awesome Checkbox
+.checkbox input[type=checkbox]:checked + label:after {
+	font-family: 'Glyphicons Halflings';
+	content: "\e013";
+}
+.checkbox label:after {
+	padding-left: 4px;
+	padding-top: 2px;
+	font-size: 9px;
+}
+
+.checkbox {
+	input {
+		cursor: pointer;
+	}
+}
+
+.checkbox.single-checkbox {
+	margin: 0;
+	padding: 0;
+	width: 21px;
+
+	label {
+		padding: 0;
+	}
+	label::before,
+	label::after,
+	input[type=checkbox] {
+		margin: 0;
+	}
+	label::after {
+		padding-left: 2px;
+		padding-top: 0;
+	}
+
+	input[type=checkbox] {
+		width: 17px;
+		height: 17px;
 	}
 }

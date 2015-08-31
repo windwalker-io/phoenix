@@ -10,7 +10,7 @@
     @yield('meta')
 
     {{ \Phoenix\Asset\Asset::renderStyles(true); }}
-    <link rel="stylesheet" href="{{ $uri['media.path'] }}phoenix/css/phoenix.css" />
+    <link rel="stylesheet" href="{{ $uri['media.path'] }}phoenix/css/phoenix.css?{{ \Phoenix\Asset\Asset::getVersion() }}" />
     @yield('style')
 
     {{ \Phoenix\Asset\Asset::renderScripts(true); }}

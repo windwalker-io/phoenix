@@ -10,8 +10,9 @@ namespace Phoenix\Script\Module;
 
 use Phoenix\Asset\Asset;
 use Phoenix\Asset\AssetManager;
-use Phoenix\Script\Module\Module;
+use Phoenix\PhoenixPackage;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Ioc;
 
 /**
@@ -22,11 +23,11 @@ use Windwalker\Ioc;
 class ModuleManager
 {
 	/**
-	 * THe asset helpers storage.
+	 * Property asset.
 	 *
 	 * @var  AssetManager
 	 */
-	protected $asset = array();
+	protected $asset;
 
 	/**
 	 * Modules handler storage.
@@ -36,64 +37,53 @@ class ModuleManager
 	protected $modules = array();
 
 	/**
-	 * Property legacy.
+	 * Property inited.
 	 *
-	 * @var  boolean
+	 * @var  array
 	 */
-	protected $legacy = false;
+	protected $inited = array();
 
 	/**
-	 * Class init.
+	 * ModuleManager constructor.
+	 *
+	 * @param AssetManager $asset
 	 */
-	public function __construct()
+	public function __construct(AssetManager $asset = null)
 	{
-		$this->registerCoreModules();
+		$this->asset = $asset ? : Asset::getInstance();
 	}
 
 	/**
-	 * Load RequireJS.
+	 * inited
 	 *
-	 * @return  void
+	 * @param   mixed $data
+	 *
+	 * @return  boolean
 	 */
-	public function requireJS()
+	public function inited($name, $data = null)
 	{
-		$this->load(__FUNCTION__);
+		$id = $this->getInitedId($data);
+
+		if (!isset($this->inited[$name][$id]))
+		{
+			$this->inited[$name][$id] = true;
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
-	 * Load underscore.
+	 * getInitedId
 	 *
-	 * @param boolean $noConflict Enable underscore no conflict mode.
+	 * @param   mixed  $data
 	 *
-	 * @return  void
+	 * @return  string
 	 */
-	public function underscore($noConflict = true)
+	public function getInitedId($data)
 	{
-		$this->load(__FUNCTION__, $noConflict);
-	}
-
-	/**
-	 * Include Backbone. Note this library may not support old IE browser.
-	 *
-	 * Please see: http://backbonejs.org/
-	 *
-	 * @param   boolean $noConflict
-	 *
-	 * @return  void
-	 */
-	public function backbone($noConflict = false)
-	{
-		$this->load(__FUNCTION__, $noConflict);
-	}
-
-	/**
-	 * Load Windwalker script.
-	 *
-	 * @return  void
-	 */
-	public function windwalker()
-	{
-		$this->load(__FUNCTION__);
+		return sha1(serialize($data));
 	}
 
 	/**
@@ -139,12 +129,7 @@ class ModuleManager
 			return false;
 		}
 
-		if ($this->legacy && $module->inited())
-		{
-			return true;
-		}
-
-		$module->execute(Asset::getInstance(), $arguments);
+		$module->execute($this->getAsset(), $arguments);
 
 		return true;
 	}
@@ -213,36 +198,60 @@ class ModuleManager
 	}
 
 	/**
-	 * Method to get property Legacy
+	 * Method to get property Asset
 	 *
-	 * @return  boolean
+	 * @return  AssetManager
 	 */
-	public function getLegacy()
+	public function getAsset()
 	{
-		return $this->legacy;
+		if (!$this->asset)
+		{
+			$this->asset = Asset::getInstance();
+		}
+
+		return $this->asset;
 	}
 
 	/**
-	 * Method to set property legacy
+	 * Method to set property asset
 	 *
-	 * @param   boolean $legacy
+	 * @param   AssetManager $asset
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setLegacy($legacy)
+	public function setAsset($asset)
 	{
-		$this->legacy = $legacy;
+		$this->asset = $asset;
 
 		return $this;
 	}
 
 	/**
-	 * registerCoreModules
+	 * phoenixName
 	 *
-	 * @return  void
+	 * @return  string
 	 */
-	protected function registerCoreModules()
+	public function phoenixName()
 	{
+		static $name;
 
+		if ($name)
+		{
+			return $name;
+		}
+
+		$packages = PackageHelper::getPackages();
+
+		foreach ($packages as $package)
+		{
+			if ($package instanceof PhoenixPackage)
+			{
+				$name = $package->getName();
+
+				break;
+			}
+		}
+
+		return $name = 'phoenix';
 	}
 }

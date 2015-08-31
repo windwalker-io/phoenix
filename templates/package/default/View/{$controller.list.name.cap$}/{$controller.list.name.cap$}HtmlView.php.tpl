@@ -36,8 +36,11 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	 */
 	protected function prepareData($data)
 	{
+		PhoenixScript::chosen();
 		BootstrapScript::css();
 		BootstrapScript::script();
+		BootstrapScript::checkbox();
+		PhoenixScript::core();
 		PhoenixScript::filterbar();
 	}
 }

@@ -46,6 +46,8 @@ class FilterDefinition implements FieldDefinitionInterface
 		{
 			$form->add('{$controller.item.name.lower$}.state', new ListField)
 				->label('state')
+				// Add empty option to support single deselect button
+				->addOption(new Option('', ''))
 				->addOption(new Option('-- Select State --', ''))
 				->addOption(new Option('Published', '1'))
 				->addOption(new Option('Unpublished', '0'))

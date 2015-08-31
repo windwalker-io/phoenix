@@ -35,7 +35,7 @@ class BatchDefinition implements FieldDefinitionInterface
 		{
 			$form->add('language', new ListField)
 				->label('Language')
-				->set('class', '')
+				->set('class', 'col-md-12')
 				->addOption(new Option('-- Select Language --', ''))
 				->addOption(new Option('English', 'en-GB'))
 				->addOption(new Option('Chinese Traditional', 'zh-TW'));

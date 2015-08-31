@@ -8,9 +8,7 @@
 
 namespace Phoenix\Script;
 
-use Phoenix\Asset\AssetManager;
-use Phoenix\Script\Module\Module;
-use Phoenix\Script\Module\ModuleManager;
+use Windwalker\Core\Language\Translator;
 
 /**
  * The PhoenixScript class.
@@ -18,56 +16,56 @@ use Phoenix\Script\Module\ModuleManager;
  * @see  \Phoenix\Script\ScriptManager
  * @see  \Phoenix\Script\Module\ModuleManager
  *
- * @method  static  boolean  jquery($noConflict = false)
- * @method  static  boolean  core($formSelector = '#admin-form', $options = array())
- * @method  static  boolean  filterbar($formSelector = '#admin-form', $options = array())
- *
  * @since  {DEPLOY_VERSION}
  */
 class PhoenixScript extends ScriptManager
 {
 	/**
-	 * registerModules
+	 * jquery
 	 *
-	 * @param ModuleManager $moduleManager
+	 * @param   boolean $noConflict
 	 *
 	 * @return  void
 	 */
-	protected function registerModules(ModuleManager $moduleManager)
+	public static function jquery($noConflict = false)
 	{
-		// jquery()
-		// -------------------------------------------------------
-		$moduleManager->addModule('jquery', function(Module $module, AssetManager $asset,
-			$noConflict = false)
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
 		{
-			if (!$module->inited())
-			{
-				$asset->addScript('phoenix/js/jquery/jquery.js');
-			}
+			$asset->addScript(static::phoenixName() . '/js/jquery/jquery.js');
+		}
 
-			if (!$module->stateInited() && $noConflict)
-			{
-				$asset->internalScript('jQuery.noConflict();');
-			}
-		});
+		if (!static::inited(__METHOD__, func_get_args()) && $noConflict)
+		{
+			$asset->internalScript('jQuery.noConflict();');
+		}
+	}
 
-		// core()
-		// -------------------------------------------------------
-		$moduleManager->addModule('core', function(Module $module, AssetManager $asset,
-			$formSelector = '#admin-form', $options = array())
+	/**
+	 * core
+	 *
+	 * @param string $formSelector
+	 * @param array  $options
+	 *
+	 * @return  void
+	 */
+	public static function core($formSelector = '#admin-form', $options = array())
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
 		{
 			static::jquery();
 
-			if (!$module->inited())
-			{
-				$asset->addScript('phoenix/js/phoenix.js');
-			}
+			$asset->addScript(static::phoenixName() . '/js/phoenix.js');
+		}
 
-			if (!$module->stateInited())
-			{
-				$options = json_encode((object) $options);
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$options = json_encode((object) $options);
 
-				$js = <<<JS
+			$js = <<<JS
 // Phoenix Core
 jQuery(document).ready(function($)
 {
@@ -77,27 +75,34 @@ jQuery(document).ready(function($)
 });
 JS;
 
-				$asset->internalScript($js);
-			}
-		});
+			$asset->internalScript($js);
+		}
+	}
 
-		// filterbar()
-		// -------------------------------------------------------
-		$moduleManager->addModule('filterbar', function(Module $module, AssetManager $asset,
-			$formSelector = '#admin-form', $options = array())
+	/**
+	 * filterbar
+	 *
+	 * @param string $formSelector
+	 * @param array  $options
+	 *
+	 * @return  void
+	 */
+	public static function filterbar($formSelector = '#admin-form', $options = array())
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
 		{
 			static::core();
 
-			if (!$module->inited())
-			{
-				$asset->addScript('phoenix/js/filterbar.js');
-			}
+			$asset->addScript(static::phoenixName() . '/js/filterbar.js');
+		}
 
-			if (!$module->stateInited())
-			{
-				$options = json_encode((object) $options);
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$options = json_encode((object) $options);
 
-				$js = <<<JS
+			$js = <<<JS
 // Filter bar
 jQuery(document).ready(function($)
 {
@@ -107,28 +112,43 @@ jQuery(document).ready(function($)
 });
 JS;
 
-				$asset->internalScript($js);
-			}
-		});
+			$asset->internalScript($js);
+		}
+	}
 
-		// chosen()
-		// -------------------------------------------------------
-		$moduleManager->addModule('chosen', function(Module $module, AssetManager $asset,
-			$selector = 'select', $options = array())
+	/**
+	 * chosen
+	 *
+	 * @param string $selector
+	 * @param array  $options
+	 *
+	 * @return  void
+	 */
+	public static function chosen($selector = 'select', $options = array())
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
 		{
 			static::jquery();
 
-			if (!$module->inited())
-			{
-				$asset->addScript('phoenix/js/chosen/chosen.min.js');
-				$asset->addStyle('phoenix/css/chosen/bootstrap-chosen.css');
-			}
+			$asset->addScript(static::phoenixName() . '/js/chosen/chosen.min.js');
+			$asset->addStyle(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
+		}
 
-			if (!$module->stateInited())
-			{
-				$options = json_encode((object) $options);
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$defaultOptions = array(
+				'allow_single_deselect'     => true,
+				'disable_search_threshold'  => 10,
+				'placeholder_text_multiple' => Translator::translate('phoenix.select.some.options'),
+				'placeholder_text_single'   => Translator::translate('phoenix.select.an.option'),
+				'no_results_text'           => Translator::translate('phoenix.select.no.result')
+			);
 
-				$js = <<<JS
+			$options = json_encode((object) array_merge($defaultOptions, $options));
+
+			$js = <<<JS
 // Chosen select
 jQuery(document).ready(function($)
 {
@@ -136,8 +156,7 @@ jQuery(document).ready(function($)
 });
 JS;
 
-				$asset->internalScript($js);
-			}
-		});
+			$asset->internalScript($js);
+		}
 	}
 }

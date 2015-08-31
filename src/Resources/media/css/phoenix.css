@@ -27,6 +27,9 @@
 #phoenix-iframe-modal .modal-body iframe {
   height: 500px;
 }
+.chosen-container {
+  cursor: pointer;
+}
 .chosen-container-multi .chosen-choices .search-choice {
   background: #eee;
   padding: 4px 25px 4px 14px;
@@ -35,4 +38,40 @@
 .chosen-container-multi .chosen-choices .search-choice .search-choice-close {
   top: 7px;
   right: 6px;
+}
+.modal .chosen-container {
+  min-width: 100%;
+}
+.checkbox input[type=checkbox]:checked + label:after {
+  font-family: 'Glyphicons Halflings';
+  content: "\e013";
+}
+.checkbox label:after {
+  padding-left: 4px;
+  padding-top: 2px;
+  font-size: 9px;
+}
+.checkbox input {
+  cursor: pointer;
+}
+.checkbox.single-checkbox {
+  margin: 0;
+  padding: 0;
+  width: 21px;
+}
+.checkbox.single-checkbox label {
+  padding: 0;
+}
+.checkbox.single-checkbox label::before,
+.checkbox.single-checkbox label::after,
+.checkbox.single-checkbox input[type=checkbox] {
+  margin: 0;
+}
+.checkbox.single-checkbox label::after {
+  padding-left: 2px;
+  padding-top: 0;
+}
+.checkbox.single-checkbox input[type=checkbox] {
+  width: 17px;
+  height: 17px;
 }

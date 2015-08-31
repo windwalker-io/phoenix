@@ -8,67 +8,85 @@
 
 namespace Phoenix\Script;
 
-use Phoenix\Asset\AssetManager;
-use Phoenix\Script\Module\Module;
-use Phoenix\Script\Module\ModuleManager;
-
 /**
  * The BootstrapScript class.
  *
  * @see  \Phoenix\Script\ScriptManager
  * @see  \Phoenix\Script\Module\ModuleManager
  *
- * @method  static  boolean  css()
- * @method  static  boolean  script()
- * @method  static  boolean  modal($selector = '.hasModal')
- * @method  static  boolean  calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss')
- *
  * @since  {DEPLOY_VERSION}
  */
 class BootstrapScript extends ScriptManager
 {
 	/**
-	 * registerModules
-	 *
-	 * @param ModuleManager $moduleManager
+	 * css
 	 *
 	 * @return  void
 	 */
-	protected function registerModules(ModuleManager $moduleManager)
+	public static function css()
 	{
-		// css()
-		// -------------------------------------------------------
-		$moduleManager->addModule('css', function(Module $module, AssetManager $asset)
+		if (!static::inited(__METHOD__))
 		{
-			if (!$module->inited())
-			{
-				$asset->addStyle('phoenix/bootstrap/css/bootstrap.min.css');
-			}
-		});
+			$asset = static::getAsset();
 
-		// script()
-		// -------------------------------------------------------
-		$moduleManager->addModule('script', function(Module $module, AssetManager $asset)
+			$asset->addStyle(static::phoenixName() . '/bootstrap/css/bootstrap.min.css');
+		}
+	}
+
+	/**
+	 * script
+	 *
+	 * @return  void
+	 */
+	public static function script()
+	{
+		if (!static::inited(__METHOD__))
 		{
 			PhoenixScript::jquery(true);
 			static::css();
 
-			if (!$module->inited())
-			{
-				$asset->addScript('phoenix/bootstrap/js/bootstrap.min.js');
-			}
-		});
+			$asset = static::getAsset();
 
-		// modal()
-		// -------------------------------------------------------
-		$moduleManager->addModule('modal', function(Module $module, AssetManager $asset, $selector = '.hasModal')
+			$asset->addScript(static::phoenixName() . '/bootstrap/js/bootstrap.min.js');
+		}
+	}
+
+	/**
+	 * checkbox
+	 *
+	 * @return  void
+	 */
+	public static function checkbox()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::css();
+
+			$asset = static::getAsset();
+
+			$asset->addStyle(static::phoenixName() . '/bootstrap/css/awesome-checkbox.min.css');
+		}
+	}
+
+	/**
+	 * modal
+	 *
+	 * @param string $selector
+	 *
+	 * @return  void
+	 */
+	public static function modal($selector = '.hasModal')
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
 		{
 			static::script();
 
-			if (!$module->inited())
-			{
-				$tmpl = <<<MODAL
-<div class="modal fade" id="phoenix-iframe-modal"> \
+			$js = <<<JS
+// Init modal
+jQuery(document).ready(function($) {
+	var modalBox = $('<div class="modal fade" id="phoenix-iframe-modal"> \
     <div class="modal-dialog"> \
         <div class="modal-content"> \
             <div class="modal-body"> \
@@ -76,31 +94,24 @@ class BootstrapScript extends ScriptManager
             </div> \
         </div> \
     </div> \
-</div>
-MODAL;
-
-				$js = <<<JS
-
-// Init modal
-jQuery(document).ready(function($) {
-	var modalBox = $('{$tmpl}');
+</div>');
 
 	$('body').append(modalBox);
 });
 JS;
 
-				$asset->internalScript($js);
-			}
+			$asset->internalScript($js);
+		}
 
-			if (!$module->stateInited())
-			{
-				$js = <<<JS
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$js = <<<JS
 
 // Modal task
 jQuery(document).ready(function($) {
-	\$('{$selector}').click(function(event) {
-		var \$link = \$(this);
-		var modal  = \$('#phoenix-iframe-modal');
+	$('{$selector}').click(function(event) {
+		var \$link = $(this);
+		var modal  = $('#phoenix-iframe-modal');
 		var href   = \$link.attr('href');
 		var iframe = modal.find('iframe');
 
@@ -113,44 +124,51 @@ jQuery(document).ready(function($) {
 });
 JS;
 
-				$asset->internalScript($js);
-			}
-		});
+			$asset->internalScript($js);
+		}
+	}
 
-		// calendar()
-		// -------------------------------------------------------
-		$moduleManager->addModule('calendar', function(Module $module, AssetManager $asset,
-			$selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = array())
+	/**
+	 * calendar
+	 *
+	 * @param string $selector
+	 * @param string $format
+	 * @param array  $options
+	 *
+	 * @return  void
+	 */
+	public static function calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = array())
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
 		{
 			PhoenixScript::jquery();
 			static::css();
 
-			if (!$module->inited())
-			{
-				$asset->addScript('phoenix/js/datetime/moment.min.js');
-				$asset->addScript('phoenix/bootstrap/js/bootstrap-datetimepicker.min.js');
-				$asset->addStyle('phoenix/bootstrap/css/bootstrap-datetimepicker.min.css');
-			}
+			$asset->addScript(static::phoenixName() . '/js/datetime/moment.min.js');
+			$asset->addScript(static::phoenixName() . '/bootstrap/js/bootstrap-datetimepicker.min.js');
+			$asset->addStyle(static::phoenixName() . '/bootstrap/css/bootstrap-datetimepicker.min.css');
+		}
 
-			if (!$module->stateInited())
-			{
-				$defaultOptions = array(
-					'format' => $format,
-					'sideBySide' => true,
-					'calendarWeeks' => true
-				);
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$defaultOptions = array(
+				'format' => $format,
+				'sideBySide' => true,
+				'calendarWeeks' => true
+			);
 
-				$options = json_encode((object) array_merge($defaultOptions, $options));
+			$options = json_encode((object) array_merge($defaultOptions, $options));
 
-				$js = <<<JS
+			$js = <<<JS
 jQuery(document).ready(function($)
 {
-	\$('$selector').datetimepicker($options);
+	$('$selector').datetimepicker($options);
 });
 JS;
 
-				$asset->internalScript($js);
-			}
-		});
+			$asset->internalScript($js);
+		}
 	}
 }
