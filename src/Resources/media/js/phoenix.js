@@ -207,21 +207,40 @@
 			this.patch(url, queries);
 		},
 
+		/**
+		 * Toggle all checkboxes.
+		 *
+		 * @param  {boolean}  value  Checked or unchecked.
+		 */
 		toggleAll: function(value)
 		{
 			var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
 
 			$.each(checkboxes, function(i, e)
 			{
-				e.checked = value;
+				// A little pretty effect
+				setTimeout(function()
+				{
+					e.checked = value;
+				}, (150 / checkboxes.length) * i);
 			});
 		},
 
+		/**
+		 * Count checked checkboxes.
+		 *
+		 * @returns {int}
+		 */
 		countChecked: function()
 		{
 			return this.getChecked().length;
 		},
 
+		/**
+		 * Get Checked boxes.
+		 *
+		 * @returns {Element[]}
+		 */
 		getChecked: function()
 		{
 			var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]'),
@@ -238,6 +257,14 @@
 			return result;
 		},
 
+		/**
+		 * Validate there has one or more checked boxes.
+		 *
+		 * @param   {string}  msg
+		 * @param   {Event}   event
+		 *
+		 * @returns {PhoenixCore}
+		 */
 		validateChecked: function(msg, event)
 		{
 			msg = msg || 'Please check one or more items.';
@@ -255,6 +282,14 @@
 			return this;
 		},
 
+		/**
+		 * Reorder all.
+		 *
+		 * @param   {string}  url
+		 * @param   {Object}  queries
+		 *
+		 * @returns {boolean}
+		 */
 		reorderAll: function(url, queries)
 		{
 			queries = queries || {};
@@ -263,6 +298,16 @@
 			return this.patch(url, queries);
 		},
 
+		/**
+		 * Reorder items.
+		 *
+		 * @param  {int}     row
+		 * @param  {int}     offset
+		 * @param  {string}  url
+		 * @param  {Object}  queries
+		 *
+		 * @returns {boolean}
+		 */
 		reorder: function(row, offset, url, queries)
 		{
 			var input = this.form.find('input[data-order-row=' + row + ']');

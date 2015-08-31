@@ -159,4 +159,29 @@ JS;
 			$asset->internalScript($js);
 		}
 	}
+
+	public static function multiSelect($selector = '#admin-form table')
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
+		{
+			static::jquery();
+
+			$asset->addScript(static::phoenixName() . '/js/grid/multiselect.min.js');
+		}
+
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$js = <<<JS
+// Chosen select
+jQuery(document).ready(function($)
+{
+	var multiSelect = new PhoenixMultiSelect('$selector');
+});
+JS;
+
+			$asset->internalScript($js);
+		}
+	}
 }
