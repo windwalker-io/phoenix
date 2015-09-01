@@ -461,33 +461,46 @@ class AssetManager
 		$ext = File::getExtension($uri);
 		$root = Ioc::getEnvironment()->server->getServerPublicRoot();
 
-		// Add min
-		if (WINDWALKER_DEBUG)
+		if (StringHelper::endsWith($uri, '.min.' . $ext))
 		{
-			// Uri has .min and uncompressed file exists, use uncompressed file in debug mode
-			if (StringHelper::endsWith($uri, '.min.' . $ext))
-			{
-				$assetFile = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
-
-				if (is_file($root . '/' . $assetFile))
-				{
-					return $assetFile;
-				}
-			}
+			$assetFile = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
+			$assetMinFile = $uri;
 		}
 		else
 		{
-			if (!StringHelper::endsWith($uri, '.min.' . $ext))
-			{
-				$assetMinFile = substr($uri, 0, -strlen('.' . $ext)) . '.min.' . $ext;
+			$assetMinFile = substr($uri, 0, -strlen('.' . $ext)) . '.min.' . $ext;
+			$assetFile = $uri;
+		}
 
-				if (is_file($root . '/' . $assetMinFile))
-				{
-					return $assetMinFile;
-				}
+		// Use uncompressed file first
+		if (WINDWALKER_DEBUG)
+		{
+			if (is_file($root . '/' . $assetFile))
+			{
+				return $assetFile;
+			}
+
+			if (is_file($root . '/' . $assetMinFile))
+			{
+				return $assetMinFile;
 			}
 		}
 
+		// Use min file first
+		else
+		{
+			if (is_file($root . '/' . $assetMinFile))
+			{
+				return $assetMinFile;
+			}
+
+			if (is_file($root . '/' . $assetFile))
+			{
+				return $assetFile;
+			}
+		}
+
+		// All file not found, fallback to default uri.
 		return $uri;
 	}
 }
