@@ -110,6 +110,8 @@ abstract class AbstractFormModel extends AbstractRadModel
 			$form->bind($data);
 		}
 
+		$form->setFieldRenderHandler($this->get('field.renderer', array('Phoenix\Form\Renderer\BootstrapRenderer', 'render')));
+
 		return $form;
 	}
 

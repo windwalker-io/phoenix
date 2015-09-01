@@ -14,20 +14,20 @@
             <fieldset class="form-horizontal">
                 <legend>Basic</legend>
 
-                {{ \Windwalker\Core\Frontend\Bootstrap::renderFields($form->getFields('basic')) }}
+                {{ $form->renderFields('basic') }}
             </fieldset>
 
             <fieldset class="form-horizontal">
                 <legend>Text</legend>
 
-                {{ \Windwalker\Core\Frontend\Bootstrap::renderFields($form->getFields('text')) }}
+                {{ $form->renderFields('text') }}
             </fieldset>
         </div>
         <div class="col-md-4">
             <fieldset class="form-horizontal">
                 <legend>Created</legend>
 
-                {{ \Windwalker\Core\Frontend\Bootstrap::renderFields($form->getFields('created')) }}
+                {{ $form->renderFields('created') }}
             </fieldset>
         </div>
     </div>

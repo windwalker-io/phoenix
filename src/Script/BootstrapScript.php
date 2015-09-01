@@ -65,6 +65,46 @@ class BootstrapScript extends ScriptManager
 			$asset = static::getAsset();
 
 			$asset->addStyle(static::phoenixName() . '/bootstrap/css/awesome-checkbox.min.css');
+
+			$css = <<<CSS
+/* Bootstrap Awesome Checkbox */
+.checkbox input[type=checkbox]:checked + label:after {
+  font-family: 'Glyphicons Halflings';
+  content: "\e013";
+}
+.checkbox label:after {
+  padding-left: 4px;
+  padding-top: 2px;
+  font-size: 9px;
+}
+.checkbox input {
+  cursor: pointer;
+}
+.checkbox.single-checkbox {
+  margin: 0;
+  padding: 0;
+  width: 21px;
+}
+.checkbox.single-checkbox label {
+  padding: 0;
+}
+.checkbox.single-checkbox label::before,
+.checkbox.single-checkbox label::after,
+.checkbox.single-checkbox input[type=checkbox] {
+  margin: 0;
+}
+.checkbox.single-checkbox label::after {
+  padding-left: 2px;
+  padding-top: 0;
+}
+.checkbox.single-checkbox input[type=checkbox] {
+  width: 17px;
+  height: 17px;
+}
+CSS;
+
+
+			$asset->internalStyle($css);
 		}
 	}
 

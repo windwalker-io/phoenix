@@ -49,7 +49,7 @@
 	 */
 	function Filterbar(element, options)
 	{
-		this.element = element;
+		this.form = element;
 		this.options = $.extend(true, {}, defaultOptions, options);
 
 		var selector = this.options.selector;

@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
 
 use Phoenix\Html\Document;
+use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\EditView;
 
@@ -32,5 +33,7 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 
 		PhoenixScript::chosen();
 		PhoenixScript::core();
+		PhoenixScript::formValidation();
+		BootstrapScript::checkbox();
 	}
 }

@@ -12,6 +12,7 @@ use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}
 use Phoenix\Field\CalendarField;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Field\ListField;
+use Windwalker\Form\Field\RadioField;
 use Windwalker\Form\Field\TextareaField;
 use Windwalker\Form\Field\TextField;
 use Windwalker\Form\FieldDefinitionInterface;
@@ -74,7 +75,7 @@ class EditDefinition implements FieldDefinitionInterface
 
 		$form->wrap('created', null, function(Form $form)
 		{
-			$form->add('state', new ListField)
+			$form->add('state', new RadioField)
 				->label('State')
 				->addOption(new Option('Published', '1'))
 				->addOption(new Option('Unpublished', '0'));

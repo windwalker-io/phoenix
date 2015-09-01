@@ -9,6 +9,7 @@
 namespace Phoenix\Script;
 
 use Windwalker\Core\Language\Translator;
+use Windwalker\Registry\Format\JsonFormat;
 
 /**
  * The PhoenixScript class.
@@ -146,7 +147,7 @@ JS;
 				'no_results_text'           => Translator::translate('phoenix.select.no.result')
 			);
 
-			$options = json_encode((object) array_merge($defaultOptions, $options));
+			$options = json_encode((object) array_merge($defaultOptions, $options), JsonFormat::prettyPrint());
 
 			$js = <<<JS
 // Chosen select
@@ -178,6 +179,36 @@ JS;
 jQuery(document).ready(function($)
 {
 	var multiSelect = new PhoenixMultiSelect('$selector');
+});
+JS;
+
+			$asset->internalScript($js);
+		}
+	}
+
+	public static function formValidation($selector = '#admin-form', $options = array())
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
+		{
+			static::jquery();
+
+			$asset->addScript(static::phoenixName() . '/js/string/punycode.min.js');
+			$asset->addScript(static::phoenixName() . '/js/form/validation.min.js');
+		}
+
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$defaultOptions = array();
+
+			$options = json_encode((object) array_merge($defaultOptions, $options));
+
+			$js = <<<JS
+// Chosen select
+jQuery(document).ready(function($)
+{
+	$('$selector').validation($options);
 });
 JS;
 

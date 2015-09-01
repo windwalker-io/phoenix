@@ -14,28 +14,46 @@
     /**
      * Class init.
      *
-     * @param {string} selector
+     * @param {jQuery} element
      * @param {Object} options
      * @constructor
      */
-    var PhoenixValidator = function(selector, options)
+    var PhoenixValidation = function(element, options)
     {
         options = $.extend({}, defaultOptions, options);
 
-        this.form = $(selector);
+        this.form = element || $;
         this.options = options;
         this.validators = [];
+        this.inputs = this.form.find('input, select, textarea');
 
         this.init();
     };
 
-    PhoenixValidator = {
+    PhoenixValidation.prototype = {
         isVaild: function()
         {
 
         },
 
-        validate: function()
+        validField: function(input)
+        {
+            var $input = $(input);
+
+            if ($input.attr('disabled'))
+            {
+                this.showResponse(true, $input)
+                return true;
+            }
+
+            if ($input.attr('required') || $input.hasClass('required'))
+            {
+                // Handle radio & checkboxes
+
+            }
+        },
+
+        showResponse: function(state, $input)
         {
 
         },
@@ -46,7 +64,7 @@
          * @param name
          * @param validator
          * @param options
-         * @returns {PhoenixValidator}
+         * @returns {PhoenixValidation}
          */
         addValidator: function(name, validator, options)
         {
@@ -88,6 +106,14 @@
         }
     };
 
-    window.PhoenixValidator = PhoenixValidator;
+    $.fn.validation = function (options)
+    {
+        if (!this.data('phoenix.validation'))
+        {
+            this.data('phoenix.validation', new PhoenixValidation(this, options));
+        }
+
+        return this.data('phoenix.validation');
+    };
 
 })(jQuery);
