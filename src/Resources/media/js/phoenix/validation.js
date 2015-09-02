@@ -9,6 +9,13 @@
 {
     "use strict";
 
+    /**
+     * Plugin name.
+     *
+     * @type {string}
+     */
+    var plugin = 'validation';
+
     var defaultOptions = {
         events: ['change']
     };
@@ -307,14 +314,14 @@
         }
     };
 
-    $.fn.validation = function (options)
+    $.fn[plugin] = function (options)
     {
-        if (!this.data('phoenix.validation'))
+        if (!this.data('phoenix.' + plugin))
         {
-            this.data('phoenix.validation', new PhoenixValidation(this, options));
+            this.data('phoenix.' + plugin, new PhoenixValidation(this, options));
         }
 
-        return this.data('phoenix.validation');
+        return this.data('phoenix.' + plugin);
     };
 
 })(jQuery);

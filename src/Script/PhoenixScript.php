@@ -23,44 +23,23 @@ use Windwalker\Registry\Format\JsonFormat;
 class PhoenixScript extends ScriptManager
 {
 	/**
-	 * jquery
-	 *
-	 * @param   boolean $noConflict
-	 *
-	 * @return  void
-	 */
-	public static function jquery($noConflict = false)
-	{
-		$asset = static::getAsset();
-
-		if (!static::inited(__METHOD__))
-		{
-			$asset->addScript(static::phoenixName() . '/js/jquery/jquery.js');
-		}
-
-		if (!static::inited(__METHOD__, func_get_args()) && $noConflict)
-		{
-			$asset->internalScript('jQuery.noConflict();');
-		}
-	}
-
-	/**
 	 * core
 	 *
 	 * @param string $formSelector
+	 * @param string $variable
 	 * @param array  $options
 	 *
-	 * @return  void
+	 * @return void
 	 */
-	public static function core($formSelector = '#admin-form', $options = array())
+	public static function core($formSelector = '#admin-form', $variable = 'Phoenix', $options = array())
 	{
 		$asset = static::getAsset();
 
 		if (!static::inited(__METHOD__))
 		{
-			static::jquery();
+			JQueryScript::jquery();
 
-			$asset->addScript(static::phoenixName() . '/js/phoenix.js');
+			$asset->addScript(static::phoenixName() . '/js/phoenix/phoenix.js');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
@@ -71,9 +50,8 @@ class PhoenixScript extends ScriptManager
 // Phoenix Core
 jQuery(document).ready(function($)
 {
-	var form = $('$formSelector');
-
-	window.Phoenix = new PhoenixCore(form, $options);
+	window.$variable = window.$variable || {};
+	window.$variable = $.extend(window.$variable, new Phoenix.Core('$formSelector', $options));
 });
 JS;
 
@@ -89,7 +67,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function filterbar($formSelector = '#admin-form', $options = array())
+	public static function grid($formSelector = '#admin-form', $options = array())
 	{
 		$asset = static::getAsset();
 
@@ -97,7 +75,7 @@ JS;
 		{
 			static::core();
 
-			$asset->addScript(static::phoenixName() . '/js/filterbar.js');
+			$asset->addScript(static::phoenixName() . '/js/phoenix/grid.js');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
@@ -105,12 +83,12 @@ JS;
 			$options = json_encode((object) $options);
 
 			$js = <<<JS
-// Filter bar
+// Gird and filter bar
 jQuery(document).ready(function($)
 {
 	var form = $('$formSelector');
 
-	form.filterbar($options);
+	form.grid($options);
 });
 JS;
 
@@ -132,7 +110,7 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			static::jquery();
+			JQueryScript::jquery();
 
 			$asset->addScript(static::phoenixName() . '/js/chosen/chosen.min.js');
 			$asset->addStyle(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
@@ -171,8 +149,10 @@ JS;
 	{
 		if (!static::inited(__METHOD__))
 		{
+			CoreScript::underscoreString(true);
+
 			$asset = static::getAsset();
-			$asset->addScript(static::phoenixName() . '/js/string/translator.min.js');
+			$asset->addScript(static::phoenixName() . '/js/phoenix/translator.min.js');
 		}
 	}
 
@@ -197,18 +177,25 @@ JS;
 
 		$key = call_user_func($handler, $key);
 
-		$asset->internalScript("PhoenixTranslator.addKey('{$key}', '$text')");
+		$asset->internalScript("Phoenix.Translator.addKey('{$key}', '$text')");
 	}
 
+	/**
+	 * multiSelect
+	 *
+	 * @param string $selector
+	 *
+	 * @return  void
+	 */
 	public static function multiSelect($selector = '#admin-form table')
 	{
 		$asset = static::getAsset();
 
 		if (!static::inited(__METHOD__))
 		{
-			static::jquery();
+			JQueryScript::jquery();
 
-			$asset->addScript(static::phoenixName() . '/js/grid/multiselect.min.js');
+			$asset->addScript(static::phoenixName() . '/js/phoenix/multiselect.min.js');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
@@ -217,7 +204,7 @@ JS;
 // Chosen select
 jQuery(document).ready(function($)
 {
-	var multiSelect = new PhoenixMultiSelect('$selector');
+	$('$selector').multiselect('$selector');
 });
 JS;
 
@@ -225,16 +212,24 @@ JS;
 		}
 	}
 
+	/**
+	 * formValidation
+	 *
+	 * @param string $selector
+	 * @param array  $options
+	 *
+	 * @return  void
+	 */
 	public static function formValidation($selector = '#admin-form', $options = array())
 	{
 		$asset = static::getAsset();
 
 		if (!static::inited(__METHOD__))
 		{
-			static::jquery();
+			JQueryScript::jquery();
 
 			$asset->addScript(static::phoenixName() . '/js/string/punycode.min.js');
-			$asset->addScript(static::phoenixName() . '/js/form/validation.min.js');
+			$asset->addScript(static::phoenixName() . '/js/phoenix/validation.min.js');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))

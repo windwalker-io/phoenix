@@ -5,7 +5,8 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-;(function($)
+var Phoenix;
+(function(Phoenix, $)
 {
 	"use strict";
 
@@ -347,7 +348,7 @@
 
 		addMessage: function(msg, type)
 		{
-			var messageContainer = $('.message-wrap'),
+            var messageContainer = $('.message-wrap'),
 				message = messageContainer.find('div.alert.alert-' + type),
 				i;
 
@@ -381,5 +382,5 @@
 		}
 	};
 
-	window.PhoenixCore = PhoenixCore;
-})(jQuery);
+    Phoenix.Core = PhoenixCore;
+})(Phoenix || (Phoenix = {}), jQuery);

@@ -42,7 +42,7 @@ class BootstrapScript extends ScriptManager
 	{
 		if (!static::inited(__METHOD__))
 		{
-			PhoenixScript::jquery(true);
+			JQueryScript::jquery(true);
 			static::css();
 
 			$asset = static::getAsset();
@@ -70,7 +70,7 @@ class BootstrapScript extends ScriptManager
 /* Bootstrap Awesome Checkbox */
 .checkbox input[type=checkbox]:checked + label:after {
   font-family: 'Glyphicons Halflings';
-  content: "\e013";
+  content: "\\e013";
 }
 .checkbox label:after {
   padding-left: 4px;
@@ -183,7 +183,7 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			PhoenixScript::jquery();
+			JQueryScript::jquery();
 			static::css();
 
 			$asset->addScript(static::phoenixName() . '/js/datetime/moment.min.js');

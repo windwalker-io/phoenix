@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
 use Phoenix\Script\BootstrapScript;
+use Phoenix\Script\CoreScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
 
@@ -40,7 +41,10 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 		BootstrapScript::script();
 		BootstrapScript::checkbox();
 		PhoenixScript::core();
-		PhoenixScript::filterbar();
+		PhoenixScript::grid();
 		PhoenixScript::multiSelect();
+
+		CoreScript::underscoreString();
+		CoreScript::underscore();
 	}
 }

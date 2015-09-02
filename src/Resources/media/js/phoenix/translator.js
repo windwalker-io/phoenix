@@ -5,11 +5,12 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-;(function()
+var Phoenix;
+(function(Phoenix)
 {
     "use strict";
 
-    window.PhoenixTranslator = {
+   Phoenix.Translator = {
         keys: {},
 
         /**
@@ -28,6 +29,20 @@
             return text;
         },
 
+        sprintf: function(text)
+        {
+            var args = [], i;
+
+            for (i in arguments)
+            {
+                args.push(arguments[i]);
+            }
+
+            args[0] = this.translate(text);
+
+            return underscore.string.sprintf.apply(underscore.string, args);
+        },
+
         /**
          * Add language key.
          *
@@ -39,4 +54,4 @@
             this.keys[key] = value;
         }
     };
-})();
+})(Phoenix || (Phoenix = {}));
