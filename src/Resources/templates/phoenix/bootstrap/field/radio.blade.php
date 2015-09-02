@@ -7,7 +7,7 @@
     ?>
     {{ $field->renderLabel() }}
 
-    <div class="{{ $field->get('fieldWidth', 'col-md-9') }}">
+    <div id="{{$field->getId()}}" class="radio-container {{ $field->get('fieldWidth', 'col-md-9') }}" {{ $field->get('required') ? 'required' : null }}>
     <?php
     $radios = $field->renderInput();
     \Windwalker\Test\TestHelper::invoke($radios, 'prepareOptions');

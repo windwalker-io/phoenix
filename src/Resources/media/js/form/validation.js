@@ -25,9 +25,10 @@
         this.form = element || $;
         this.options = options;
         this.validators = [];
-        this.inputs = this.form.find('input, select, textarea');
+        this.inputs = this.form.find('input, select, textarea, div.radio-container, div.checkbox-container');
 
-        this.init();
+        this.registerDefaultValidators();
+        this.registerEvents();
     };
 
     PhoenixValidation.prototype = {
@@ -36,9 +37,21 @@
 
         },
 
+        validate: function()
+        {
+            var self = this;
+
+            this.inputs.each(function()
+            {
+                self.validField(this);
+            });
+
+            return false;
+        },
+
         validField: function(input)
         {
-            var $input = $(input);
+            var $input = $(input), tagName;
 
             if ($input.attr('disabled'))
             {
@@ -49,13 +62,68 @@
             if ($input.attr('required') || $input.hasClass('required'))
             {
                 // Handle radio & checkboxes
+                tagName = $input.prop("tagName").toLowerCase();
 
+                if (tagName === 'div' && ($input.hasClass('radio-container') || $input.hasClass('checkbox-container')))
+                {
+                    if (!$input.find('input:checked').length)
+                    {
+                        this.showResponse(false, $input);
+
+                        return false;
+                    }
+                }
             }
+
+            if ($input.attr('type') == 'radio' || $input.attr('type') == 'checkbox')
+            {
+                return true;
+            }
+
+            this.showResponse(true, $input);
         },
 
         showResponse: function(state, $input)
         {
+            var control = $input.parents('.form-group').first();
 
+            if (!state)
+            {
+                control.addClass('has-error has-feedback');
+
+                if (!control.find('.form-control-feedback').length)
+                {
+                    var feedback = $('<span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>');
+                    control.prepend(feedback);
+                }
+
+                if (!control.find('.help-block').length)
+                {
+                    var help = $('<small class="help-block">Some thing</small>');
+                    $input.append(help);
+                }
+            }
+            else
+            {
+                control.find('.form-control-feedback').remove();
+                control.find('.help-block').remove();
+                control.removeClass('has-error').removeClass('has-feedback');
+            }
+        },
+
+        findLabel: function($input)
+        {
+            var id, label;
+
+            if (id = $input.attr('id'))
+            {
+                label = $('label[for=' + id + ']');
+
+                if (label.length)
+                {
+                    return label.first();
+                }
+            }
         },
 
         /**
@@ -76,7 +144,25 @@
             return this;
         },
 
-        init: function()
+        registerEvents: function()
+        {
+            var self = this;
+
+            this.form.on('submit', function(event)
+            {
+                if (!self.validate())
+                {
+                    event.stopPropagation();
+                    event.preventDefault();
+
+                    return false;
+                }
+
+                return true;
+            });
+        },
+
+        registerDefaultValidators: function()
         {
             // Default handlers
             this.addValidator('username', function(value, element)

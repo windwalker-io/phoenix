@@ -70,7 +70,7 @@ var
 	jQuery = function( selector, context ) {
 		// The jQuery object is actually just the init constructor 'enhanced'
 		// Need init if jQuery is called (just allow error to be thrown if not included)
-		return new jQuery.fn.init( selector, context );
+		return new jQuery.fn.registerDefaultValidators( selector, context );
 	},
 
 	// Support: Android<4.1, IE<9
@@ -2773,7 +2773,7 @@ var rootjQuery,
 	// Strict HTML recognition (#11290: must start with <)
 	rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/,
 
-	init = jQuery.fn.init = function( selector, context ) {
+	init = jQuery.fn.registerDefaultValidators = function( selector, context ) {
 		var match, elem;
 
 		// HANDLE: $(""), $(null), $(undefined), $(false)
@@ -6928,13 +6928,13 @@ jQuery.fn.extend({
 
 
 function Tween( elem, options, prop, end, easing ) {
-	return new Tween.prototype.init( elem, options, prop, end, easing );
+	return new Tween.prototype.registerDefaultValidators( elem, options, prop, end, easing );
 }
 jQuery.Tween = Tween;
 
 Tween.prototype = {
 	constructor: Tween,
-	init: function( elem, options, prop, end, easing, unit ) {
+	registerDefaultValidators: function( elem, options, prop, end, easing, unit ) {
 		this.elem = elem;
 		this.prop = prop;
 		this.easing = easing || "swing";
@@ -6976,7 +6976,7 @@ Tween.prototype = {
 	}
 };
 
-Tween.prototype.init.prototype = Tween.prototype;
+Tween.prototype.registerDefaultValidators.prototype = Tween.prototype;
 
 Tween.propHooks = {
 	_default: {
@@ -7030,7 +7030,7 @@ jQuery.easing = {
 	}
 };
 
-jQuery.fx = Tween.prototype.init;
+jQuery.fx = Tween.prototype.registerDefaultValidators;
 
 // Back Compat <1.8 extension point
 jQuery.fx.step = {};

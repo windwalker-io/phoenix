@@ -77,6 +77,7 @@ class EditDefinition implements FieldDefinitionInterface
 		{
 			$form->add('state', new RadioField)
 				->label('State')
+				->required(true)
 				->addOption(new Option('Published', '1'))
 				->addOption(new Option('Unpublished', '0'));
 

@@ -1294,7 +1294,7 @@ if (typeof jQuery === 'undefined') {
     }
   }
 
-  Tooltip.prototype.init = function (type, element, options) {
+  Tooltip.prototype.registerDefaultValidators = function (type, element, options) {
     this.enabled   = true
     this.type      = type
     this.$element  = $(element)
