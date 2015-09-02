@@ -48,10 +48,14 @@ var Phoenix;
          *
          * @param {string} key
          * @param {string} value
+         *
+         * @return {Phoenix.Translator}
          */
         addKey: function(key, value)
         {
             this.keys[key] = value;
+
+            return this;
         }
     };
 })(Phoenix || (Phoenix = {}));

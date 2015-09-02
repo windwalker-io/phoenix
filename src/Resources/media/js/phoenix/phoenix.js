@@ -5,382 +5,195 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-var Phoenix;
-(function(Phoenix, $)
+(function($)
 {
-	"use strict";
+    "use strict";
 
-	var defaultOptions = {
+    /**
+     * Plugin name.
+     *
+     * @type {string}
+     */
+    var plugin = 'phoenix';
 
-	};
+    var defaultOptions = {
+        selector: {
+            message: '.message-wrap'
+        }
+    };
 
-	/**
-	 * Class init.
-	 *
-	 * @param {Element} form
-	 * @param {Object}  options
-	 *
-	 * @constructor
-	 */
-	var PhoenixCore = function(form, options)
-	{
-		if (typeof form == 'string')
-		{
-			form = $(form);
-		}
+    /**
+     * Class init.
+     *
+     * @param {Element} $form
+     * @param {Object}  options
+     *
+     * @constructor
+     */
+    var PhoenixCore = function($form, options)
+    {
+        options = $.extend(true, {}, defaultOptions, options);
 
-		options = $.extend({}, defaultOptions, options);
+        this.form = $form;
+        this.options = options;
+    };
 
-		this.element = form;
-		this.options = options;
-	};
+    PhoenixCore.prototype = {
 
-	PhoenixCore.prototype = {
-
-		/**
-		 * Make a request.
-		 *
-		 * @param  {string} url
-		 * @param  {Object} queries
+        /**
+         * Make a request.
+         *
+         * @param  {string} url
+         * @param  {Object} queries
          * @param  {string} method
-		 * @param  {string} customMethod
-		 *
-		 * @returns {boolean}
-		 */
-		submit: function(url, queries, method, customMethod)
-		{
-			var form = this.element;
+         * @param  {string} customMethod
+         *
+         * @returns {boolean}
+         */
+        submit: function(url, queries, method, customMethod)
+        {
+            var form = this.form;
 
-			var methodInput = form.find('input[name="_method"]');
+            var methodInput = form.find('input[name="_method"]');
 
-			if(!methodInput.length)
-			{
-				methodInput = $('<input name="_method" type="hidden">');
+            if (!methodInput.length)
+            {
+                methodInput = $('<input name="_method" type="hidden">');
 
-				form.append(methodInput);
-			}
+                form.append(methodInput);
+            }
 
-			methodInput.val(customMethod);
+            methodInput.val(customMethod);
 
-			// Set queries into form.
-			if (queries)
-			{
-				var input;
+            // Set queries into form.
+            if (queries)
+            {
+                var input;
 
-				$.each(queries, function(key, value)
-				{
-					input = form.find('input[name="' + key + '"]');
+                $.each(queries, function(key, value)
+                {
+                    input = form.find('input[name="' + key + '"]');
 
-					if (!input.length)
-					{
-						input = $('<input name="' + key + '" type="hidden">');
+                    if (!input.length)
+                    {
+                        input = $('<input name="' + key + '" type="hidden">');
 
-						form.append(input);
-					}
+                        form.append(input);
+                    }
 
-					input.val(value);
-				});
-			}
+                    input.val(value);
+                });
+            }
 
-			if (url)
-			{
-				form.attr('action', url);
-			}
+            if (url)
+            {
+                form.attr('action', url);
+            }
 
-			if (method)
-			{
-				form.attr('method', method);
-			}
+            if (method)
+            {
+                form.attr('method', method);
+            }
 
-			form.submit();
+            form.submit();
 
-			return true;
-		},
+            return true;
+        },
 
-		/**
-		 * Make a GET request.
-		 *
-		 * @param  {string} url
-		 * @param  {Object} queries
-		 * @param  {string} customMethod
-		 *
-		 * @returns {boolean}
-		 */
-		get: function(url, queries, customMethod)
-		{
-			return this.submit(url, queries, 'GET', customMethod);
-		},
+        /**
+         * Make a GET request.
+         *
+         * @param  {string} url
+         * @param  {Object} queries
+         * @param  {string} customMethod
+         *
+         * @returns {boolean}
+         */
+        get: function(url, queries, customMethod)
+        {
+            return this.submit(url, queries, 'GET', customMethod);
+        },
 
-		/**
-		 * Post form.
-		 *
-		 * @param  {string} url
-		 * @param  {Object} queries
-		 * @param  {string} customMethod
-		 *
-		 * @returns {boolean}
-		 */
-		post: function (url, queries, customMethod)
-		{
-			return this.submit(url, queries, 'POST', customMethod);
-		},
+        /**
+         * Post form.
+         *
+         * @param  {string} url
+         * @param  {Object} queries
+         * @param  {string} customMethod
+         *
+         * @returns {boolean}
+         */
+        post: function(url, queries, customMethod)
+        {
+            return this.submit(url, queries, 'POST', customMethod);
+        },
 
-		/**
-		 * Make a PUT request.
-		 *
-		 * @param  {string} url
-		 * @param  {Object} queries
-		 *
-		 * @returns {boolean}
-		 */
-		put: function(url, queries)
-		{
-			return this.post(url, queries, 'PUT');
-		},
+        /**
+         * Make a PUT request.
+         *
+         * @param  {string} url
+         * @param  {Object} queries
+         *
+         * @returns {boolean}
+         */
+        put: function(url, queries)
+        {
+            return this.post(url, queries, 'PUT');
+        },
 
-		/**
-		 * Make a PATCH request.
-		 *
-		 * @param  {string} url
-		 * @param  {Object} queries
-		 *
-		 * @returns {boolean}
-		 */
-		patch: function(url, queries)
-		{
-			return this.post(url, queries, 'PATCH');
-		},
+        /**
+         * Make a PATCH request.
+         *
+         * @param  {string} url
+         * @param  {Object} queries
+         *
+         * @returns {boolean}
+         */
+        patch: function(url, queries)
+        {
+            return this.post(url, queries, 'PATCH');
+        },
 
-		/**
-		 * Make a DELETE request.
-		 *
-		 * @param  {string} url
-		 * @param  {Object} queries
-		 *
-		 * @returns {boolean}
-		 */
-		delete: function(url, queries)
-		{
-			return this.post(url, queries, 'DELETE');
-		},
+        /**
+         * Make a DELETE request.
+         *
+         * @param  {string} url
+         * @param  {Object} queries
+         *
+         * @returns {boolean}
+         */
+        delete: function(url, queries)
+        {
+            return this.post(url, queries, 'DELETE');
+        },
 
-		/**
-		 * Make a DELETE request.
-		 *
-		 * @param  {string} url
-		 * @param  {Object} queries
-		 * @param  {string} msg
-		 *
-		 * @returns {boolean}
-		 */
-		deleteItem: function(url, queries, msg)
-		{
-			msg = msg || 'Are you sure';
+        addMessage: function(msg, type)
+        {
+            var messageContainer = $(this.options.selector.message);
 
-			if (!confirm(msg))
-			{
-				return false;
-			}
+            Phoenix.Theme.renderMessage(messageContainer, msg, type);
 
-			return this.delete(url, queries);
-		},
+            return this;
+        },
 
-		/**
-		 * Update a row.
-		 *
-		 * @param  {number} row
-		 * @param  {string} url
-		 * @param  {Object} queries
-		 */
-		updateRow: function(row, url, queries)
-		{
-			this.toggleAll(false);
+        removeMessages: function()
+        {
+            var messageContainer = $(this.options.selector.message);
 
-			var ch = this.element.find('input.grid-checkbox[data-row-number=' + row + ']');
+            Phoenix.Theme.removeMessages(messageContainer);
 
-			if (!ch.length)
-			{
-				throw new Error('Checkbox of row: ' + row + ' not found.');
-			}
+            return this;
+        }
+    };
 
-			ch[0].checked = true;
+    $.fn[plugin] = function(options)
+    {
+        if (!this.data('phoenix.' + plugin))
+        {
+            this.data('phoenix.' + plugin, new PhoenixCore(this, options));
+        }
 
-			this.patch(url, queries);
-		},
+        return this.data('phoenix.' + plugin);
+    };
 
-		/**
-		 * Toggle all checkboxes.
-		 *
-		 * @param  {boolean}  value  Checked or unchecked.
-		 */
-		toggleAll: function(value)
-		{
-			var checkboxes = this.element.find('input.grid-checkbox[type=checkbox]');
-
-			$.each(checkboxes, function(i, e)
-			{
-				// A little pretty effect
-				setTimeout(function()
-				{
-					e.checked = value;
-				}, (150 / checkboxes.length) * i);
-			});
-		},
-
-		/**
-		 * Count checked checkboxes.
-		 *
-		 * @returns {int}
-		 */
-		countChecked: function()
-		{
-			return this.getChecked().length;
-		},
-
-		/**
-		 * Get Checked boxes.
-		 *
-		 * @returns {Element[]}
-		 */
-		getChecked: function()
-		{
-			var checkboxes = this.element.find('input.grid-checkbox[type=checkbox]'),
-				result = [];
-
-			$.each(checkboxes, function(i, e)
-			{
-				if (e.checked)
-				{
-					result.push(e);
-				}
-			});
-
-			return result;
-		},
-
-		/**
-		 * Validate there has one or more checked boxes.
-		 *
-		 * @param   {string}  msg
-		 * @param   {Event}   event
-		 *
-		 * @returns {PhoenixCore}
-		 */
-		validateChecked: function(msg, event)
-		{
-			msg = msg || 'Please check one or more items.';
-
-			if (!this.countChecked())
-			{
-				alert(msg);
-
-				event.stopPropagation();
-				event.preventDefault();
-
-				throw new Error(msg);
-			}
-
-			return this;
-		},
-
-		/**
-		 * Reorder all.
-		 *
-		 * @param   {string}  url
-		 * @param   {Object}  queries
-		 *
-		 * @returns {boolean}
-		 */
-		reorderAll: function(url, queries)
-		{
-			queries = queries || {};
-			queries['task'] = queries['task'] || 'reorder';
-
-			return this.patch(url, queries);
-		},
-
-		/**
-		 * Reorder items.
-		 *
-		 * @param  {int}     row
-		 * @param  {int}     offset
-		 * @param  {string}  url
-		 * @param  {Object}  queries
-		 *
-		 * @returns {boolean}
-		 */
-		reorder: function(row, offset, url, queries)
-		{
-			var input = this.element.find('input[data-order-row=' + row + ']');
-			var tr    = input.parents('tr');
-			var group = tr.attr('data-order-group');
-			var input2;
-
-			input.val(parseInt(input.val()) + parseFloat(offset));
-
-			if (offset > 0)
-			{
-				if (group)
-				{
-					input2 = tr.nextAll('tr[data-order-group=' + group + ']').first().find('input[data-order-row]');
-				}
-				else
-				{
-					input2 = tr.next().find('input[data-order-row]');
-				}
-			}
-			else if (offset < 0)
-			{
-				if (group)
-				{
-					input2 = tr.prevAll('tr[data-order-group=' + group + ']').first().find('input[data-order-row]');
-				}
-				else
-				{
-					input2 = tr.prev().find('input[data-order-row]');
-				}
-			}
-
-			input2.val(parseInt(input2.val()) - parseFloat(offset));
-
-			return this.reorderAll(url, queries);
-		},
-
-		addMessage: function(msg, type)
-		{
-            var messageContainer = $('.message-wrap'),
-				message = messageContainer.find('div.alert.alert-' + type),
-				i;
-
-
-			if (!message.length)
-			{
-				message = $('<div class="alert alert-' + type + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close"></div>');
-				messageContainer.append(message);
-			}
-
-			if (typeof msg == 'string')
-			{
-				msg = [msg];
-			}
-
-			for (i in msg)
-			{
-				message.append('<p>' + msg[i] + '</p>');
-			}
-		},
-
-		removeMessages: function()
-		{
-			var messages = $('.message-wrap *');
-
-			// Empty container with a while for Chrome performance issues
-			messages.each(function()
-			{
-				this.remove();
-			});
-		}
-	};
-
-    Phoenix.Core = PhoenixCore;
-})(Phoenix || (Phoenix = {}), jQuery);
+})(jQuery);

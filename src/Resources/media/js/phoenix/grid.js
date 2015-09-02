@@ -15,7 +15,7 @@
      *
      * @type {string}
      */
-    var pluginName = "grid";
+    var plugin = "grid";
 
     /**
      * Default options.
@@ -24,7 +24,6 @@
      */
     var defaultOptions = {
         selector: {
-            form: '#admin-form',
             search: {
                 container: '.search-container',
                 button: '.search-button',
@@ -44,24 +43,25 @@
      * PhoenixGrid constructor.
      *
      * @param element
+     * @param core
      * @param options
      *
      * @constructor
      */
-    function PhoenixGrid(element, options)
+    function PhoenixGrid(element, core, options)
     {
-        this.element = element;
+        this.form = element;
+        this.core = core;
         this.options = $.extend(true, {}, defaultOptions, options);
 
         var selector = this.options.selector;
 
-        this.element = $(selector.element);
-        this.searchContainer = this.element.find(selector.search.container);
-        this.searchButton = this.element.find(selector.search.button);
-        this.searchClearButton = this.element.find(selector.search.clearButton);
-        this.filterContainer = this.element.find(selector.filter.container);
-        this.filterButton = this.element.find(selector.filter.button);
-        this.sortButtons = this.element.find(selector.sort.button);
+        this.searchContainer = this.form.find(selector.search.container);
+        this.searchButton = this.form.find(selector.search.button);
+        this.searchClearButton = this.form.find(selector.search.clearButton);
+        this.filterContainer = this.form.find(selector.filter.container);
+        this.filterButton = this.form.find(selector.filter.button);
+        this.sortButtons = this.form.find(selector.sort.button);
 
         this.registerEvents();
     }
@@ -77,7 +77,7 @@
                 self.searchContainer.find('input, textarea, select').val('');
                 self.filterContainer.find('input, textarea, select').val('');
 
-                self.element.submit();
+                self.form.submit();
             });
 
             this.filterButton.click(function(event)
@@ -107,48 +107,229 @@
                 this.filterContainer.show('fast');
                 this.filterContainer.addClass('shown');
             }
+
+            return this;
         },
 
-        sort: function(element, event)
+        sort: function(ordering, direction)
         {
-            var $element = $(element);
-            var ordering = $element.attr('data-sort-field');
-            var direction = $element.attr('data-sort-direction');
-
-            var orderingInput = $element.find('input[name=list_ordering]');
+            var orderingInput = this.form.find('input[name=list_ordering]');
 
             if (!orderingInput.length)
             {
                 orderingInput = $('<input name="list_ordering" type="hidden" value="" />');
 
-                this.element.append(orderingInput);
+                this.form.append(orderingInput);
             }
 
-            var directionInput = $element.find('input[name=list_direction]');
+            var directionInput = this.form.find('input[name=list_direction]');
 
             if (!directionInput.length)
             {
                 directionInput = $('<input name="list_direction" type="hidden" value="" />');
 
-                this.element.append(directionInput);
+                this.form.append(directionInput);
             }
 
             orderingInput.val(ordering);
             directionInput.val(direction);
 
-            this.element.submit();
+            return this.core.put();
+        },
+
+        /**
+         * Update a row.
+         *
+         * @param  {number} row
+         * @param  {string} url
+         * @param  {Object} queries
+         */
+        updateRow: function(row, url, queries)
+        {
+            this.toggleAll(false);
+
+            var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
+
+            if (!ch.length)
+            {
+                throw new Error('Checkbox of row: ' + row + ' not found.');
+            }
+
+            ch[0].checked = true;
+
+            return this.core.patch(url, queries);
+        },
+
+        /**
+         * Toggle all checkboxes.
+         *
+         * @param  {boolean}  value  Checked or unchecked.
+         */
+        toggleAll: function(value)
+        {
+            var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
+
+            $.each(checkboxes, function(i, e)
+            {
+                // A little pretty effect
+                setTimeout(function()
+                {
+                    e.checked = value;
+                }, (150 / checkboxes.length) * i);
+            });
+
+            return this;
+        },
+
+        /**
+         * Count checked checkboxes.
+         *
+         * @returns {int}
+         */
+        countChecked: function()
+        {
+            return this.getChecked().length;
+        },
+
+        /**
+         * Get Checked boxes.
+         *
+         * @returns {Element[]}
+         */
+        getChecked: function()
+        {
+            var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]'),
+                result = [];
+
+            $.each(checkboxes, function(i, e)
+            {
+                if (e.checked)
+                {
+                    result.push(e);
+                }
+            });
+
+            return result;
+        },
+
+        /**
+         * Validate there has one or more checked boxes.
+         *
+         * @param   {string}  msg
+         * @param   {Event}   event
+         *
+         * @returns {PhoenixCore}
+         */
+        hasChecked: function(msg, event)
+        {
+            msg = msg || 'Please check one or more items.';
+
+            if (!this.countChecked())
+            {
+                alert(msg);
+
+                event.stopPropagation();
+                event.preventDefault();
+
+                throw new Error(msg);
+            }
+
+            return this.core;
+        },
+
+        /**
+         * Reorder all.
+         *
+         * @param   {string}  url
+         * @param   {Object}  queries
+         *
+         * @returns {boolean}
+         */
+        reorderAll: function(url, queries)
+        {
+            queries = queries || {};
+            queries['task'] = queries['task'] || 'reorder';
+
+            return this.core.patch(url, queries);
+        },
+
+        /**
+         * Reorder items.
+         *
+         * @param  {int}     row
+         * @param  {int}     offset
+         * @param  {string}  url
+         * @param  {Object}  queries
+         *
+         * @returns {boolean}
+         */
+        reorder: function(row, offset, url, queries)
+        {
+            var input = this.form.find('input[data-order-row=' + row + ']');
+            var tr    = input.parents('tr');
+            var group = tr.attr('data-order-group');
+            var input2;
+
+            input.val(parseInt(input.val()) + parseFloat(offset));
+
+            if (offset > 0)
+            {
+                if (group)
+                {
+                    input2 = tr.nextAll('tr[data-order-group=' + group + ']').first().find('input[data-order-row]');
+                }
+                else
+                {
+                    input2 = tr.next().find('input[data-order-row]');
+                }
+            }
+            else if (offset < 0)
+            {
+                if (group)
+                {
+                    input2 = tr.prevAll('tr[data-order-group=' + group + ']').first().find('input[data-order-row]');
+                }
+                else
+                {
+                    input2 = tr.prev().find('input[data-order-row]');
+                }
+            }
+
+            input2.val(parseInt(input2.val()) - parseFloat(offset));
+
+            return this.reorderAll(url, queries);
+        },
+
+        /**
+         * Make a DELETE request.
+         *
+         * @param  {string} msg
+         * @param  {string} url
+         * @param  {Object} queries
+         *
+         * @returns {boolean}
+         */
+        deleteItem: function(msg, url, queries)
+        {
+            msg = msg || Phoenix.Translator.translate('phoenix.delete.confirm');
+
+            if (!confirm(msg))
+            {
+                return false;
+            }
+
+            return this.core.delete(url, queries);
         }
     };
 
-    $.fn[pluginName] = function(options)
+    $.fn[plugin] = function(core, options)
     {
-        return this.each(function()
+        if (!$.data(this, "phoenix." + plugin))
         {
-            if (!$.data(this, "plugin_" + pluginName))
-            {
-                $.data(this, "plugin_" + pluginName, new PhoenixGrid(this, options));
-            }
-        });
+            $.data(this, "phoenix." + plugin, new PhoenixGrid(this, core, options));
+        }
+
+        return $.data(this, "phoenix." + plugin);
     };
 
 })(jQuery);

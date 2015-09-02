@@ -16,6 +16,13 @@
      */
     var plugin = 'validation';
 
+    /**
+     * Default handlers
+     *
+     * @type {Object}
+     */
+    var handlers = {};
+
     var defaultOptions = {
         events: ['change']
     };
@@ -31,21 +38,59 @@
     {
         options = $.extend({}, defaultOptions, options);
 
-        this.SUCCESS = 'success';
-        this.NONE    = 'none';
-        this.EMPTY   = 'empty';
-        this.WARNING = 'warning';
+        /**
+         * Validate success.
+         *
+         * @type {string}
+         */
+        this.STATE_SUCCESS = 'success';
 
-        this.element = element || $;
+        /**
+         * Validate fail.
+         *
+         * @type {string}
+         */
+        this.STATE_FAIL = 'fail';
+
+        /**
+         * Pass or required with value.
+         *
+         * @type {string}
+         */
+        this.STATE_NONE = 'none';
+
+        /**
+         * Required with no value.
+         *
+         * @type {string}
+         */
+        this.STATE_EMPTY = 'empty';
+
+        this.form = element || $;
         this.options = options;
         this.validators = [];
-        this.inputs = this.element.find('input, select, textarea, div.input-list-container');
+        this.theme = {};
+        this.inputs = this.form.find('input, select, textarea, div.input-list-container');
 
         this.registerDefaultValidators();
         this.registerEvents();
     };
 
     PhoenixValidation.prototype = {
+
+        /**
+         * Add field.
+         *
+         * @param {*} input
+         * @returns {PhoenixValidation}
+         */
+        addField: function(input)
+        {
+            this.inputs = this.inputs.add(input);
+
+            return this;
+        },
+
         /**
          * Validate All.
          *
@@ -78,7 +123,7 @@
 
             if ($input.attr('disabled'))
             {
-                this.showResponse(this.NONE, $input);
+                this.showResponse(this.STATE_NONE, $input);
 
                 return true;
             }
@@ -95,7 +140,7 @@
                 {
                     if (!$input.find('input:checked').length)
                     {
-                        this.showResponse(this.EMPTY, $input);
+                        this.showResponse(this.STATE_EMPTY, $input);
 
                         return false;
                     }
@@ -104,7 +149,7 @@
                 // Handle all fields and checkbox
                 else if (!$input.val() || ($input.attr('type') === 'checkbox' && !$input.is(':checked')))
                 {
-                    this.showResponse(this.EMPTY, $input);
+                    this.showResponse(this.STATE_EMPTY, $input);
 
                     return false;
                 }
@@ -121,7 +166,7 @@
             // Empty value and no validator config, set response to none.
             if (!$input.val() || !validator)
             {
-                this.showResponse(this.NONE, $input);
+                this.showResponse(this.STATE_NONE, $input);
 
                 return true;
             }
@@ -130,19 +175,26 @@
 
             if (!validator || !validator.handler)
             {
-                this.showResponse(this.NONE, $input);
+                this.showResponse(this.STATE_NONE, $input);
 
                 return true;
             }
 
             if (!validator.handler($input.val(), $input))
             {
-                this.showResponse(this.WARNING, $input, validator.options.notice);
+                var help = validator.options.notice;
+
+                if (typeof  help == 'function')
+                {
+                    help = help($input, this);
+                }
+
+                this.showResponse(this.STATE_FAIL, $input, help);
 
                 return false;
             }
 
-            this.showResponse(this.SUCCESS, $input);
+            this.showResponse(this.STATE_SUCCESS, $input);
 
             return true;
         },
@@ -154,57 +206,11 @@
          * @param {jQuery} $input
          * @param {string} help
          *
-         * @returns {boolean}
+         * @returns {PhoenixValidation}
          */
         showResponse: function(state, $input, help)
         {
-            var $control = $input.parents('.form-group').first();
-
-            this.removeResponce($control);
-
-            if (state != this.NONE)
-            {
-                var icon, color;
-
-                switch (state)
-                {
-                    case this.SUCCESS:
-                        color = 'success';
-                        icon  = 'ok';
-                        break;
-
-                    case this.EMPTY:
-                        color = 'error';
-                        icon  = 'remove';
-                        break;
-
-                    case this.WARNING:
-                        color = 'warning';
-                        icon  = 'warning-sign';
-                        break;
-                }
-
-                $control.addClass('has-' + color + ' has-feedback');
-
-                var feedback = $('<span class="glyphicon glyphicon-' + icon + ' form-control-feedback" aria-hidden="true"></span>');
-                $control.prepend(feedback);
-
-                if (help)
-                {
-                    var helpElement = $('<small class="help-block">' + help + '</small>');
-
-                    var tagName = $input.prop('tagName').toLowerCase();
-
-                    if (tagName == 'div')
-                    {
-                        $input.append(helpElement);
-                    }
-                    else
-                    {
-                        $input.parent().append(helpElement);
-                    }
-                }
-            }
+            Phoenix.Theme.showValidateResponse(this, state, $input, help);
 
             $input.trigger({
                 type: 'phoenix.validate.' + state,
@@ -213,16 +219,21 @@
                 help: help
             });
 
-            return state;
+            return this;
         },
 
-        removeResponce: function($element)
+        /**
+         * Remove responses.
+         *
+         * @param {jQuery} $element
+         *
+         * @returns {PhoenixValidation}
+         */
+        removeResponse: function($element)
         {
-            $element.find('.form-control-feedback').remove();
-            $element.removeClass('has-error')
-                .removeClass('has-success')
-                .removeClass('has-warning')
-                .removeClass('has-feedback');
+            Phoenix.Theme.removeValidateResponse($element);
+
+            return this;
         },
 
         /**
@@ -252,7 +263,7 @@
         {
             var self = this;
 
-            this.element.on('submit', function(event)
+            this.form.on('submit', function(event)
             {
                 if (!self.validateAll())
                 {
@@ -279,37 +290,11 @@
          */
         registerDefaultValidators: function()
         {
-            // Default handlers
-            this.addValidator('username', function(value, element)
-            {
-                var regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
-                return !regex.test(value);
-            });
+            var self = this;
 
-            this.addValidator('password', function(value, element)
+            $.each(handlers, function(i)
             {
-                var regex = /^\S[\S ]{2,98}\S$/;
-                return regex.test(value);
-            });
-
-            this.addValidator('numeric', function(value, element)
-            {
-                var regex = /^(\d|-)?(\d|,)*\.?\d*$/;
-                return regex.test(value);
-            });
-
-            this.addValidator('email', function(value, element)
-            {
-                value = punycode.toASCII(value);
-                var regex = /^[a-zA-Z0-9.!#$%&â€™*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-                return regex.test(value);
-            });
-
-            this.addValidator('url', function(value, element)
-            {
-                value = punycode.toASCII(value);
-                var regex = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
-                return regex.test(value);
+                self.addValidator(i, this);
             });
         }
     };
@@ -322,6 +307,65 @@
         }
 
         return this.data('phoenix.' + plugin);
+    };
+
+    handlers.username = function(value, element)
+    {
+        var regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
+        return !regex.test(value);
+    };
+
+    handlers.password = function(value, element)
+    {
+        var regex = /^\S[\S ]{2,98}\S$/;
+        return regex.test(value);
+    };
+
+    handlers.numeric = function(value, element)
+    {
+        var regex = /^(\d|-)?(\d|,)*\.?\d*$/;
+        return regex.test(value);
+    };
+
+    handlers.email = function(value, element)
+    {
+        value = punycode.toASCII(value);
+        var regex = /^[a-zA-Z0-9.!#$%&â€™*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+        return regex.test(value);
+    };
+
+    handlers.url = function(value, element)
+    {
+        value = punycode.toASCII(value);
+        var regex = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/;
+        return regex.test(value);
+    };
+
+    handlers.alnum = function(value, element)
+    {
+        var regex = /^[a-zA-Z0-9]*$/;
+        return regex.test(value);
+    };
+
+    handlers.color = function(value, element)
+    {
+        var regex = /^#(?:[0-9a-f]{3}){1,2}$/;
+        return regex.test(value);
+    };
+
+    /**
+     * @see  http://www.virtuosimedia.com/dev/php/37-tested-php-perl-and-javascript-regular-expressions
+     */
+    handlers.creditcard = function(value, element)
+    {
+        var regex = /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|622((12[6-9]|1[3-9][0-9])|([2-8][0-9][0-9])|(9(([0-1][0-9])|(2[0-5]))))[0-9]{10}|64[4-9][0-9]{13}|65[0-9]{14}|3(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})*$/;
+        return regex.test(value);
+    };
+
+    handlers.ip = function(value, element)
+    {
+        var regex = /^((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))*$/;
+        return regex.test(value);
     };
 
 })(jQuery);

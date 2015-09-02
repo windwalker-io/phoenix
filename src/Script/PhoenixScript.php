@@ -37,21 +37,34 @@ class PhoenixScript extends ScriptManager
 
 		if (!static::inited(__METHOD__))
 		{
-			JQueryScript::jquery();
+			JQueryScript::core();
 
 			$asset->addScript(static::phoenixName() . '/js/phoenix/phoenix.js');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
+			$defaultOptions = array(
+				'theme' => 'bootstrap'
+			);
+
+			$options = array_merge($defaultOptions, $options);
+
+			if ($options['theme'] == 'bootstrap')
+			{
+				$asset->addScript(static::phoenixName() . '/js/phoenix/bootstrap-theme.js');
+			}
+
 			$options = json_encode((object) $options);
 
 			$js = <<<JS
 // Phoenix Core
 jQuery(document).ready(function($)
 {
+	var core = $('$formSelector').phoenix($options);
+
 	window.$variable = window.$variable || {};
-	window.$variable = $.extend(window.$variable, new Phoenix.Core('$formSelector', $options));
+	window.$variable = $.extend(window.$variable, core);
 });
 JS;
 
@@ -62,12 +75,13 @@ JS;
 	/**
 	 * filterbar
 	 *
-	 * @param string $formSelector
+	 * @param string $selector
+	 * @param string $variable
 	 * @param array  $options
 	 *
-	 * @return  void
+	 * @return void
 	 */
-	public static function grid($formSelector = '#admin-form', $options = array())
+	public static function grid($selector = '#admin-form', $variable = 'Phoenix' ,$options = array())
 	{
 		$asset = static::getAsset();
 
@@ -86,9 +100,11 @@ JS;
 // Gird and filter bar
 jQuery(document).ready(function($)
 {
-	var form = $('$formSelector');
+	var form = $('$selector');
+	var grid = form.grid(form.phoenix(), $options);
 
-	form.grid($options);
+	window.$variable = window.$variable || {};
+	window.$variable.Grid = window.$variable.Grid || grid;
 });
 JS;
 
@@ -110,7 +126,7 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			JQueryScript::jquery();
+			JQueryScript::core();
 
 			$asset->addScript(static::phoenixName() . '/js/chosen/chosen.min.js');
 			$asset->addStyle(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
@@ -163,7 +179,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public function lang($key)
+	public static function lang($key)
 	{
 		static::translator();
 
@@ -193,7 +209,7 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			JQueryScript::jquery();
+			JQueryScript::core();
 
 			$asset->addScript(static::phoenixName() . '/js/phoenix/multiselect.min.js');
 		}
@@ -226,7 +242,7 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			JQueryScript::jquery();
+			JQueryScript::core();
 
 			$asset->addScript(static::phoenixName() . '/js/string/punycode.min.js');
 			$asset->addScript(static::phoenixName() . '/js/phoenix/validation.min.js');

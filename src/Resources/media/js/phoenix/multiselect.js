@@ -5,7 +5,8 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-;(function($)
+;
+(function($)
 {
     /**
      * Plugin name.
@@ -14,71 +15,71 @@
      */
     var plugin = 'multiselect';
 
-	/**
-	 * Multi Select.
-	 *
-	 * @param {jQuery} $element
-	 *
-	 * @constructor
-	 */
-	var PhoenixMultiSelect = function($element)
-	{
-		var self = this;
-		this.element = $element;
-		this.boxes = $element.find('input.grid-checkbox[type=checkbox]');
-		this.last = false;
+    /**
+     * Multi Select.
+     *
+     * @param {jQuery} $element
+     *
+     * @constructor
+     */
+    var PhoenixMultiSelect = function($element)
+    {
+        var self = this;
+        this.form = $element;
+        this.boxes = $element.find('input.grid-checkbox[type=checkbox]');
+        this.last = false;
 
-		this.boxes.click(function(event)
-		{
-			self.select(this, event);
-		})
-	};
+        this.boxes.click(function(event)
+        {
+            self.select(this, event);
+        })
+    };
 
-	PhoenixMultiSelect.prototype = {
-		/**
-		 * Do select.
-		 *
-		 * @param {Element} element
-		 * @param {Event}   event
-		 */
-		select: function(element, event)
-		{
-			if (!this.last)
-			{
-				this.last = element;
+    PhoenixMultiSelect.prototype = {
+        /**
+         * Do select.
+         *
+         * @param {Element} element
+         * @param {Event}   event
+         */
+        select: function(element, event)
+        {
+            if (!this.last)
+            {
+                this.last = element;
 
-				return;
-			}
+                return;
+            }
 
-			if(event.shiftKey)
-			{
-				var self  = this;
-				var start = this.boxes.index(element);
-				var end   = this.boxes.index(this.last);
+            if (event.shiftKey)
+            {
+                var self = this;
+                var start = this.boxes.index(element);
+                var end = this.boxes.index(this.last);
 
-				var chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
+                var chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
 
-				$.each(chs, function(i, e)
-				{
-					setTimeout(function()
-					{
-						e.checked = self.last.checked;
-					}, (100 / chs.length) * i);
-				})
-			}
+                $.each(chs, function(i, e)
+                {
+                    setTimeout(function()
+                    {
+                        e.checked = self.last.checked;
+                    }, (100 / chs.length) * i);
+                })
+            }
 
-			this.last = element;
-		}
-	};
+            this.last = element;
+        }
+    };
 
-	$.fn[plugin] = function ()
-	{
-		if (!this.data('phoenix.' + plugin))
-		{
-			this.data('phoenix.' + plugin, new PhoenixMultiSelect(this));
-		}
+    $.fn[plugin] = function()
+    {
+        if (!this.data('phoenix.' + plugin))
+        {
+            this.data('phoenix.' + plugin, new PhoenixMultiSelect(this));
+        }
 
-		return this.data('phoenix.' + plugin);
-	};
+        return this.data('phoenix.' + plugin);
+    };
 
 })(jQuery);

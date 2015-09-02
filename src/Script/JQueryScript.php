@@ -24,7 +24,7 @@ class JQueryScript extends ScriptManager
 	 *
 	 * @return  void
 	 */
-	public static function jquery($noConflict = false)
+	public static function core($noConflict = false)
 	{
 		$asset = static::getAsset();
 
@@ -48,6 +48,7 @@ class JQueryScript extends ScriptManager
 	 */
 	public static function ui(array $components)
 	{
+		static::core();
 		$asset = static::getAsset();
 
 		if (!static::inited(__METHOD__))
@@ -85,6 +86,7 @@ class JQueryScript extends ScriptManager
 	 */
 	public static function colorPicker($selector = '.colorpicker', $options = array())
 	{
+		static::core();
 		$asset = static::getAsset();
 
 		if (!static::inited(__METHOD__))

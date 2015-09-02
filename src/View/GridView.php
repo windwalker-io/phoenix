@@ -56,9 +56,6 @@ class GridView extends ListView
 
 		// Grid
 		$data->grid = $this->getGridHelper();
-		$data->toolbar = new Toolbar;
-
-		$this->configureToolbar($data->toolbar);
 
 		Document::setTitle(ucfirst($this->getName()));
 	}
@@ -82,9 +79,5 @@ class GridView extends ListView
 		}
 
 		return $this->gridHelper;
-	}
-
-	public function configureToolbar(Toolbar $toolbar)
-	{
 	}
 }

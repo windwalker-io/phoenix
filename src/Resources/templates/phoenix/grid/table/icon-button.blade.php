@@ -5,7 +5,7 @@
 @else
     <button type="button" class="grid-boolean-icon data-state-{{ $value }} btn btn-default btn-xs"
         title="{{ isset($options['titleMapping'][$value]) ? $options['titleMapping'][$value] : null }}"
-        onclick="Phoenix.updateRow({{ $row }}, null, {task: '{{ isset($taskMapping[$value]) ? $taskMapping[$value] : null }}'})">
+        onclick="Phoenix.Grid.updateRow({{ $row }}, null, {task: '{{ isset($taskMapping[$value]) ? $taskMapping[$value] : null }}'})">
         <span class="glyphicon glyphicon-{{ $iconMapping[$value] }}"></span>
     </button>
 @endif

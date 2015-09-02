@@ -42,7 +42,7 @@ class BootstrapScript extends ScriptManager
 	{
 		if (!static::inited(__METHOD__))
 		{
-			JQueryScript::jquery(true);
+			JQueryScript::core();
 			static::css();
 
 			$asset = static::getAsset();
@@ -183,7 +183,7 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			JQueryScript::jquery();
+			JQueryScript::core();
 			static::css();
 
 			$asset->addScript(static::phoenixName() . '/js/datetime/moment.min.js');
