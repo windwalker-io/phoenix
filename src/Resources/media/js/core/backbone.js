@@ -454,7 +454,7 @@
 				(attrs = {})[key] = val;
 			}
 
-			options = _.extend({validate: true}, options);
+			options = _.extend({validateAll: true}, options);
 
 			// If we're not waiting and attributes exist, save acts as
 			// `set(attr).save(null, opts)` with validation. Otherwise, check if
@@ -557,13 +557,13 @@
 
 		// Check if the model is currently in a valid state.
 		isValid: function(options) {
-			return this._validate({}, _.extend(options || {}, { validate: true }));
+			return this._validate({}, _.extend(options || {}, { validateAll: true }));
 		},
 
 		// Run validation against the next complete set of model attributes,
 		// returning `true` if all is well. Otherwise, fire an `"invalid"` event.
 		_validate: function(attrs, options) {
-			if (!options.validate || !this.validate) return true;
+			if (!options.validateAll || !this.validate) return true;
 			attrs = _.extend({}, this.attributes, attrs);
 			var error = this.validationError = this.validate(attrs, options) || null;
 			if (!error) return true;

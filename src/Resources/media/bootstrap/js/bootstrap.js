@@ -2060,7 +2060,7 @@ if (typeof jQuery === 'undefined') {
 
   var Tab = function (element) {
     // jscs:disable requireDollarBeforejQueryAssignment
-    this.form = $(element)
+    this.element = $(element)
     // jscs:enable requireDollarBeforejQueryAssignment
   }
 
@@ -2069,7 +2069,7 @@ if (typeof jQuery === 'undefined') {
   Tab.TRANSITION_DURATION = 150
 
   Tab.prototype.show = function () {
-    var $this    = this.form
+    var $this    = this.element
     var $ul      = $this.closest('ul:not(.dropdown-menu)')
     var selector = $this.data('target')
 

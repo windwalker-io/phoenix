@@ -52,6 +52,7 @@ class EditDefinition implements FieldDefinitionInterface
 
 			$form->add('url', new TextField)
 				->label('URL')
+				->set('class', 'validate-url')
 				->setValidator(new UrlValidator);
 
 			$form->add('{$controller.item.name.lower$}', new {$controller.item.name.cap$}ListField)

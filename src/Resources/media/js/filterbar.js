@@ -49,18 +49,18 @@
 	 */
 	function Filterbar(element, options)
 	{
-		this.form = element;
+		this.element = element;
 		this.options = $.extend(true, {}, defaultOptions, options);
 
 		var selector = this.options.selector;
 
-		this.form = $(selector.form);
-		this.searchContainer = this.form.find(selector.search.container);
-		this.searchButton    = this.form.find(selector.search.button);
-		this.searchClearButton = this.form.find(selector.search.clearButton);
-		this.filterContainer = this.form.find(selector.filter.container);
-		this.filterButton    = this.form.find(selector.filter.button);
-		this.sortButtons     = this.form.find(selector.sort.button);
+		this.element = $(selector.element);
+		this.searchContainer = this.element.find(selector.search.container);
+		this.searchButton    = this.element.find(selector.search.button);
+		this.searchClearButton = this.element.find(selector.search.clearButton);
+		this.filterContainer = this.element.find(selector.filter.container);
+		this.filterButton    = this.element.find(selector.filter.button);
+		this.sortButtons     = this.element.find(selector.sort.button);
 
 		this.registerEvents();
 	}
@@ -76,7 +76,7 @@
 				self.searchContainer.find('input, textarea, select').val('');
 				self.filterContainer.find('input, textarea, select').val('');
 
-				self.form.submit();
+				self.element.submit();
 			});
 
 			this.filterButton.click(function(event)
@@ -120,7 +120,7 @@
 			{
 				orderingInput = $('<input name="list_ordering" type="hidden" value="" />');
 
-				this.form.append(orderingInput);
+				this.element.append(orderingInput);
 			}
 
 			var directionInput = $element.find('input[name=list_direction]');
@@ -129,13 +129,13 @@
 			{
 				directionInput = $('<input name="list_direction" type="hidden" value="" />');
 
-				this.form.append(directionInput);
+				this.element.append(directionInput);
 			}
 
 			orderingInput.val(ordering);
 			directionInput.val(direction);
 
-			this.form.submit();
+			this.element.submit();
 		}
 	};
 

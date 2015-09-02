@@ -30,7 +30,7 @@
 
 		options = $.extend({}, defaultOptions, options);
 
-		this.form = form;
+		this.element = form;
 		this.options = options;
 	};
 
@@ -48,7 +48,7 @@
 		 */
 		submit: function(url, queries, method, customMethod)
 		{
-			var form = this.form;
+			var form = this.element;
 
 			var methodInput = form.find('input[name="_method"]');
 
@@ -195,7 +195,7 @@
 		{
 			this.toggleAll(false);
 
-			var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
+			var ch = this.element.find('input.grid-checkbox[data-row-number=' + row + ']');
 
 			if (!ch.length)
 			{
@@ -214,7 +214,7 @@
 		 */
 		toggleAll: function(value)
 		{
-			var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
+			var checkboxes = this.element.find('input.grid-checkbox[type=checkbox]');
 
 			$.each(checkboxes, function(i, e)
 			{
@@ -243,7 +243,7 @@
 		 */
 		getChecked: function()
 		{
-			var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]'),
+			var checkboxes = this.element.find('input.grid-checkbox[type=checkbox]'),
 				result = [];
 
 			$.each(checkboxes, function(i, e)
@@ -310,7 +310,7 @@
 		 */
 		reorder: function(row, offset, url, queries)
 		{
-			var input = this.form.find('input[data-order-row=' + row + ']');
+			var input = this.element.find('input[data-order-row=' + row + ']');
 			var tr    = input.parents('tr');
 			var group = tr.attr('data-order-group');
 			var input2;
@@ -343,6 +343,41 @@
 			input2.val(parseInt(input2.val()) - parseFloat(offset));
 
 			return this.reorderAll(url, queries);
+		},
+
+		addMessage: function(msg, type)
+		{
+			var messageContainer = $('.message-wrap'),
+				message = messageContainer.find('div.alert.alert-' + type),
+				i;
+
+
+			if (!message.length)
+			{
+				message = $('<div class="alert alert-' + type + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close"></div>');
+				messageContainer.append(message);
+			}
+
+			if (typeof msg == 'string')
+			{
+				msg = [msg];
+			}
+
+			for (i in msg)
+			{
+				message.append('<p>' + msg[i] + '</p>');
+			}
+		},
+
+		removeMessages: function()
+		{
+			var messages = $('.message-wrap *');
+
+			// Empty container with a while for Chrome performance issues
+			messages.each(function()
+			{
+				this.remove();
+			});
 		}
 	};
 

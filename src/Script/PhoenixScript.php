@@ -9,6 +9,7 @@
 namespace Phoenix\Script;
 
 use Windwalker\Core\Language\Translator;
+use Windwalker\Language\Language;
 use Windwalker\Registry\Format\JsonFormat;
 
 /**
@@ -161,6 +162,44 @@ JS;
 		}
 	}
 
+	/**
+	 * translator
+	 *
+	 * @return  void
+	 */
+	public static function translator()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			$asset = static::getAsset();
+			$asset->addScript(static::phoenixName() . '/js/string/translator.min.js');
+		}
+	}
+
+	/**
+	 * langKey
+	 *
+	 * @param   string  $key
+	 *
+	 * @return  void
+	 */
+	public function lang($key)
+	{
+		static::translator();
+
+		$asset = static::getAsset();
+
+		$text = Translator::translate($key);
+
+		/** @var Language $language */
+		$language = Translator::getInstance();
+		$handler = $language->getNormalizeHandler();
+
+		$key = call_user_func($handler, $key);
+
+		$asset->internalScript("PhoenixTranslator.addKey('{$key}', '$text')");
+	}
+
 	public static function multiSelect($selector = '#admin-form table')
 	{
 		$asset = static::getAsset();
@@ -203,6 +242,8 @@ JS;
 			$defaultOptions = array();
 
 			$options = json_encode((object) array_merge($defaultOptions, $options));
+
+			static::lang('phoenix.validation.fail');
 
 			$js = <<<JS
 // Chosen select

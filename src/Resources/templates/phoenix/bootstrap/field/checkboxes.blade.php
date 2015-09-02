@@ -7,7 +7,7 @@
     ?>
     {{ $field->renderLabel() }}
 
-    <div id="{{$field->getId()}}" class="checkbox-container {{ $field->get('fieldWidth', 'col-md-9') }}" {{ $field->get('required') ? 'required' : null }}>
+    <div id="{{$field->getId()}}" class="checkbox-container input-list-container {{ $field->get('fieldWidth', 'col-md-9') }}" {{ $field->get('required') ? 'required' : null }}>
     <?php
     $radios = $field->renderInput();
     \Windwalker\Test\TestHelper::invoke($radios, 'prepareOptions');

@@ -7,8 +7,10 @@
 
 ;(function($)
 {
-    var defaultOptions = {
+    "use strict";
 
+    var defaultOptions = {
+        events: ['change']
     };
 
     /**
@@ -22,57 +24,56 @@
     {
         options = $.extend({}, defaultOptions, options);
 
-        this.form = element || $;
+        this.SUCCESS = 'success';
+        this.NONE    = 'none';
+        this.EMPTY   = 'empty';
+        this.WARNING = 'warning';
+
+        this.element = element || $;
         this.options = options;
         this.validators = [];
-        this.inputs = this.form.find('input, select, textarea, div.radio-container, div.checkbox-container');
+        this.inputs = this.element.find('input, select, textarea, div.input-list-container');
 
         this.registerDefaultValidators();
         this.registerEvents();
     };
 
     PhoenixValidation.prototype = {
-        isVaild: function()
+        /**
+         * Validate All.
+         *
+         * @returns {boolean}
+         */
+        validateAll: function()
         {
-
-        },
-
-        validate: function()
-        {
-            var self = this;
+            var self = this, inValid = [];
 
             this.inputs.each(function()
             {
-                self.validField(this);
+                if (!self.validate(this))
+                {
+                    inValid.push(this);
+                }
             });
 
-            return false;
+            return inValid.length <= 0;
         },
 
-        validField: function(input)
+        /**
+         * Validate.
+         *
+         * @param {jQuery} input
+         * @returns {boolean}
+         */
+        validate: function(input)
         {
-            var $input = $(input), tagName;
+            var $input = $(input), tagName, className, validator;
 
             if ($input.attr('disabled'))
             {
-                this.showResponse(true, $input)
+                this.showResponse(this.NONE, $input);
+
                 return true;
-            }
-
-            if ($input.attr('required') || $input.hasClass('required'))
-            {
-                // Handle radio & checkboxes
-                tagName = $input.prop("tagName").toLowerCase();
-
-                if (tagName === 'div' && ($input.hasClass('radio-container') || $input.hasClass('checkbox-container')))
-                {
-                    if (!$input.find('input:checked').length)
-                    {
-                        this.showResponse(false, $input);
-
-                        return false;
-                    }
-                }
             }
 
             if ($input.attr('type') == 'radio' || $input.attr('type') == 'checkbox')
@@ -80,50 +81,141 @@
                 return true;
             }
 
-            this.showResponse(true, $input);
+            if ($input.attr('required') || $input.hasClass('required'))
+            {
+                // Handle radio & checkboxes
+                if ($input.prop("tagName").toLowerCase() === 'div' && $input.hasClass('input-list-container'))
+                {
+                    if (!$input.find('input:checked').length)
+                    {
+                        this.showResponse(this.EMPTY, $input);
+
+                        return false;
+                    }
+                }
+
+                // Handle all fields and checkbox
+                else if (!$input.val() || ($input.attr('type') === 'checkbox' && !$input.is(':checked')))
+                {
+                    this.showResponse(this.EMPTY, $input);
+
+                    return false;
+                }
+            }
+
+            // Is value exists, validate this type.
+            className = $input.attr('class');
+
+            if (className)
+            {
+                validator = className.match(/validate-([a-zA-Z0-9\_|-]+)/);
+            }
+
+            // Empty value and no validator config, set response to none.
+            if (!$input.val() || !validator)
+            {
+                this.showResponse(this.NONE, $input);
+
+                return true;
+            }
+
+            validator = this.validators[validator[1]];
+
+            if (!validator || !validator.handler)
+            {
+                this.showResponse(this.NONE, $input);
+
+                return true;
+            }
+
+            if (!validator.handler($input.val(), $input))
+            {
+                this.showResponse(this.WARNING, $input, validator.options.notice);
+
+                return false;
+            }
+
+            this.showResponse(this.SUCCESS, $input);
+
+            return true;
         },
 
-        showResponse: function(state, $input)
+        /**
+         * Show response on input.
+         *
+         * @param {string} state
+         * @param {jQuery} $input
+         * @param {string} help
+         *
+         * @returns {boolean}
+         */
+        showResponse: function(state, $input, help)
         {
-            var control = $input.parents('.form-group').first();
+            var $control = $input.parents('.form-group').first();
 
-            if (!state)
+            this.removeResponce($control);
+
+            if (state != this.NONE)
             {
-                control.addClass('has-error has-feedback');
+                var icon, color;
 
-                if (!control.find('.form-control-feedback').length)
+                switch (state)
                 {
-                    var feedback = $('<span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>');
-                    control.prepend(feedback);
+                    case this.SUCCESS:
+                        color = 'success';
+                        icon  = 'ok';
+                        break;
+
+                    case this.EMPTY:
+                        color = 'error';
+                        icon  = 'remove';
+                        break;
+
+                    case this.WARNING:
+                        color = 'warning';
+                        icon  = 'warning-sign';
+                        break;
                 }
 
-                if (!control.find('.help-block').length)
+                $control.addClass('has-' + color + ' has-feedback');
+
+                var feedback = $('<span class="glyphicon glyphicon-' + icon + ' form-control-feedback" aria-hidden="true"></span>');
+                $control.prepend(feedback);
+
+                if (help)
                 {
-                    var help = $('<small class="help-block">Some thing</small>');
-                    $input.append(help);
+                    var helpElement = $('<small class="help-block">' + help + '</small>');
+
+                    var tagName = $input.prop('tagName').toLowerCase();
+
+                    if (tagName == 'div')
+                    {
+                        $input.append(helpElement);
+                    }
+                    else
+                    {
+                        $input.parent().append(helpElement);
+                    }
                 }
             }
-            else
-            {
-                control.find('.form-control-feedback').remove();
-                control.find('.help-block').remove();
-                control.removeClass('has-error').removeClass('has-feedback');
-            }
+
+            $input.trigger({
+                type: 'phoenix.validate.' + state,
+                input: $input,
+                state: state,
+                help: help
+            });
+
+            return state;
         },
 
-        findLabel: function($input)
+        removeResponce: function($element)
         {
-            var id, label;
-
-            if (id = $input.attr('id'))
-            {
-                label = $('label[for=' + id + ']');
-
-                if (label.length)
-                {
-                    return label.first();
-                }
-            }
+            $element.find('.form-control-feedback').remove();
+            $element.removeClass('has-error')
+                .removeClass('has-success')
+                .removeClass('has-warning')
+                .removeClass('has-feedback');
         },
 
         /**
@@ -136,6 +228,8 @@
          */
         addValidator: function(name, validator, options)
         {
+            options = options || {};
+
             this.validators[name] = {
                 handler: validator,
                 options: options
@@ -144,13 +238,16 @@
             return this;
         },
 
+        /**
+         * Register events.
+         */
         registerEvents: function()
         {
             var self = this;
 
-            this.form.on('submit', function(event)
+            this.element.on('submit', function(event)
             {
-                if (!self.validate())
+                if (!self.validateAll())
                 {
                     event.stopPropagation();
                     event.preventDefault();
@@ -160,8 +257,19 @@
 
                 return true;
             });
+
+            $.each(this.options.events, function()
+            {
+                self.inputs.on(this, function()
+                {
+                    self.validate(this);
+                });
+            });
         },
 
+        /**
+         * Register default validators.
+         */
         registerDefaultValidators: function()
         {
             // Default handlers
@@ -187,6 +295,13 @@
             {
                 value = punycode.toASCII(value);
                 var regex = /^[a-zA-Z0-9.!#$%&â€™*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                return regex.test(value);
+            });
+
+            this.addValidator('url', function(value, element)
+            {
+                value = punycode.toASCII(value);
+                var regex = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
                 return regex.test(value);
             });
         }
