@@ -32,7 +32,7 @@
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     @section('nav')
-                        <li class="active"><a href="{{ $router->html('home') }}">Home</a></li>
+                        @include('_global.{$package.name.lower$}.mainmenu')
                     @show
                 </ul>
                 <ul class="nav navbar-nav navbar-right">

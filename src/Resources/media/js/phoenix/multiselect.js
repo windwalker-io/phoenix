@@ -5,8 +5,10 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-;
-(function($)
+/**
+ * PhoenixMultiSelect
+ */
+;(function($)
 {
     /**
      * Plugin name.

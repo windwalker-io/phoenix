@@ -5,8 +5,10 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-;
-(function($)
+/**
+ * PhoenixGrid
+ */
+;(function($)
 {
     "use strict";
 
@@ -95,18 +97,7 @@
 
         toggleFilter: function()
         {
-            if (this.filterContainer.hasClass('shown'))
-            {
-                this.filterButton.removeClass('btn-default').addClass('btn-primary');
-                this.filterContainer.hide('fast');
-                this.filterContainer.removeClass('shown');
-            }
-            else
-            {
-                this.filterButton.removeClass('btn-primary').addClass('btn-default');
-                this.filterContainer.show('fast');
-                this.filterContainer.addClass('shown');
-            }
+            Phoenix.Theme.toggleFilter(this.filterContainer, this.filterButton);
 
             return this;
         },
@@ -228,8 +219,12 @@
             {
                 alert(msg);
 
-                event.stopPropagation();
-                event.preventDefault();
+                // If you send event object as second argument, we will stop all actions.
+                if (event)
+                {
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
 
                 throw new Error(msg);
             }

@@ -10,6 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.
 
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\CoreScript;
+use Phoenix\Script\JQueryScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
 
@@ -36,15 +37,22 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	 */
 	protected function prepareData($data)
 	{
-		PhoenixScript::chosen();
+		$this->prepareScripts();
+	}
+
+	/**
+	 * prepareDocument
+	 *
+	 * @return  void
+	 */
+	protected function prepareScripts()
+	{
 		BootstrapScript::css();
 		BootstrapScript::script();
-		BootstrapScript::checkbox();
 		PhoenixScript::core();
 		PhoenixScript::grid();
 		PhoenixScript::multiSelect();
-
-		CoreScript::underscoreString();
-		CoreScript::underscore();
+		PhoenixScript::chosen();
+		BootstrapScript::checkbox();
 	}
 }

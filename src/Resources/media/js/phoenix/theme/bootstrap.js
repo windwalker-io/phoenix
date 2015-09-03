@@ -131,6 +131,32 @@ var Phoenix;
             {
                 this.remove();
             });
+        },
+
+        /**
+         * Toggle filter bar.
+         *
+         * @param {jQuery} container
+         * @param {jQuery} button
+         */
+        toggleFilter: function(container, button)
+        {
+            if (container.hasClass('shown'))
+            {
+                button.removeClass('btn-primary').addClass('btn-default');
+                container.hide('fast');
+                container.removeClass('shown');
+
+                button.find('span.glyphicon').removeClass('glyphicon-menu-up').addClass('glyphicon-menu-down');
+            }
+            else
+            {
+                button.removeClass('btn-default').addClass('btn-primary');
+                container.show('fast');
+                container.addClass('shown');
+
+                button.find('span.glyphicon').removeClass('glyphicon-menu-down').addClass('glyphicon-menu-up');
+            }
         }
     };
 

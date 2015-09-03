@@ -8,7 +8,9 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Form\{$controller.list.name.cap$};
 
+use Windwalker\Core\Language\Translator;
 use Windwalker\Form\Field\ListField;
+use Windwalker\Form\Field\SpacerField;
 use Windwalker\Form\Field\TextField;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
@@ -39,7 +41,7 @@ class FilterDefinition implements FieldDefinitionInterface
 				->addOption(new Option('Alias', '{$controller.item.name.lower$}.alias'));
 
 			$form->add('content', new TextField)
-				->set('placeholder', 'Search');
+				->set('placeholder', Translator::translate('phoenix.search.placeholder'));
 		});
 
 		$form->wrap(null, 'filter', function(Form $form)

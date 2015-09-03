@@ -4,6 +4,10 @@
 	white-space: nowrap;
 }
 
+.clearfix {
+	clear: both;
+}
+
 .jumbotron.admin-header {
 	margin-bottom: 0;
 }
@@ -18,6 +22,11 @@
 }
 
 // Grid
+
+.search-container {
+    margin-bottom: 15px;
+}
+
 .ordering-control
 {
 	input {
@@ -65,49 +74,7 @@
 }
 
 // Chosen in modal will be 0px, force it's width
-.modal .chosen-container {
+.modal .chosen-container,
+*[class*="col-"] > .chosen-container {
 	min-width: 100%;
 }
-
-// Bootstrap Awesome Checkbox
-/*
-.checkbox input[type=checkbox]:checked + label:after {
-	font-family: 'Glyphicons Halflings';
-	content: "\e013";
-}
-.checkbox label:after {
-	padding-left: 4px;
-	padding-top: 2px;
-	font-size: 9px;
-}
-
-.checkbox {
-	input {
-		cursor: pointer;
-	}
-}
-
-.checkbox.single-checkbox {
-	margin: 0;
-	padding: 0;
-	width: 21px;
-
-	label {
-		padding: 0;
-	}
-	label::before,
-	label::after,
-	input[type=checkbox] {
-		margin: 0;
-	}
-	label::after {
-		padding-left: 2px;
-		padding-top: 0;
-	}
-
-	input[type=checkbox] {
-		width: 17px;
-		height: 17px;
-	}
-}
-*/

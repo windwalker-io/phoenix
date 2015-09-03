@@ -1,10 +1,13 @@
 /**
- * Part of asukademy project.
+ * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
  */
 
+/**
+ * PhoenixCore
+ */
 (function($)
 {
     "use strict";
@@ -183,6 +186,26 @@
             Phoenix.Theme.removeMessages(messageContainer);
 
             return this;
+        },
+
+        keepAlive: function(url, time)
+        {
+            window.setInterval(function()
+            {
+                var r;
+
+                try
+                {
+                    r = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject('Microsoft.XMLHTTP');
+                }
+                catch (e) {}
+
+                if (r)
+                {
+                    r.open('GET', url, true);
+                    r.send(null);
+                }
+            }, time);
         }
     };
 

@@ -1,6 +1,6 @@
 {{-- Part of phoenix project. --}}
 
-@extends('_global.html')
+@extends('_global.{$package.name.lower$}.html')
 
 @section('content')
 <section class="jumbotron admin-header">
@@ -17,7 +17,7 @@
 
         @section('admin-area')
         <div class="col-md-2">
-            MENU
+            @include('_global.{$package.name.lower$}.submenu')
         </div>
         <div class="col-md-10">
 

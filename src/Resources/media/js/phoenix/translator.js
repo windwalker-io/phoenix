@@ -6,6 +6,10 @@
  */
 
 var Phoenix;
+
+/**
+ * Phoenix.Translator
+ */
 (function(Phoenix)
 {
     "use strict";

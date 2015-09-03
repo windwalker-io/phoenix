@@ -1,6 +1,9 @@
 .nowrap {
   white-space: nowrap;
 }
+.clearfix {
+  clear: both;
+}
 .jumbotron.admin-header {
   margin-bottom: 0;
 }
@@ -10,6 +13,9 @@
 #admin-toolbar {
   background-color: #f6f6f6;
   padding: 7px 25px;
+}
+.search-container {
+  margin-bottom: 15px;
 }
 .ordering-control {
   max-width: 90px;
@@ -39,47 +45,7 @@
   top: 7px;
   right: 6px;
 }
-.modal .chosen-container {
+.modal .chosen-container,
+*[class*="col-"] > .chosen-container {
   min-width: 100%;
 }
-/*
-.checkbox input[type=checkbox]:checked + label:after {
-	font-family: 'Glyphicons Halflings';
-	content: "\e013";
-}
-.checkbox label:after {
-	padding-left: 4px;
-	padding-top: 2px;
-	font-size: 9px;
-}
-
-.checkbox {
-	input {
-		cursor: pointer;
-	}
-}
-
-.checkbox.single-checkbox {
-	margin: 0;
-	padding: 0;
-	width: 21px;
-
-	label {
-		padding: 0;
-	}
-	label::before,
-	label::after,
-	input[type=checkbox] {
-		margin: 0;
-	}
-	label::after {
-		padding-left: 2px;
-		padding-top: 0;
-	}
-
-	input[type=checkbox] {
-		width: 17px;
-		height: 17px;
-	}
-}
-*/

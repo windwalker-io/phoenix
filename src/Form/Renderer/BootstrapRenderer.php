@@ -27,6 +27,15 @@ class BootstrapRenderer
 	protected static $renderers = array();
 
 	/**
+	 * Property aliases.
+	 *
+	 * @var  array
+	 */
+	protected static $aliases = array(
+		'spacer' => 'default'
+	);
+
+	/**
 	 * render
 	 *
 	 * @param AbstractField $field
@@ -37,6 +46,8 @@ class BootstrapRenderer
 	public function render(AbstractField $field, Form $form)
 	{
 		$type = $field->getType();
+
+		$type = static::resolveAlias($type);
 
 		$handler = static::getRenderer($type);
 
@@ -50,7 +61,7 @@ class BootstrapRenderer
 			return call_user_func(array(__CLASS__, 'render' . ucfirst($type)), $field, $form);
 		}
 
-		return static::renderDefault($field, $form);
+		return static::renderInput($field, $form);
 	}
 
 	/**
@@ -86,13 +97,29 @@ class BootstrapRenderer
 	}
 
 	/**
+	 * renderSpacer
+	 *
+	 * @param AbstractField $field
+	 * @param Form          $form
+	 *
+	 * @return  string
+	 */
+	public static function renderSpacer(AbstractField $field, Form $form)
+	{
+		return WidgetHelper::render('phoenix.bootstrap.field.spacer', array(
+			'form' => $form,
+			'field' => $field
+		), WidgetHelper::ENGINE_BLADE);
+	}
+
+	/**
 	 * renderHidden
 	 *
 	 * @param AbstractField $field
 	 *
 	 * @return  string
 	 */
-	protected function renderHidden(AbstractField $field)
+	protected static function renderHidden(AbstractField $field)
 	{
 		return $field->renderInput();
 	}
@@ -105,14 +132,86 @@ class BootstrapRenderer
 	 *
 	 * @return  string
 	 */
-	protected static function renderDefault(AbstractField $field, Form $form)
+	protected static function renderInput(AbstractField $field, Form $form)
 	{
-		return WidgetHelper::render('phoenix.bootstrap.field.default', array(
+		return WidgetHelper::render('phoenix.bootstrap.field.input', array(
 			'form' => $form,
 			'field' => $field
 		), WidgetHelper::ENGINE_BLADE);
 	}
 
+	/**
+	 * renderDefault
+	 *
+	 * @param   AbstractField $field
+	 *
+	 * @return  string
+	 */
+	protected static function renderDefault(AbstractField $field)
+	{
+		return $field->render();
+	}
+
+	/**
+	 * resolveAlias
+	 *
+	 * @param   string  $type
+	 *
+	 * @return  string
+	 */
+	public static function resolveAlias($type)
+	{
+		if (isset(static::$aliases[$type]))
+		{
+			return static::$aliases[$type];
+		}
+
+		return $type;
+	}
+
+	/**
+	 * addAlias
+	 *
+	 * @param   string  $type
+	 * @param   string  $alias
+	 *
+	 * @return  void
+	 */
+	public static function addAlias($type, $alias)
+	{
+		static::$aliases[$type] = $alias;
+	}
+
+	/**
+	 * Method to get property Aliases
+	 *
+	 * @return  array
+	 */
+	public static function getAliases()
+	{
+		return static::$aliases;
+	}
+
+	/**
+	 * Method to set property aliases
+	 *
+	 * @param   array $aliases
+	 *
+	 * @return  void
+	 */
+	public static function setAliases($aliases)
+	{
+		static::$aliases = $aliases;
+	}
+
+	/**
+	 * addRenderer
+	 *
+	 * @param   string    $type
+	 * @param   callable  $renderer
+	 *
+	 * @return  void
+	 */
 	public static function addRenderer($type, $renderer)
 	{
 		if (!is_callable($renderer))

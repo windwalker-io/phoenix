@@ -29,7 +29,7 @@ class BootstrapScript extends ScriptManager
 		{
 			$asset = static::getAsset();
 
-			$asset->addStyle(static::phoenixName() . '/bootstrap/css/bootstrap.min.css');
+			$asset->addStyle(static::phoenixName() . '/css/bootstrap/bootstrap.min.css');
 		}
 	}
 
@@ -47,7 +47,7 @@ class BootstrapScript extends ScriptManager
 
 			$asset = static::getAsset();
 
-			$asset->addScript(static::phoenixName() . '/bootstrap/js/bootstrap.min.js');
+			$asset->addScript(static::phoenixName() . '/js/bootstrap/bootstrap.min.js');
 		}
 	}
 
@@ -64,7 +64,7 @@ class BootstrapScript extends ScriptManager
 
 			$asset = static::getAsset();
 
-			$asset->addStyle(static::phoenixName() . '/bootstrap/css/awesome-checkbox.min.css');
+			$asset->addStyle(static::phoenixName() . '/css/bootstrap/awesome-checkbox.min.css');
 
 			$css = <<<CSS
 /* Bootstrap Awesome Checkbox */
@@ -187,8 +187,8 @@ JS;
 			static::css();
 
 			$asset->addScript(static::phoenixName() . '/js/datetime/moment.min.js');
-			$asset->addScript(static::phoenixName() . '/bootstrap/js/bootstrap-datetimepicker.min.js');
-			$asset->addStyle(static::phoenixName() . '/bootstrap/css/bootstrap-datetimepicker.min.css');
+			$asset->addScript(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
+			$asset->addStyle(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
@@ -209,6 +209,23 @@ jQuery(document).ready(function($)
 JS;
 
 			$asset->internalScript($js);
+		}
+	}
+
+	/**
+	 * tabState
+	 *
+	 * @return  void
+	 */
+	public static function tabState()
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
+		{
+			JQueryScript::core();
+
+			$asset->addScript(static::phoenixName() . '/js/bootstrap/tabs-state.js');
 		}
 	}
 }

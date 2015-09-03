@@ -8,6 +8,8 @@
 
 namespace Phoenix\View;
 
+use Windwalker\Core\Language\Translator;
+
 /**
  * The ListHtmlView class.
  *
@@ -15,5 +17,17 @@ namespace Phoenix\View;
  */
 class ListView extends AbstractRadHtmView
 {
+	/**
+	 * setTitle
+	 *
+	 * @param string $title
+	 *
+	 * @return  static
+	 */
+	public function setTitle($title = null)
+	{
+		$title = $title ? : Translator::sprintf('phoenix.title.list.' . $this->getName());
 
+		return parent::setTitle($title);
+	}
 }

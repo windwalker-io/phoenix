@@ -8,6 +8,8 @@
 
 namespace Phoenix\View;
 
+use Windwalker\Core\Language\Translator;
+
 /**
  * The EditView class.
  *
@@ -15,8 +17,31 @@ namespace Phoenix\View;
  */
 class EditView extends ItemView
 {
+	/**
+	 * setTitle
+	 *
+	 * @param string $title
+	 *
+	 * @return  static
+	 */
+	public function setTitle($title = null)
+	{
+		$title = $title ? : Translator::sprintf('phoenix.title.edit.' . $this->getName());
+
+		return parent::setTitle($title);
+	}
+
+	/**
+	 * prepareRender
+	 *
+	 * @param \Windwalker\Data\Data $data
+	 *
+	 * @return  void
+	 */
 	protected function prepareRender($data)
 	{
+		parent::prepareRender($data);
+
 		$data->item = $this->model->getItem();
 		$data->form = $this->model->getForm('edit', 'item', true);
 	}

@@ -8,7 +8,9 @@
 
 namespace Phoenix\View;
 
+use Phoenix\Html\Document;
 use Windwalker\Core\View\HtmlView;
+use Windwalker\Data\Data;
 use Windwalker\Renderer\BladeRenderer;
 use Windwalker\Renderer\RendererInterface;
 
@@ -30,5 +32,31 @@ abstract class AbstractRadHtmView extends HtmlView
 		$renderer = $renderer ? : new BladeRenderer;
 
 		parent::__construct($data, $renderer);
+	}
+
+	/**
+	 * prepareRender
+	 *
+	 * @param   Data $data
+	 *
+	 * @return  void
+	 */
+	protected function prepareRender($data)
+	{
+		$this->setTitle();
+	}
+
+	/**
+	 * setTitle
+	 *
+	 * @param string $title
+	 *
+	 * @return  static
+	 */
+	public function setTitle($title = null)
+	{
+		Document::setTitle($title);
+
+		return $this;
 	}
 }

@@ -9,6 +9,7 @@
 namespace Phoenix\Script;
 
 use Windwalker\Core\Language\Translator;
+use Windwalker\Ioc;
 use Windwalker\Language\Language;
 use Windwalker\Registry\Format\JsonFormat;
 
@@ -52,7 +53,7 @@ class PhoenixScript extends ScriptManager
 
 			if ($options['theme'] == 'bootstrap')
 			{
-				$asset->addScript(static::phoenixName() . '/js/phoenix/bootstrap-theme.js');
+				$asset->addScript(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
 			}
 
 			$options = json_encode((object) $options);
@@ -267,4 +268,31 @@ JS;
 			$asset->internalScript($js);
 		}
 	}
+
+	/**
+	 * keepAlive
+	 *
+	 * @param string  $url
+	 * @param integer $time
+	 *
+	 * @return  void
+	 */
+	public static function keepAlive($url = './', $time = null)
+	{
+		if (!static::inited(__METHOD__))
+		{
+			if ($time === null)
+			{
+				$config = Ioc::getConfig();
+				$time = $config->get('session.life_time', 3);
+
+				$time = $time * 60000;
+			}
+
+			$js = "Phoenix.keepAlive('$url', $time);";
+
+			static::getAsset()->internalScript($js);
+		}
+	}
+
 }

@@ -29,8 +29,16 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	 */
 	protected function prepareData($data)
 	{
-		Document::setTitle('{$controller.item.name.cap$} Edit');
+		$this->prepareScripts();
+	}
 
+	/**
+	 * prepareDocument
+	 *
+	 * @return  void
+	 */
+	protected function prepareScripts()
+	{
 		PhoenixScript::chosen();
 		PhoenixScript::core();
 		PhoenixScript::formValidation();

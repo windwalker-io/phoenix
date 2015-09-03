@@ -12,7 +12,9 @@ use Phoenix\Html\Document;
 use Phoenix\Toolbar\Button\NewButton;
 use Phoenix\Toolbar\Toolbar;
 use Phoenix\View\Helper\GridHelper;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Widget\BladeWidget;
+use Windwalker\Form\Field\AbstractField;
 use Windwalker\Ioc;
 
 /**
@@ -37,6 +39,20 @@ class GridView extends ListView
 	protected $orderColumn = null;
 
 	/**
+	 * setTitle
+	 *
+	 * @param string $title
+	 *
+	 * @return  static
+	 */
+	public function setTitle($title = null)
+	{
+		$title = $title ? : Translator::sprintf('phoenix.title.grid.' . $this->getName());
+
+		return parent::setTitle($title);
+	}
+
+	/**
 	 * prepareData
 	 *
 	 * @param \Windwalker\Data\Data $data
@@ -45,6 +61,8 @@ class GridView extends ListView
 	 */
 	protected function prepareRender($data)
 	{
+		parent::prepareRender($data);
+
 		$data->items      = $this->model->getItems();
 		$data->pagination = $this->model->getPagination()->render($this->getPackage()->getName() . ':sakuras');
 		$data->filterForm = $this->model->getForm('filter', null, true);
@@ -53,11 +71,21 @@ class GridView extends ListView
 
 		// Widget
 		$data->filterBar = new BladeWidget('phoenix.grid.filterbar', $this->package->getName());
+		$data->showFilterBar = false;
+
+		// Handler filter bar
+		foreach ((array) $data->state->get('input.filter') as $value)
+		{
+			if ($value !== '' && $value !== null)
+			{
+				$data->showFilterBar = true;
+
+				break;
+			}
+		}
 
 		// Grid
 		$data->grid = $this->getGridHelper();
-
-		Document::setTitle(ucfirst($this->getName()));
 	}
 
 	/**

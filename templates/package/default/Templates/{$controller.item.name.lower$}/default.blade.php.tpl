@@ -1,6 +1,6 @@
 {{-- Part of phoenix project. --}}
 
-@extends('_global.admin-edit')
+@extends('_global.{$package.name.lower$}.admin-edit')
 
 @section('toolbar')
     @include('toolbar')
