@@ -8,6 +8,10 @@
 
 namespace Phoenix\Model;
 
+use Windwalker\Core\Authentication\User;
+use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Data\Data;
+use Windwalker\Filter\OutputFilter;
 use Windwalker\Record\Record;
 
 /**
@@ -26,6 +30,88 @@ abstract class AbstractAdminModel extends AbstractCrudModel
 	 * @var  array
 	 */
 	protected $reorderConditions = array();
+
+	/**
+	 * save
+	 *
+	 * @param Data $data
+	 *
+	 * @return  boolean
+	 */
+	public function save(Data $data)
+	{
+		$result = parent::save($data);
+
+		// Reorder
+		if ($result && $this->get('order.position') == static::ORDER_POSITION_FIRST)
+		{
+			$pk = $this->get('item.pk');
+
+			$this->reorder(array($pk => 0));
+
+			$this->state->set('order.position', null);
+		}
+
+		return $result;
+	}
+
+	protected function prepareRecord(Record $record)
+	{
+		$date = DateTime::create();
+		$user = User::get();
+		$key = $record->getKeyName();
+
+		// Alias
+		if ($record->hasField('alias'))
+		{
+			if (!$record->alias)
+			{
+				$record->alias = OutputFilter::stringURLSafe(trim($record->title));
+			}
+			else
+			{
+				$record->alias = OutputFilter::stringURLSafe(trim($record->alias));
+			}
+
+			if (!$record->alias)
+			{
+				$record->alias = OutputFilter::stringURLSafe(trim($date->toSql()));
+			}
+		}
+
+		// Created date
+		if ($record->hasField('created') && !$record->created)
+		{
+			$record->created = $date->toSql();
+		}
+
+		// Modified date
+		if ($record->hasField('modified') && $record->$key)
+		{
+			$record->modified = $date->toSql();
+		}
+
+		// Created user
+		if ($record->hasField('created_by') && !$record->created_by)
+		{
+			$record->created_by = $user->id;
+		}
+
+		// Modified user
+		if ($record->hasField('modified_by') && $record->id)
+		{
+			$record->modified_by = $user->id;
+		}
+
+		// Set Ordering or Nested ordering
+		if ($record->hasField($this->state->get('order.column', 'ordering')))
+		{
+			if (empty($record->id))
+			{
+				$this->setOrderPosition($record);
+			}
+		}
+	}
 
 	/**
 	 * reorder

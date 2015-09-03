@@ -50,7 +50,7 @@ class ItemListField extends SqlListField
 
 		if ($this->get('published'))
 		{
-			$query->where($query->quoteName($this->get('state_field', 'state')) . ' >= 1');
+			$query->where($query->quoteName($this->get('stateField', 'state')) . ' >= 1');
 		}
 
 		if ($ordering = $this->get('ordering', $this->ordering))
@@ -63,7 +63,7 @@ class ItemListField extends SqlListField
 		$query->select($select)
 			->from($table);
 
-		$postQuery = $this->get('post_query');
+		$postQuery = $this->get('postQuery');
 
 		if (is_callable($postQuery))
 		{

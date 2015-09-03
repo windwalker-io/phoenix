@@ -152,21 +152,80 @@
         },
 
         /**
+         * Copy a row.
+         *
+         * @param  {number} row
+         * @param  {string} url
+         * @param  {Object} queries
+         */
+        copyRow: function(row, url, queries)
+        {
+            this.toggleAll(false);
+
+            var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
+
+            if (!ch.length)
+            {
+                throw new Error('Checkbox of row: ' + row + ' not found.');
+            }
+
+            ch[0].checked = true;
+
+            return this.core.post(url, queries);
+        },
+
+        deleteList: function(msg, url, queries)
+        {
+            msg = msg || Phoenix.Translator.translate('phoenix.delete.confirm');
+
+            if (!confirm(msg))
+            {
+                return false;
+            }
+
+            return this.core.delete(url, queries);
+        },
+
+        deleteRow: function(row, msg, url, queries)
+        {
+            this.toggleAll(false);
+
+            var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
+
+            if (!ch.length)
+            {
+                throw new Error('Checkbox of row: ' + row + ' not found.');
+            }
+
+            ch[0].checked = true;
+
+            return this.deleteList(msg, url, queries);
+        },
+
+        /**
          * Toggle all checkboxes.
          *
-         * @param  {boolean}  value  Checked or unchecked.
+         * @param  {boolean}          value     Checked or unchecked.
+         * @param  {number|boolean}   duration  Duration to check all.
          */
-        toggleAll: function(value)
+        toggleAll: function(value, duration)
         {
             var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
 
             $.each(checkboxes, function(i, e)
             {
-                // A little pretty effect
-                setTimeout(function()
+                if (duration)
+                {
+                    // A little pretty effect
+                    setTimeout(function()
+                    {
+                        e.checked = value;
+                    }, (duration / checkboxes.length) * i);
+                }
+                else
                 {
                     e.checked = value;
-                }, (150 / checkboxes.length) * i);
+                }
             });
 
             return this;
@@ -209,7 +268,7 @@
          * @param   {string}  msg
          * @param   {Event}   event
          *
-         * @returns {PhoenixCore}
+         * @returns {PhoenixGrid}
          */
         hasChecked: function(msg, event)
         {
@@ -229,7 +288,7 @@
                 throw new Error(msg);
             }
 
-            return this.core;
+            return this;
         },
 
         /**
@@ -293,27 +352,6 @@
             input2.val(parseInt(input2.val()) - parseFloat(offset));
 
             return this.reorderAll(url, queries);
-        },
-
-        /**
-         * Make a DELETE request.
-         *
-         * @param  {string} msg
-         * @param  {string} url
-         * @param  {Object} queries
-         *
-         * @returns {boolean}
-         */
-        deleteItem: function(msg, url, queries)
-        {
-            msg = msg || Phoenix.Translator.translate('phoenix.delete.confirm');
-
-            if (!confirm(msg))
-            {
-                return false;
-            }
-
-            return this.core.delete(url, queries);
         }
     };
 

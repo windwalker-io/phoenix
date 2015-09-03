@@ -29,7 +29,7 @@
             @endif
         </div>
     @else
-    <div class="form-group col-md-3">
+    <div class="form-group col-sm-4 col-md-3">
         {{ $field->appendAttribute('labelClass', 'hide')->renderLabel() }}
         {{ $field->appendAttribute('class', 'form-control')->renderInput() }}
     </div>

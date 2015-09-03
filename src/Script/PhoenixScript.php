@@ -91,6 +91,8 @@ JS;
 			static::core();
 
 			$asset->addScript(static::phoenixName() . '/js/phoenix/grid.js');
+
+			static::translate('phoenix.delete.confirm');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
@@ -180,7 +182,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function lang($key)
+	public static function translate($key)
 	{
 		static::translator();
 
@@ -201,10 +203,9 @@ JS;
 	 * multiSelect
 	 *
 	 * @param string $selector
-	 *
-	 * @return  void
+	 * @param array  $options
 	 */
-	public static function multiSelect($selector = '#admin-form table')
+	public static function multiSelect($selector = '#admin-form table', $options = array())
 	{
 		$asset = static::getAsset();
 
@@ -217,11 +218,13 @@ JS;
 
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
+			$options = json_encode((object) $options);
+
 			$js = <<<JS
 // Chosen select
 jQuery(document).ready(function($)
 {
-	$('$selector').multiselect('$selector');
+	$('$selector').multiselect('$selector', $options);
 });
 JS;
 
@@ -255,7 +258,7 @@ JS;
 
 			$options = json_encode((object) array_merge($defaultOptions, $options));
 
-			static::lang('phoenix.validation.fail');
+			static::translate('phoenix.validation.fail');
 
 			$js = <<<JS
 // Chosen select

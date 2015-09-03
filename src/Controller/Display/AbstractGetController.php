@@ -36,14 +36,31 @@ abstract class AbstractGetController extends AbstractRadController
 	protected $view;
 
 	/**
+	 * Property format.
+	 *
+	 * @var  string
+	 */
+	protected $format;
+
+	/**
+	 * Property layout.
+	 *
+	 * @var  string
+	 */
+	protected $layout;
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
 	 */
 	protected function prepareExecute()
 	{
+		$this->format = $this->input->get('format', 'html');
+		$this->layout = $this->input->get('layout', 'default');
+
 		$this->model = $this->getModel();
-		$this->view = $this->getView();
+		$this->view = $this->getView(null, $this->format);
 	}
 
 	/**
@@ -59,7 +76,7 @@ abstract class AbstractGetController extends AbstractRadController
 
 		$this->assignModels($this->view);
 
-		return $this->view->render();
+		return $this->view->setLayout($this->layout)->render();
 	}
 
 	/**

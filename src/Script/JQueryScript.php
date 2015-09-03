@@ -63,7 +63,8 @@ class JQueryScript extends ScriptManager
 				'droppable',
 				'resizable',
 				'selectable',
-				'sortable'
+				'sortable',
+				'effect'
 			);
 
 			foreach ($components as $component)

@@ -9,7 +9,9 @@
 namespace {$package.namespace$}{$package.name.cap$}\Form\{$controller.item.name.cap$};
 
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ListField;
+use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ModalField;
 use Phoenix\Field\CalendarField;
+use Phoenix\Field\ModalField;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Field\ListField;
 use Windwalker\Form\Field\RadioField;
@@ -55,12 +57,8 @@ class EditDefinition implements FieldDefinitionInterface
 				->set('class', 'validate-url')
 				->setValidator(new UrlValidator);
 
-			$form->add('{$controller.item.name.lower$}', new {$controller.item.name.cap$}ListField)
-				->label('{$controller.item.name.cap$}')
-				->set('select', 'language, created')
-				->set('text_field', 'created')
-				->set('value_field', 'language')
-				->set('published', true);
+			$form->add('version', new {$controller.item.name.cap$}ModalField)
+				->label('{$controller.item.name.cap$}');
 		});
 
 		$form->wrap('text', null, function(Form $form)
@@ -79,10 +77,11 @@ class EditDefinition implements FieldDefinitionInterface
 			$form->add('state', new RadioField)
 				->label('State')
 				->required(true)
+				->set('class', 'btn-group')
 				->addOption(new Option('Published', '1'))
 				->addOption(new Option('Unpublished', '0'));
 
-			$form->add('version', new TextField)
+			$form->add('version2', new TextField)
 				->label('Version');
 
 			$form->add('created', new CalendarField)

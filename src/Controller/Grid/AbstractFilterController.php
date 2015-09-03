@@ -37,7 +37,14 @@ abstract class AbstractFilterController extends AbstractRadController
 		$model['list.ordering']  = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering');
 		$model['list.direction'] = $this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction');
 
-		$this->setRedirect($this->router->http($this->app->get('route.matched'), array('page' => $this->getUserState($this->getContext('list.page')))));
+		if ($this->input->get('layout') == 'modal')
+		{
+			$this->setRedirect($this->app->get('uri.full'));
+		}
+		else
+		{
+			$this->setRedirect($this->router->http($this->app->get('route.matched'), array('page' => $this->getUserState($this->getContext('list.page')))));
+		}
 
 		return true;
 	}

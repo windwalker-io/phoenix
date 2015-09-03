@@ -86,6 +86,16 @@ class GridView extends ListView
 
 		// Grid
 		$data->grid = $this->getGridHelper();
+
+		// Modal
+		if ($this->getLayout() == 'modal')
+		{
+			// Should make this operation out of view
+			$input = Ioc::getInput();
+
+			$data->selector = $input->getString('selector');
+			$data->function = $input->getString('function', 'Phoenix.Field.Modal.select');
+		}
 	}
 
 	/**

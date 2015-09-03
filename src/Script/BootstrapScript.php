@@ -103,7 +103,6 @@ class BootstrapScript extends ScriptManager
 }
 CSS;
 
-
 			$asset->internalStyle($css);
 		}
 	}
@@ -146,7 +145,6 @@ JS;
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
 			$js = <<<JS
-
 // Modal task
 jQuery(document).ready(function($) {
 	$('{$selector}').click(function(event) {
@@ -219,13 +217,25 @@ JS;
 	 */
 	public static function tabState()
 	{
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset->addScript(static::phoenixName() . '/js/bootstrap/tabs-state.js');
+			$asset = static::getAsset();
+
+			$asset->addScript(static::phoenixName() . '/js/bootstrap/tab-state.min.js');
+		}
+	}
+
+	public static function buttonRadio()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			JQueryScript::core();
+
+			$asset = static::getAsset();
+
+			$asset->addScript(static::phoenixName() . '/js/bootstrap/button-radio.min.js');
 		}
 	}
 }

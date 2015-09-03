@@ -17,19 +17,25 @@
      */
     var plugin = 'multiselect';
 
+    var defaultOptions = {
+        duration: 100
+    };
+
     /**
      * Multi Select.
      *
      * @param {jQuery} $element
+     * @param {Object} options
      *
      * @constructor
      */
-    var PhoenixMultiSelect = function($element)
+    var PhoenixMultiSelect = function($element, options)
     {
         var self = this;
         this.form = $element;
         this.boxes = $element.find('input.grid-checkbox[type=checkbox]');
         this.last = false;
+        this.options = $.extend({}, defaultOptions, options);
 
         this.boxes.click(function(event)
         {
@@ -63,10 +69,17 @@
 
                 $.each(chs, function(i, e)
                 {
-                    setTimeout(function()
+                    if (self.options.duration)
+                    {
+                        setTimeout(function()
+                        {
+                            e.checked = self.last.checked;
+                        }, (self.options.duration / chs.length) * i);
+                    }
+                    else
                     {
                         e.checked = self.last.checked;
-                    }, (100 / chs.length) * i);
+                    }
                 })
             }
 
@@ -74,11 +87,11 @@
         }
     };
 
-    $.fn[plugin] = function()
+    $.fn[plugin] = function(options)
     {
         if (!this.data('phoenix.' + plugin))
         {
-            this.data('phoenix.' + plugin, new PhoenixMultiSelect(this));
+            this.data('phoenix.' + plugin, new PhoenixMultiSelect(this, options));
         }
 
         return this.data('phoenix.' + plugin);

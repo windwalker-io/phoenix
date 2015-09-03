@@ -282,11 +282,15 @@ HTML;
 	/**
 	 * checkboxesToggle
 	 *
-	 * @return  string
+	 * @param array $options
+	 *
+	 * @return string
 	 */
-	public function checkboxesToggle()
+	public function checkboxesToggle($options = array())
 	{
-		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', array(), WidgetHelper::ENGINE_BLADE);
+		$options['duration'] = isset($options['duration']) ? $options['duration'] : 0;
+
+		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', array('options' => $options), WidgetHelper::ENGINE_BLADE);
 	}
 
 	/**
@@ -317,13 +321,15 @@ HTML;
 	 *
 	 * @return  string  Link element.
 	 */
-	public function foreignLink($title = null, $url, $attribs = array())
+	public function foreignLink($title = null, $url, $attribs = array(), $options = array())
 	{
-		$title = $title . ' <small class="icon-out-2 glyphicon glyphicon-share fa fa-share-square-o"></small>';
-
 		$defaultAttribs['href']   = $url;
 		$defaultAttribs['class']  = 'text-muted muted';
 		$defaultAttribs['target'] = '_blank';
+
+		$options['icon'] = isset($options['icon']) ? $options['icon'] : 'icon-out-2 glyphicon glyphicon-share fa fa-share-square-o';
+
+		$title = $title . ' <small class="' . $options['icon'] . '"></small>';
 
 		return new HtmlElement('a', $title, array_merge($defaultAttribs, $attribs));
 	}
@@ -426,8 +432,9 @@ HTML;
 	public function stateButton($value, $taskMapping = '', $iconMapping = array(), $options = array())
 	{
 		$options['titleMapping'] = isset($options['titleMapping']) ? (array) $options['titleMapping'] : array();
+		$options['template'] = isset($options['template']) ? $options['template'] : 'phoenix.grid.table.icon-button';
 
-		return WidgetHelper::render('phoenix.grid.table.icon-button', array(
+		return WidgetHelper::render($options['template'], array(
 			'value' => $value,
 			'taskMapping' => $taskMapping,
 			'iconMapping' => $iconMapping,

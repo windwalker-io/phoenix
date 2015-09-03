@@ -12,6 +12,7 @@ use Phoenix\Model\AbstractFormModel;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Data\Data;
+use Windwalker\String\StringHelper;
 
 /**
  * The AbstractSaveController class.
@@ -184,6 +185,8 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function getSuccessRedirect(Data $data = null)
 	{
+		$data = $data ? : new Data;
+
 		switch ($this->task)
 		{
 			case 'save2close':
@@ -193,7 +196,23 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 				return $this->router->http($this->getName(), array('new' => ''));
 
 			case 'save2copy':
-				return $this->router->http($this->getName());
+				$data->{$this->pkName} = null;
+
+				if ($data->title)
+				{
+					$data->title = StringHelper::increment($data->title);
+				}
+
+				if ($data->alias)
+				{
+					$data->alias = StringHelper::increment($data->alias, StringHelper::INCREMENT_STYLE_DASH);
+				}
+
+				$this->model->save($data);
+
+				$pk = $this->model['item.pk'];
+
+				return $this->router->http($this->getName(), array($this->pkName => $pk));
 
 			default:
 				$pk = $this->model['item.pk'];
