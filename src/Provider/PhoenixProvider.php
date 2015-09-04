@@ -53,12 +53,6 @@ class PhoenixProvider implements ServiceProviderInterface
 
 		$container->share('phoenix.asset', $closure);
 
-		// Toolbar
-		$closure = function(Container $container)
-		{
-			return new ToolbarFactory;
-		};
-
 		$container->share('toolbar.factory', $closure);
 
 		$closure = function(Container $container)
@@ -68,6 +62,6 @@ class PhoenixProvider implements ServiceProviderInterface
 
 		$container->share('toolbar', $closure);
 
-		RendererHelper::addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', Priority::BELOW_NORMAL);
+		RendererHelper::addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', Priority::LOW - 25);
 	}
 }

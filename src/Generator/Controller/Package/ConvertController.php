@@ -9,6 +9,9 @@
 namespace Phoenix\Generator\Controller\Package;
 
 use Phoenix\Generator\Action;
+use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Filesystem\File;
+use Windwalker\Filesystem\Folder;
 
 /**
  * The ConvertController class.
@@ -38,6 +41,18 @@ class ConvertController extends AbstractPackageController
 		$this->config->set('dir.src',  $dest);
 
 		$this->doAction(new Action\ConvertTemplateAction);
+
+		// Rename migration
+		if (is_dir($src . '/Migration'))
+		{
+			$file = array_shift(Folder::files($src . '/Migration'));
+
+			$time = DateTime::create(0)->format('YmdHis');
+
+			$newFilename = preg_replace('/\d+(_.+Init\.php\.tpl)/', $time . '$1', $file);
+
+			File::move($file, $newFilename);
+		}
 
 		return true;
 	}

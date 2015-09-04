@@ -118,7 +118,7 @@ abstract class AbstractListModel extends AbstractFormModel
 
 			$query = $this->getListQuery($this->db->getQuery(true));
 
-			$items = $this->getList($query, $this['list.start'], $this->get('list.limit'));
+			$items = $this->getList($query, $this->getStart(), $this->get('list.limit'));
 
 			return new DataSet($items);
 		});
@@ -374,6 +374,34 @@ abstract class AbstractListModel extends AbstractFormModel
 			$this->db->execute();
 
 			return (int) $this->db->getReader()->countAffected();
+		});
+	}
+
+	/**
+	 * getStart
+	 *
+	 * @return  integer
+	 */
+	public function getStart()
+	{
+		$state = $this->state;
+
+		return $this->fetch('start', function() use ($state)
+		{
+			$start = $this['list.start'];
+			$limit = $this['list.limit'];
+
+			$total = $this->getTotal();
+
+			if ($start > $total - $limit)
+			{
+				$page = (int) ceil($total / $limit);
+				$start = max(0, ($page - 1) * $limit);
+
+				$this['list.page'] = $page;
+			}
+
+			return $start;
 		});
 	}
 

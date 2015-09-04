@@ -108,7 +108,7 @@
                 <tfoot>
                 <tr>
                     <td colspan="25">
-                        {{ $pagination }}
+                        {{ $pagination->render($package->getName() . ':{$controller.list.name.lower$}', 'windwalker.pagination.phoenix') }}
                     </td>
                 </tr>
                 </tfoot>

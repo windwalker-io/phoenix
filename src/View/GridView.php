@@ -64,7 +64,7 @@ class GridView extends ListView
 		parent::prepareRender($data);
 
 		$data->items      = $this->model->getItems();
-		$data->pagination = $this->model->getPagination()->render($this->getPackage()->getName() . ':sakuras');
+		$data->pagination = $this->model->getPagination();
 		$data->filterForm = $this->model->getForm('filter', null, true);
 		$data->batchForm  = $this->model->getForm('batch', null, true);
 		$data->state      = $this->model->getState();

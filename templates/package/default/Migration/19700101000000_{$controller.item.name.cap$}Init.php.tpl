@@ -13,7 +13,7 @@ use Windwalker\Database\Schema\DataType;
 use Windwalker\Database\Schema\Key;
 
 /**
- * Migration class, version: 20150822115006
+ * Migration class of {$controller.item.name.cap$}Init.
  */
 class {$controller.item.name.cap$}Init extends AbstractMigration
 {
