@@ -18,11 +18,11 @@ use Phoenix\Generator\Controller\Package\AbstractPackageController;
 use Windwalker\String\StringHelper;
 
 /**
- * The ItemController class.
+ * The ListController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ItemController extends AbstractPackageController
+class ListController extends AbstractPackageController
 {
 	/**
 	 * Execute the controller.
@@ -40,7 +40,7 @@ class ItemController extends AbstractPackageController
 		$this->config['list_name'] = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
 
 		$this->doAction(new Subsystem\PrepareAction);
-		$this->doAction(new Subsystem\CopyItemAction);
+		$this->doAction(new Subsystem\CopyListAction);
 
 		// Some dirty things handling
 		$this->doAction(new AddTableNameAction);
