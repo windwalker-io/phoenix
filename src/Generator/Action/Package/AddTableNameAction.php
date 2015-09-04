@@ -48,6 +48,6 @@ class AddTableNameAction extends AbstractAction
 
 		file_put_contents($file, $code);
 
-		$this->io->out()->out('Add table name: ' . $table . ' to Table class.');
+		$this->io->out('[<info>Action</info>] Add table name: ' . $table . ' to Table class.');
 	}
 }

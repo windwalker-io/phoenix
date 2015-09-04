@@ -59,7 +59,7 @@ class AddSeederAction extends AbstractAction
 		{
 			file_put_contents($file, $code);
 
-			$this->io->out()->out('Add seeder to DatabaseSeeder');
+			$this->io->out('[<info>Action</info>] Add seeder to DatabaseSeeder');
 		}
 	}
 }

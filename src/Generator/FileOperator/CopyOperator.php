@@ -39,14 +39,14 @@ class CopyOperator extends \Muse\FileOperator\CopyOperator
 
 		if (is_file($dest))
 		{
-			$this->io->out('File exists: ' . $dest);
+			$this->io->out('[<comment>File exists</comment>] ' . $dest);
 		}
 		else
 		{
 			$content = StringHelper::parseVariable(file_get_contents($src), $replace, $this->tagVariable);
 			if (File::write($dest, $content))
 			{
-				$this->io->out('File created: ' . $dest);
+				$this->io->out('[<info>File created</info>] ' . $dest);
 			}
 		}
 	}

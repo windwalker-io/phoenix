@@ -1,23 +1,21 @@
 <?php
 /**
- * Part of phoenix project. 
+ * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\Generator\Controller\Package;
+namespace Phoenix\Generator\Controller\Package\Add;
 
-use Phoenix\Generator\Action;
-use Phoenix\Generator\Action\Package\MigrateAction;
-use Phoenix\Generator\Action\Package\SeedAction;
+use Phoenix\Generator\Controller\Package\AbstractPackageController;
 
 /**
- * The InitController class.
- * 
+ * The ItemController class.
+ *
  * @since  {DEPLOY_VERSION}
  */
-class InitController extends AbstractPackageController
+class ItemController extends AbstractPackageController
 {
 	/**
 	 * Execute the controller.
@@ -31,17 +29,6 @@ class InitController extends AbstractPackageController
 	 */
 	public function execute()
 	{
-		$this->doAction(new Action\CopyAllAction);
-		$this->doAction(new Action\Package\RenameMigrationAction);
 
-		if ($this->config['migrate'])
-		{
-			$this->doAction(new MigrateAction);
-
-			if ($this->config['seed'])
-			{
-				$this->doAction(new SeedAction);
-			}
-		}
 	}
 }

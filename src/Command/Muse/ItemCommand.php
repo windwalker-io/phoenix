@@ -54,7 +54,13 @@ class ItemCommand extends Command
 	 */
 	protected function initialise()
 	{
+		$this->addGlobalOption('m')
+			->alias('migrate')
+			->description('Run migration.');
 
+		$this->addGlobalOption('s')
+			->alias('seed')
+			->description('Run seeder.');
 	}
 
 	/**

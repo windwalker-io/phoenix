@@ -18,7 +18,7 @@ use Windwalker\Filesystem\Folder;
  *
  * @since  {DEPLOY_VERSION}
  */
-class CopyMigrationAction extends AbstractAction
+class RenameMigrationAction extends AbstractAction
 {
 	/**
 	 * Do this execute.
@@ -27,14 +27,10 @@ class CopyMigrationAction extends AbstractAction
 	 */
 	protected function doExecute()
 	{
-		/** @var CopyOperator $copyOperator */
-		$copyOperator = $this->container->get('operator.factory')->getOperator('copy');
-
-		$src = $this->config['dir.src'];
 		$dest = $this->config['dir.dest'];
 		$migName = $this->config['replace.controller.item.name.cap'] . 'Init';
 
-		if (!is_dir($src . '/Migration'))
+		if (!is_dir($dest . '/Migration'))
 		{
 			return;
 		}
@@ -42,30 +38,26 @@ class CopyMigrationAction extends AbstractAction
 		// Copy migration
 		$files = Folder::files($dest . '/Migration');
 
-		$hasSameName = false;
+		$file = false;
 
 		foreach ($files as $file)
 		{
 			if (strpos($file, $migName . '.php') !== false)
 			{
-				$hasSameName = true;
-
 				break;
 			}
 		}
 
-		// Migration already exists, return.
-		if ($hasSameName)
+		// Migration not exists, return.
+		if (!$file)
 		{
 			return;
 		}
 
-		$migFile = array_shift(Folder::files($src . '/Migration'));
-
 		$newName = gmdate('YmdHis') . '_' . $migName . '.php';
 
-		$copyOperator->copy($migFile, $dest . '/Migration/' . $newName, $this->replace);
+		File::move($file, $dest . '/Migration/' . $newName);
 
-		$this->io->out('[<info>Action</info>] Create migration file: ' . $newName);
+		$this->io->out('[<info>Action</info>] Rename migration file to: ' . $newName);
 	}
 }

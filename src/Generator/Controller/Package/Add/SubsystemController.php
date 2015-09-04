@@ -12,6 +12,7 @@ use Phoenix\Generator\Action\Package\AddSeederAction;
 use Phoenix\Generator\Action\Package\MigrateAction;
 use Phoenix\Generator\Action\Package\AddTableNameAction;
 use Phoenix\Generator\Action\Package\CopyMigrationAction;
+use Phoenix\Generator\Action\Package\SeedAction;
 use Phoenix\Generator\Action\Package\Subsystem;
 use Phoenix\Generator\Controller\Package\AbstractPackageController;
 use Windwalker\String\StringHelper;
@@ -50,6 +51,11 @@ class SubsystemController extends AbstractPackageController
 		if ($this->config['migrate'])
 		{
 			$this->doAction(new MigrateAction);
+
+			if ($this->config['seed'])
+			{
+				$this->doAction(new SeedAction);
+			}
 		}
 	}
 }

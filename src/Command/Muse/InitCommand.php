@@ -52,6 +52,14 @@ class InitCommand extends Command
 	{
 		$this->addGlobalOption('table')
 			->description('The database table name.');
+
+		$this->addGlobalOption('m')
+			->alias('migrate')
+			->description('Run migration.');
+
+		$this->addGlobalOption('s')
+			->alias('seed')
+			->description('Run seeder.');
 	}
 
 	/**

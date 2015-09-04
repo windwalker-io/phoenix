@@ -3,7 +3,7 @@
  * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
- * @license    GNU General Public License version 2 or later;
+ * @license    GNU General Public License version 2 or later.
  */
 
 namespace Phoenix\Generator\Action\Package;
@@ -12,14 +12,16 @@ use Phoenix\Generator\Action\AbstractAction;
 use Windwalker\Console\IO\IOInterface;
 use Windwalker\Core\Console\WindwalkerConsole;
 use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Ioc;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
- * The MigrateAction class.
+ * The SeedAction class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class MigrateAction extends AbstractAction
+class SeedAction extends AbstractAction
 {
 	/**
 	 * Do this execute.
@@ -28,11 +30,15 @@ class MigrateAction extends AbstractAction
 	 */
 	protected function doExecute()
 	{
-		$this->io->out('[<comment>SQL</comment>] Running migrations');
+		$this->io->out('[<comment>SQL</comment>] Importing seeder');
 
 		$package = 'gen_' . $this->config['replace.package.name.lower'];
 
-		if (!PackageHelper::getPackage($package))
+		if ($package = PackageHelper::getPackage($package))
+		{
+			$packageClass = get_class($package);
+		}
+		else
 		{
 			$packageClass = sprintf(
 				'%s%s\%sPackage',
@@ -44,16 +50,16 @@ class MigrateAction extends AbstractAction
 			PackageHelper::getInstance()->addPackage($package, $packageClass);
 		}
 
+		$seedClass = MvcHelper::getPackageNamespace($packageClass, 1) . '\Seed\\' . $this->config['replace.controller.item.name.cap'] . 'Seeder';
+
 		/** @var WindwalkerConsole $app */
 		$app = Ioc::getApplication();
 
 		// A dirty work to call migration command.
 		/** @var IOInterface $io */
 		$io = clone $this->io->getIO();
-		$io->setArguments(array('migration', 'migrate'));
-		$io->setOption('p', $package);
-		$io->setOption('seed', null);
-		$io->setOption('s', null);
+		$io->setArguments(array('seed', 'import'));
+		$io->setOption('c', $seedClass);
 		$io->setOption('no-backup', true);
 
 		$app->getRootCommand()->setIO($io)->execute();

@@ -58,6 +58,8 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 
 			$this->command->out('.', false);
 		}
+
+		$this->command->out();
 	}
 
 	/**
