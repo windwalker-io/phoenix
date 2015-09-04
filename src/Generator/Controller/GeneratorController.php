@@ -119,6 +119,10 @@ class GeneratorController extends AbstractController
 		$this->template = $config['template'] = $this->command->getOption('t');
 		$this->template = $config['table']    = $this->command->getOption('table');
 
+		$config['tagVariables'] = (array) $this->tagVariables;
+		$config['migrate'] = $this->command->getOption('migrate');
+		$config['seed']    = $this->command->getOption('seed');
+
 		// Get Handler
 		$task = StringNormalise::toClassNamespace(str_replace('.', '\\', $task));
 

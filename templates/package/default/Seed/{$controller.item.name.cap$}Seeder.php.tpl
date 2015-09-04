@@ -8,7 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Seed;
 
-use {$package.namespace$}{$package.name.cap$}\Mapper\{$controller.item.name.cap$}Mapper;
+use {$package.namespace$}{$package.name.cap$}\DataMapper\{$controller.item.name.cap$}Mapper;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Faker\Factory;
 use Windwalker\Core\DateTime\DateTime;
