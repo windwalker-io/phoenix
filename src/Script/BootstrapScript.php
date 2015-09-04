@@ -52,6 +52,36 @@ class BootstrapScript extends ScriptManager
 	}
 
 	/**
+	 * tooltip
+	 *
+	 * @param string $selector
+	 *
+	 * @return  void
+	 */
+	public static function tooltip($selector = '.hasTooltip')
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
+		{
+			static::script();
+		}
+
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$js = <<<JS
+// Modal task
+jQuery(document).ready(function($)
+{
+	$('{$selector}').tooltip();
+});
+JS;
+
+			$asset->internalScript($js);
+		}
+	}
+
+	/**
 	 * checkbox
 	 *
 	 * @return  void

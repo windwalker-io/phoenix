@@ -56,9 +56,6 @@ class EditDefinition implements FieldDefinitionInterface
 				->label('URL')
 				->set('class', 'validate-url')
 				->setValidator(new UrlValidator);
-
-			$form->add('version', new {$controller.item.name.cap$}ModalField)
-				->label('{$controller.item.name.cap$}');
 		});
 
 		$form->wrap('text', null, function(Form $form)
@@ -81,7 +78,7 @@ class EditDefinition implements FieldDefinitionInterface
 				->addOption(new Option('Published', '1'))
 				->addOption(new Option('Unpublished', '0'));
 
-			$form->add('version2', new TextField)
+			$form->add('version', new TextField)
 				->label('Version');
 
 			$form->add('created', new CalendarField)

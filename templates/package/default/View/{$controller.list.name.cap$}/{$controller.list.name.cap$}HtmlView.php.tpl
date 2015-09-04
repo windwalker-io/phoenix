@@ -54,5 +54,6 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 		PhoenixScript::multiSelect(100);
 		PhoenixScript::chosen();
 		BootstrapScript::checkbox();
+		BootstrapScript::tooltip();
 	}
 }

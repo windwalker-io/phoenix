@@ -45,6 +45,8 @@ class BootstrapRenderer
 	 */
 	public function render(AbstractField $field, Form $form)
 	{
+		$field->appendAttribute('labelClass', ' hasTooltip');
+
 		$type = $field->getType();
 
 		$type = static::resolveAlias($type);

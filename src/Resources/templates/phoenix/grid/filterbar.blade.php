@@ -5,14 +5,21 @@
     <div class="input-group">
         {{ $form->getField('content', 'search')->appendAttribute('class', ' form-control')->renderInput() }}
         <span class="input-group-btn">
-            <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+            <button class="btn btn-default hasTooltip" type="submit"
+                title="@translate('phoenix.filterbar.search.button.desc')">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
         </span>
     </div>
-    <button type="button" class="btn btn-default filter-toggle-button {{ $show ? 'btn-primary' : null }}">
-        @translate('phoenix.grid.filter.button')
+    <button type="button" class="btn btn-default filter-toggle-button hasTooltip {{ $show ? 'btn-primary' : null }}"
+        title="@translate('phoenix.grid.filter.button.desc')">
+        @translate('phoenix.grid.filter.button.text')
         <span class="glyphicon glyphicon-menu-{{ $show ? 'up' : 'down' }}"></span>
     </button>
-    <button type="button" class="btn btn-default search-clear-button"><span class="glyphicon glyphicon-remove"></span></button>
+    <button type="button" class="btn btn-default search-clear-button hasTooltip"
+        title="@translate('phoenix.grid.filterbar.clear.desc')">
+        <span class="glyphicon glyphicon-remove"></span>
+    </button>
 </div>
 
 <div class="filter-container row {{ $show ? 'shown' : null }}" style="{{ $show ? null : 'display: none;' }}">

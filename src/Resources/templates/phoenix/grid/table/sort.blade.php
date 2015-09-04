@@ -2,7 +2,8 @@
 
 {{-- If is DESC, we prepare ASC --}}
 @if ($direction == 'DESC')
-    <a href="javascript: void(0);" onclick="Phoenix.Grid.sort('{{ $field }}', 'ASC')">
+    <a href="javascript: void(0);" onclick="Phoenix.Grid.sort('{{ $field }}', 'ASC')" class="hasTooltip"
+        title="@translate('phoenix.grid.sort.button')">
         {{{ $label }}}
 
         @if ($field == $ordering)
@@ -11,7 +12,8 @@
     </a>
 {{-- If is ACS, we prepare DESC --}}
 @else
-    <a href="javascript: void(0);" onclick="Phoenix.Grid.sort('{{ $field }}', 'DESC')">
+    <a href="javascript: void(0);" onclick="Phoenix.Grid.sort('{{ $field }}', 'DESC')" class="hasTooltip"
+        title="@translate('phoenix.grid.sort.button')">
         {{{ $label }}}
 
         @if ($field == $ordering)

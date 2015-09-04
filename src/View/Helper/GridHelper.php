@@ -393,6 +393,12 @@ HTML;
 			1 => 'unpublish'
 		);
 
+		$options['titleMapping'] = isset($options['titleMapping']) ? (array) $options['titleMapping'] : array(
+			-1 => 'phoenix.grid.state.trashed',
+			0 => 'phoenix.grid.state.unpublished',
+			1 => 'phoenix.grid.state.published'
+		);
+
 		return $this->stateButton($value, $taskMapping, $iconMapping, $options);
 	}
 

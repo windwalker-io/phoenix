@@ -71,10 +71,12 @@
                         <td>
                             <span class="btn-group">
                                 {{ $grid->state($item->state) }}
-                                <button type="button" class="btn btn-default btn-xs" onclick="Phoenix.Grid.copyRow({{ $i }});">
+                                <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
+                                    title="@translate('phoenix.toolbar.button.duplicate')">
                                     <span class="glyphicon glyphicon-duplicate text-info"></span>
                                 </button>
-                                <button type="button" class="btn btn-default btn-xs" onclick="Phoenix.Grid.deleteRow({{ $i }});">
+                                <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
+                                    title="@translate('phoenix.toolbar.button.delete')">
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </button>
                             </span>

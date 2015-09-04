@@ -33,6 +33,9 @@
 #phoenix-iframe-modal .modal-body iframe {
   height: 500px;
 }
+.btn-group .btn {
+  margin-left: -1px;
+}
 .chosen-container {
   cursor: pointer;
 }
