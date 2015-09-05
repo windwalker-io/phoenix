@@ -1417,7 +1417,7 @@
     'create': 'POST',
     'update': 'PUT',
     'patch':  'PATCH',
-    'delete': 'DELETE',
+    "sendDelete": 'DELETE',
     'read':   'GET'
   };
 

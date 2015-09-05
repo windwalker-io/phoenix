@@ -165,7 +165,7 @@
          *
          * @returns {boolean}
          */
-        delete: function(url, queries)
+        sendDelete: function(url, queries)
         {
             return this.post(url, queries, 'DELETE');
         },

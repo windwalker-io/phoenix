@@ -8,7 +8,6 @@
 
 namespace Phoenix\Command\Phoenix\Asset;
 
-use Minify_CSS_UriRewriter;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
@@ -50,10 +49,6 @@ class MinifyCommand extends Command
 		$this->addGlobalOption('d')
 			->alias('dir')
 			->description('Directory to minify.');
-
-		$this->addGlobalOption('r')
-			->alias('root')
-			->description('Document root to minify css.');
 	}
 
 	/**
@@ -63,26 +58,35 @@ class MinifyCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		$package = $this->getArgument(0);
+		$path = $this->getArgument(0);
 
-		$package = PackageHelper::getPackage($package);
-
-		if ($package instanceof AbstractPackage)
+		if (!is_file($path))
 		{
-			$path = $package->getDir() . '/Resources/media';
-		}
+			if (!is_dir($path))
+			{
+				$package = $this->getOption('p');
 
+				$package = PackageHelper::getPackage($package);
+
+				if ($package instanceof AbstractPackage)
+				{
+					$path = $path ? $path : 'media';
+
+					$path = $package->getDir() . '/Resources/' . $path;
+				}
+			}
+
+			if (!is_dir($path))
+			{
+				throw new \InvalidArgumentException('No path');
+			}
+
+			$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS));
+		}
 		else
 		{
-			$path = $this->getOption('dir', WINDWALKER_PUBLIC . '/media');
+			$files = array(new \SplFileInfo($path));
 		}
-
-		if (!$path)
-		{
-			throw new \InvalidArgumentException('No path');
-		}
-
-		$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS));
 
 		/** @var \SplFileInfo $file */
 		foreach ($files as $file)
@@ -96,21 +100,30 @@ class MinifyCommand extends Command
 
 			if ($ext == 'css')
 			{
+				$this->out('[<comment>Compressing</comment>] ' . $file);
+
 				$data = \Minify_CSS_Compressor::process(file_get_contents($file));
+
+				$data = str_replace("\n", ' ', $data);
 			}
 			elseif ($ext == 'js')
 			{
-				$data = \JSMin::minify(file_get_contents($file));
+				$this->out('[<comment>Compressing</comment>] ' . $file);
+
+				$data = \JSMinPlus::minify(file_get_contents($file));
+
+				$data = str_replace("\n", ';', $data);
 			}
 			else
 			{
 				continue;
 			}
 
-			file_put_contents(
-				$file->getPath() . '/' . File::getExtension($file->getBasename()) . '.min.' . $ext,
-				$data
-			);
+			$newName = $file->getPath() . '/' . File::stripExtension($file->getBasename()) . '.min.' . $ext;
+
+			file_put_contents($newName, $data);
+
+			$this->out('[<info>Compressed</info>] ' . $newName);
 		}
 	}
 }

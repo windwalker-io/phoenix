@@ -183,7 +183,7 @@
                 return false;
             }
 
-            return this.core.delete(url, queries);
+            return this.core.sendDelete(url, queries);
         },
 
         deleteRow: function(row, msg, url, queries)

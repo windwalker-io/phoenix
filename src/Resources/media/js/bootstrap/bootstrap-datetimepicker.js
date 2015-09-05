@@ -122,7 +122,7 @@
                 32: 'space',
                 't': 84,
                 84: 't',
-                'delete': 46,
+                "sendDelete": 46,
                 46: 'delete'
             },
             keyState = {},
@@ -2471,7 +2471,7 @@
             t: function () {
                 this.date(moment());
             },
-            'delete': function () {
+            "sendDelete": function () {
                 this.clear();
             }
         },
