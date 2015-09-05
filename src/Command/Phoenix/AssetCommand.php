@@ -9,6 +9,7 @@
 namespace Phoenix\Command\Phoenix;
 
 use Phoenix\Command\Phoenix\Asset\MakesumCommand;
+use Phoenix\Command\Phoenix\Asset\MinifyCommand;
 use Phoenix\Command\Phoenix\Asset\SyncCommand;
 use Windwalker\Console\Command\Command;
 
@@ -42,5 +43,6 @@ class AssetCommand extends Command
 	{
 		$this->addCommand(new SyncCommand);
 		$this->addCommand(new MakesumCommand);
+		$this->addCommand(new MinifyCommand);
 	}
 }
