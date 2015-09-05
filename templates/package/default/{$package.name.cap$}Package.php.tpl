@@ -15,8 +15,11 @@ use Phoenix\Record\RecordResolver;
 use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Debugger\Helper\DebuggerHelper;
+use Windwalker\Event\Dispatcher;
 use Windwalker\Form\FieldHelper;
 use Windwalker\Form\ValidatorHelper;
+
+define('{$package.name.upper$}_ROOT', __DIR__);
 
 /**
  * The {$package.name.cap$}Package class.
@@ -66,5 +69,17 @@ class {$package.name.cap$}Package extends AbstractPackage
 		}
 
 		return $result;
+	}
+
+	/**
+	 * registerListeners
+	 *
+	 * @param Dispatcher $dispatcher
+	 *
+	 * @return  void
+	 */
+	public function registerListeners(Dispatcher $dispatcher)
+	{
+		parent::registerListeners($dispatcher);
 	}
 }

@@ -22,7 +22,7 @@ class {$controller.item.name.cap$}ListField extends ItemListField
 	 *
 	 * @var  string
 	 */
-	protected $table = '{$package.name.lower$}_{$controller.list.name.lower$}';
+	protected $table = '{$controller.list.name.lower$}';
 
 	/**
 	 * Property ordering.

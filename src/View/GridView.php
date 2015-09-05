@@ -47,7 +47,7 @@ class GridView extends ListView
 	 */
 	public function setTitle($title = null)
 	{
-		$title = $title ? : Translator::sprintf('phoenix.title.grid.' . $this->getName());
+		$title = $title ? : Translator::sprintf('phoenix.title.grid', Translator::translate($this->package->getName() . '.' . $this->getName()));
 
 		return parent::setTitle($title);
 	}

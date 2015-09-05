@@ -55,6 +55,9 @@ class EditDefinition implements FieldDefinitionInterface
 			$form->add('url', new TextField)
 				->label('URL')
 				->set('class', 'validate-url');
+
+			$form->add('{$controller.item.name.lower$}1', new {$controller.item.name.cap$}ListField);
+			$form->add('{$controller.item.name.lower$}2', new {$controller.item.name.cap$}ModalField);
 		});
 
 		$form->wrap('text', null, function(Form $form)

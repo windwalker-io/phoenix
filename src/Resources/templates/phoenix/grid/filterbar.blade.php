@@ -6,7 +6,7 @@
         {{ $form->getField('content', 'search')->appendAttribute('class', ' form-control')->renderInput() }}
         <span class="input-group-btn">
             <button class="btn btn-default hasTooltip" type="submit"
-                title="@translate('phoenix.filterbar.search.button.desc')">
+                title="@translate('phoenix.grid.search.button.desc')">
                 <span class="glyphicon glyphicon-search"></span>
             </button>
         </span>
@@ -17,7 +17,7 @@
         <span class="glyphicon glyphicon-menu-{{ $show ? 'up' : 'down' }}"></span>
     </button>
     <button type="button" class="btn btn-default search-clear-button hasTooltip"
-        title="@translate('phoenix.grid.filterbar.clear.desc')">
+        title="@translate('phoenix.grid.clear.button.desc')">
         <span class="glyphicon glyphicon-remove"></span>
     </button>
 </div>

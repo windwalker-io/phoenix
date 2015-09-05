@@ -92,7 +92,7 @@ JS;
 
 			$asset->addScript(static::phoenixName() . '/js/phoenix/grid.js');
 
-			static::translate('phoenix.delete.confirm');
+			static::translate('phoenix.message.delete.confirm');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
@@ -140,9 +140,9 @@ JS;
 			$defaultOptions = array(
 				'allow_single_deselect'     => true,
 				'disable_search_threshold'  => 10,
-				'placeholder_text_multiple' => Translator::translate('phoenix.select.some.options'),
-				'placeholder_text_single'   => Translator::translate('phoenix.select.an.option'),
-				'no_results_text'           => Translator::translate('phoenix.select.no.result')
+				'placeholder_text_multiple' => Translator::translate('phoenix.chosen.text,multiple'),
+				'placeholder_text_single'   => Translator::translate('phoenix.chosen.text.single'),
+				'no_results_text'           => Translator::translate('phoenix.chosen.text.noresult')
 			);
 
 			$options = json_encode((object) array_merge($defaultOptions, $options), JsonFormat::prettyPrint());
@@ -258,7 +258,7 @@ JS;
 
 			$options = json_encode((object) array_merge($defaultOptions, $options));
 
-			static::translate('phoenix.validation.fail');
+			static::translate('phoenix.form.validation.fail');
 
 			$js = <<<JS
 // Chosen select
@@ -297,5 +297,4 @@ JS;
 			static::getAsset()->internalScript($js);
 		}
 	}
-
 }

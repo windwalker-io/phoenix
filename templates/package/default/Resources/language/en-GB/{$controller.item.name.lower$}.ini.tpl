@@ -1,1 +1,0 @@
-phoenix.title.grid.{$controller.list.name.lower$}="{$controller.list.name.cap$} List Manager"

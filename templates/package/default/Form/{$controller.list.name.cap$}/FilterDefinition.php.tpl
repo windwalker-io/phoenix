@@ -41,7 +41,7 @@ class FilterDefinition implements FieldDefinitionInterface
 				->addOption(new Option('Alias', '{$controller.item.name.lower$}.alias'));
 
 			$form->add('content', new TextField)
-				->set('placeholder', Translator::translate('phoenix.search.placeholder'));
+				->set('placeholder', Translator::translate('phoenix.grid.search.placeholder'));
 		});
 
 		$form->wrap(null, 'filter', function(Form $form)
