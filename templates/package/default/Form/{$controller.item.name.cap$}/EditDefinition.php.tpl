@@ -54,8 +54,7 @@ class EditDefinition implements FieldDefinitionInterface
 
 			$form->add('url', new TextField)
 				->label('URL')
-				->set('class', 'validate-url')
-				->setValidator(new UrlValidator);
+				->set('class', 'validate-url');
 		});
 
 		$form->wrap('text', null, function(Form $form)

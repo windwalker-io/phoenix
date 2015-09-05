@@ -10,9 +10,11 @@ namespace {$package.namespace$}{$package.name.cap$};
 
 use Phoenix\Asset\Asset;
 use Phoenix\DataMapper\DataMapperResolver;
+use Phoenix\Language\TranslatorHelper;
 use Phoenix\Record\RecordResolver;
 use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Form\FieldHelper;
 use Windwalker\Form\ValidatorHelper;
 
@@ -39,5 +41,30 @@ class {$package.name.cap$}Package extends AbstractPackage
 		// Assets
 		BootstrapScript::css();
 		Asset::addStyle('{$package.name.lower$}/css/{$package.name.lower$}.css');
+
+		// Language
+		TranslatorHelper::loadAll($this, 'ini');
+	}
+
+	/**
+	 * postExecute
+	 *
+	 * @param string $result
+	 *
+	 * @return  string
+	 */
+	protected function postExecute($result = null)
+	{
+		if (WINDWALKER_DEBUG)
+		{
+			if (class_exists('Windwalker\Debugger\Helper\DebuggerHelper'))
+			{
+				DebuggerHelper::addCustomData('Language Orphans', '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
+			}
+
+			TranslatorHelper::dumpOrphans('yaml');
+		}
+
+		return $result;
 	}
 }
