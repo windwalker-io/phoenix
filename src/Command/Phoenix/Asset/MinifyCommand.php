@@ -60,32 +60,28 @@ class MinifyCommand extends Command
 	{
 		$path = $this->getArgument(0);
 
-		if (!is_file($path))
+		$package = $this->getOption('p');
+
+		if ($package = PackageHelper::getPackage($package))
 		{
-			if (!is_dir($path))
-			{
-				$package = $this->getOption('p');
+			$path = $package->getDir() . '/Resources/media/' . $path;
+		}
+		else
+		{
+			$path = WINDWALKER_PUBLIC . '/media/' . $path;
+		}
 
-				$package = PackageHelper::getPackage($package);
-
-				if ($package instanceof AbstractPackage)
-				{
-					$path = $path ? $path : 'media';
-
-					$path = $package->getDir() . '/Resources/' . $path;
-				}
-			}
-
-			if (!is_dir($path))
-			{
-				throw new \InvalidArgumentException('No path');
-			}
-
+		if (is_file($path))
+		{
+			$files = array(new \SplFileInfo($path));
+		}
+		elseif (is_dir($path))
+		{
 			$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS));
 		}
 		else
 		{
-			$files = array(new \SplFileInfo($path));
+			throw new \InvalidArgumentException('No path');
 		}
 
 		/** @var \SplFileInfo $file */
