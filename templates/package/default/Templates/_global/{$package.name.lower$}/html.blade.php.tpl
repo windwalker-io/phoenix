@@ -11,58 +11,59 @@
     <meta name="generator" content="Windwalker Framework" />
     @yield('meta')
 
-    {{ \Phoenix\Asset\Asset::renderStyles(true); }}
-    <link rel="stylesheet" href="{{ $uri['media.path'] }}phoenix/css/phoenix.css?{{ \Phoenix\Asset\Asset::getVersion() }}" />
+    {{ \Phoenix\Asset\Asset::renderStyles(true) }}
     @yield('style')
 
-    {{ \Phoenix\Asset\Asset::renderScripts(true); }}
+    {{ \Phoenix\Asset\Asset::renderScripts(true) }}
     @yield('script')
 
 </head>
 <body>
-@section('navbar')
-    <div class="navbar navbar-default navbar-fixed-top">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{{ $router->html('home') }}">Windwalker</a>
+@section ('superbody')
+    @section('navbar')
+        <div class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{{ $router->html('home') }}">Windwalker</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        @section('nav')
+                            @include('_global.{$package.name.lower$}.mainmenu')
+                        @show
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {{-- <li class="pull-right"><a href="{{ $uri['base.path'] }}admin">Admin</a></li> --}}
+                    </ul>
+                </div>
+                <!--/.nav-collapse -->
             </div>
-            <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    @section('nav')
-                        @include('_global.{$package.name.lower$}.mainmenu')
-                    @show
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    {{-- <li class="pull-right"><a href="{{ $uri['base.path'] }}admin">Admin</a></li> --}}
-                </ul>
-            </div>
-            <!--/.nav-collapse -->
         </div>
-    </div>
-@show
+    @show
 
-@yield('content', 'Content')
+    @yield('content', 'Content')
 
-@section('copyright')
-    <div id="copyright">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-12">
+    @section('copyright')
+        <div id="copyright">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
 
-                    <hr />
+                        <hr />
 
-                    <footer>
-                        &copy; Windwalker {{ $datetime->format('Y') }}
-                    </footer>
+                        <footer>
+                            &copy; Windwalker {{ $datetime->format('Y') }}
+                        </footer>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    @show
 @show
 </body>
 </html>

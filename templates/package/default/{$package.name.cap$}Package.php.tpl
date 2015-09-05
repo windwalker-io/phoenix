@@ -9,8 +9,12 @@
 namespace {$package.namespace$}{$package.name.cap$};
 
 use Phoenix\Asset\Asset;
+use Phoenix\DataMapper\DataMapperResolver;
+use Phoenix\Record\RecordResolver;
 use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Form\FieldHelper;
+use Windwalker\Form\ValidatorHelper;
 
 /**
  * The {$package.name.cap$}Package class.
@@ -26,8 +30,14 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	protected function prepareExecute()
 	{
+		// Prepare Resolvers
+		RecordResolver::addNamespace(__NAMESPACE__ . '\Record');
+		DataMapperResolver::addNamespace(__NAMESPACE__ . '\DataMapper');
+		FieldHelper::addNamespace(__NAMESPACE__ . '\Field');
+		ValidatorHelper::addNamespace(__NAMESPACE__ . 'Validator');
+
+		// Assets
 		BootstrapScript::css();
-		Asset::addStyle('phoenix/css/phoenix.css');
 		Asset::addStyle('{$package.name.lower$}/css/{$package.name.lower$}.css');
 	}
 }
