@@ -10,6 +10,7 @@ namespace Phoenix\Generator\Action\Package\Subsystem;
 
 use Phoenix\Generator\Action\AbstractAction;
 use Phoenix\Generator\FileOperator\CopyOperator;
+use Windwalker\String\StringHelper;
 
 /**
  * The CopyListAction class.
@@ -30,24 +31,26 @@ class CopyListAction extends AbstractAction
 
 		$src  = $this->config['dir.src'];
 		$dest = $this->config['dir.dest'];
-		$list = $this->config['list_name'];
+		$list = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
 
 		$files = array(
 			'Controller/%s',
 			'Field',
 			'Form/%s',
-			'Model/%s.php',
-			'Templates/' . strtolower($list),
+			'Model/%sModel.php.tpl',
+			'Templates/' . StringHelper::quote('controller.list.name.lower', $this->config['tagVariables']),
 			'View/%s'
 		);
 
 		foreach ($files as $file)
 		{
 			$file = sprintf($file, $list);
+
 			if (!file_exists($src . '/' . $file))
 			{
 				continue;
 			}
+
 			$copyOperator->copy(
 				$src . '/' . $file,
 				$dest . '/' . $file,

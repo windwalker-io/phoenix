@@ -8,7 +8,9 @@
 
 namespace Phoenix\Generator\Controller\Package\Add;
 
+use Phoenix\Generator\Action\Package\AddRoutingAction;
 use Phoenix\Generator\Action\Package\AddSeederAction;
+use Phoenix\Generator\Action\Package\AddSubmenuAction;
 use Phoenix\Generator\Action\Package\MigrateAction;
 use Phoenix\Generator\Action\Package\AddTableNameAction;
 use Phoenix\Generator\Action\Package\CopyMigrationAction;
@@ -43,6 +45,8 @@ class ListController extends AbstractPackageController
 		$this->doAction(new Subsystem\CopyListAction);
 
 		// Some dirty things handling
+		$this->doAction(new AddSubmenuAction);
+		$this->doAction(new AddRoutingAction);
 		$this->doAction(new AddTableNameAction);
 		$this->doAction(new CopyMigrationAction);
 		$this->doAction(new AddSeederAction);

@@ -21,15 +21,16 @@ class GeneratorHelper
 	 * @param string $name
 	 * @param string $origin
 	 * @param string $replace
+	 * @param string $prefix
 	 * @param string $modifier
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public static function addBeforePlaceholder($name, $origin, $replace, $modifier = null)
+	public static function addBeforePlaceholder($name, $origin, $replace, $prefix = '//', $modifier = null)
 	{
 		$replace = $replace . '$1';
 
-		return static::replacePlaceholder($name, $origin, $replace, $modifier);
+		return static::replacePlaceholder($name, $origin, $replace, $prefix, $modifier);
 	}
 
 	/**
@@ -38,15 +39,16 @@ class GeneratorHelper
 	 * @param string $name
 	 * @param string $origin
 	 * @param string $replace
+	 * @param string $prefix
 	 * @param string $modifier
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public static function addAfterPlaceholder($name, $origin, $replace, $modifier = null)
+	public static function addAfterPlaceholder($name, $origin, $replace, $prefix = '//', $modifier = null)
 	{
 		$replace = '$1' . $replace;
 
-		return static::replacePlaceholder($name, $origin, $replace, $modifier);
+		return static::replacePlaceholder($name, $origin, $replace, $prefix, $modifier);
 	}
 
 	/**
@@ -55,25 +57,27 @@ class GeneratorHelper
 	 * @param string $name
 	 * @param string $origin
 	 * @param string $replace
+	 * @param string $prefix
 	 * @param string $modifier
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public static function replacePlaceholder($name, $origin, $replace, $modifier = null)
+	public static function replacePlaceholder($name, $origin, $replace, $prefix = '//', $modifier = null)
 	{
-		return preg_replace(static::getPlaceholderRegex($name, $modifier), $replace, $origin);
+		return preg_replace(static::getPlaceholderRegex($name, $prefix, $modifier), $replace, $origin);
 	}
 
 	/**
 	 * getPlaceholderRegex
 	 *
 	 * @param string $name
+	 * @param string $prefix
 	 * @param string $modifier
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public static function getPlaceholderRegex($name, $modifier = null)
+	public static function getPlaceholderRegex($name, $prefix = '//', $modifier = null)
 	{
-		return '/(\/\/\s@muse-placeholder\s+' . $name . ')/' . $modifier;
+		return '/([ \t]*' . preg_quote($prefix, '/') . '\s@muse-placeholder\s+' . $name . '\s+[ a-zA-Z\d._-]+)/' . $modifier;
 	}
 }

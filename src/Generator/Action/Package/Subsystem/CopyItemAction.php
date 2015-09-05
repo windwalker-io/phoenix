@@ -31,15 +31,15 @@ class CopyItemAction extends AbstractAction
 
 		$src  = $this->config['dir.src'];
 		$dest = $this->config['dir.dest'];
-		$item = $this->config['item_name'];
+		$item = StringHelper::quote('controller.item.name.cap', $this->config['tagVariables']);
 
 		$files = array(
 			'Controller/%s',
 			'Field',
 			'Form/%s',
-			'Model/%s.php.tpl',
+			'Model/%sModel.php.tpl',
 			'View/%s',
-			'Templates/' . StringHelper::quote('controller.name.item.lower', $this->config['tagVariables'])
+			'Templates/' . StringHelper::quote('controller.item.name.lower', $this->config['tagVariables'])
 		);
 
 		foreach ($files as $file)

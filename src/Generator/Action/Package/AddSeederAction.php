@@ -39,7 +39,7 @@ class AddSeederAction extends AbstractAction
 
 		if (strpos($code, '$this->execute(new ' . $name . 'Seeder);') === false)
 		{
-			$replace = "\$this->execute(new {$name}Seeder);\n\n\t\t";
+			$replace = "\t\t\$this->execute(new {$name}Seeder);\n\n";
 
 			$code = GeneratorHelper::addBeforePlaceholder('seeder-execute', $code, $replace);
 
@@ -48,7 +48,7 @@ class AddSeederAction extends AbstractAction
 
 		if (strpos($code, '$this->clean(new ' . $name . 'Seeder);') === false)
 		{
-			$replace = "\$this->clean(new {$name}Seeder);\n\n\t\t";
+			$replace = "\t\t\$this->clean(new {$name}Seeder);\n\n";
 
 			$code = GeneratorHelper::addBeforePlaceholder('seeder-clean', $code, $replace);
 

@@ -42,7 +42,7 @@ class AddTableNameAction extends AbstractAction
 			return;
 		}
 
-		$replace = "const $constant = '$table';\n\n\t";
+		$replace = "\tconst $constant = '$table';\n\n";
 
 		$code = GeneratorHelper::addBeforePlaceholder('db-table', $code, $replace);
 
