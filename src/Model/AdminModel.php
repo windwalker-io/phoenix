@@ -55,6 +55,13 @@ abstract class AdminModel extends CrudModel
 		return $result;
 	}
 
+	/**
+	 * prepareRecord
+	 *
+	 * @param Record $record
+	 *
+	 * @return  void
+	 */
 	protected function prepareRecord(Record $record)
 	{
 		$date = DateTime::create();
@@ -98,7 +105,7 @@ abstract class AdminModel extends CrudModel
 		}
 
 		// Modified user
-		if ($record->hasField('modified_by') && $record->id)
+		if ($record->hasField('modified_by') && $record->$key)
 		{
 			$record->modified_by = $user->id;
 		}
@@ -106,7 +113,7 @@ abstract class AdminModel extends CrudModel
 		// Set Ordering or Nested ordering
 		if ($record->hasField($this->state->get('order.column', 'ordering')))
 		{
-			if (empty($record->id))
+			if (empty($record->$key))
 			{
 				$this->setOrderPosition($record);
 			}
