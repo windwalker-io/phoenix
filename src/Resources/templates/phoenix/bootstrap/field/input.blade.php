@@ -7,6 +7,6 @@
     ?>
     {{ $field->renderLabel() }}
     <div class="{{ $field->get('fieldWidth', 'col-md-9') }}">
-        {{ $field->renderInput() }}
+        {!! $field->renderInput() !!}
     </div>
 </div>

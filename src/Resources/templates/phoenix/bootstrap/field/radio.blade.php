@@ -7,7 +7,7 @@
     ?>
     {{ $field->renderLabel() }}
 
-    <div {{ \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($field->prepareAttributes()) }}>
+    <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($field->prepareAttributes()) !!}>
     <?php
     $radios = $field->renderInput();
     \Windwalker\Test\TestHelper::invoke($radios, 'prepareOptions');

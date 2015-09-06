@@ -29,7 +29,7 @@
                 <div class="col-md-10">
 
                     @section('message')
-                        {{ \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) }}
+                        {!! \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) !!}
                     @show
 
                     @yield('body', 'Body')

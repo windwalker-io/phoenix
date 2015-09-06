@@ -16,6 +16,7 @@ use Windwalker\Data\Data;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
+use Windwalker\Ioc;
 use Windwalker\Record\Record;
 
 /**
@@ -25,6 +26,13 @@ use Windwalker\Record\Record;
  */
 class FormModel extends PhoenixModel
 {
+	/**
+	 * Property formRenderer.
+	 *
+	 * @var callable
+	 */
+	protected $formRenderer = array('Phoenix\Form\Renderer\BootstrapRenderer', 'render');
+
 	/**
 	 * getItem
 	 *
@@ -112,7 +120,12 @@ class FormModel extends PhoenixModel
 			$form->bind($data);
 		}
 
-		$form->setFieldRenderHandler($this->get('field.renderer', array('Phoenix\Form\Renderer\BootstrapRenderer', 'render')));
+		$form->setFieldRenderHandler($this->get('field.renderer', $this->formRenderer));
+
+		Ioc::getDispatcher()->triggerEvent('onModelAfterGetForm', array(
+			'form' => $form,
+			'model' => $this
+		));
 
 		return $form;
 	}
@@ -186,5 +199,29 @@ class FormModel extends PhoenixModel
 		}
 
 		throw new ValidFailException($msg);
+	}
+
+	/**
+	 * Method to get property FormRenderer
+	 *
+	 * @return  callable
+	 */
+	public function getFormRenderer()
+	{
+		return $this->formRenderer;
+	}
+
+	/**
+	 * Method to set property formRenderer
+	 *
+	 * @param   callable $formRenderer
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setFormRenderer($formRenderer)
+	{
+		$this->formRenderer = $formRenderer;
+
+		return $this;
 	}
 }
