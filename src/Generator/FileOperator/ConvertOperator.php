@@ -35,7 +35,7 @@ class ConvertOperator extends CopyOperator
 
 		if (is_file($dest))
 		{
-			$this->io->out('File exists: ' . $dest);
+			$this->io->out('[<comment>File exists</comment>] ' . $dest);
 		}
 		else
 		{
@@ -43,7 +43,7 @@ class ConvertOperator extends CopyOperator
 
 			if (File::write($dest, $content))
 			{
-				$this->io->out('File created: ' . $dest);
+				$this->io->out('[<info>File created</info>] ' . $dest);
 			}
 		}
 	}

@@ -4,9 +4,16 @@
 </h3>
 
 <div class="search-container form-inline">
-    {!! $form->getField('field', 'search')->appendAttribute('class', ' sr-only')->renderLabel() !!}
-    {!! $form->getField('field', 'search')->appendAttribute('class', ' form-control')->renderInput() !!}
+    <?php $field = $form->getField('field', 'search'); ?>
+    {!! $field->appendAttribute('labelClass', ' sr-only')->renderLabel() !!}
 
+    @if ($field->get('display'))
+    {!! $field->appendAttribute('class', ' form-control')->renderInput() !!}
+    @else
+    <input id="{{ $field->getId() }}" name="{{ $field->getFieldName() }}" value="{{ $field->getValue() }}" type="hidden" />
+    @endif
+
+    {!! $form->getField('content', 'search')->appendAttribute('labelClass', ' sr-only')->renderLabel() !!}
     <div class="input-group">
         {!! $form->getField('content', 'search')->appendAttribute('class', ' form-control')->renderInput() !!}
         <span class="input-group-btn">
@@ -44,8 +51,8 @@
         </div>
     @else
     <div class="form-group col-sm-4 col-md-3">
-        {!! $field->appendAttribute('labelClass', 'hide')->renderLabel() !!}
-        {!! $field->appendAttribute('class', 'form-control')->renderInput() !!}
+        {!! $field->appendAttribute('labelClass', ' sr-only')->renderLabel() !!}
+        {!! $field->appendAttribute('class', ' form-control')->renderInput() !!}
     </div>
     @endif
 @endforeach

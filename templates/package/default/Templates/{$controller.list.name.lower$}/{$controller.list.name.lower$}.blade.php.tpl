@@ -92,7 +92,7 @@
                             </a>
                         </td>
                         <td>
-                            {{ $grid->orderButton() }}
+                            {!! $grid->orderButton() !!}
                         </td>
                         <td>
                             {{ $item->created_by }}

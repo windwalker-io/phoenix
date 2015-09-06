@@ -10,7 +10,6 @@ namespace {$package.namespace$}{$package.name.cap$}\Form\{$controller.list.name.
 
 use Windwalker\Core\Language\Translator;
 use Windwalker\Form\Field\ListField;
-use Windwalker\Form\Field\SpacerField;
 use Windwalker\Form\Field\TextField;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
@@ -32,22 +31,30 @@ class FilterDefinition implements FieldDefinitionInterface
 	 */
 	public function define(Form $form)
 	{
+		// Search
 		$form->wrap(null, 'search', function (Form $form)
 		{
+			// Search Field
 			$form->add('field', new ListField)
-				->set('class', '')
+				->label(Translator::translate('phoenix.grid.search.field.label'))
+				->set('display', false)
+				->defaultValue('*')
 				->addOption(new Option(Translator::translate('phoenix.core.all'), '*'))
 				->addOption(new Option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'), '{$controller.item.name.lower$}.title'))
 				->addOption(new Option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'), '{$controller.item.name.lower$}.alias'));
 
+			// Search Content
 			$form->add('content', new TextField)
-				->set('placeholder', Translator::translate('phoenix.grid.search.placeholder'));
+				->label(Translator::translate('phoenix.grid.search.label'))
+				->set('placeholder', Translator::translate('phoenix.grid.search.label'));
 		});
 
+		// Filter
 		$form->wrap(null, 'filter', function(Form $form)
 		{
+			// State
 			$form->add('{$controller.item.name.lower$}.state', new ListField)
-				->label('state')
+				->label('State')
 				// Add empty option to support single deselect button
 				->addOption(new Option('', ''))
 				->addOption(new Option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select'), ''))

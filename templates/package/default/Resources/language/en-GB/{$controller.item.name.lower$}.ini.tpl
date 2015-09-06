@@ -6,7 +6,7 @@
 [field]
 {$package.name.lower$}.{$controller.item.name.lower$}.field.state="State"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.title="Title"
-{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering="Ordering"
+{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering="Order"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.author="Author"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.created="Created"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.language="Language"

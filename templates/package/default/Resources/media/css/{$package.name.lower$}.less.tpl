@@ -183,5 +183,6 @@ body {
 .tooltip .tooltip-inner {
 	padding: 8px;
 	background-color: rgba(0,0,0,.8);
-	font-size: 15px;
+	font-size: 13px;
+	min-width: 100px;
 }
