@@ -1,4 +1,8 @@
 
+<h3 class="visible-xs-block">
+    @translate('phoenix.title.submenu')
+</h3>
+
 <ul class="nav nav-stacked nav-pills">
     <li class="{{ $helper->menu->active('categories') }}">
         <a href="#">

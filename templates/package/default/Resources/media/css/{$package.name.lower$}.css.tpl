@@ -13,10 +13,6 @@ body {
 #admin-area {
   margin-top: 30px;
 }
-#admin-toolbar {
-  background-color: #f6f6f6;
-  padding: 7px 25px;
-}
 .navbar-fixed-top {
   position: relative;
   margin-bottom: 0;
@@ -35,12 +31,43 @@ body {
 .admin-header.jumbotron h1 {
   font-size: 48px;
 }
+#admin-toolbar {
+  background-color: #f6f6f6;
+  padding: 7px 15px;
+}
+#admin-toolbar .toolbar-toggle-button,
+#admin-toolbar .admin-toolbar-buttons hr {
+  display: none;
+}
 .admin-toolbar-fixed {
   position: fixed;
   width: 100%;
   top: 0;
   z-index: 100;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+@media (max-width: 767px) {
+  #admin-toolbar button.btn,
+  #admin-toolbar a.btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  #admin-toolbar .admin-toolbar-buttons {
+    height: 0;
+    overflow: hidden;
+  }
+  #admin-toolbar .admin-toolbar-buttons.collapse.in {
+    height: auto;
+  }
+  #admin-toolbar .toolbar-toggle-button,
+  #admin-toolbar .admin-toolbar-buttons hr {
+    display: block;
+  }
+  .admin-toolbar-fixed {
+    position: relative;
+    box-shadow: none;
+  }
 }
 .search-container {
   margin-bottom: 15px;
@@ -61,6 +88,26 @@ body {
 #phoenix-iframe-modal .modal-body iframe {
   height: 500px;
 }
+@media (max-width: 767px) {
+  .filter-buttons-group {
+    display: block;
+    width: 100%;
+  }
+  .filter-buttons-group .filter-toggle-button {
+    width: 70%;
+  }
+  .filter-buttons-group .search-clear-button {
+    width: 30%;
+  }
+  .search-container > * {
+    margin-bottom: 5px;
+  }
+  .search-container::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
 .btn-group .btn {
   margin-left: -1px;
 }
@@ -79,4 +126,9 @@ body {
 .modal .chosen-container,
 *[class*="col-"] > .chosen-container {
   min-width: 100%;
+}
+.tooltip .tooltip-inner {
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  font-size: 15px;
 }

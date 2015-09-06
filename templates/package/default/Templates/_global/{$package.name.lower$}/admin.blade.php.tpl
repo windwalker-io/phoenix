@@ -9,25 +9,33 @@
     </div>
 </section>
 <aside id="admin-toolbar" class="">
-    @yield('toolbar')
+    <button data-toggle="collapse" class="btn btn-default toolbar-toggle-button" data-target=".admin-toolbar-buttons">
+        <span class="glyphicon glyphicon-wrench"></span>
+        @translate('phoenix.toolbar.toggle')
+    </button>
+    <div class="admin-toolbar-buttons">
+        <hr />
+        @yield('toolbar')
+    </div>
 </aside>
 
 <section id="admin-area">
     <div class="container-fluid">
+        <div class="row">
+            @section('admin-area')
+                <div class="col-md-2">
+                    @include('_global.{$package.name.lower$}.submenu')
+                </div>
+                <div class="col-md-10">
 
-        @section('admin-area')
-        <div class="col-md-2">
-            @include('_global.{$package.name.lower$}.submenu')
-        </div>
-        <div class="col-md-10">
+                    @section('message')
+                        {{ \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) }}
+                    @show
 
-            @section('message')
-                {{ \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) }}
+                    @yield('body', 'Body')
+                </div>
             @show
-
-            @yield('body', 'Body')
         </div>
-        @show
     </div>
 </section>
 

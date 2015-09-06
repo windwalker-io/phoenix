@@ -14,7 +14,11 @@
             {{ $filterBar->render(array('form' => $filterForm, 'show' => $showFilterBar)) }}
         </div>
 
-        <div class="grid-table">
+        <p class="visible-xs-block">
+            @translate('phoenix.grid.responsive.table.desc')
+        </p>
+
+        <div class="grid-table table-responsive">
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -23,7 +27,8 @@
                         {{ $grid->checkboxesToggle(array('duration' => 150)) }}
                     </th>
 
-                    <th>
+                    {{-- STATE --}}
+                    <th style="min-width: 90px;">
                         {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') }}
                     </th>
 
