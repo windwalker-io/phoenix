@@ -1,6 +1,7 @@
-{$package.name.lower$}.{$controller.item.name.lower$}="{$controller.item.name.cap$}"
-{$package.name.lower$}.{$controller.list.name.lower$}="{$controller.list.name.cap$}"
-{$package.name.lower$}.categories="Categories"
+[groups]
+{$package.name.lower$}.{$controller.item.name.lower$}.title="{$controller.item.name.cap$}"
+{$package.name.lower$}.{$controller.list.name.lower$}.title="{$controller.list.name.cap$}"
+{$package.name.lower$}.categories.title="Categories"
 
 [field]
 {$package.name.lower$}.{$controller.item.name.lower$}.field.state="State"

@@ -78,6 +78,6 @@ class GeneratorHelper
 	 */
 	public static function getPlaceholderRegex($name, $prefix = '//', $modifier = null)
 	{
-		return '/([ \t]*' . preg_quote($prefix, '/') . '\s@muse-placeholder\s+' . $name . '\s+[ a-zA-Z\d._-]+)/' . $modifier;
+		return '/([ \t]*' . preg_quote($prefix, '/') . '\s+@muse-placeholder\s+' . $name . '\s+[ a-zA-Z\d._-]+)/' . $modifier;
 	}
 }

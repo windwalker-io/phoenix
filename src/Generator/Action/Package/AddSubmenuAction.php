@@ -26,6 +26,7 @@ class AddSubmenuAction extends AbstractAction
 	protected function doExecute()
 	{
 		$name = $this->config['replace.controller.list.name.lower'];
+		$package = $this->config['replace.package.name.lower'];
 		$file = $this->config['dir.dest'] . '/Templates/_global/' . $this->config['replace.package.name.lower'] . '/submenu.blade.php';
 
 		if (!is_file($file))
@@ -43,7 +44,7 @@ class AddSubmenuAction extends AbstractAction
 		$replace = <<<MENU
 	<li class="{{ \$helper->menu->active('$name') }}">
 		<a href="{{ \$router->html('$name') }}">
-			@translate(\$package->getName() . '.$name')
+			@translate('$package.$name.title')
 		</a>
 	</li>
 

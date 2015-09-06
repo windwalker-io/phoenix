@@ -26,7 +26,7 @@ class EditView extends ItemView
 	 */
 	public function setTitle($title = null)
 	{
-		$title = $title ? : Translator::sprintf('phoenix.title.edit', Translator::translate($this->package->getName() . '.' . $this->getName()));
+		$title = $title ? : Translator::sprintf('phoenix.title.edit', Translator::translate($this->package->getName() . '.' . $this->getName() . '.title'));
 
 		return parent::setTitle($title);
 	}

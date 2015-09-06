@@ -27,7 +27,8 @@ class AddRoutingAction extends AbstractAction
 	protected function doExecute()
 	{
 		$file = $this->config['dir.dest'] . '/routing.yml';
-		$list = $this->config['list_name'];
+		$list = $this->config['replace.controller.list.name.lower'];
+		$item = $this->config['replace.controller.item.name.lower'];
 
 		if (!is_file($file))
 		{
@@ -36,7 +37,7 @@ class AddRoutingAction extends AbstractAction
 
 		$code = file_get_contents($file);
 
-		if (strpos($code, $list . ':') !== false || strpos($code, $list . ':') !== false)
+		if (strpos($code, $list . ':') !== false || strpos($code, $item . ':') !== false)
 		{
 			return;
 		}
@@ -45,8 +46,9 @@ class AddRoutingAction extends AbstractAction
 
 		$replace = file_get_contents($routing);
 		$replace = StringHelper::parseVariable($replace, $this->replace, $this->config['tagVariables']);
+		$replace = preg_replace(GeneratorHelper::getPlaceholderRegex('routing', '#'), '', $replace);
 
-		$code = GeneratorHelper::addBeforePlaceholder('routing', $code, $replace . "\n", '#');
+		$code = GeneratorHelper::addBeforePlaceholder('routing', $code, trim($replace) . "\n\n", '#');
 
 		file_put_contents($file, $code);
 

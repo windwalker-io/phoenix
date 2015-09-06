@@ -26,7 +26,7 @@ class ListView extends AbstractRadHtmView
 	 */
 	public function setTitle($title = null)
 	{
-		$title = $title ? : Translator::sprintf('phoenix.title.list', Translator::translate($this->package->getName() . '.' . $this->getName()));
+		$title = $title ? : Translator::sprintf('phoenix.title.list', Translator::translate($this->package->getName() . '.' . $this->getName() . '.title'));
 
 		return parent::setTitle($title);
 	}
