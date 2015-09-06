@@ -272,7 +272,7 @@
          */
         hasChecked: function(msg, event)
         {
-            msg = msg || 'Please check one or more items.';
+            msg = msg || Phoenix.Translator.translate('phoenix.message.grid.checked');
 
             if (!this.countChecked())
             {

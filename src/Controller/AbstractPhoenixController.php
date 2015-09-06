@@ -22,7 +22,7 @@ use Windwalker\String\StringInflector;
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractRadController extends Controller
+abstract class AbstractPhoenixController extends Controller
 {
 	const SINGULAR = 'singular';
 	const PLURAL   = 'plural';
@@ -47,6 +47,13 @@ abstract class AbstractRadController extends Controller
 	 * @var  string
 	 */
 	protected $listName;
+
+	/**
+	 * Property prefix.
+	 *
+	 * @var  string
+	 */
+	protected $langPrefix = 'phoenix.';
 
 	/**
 	 * Class init.

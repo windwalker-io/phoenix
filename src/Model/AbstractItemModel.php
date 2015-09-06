@@ -21,7 +21,7 @@ use Windwalker\Ioc;
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractItemModel extends AbstractFormModel
+abstract class AbstractItemModel extends FormModel
 {
 	/**
 	 * getItem

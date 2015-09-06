@@ -9,8 +9,10 @@
 namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractDataHandlingController;
-use Phoenix\Model\AbstractCrudModel;
-use Phoenix\Model\AbstractRadModel;
+use Phoenix\Model\CrudModel;
+use Phoenix\Model\PhoenixModel;
+use Windwalker\Core\Frontend\Bootstrap;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Data\Data;
 
@@ -19,8 +21,15 @@ use Windwalker\Data\Data;
  *
  * @since  {DEPLOY_VERSION}
  */
-class AbstractBatchController extends AbstractDataHandlingController
+class BatchController extends AbstractDataHandlingController
 {
+	/**
+	 * Property action.
+	 *
+	 * @var  string
+	 */
+	protected $action = 'batch';
+
 	/**
 	 * Property inflection.
 	 *
@@ -84,6 +93,11 @@ class AbstractBatchController extends AbstractDataHandlingController
 				throw new \LogicException('Update data should not be empty');
 			}
 
+			if (count($this->pks) < 1)
+			{
+				throw new ValidFailException(Translator::translate($this->langPrefix . '.message.' . $this->action . '.empty'));
+			}
+
 			$data = new Data($this->data);
 
 			foreach ((array) $this->pks as $pk)
@@ -95,7 +109,7 @@ class AbstractBatchController extends AbstractDataHandlingController
 		{
 			!$this->useTransaction or $this->model->transactionRollback();
 
-			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), 'warning');
+			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), Bootstrap::MSG_WARNING);
 
 			return false;
 		}
@@ -108,14 +122,16 @@ class AbstractBatchController extends AbstractDataHandlingController
 				throw $e;
 			}
 
-			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), 'warning');
+			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), Bootstrap::MSG_DANGER);
 
 			return false;
 		}
 
 		!$this->useTransaction or $this->model->transactionCommit();
 
-		$this->setRedirect($this->getSuccessRedirect(), 'Save success', 'success');
+		$msg = Translator::plural($this->langPrefix . 'message.batch.' . $this->action . '.success', count($this->pks), count($this->pks));
+
+		$this->setRedirect($this->getSuccessRedirect(), $msg, Bootstrap::MSG_SUCCESS);
 
 		return true;
 	}

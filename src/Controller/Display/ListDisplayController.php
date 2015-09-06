@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Display;
 
-use Phoenix\Model\AbstractListModel;
+use Phoenix\Model\ListModel;
 use Windwalker\Core\Model\Model;
 use Windwalker\Filter\InputFilter;
 use Windwalker\Form\Form;
@@ -18,7 +18,7 @@ use Windwalker\Form\Form;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class ListGetController extends AbstractGetController
+class ListDisplayController extends DisplayController
 {
 	/**
 	 * Property inflection.
@@ -30,7 +30,7 @@ class ListGetController extends AbstractGetController
 	/**
 	 * Property model.
 	 *
-	 * @var  AbstractListModel
+	 * @var  ListModel
 	 */
 	protected $model;
 

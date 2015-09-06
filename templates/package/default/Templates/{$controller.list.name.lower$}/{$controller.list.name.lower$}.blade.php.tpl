@@ -24,37 +24,37 @@
                     </th>
 
                     <th>
-                        {{ $grid->sortTitle('State', '{$controller.item.name.lower$}.state') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') }}
                     </th>
 
                     {{-- TITLE --}}
                     <th>
-                        {{ $grid->sortTitle('Title', '{$controller.item.name.lower$}.title') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') }}
                     </th>
 
                     {{-- ORDERING --}}
                     <th width="5%" class="nowrap">
-                        {{ $grid->sortTitle('Order', '{$controller.item.name.lower$}.ordering') }} {{ $grid->saveorderButton() }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.ordering', '{$controller.item.name.lower$}.ordering') }} {{ $grid->saveorderButton() }}
                     </th>
 
                     {{-- AUTHOR --}}
                     <th>
-                        {{ $grid->sortTitle('Author', '{$controller.item.name.lower$}.created_by') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.author', '{$controller.item.name.lower$}.created_by') }}
                     </th>
 
                     {{-- CREATED --}}
                     <th>
-                        {{ $grid->sortTitle('Created', '{$controller.item.name.lower$}.created') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') }}
                     </th>
 
                     {{-- LANGUAGE --}}
                     <th>
-                        {{ $grid->sortTitle('Language', '{$controller.item.name.lower$}.language') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') }}
                     </th>
 
                     {{-- ID --}}
                     <th>
-                        {{ $grid->sortTitle('ID', '{$controller.item.name.lower$}.id') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') }}
                     </th>
                 </tr>
                 </thead>
@@ -93,7 +93,7 @@
                             {{{ $item->created_by }}}
                         </td>
                         <td>
-                            {{{ $item->created }}}
+                            {{{ Windwalker\Core\DateTime\DateTime::toLocalTime($item->created) }}}
                         </td>
                         <td>
                             {{{ $item->language }}}

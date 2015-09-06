@@ -9,6 +9,7 @@
 namespace Phoenix;
 
 use Phoenix\Provider\PhoenixProvider;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
 
@@ -31,6 +32,8 @@ class PhoenixPackage extends AbstractPackage
 	public function initialise()
 	{
 		parent::initialise();
+
+		Translator::loadFile('phoenix', 'ini', $this);
 	}
 
 	/**

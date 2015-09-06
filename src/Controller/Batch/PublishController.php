@@ -13,8 +13,15 @@ namespace Phoenix\Controller\Batch;
  *
  * @since  {DEPLOY_VERSION}
  */
-class PublishController extends AbstractBatchController
+class PublishController extends BatchController
 {
+	/**
+	 * Property action.
+	 *
+	 * @var  string
+	 */
+	protected $action = 'publish';
+
 	/**
 	 * Property data.
 	 *

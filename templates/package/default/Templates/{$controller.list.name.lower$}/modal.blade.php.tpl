@@ -20,27 +20,32 @@
                 <tr>
                     {{-- TITLE --}}
                     <th>
-                        {{ $grid->sortTitle('Title', '{$controller.item.name.lower$}.title') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') }}
+                    </th>
+
+                    {{-- STATE --}}
+                    <th>
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') }}
                     </th>
 
                     {{-- AUTHOR --}}
                     <th>
-                        {{ $grid->sortTitle('Author', '{$controller.item.name.lower$}.created_by') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.author', '{$controller.item.name.lower$}.created_by') }}
                     </th>
 
                     {{-- CREATED --}}
                     <th>
-                        {{ $grid->sortTitle('Created', '{$controller.item.name.lower$}.created') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') }}
                     </th>
 
                     {{-- LANGUAGE --}}
                     <th>
-                        {{ $grid->sortTitle('Language', '{$controller.item.name.lower$}.language') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') }}
                     </th>
 
                     {{-- ID --}}
                     <th>
-                        {{ $grid->sortTitle('ID', '{$controller.item.name.lower$}.id') }}
+                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') }}
                     </th>
                 </tr>
                 </thead>
@@ -56,11 +61,14 @@
                                 <span class="glyphicon glyphicon-menu-left text-muted"></span> {{{ $item->title }}}
                             </a>
                         </td>
+                        <td class="text-center">
+                            {{ $grid->state($item->state, array('only_icon' => true)) }}
+                        </td>
                         <td>
                             {{{ $item->created_by }}}
                         </td>
                         <td>
-                            {{{ $item->created }}}
+                            {{{ \Windwalker\Core\DateTime\DateTime::toLocalTime($item->created) }}}
                         </td>
                         <td>
                             {{{ $item->language }}}

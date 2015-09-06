@@ -8,100 +8,33 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use Phoenix\Controller\Batch\AbstractBatchController;
-use Windwalker\Data\Data;
-use Windwalker\String\StringHelper;
+use Phoenix\Controller\Batch\CopyController as PhoenixCopyController;
 
 /**
  * The CopyController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class CopyController extends AbstractBatchController
+class CopyController extends PhoenixCopyController
 {
 	/**
-	 * Which fields should increment.
+	 * Property name.
 	 *
-	 * @var array
+	 * @var  string
 	 */
-	protected $incrementFields = array(
-		'title' => StringHelper::INCREMENT_STYLE_DEFAULT,
-		'alias' => StringHelper::INCREMENT_STYLE_DASH
-	);
+	protected $name = '{$controller.list.name.lower$}';
 
 	/**
-	 * prepareExecute
+	 * Property itemName.
 	 *
-	 * @return  void
+	 * @var  string
 	 */
-	protected function prepareExecute()
-	{
-		parent::prepareExecute();
-
-		$this->data = $this->input->getVar('batch', array());
-	}
+	protected $itemName = '{$controller.item.name.lower$}';
 
 	/**
-	 * save
+	 * Property listName.
 	 *
-	 * @param int|string $pk
-	 * @param Data       $data
-	 *
-	 * @return  void
+	 * @var  string
 	 */
-	protected function save($pk, Data $data)
-	{
-		// We load existing item first and bind data into it.
-		$this->record->reset();
-
-		$this->record->load($pk);
-
-		$this->record->bind($data->dump());
-
-		$item = $this->record->toArray();
-
-		$recordClone = $this->model->getRecord();
-
-		$condition = array();
-
-		// Check table has increment fields, default is title and alias.
-		foreach ($this->incrementFields as $field => $type)
-		{
-			if ($this->record->hasField($field))
-			{
-				$condition[$field] = $item[$field];
-			}
-		}
-
-		// Recheck item with same conditions(default is title & alias), if true, increment them.
-		// If no item got, means it is the max number.
-		do
-		{
-			$result = true;
-
-			try
-			{
-				$recordClone->load($condition);
-
-				foreach ($this->incrementFields as $field => $type)
-				{
-					if ($this->record->hasField($field))
-					{
-						$item[$field] = $condition[$field] = StringHelper::increment($item[$field], $type);
-					}
-				}
-			}
-			catch (\RuntimeException $e)
-			{
-				$result = false;
-			}
-		}
-		while ($result);
-
-		$item = new Data($item);
-
-		unset($item->{$this->pkName});
-
-		$this->model->save($item);
-	}
+	protected $listName = '{$controller.list.name.lower$}';
 }

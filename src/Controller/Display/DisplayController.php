@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Display;
 
-use Phoenix\Controller\AbstractRadController;
+use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\View\BladeHtmlView;
@@ -19,7 +19,7 @@ use Windwalker\Core\View\HtmlView;
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractGetController extends AbstractRadController
+class DisplayController extends AbstractPhoenixController
 {
 	/**
 	 * Property model.
@@ -57,7 +57,7 @@ abstract class AbstractGetController extends AbstractRadController
 	protected function prepareExecute()
 	{
 		$this->format = $this->input->get('format', 'html');
-		$this->layout = $this->input->get('layout', 'default');
+		$this->layout = $this->input->get('layout', $this->getName());
 
 		$this->model = $this->getModel();
 		$this->view = $this->getView(null, $this->format);

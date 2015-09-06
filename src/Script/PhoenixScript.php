@@ -93,6 +93,7 @@ JS;
 			$asset->addScript(static::phoenixName() . '/js/phoenix/grid.js');
 
 			static::translate('phoenix.message.delete.confirm');
+			static::translate('phoenix.message.grid.checked');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
@@ -258,7 +259,8 @@ JS;
 
 			$options = json_encode((object) array_merge($defaultOptions, $options));
 
-			static::translate('phoenix.form.validation.fail');
+			static::translate('phoenix.message.validation.required');
+			static::translate('phoenix.message.validation.failure');
 
 			$js = <<<JS
 // Chosen select

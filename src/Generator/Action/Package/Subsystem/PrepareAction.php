@@ -36,6 +36,7 @@ class PrepareAction extends AbstractAction
 		$files = array(
 			'DataMapper',
 			'Field',
+			'Resources/languages',
 			'Record',
 			'Seed'
 		);

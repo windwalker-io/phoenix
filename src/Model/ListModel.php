@@ -21,7 +21,7 @@ use Windwalker\Query\Query;
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractListModel extends AbstractFormModel
+class ListModel extends FormModel
 {
 	/**
 	 * Property allowFields.
@@ -72,7 +72,9 @@ abstract class AbstractListModel extends AbstractFormModel
 	 *
 	 * @return  void
 	 */
-	abstract protected function configureTables();
+	protected function configureTables()
+	{
+	}
 
 	/**
 	 * getAllowFields

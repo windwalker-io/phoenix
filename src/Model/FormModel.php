@@ -9,11 +9,13 @@
 namespace Phoenix\Model;
 
 use Phoenix\Form\NullFiledDefinition;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Data\Data;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
+use Windwalker\Form\Validate\ValidateResult;
 use Windwalker\Record\Record;
 
 /**
@@ -21,7 +23,7 @@ use Windwalker\Record\Record;
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractFormModel extends AbstractRadModel
+class FormModel extends PhoenixModel
 {
 	/**
 	 * getItem
@@ -164,11 +166,23 @@ abstract class AbstractFormModel extends AbstractRadModel
 
 		$errors = $form->getErrors();
 
-		$msg = array();
+		$msg = array(
+			ValidateResult::STATUS_REQUIRED => array(),
+			ValidateResult::STATUS_FAILURE => array()
+		);
 
 		foreach ($errors as $error)
 		{
-			$msg[] = $error->getMessage();
+			$field = $error->getField();
+
+			if ($error->getResult() == ValidateResult::STATUS_REQUIRED)
+			{
+				$msg[ValidateResult::STATUS_REQUIRED][] = Translator::sprintf('phoenix.message.validation.required', $field->getLabel() ? : $field->getName(false));
+			}
+			elseif ($error->getResult() == ValidateResult::STATUS_FAILURE)
+			{
+				$msg[ValidateResult::STATUS_FAILURE][] = Translator::sprintf('phoenix.message.validation.failure', $field->getLabel() ? : $field->getName(false));
+			}
 		}
 
 		throw new ValidFailException($msg);

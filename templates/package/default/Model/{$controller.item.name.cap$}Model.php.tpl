@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
-use Phoenix\Model\AbstractAdminModel;
+use Phoenix\Model\AdminModel;
 
 /**
  * The {$controller.item.name.cap$}Model class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class {$controller.item.name.cap$}Model extends AbstractAdminModel
+class {$controller.item.name.cap$}Model extends AdminModel
 {
 
 }

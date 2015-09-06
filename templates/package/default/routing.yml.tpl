@@ -1,3 +1,4 @@
+# {$controller.item.name.cap$} & {$controller.list.name.cap$}
 {$controller.item.name.lower$}:
     pattern: /{$controller.item.name.lower$}(/id)
     controller: {$controller.item.name.cap$}
@@ -8,3 +9,5 @@
         post: CopyController
         patch: BatchController
         put: FilterController
+
+#  @muse-placeholder  submenu  Do not remove this line

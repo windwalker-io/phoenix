@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Phoenix\Controller\AbstractRadController;
+use Phoenix\Controller\AbstractPhoenixController;
 use Phoenix\Controller\ControllerResolver as PhoenixControllerResolver;
 use Windwalker\Core\Controller\Controller;
 
@@ -17,7 +17,7 @@ use Windwalker\Core\Controller\Controller;
  *
  * @since  {DEPLOY_VERSION}
  */
-class AbstractBatchDelegatingController extends AbstractRadController
+class BatchDelegationController extends AbstractPhoenixController
 {
 	/**
 	 * Property inflection.

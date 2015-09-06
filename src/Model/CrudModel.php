@@ -16,7 +16,7 @@ use Windwalker\Record\Record;
  *
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractCrudModel extends AbstractFormModel
+class CrudModel extends FormModel
 {
 	/**
 	 * save

@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\AbstractCrudModel;
+use Phoenix\Model\CrudModel;
 use Windwalker\Data\Data;
 use Windwalker\Record\Record;
 
@@ -17,12 +17,12 @@ use Windwalker\Record\Record;
  *
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractDataHandlingController extends AbstractRadController
+abstract class AbstractDataHandlingController extends AbstractPhoenixController
 {
 	/**
 	 * Property model.
 	 *
-	 * @var  AbstractCrudModel
+	 * @var  CrudModel
 	 */
 	protected $model;
 
@@ -75,7 +75,7 @@ abstract class AbstractDataHandlingController extends AbstractRadController
 		$this->task   = $this->input->get('task');
 
 		// Determine model
-		if (!$this->model instanceof AbstractCrudModel)
+		if (!$this->model instanceof CrudModel)
 		{
 			throw new \UnexpectedValueException(sprintf('%s model need extend to CrudModel', $this->getName()));
 		}

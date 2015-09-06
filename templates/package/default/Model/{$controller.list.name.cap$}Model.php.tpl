@@ -10,7 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Model;
 
 use {$package.namespace$}{$package.name.cap$}\Mapper\{$controller.item.name.cap$}Mapper;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
-use Phoenix\Model\AbstractListModel;
+use Phoenix\Model\ListModel;
 use Phoenix\Model\Filter\FilterHelperInterface;
 use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Data\DataSet;
@@ -21,7 +21,7 @@ use Windwalker\Query\Query;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class {$controller.list.name.cap$}Model extends AbstractListModel
+class {$controller.list.name.cap$}Model extends ListModel
 {
 	/**
 	 * Property allowFields.

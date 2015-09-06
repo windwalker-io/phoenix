@@ -65,7 +65,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 				DebuggerHelper::addCustomData('Language Orphans', '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
 			}
 
-			TranslatorHelper::dumpOrphans('yaml');
+			TranslatorHelper::dumpOrphans('ini');
 		}
 
 		return $result;

@@ -20,7 +20,7 @@ use Windwalker\Record\Record;
  *
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractRadModel extends DatabaseModel
+class PhoenixModel extends DatabaseModel
 {
 	/**
 	 * getRecord

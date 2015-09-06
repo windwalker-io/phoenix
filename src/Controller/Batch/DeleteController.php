@@ -8,19 +8,21 @@
 
 namespace Phoenix\Controller\Batch;
 
+use Windwalker\Data\Data;
+
 /**
- * The UnpublishController class.
+ * The DeleteController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class UnpublishController extends BatchController
+class DeleteController extends BatchController
 {
 	/**
 	 * Property action.
 	 *
 	 * @var  string
 	 */
-	protected $action = 'unpublish';
+	protected $action = 'delete';
 
 	/**
 	 * Property data.
@@ -28,6 +30,21 @@ class UnpublishController extends BatchController
 	 * @var  array
 	 */
 	protected $data = array(
-		'state' => 0
+		'state' => -9
 	);
+
+	/**
+	 * save
+	 *
+	 * @param   string|int $pk
+	 * @param   Data       $data
+	 *
+	 * @return  mixed
+	 */
+	protected function save($pk, Data $data)
+	{
+		$data->{$this->pkName} = $pk;
+
+		$this->model->delete($pk);
+	}
 }

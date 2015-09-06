@@ -8,19 +8,26 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Phoenix\Model\AbstractAdminModel;
+use Phoenix\Model\AdminModel;
 
 /**
  * The ReorderController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ReorderController extends AbstractBatchController
+class ReorderController extends BatchController
 {
+	/**
+	 * Property action.
+	 *
+	 * @var  string
+	 */
+	protected $action = 'reorder';
+
 	/**
 	 * Property model.
 	 *
-	 * @var  AbstractAdminModel
+	 * @var  AdminModel
 	 */
 	protected $model;
 
@@ -42,7 +49,7 @@ class ReorderController extends AbstractBatchController
 		$this->data   = $this->input->getVar('ordering', array());
 
 		// Determine model
-		if (!$this->model instanceof AbstractAdminModel)
+		if (!$this->model instanceof AdminModel)
 		{
 			throw new \UnexpectedValueException(sprintf('%s model need extend to AdminModel', $this->getName()));
 		}

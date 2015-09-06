@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Grid;
 
-use Phoenix\Controller\AbstractRadController;
+use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Filter\InputFilter;
 
 /**
@@ -16,7 +16,7 @@ use Windwalker\Filter\InputFilter;
  *
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractFilterController extends AbstractRadController
+class FilterController extends AbstractPhoenixController
 {
 	/**
 	 * Property inflection.

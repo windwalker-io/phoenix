@@ -8,37 +8,33 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use Phoenix\Controller\Batch\AbstractBatchController;
-use Windwalker\Data\Data;
+use Phoenix\Controller\Batch\DeleteController as PhoenixDeleteController;
 
 /**
  * The DeleteController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class DeleteController extends AbstractBatchController
+class DeleteController extends PhoenixDeleteController
 {
 	/**
-	 * Property data.
+	 * Property name.
 	 *
-	 * @var  array
+	 * @var  string
 	 */
-	protected $data = array(
-		'state' => -9
-	);
+	protected $name = '{$controller.list.name.lower$}';
 
 	/**
-	 * save
+	 * Property itemName.
 	 *
-	 * @param   string|int $pk
-	 * @param   Data       $data
-	 *
-	 * @return  mixed
+	 * @var  string
 	 */
-	protected function save($pk, Data $data)
-	{
-		$data->{$this->pkName} = $pk;
+	protected $itemName = '{$controller.item.name.lower$}';
 
-		$this->model->delete($pk);
-	}
+	/**
+	 * Property listName.
+	 *
+	 * @var  string
+	 */
+	protected $listName = '{$controller.list.name.lower$}';
 }

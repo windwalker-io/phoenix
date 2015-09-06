@@ -13,8 +13,15 @@ namespace Phoenix\Controller\Batch;
  *
  * @since  {DEPLOY_VERSION}
  */
-class TrashController extends AbstractBatchController
+class TrashController extends BatchController
 {
+	/**
+	 * Property action.
+	 *
+	 * @var  string
+	 */
+	protected $action = 'trash';
+
 	/**
 	 * Property data.
 	 *

@@ -4,7 +4,7 @@
 @if ($direction == 'DESC')
     <a href="javascript: void(0);" onclick="Phoenix.Grid.sort('{{ $field }}', 'ASC')" class="hasTooltip"
         title="@translate('phoenix.grid.sort.button')">
-        {{{ $label }}}
+        @translate($label)
 
         @if ($field == $ordering)
             <small class="glyphicon glyphicon-triangle-bottom"></small>
@@ -14,7 +14,7 @@
 @else
     <a href="javascript: void(0);" onclick="Phoenix.Grid.sort('{{ $field }}', 'DESC')" class="hasTooltip"
         title="@translate('phoenix.grid.sort.button')">
-        {{{ $label }}}
+        @translate($label)
 
         @if ($field == $ordering)
             <small class="glyphicon glyphicon-triangle-top"></small>

@@ -19,7 +19,7 @@ use Windwalker\Record\Record;
  *
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractAdminModel extends AbstractCrudModel
+abstract class AdminModel extends CrudModel
 {
 	const ORDER_POSITION_FIRST = 'first';
 	const ORDER_POSITION_LAST  = 'last';

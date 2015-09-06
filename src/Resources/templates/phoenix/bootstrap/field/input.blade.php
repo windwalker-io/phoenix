@@ -5,8 +5,8 @@
     $field->set('class', $field->get('class') . ' form-control');
     $field->set('labelClass', $field->get('labelClass') . ' control-label ' . $field->get('labelWidth', 'col-md-3'));
     ?>
-    <?php echo $field->renderLabel(); ?>
+    {{ $field->renderLabel() }}
     <div class="{{ $field->get('fieldWidth', 'col-md-9') }}">
-        <?php echo $field->renderInput(); ?>
+        {{ $field->renderInput() }}
     </div>
 </div>

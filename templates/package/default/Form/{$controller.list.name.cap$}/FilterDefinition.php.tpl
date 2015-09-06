@@ -36,9 +36,9 @@ class FilterDefinition implements FieldDefinitionInterface
 		{
 			$form->add('field', new ListField)
 				->set('class', '')
-				->addOption(new Option('All', '*'))
-				->addOption(new Option('Title', '{$controller.item.name.lower$}.title'))
-				->addOption(new Option('Alias', '{$controller.item.name.lower$}.alias'));
+				->addOption(new Option(Translator::translate('phoenix.core.all'), '*'))
+				->addOption(new Option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'), '{$controller.item.name.lower$}.title'))
+				->addOption(new Option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'), '{$controller.item.name.lower$}.alias'));
 
 			$form->add('content', new TextField)
 				->set('placeholder', Translator::translate('phoenix.grid.search.placeholder'));
@@ -50,9 +50,9 @@ class FilterDefinition implements FieldDefinitionInterface
 				->label('state')
 				// Add empty option to support single deselect button
 				->addOption(new Option('', ''))
-				->addOption(new Option('-- Select State --', ''))
-				->addOption(new Option('Published', '1'))
-				->addOption(new Option('Unpublished', '0'))
+				->addOption(new Option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select'), ''))
+				->addOption(new Option(Translator::translate('phoenix.grid.state.published'), '1'))
+				->addOption(new Option(Translator::translate('phoenix.grid.state.unpublished'), '0'))
 				->set('onchange', 'this.form.submit()');
 		});
 	}

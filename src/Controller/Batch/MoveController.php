@@ -13,8 +13,15 @@ namespace Phoenix\Controller\Batch;
  *
  * @since  {DEPLOY_VERSION}
  */
-class MoveController extends AbstractBatchController
+class MoveController extends BatchController
 {
+	/**
+	 * Property action.
+	 *
+	 * @var  string
+	 */
+	protected $action = 'move';
+
 	/**
 	 * prepareExecute
 	 *

@@ -13,7 +13,7 @@ namespace Phoenix\Controller\Display;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class ItemGetController extends AbstractGetController
+class ItemDisplayController extends DisplayController
 {
 	/**
 	 * Property inflection.

@@ -8,10 +8,12 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\AbstractFormModel;
+use Phoenix\Model\FormModel;
 use Windwalker\Core\Frontend\Bootstrap;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Data\Data;
+use Windwalker\Form\Validate\ValidateResult;
 use Windwalker\String\StringHelper;
 
 /**
@@ -19,7 +21,7 @@ use Windwalker\String\StringHelper;
  * 
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractSaveController extends AbstractDataHandlingController
+class SaveController extends AbstractDataHandlingController
 {
 	/**
 	 * Property inflection.
@@ -94,7 +96,23 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 
 			$this->setUserState($this->getContext('edit.data'), $this->data);
 
-			$this->setRedirect($this->getFailRedirect($data), $e->getMessages(), Bootstrap::MSG_DANGER);
+			$messages = $e->getMessages();
+
+			if (isset($messages[ValidateResult::STATUS_REQUIRED]))
+			{
+				$this->addFlash((array) $messages[ValidateResult::STATUS_REQUIRED], Bootstrap::MSG_DANGER);
+
+				unset($messages[ValidateResult::STATUS_REQUIRED]);
+			}
+
+			if (isset($messages[ValidateResult::STATUS_FAILURE]))
+			{
+				$this->addFlash((array) $messages[ValidateResult::STATUS_FAILURE], Bootstrap::MSG_WARNING);
+
+				unset($messages[ValidateResult::STATUS_FAILURE]);
+			}
+
+			$this->setRedirect($this->getFailRedirect($data), $messages, Bootstrap::MSG_DANGER);
 
 			return false;
 		}
@@ -118,7 +136,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 
 		$this->removeUserState($this->getContext('edit.data'));
 
-		$this->setRedirect($this->getSuccessRedirect($data), 'Save success', Bootstrap::MSG_SUCCESS);
+		$this->setRedirect($this->getSuccessRedirect($data), Translator::translate($this->langPrefix . 'message.save.success'), Bootstrap::MSG_SUCCESS);
 
 		return true;
 	}
@@ -156,7 +174,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function validate(Data $data)
 	{
-		if ($this->model instanceof AbstractFormModel)
+		if ($this->model instanceof FormModel)
 		{
 			$this->model->validate($data->dump());
 		}

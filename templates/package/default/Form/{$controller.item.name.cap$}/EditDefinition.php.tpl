@@ -12,6 +12,7 @@ use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ModalField;
 use Phoenix\Field\CalendarField;
 use Phoenix\Field\ModalField;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Field\ListField;
 use Windwalker\Form\Field\RadioField;
@@ -43,57 +44,61 @@ class EditDefinition implements FieldDefinitionInterface
 			$form->add('id', new HiddenField);
 
 			$form->add('title', new TextField)
-				->label('Title')
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
 				->required(true);
 
 			$form->add('alias', new TextField)
-				->label('Alias');
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'));
 
 			$form->add('images', new TextField)
-				->label('Images');
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.images'));
 
 			$form->add('url', new TextField)
-				->label('URL')
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
+				->setValidator(new UrlValidator)
 				->set('class', 'validate-url');
 
-			$form->add('{$controller.item.name.lower$}1', new {$controller.item.name.cap$}ListField);
-			$form->add('{$controller.item.name.lower$}2', new {$controller.item.name.cap$}ModalField);
+			$form->add('{$controller.item.name.lower$}_list', new {$controller.item.name.cap$}ListField)
+				->label('List Example');
+
+			$form->add('{$controller.item.name.lower$}_modal', new {$controller.item.name.cap$}ModalField)
+				->label('Modal Example');
 		});
 
 		$form->wrap('text', null, function(Form $form)
 		{
 			$form->add('introtext', new TextareaField)
-				->label('Intro Text')
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
 				->set('rows', 10);
 
 			$form->add('fulltext', new TextareaField)
-				->label('Full Text')
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
 				->set('rows', 10);
 		});
 
 		$form->wrap('created', null, function(Form $form)
 		{
 			$form->add('state', new RadioField)
-				->label('State')
-				->required(true)
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.state'))
 				->set('class', 'btn-group')
-				->addOption(new Option('Published', '1'))
-				->addOption(new Option('Unpublished', '0'));
+				->set('default', 1)
+				->addOption(new Option(Translator::translate('phoenix.grid.state.published'), '1'))
+				->addOption(new Option(Translator::translate('phoenix.grid.state.unpublished'), '0'));
 
 			$form->add('version', new TextField)
-				->label('Version');
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.version'));
 
 			$form->add('created', new CalendarField)
-				->label('Created Time');
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.created'));
 
 			$form->add('modified', new CalendarField)
-				->label('Modified Time');
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'));
 
 			$form->add('created_by', new TextField)
-				->label('Author');
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.author'));
 
 			$form->add('modified_by', new TextField)
-				->label('Modified User');
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'));
 		});
 	}
 }

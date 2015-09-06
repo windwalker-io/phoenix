@@ -13,7 +13,7 @@ namespace Phoenix\Controller\Display;
  *
  * @since  {DEPLOY_VERSION}
  */
-class EditGetController extends ItemGetController
+class EditGetController extends ItemDisplayController
 {
 	/**
 	 * prepareExecute

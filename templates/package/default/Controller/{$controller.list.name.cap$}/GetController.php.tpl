@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use Phoenix\Controller\Display\ListGetController;
+use Phoenix\Controller\Display\ListDisplayController;
 
 /**
  * The GetController class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class GetController extends ListGetController
+class GetController extends ListDisplayController
 {
 	/**
 	 * Property name.

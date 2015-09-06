@@ -115,46 +115,14 @@ class GridHelper
 	}
 
 	/**
-	 * Register table drg sorting script.
-	 *
-	 * @param   string   $task    Sorting task for ajax.
-	 * @param   integer  $tableId The table id selector.
-	 *
-	 * @return bool
-	 */
-	public function registerTableSort($task = null, $tableId = null)
-	{
-		if (!$this->state->get('list.saveorder', false))
-		{
-			return false;
-		}
-
-		$option   = $this->config->get('option');
-		$task     = $task ? : $this->config->get('view_list') . '.state.reorder';
-		$listDirn = $this->state->get('list.direction');
-		$tableId  = $tableId ? : $this->config->get('order_table_id', 'TableList');
-
-		$saveOrderingUrl = 'index.php?option=' . $option . '&task=' . $task . '&tmpl=component';
-		$formName  = $this->config->get('form_name', 'adminForm');
-
-		\JHtml::_('sortablelist.sortable', $tableId, $formName, strtolower($listDirn), $saveOrderingUrl);
-
-		return true;
-	}
-
-	/**
 	 * Method to sort a column in a grid
 	 *
 	 * @param   string  $label  The link title
 	 * @param   string  $field  The order field for the column
-	 * @param   string  $task   An optional task override
-	 * @param   string  $newDir An optional direction for the new column
-	 * @param   string  $tip    An optional text shown as tooltip title instead of $title
-	 * @param   string  $icon   Icon to show
 	 *
 	 * @return  string
 	 */
-	public function sortTitle($label, $field, $task = null, $newDir = 'asc', $tip = '', $icon = null)
+	public function sortTitle($label, $field)
 	{
 		$listOrder = $this->state->get('list.ordering');
 		$listDirn  = $this->state->get('list.direction');
@@ -269,6 +237,11 @@ HTML;
 		), WidgetHelper::ENGINE_BLADE);
 	}
 
+	/**
+	 * saveOrderButton
+	 *
+	 * @return  string
+	 */
 	public function saveOrderButton()
 	{
 		if ($this->state->get('list.saveorder'))
@@ -429,13 +402,13 @@ HTML;
 	 * Show a boolean icon.
 	 *
 	 * @param   mixed  $value       A variable has value or not.
-	 * @param   string $taskMapping Click to call a component task. Not available yet.
+	 * @param   array  $taskMapping Click to call a component task. Not available yet.
 	 * @param   array  $iconMapping The state to icon mapping.
 	 * @param   array  $options     Some options.
 	 *
 	 * @return string A boolean icon HTML string.
 	 */
-	public function stateButton($value, $taskMapping = '', $iconMapping = array(), $options = array())
+	public function stateButton($value, $taskMapping = array(), $iconMapping = array(), $options = array())
 	{
 		$options['titleMapping'] = isset($options['titleMapping']) ? (array) $options['titleMapping'] : array();
 		$options['template'] = isset($options['template']) ? $options['template'] : 'phoenix.grid.table.icon-button';
