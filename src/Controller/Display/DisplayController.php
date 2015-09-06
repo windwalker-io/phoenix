@@ -57,7 +57,7 @@ class DisplayController extends AbstractPhoenixController
 	protected function prepareExecute()
 	{
 		$this->format = $this->input->get('format', 'html');
-		$this->layout = $this->input->get('layout', $this->getName());
+		$this->layout = $this->input->get('layout', 'default');
 
 		$this->model = $this->getModel();
 		$this->view = $this->getView(null, $this->format);

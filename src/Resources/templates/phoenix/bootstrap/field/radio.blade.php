@@ -5,7 +5,7 @@
     $field->appendAttribute('class', ' radio-container input-list-container ' . $field->get('fieldWidth', 'col-md-9'));
     $field->appendAttribute('labelClass', ' control-label ' . $field->get('labelWidth', 'col-md-3'));
     ?>
-    {{ $field->renderLabel() }}
+    {!! $field->renderLabel() !!}
 
     <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($field->prepareAttributes()) !!}>
     <?php
@@ -14,8 +14,8 @@
     ?>
     @foreach($radios->getContent() as $option)
         <div class="radio">
-            {{ $option[0]->setAttribute('style', 'margin-left: 0;') }}
-            {{ $option[1] }}
+            {!! $option[0]->setAttribute('style', 'margin-left: 0;') !!}
+            {!! $option[1] !!}
         </div>
     @endforeach
     </div>

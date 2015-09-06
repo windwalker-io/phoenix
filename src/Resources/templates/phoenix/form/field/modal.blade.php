@@ -6,7 +6,7 @@
 
 <div id="{{ $id }}-wrap">
     <div class="input-group">
-        {{ $input }}
+        {!! $input !!}
         <span class="input-group-btn">
             <a class="btn btn-info hasModal" type="button" href="{{ $url }}">
                 @translate($field->getAttribute('buttonText', 'phoenix.form.field.modal.button.text'))

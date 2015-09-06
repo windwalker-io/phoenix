@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
 
-    <title>{{{ \Phoenix\Html\Document::getPageTitle() }}}</title>
+    <title>{{ \Phoenix\Html\Document::getPageTitle() }}</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ $uri['media.path'] }}images/favicon.ico" />
     <meta name="generator" content="Windwalker Framework" />
     @yield('meta')
 
-    {{ \Phoenix\Asset\Asset::renderStyles(true) }}
+    {!! \Phoenix\Asset\Asset::renderStyles(true) !!}
     @yield('style')
 
-    {{ \Phoenix\Asset\Asset::renderScripts(true) }}
+    {!! \Phoenix\Asset\Asset::renderScripts(true) !!}
     @yield('script')
 
 </head>

@@ -6,12 +6,12 @@
     @include('toolbar')
 @stop
 
-@section('body')
+@section('admin-body')
 <div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
     <form name="admin-form" id="admin-form" action="{{ $router->html('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
 
         <div class="filter-bar">
-            {{ $filterBar->render(array('form' => $filterForm, 'show' => $showFilterBar)) }}
+            {!! $filterBar->render(array('form' => $filterForm, 'show' => $showFilterBar)) !!}
         </div>
 
         <p class="visible-xs-block">
@@ -24,42 +24,42 @@
                 <tr>
                     {{-- CHECKBOX --}}
                     <th>
-                        {{ $grid->checkboxesToggle(array('duration' => 150)) }}
+                        {!! $grid->checkboxesToggle(array('duration' => 150)) !!}
                     </th>
 
                     {{-- STATE --}}
                     <th style="min-width: 90px;">
-                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') }}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
                     </th>
 
                     {{-- TITLE --}}
                     <th>
-                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') }}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
                     </th>
 
                     {{-- ORDERING --}}
                     <th width="5%" class="nowrap">
-                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.ordering', '{$controller.item.name.lower$}.ordering') }} {{ $grid->saveorderButton() }}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.ordering', '{$controller.item.name.lower$}.ordering') !!} {!! $grid->saveorderButton() !!}
                     </th>
 
                     {{-- AUTHOR --}}
                     <th>
-                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.author', '{$controller.item.name.lower$}.created_by') }}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.author', '{$controller.item.name.lower$}.created_by') !!}
                     </th>
 
                     {{-- CREATED --}}
                     <th>
-                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') }}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
                     </th>
 
                     {{-- LANGUAGE --}}
                     <th>
-                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') }}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') !!}
                     </th>
 
                     {{-- ID --}}
                     <th>
-                        {{ $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') }}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
                     </th>
                 </tr>
                 </thead>
@@ -71,11 +71,11 @@
                     ?>
                     <tr>
                         <td>
-                            {{ $grid->checkbox() }}
+                            {!! $grid->checkbox() !!}
                         </td>
                         <td>
                             <span class="btn-group">
-                                {{ $grid->state($item->state) }}
+                                {!! $grid->state($item->state) !!}
                                 <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
                                     title="@translate('phoenix.toolbar.duplicate')">
                                     <span class="glyphicon glyphicon-duplicate text-info"></span>
@@ -88,23 +88,23 @@
                         </td>
                         <td>
                             <a href="{{{ $router->html('{$controller.item.name.lower$}', array('id' => $item->id)) }}}">
-                                {{{ $item->title }}}
+                                {{ $item->title }}
                             </a>
                         </td>
                         <td>
                             {{ $grid->orderButton() }}
                         </td>
                         <td>
-                            {{{ $item->created_by }}}
+                            {{ $item->created_by }}
                         </td>
                         <td>
-                            {{{ Windwalker\Core\DateTime\DateTime::toLocalTime($item->created) }}}
+                            {{ Windwalker\Core\DateTime\DateTime::toLocalTime($item->created) }}
                         </td>
                         <td>
-                            {{{ $item->language }}}
+                            {{ $item->language }}
                         </td>
                         <td>
-                            {{{ $item->id }}}
+                            {{ $item->id }}
                         </td>
                     </tr>
                 @endforeach
@@ -113,7 +113,7 @@
                 <tfoot>
                 <tr>
                     <td colspan="25">
-                        {{ $pagination->render($package->getName() . ':{$controller.list.name.lower$}', 'windwalker.pagination.phoenix') }}
+                        {!! $pagination->render($package->getName() . ':{$controller.list.name.lower$}', 'windwalker.pagination.phoenix') !!}
                     </td>
                 </tr>
                 </tfoot>
@@ -122,7 +122,7 @@
 
         <div class="hidden-inputs">
             <input type="hidden" name="_method" value="PUT" />
-            {{ \Windwalker\Core\Security\CsrfProtection::input() }}
+            {!! \Windwalker\Core\Security\CsrfProtection::input() !!}
         </div>
 
         @include('batch')

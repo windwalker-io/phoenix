@@ -32,7 +32,7 @@
                         {!! \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) !!}
                     @show
 
-                    @yield('body', 'Body')
+                    @yield('admin-body', 'Body')
                 </div>
             @show
         </div>

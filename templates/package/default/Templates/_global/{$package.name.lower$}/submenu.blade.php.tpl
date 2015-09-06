@@ -10,9 +10,11 @@
         </a>
     </li>
 
-    @foreach ($helper->menu->getSubmenus() as $menu)
-        <li class="{{ $helper->menu->active('{$controller.list.name.lower$}') }}">
-            {{ $menu }}
-        </li>
-    @endforeach
+    <li class="{{ $helper->menu->active('{$controller.list.name.lower$}') }}">
+        <a href="{{ $router->html('{$controller.list.name.lower$}') }}">
+            @translate('{$package.name.lower$}.title.{$controller.list.name.lower$}')
+        </a>
+    </li>
+
+    {{-- @muse-placeholder  submenu  Do not remove this line --}}
 </ul>

@@ -4,10 +4,11 @@
 </h3>
 
 <div class="search-container form-inline">
-    {{ $form->getField('field', 'search')->appendAttribute('class', ' form-control')->renderInput() }}
+    {!! $form->getField('field', 'search')->appendAttribute('class', ' sr-only')->renderLabel() !!}
+    {!! $form->getField('field', 'search')->appendAttribute('class', ' form-control')->renderInput() !!}
 
     <div class="input-group">
-        {{ $form->getField('content', 'search')->appendAttribute('class', ' form-control')->renderInput() }}
+        {!! $form->getField('content', 'search')->appendAttribute('class', ' form-control')->renderInput() !!}
         <span class="input-group-btn">
             <button class="btn btn-default hasTooltip" type="submit"
                 title="@translate('phoenix.grid.search.button.desc')">
@@ -43,8 +44,8 @@
         </div>
     @else
     <div class="form-group col-sm-4 col-md-3">
-        {{ $field->appendAttribute('labelClass', 'hide')->renderLabel() }}
-        {{ $field->appendAttribute('class', 'form-control')->renderInput() }}
+        {!! $field->appendAttribute('labelClass', 'hide')->renderLabel() !!}
+        {!! $field->appendAttribute('class', 'form-control')->renderInput() !!}
     </div>
     @endif
 @endforeach

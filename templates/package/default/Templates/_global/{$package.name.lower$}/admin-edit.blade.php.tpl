@@ -6,9 +6,9 @@
     <div class="col-md-12">
 
         @section('message')
-            {{ \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) }}
+            {!! \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) !!}
         @show
 
-        @yield('body', 'Body')
+        @yield('admin-body', 'Body')
     </div>
 @stop
