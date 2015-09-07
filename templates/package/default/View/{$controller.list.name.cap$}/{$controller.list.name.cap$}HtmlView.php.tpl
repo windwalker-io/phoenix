@@ -9,8 +9,6 @@
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
 use Phoenix\Script\BootstrapScript;
-use Phoenix\Script\CoreScript;
-use Phoenix\Script\JQueryScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
 
@@ -22,11 +20,38 @@ use Phoenix\View\GridView;
 class {$controller.list.name.cap$}HtmlView extends GridView
 {
 	/**
-	 * Property orderField.
+	 * Property name.
 	 *
 	 * @var  string
 	 */
-	protected $orderColumn = '{$controller.item.name.lower$}.ordering';
+	protected $name = '{$controller.list.name.lower$}';
+
+	/**
+	 * The fields mapper.
+	 *
+	 * @var  array
+	 */
+	protected $fields = array(
+		'pk'          => 'id',
+		'title'       => 'title',
+		'alias'       => 'alias',
+		'state'       => 'state',
+		'ordering'    => 'ordering',
+		'author'      => 'created_by',
+		'author_name' => 'user_name',
+		'created'     => 'created',
+		'language'    => 'language',
+		'lang_title'  => 'lang_title'
+	);
+
+	/**
+	 * The grid config.
+	 *
+	 * @var  array
+	 */
+	protected $gridConfig = array(
+		'order_column' => '{$controller.item.name.lower$}.ordering'
+	);
 
 	/**
 	 * prepareData
@@ -47,13 +72,23 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	 */
 	protected function prepareScripts()
 	{
-		BootstrapScript::css();
-		BootstrapScript::script();
 		PhoenixScript::core();
 		PhoenixScript::grid();
-		PhoenixScript::multiSelect('#admin-form table', array('duration' => 100));
 		PhoenixScript::chosen();
+		PhoenixScript::multiSelect('#admin-form table', array('duration' => 100));
 		BootstrapScript::checkbox();
 		BootstrapScript::tooltip();
+	}
+
+	/**
+	 * setTitle
+	 *
+	 * @param string $title
+	 *
+	 * @return  static
+	 */
+	public function setTitle($title = null)
+	{
+		return parent::setTitle($title);
 	}
 }

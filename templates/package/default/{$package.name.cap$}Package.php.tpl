@@ -13,17 +13,23 @@ use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Language\TranslatorHelper;
 use Phoenix\Record\RecordResolver;
 use Phoenix\Script\BootstrapScript;
+use Symfony\Component\Yaml\Yaml;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Event\Dispatcher;
+use Windwalker\Filesystem\File;
+use Windwalker\Filesystem\Folder;
 use Windwalker\Form\FieldHelper;
 use Windwalker\Form\ValidatorHelper;
 
-define('{$package.name.upper$}_ROOT', __DIR__);
+if (!defined('{$package.name.upper$}_ROOT'))
+{
+	define('{$package.name.upper$}_ROOT', __DIR__);
+}
 
 /**
  * The {$package.name.cap$}Package class.
- * 
+ *
  * @since  {DEPLOY_VERSION}
  */
 class {$package.name.cap$}Package extends AbstractPackage
@@ -43,6 +49,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 
 		// Assets
 		BootstrapScript::css();
+		BootstrapScript::script();
 		Asset::addStyle('{$package.name.lower$}/css/{$package.name.lower$}.css');
 
 		// Language
@@ -65,7 +72,8 @@ class {$package.name.cap$}Package extends AbstractPackage
 				DebuggerHelper::addCustomData('Language Orphans', '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
 			}
 
-			TranslatorHelper::dumpOrphans('ini');
+			// Un comment this line, Translator will export all orphans to /cache/language
+			// TranslatorHelper::dumpOrphans('ini');
 		}
 
 		return $result;
@@ -81,5 +89,30 @@ class {$package.name.cap$}Package extends AbstractPackage
 	public function registerListeners(Dispatcher $dispatcher)
 	{
 		parent::registerListeners($dispatcher);
+	}
+
+	/**
+	 * loadRouting
+	 *
+	 * @return  mixed
+	 */
+	public function loadRouting()
+	{
+		$files = Folder::files(__DIR__ . '/Resources/routing');
+		$routes = array();
+
+		foreach ($files as $file)
+		{
+			$ext = File::getExtension($file);
+
+			if ($ext != 'yml')
+			{
+				continue;
+			}
+
+			$routes = array_merge($routes, Yaml::parse(file_get_contents($file)));
+		}
+
+		return $routes;
 	}
 }

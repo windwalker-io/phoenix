@@ -8,12 +8,9 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
-use {$package.namespace$}{$package.name.cap$}\Mapper\{$controller.item.name.cap$}Mapper;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Phoenix\Model\ListModel;
 use Phoenix\Model\Filter\FilterHelperInterface;
-use Windwalker\Core\Model\DatabaseModel;
-use Windwalker\Data\DataSet;
 use Windwalker\Query\Query;
 
 /**
@@ -24,11 +21,25 @@ use Windwalker\Query\Query;
 class {$controller.list.name.cap$}Model extends ListModel
 {
 	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = '{$controller.list.name.lower$}';
+
+	/**
 	 * Property allowFields.
 	 *
 	 * @var  array
 	 */
 	protected $allowFields = array();
+
+	/**
+	 * Property fieldMapping.
+	 *
+	 * @var  array
+	 */
+	protected $fieldMapping = array();
 
 	/**
 	 * configureTables
@@ -41,14 +52,72 @@ class {$controller.list.name.cap$}Model extends ListModel
 	}
 
 	/**
-	 * configureFilters
+	 * The prepare getQuery hook
 	 *
-	 * @param FilterHelperInterface $filterHelper
+	 * @param Query $query The db query object.
+	 *
+	 * @return  void
+	 */
+	protected function prepareGetQuery(Query $query)
+	{
+		// Add your logic
+	}
+
+	/**
+	 * The post getQuery object.
+	 *
+	 * @param Query $query The db query object.
+	 *
+	 * @return  void
+	 */
+	protected function postGetQuery(Query $query)
+	{
+		// Add your logic
+	}
+
+	/**
+	 * Configure the filter handlers.
+	 *
+	 * Example:
+	 * ``` php
+	 * $filterHelper->setHandler(
+	 *     '{$controller.item.name.lower$}.date',
+	 *     function($query, $field, $value)
+	 *     {
+	 *         $query->where($field . ' >= ' . $value);
+	 *     }
+	 * );
+	 * ```
+	 *
+	 * @param FilterHelperInterface $filterHelper The filter helper object.
 	 *
 	 * @return  void
 	 */
 	protected function configureFilters(FilterHelperInterface $filterHelper)
 	{
-		//
+		// Configure filters
+	}
+
+	/**
+	 * Configure the search handlers.
+	 *
+	 * Example:
+	 * ``` php
+	 * $searchHelper->setHandler(
+	 *     '{$controller.item.name.lower$}.title',
+	 *     function($query, $field, $value)
+	 *     {
+	 *         return $query->quoteName($field) . ' LIKE ' . $query->quote('%' . $value . '%');
+	 *     }
+	 * );
+	 * ```
+	 *
+	 * @param FilterHelperInterface $searchHelper The search helper object.
+	 *
+	 * @return  void
+	 */
+	protected function configureSearches(FilterHelperInterface $searchHelper)
+	{
+		// Configure searches
 	}
 }

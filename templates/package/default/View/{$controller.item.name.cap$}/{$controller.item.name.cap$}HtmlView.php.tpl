@@ -8,7 +8,6 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
 
-use Phoenix\Html\Document;
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\EditView;
@@ -20,6 +19,13 @@ use Phoenix\View\EditView;
  */
 class {$controller.item.name.cap$}HtmlView extends EditView
 {
+	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = '{$controller.item.name.lower$}';
+
 	/**
 	 * prepareData
 	 *
@@ -39,11 +45,23 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	 */
 	protected function prepareScripts()
 	{
-		PhoenixScript::chosen();
 		PhoenixScript::core();
-		// PhoenixScript::formValidation();
+		PhoenixScript::chosen();
+		PhoenixScript::formValidation();
 		BootstrapScript::checkbox();
 		BootstrapScript::buttonRadio();
 		BootstrapScript::tooltip();
+	}
+
+	/**
+	 * setTitle
+	 *
+	 * @param string $title
+	 *
+	 * @return  static
+	 */
+	public function setTitle($title = null)
+	{
+		return parent::setTitle($title);
 	}
 }

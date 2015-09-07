@@ -45,11 +45,11 @@ class ControllerResolver extends \Windwalker\Core\Controller\ControllerResolver
 				$package = PackageHelper::getPackage($package);
 			}
 
-			$class = sprintf('%s\Controller\$s\%sController', ReflectionHelper::getNamespaceName($package), ucfirst($name), $controller);
+			$class = sprintf('%s\Controller\%s\%sController', ReflectionHelper::getNamespaceName($package), ucfirst($name), $controller);
 
 			if (!class_exists($class))
 			{
-				$class = sprintf('Phoenix\Controller\%sController', $controller);
+				// $class = sprintf('Phoenix\Controller\%sController', $controller);
 			}
 
 			if (!class_exists($class))

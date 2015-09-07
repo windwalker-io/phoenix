@@ -11,6 +11,7 @@ namespace Phoenix\Model;
 use Windwalker\Core\Authentication\User;
 use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Data\Data;
+use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Filter\OutputFilter;
 use Windwalker\Record\Record;
 
@@ -295,27 +296,5 @@ abstract class AdminModel extends CrudModel
 				$record->$orderField = $max + 1;
 			}
 		}
-	}
-
-	/**
-	 * getMaxOrdering
-	 *
-	 * @param array $conditions
-	 *
-	 * @return  int
-	 */
-	public function getMaxOrdering($conditions = array())
-	{
-		$query = $this->db->getQuery(true)
-			->select(sprintf('MAX(%s)', 'ordering'))
-			->from($this->getDefaultTable());
-
-		// Condition should be an array.
-		if (count($conditions))
-		{
-			QueryHelper::buildWheres($query, $conditions);
-		}
-
-		return $this->db->setQuery($query)->loadResult();
 	}
 }

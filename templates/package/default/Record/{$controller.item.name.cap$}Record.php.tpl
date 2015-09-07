@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\Record;
 
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
+use Windwalker\Event\Event;
 use Windwalker\Record\Record;
 
 /**
@@ -24,4 +25,40 @@ class {$controller.item.name.cap$}Record extends Record
 	 * @var  string
 	 */
 	protected $table = Table::{$controller.list.name.upper$};
+
+	/**
+	 * onAfterLoad
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onAfterLoad(Event $event)
+	{
+		// Add your logic
+	}
+
+	/**
+	 * onAfterStore
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onAfterStore(Event $event)
+	{
+		// Add your logic
+	}
+
+	/**
+	 * onAfterDelete
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onAfterDelete(Event $event)
+	{
+		// Add your logic
+	}
 }

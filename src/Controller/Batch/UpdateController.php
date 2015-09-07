@@ -13,7 +13,7 @@ namespace Phoenix\Controller\Batch;
  *
  * @since  {DEPLOY_VERSION}
  */
-class MoveController extends BatchController
+class UpdateController extends BatchController
 {
 	/**
 	 * Property action.

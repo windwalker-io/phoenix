@@ -25,6 +25,31 @@ use Windwalker\Ioc;
 class GridView extends ListView
 {
 	/**
+	 * The fields mapper.
+	 *
+	 * @var  array
+	 */
+	protected $fields = array(
+		'pk'          => 'id',
+		'title'       => 'title',
+		'alias'       => 'alias',
+		'state'       => 'state',
+		'ordering'    => 'ordering',
+		'author'      => 'created_by',
+		'author_name' => 'user_name',
+		'created'     => 'created',
+		'language'    => 'language',
+		'lang_title'  => 'lang_title'
+	);
+
+	/**
+	 * The grid config.
+	 *
+	 * @var  array
+	 */
+	protected $gridConfig = array();
+
+	/**
 	 * Property gridHelper.
 	 *
 	 * @var  GridHelper
@@ -109,13 +134,28 @@ class GridView extends ListView
 	{
 		if (!$this->gridHelper)
 		{
-			$defaultOptions = array(
-				'order_column' => $this->orderColumn
-			);
+			$config['field'] = !empty($config['field']) ? $config['field'] : $this->configureFields();
 
-			$this->gridHelper = new GridHelper($this, array_merge($defaultOptions, $options));
+			$this->gridHelper = new GridHelper($this, array_merge($this->gridConfig, $options));
 		}
 
 		return $this->gridHelper;
+	}
+
+	/**
+	 * configureFields
+	 *
+	 * @param array $fields
+	 *
+	 * @return  array
+	 */
+	protected function configureFields($fields = null)
+	{
+		if ($fields && is_array($fields))
+		{
+			$this->fields = array_merge($this->fields, $fields);
+		}
+
+		return $this->fields;
 	}
 }

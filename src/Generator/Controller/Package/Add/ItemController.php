@@ -44,7 +44,6 @@ class ItemController extends AbstractPackageController
 		$this->doAction(new Subsystem\CopyItemAction);
 
 		// Some dirty things handling
-		$this->doAction(new AddRoutingAction);
 		$this->doAction(new AddTableNameAction);
 		$this->doAction(new CopyMigrationAction);
 		$this->doAction(new AddSeederAction);

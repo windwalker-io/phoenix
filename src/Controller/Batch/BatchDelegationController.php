@@ -33,7 +33,7 @@ class BatchDelegationController extends AbstractPhoenixController
 	 */
 	protected function doExecute()
 	{
-		$task = $this->input->get('task', 'Move');
+		$task = $this->input->get('task', 'Update');
 
 		if (!$task)
 		{

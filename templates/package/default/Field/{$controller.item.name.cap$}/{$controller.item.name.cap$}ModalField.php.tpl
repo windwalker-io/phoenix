@@ -8,6 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$};
 
+use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Phoenix\Field\ModalField;
 
 /**
@@ -22,7 +23,7 @@ class {$controller.item.name.cap$}ModalField extends ModalField
 	 *
 	 * @var  string
 	 */
-	protected $table = '{$controller.list.name.lower$}';
+	protected $table = Table::{$controller.list.name.upper$};
 
 	/**
 	 * Property view.

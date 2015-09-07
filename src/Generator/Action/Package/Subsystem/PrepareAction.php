@@ -37,6 +37,7 @@ class PrepareAction extends AbstractAction
 			'DataMapper',
 			'Field',
 			'Resources/languages',
+			'Resources/routing',
 			'Record',
 			'Seed'
 		);

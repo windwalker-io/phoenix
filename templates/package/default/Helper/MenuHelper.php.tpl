@@ -49,6 +49,11 @@ class MenuHelper extends AbstractHelper
 		return null;
 	}
 
+	/**
+	 * getSubmenus
+	 *
+	 * @return  array
+	 */
 	public function getSubmenus()
 	{
 		$menus = $this->findViewMenus(static::PLURAL);

@@ -11,10 +11,8 @@ namespace {$package.namespace$}{$package.name.cap$}\Form\{$controller.item.name.
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ListField;
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ModalField;
 use Phoenix\Field\CalendarField;
-use Phoenix\Field\ModalField;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Form\Field\HiddenField;
-use Windwalker\Form\Field\ListField;
 use Windwalker\Form\Field\RadioField;
 use Windwalker\Form\Field\TextareaField;
 use Windwalker\Form\Field\TextField;
@@ -39,6 +37,7 @@ class EditDefinition implements FieldDefinitionInterface
 	 */
 	public function define(Form $form)
 	{
+		// Basic fieldset
 		$form->wrap('basic', null, function(Form $form)
 		{
 			$form->add('id', new HiddenField);
@@ -65,6 +64,7 @@ class EditDefinition implements FieldDefinitionInterface
 				->label('Modal Example');
 		});
 
+		// Text Fieldset
 		$form->wrap('text', null, function(Form $form)
 		{
 			$form->add('introtext', new TextareaField)
@@ -76,6 +76,7 @@ class EditDefinition implements FieldDefinitionInterface
 				->set('rows', 10);
 		});
 
+		// Created fieldset
 		$form->wrap('created', null, function(Form $form)
 		{
 			$form->add('state', new RadioField)

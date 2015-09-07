@@ -16,6 +16,8 @@ use Windwalker\String\StringHelper;
  * The AddRoutingAction class.
  *
  * @since  {DEPLOY_VERSION}
+ *
+ * @deprecated  No longer used.
  */
 class AddRoutingAction extends AbstractAction
 {

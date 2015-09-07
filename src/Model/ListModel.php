@@ -372,10 +372,18 @@ class ListModel extends FormModel
 			}
 
 			// Otherwise fall back to inefficient way of counting all results.
-			$this->db->setQuery($query);
-			$this->db->execute();
+			$subQuery = clone $query;
 
-			return (int) $this->db->getReader()->countAffected();
+			$subQuery->clear('select')->clear('order')->select('COUNT(*) AS ' . $query->quoteName('count'));
+
+			$query = $this->db->getQuery(true);
+
+			$query->select($query->format('SUM(%n)', 'count'))
+				->from($subQuery, 'c');
+
+			$this->db->setQuery($query);
+
+			return (int) $this->db->loadResult();
 		});
 	}
 

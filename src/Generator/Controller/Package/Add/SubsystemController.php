@@ -47,7 +47,6 @@ class SubsystemController extends AbstractPackageController
 
 		// Some dirty things handling
 		$this->doAction(new AddSubmenuAction);
-		$this->doAction(new AddRoutingAction);
 		$this->doAction(new AddTableNameAction);
 		$this->doAction(new CopyMigrationAction);
 		$this->doAction(new AddSeederAction);
