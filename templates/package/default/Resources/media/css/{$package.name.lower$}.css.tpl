@@ -68,6 +68,11 @@ body {
     position: relative;
     box-shadow: none;
   }
+  #batch-modal .modal-footer .btn {
+    width: 100%;
+    margin-bottom: 5px;
+    margin-left: 0;
+  }
 }
 .search-container {
   margin-bottom: 15px;
@@ -108,11 +113,20 @@ body {
     clear: both;
   }
 }
+@media (max-width: 1000px) {
+  #phoenix-iframe-modal .modal-dialog {
+    min-width: 90%;
+  }
+  #phoenix-iframe-modal .modal-body iframe {
+    height: 400px;
+  }
+}
 .btn-group .btn {
   margin-left: -1px;
 }
 .chosen-container {
   cursor: pointer;
+  max-width: 100%;
 }
 .chosen-container-multi .chosen-choices .search-choice {
   background: #eee;

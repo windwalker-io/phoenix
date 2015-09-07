@@ -35,6 +35,17 @@ if (!defined('{$package.name.upper$}_ROOT'))
 class {$package.name.cap$}Package extends AbstractPackage
 {
 	/**
+	 * initialise
+	 *
+	 * @throws  \LogicException
+	 * @return  void
+	 */
+	public function initialise()
+	{
+		parent::initialise();
+	}
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void

@@ -10,10 +10,12 @@
 <div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
     <form name="admin-form" id="admin-form" action="{{ $router->html('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
 
+        {{-- FILTER BAR --}}
         <div class="filter-bar">
             {!! $filterBar->render(array('form' => $filterForm, 'show' => $showFilterBar)) !!}
         </div>
 
+        {{-- RESPONSIVE TABLE DESC --}}
         <p class="visible-xs-block">
             @translate('phoenix.grid.responsive.table.desc')
         </p>
@@ -70,9 +72,12 @@
                     $grid->setItem($item, $i);
                     ?>
                     <tr>
+                        {{-- CHECKBOX --}}
                         <td>
                             {!! $grid->checkbox() !!}
                         </td>
+
+                        {{-- STATE --}}
                         <td>
                             <span class="btn-group">
                                 {!! $grid->state($item->state) !!}
@@ -86,23 +91,35 @@
                                 </button>
                             </span>
                         </td>
+
+                        {{-- TITLE --}}
                         <td>
                             <a href="{{{ $router->html('{$controller.item.name.lower$}', array('id' => $item->id)) }}}">
                                 {{ $item->title }}
                             </a>
                         </td>
+
+                        {{-- ORDERING --}}
                         <td>
                             {!! $grid->orderButton() !!}
                         </td>
+
+                        {{-- AUTHOR --}}
                         <td>
                             {{ $item->created_by }}
                         </td>
+
+                        {{-- CREATED --}}
                         <td>
                             {{ Windwalker\Core\DateTime\DateTime::toLocalTime($item->created) }}
                         </td>
+
+                        {{-- LANGUAGE --}}
                         <td>
                             {{ $item->language }}
                         </td>
+
+                        {{-- ID --}}
                         <td>
                             {{ $item->id }}
                         </td>
@@ -112,6 +129,7 @@
 
                 <tfoot>
                 <tr>
+                    {{-- PAGINATION --}}
                     <td colspan="25">
                         {!! $pagination->render($package->getName() . ':{$controller.list.name.lower$}', 'windwalker.pagination.phoenix') !!}
                     </td>
@@ -121,7 +139,10 @@
         </div>
 
         <div class="hidden-inputs">
+            {{-- METHOD --}}
             <input type="hidden" name="_method" value="PUT" />
+
+            {{-- TOKEN --}}
             {!! \Windwalker\Core\Security\CsrfProtection::input() !!}
         </div>
 

@@ -31,7 +31,12 @@ class FilterDefinition implements FieldDefinitionInterface
 	 */
 	public function define(Form $form)
 	{
-		// Search
+		/*
+		 * Search Control
+		 * -------------------------------------------------
+		 * Add search fields as options, by default, model will search all columns.
+		 * If you hop that user can choose a field to search, change "display" to true.
+		 */
 		$form->wrap(null, 'search', function (Form $form)
 		{
 			// Search Field
@@ -49,7 +54,14 @@ class FilterDefinition implements FieldDefinitionInterface
 				->set('placeholder', Translator::translate('phoenix.grid.search.label'));
 		});
 
-		// Filter
+		/*
+		 * Filter Control
+		 * -------------------------------------------------
+		 * Add filter fields to this section.
+		 * Remember to add onchange event => this.form.submit(); or Phoenix.post();
+		 *
+		 * You can override filter actions in {$controller.list.name.cap$}Model::configureFilters()
+		 */
 		$form->wrap(null, 'filter', function(Form $form)
 		{
 			// State
