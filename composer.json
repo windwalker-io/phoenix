@@ -1,13 +1,25 @@
 {
-    "name": "asika/windwalker-phoenix",
+    "name": "windwalker/phoenix",
+    "description": "A powerful RAD framework to support Rapid Application Development.",
+    "homepage": "https://github.com/ventoviro/phoenix",
+    "license": "LGPL-2.0+",
+    "minimum-stability": "beta",
     "require": {
         "illuminate/view": ">=4.0 <6.0",
         "asika/muse": "~1.0",
         "mrclay/minify": "~2.0"
     },
+    "require-dev": {
+
+    },
     "autoload": {
         "psr-4": {
             "Phoenix\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
         }
     }
 }
