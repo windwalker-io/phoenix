@@ -1,2 +1,3 @@
-# windwalker-phenix
+# Phoenix RAD package
+
 Phenix
