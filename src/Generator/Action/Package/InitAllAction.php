@@ -3,22 +3,21 @@
  * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
- * @license    GNU General Public License version 2 or later;
+ * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\Generator\Action\Package\Subsystem;
+namespace Phoenix\Generator\Action\Package;
 
-use Phoenix\Generator\Action;
 use Phoenix\Generator\Action\AbstractAction;
 use Phoenix\Generator\FileOperator\CopyOperator;
 use Windwalker\String\StringHelper;
 
 /**
- * The PrepareAction class.
+ * The InitAllAction class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class PrepareAction extends AbstractAction
+class InitAllAction extends AbstractAction
 {
 	/**
 	 * Do this execute.
@@ -32,18 +31,28 @@ class PrepareAction extends AbstractAction
 
 		$src  = $this->config['dir.src'];
 		$dest = $this->config['dir.dest'];
+		$item = StringHelper::quote('controller.item.name.cap', $this->config['tagVariables']);
 
 		$files = array(
+			'Controller',
 			'DataMapper',
 			'Field',
-			'Resources/language',
-			'Resources/routing',
+			'Form',
+			'Helper',
+			'Model',
 			'Record',
-			'Seed'
+			'Resources',
+			'Seed',
+			'Table',
+			'Templates',
+			'View',
+			''
 		);
 
 		foreach ($files as $file)
 		{
+			$file = sprintf($file, $item);
+
 			if (!file_exists($src . '/' . $file))
 			{
 				continue;

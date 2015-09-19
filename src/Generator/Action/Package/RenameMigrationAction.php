@@ -40,6 +40,22 @@ class RenameMigrationAction extends AbstractAction
 
 		$file = false;
 
+		// If last migration with same name exists, delete duplicated migration.
+		foreach ($files as $file)
+		{
+			$fileName = pathinfo($file, PATHINFO_BASENAME);
+
+			if (strpos($file, $migName . '.php') !== false && $fileName != '19700101010000_' . $migName . '.php')
+			{
+				if (is_file($dest . '/Migration/' . '19700101010000_' . $migName . '.php'))
+				{
+					File::delete($dest . '/Migration/' . '19700101010000_' . $migName . '.php');
+				}
+
+				return;
+			}
+		}
+
 		foreach ($files as $file)
 		{
 			if (strpos($file, $migName . '.php') !== false)
