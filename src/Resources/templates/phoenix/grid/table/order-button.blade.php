@@ -1,4 +1,4 @@
-{{-- Part of phoenix project. --}}
+{{-- Part of Phoenix project. --}}
 
 @if ($saveOrder)
 <div class="input-group ordering-control">

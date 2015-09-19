@@ -1,4 +1,4 @@
-{{-- Part of phoenix project. --}}
+{{-- Part of Phoenix project. --}}
 
 @if (!empty($options['only_icon']))
     <span class="glyphicon glyphicon-{{ isset($iconMapping[$value]) ? $iconMapping[$value] : null }}" title="@translate(isset($options['titleMapping'][$value]) ? $options['titleMapping'][$value] : null)"></span>

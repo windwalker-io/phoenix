@@ -1,4 +1,4 @@
-{{-- Part of phoenix project. --}}
+{{-- Part of Phoenix project. --}}
 
 <div class="checkbox checkbox-primary single-checkbox">
     <input id="grid-checkboxes-toggle" type="checkbox" class="grid-check-all"

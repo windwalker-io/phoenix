@@ -1,8 +1,8 @@
 <?php
 /**
- * Part of asukademy project. 
+ * Part of Phoenix project.
  *
- * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2015 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later;
  */
 
@@ -27,7 +27,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  AssetManager  setIndents()              setIndents(string $indents)
  * @method  static  string        getIndents()              getIndents()
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.0
  */
 abstract class Asset extends AbstractProxyFacade
 {

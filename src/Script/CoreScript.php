@@ -1,8 +1,8 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of Phoenix project.
  *
- * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2015 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -14,7 +14,7 @@ namespace Phoenix\Script;
  * @see  \Phoenix\Script\ScriptManager
  * @see  \Phoenix\Script\Module\ModuleManager
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.0
  */
 abstract class CoreScript extends ScriptManager
 {

@@ -1,4 +1,4 @@
-{{-- Part of phoenix project. --}}
+{{-- Part of Phoenix project. --}}
 
 <?php
 \Phoenix\Script\BootstrapScript::modal();

@@ -1,4 +1,4 @@
-{{-- Part of phoenix project. --}}
+{{-- Part of Phoenix project. --}}
 
 <div class="modal fade" id="phoenix-iframe-modal">
     <div class="modal-dialog">

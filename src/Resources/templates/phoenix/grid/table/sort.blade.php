@@ -1,4 +1,4 @@
-{{-- Part of phoenix project. --}}
+{{-- Part of Phoenix project. --}}
 
 {{-- If is DESC, we prepare ASC --}}
 @if ($direction == 'DESC')

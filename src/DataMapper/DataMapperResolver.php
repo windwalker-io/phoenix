@@ -1,8 +1,8 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of Phoenix project.
  *
- * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2015 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -17,7 +17,7 @@ use Windwalker\DataMapper\DataMapper;
  * @method  static  DataMapper  create($name, $args = array())
  * @method  static  DataMapper  getInstance($name, $args = array(), $forceNew = false)
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.0
  */
 abstract class DataMapperResolver extends AbstractPackageObjectResolver
 {
