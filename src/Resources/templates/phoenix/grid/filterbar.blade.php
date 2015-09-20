@@ -19,7 +19,7 @@
         <span class="input-group-btn">
             <button class="btn btn-default hasTooltip" type="submit"
                 title="@translate('phoenix.grid.search.button.desc')">
-                <span class="glyphicon glyphicon-search"></span>
+                <span class="glyphicon glyphicon-search fa fa-search"></span>
             </button>
         </span>
     </div>
@@ -27,11 +27,11 @@
         <button type="button" class="btn btn-default filter-toggle-button hasTooltip {{ $show ? 'btn-primary' : null }}"
             title="@translate('phoenix.grid.filter.button.desc')">
             @translate('phoenix.grid.filter.button.text')
-            <span class="glyphicon glyphicon-menu-{{ $show ? 'up' : 'down' }}"></span>
+            <span class="glyphicon glyphicon-menu-{{ $show ? 'up' : 'down' }} fa fa-angle-{{ $show ? 'up' : 'down' }}"></span>
         </button>
         <button type="button" class="btn btn-default search-clear-button hasTooltip"
             title="@translate('phoenix.grid.clear.button.desc')">
-            <span class="glyphicon glyphicon-remove"></span>
+            <span class="glyphicon glyphicon-remove fa fa-remove"></span>
         </button>
     </div>
 </div>

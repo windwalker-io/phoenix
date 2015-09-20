@@ -300,7 +300,7 @@ HTML;
 		$defaultAttribs['class']  = 'text-muted muted';
 		$defaultAttribs['target'] = '_blank';
 
-		$options['icon'] = isset($options['icon']) ? $options['icon'] : 'icon-out-2 glyphicon glyphicon-share fa fa-share-square-o';
+		$options['icon'] = isset($options['icon']) ? $options['icon'] : 'icon-out-2 glyphicon glyphicon-share fa fa-external-link';
 
 		$title = $title . ' <small class="' . $options['icon'] . '"></small>';
 
@@ -355,9 +355,9 @@ HTML;
 	public function state($value, $options = array())
 	{
 		$iconMapping = array(
-			-1 => 'trash',
-			0 => 'remove text-danger',
-			1 => 'ok text-success'
+			-1 => 'trash fa fa-trash',
+			0 => 'remove fa fa-remove text-danger',
+			1 => 'ok fa fa-check text-success'
 		);
 
 		$taskMapping = array(

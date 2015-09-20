@@ -18,6 +18,9 @@ namespace Phoenix\Script;
  */
 class BootstrapScript extends ScriptManager
 {
+	const GLYPHICONS = 'glyphicons';
+	const FONTAWESOME = 'fontawesome';
+
 	/**
 	 * css
 	 *
@@ -84,9 +87,9 @@ JS;
 	/**
 	 * checkbox
 	 *
-	 * @return  void
+	 * @param string $iconSet
 	 */
-	public static function checkbox()
+	public static function checkbox($iconSet = self::GLYPHICONS)
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -96,11 +99,14 @@ JS;
 
 			$asset->addStyle(static::phoenixName() . '/css/bootstrap/awesome-checkbox.min.css');
 
+			$font = $iconSet == static::GLYPHICONS ? 'Glyphicons Halflings' : 'FontAwesome';
+			$content = $iconSet == static::GLYPHICONS ? '\\e013' : '\\f00c';
+
 			$css = <<<CSS
 /* Bootstrap Awesome Checkbox */
 .checkbox input[type=checkbox]:checked + label:after {
-  font-family: 'Glyphicons Halflings';
-  content: "\\e013";
+  font-family: '$font';
+  content: "$content";
 }
 .checkbox label:after {
   padding-left: 4px;

@@ -83,11 +83,11 @@
                                 {!! $grid->state($item->state) !!}
                                 <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
                                     title="@translate('phoenix.toolbar.duplicate')">
-                                    <span class="glyphicon glyphicon-duplicate text-info"></span>
+                                    <span class="glyphicon glyphicon-duplicate fa fa-copy text-info"></span>
                                 </button>
                                 <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
                                     title="@translate('phoenix.toolbar.delete')">
-                                    <span class="glyphicon glyphicon-trash"></span>
+                                    <span class="glyphicon glyphicon-trash fa fa-trash"></span>
                                 </button>
                             </span>
                         </td>

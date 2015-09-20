@@ -18,7 +18,7 @@
     @yield('script')
 
 </head>
-<body>
+<body class="{{ $package->getName() }}-admin-body phoenix-admin view-{{ $view->name }} layout-{{ $view->layout }}">
 @section ('superbody')
     @section('navbar')
         <div class="navbar navbar-default navbar-fixed-top">

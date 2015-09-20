@@ -50,7 +50,7 @@ class CalendarField extends TextField
 <div id="$id-wrapper" class="input-group date">
 $input
 <span class="input-group-addon">
-	<span class="glyphicon glyphicon-calendar"></span>
+	<span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
 </span>
 </div>
 HTML;

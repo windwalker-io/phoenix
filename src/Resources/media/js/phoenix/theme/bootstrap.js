@@ -36,17 +36,17 @@ var Phoenix;
                 {
                     case validation.STATE_SUCCESS:
                         color = 'success';
-                        icon  = 'ok';
+                        icon  = 'ok fa fa-check';
                         break;
 
                     case validation.STATE_EMPTY:
                         color = 'error';
-                        icon  = 'remove';
+                        icon  = 'remove fa fa-remove';
                         break;
 
                     case validation.STATE_FAIL:
                         color = 'warning';
-                        icon  = 'warning-sign';
+                        icon  = 'warning-sign fa fa-warning';
                         break;
                 }
 
@@ -147,7 +147,7 @@ var Phoenix;
                 container.hide('fast');
                 container.removeClass('shown');
 
-                button.find('span.glyphicon').removeClass('glyphicon-menu-up').addClass('glyphicon-menu-down');
+                button.find('span.glyphicon').removeClass('glyphicon-menu-up fa fa-angle-up').addClass('glyphicon-menu-down fa fa-angle-down');
             }
             else
             {
@@ -155,7 +155,7 @@ var Phoenix;
                 container.show('fast');
                 container.addClass('shown');
 
-                button.find('span.glyphicon').removeClass('glyphicon-menu-down').addClass('glyphicon-menu-up');
+                button.find('span.glyphicon').removeClass('glyphicon-menu-down fa fa-angle-down').addClass('glyphicon-menu-up fa fa-angle-up');
             }
         }
     };

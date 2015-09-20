@@ -48,7 +48,7 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 		PhoenixScript::core();
 		PhoenixScript::chosen();
 		PhoenixScript::formValidation();
-		BootstrapScript::checkbox();
+		BootstrapScript::checkbox(BootstrapScript::GLYPHICONS);
 		BootstrapScript::buttonRadio();
 		BootstrapScript::tooltip();
 	}

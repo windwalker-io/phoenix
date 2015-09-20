@@ -7,7 +7,7 @@
         @translate($label)
 
         @if ($field == $ordering)
-            <small class="glyphicon glyphicon-triangle-bottom"></small>
+            <small class="glyphicon glyphicon-triangle-bottom fa fa-caret-down"></small>
         @endif
     </a>
 {{-- If is ACS, we prepare DESC --}}
@@ -17,7 +17,7 @@
         @translate($label)
 
         @if ($field == $ordering)
-            <small class="glyphicon glyphicon-triangle-top"></small>
+            <small class="glyphicon glyphicon-triangle-top fa fa-caret-up"></small>
         @endif
     </a>
 @endif
