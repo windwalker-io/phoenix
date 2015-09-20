@@ -9,6 +9,7 @@
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ $uri['media.path'] }}images/favicon.ico" />
     <meta name="generator" content="Windwalker Framework" />
+    {!! \Phoenix\Html\Document::renderMetadata() !!}
     @yield('meta')
 
     {!! \Phoenix\Asset\Asset::renderStyles(true) !!}
@@ -16,7 +17,7 @@
 
     {!! \Phoenix\Asset\Asset::renderScripts(true) !!}
     @yield('script')
-
+    {!! \Phoenix\Html\Document::renderCustomTags() !!}
 </head>
 <body class="{{ $package->getName() }}-admin-body phoenix-admin view-{{ $view->name }} layout-{{ $view->layout }}">
 @section ('superbody')

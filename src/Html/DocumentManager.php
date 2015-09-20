@@ -53,6 +53,13 @@ class DocumentManager
 	protected $customTags = array();
 
 	/**
+	 * Property indents.
+	 *
+	 * @var  string
+	 */
+	protected $indents = '    ';
+
+	/**
 	 * Method to get property Title
 	 *
 	 * @param string $separator
@@ -271,7 +278,7 @@ class DocumentManager
 			$html[] = (string) $metadata;
 		}
 
-		return implode("\n", $html);
+		return implode("\n" . $this->indents, $html);
 	}
 
 	/**
@@ -288,7 +295,7 @@ class DocumentManager
 			$html[] = (string) $tag;
 		}
 
-		return implode("\n", $html);
+		return implode("\n" . $this->indents, $html);
 	}
 
 	/**
@@ -311,6 +318,30 @@ class DocumentManager
 	public function setSiteName($siteName)
 	{
 		$this->siteName = $siteName;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Indents
+	 *
+	 * @return  string
+	 */
+	public function getIndents()
+	{
+		return $this->indents;
+	}
+
+	/**
+	 * Method to set property indents
+	 *
+	 * @param   string $indents
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setIndents($indents)
+	{
+		$this->indents = $indents;
 
 		return $this;
 	}

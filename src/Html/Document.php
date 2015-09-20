@@ -33,6 +33,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  string           renderCustomTags()
  * @method  static  string           getSiteName()
  * @method  static  DocumentManager  setSiteName($siteName)
+ * @method  static  string           getIndents()
+ * @method  static  DocumentManager  setIndents($indents)
  *
  * @since  1.0
  */
