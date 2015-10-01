@@ -94,7 +94,7 @@ class CrudModel extends FormModel
 
 		$record = $this->getRecord();
 
-		$record->delete($pk);
+		$record->load($pk)->delete();
 
 		return true;
 	}

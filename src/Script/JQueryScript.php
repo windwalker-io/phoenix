@@ -93,13 +93,14 @@ class JQueryScript extends ScriptManager
 		if (!static::inited(__METHOD__))
 		{
 			$asset->addScript(static::phoenixName() . '/js/jquery/jquery.minicolors.min.js');
+			$asset->addStyle(static::phoenixName() . '/css/jquery/jquery.minicolors.min.css');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
 			$defaultOptions = array(
 				'control' => 'hue',
-				'position' => 'right',
+				'position' => 'left',
 				'theme' => 'bootstrap'
 			);
 
@@ -109,7 +110,7 @@ class JQueryScript extends ScriptManager
 // Color picker
 jQuery(document).ready(function($)
 {
-	$('.minicolors').each(function() {
+	$('$selector').each(function() {
 		$(this).minicolors($options);
 	});
 });
