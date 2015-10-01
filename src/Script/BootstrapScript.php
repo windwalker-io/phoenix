@@ -46,7 +46,6 @@ class BootstrapScript extends ScriptManager
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
-			static::css();
 
 			$asset = static::getAsset();
 
@@ -93,8 +92,6 @@ JS;
 	{
 		if (!static::inited(__METHOD__))
 		{
-			static::css();
-
 			$asset = static::getAsset();
 
 			$asset->addStyle(static::phoenixName() . '/css/bootstrap/awesome-checkbox.min.css');
@@ -218,7 +215,6 @@ JS;
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
-			static::css();
 
 			$asset->addScript(static::phoenixName() . '/js/datetime/moment.min.js');
 			$asset->addScript(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
