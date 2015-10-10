@@ -518,7 +518,9 @@ class ListModel extends FormModel
 	 */
 	protected function processOrdering(Query $query, $ordering = null, $direction = null)
 	{
-		$ordering  = $ordering  ? : $this->state->get('list.ordering');
+		$ordering = $this->state->get('list.ordering', $ordering);
+
+		$this->state->set('list.ordering', $ordering);
 
 		// If no ordering set, ignore this function.
 		if (!$ordering)
@@ -528,7 +530,9 @@ class ListModel extends FormModel
 
 		$self = $this;
 
-		$direction = $direction ? : $this->state->get('list.direction', 'ASC');
+		$direction = $this->state->get('list.direction', $direction);
+
+		$this->state->set('list.direction', $direction);
 
 		$ordering  = explode(',', $ordering);
 

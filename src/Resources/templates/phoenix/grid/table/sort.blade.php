@@ -6,7 +6,7 @@
         title="@translate('phoenix.grid.sort.button')">
         @translate($label)
 
-        @if ($field == $ordering)
+        @if (isset($ordering) && $field == $ordering)
             <small class="glyphicon glyphicon-triangle-bottom fa fa-caret-down"></small>
         @endif
     </a>
@@ -16,7 +16,7 @@
         title="@translate('phoenix.grid.sort.button')">
         @translate($label)
 
-        @if ($field == $ordering)
+        @if (isset($ordering) && $field == $ordering)
             <small class="glyphicon glyphicon-triangle-top fa fa-caret-up"></small>
         @endif
     </a>

@@ -39,14 +39,14 @@ class ListDisplayController extends DisplayController
 	 *
 	 * @var  string
 	 */
-	protected $defaultOrdering = 'id';
+	protected $defaultOrdering = null;
 
 	/**
 	 * Property direction.
 	 *
 	 * @var  string
 	 */
-	protected $defaultDirection = 'DESC';
+	protected $defaultDirection = null;
 
 	/**
 	 * prepareUserState
