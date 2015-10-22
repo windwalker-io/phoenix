@@ -30,5 +30,5 @@ class {$controller.item.name.cap$}ListField extends ItemListField
 	 *
 	 * @var  string
 	 */
-	protected $ordering = 'ordering';
+	protected $ordering = null;
 }
