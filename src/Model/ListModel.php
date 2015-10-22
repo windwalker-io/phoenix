@@ -378,7 +378,7 @@ class ListModel extends FormModel
 
 			$query = $this->db->getQuery(true);
 
-			$query->select($query->format('SUM(%n)', 'count'))
+			$query->select($query->format('COUNT(%n)', 'count'))
 				->from($subQuery, 'c');
 
 			$this->db->setQuery($query);
