@@ -94,7 +94,7 @@
 
                         {{-- TITLE --}}
                         <td>
-                            <a href="{{{ $router->html('{$controller.item.name.lower$}', array('id' => $item->id)) }}}">
+                            <a href="{{ $router->html('{$controller.item.name.lower$}', array('id' => $item->id)) }}">
                                 {{ $item->title }}
                             </a>
                         </td>
