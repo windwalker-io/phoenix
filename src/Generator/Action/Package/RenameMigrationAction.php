@@ -45,11 +45,11 @@ class RenameMigrationAction extends AbstractAction
 		{
 			$fileName = pathinfo($file, PATHINFO_BASENAME);
 
-			if (strpos($file, $migName . '.php') !== false && $fileName != '19700101010000_' . $migName . '.php')
+			if (strpos($file, $migName . '.php') !== false && $fileName != '19700101000000_' . $migName . '.php')
 			{
-				if (is_file($dest . '/Migration/' . '19700101010000_' . $migName . '.php'))
+				if (is_file($dest . '/Migration/' . '19700101000000_' . $migName . '.php'))
 				{
-					File::delete($dest . '/Migration/' . '19700101010000_' . $migName . '.php');
+					File::delete($dest . '/Migration/' . '19700101000000_' . $migName . '.php');
 				}
 
 				return;

@@ -10,7 +10,6 @@ namespace Phoenix\Generator\Action\Package;
 
 use Phoenix\Generator\Action\AbstractAction;
 use Phoenix\Generator\FileOperator\CopyOperator;
-use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
 
 /**
