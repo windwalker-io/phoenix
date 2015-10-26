@@ -9,6 +9,7 @@
 namespace Phoenix\Controller\Batch;
 
 use Phoenix\Model\AdminModel;
+use Windwalker\Core\Language\Translator;
 
 /**
  * The ReorderController class.
@@ -92,7 +93,7 @@ abstract class AbstractReorderController extends AbstractBatchController
 
 		!$this->useTransaction or $this->model->transactionCommit();
 
-		$this->setRedirect($this->getSuccessRedirect(), 'Reorder success', 'success');
+		$this->setRedirect($this->getSuccessRedirect(), Translator::translate('phoenix.message.batch.reorder.success'), 'success');
 
 		return true;
 	}
