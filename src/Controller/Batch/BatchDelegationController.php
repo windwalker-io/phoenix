@@ -54,10 +54,6 @@ class BatchDelegationController extends AbstractPhoenixController
 			'ordering' => $this->input->getVar('ordering'),
 		));
 
-		list($url, $msg, $type) = $controller->getRedirect(true);
-
-		$this->setRedirect($url, $msg, $type);
-
 		return $result;
 	}
 }

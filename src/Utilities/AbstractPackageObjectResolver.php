@@ -43,7 +43,14 @@ abstract class AbstractPackageObjectResolver
 	{
 		$name = static::getClass($name);
 
-		foreach (static::$namespaces as $namespace)
+		$called = get_called_class();
+
+		if (!isset(static::$namespaces[$called]))
+		{
+			return null;
+		}
+
+		foreach (static::$namespaces[$called] as $namespace)
 		{
 			$class = $namespace . '\\' . $name;
 
@@ -130,7 +137,14 @@ abstract class AbstractPackageObjectResolver
 	 */
 	public static function addNamespace($namespace)
 	{
-		static::$namespaces[] = $namespace;
+		$called = get_called_class();
+
+		if (!isset(static::$namespaces[$called]))
+		{
+			static::$namespaces[$called] = array();
+		}
+
+		static::$namespaces[$called][] = $namespace;
 	}
 
 	/**
@@ -142,11 +156,18 @@ abstract class AbstractPackageObjectResolver
 	 */
 	public static function removeNamespace($namespace)
 	{
-		foreach (static::$namespaces as $k => $ns)
+		$called = get_called_class();
+
+		if (!isset(static::$namespaces[$called]))
+		{
+			return;
+		}
+
+		foreach (static::$namespaces[$called] as $k => $ns)
 		{
 			if (strcasecmp($namespace, $ns) === 0)
 			{
-				unset(static::$namespaces[$k]);
+				unset(static::$namespaces[$called][$k]);
 
 				break;
 			}
@@ -160,7 +181,9 @@ abstract class AbstractPackageObjectResolver
 	 */
 	public static function getNamespaces()
 	{
-		return static::$namespaces;
+		$called = get_called_class();
+
+		return static::$namespaces[$called];
 	}
 
 	/**
@@ -172,6 +195,8 @@ abstract class AbstractPackageObjectResolver
 	 */
 	public static function setNamespaces($namespaces)
 	{
-		static::$namespaces = $namespaces;
+		$called = get_called_class();
+
+		static::$namespaces[$called] = $namespaces;
 	}
 }
