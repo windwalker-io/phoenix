@@ -36,7 +36,7 @@
 
                     {{-- AUTHOR --}}
                     <th>
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.author', '{$controller.item.name.lower$}.created_by') !!}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
                     </th>
 
                     {{-- CREATED --}}
