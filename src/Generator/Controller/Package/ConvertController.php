@@ -47,7 +47,7 @@ class ConvertController extends AbstractPackageController
 		{
 			$file = array_shift(Folder::files($src . '/Migration'));
 
-			$time = DateTime::create(0)->format('YmdHis');
+			$time = '19700101000000';
 
 			$newFilename = preg_replace('/\d+(_.+Init\.php\.tpl)/', $time . '$1', $file);
 
