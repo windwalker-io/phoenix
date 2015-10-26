@@ -56,6 +56,8 @@ class CrudModel extends FormModel
 
 		$this->postSaveHook($record);
 
+		$data->bind($record->toArray());
+
 		return true;
 	}
 
