@@ -8,12 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$}\Batch;
 
+use Phoenix\Controller\Batch\AbstractReorderController;
+
 /**
  * The ReorderController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ReorderController extends \Phoenix\Controller\Batch\ReorderController
+class ReorderController extends AbstractReorderController
 {
 
 }

@@ -9,25 +9,13 @@
 namespace Phoenix\Controller\Batch;
 
 /**
- * The UnpublishController class.
+ * The TrashController class.
  *
  * @since  1.0
+ *
+ * @deprecated  Use AbstractTrashController instead.
  */
-class TrashController extends BatchController
+class TrashController extends AbstractTrashController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'trash';
 
-	/**
-	 * Property data.
-	 *
-	 * @var  array
-	 */
-	protected $data = array(
-		'state' => -1
-	);
 }

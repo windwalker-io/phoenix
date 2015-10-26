@@ -43,11 +43,10 @@ class FormModel extends PhoenixModel
 	public function getItem($pk = null)
 	{
 		$state = $this->state;
+		$pk = $pk ? : $state['item.pk'];
 
-		return $this->fetch('item', function() use ($pk, $state)
+		return $this->fetch('item.' . $pk, function() use ($pk, $state)
 		{
-			$pk = $pk ? : $state['item.pk'];
-
 			if (!$pk)
 			{
 				return new Data;
@@ -64,9 +63,11 @@ class FormModel extends PhoenixModel
 				return new Data;
 			}
 
+			$item = new Data($item->toArray());
+
 			$this->postGetItem($item);
 
-			return new Data($item->toArray());
+			return $item;
 		});
 	}
 
@@ -90,11 +91,11 @@ class FormModel extends PhoenixModel
 	/**
 	 * postGetItem
 	 *
-	 * @param Record $item
+	 * @param Data $item
 	 *
 	 * @return  void
 	 */
-	protected function postGetItem(Record $item)
+	protected function postGetItem(Data $item)
 	{
 	}
 

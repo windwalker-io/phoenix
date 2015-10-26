@@ -8,11 +8,13 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$}\Batch;
 
+use Phoenix\Controller\Batch\AbstractUnpublishController;
+
 /**
  * The UnpublishController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class UnpublishController extends \Phoenix\Controller\Batch\UnpublishController
+class UnpublishController extends AbstractUnpublishController
 {
 }

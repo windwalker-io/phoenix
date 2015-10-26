@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use Phoenix\Controller\Batch\DeleteController as PhoenixDeleteController;
+use Phoenix\Controller\Batch\AbstractDeleteController;
 
 /**
  * The DeleteController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class DeleteController extends PhoenixDeleteController
+class DeleteController extends AbstractDeleteController
 {
 	/**
 	 * Property name.

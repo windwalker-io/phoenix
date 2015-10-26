@@ -12,22 +12,10 @@ namespace Phoenix\Controller\Batch;
  * The PublishController class.
  *
  * @since  1.0
+ *
+ * @deprecated  Use AbstractPublishController instead.
  */
-class PublishController extends BatchController
+class PublishController extends AbstractPublishController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'publish';
 
-	/**
-	 * Property data.
-	 *
-	 * @var  array
-	 */
-	protected $data = array(
-		'state' => 1
-	);
 }

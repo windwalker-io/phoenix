@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
 use Phoenix\Model\AdminModel;
+use Windwalker\Data\Data;
 use Windwalker\Record\Record;
 
 /**
@@ -35,13 +36,13 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	/**
 	 * postGetItem
 	 *
-	 * @param Record $item
+	 * @param Data $item
 	 *
 	 * @return  void
 	 */
-	protected function postGetItem(Record $item)
+	protected function postGetItem(Data $item)
 	{
-		parent::postGetItem($item);
+		// Do some stuff
 	}
 
 	/**

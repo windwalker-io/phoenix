@@ -35,6 +35,13 @@ class ListDisplayController extends DisplayController
 	protected $model;
 
 	/**
+	 * Property limit.
+	 *
+	 * @var  integer
+	 */
+	protected $limit;
+
+	/**
 	 * Property ordering.
 	 *
 	 * @var  string
@@ -58,7 +65,7 @@ class ListDisplayController extends DisplayController
 	protected function prepareUserState(Model $model)
 	{
 		// Pagination
-		$model['list.limit'] = $this->app->get('list.limit', 15);
+		$model['list.limit'] = $this->limit === null ? $this->app->get('list.limit', 15) : $this->limit;
 		$model['list.page']  = $this->getUserStateFromInput($this->getContext('list.page'), 'page', 1, InputFilter::INTEGER);
 		$model['list.page']  = $model['list.page'] < 1 ? 1 : $model['list.page'];
 		$model['list.start'] = ($model['list.page'] - 1) * $model['list.limit'];

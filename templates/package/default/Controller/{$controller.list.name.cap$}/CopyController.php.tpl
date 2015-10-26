@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use Phoenix\Controller\Batch\CopyController as PhoenixCopyController;
+use Phoenix\Controller\Batch\AbstractCopyController;
 
 /**
  * The CopyController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class CopyController extends PhoenixCopyController
+class CopyController extends AbstractCopyController
 {
 	/**
 	 * Property name.

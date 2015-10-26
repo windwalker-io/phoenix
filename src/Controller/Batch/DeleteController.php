@@ -8,43 +8,14 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Windwalker\Data\Data;
-
 /**
  * The DeleteController class.
  *
  * @since  1.0
+ *
+ * @deprecated  Use AbstractDeleteController instead.
  */
-class DeleteController extends BatchController
+class DeleteController extends AbstractDeleteController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'delete';
 
-	/**
-	 * Property data.
-	 *
-	 * @var  array
-	 */
-	protected $data = array(
-		'state' => -9
-	);
-
-	/**
-	 * save
-	 *
-	 * @param   string|int $pk
-	 * @param   Data       $data
-	 *
-	 * @return  mixed
-	 */
-	protected function save($pk, Data $data)
-	{
-		$data->{$this->pkName} = $pk;
-
-		$this->model->delete($pk);
-	}
 }

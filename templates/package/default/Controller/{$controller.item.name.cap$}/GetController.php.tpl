@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
-use Phoenix\Controller\Display\EditGetController;
+use Phoenix\Controller\Display\EditDisplayController;
 
 /**
  * The GetController class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class GetController extends EditGetController
+class GetController extends EditDisplayController
 {
 	/**
 	 * Property name.

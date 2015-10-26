@@ -65,20 +65,20 @@ abstract class AdminModel extends CrudModel
 	 */
 	protected function prepareRecord(Record $record)
 	{
-		$date = DateTime::create();
+		$date = $this->getDate();
 		$user = User::get();
-		$key = $record->getKeyName();
+		$key  = $record->getKeyName();
 
 		// Alias
 		if ($record->hasField('alias'))
 		{
 			if (!$record->alias)
 			{
-				$record->alias = OutputFilter::stringURLSafe(trim($record->title));
+				$record->alias = $this->handleAlias(trim($record->title));
 			}
 			else
 			{
-				$record->alias = OutputFilter::stringURLSafe(trim($record->alias));
+				$record->alias = $this->handleAlias(trim($record->alias));
 			}
 
 			if (!$record->alias)
@@ -119,6 +119,28 @@ abstract class AdminModel extends CrudModel
 				$this->setOrderPosition($record);
 			}
 		}
+	}
+
+	/**
+	 * handleAlias
+	 *
+	 * @param   string  $alias
+	 *
+	 * @return  string
+	 */
+	public function handleAlias($alias)
+	{
+		return OutputFilter::stringURLSafe($alias);
+	}
+
+	/**
+	 * getDate
+	 *
+	 * @return  DateTime
+	 */
+	public function getDate()
+	{
+		return DateTime::create();
 	}
 
 	/**

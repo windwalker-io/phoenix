@@ -12,23 +12,10 @@ namespace Phoenix\Controller\Display;
  * The EditGetController class.
  *
  * @since  1.0
+ *
+ * @deprecated  Use EditDisplayController instead.
  */
-class EditGetController extends ItemDisplayController
+class EditGetController extends EditDisplayController
 {
-	/**
-	 * prepareExecute
-	 *
-	 * @return  void
-	 */
-	protected function prepareUserState()
-	{
-		parent::prepareUserState();
 
-		if ($this->input->get('new') !== null)
-		{
-			$this->removeUserState($this->getContext('edit.data'));
-		}
-
-		$this->model['form.data'] = $this->getUserState($this->getContext('edit.data'));
-	}
 }

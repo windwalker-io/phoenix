@@ -8,12 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$}\Batch;
 
+use Phoenix\Controller\Batch\AbstractUpdateController;
+
 /**
  * The MoveController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class UpdateController extends \Phoenix\Controller\Batch\UpdateController
+class UpdateController extends AbstractUpdateController
 {
 
 }

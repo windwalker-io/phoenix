@@ -12,22 +12,10 @@ namespace Phoenix\Controller\Batch;
  * The UnpublishController class.
  *
  * @since  1.0
+ *
+ * @deprecated  Use AbstractUnpublishController instead.
  */
-class UnpublishController extends BatchController
+class UnpublishController extends AbstractUnpublishController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'unpublish';
 
-	/**
-	 * Property data.
-	 *
-	 * @var  array
-	 */
-	protected $data = array(
-		'state' => 0
-	);
 }

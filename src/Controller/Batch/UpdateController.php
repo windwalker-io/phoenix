@@ -12,25 +12,10 @@ namespace Phoenix\Controller\Batch;
  * The BatchController class.
  *
  * @since  1.0
+ *
+ * @deprecated  Use AbstractUpdateController instead.
  */
-class UpdateController extends BatchController
+class UpdateController extends AbstractUpdateController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'move';
 
-	/**
-	 * prepareExecute
-	 *
-	 * @return  void
-	 */
-	protected function prepareExecute()
-	{
-		parent::prepareExecute();
-
-		$this->data = $this->input->getVar('batch', array());
-	}
 }

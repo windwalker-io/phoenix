@@ -8,12 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$}\Batch;
 
+use Phoenix\Controller\Batch\AbstractPublishController;
+
 /**
  * The PublishController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class PublishController extends \Phoenix\Controller\Batch\PublishController
+class PublishController extends AbstractPublishController
 {
 
 }

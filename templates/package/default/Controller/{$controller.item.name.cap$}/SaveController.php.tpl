@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
-use Phoenix\Controller\SaveController as PhoenixSaveController;
+use Phoenix\Controller\AbstractSaveController;
 
 /**
  * The SaveController class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class SaveController extends PhoenixSaveController
+class SaveController extends AbstractSaveController
 {
 	/**
 	 * Property name.

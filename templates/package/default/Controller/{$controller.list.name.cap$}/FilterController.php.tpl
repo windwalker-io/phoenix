@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use Phoenix\Controller\Grid\FilterController as PhoenixFilterController;
+use Phoenix\Controller\Grid\AbstractFilterController;
 
 /**
  * The FilterController class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class FilterController extends PhoenixFilterController
+class FilterController extends AbstractFilterController
 {
 	/**
 	 * Property name.
