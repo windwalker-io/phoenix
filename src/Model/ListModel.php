@@ -15,6 +15,7 @@ use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The ListModel class.
@@ -427,6 +428,8 @@ class ListModel extends FormModel
 	{
 		$filters = $filters ? : $this->state->get('list.filter', array());
 
+		$filters = ArrayHelper::flatten($filters);
+
 		$filters = $this->filterDataFields($filters);
 
 		$filterHelper = $this->getFilterHelper();
@@ -472,6 +475,8 @@ class ListModel extends FormModel
 	protected function processSearches(Query $query, $searches = array())
 	{
 		$searches = $searches ? : $this->state->get('list.search', array());
+
+		$searches = ArrayHelper::flatten($searches);
 
 		$searches = $this->filterDataFields($searches);
 

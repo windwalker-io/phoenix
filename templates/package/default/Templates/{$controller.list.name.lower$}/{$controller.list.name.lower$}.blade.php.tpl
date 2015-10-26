@@ -41,12 +41,12 @@
 
                     {{-- ORDERING --}}
                     <th width="5%" class="nowrap">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.ordering', '{$controller.item.name.lower$}.ordering') !!} {!! $grid->saveorderButton() !!}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!} {!! $grid->saveorderButton() !!}
                     </th>
 
                     {{-- AUTHOR --}}
                     <th>
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field,.author', '{$controller.item.name.lower$}.created_by') !!}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
                     </th>
 
                     {{-- CREATED --}}
