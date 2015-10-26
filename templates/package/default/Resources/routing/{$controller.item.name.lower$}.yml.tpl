@@ -2,7 +2,7 @@
 {$controller.item.name.lower$}:
     pattern: /{$controller.item.name.lower$}(/id)
     controller: {$controller.item.name.cap$}
-    variables:
+    extra:
         layout: {$controller.item.name.lower$}
 
 # {$controller.list.name.cap$}
@@ -13,5 +13,5 @@
         post: CopyController
         patch: BatchController
         put: FilterController
-    variables:
+    extra:
         layout: {$controller.list.name.lower$}
