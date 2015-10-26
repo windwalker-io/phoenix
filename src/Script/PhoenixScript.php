@@ -46,7 +46,8 @@ class PhoenixScript extends ScriptManager
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
 			$defaultOptions = array(
-				'theme' => 'bootstrap'
+				'theme' => 'bootstrap',
+				'uri' => static::getContainer()->get('uri')->toArray()
 			);
 
 			$options = array_merge($defaultOptions, $options);
@@ -70,6 +71,37 @@ jQuery(document).ready(function($)
 JS;
 
 			$asset->internalScript($js);
+		}
+	}
+
+	/**
+	 * route
+	 *
+	 * @param   string  $route
+	 * @param   string  $url
+	 *
+	 * @return  void
+	 */
+	public static function route($route, $url)
+	{
+		static::translator();
+
+		$asset = static::getAsset();
+
+		$asset->internalScript("Phoenix.Router.add('$route', '$url')");
+	}
+
+	/**
+	 * router
+	 *
+	 * @return  void
+	 */
+	public static function router()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			$asset = static::getAsset();
+			$asset->addScript(static::phoenixName() . '/js/phoenix/router.min.js');
 		}
 	}
 
