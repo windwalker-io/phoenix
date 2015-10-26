@@ -10,6 +10,7 @@ namespace Phoenix\Controller;
 
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\DI\Container;
@@ -185,5 +186,19 @@ abstract class AbstractPhoenixController extends Controller
 	protected function checkToken()
 	{
 		return CsrfProtection::checkToken();
+	}
+
+	/**
+	 * checkAccess
+	 *
+	 * @param   mixed  $data
+	 *
+	 * @return  boolean
+	 *
+	 * @throws  ValidFailException
+	 */
+	protected function checkAccess($data)
+	{
+		return true;
 	}
 }

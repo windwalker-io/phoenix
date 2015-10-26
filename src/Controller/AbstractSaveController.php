@@ -84,6 +84,8 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 				throw new \RuntimeException('Invalid Token');
 			}
 
+			$this->checkAccess($data);
+
 			$this->preSave($data);
 
 			$this->doSave($data);

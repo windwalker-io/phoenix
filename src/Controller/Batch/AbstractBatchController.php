@@ -86,16 +86,20 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 				throw new \RuntimeException('Invalid Token');
 			}
 
+			$data = new Data($this->data);
+
 			// Remove empty data
-			foreach ($this->data as $k => $value)
+			foreach ($data as $k => $value)
 			{
 				if ((string) $value === '')
 				{
-					unset($this->data[$k]);
+					unset($data[$k]);
 				}
 			}
 
-			if (!$this->data)
+			$this->checkAccess($data);
+
+			if ($data->isNull())
 			{
 				throw new ValidFailException(Translator::translate('phoenix.message.batch.error.empty'));
 			}
@@ -105,12 +109,16 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 				throw new ValidFailException(Translator::translate($this->langPrefix . '.message.' . $this->action . '.empty'));
 			}
 
-			$data = new Data($this->data);
+			$this->validate($data);
+
+			$this->preSave($data);
 
 			foreach ((array) $this->pks as $pk)
 			{
 				$this->save($pk, $data);
 			}
+
+			$this->postSave($data);
 		}
 		catch (ValidFailException $e)
 		{
@@ -141,5 +149,43 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 		$this->setRedirect($this->getSuccessRedirect(), $msg, Bootstrap::MSG_SUCCESS);
 
 		return true;
+	}
+
+	/**
+	 * preSave
+	 *
+	 * @param Data $data
+	 *
+	 * @return  void
+	 */
+	protected function preSave(Data $data)
+	{
+		// Do some stuff
+	}
+
+	/**
+	 * postSave
+	 *
+	 * @param Data $data
+	 *
+	 * @return  void
+	 */
+	protected function postSave(Data $data)
+	{
+		// Do some stuff
+	}
+
+	/**
+	 * validate
+	 *
+	 * @param Data $data
+	 *
+	 * @return  void
+	 *
+	 * @throws  ValidFailException
+	 */
+	protected function validate(Data $data)
+	{
+		// Do some stuff
 	}
 }
