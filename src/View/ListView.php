@@ -9,6 +9,7 @@
 namespace Phoenix\View;
 
 use Windwalker\Core\Language\Translator;
+use Windwalker\Data\Data;
 
 /**
  * The ListHtmlView class.
@@ -29,5 +30,20 @@ class ListView extends AbstractRadHtmView
 		$title = $title ? : Translator::sprintf('phoenix.title.list', Translator::translate($this->package->getName() . '.' . $this->getName() . '.title'));
 
 		return parent::setTitle($title);
+	}
+
+	/**
+	 * prepareRender
+	 *
+	 * @param   Data $data
+	 *
+	 * @return  void
+	 */
+	protected function prepareRender($data)
+	{
+		parent::prepareRender($data);
+
+		$data->items      = $this->model->getItems();
+		$data->pagination = $this->model->getPagination();
 	}
 }

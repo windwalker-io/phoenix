@@ -42,7 +42,6 @@ class EditView extends ItemView
 	{
 		parent::prepareRender($data);
 
-		$data->item = $this->model->getItem();
 		$data->form = $this->model->getForm('edit', 'item', true);
 	}
 }

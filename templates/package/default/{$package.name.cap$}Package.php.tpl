@@ -42,6 +42,12 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	public function initialise()
 	{
+		// Prepare Resolvers
+		RecordResolver::addNamespace(__NAMESPACE__ . '\Record');
+		DataMapperResolver::addNamespace(__NAMESPACE__ . '\DataMapper');
+		FieldHelper::addNamespace(__NAMESPACE__ . '\Field');
+		ValidatorHelper::addNamespace(__NAMESPACE__ . 'Validator');
+
 		parent::initialise();
 	}
 
@@ -52,12 +58,6 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	protected function prepareExecute()
 	{
-		// Prepare Resolvers
-		RecordResolver::addNamespace(__NAMESPACE__ . '\Record');
-		DataMapperResolver::addNamespace(__NAMESPACE__ . '\DataMapper');
-		FieldHelper::addNamespace(__NAMESPACE__ . '\Field');
-		ValidatorHelper::addNamespace(__NAMESPACE__ . 'Validator');
-
 		// Assets
 		BootstrapScript::css();
 		BootstrapScript::script();

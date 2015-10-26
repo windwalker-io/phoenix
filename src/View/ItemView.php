@@ -30,4 +30,18 @@ class ItemView extends AbstractRadHtmView
 
 		return parent::setTitle($title);
 	}
+
+	/**
+	 * prepareRender
+	 *
+	 * @param \Windwalker\Data\Data $data
+	 *
+	 * @return  void
+	 */
+	protected function prepareRender($data)
+	{
+		parent::prepareRender($data);
+
+		$data->item = $this->model->getItem();
+	}
 }
