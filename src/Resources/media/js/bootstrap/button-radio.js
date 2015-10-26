@@ -17,11 +17,12 @@
         $radios.click(function()
         {
             var btn = $(this);
+            var group = btn.parent().find('.btn');
             var input = btn.find('input[type=radio]');
 
             if (!input.prop('checked'))
             {
-                $radios.removeClass('active btn-success btn-danger btn-primary');
+                group.removeClass('active btn-success btn-danger btn-primary');
 
                 if (input.val() == '')
                 {
