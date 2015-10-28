@@ -12,19 +12,17 @@ use Phoenix\Form\NullFiledDefinition;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
-use Windwalker\Data\Data;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
 use Windwalker\Ioc;
-use Windwalker\Record\Record;
 
 /**
  * The AbstractFormModel class.
  * 
  * @since  1.0
  */
-class FormModel extends PhoenixModel
+class FormModel extends ItemModel
 {
 	/**
 	 * Property formRenderer.
@@ -32,44 +30,6 @@ class FormModel extends PhoenixModel
 	 * @var callable
 	 */
 	protected $formRenderer = array('Phoenix\Form\Renderer\BootstrapRenderer', 'render');
-
-	/**
-	 * getItem
-	 *
-	 * @param   mixed  $pk
-	 *
-	 * @return  Data
-	 */
-	public function getItem($pk = null)
-	{
-		$state = $this->state;
-		$pk = $pk ? : $state['item.pk'];
-
-		return $this->fetch('item.' . $pk, function() use ($pk, $state)
-		{
-			if (!$pk)
-			{
-				return new Data;
-			}
-
-			$item = $this->getRecord();
-
-			try
-			{
-				$item->load($pk);
-			}
-			catch (\RuntimeException $e)
-			{
-				return new Data;
-			}
-
-			$item = new Data($item->toArray());
-
-			$this->postGetItem($item);
-
-			return $item;
-		});
-	}
 
 	/**
 	 * getDefaultData
@@ -86,17 +46,6 @@ class FormModel extends PhoenixModel
 		}
 
 		return $this['form.data'];
-	}
-
-	/**
-	 * postGetItem
-	 *
-	 * @param Data $item
-	 *
-	 * @return  void
-	 */
-	protected function postGetItem(Data $item)
-	{
 	}
 
 	/**

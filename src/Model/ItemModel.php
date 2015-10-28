@@ -8,20 +8,14 @@
 
 namespace Phoenix\Model;
 
-use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Data\Data;
-use Windwalker\Database\Query\QueryHelper;
-use Windwalker\DataMapper\DataMapper;
-use Windwalker\Form\FieldDefinitionInterface;
-use Windwalker\Form\Form;
-use Windwalker\Ioc;
 
 /**
  * The AbstractFormModel class.
  * 
  * @since  1.0
  */
-abstract class AbstractItemModel extends FormModel
+class ItemModel extends PhoenixModel
 {
 	/**
 	 * getItem
@@ -34,10 +28,10 @@ abstract class AbstractItemModel extends FormModel
 	{
 		$state = $this->state;
 
-		return $this->fetch('item', function() use ($pk, $state)
-		{
-			$pk = $pk ? : $state['item.id'];
+		$pk = $pk ? : $state['item.pk'];
 
+		return $this->fetch('item.' . json_encode($pk), function() use ($pk, $state)
+		{
 			if (!$pk)
 			{
 				return new Data;
@@ -54,9 +48,22 @@ abstract class AbstractItemModel extends FormModel
 				return new Data;
 			}
 
+			$item = new Data($item->toArray());
+
 			$this->postGetItem($item);
 
-			return new Data($item->toArray());
+			return $item;
 		});
+	}
+
+	/**
+	 * postGetItem
+	 *
+	 * @param Data $item
+	 *
+	 * @return  void
+	 */
+	protected function postGetItem(Data $item)
+	{
 	}
 }
