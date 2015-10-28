@@ -16,7 +16,7 @@ use Windwalker\Data\Data;
  *
  * @since  1.0
  */
-class ListView extends AbstractRadHtmView
+class ListView extends AbstractPhoenixHtmView
 {
 	/**
 	 * setTitle

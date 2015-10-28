@@ -15,7 +15,7 @@ use Windwalker\Core\Language\Translator;
  *
  * @since  1.0
  */
-class ItemView extends AbstractRadHtmView
+class ItemView extends AbstractPhoenixHtmView
 {
 	/**
 	 * setTitle
