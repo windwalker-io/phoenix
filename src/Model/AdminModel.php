@@ -66,6 +66,7 @@ abstract class AdminModel extends CrudModel
 	protected function prepareRecord(Record $record)
 	{
 		$date = $this->getDate();
+
 		$user = User::get();
 		$key  = $record->getKeyName();
 
@@ -136,11 +137,14 @@ abstract class AdminModel extends CrudModel
 	/**
 	 * getDate
 	 *
-	 * @return  DateTime
+	 * @param string $date
+	 * @param bool   $tz
+	 *
+	 * @return DateTime
 	 */
-	public function getDate()
+	public function getDate($date = 'now', $tz = DateTime::TZ_LOCALE)
 	{
-		return DateTime::create();
+		return DateTime::create($date, $tz);
 	}
 
 	/**
