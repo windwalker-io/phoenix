@@ -19,7 +19,7 @@ use Windwalker\Renderer\RendererInterface;
  *
  * @since  1.0
  */
-abstract class AbstractRadHtmView extends HtmlView
+abstract class AbstractPhoenixHtmView extends HtmlView
 {
 	/**
 	 * Method to instantiate the view.
