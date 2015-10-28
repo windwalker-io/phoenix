@@ -20,14 +20,28 @@ use Windwalker\Ioc;
 class SqlListField extends ListField
 {
 	/**
+	 * Property valueField.
+	 *
+	 * @var  string
+	 */
+	protected $valueField = 'id';
+
+	/**
+	 * Property textField.
+	 *
+	 * @var  string
+	 */
+	protected $textField = 'title';
+
+	/**
 	 * prepareOptions
 	 *
 	 * @return  Option[]
 	 */
 	protected function prepareOptions()
 	{
-		$valueField = $this->get('value_field', 'id');
-		$textField  = $this->get('text_field', 'title');
+		$valueField = $this->get('value_field', $this->valueField);
+		$textField  = $this->get('text_field', $this->textField);
 		$attribs    = $this->get('option_attribs', array());
 
 		$items = $this->getItems();

@@ -9,6 +9,7 @@
 namespace Phoenix\Field;
 
 use Windwalker\Ioc;
+use Windwalker\Query\Query;
 
 /**
  * The ItemlistField class.
@@ -63,6 +64,8 @@ class ItemListField extends SqlListField
 		$query->select($select)
 			->from($table);
 
+		$this->postQuery($query);
+
 		$postQuery = $this->get('postQuery');
 
 		if (is_callable($postQuery))
@@ -71,5 +74,17 @@ class ItemListField extends SqlListField
 		}
 
 		return (array) $db->setQuery($query)->loadAll();
+	}
+
+	/**
+	 * postQuery
+	 *
+	 * @param Query $query
+	 *
+	 * @return  void
+	 */
+	protected function postQuery(Query $query)
+	{
+
 	}
 }

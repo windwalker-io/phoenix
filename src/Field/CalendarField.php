@@ -8,7 +8,7 @@
 
 namespace Phoenix\Field;
 
-use Phoenix\Script\BootstrapScript;
+use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Form\Field\TextField;
 
 /**
@@ -39,22 +39,16 @@ class CalendarField extends TextField
 	 */
 	public function buildInput($attrs)
 	{
-		$attrs['class'] .= ' hasCalendar';
+		$input  = parent::buildInput($attrs);
 		$format = $this->get('format', 'YYYY-MM-DD HH:mm:ss');
-		$input =  parent::buildInput($attrs);
-		$id = $this->getId();
+		$id     = $this->getId();
 
-		BootstrapScript::calendar('#' . $id . '-wrapper', $format);
-
-		$html = <<<HTML
-<div id="$id-wrapper" class="input-group date">
-$input
-<span class="input-group-addon">
-	<span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
-</span>
-</div>
-HTML;
-
-		return $html;
+		return WidgetHelper::render('phoenix.form.field.calendar', array(
+			'id'     => $id,
+			'input'  => $input,
+			'attrs'  => $attrs,
+			'format' => $format,
+			'field'  => $this
+		), WidgetHelper::ENGINE_BLADE);
 	}
 }

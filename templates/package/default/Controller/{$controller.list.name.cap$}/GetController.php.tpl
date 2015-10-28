@@ -46,6 +46,8 @@ class GetController extends ListDisplayController
 	 */
 	protected function prepareExecute()
 	{
+		$this->layout = $this->input->get('layout', 'default');
+
 		parent::prepareExecute();
 	}
 

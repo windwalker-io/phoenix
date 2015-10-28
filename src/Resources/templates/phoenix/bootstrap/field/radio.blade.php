@@ -1,6 +1,6 @@
 {{-- Part of Phoenix project. --}}
 
-<div class="form-group">
+<div id="{{ $field->getId() }}-group" class="form-group">
     <?php
     $field->appendAttribute('class', ' radio-container input-list-container ' . $field->get('fieldWidth', 'col-md-9'));
     $field->appendAttribute('labelClass', ' control-label ' . $field->get('labelWidth', 'col-md-3'));

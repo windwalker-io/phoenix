@@ -39,13 +39,6 @@ class ModalField extends TextField
 	protected $titleField = 'title';
 
 	/**
-	 * Property listName.
-	 *
-	 * @var  string
-	 */
-	protected $listName;
-
-	/**
 	 * Property pkName.
 	 *
 	 * @var  string
@@ -65,6 +58,20 @@ class ModalField extends TextField
 	 * @var  string
 	 */
 	protected $view;
+
+	/**
+	 * Property route.
+	 *
+	 * @var  string
+	 */
+	protected $route;
+
+	/**
+	 * Property query.
+	 *
+	 * @var  array
+	 */
+	protected $query = array();
 
 	/**
 	 * buildInput
@@ -110,8 +117,8 @@ class ModalField extends TextField
 	{
 		$table = $this->table ? : $this->get('table', $this->view);
 		$value = $this->getValue();
-		$keyField   = $this->get('keyField', $this->keyField);
-		$titleField = $this->get('titleField', $this->titleField);
+		$keyField   = $this->get('key_field', $this->keyField);
+		$titleField = $this->get('title_field', $this->titleField);
 
 		$dataMapper = new DataMapper($table);
 
@@ -131,11 +138,14 @@ class ModalField extends TextField
 
 		$package = $package ? : Ioc::get('current.package');
 
-		return $package->router->html($this->view, array(
+		$route = $this->get('route', $this->route) ? : $this->view;
+		$query = $this->get('query', $this->query);
+
+		return $package->router->html($route, array_merge(array(
 			'layout'   => 'modal',
 			'selector' => '#' . $this->getId() . '-wrap',
 			'function' => 'Phoenix.Field.Modal.select'
-		));
+		), $query));
 	}
 
 	/**
