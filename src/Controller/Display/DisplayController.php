@@ -101,4 +101,52 @@ class DisplayController extends AbstractPhoenixController
 	protected function prepareUserState(Model $model)
 	{
 	}
+
+	/**
+	 * Method to get property Layout
+	 *
+	 * @return  string
+	 */
+	public function getLayout()
+	{
+		return $this->layout;
+	}
+
+	/**
+	 * Method to set property layout
+	 *
+	 * @param   string $layout
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setLayout($layout)
+	{
+		$this->layout = $layout;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Format
+	 *
+	 * @return  string
+	 */
+	public function getFormat()
+	{
+		return $this->format;
+	}
+
+	/**
+	 * Method to set property format
+	 *
+	 * @param   string $format
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setFormat($format)
+	{
+		$this->format = $format;
+
+		return $this;
+	}
 }

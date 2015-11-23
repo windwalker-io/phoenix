@@ -298,7 +298,7 @@ class ListModel extends FormModel
 			return $this->fieldMapping[$field];
 		}
 
-		return $default;
+		return ($default === null) ? $field : $default;
 	}
 
 	/**
@@ -432,6 +432,11 @@ class ListModel extends FormModel
 
 		$filters = $this->filterDataFields($filters);
 
+		foreach ($filters as &$filter)
+		{
+			$filter = $this->mapField($filter);
+		}
+
 		$filterHelper = $this->getFilterHelper();
 
 		$this->configureFilters($filterHelper);
@@ -479,6 +484,11 @@ class ListModel extends FormModel
 		$searches = ArrayHelper::flatten($searches);
 
 		$searches = $this->filterDataFields($searches);
+
+		foreach ($searches as &$search)
+		{
+			$search = $this->mapField($search);
+		}
 
 		$searchHelper = $this->getSearchHelper();
 
@@ -553,13 +563,20 @@ class ListModel extends FormModel
 					return '';
 				}
 
+				$field = $this->mapField($value[0]);
+
+				if ($field[strlen($field) - 1] != ')')
+				{
+					$field = $query->quoteName($field);
+				}
+
 				// $value[1] is direction
 				if (isset($value[1]))
 				{
-					return $query->quoteName($value[0]) . ' ' . $value[1];
+					return $field . ' ' . $value[1];
 				}
 
-				return $query->quoteName($value[0]);
+				return $field;
 			},
 			$ordering
 		);
@@ -630,6 +647,56 @@ class ListModel extends FormModel
 	public function setSearchHelper(FilterHelperInterface $searchHelper)
 	{
 		$this->searchHelper = $searchHelper;
+
+		return $this;
+	}
+
+	/**
+	 * addFilter
+	 *
+	 * @param   string  $key
+	 * @param   mixed   $value
+	 *
+	 * @return  static
+	 */
+	public function addFilter($key, $value)
+	{
+		$this->set('list.filter.' . $key, $value);
+
+		return $this;
+	}
+
+	/**
+	 * addSearch
+	 *
+	 * @param   string  $key
+	 * @param   mixed   $value
+	 *
+	 * @return  static
+	 */
+	public function addSearch($key, $value)
+	{
+		$this->set('list.search.' . $key, $value);
+
+		return $this;
+	}
+
+	/**
+	 * setOrdering
+	 *
+	 * @param  string      $order
+	 * @param  bool|false  $direction
+	 *
+	 * @return  static
+	 */
+	public function setOrdering($order, $direction = false)
+	{
+		$this->set('list.ordering', $order);
+
+		if ($direction !== false)
+		{
+			$this->set('list.direction', $direction);
+		}
 
 		return $this;
 	}

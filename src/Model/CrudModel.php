@@ -44,7 +44,7 @@ class CrudModel extends FormModel
 		$this->prepareRecord($record);
 
 		$record->check()
-			->store();
+			->store(true);
 
 		if ($record->$key)
 		{

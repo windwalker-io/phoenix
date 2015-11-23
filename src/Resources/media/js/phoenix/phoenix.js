@@ -57,16 +57,19 @@
         {
             var form = this.form;
 
-            var methodInput = form.find('input[name="_method"]');
-
-            if (!methodInput.length)
+            if (customMethod)
             {
-                methodInput = $('<input name="_method" type="hidden">');
+                var methodInput = form.find('input[name="_method"]');
 
-                form.append(methodInput);
+                if (!methodInput.length)
+                {
+                    methodInput = $('<input name="_method" type="hidden">');
+
+                    form.append(methodInput);
+                }
+
+                methodInput.val(customMethod);
             }
-
-            methodInput.val(customMethod);
 
             // Set queries into form.
             if (queries)
