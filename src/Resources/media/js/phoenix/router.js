@@ -43,7 +43,7 @@ var Phoenix;
         {
             if (this.routes[route])
             {
-                return this.route[route];
+                return this.routes[route];
             }
 
             return null;
