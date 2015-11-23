@@ -84,7 +84,7 @@ JS;
 	 */
 	public static function route($route, $url)
 	{
-		static::translator();
+		static::router();
 
 		$asset = static::getAsset();
 
@@ -120,7 +120,7 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			static::core();
+			static::core($selector);
 
 			$asset->addScript(static::phoenixName() . '/js/phoenix/grid.js');
 

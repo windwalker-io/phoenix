@@ -19,6 +19,13 @@ use Windwalker\Record\Record;
 class CrudModel extends FormModel
 {
 	/**
+	 * Property updateNulls.
+	 *
+	 * @var  boolean
+	 */
+	protected $updateNulls = true;
+
+	/**
 	 * save
 	 *
 	 * @param Data $data
@@ -44,7 +51,7 @@ class CrudModel extends FormModel
 		$this->prepareRecord($record);
 
 		$record->check()
-			->store(true);
+			->store($this->updateNulls);
 
 		if ($record->$key)
 		{
@@ -99,5 +106,24 @@ class CrudModel extends FormModel
 		$record->load($pk)->delete();
 
 		return true;
+	}
+
+	/**
+	 * updateNulls
+	 *
+	 * @param   boolean $boolean
+	 *
+	 * @return  static|boolean
+	 */
+	public function updateNulls($boolean = null)
+	{
+		if ($boolean !== null)
+		{
+			$this->updateNulls = (bool) $boolean;
+
+			return $this;
+		}
+
+		return $this->updateNulls;
 	}
 }
