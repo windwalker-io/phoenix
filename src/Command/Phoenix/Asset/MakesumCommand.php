@@ -52,7 +52,7 @@ class MakesumCommand extends Command
 
 		$sum = md5(uniqid());
 
-		file_put_contents(WINDWALKER_CACHE . '/phoenix/MD5SUM', $sum);
+		file_put_contents(WINDWALKER_CACHE . '/phoenix/asset/MD5SUM', $sum);
 
 		$this->out('Create SUM: <info>' . $sum . '</info> at <info>' . WINDWALKER_CACHE . '/phoenix/MD5SUM</info>');
 
