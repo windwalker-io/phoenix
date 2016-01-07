@@ -43,7 +43,7 @@ class BootstrapRenderer
 	 *
 	 * @return  string
 	 */
-	public function render(AbstractField $field, Form $form)
+	public static function render(AbstractField $field, Form $form)
 	{
 		$field->appendAttribute('labelClass', ' hasTooltip');
 

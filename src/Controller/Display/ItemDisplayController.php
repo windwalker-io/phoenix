@@ -8,6 +8,8 @@
 
 namespace Phoenix\Controller\Display;
 
+use Windwalker\Core\Model\Model;
+
 /**
  * The GetController class.
  * 
@@ -32,10 +34,12 @@ class ItemDisplayController extends DisplayController
 	/**
 	 * prepareExecute
 	 *
-	 * @return  void
+	 * @param Model $model
+	 *
+	 * @return void
 	 */
-	protected function prepareUserState()
+	protected function prepareUserState(Model $model)
 	{
-		$this->model['item.pk'] = $this->input->get($this->pkName);
+		$model['item.pk'] = $this->input->get($this->pkName);
 	}
 }

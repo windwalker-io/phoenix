@@ -8,6 +8,8 @@
 
 namespace Phoenix\Controller\Display;
 
+use Windwalker\Core\Model\Model;
+
 /**
  * The EditGetController class.
  *
@@ -18,17 +20,19 @@ class EditDisplayController extends ItemDisplayController
 	/**
 	 * prepareExecute
 	 *
-	 * @return  void
+	 * @param Model $model
+	 *
+	 * @return void
 	 */
-	protected function prepareUserState()
+	protected function prepareUserState(Model $model)
 	{
-		parent::prepareUserState();
+		parent::prepareUserState($model);
 
 		if ($this->input->get('new') !== null)
 		{
 			$this->removeUserState($this->getContext('edit.data'));
 		}
 
-		$this->model['form.data'] = $this->getUserState($this->getContext('edit.data'));
+		$model['form.data'] = $this->getUserState($this->getContext('edit.data'));
 	}
 }
