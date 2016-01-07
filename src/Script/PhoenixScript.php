@@ -82,13 +82,28 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function route($route, $url)
+	public static function addRoute($route, $url)
 	{
 		static::router();
 
 		$asset = static::getAsset();
 
 		$asset->internalScript("Phoenix.Router.add('$route', '$url')");
+	}
+
+	/**
+	 * route
+	 *
+	 * @param   string  $route
+	 * @param   string  $url
+	 *
+	 * @return  void
+	 *
+	 * @deprecated  1.1  Use addRoute() instead.
+	 */
+	public static function route($route, $url)
+	{
+		static::addRoute($route, $url);
 	}
 
 	/**

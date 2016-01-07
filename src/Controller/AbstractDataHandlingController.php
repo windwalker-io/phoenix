@@ -70,7 +70,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	{
 		parent::prepareExecute();
 
-		$this->model  = $this->getModel($this->config['item_name']);
+		$this->model  = $this->getModel();
 		$this->record = $this->model->getRecord($this->config['item_name']);
 		$this->task   = $this->input->get('task');
 

@@ -183,7 +183,7 @@ class TranslatorHelper
 		$format = strtolower($format);
 		$ext = $format == 'yaml' ? 'yml' : $format;
 
-		$file = WINDWALKER_CACHE . '/language/orphans.' . $ext;
+		$file = WINDWALKER_TEMP . '/language/orphans.' . $ext;
 
 		if (!is_file($file))
 		{
