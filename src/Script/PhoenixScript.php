@@ -199,7 +199,25 @@ JS;
 // Chosen select
 jQuery(document).ready(function($)
 {
-	$('{$selector}').chosen($options);
+	var select = $('{$selector}').chosen($options);
+
+	// Readonly hack by http://jsfiddle.net/eirc/v2es7L8o/
+	select.on('chosen:updated', function () {
+		if (select.attr('readonly')) {
+			var wasDisabled = select.is(':disabled');
+
+			select.attr('disabled', 'disabled');
+			select.data('chosen').search_field_disabled();
+
+			if (wasDisabled) {
+				select.attr('disabled', 'disabled');
+			} else {
+				select.removeAttr('disabled');
+			}
+		}
+	});
+
+	select.trigger('chosen:updated');
 });
 JS;
 

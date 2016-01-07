@@ -20,6 +20,11 @@
             var group = btn.parent().find('.btn');
             var input = btn.find('input[type=radio]');
 
+            if (input.prop('disabled') || input.prop('readonly'))
+            {
+                return;
+            }
+
             if (!input.prop('checked'))
             {
                 group.removeClass('active btn-success btn-danger btn-primary');
@@ -68,6 +73,16 @@
                 {
                     $radio.addClass('active btn-success');
                 }
+            }
+
+            if ($input.prop('disabled'))
+            {
+                $radio.addClass('disabled');
+            }
+
+            if ($input.prop('readonly'))
+            {
+                $radio.addClass('readonly');
             }
         });
 
