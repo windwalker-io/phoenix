@@ -129,10 +129,7 @@ class FormModel extends ItemModel
 
 		$errors = $form->getErrors();
 
-		$msg = array(
-			ValidateResult::STATUS_REQUIRED => array(),
-			ValidateResult::STATUS_FAILURE => array()
-		);
+		$msg = array();
 
 		foreach ($errors as $error)
 		{
