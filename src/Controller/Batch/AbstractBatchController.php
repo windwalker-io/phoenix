@@ -36,6 +36,13 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 	protected $inflection = self::PLURAL;
 
 	/**
+	 * Property allowNullData.
+	 *
+	 * @var  boolean
+	 */
+	protected $allowNullData = false;
+
+	/**
 	 * Property cid.
 	 *
 	 * @var  array
@@ -99,7 +106,7 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 
 			$this->checkAccess($data);
 
-			if ($data->isNull())
+			if ($data->isNull() && !$this->allowNullData)
 			{
 				throw new ValidFailException(Translator::translate('phoenix.message.batch.error.empty'));
 			}
@@ -187,5 +194,20 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 	protected function validate(Data $data)
 	{
 		// Do some stuff
+	}
+
+	/**
+	 * getModel
+	 *
+	 * @param string $name
+	 * @param bool   $forceNew
+	 *
+	 * @return  mixed
+	 */
+	public function getModel($name = null, $forceNew = false)
+	{
+		$name = $name ? : $this->config['item_name'];
+
+		return parent::getModel($name, $forceNew);
 	}
 }

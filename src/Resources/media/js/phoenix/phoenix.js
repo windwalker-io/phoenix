@@ -131,6 +131,8 @@
          */
         post: function(url, queries, customMethod)
         {
+            customMethod = customMethod || 'POST';
+
             return this.submit(url, queries, 'POST', customMethod);
         },
 

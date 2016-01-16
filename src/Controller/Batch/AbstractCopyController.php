@@ -26,6 +26,13 @@ abstract class AbstractCopyController extends AbstractBatchController
 	protected $action = 'copy';
 
 	/**
+	 * Property allowNullData.
+	 *
+	 * @var  boolean
+	 */
+	protected $allowNullData = true;
+
+	/**
 	 * Which fields should increment.
 	 *
 	 * @var array
