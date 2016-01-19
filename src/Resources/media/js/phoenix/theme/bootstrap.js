@@ -141,21 +141,28 @@ var Phoenix;
          */
         toggleFilter: function(container, button)
         {
+            var showClass = button.attr('data-class-show') || 'btn-primary';
+            var hideClass = button.attr('data-class-hide') || 'btn-default';
+
+            var icon = button.find('span.filter-button-icon');
+            var iconShowClass = icon.attr('data-class-show') || 'glyphicon-menu-up fa fa-angle-up';
+            var iconHideClass = icon.attr('data-class-hide') || 'glyphicon-menu-down fa fa-angle-down';
+
             if (container.hasClass('shown'))
             {
-                button.removeClass('btn-primary').addClass('btn-default');
+                button.removeClass(showClass).addClass(hideClass);
                 container.hide('fast');
                 container.removeClass('shown');
 
-                button.find('span.glyphicon').removeClass('glyphicon-menu-up fa fa-angle-up').addClass('glyphicon-menu-down fa fa-angle-down');
+                icon.removeClass(iconShowClass).addClass(iconHideClass);
             }
             else
             {
-                button.removeClass('btn-default').addClass('btn-primary');
+                button.removeClass(hideClass).addClass(showClass);
                 container.show('fast');
                 container.addClass('shown');
 
-                button.find('span.glyphicon').removeClass('glyphicon-menu-down fa fa-angle-down').addClass('glyphicon-menu-up fa fa-angle-up');
+                icon.removeClass(iconHideClass).addClass(iconShowClass);
             }
         }
     };
