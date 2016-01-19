@@ -11,6 +11,7 @@ namespace Phoenix\View\Helper;
 use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
 use Windwalker\Dom\HtmlElement;
@@ -34,7 +35,7 @@ class GridHelper
 	/**
 	 * View instance.
 	 *
-	 * @var HtmlView
+	 * @var PhpHtmlView
 	 */
 	protected $view;
 
@@ -87,10 +88,10 @@ class GridHelper
 	/**
 	 * Constructor.
 	 *
-	 * @param HtmlView $view   The view object.
-	 * @param array    $config The config object.
+	 * @param PhpHtmlView $view   The view object.
+	 * @param array       $config The config object.
 	 */
-	public function __construct(HtmlView $view, $config = array())
+	public function __construct(PhpHtmlView $view, $config = array())
 	{
 		$this->view   = $view;
 		$this->config = $config = ($config instanceof Registry) ? $config : new Registry($config);
@@ -138,18 +139,6 @@ class GridHelper
 	}
 
 	/**
-	 * The reorder title.
-	 *
-	 * @return string
-	 */
-	public function orderTitle()
-	{
-		$orderColumn = $this->state->get('list.orderColumn', $this->config->get('order_column'));
-
-		return $this->sortTitle('', $orderColumn, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2');
-	}
-
-	/**
 	 * Set current item for this loop.
 	 *
 	 * @param object  $item The item object.
@@ -182,46 +171,10 @@ class GridHelper
 	}
 
 	/**
-	 * Drag sort symbol.
+	 * orderButton
 	 *
-	 * @return string
+	 * @return  string
 	 */
-	public function dragSort()
-	{
-		$iconClass  = '';
-		$input      = '';
-		$item       = $this->current;
-		$orderField = $this->config->get('field.ordering', 'ordering');
-		$canChange  = $this->state->get('access.canChange', true);
-		$saveOrder  = $this->state->get('list.saveorder', false);
-
-		if (!$canChange)
-		{
-			$iconClass = ' inactive';
-		}
-		elseif (!$saveOrder)
-		{
-			$iconClass = ' inactive tip-top hasTooltip" title="' . \JHtml::tooltipText('JORDERINGDISABLED');
-		}
-
-		if ($canChange && $saveOrder)
-		{
-			$input = '<input type="text" style="display:none" name="order[]" size="5" value="' . $item->$orderField . '" class="width-20 text-area-order " />';
-		}
-
-		$html = <<<HTML
-		<span class="sortable-handler{$iconClass}">
-			<i class="icon-menu"></i>
-		</span>
-		{$input}
-		<span class="label">
-			{$item->$orderField}
-		</span>
-HTML;
-
-		return $html;
-	}
-
 	public function orderButton()
 	{
 		$pkName = $this->config->get('field.pk');
@@ -284,15 +237,13 @@ HTML;
 
 	/**
 	 * Make a link to direct to foreign table item.
-	 * Note that the ordering or id and title are different from `editButton()`, but others are same.
 	 *
-	 * Usage: `echo $grid->foreignLink('customer', $item->customer_name, $item->customer_id);`
+	 * @param   string $title   Title of link, default is an icon.
+	 * @param   string $url     URL to link.
+	 * @param   array  $attribs Link element attributes.
+	 * @param   array  $options
 	 *
-	 * @param   string  $title    Title of link, default is an icon.
-	 * @param   string  $url      URL to link.
-	 * @param   array   $attribs  Link element attributes.
-	 *
-	 * @return  string  Link element.
+	 * @return string Link element.
 	 */
 	public function foreignLink($title = null, $url, $attribs = array(), $options = array())
 	{
@@ -321,27 +272,6 @@ HTML;
 		$format  = $format ? : DateTime::$format;
 
 		return DateTime::create($this->current->$field, $local)->format($format, true);
-	}
-
-	/**
-	 * The language title.
-	 *
-	 * @return  string Language title.
-	 */
-	public function language()
-	{
-		$field = $this->config->get('field.language', 'language');
-		$title = $this->config->get('field.lang_title', 'lang_title');
-		$all   = $this->config->get('lang.all', 'phoenix.all');
-
-		if ($this->current->$field == '*')
-		{
-			return Translator::translate($all);
-		}
-		else
-		{
-			return $this->current->$title ? $this->escape($this->current->$title) : '-';
-		}
 	}
 
 	/**
@@ -414,7 +344,7 @@ HTML;
 		$options['template'] = isset($options['template']) ? $options['template'] : 'phoenix.grid.table.icon-button';
 
 		return WidgetHelper::render($options['template'], array(
-			'value' => $value,
+			'value' => (string) $value,
 			'taskMapping' => $taskMapping,
 			'iconMapping' => $iconMapping,
 			'item' => $this->current,
@@ -423,34 +353,108 @@ HTML;
 		), WidgetHelper::ENGINE_BLADE);
 	}
 
-	/**
-	 * Can do what?
-	 *
-	 * @param string $action The action which can do or not.
-	 *
-	 * @return boolean Can do or not.
-	 */
-	public function can($action)
-	{
-		$action = 'can' . ucfirst($action);
+//	/**
+//	 * The language title.
+//	 *
+//	 * @return  string Language title.
+//	 */
+//	public function language()
+//	{
+//		$field = $this->config->get('field.language', 'language');
+//		$title = $this->config->get('field.lang_title', 'lang_title');
+//		$all   = $this->config->get('lang.all', 'phoenix.all');
+//
+//		if ($this->current->$field == '*')
+//		{
+//			return Translator::translate($all);
+//		}
+//		else
+//		{
+//			return $this->current->$title ? $this->escape($this->current->$title) : '-';
+//		}
+//	}
 
-		return $this->state->get('access.' . $action, true);
-	}
+//	/**
+//	 * The reorder title.
+//	 *
+//	 * @return string
+//	 */
+//	public function orderTitle()
+//	{
+//		$orderColumn = $this->state->get('list.orderColumn', $this->config->get('order_column'));
+//
+//		return $this->sortTitle('', $orderColumn, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2');
+//	}
 
-	/**
-	 * Method to escape output.
-	 *
-	 * @param   string $output The output to escape.
-	 *
-	 * @return  string  The escaped output.
-	 *
-	 * @see     \JView::escape()
-	 */
-	public function escape($output)
-	{
-		// Escape the output.
-		return htmlspecialchars($output, ENT_COMPAT, 'UTF-8');
-	}
+//	/**
+//	 * Drag sort symbol.
+//	 *
+//	 * @return string
+//	 */
+//	public function dragSort()
+//	{
+//		$iconClass  = '';
+//		$input      = '';
+//		$item       = $this->current;
+//		$orderField = $this->config->get('field.ordering', 'ordering');
+//		$canChange  = $this->state->get('access.canChange', true);
+//		$saveOrder  = $this->state->get('list.saveorder', false);
+//
+//		if (!$canChange)
+//		{
+//			$iconClass = ' inactive';
+//		}
+//		elseif (!$saveOrder)
+//		{
+//			$iconClass = ' inactive tip-top hasTooltip" title="' . \JHtml::tooltipText('JORDERINGDISABLED');
+//		}
+//
+//		if ($canChange && $saveOrder)
+//		{
+//			$input = '<input type="text" style="display:none" name="order[]" size="5" value="' . $item->$orderField . '" class="width-20 text-area-order " />';
+//		}
+//
+//		$html = <<<HTML
+//		<span class="sortable-handler{$iconClass}">
+//			<i class="icon-menu"></i>
+//		</span>
+//		{$input}
+//		<span class="label">
+//			{$item->$orderField}
+//		</span>
+//HTML;
+//
+//		return $html;
+//	}
+
+//	/**
+//	 * Can do what?
+//	 *
+//	 * @param string $action The action which can do or not.
+//	 *
+//	 * @return boolean Can do or not.
+//	 */
+//	public function can($action)
+//	{
+//		$action = 'can' . ucfirst($action);
+//
+//		return $this->state->get('access.' . $action, true);
+//	}
+
+//	/**
+//	 * Method to escape output.
+//	 *
+//	 * @param   string $output The output to escape.
+//	 *
+//	 * @return  string  The escaped output.
+//	 *
+//	 * @see     \JView::escape()
+//	 */
+//	public function escape($output)
+//	{
+//		// Escape the output.
+//		return htmlspecialchars($output, ENT_COMPAT, 'UTF-8');
+//	}
 
 	/**
 	 * Method to get property Row
