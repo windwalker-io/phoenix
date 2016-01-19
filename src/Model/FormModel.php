@@ -51,9 +51,9 @@ class FormModel extends ItemModel
 	/**
 	 * getForm
 	 *
-	 * @param string $definition
-	 * @param string $control
-	 * @param bool   $loadData
+	 * @param string|FieldDefinitionInterface $definition
+	 * @param string                          $control
+	 * @param bool                            $loadData
 	 *
 	 * @return Form
 	 */
@@ -61,7 +61,12 @@ class FormModel extends ItemModel
 	{
 		$form = new Form($control);
 
-		$form->defineFormFields($this->getFieldDefinition($definition));
+		if (is_string($definition))
+		{
+			$definition = $this->getFieldDefinition($definition);
+		}
+
+		$form->defineFormFields($definition);
 
 		if ($loadData)
 		{
@@ -105,6 +110,24 @@ class FormModel extends ItemModel
 		}
 
 		return new $class;
+	}
+
+	/**
+	 * filter
+	 *
+	 * @param array $data
+	 *
+	 * @return  static
+	 */
+	public function filter($data)
+	{
+		$form = $this->getForm('edit');
+
+		$form->bind($data);
+
+		$form->filter();
+
+		return $form->getValues();
 	}
 
 	/**

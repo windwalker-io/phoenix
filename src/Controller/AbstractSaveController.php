@@ -58,6 +58,8 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function doSave(Data $data)
 	{
+		$data = $this->filter($data);
+
 		$this->validate($data);
 
 		$this->model->save($data);
@@ -163,6 +165,25 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function postSave(Data $data)
 	{
+	}
+
+	/**
+	 * filter
+	 *
+	 * @param Data $data
+	 *
+	 * @return  Data
+	 */
+	protected function filter(Data $data)
+	{
+		if ($this->model instanceof FormModel)
+		{
+			$result = $this->model->filter($data->dump());
+
+			return new Data($result);
+		}
+
+		return $data;
 	}
 
 	/**

@@ -12,6 +12,7 @@ use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ModalField;
 use Phoenix\Field\CalendarField;
 use Windwalker\Core\Language\Translator;
+use Windwalker\Filter\InputFilter;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Field\RadioField;
 use Windwalker\Form\Field\TextareaField;
@@ -46,6 +47,7 @@ class EditDefinition implements FieldDefinitionInterface
 			// Title
 			$form->add('title', new TextField)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
+				->setFilter('trim')
 				->required(true);
 
 			// Alias
