@@ -12,6 +12,7 @@ use Phoenix\Controller\AbstractDataHandlingController;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidFailException;
+use Windwalker\Core\Model\Model;
 use Windwalker\Data\Data;
 
 /**
@@ -95,14 +96,7 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 
 			$data = new Data($this->data);
 
-			// Remove empty data
-			foreach ($data as $k => $value)
-			{
-				if ((string) $value === '')
-				{
-					unset($data[$k]);
-				}
-			}
+			$data = $this->cleanData($data);
 
 			$this->checkAccess($data);
 
@@ -183,6 +177,27 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 	}
 
 	/**
+	 * cleanData
+	 *
+	 * @param Data $data
+	 *
+	 * @return  Data
+	 */
+	protected function cleanData(Data $data)
+	{
+		// Remove empty data
+		foreach ($data as $k => $value)
+		{
+			if ((string) $value === '')
+			{
+				unset($data[$k]);
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * validate
 	 *
 	 * @param Data $data
@@ -202,10 +217,11 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 	 * @param string $name
 	 * @param bool   $forceNew
 	 *
-	 * @return  mixed
+	 * @return  Model
 	 */
 	public function getModel($name = null, $forceNew = false)
 	{
+		// Force the singular model
 		$name = $name ? : $this->config['item_name'];
 
 		return parent::getModel($name, $forceNew);
