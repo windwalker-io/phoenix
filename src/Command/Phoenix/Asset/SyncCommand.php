@@ -11,6 +11,7 @@ namespace Phoenix\Command\Phoenix\Asset;
 use Phoenix\Symlink\Symlink;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Environment\ServerHelper;
 use Windwalker\Filesystem\Folder;
 
 /**
@@ -100,6 +101,11 @@ class SyncCommand extends Command
 		else
 		{
 			$this->out(Symlink::make($dir, $target));
+
+			if (!ServerHelper::isWindows())
+			{
+				$this->out('Link success ' . $dir . ' <====> ' . $target);
+			}
 		}
 
 		return true;
