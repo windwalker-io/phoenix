@@ -40,7 +40,7 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
 			->addColumn(new Column\Char('language', 7))
 			->addColumn(new Column\Text('params'))
 			->addIndex(Key::TYPE_INDEX, 'idx_{$controller.list.name.lower$}_alias', 'alias')
-			->addIndex(Key::TYPE_INDEX, 'idx_{$controller.list.name.lower$}_alias', 'language')
+			->addIndex(Key::TYPE_INDEX, 'idx_{$controller.list.name.lower$}_language', 'language')
 			->addIndex(Key::TYPE_INDEX, 'idx_{$controller.list.name.lower$}_created_by', 'created_by')
 			->create(true);
 	}
