@@ -23,12 +23,12 @@
     @translate('phoenix.toolbar.duplicate')
 </button>
 
-<button type="button" class="btn btn-default btn-sm" onclick="Phoenix.Grid.hasChecked();Phoenix.patch(null, {task: 'publish'});">
+<button type="button" class="btn btn-default btn-sm" onclick="Phoenix.Grid.hasChecked().batch('publish');">
     <span class="glyphicon glyphicon-ok fa fa-check text-success"></span>
     @translate('phoenix.toolbar.publish')
 </button>
 
-<button type="button" class="btn btn-default btn-sm" onclick="Phoenix.Grid.hasChecked();Phoenix.patch(null, {task: 'unpublish'});">
+<button type="button" class="btn btn-default btn-sm" onclick="Phoenix.Grid.hasChecked().batch('unpublish');">
     <span class="glyphicon glyphicon-remove fa fa-remove text-danger"></span>
     @translate('phoenix.toolbar.unpublish')
 </button>
