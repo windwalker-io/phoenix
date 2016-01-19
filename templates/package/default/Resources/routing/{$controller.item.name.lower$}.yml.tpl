@@ -4,6 +4,8 @@
     controller: {$controller.item.name.cap$}
     extra:
         layout: {$controller.item.name.lower$}
+        active:
+            mainmenu: {$controller.list.name.lower$}
 
 # {$controller.list.name.cap$}
 {$controller.list.name.lower$}:
@@ -15,3 +17,5 @@
         put: FilterController
     extra:
         layout: {$controller.list.name.lower$}
+        active:
+            mainmenu: {$controller.list.name.lower$}
