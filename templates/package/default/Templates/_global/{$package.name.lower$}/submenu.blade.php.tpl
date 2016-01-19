@@ -1,3 +1,9 @@
+<?php
+/**
+ * @var $helper \{$package.namespace$}{$package.name.cap$}\Helper\MenuHelper
+ * @var $router \Windwalker\Core\Router\PackageRouter
+ */
+?>
 
 <h3 class="visible-xs-block">
     @translate('phoenix.title.submenu')

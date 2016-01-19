@@ -1,4 +1,17 @@
 {{-- Part of phoenix project. --}}
+<?php
+/**
+ * Global variables
+ * --------------------------------------------------------------
+ * @var $app      \Windwalker\Web\Application            Global Application
+ * @var $package  \{$package.namespace$}{$package.name.cap$}\{$package.name.cap$}Package            Package object.
+ * @var $view     \Windwalker\Data\Data                  Some information of this view.
+ * @var $uri      \Windwalker\Registry\Registry          Uri information, example: $uri['media.path']
+ * @var $datetime \DateTime                              PHP DateTime object of current time.
+ * @var $helper   \{$package.namespace$}{$package.name.cap$}\Helper\MenuHelper        The Windwalker HelperSet object.
+ * @var $router   \Windwalker\Core\Router\PackageRouter  Router object.
+ */
+?>
 
 <button type="button" class="btn btn-success btn-sm" onclick="Phoenix.post();">
     <span class="glyphicon glyphicon-floppy-disk fa fa-save"></span>
