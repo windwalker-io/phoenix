@@ -240,22 +240,27 @@
 	    /**
          * Delete checked items.
          *
-         * @param  {string} msg
+         * @param  {string} message
          * @param  {string} url
          * @param  {Object} queries
          *
          * @returns {boolean}
 	     */
-        deleteList: function(msg, url, queries)
+        deleteList: function(message, url, queries)
         {
-            msg = msg || Phoenix.Translator.translate('phoenix.message.delete.confirm');
+            var self = this;
 
-            if (!confirm(msg))
+            message = message || Phoenix.Translator.translate('phoenix.message.delete.confirm');
+
+            this.core.confirm(message, function(isConfirm)
             {
-                return false;
-            }
+                if (isConfirm)
+                {
+                    self.core.sendDelete(url, queries);
+                }
+            });
 
-            return this.core.sendDelete(url, queries);
+            return true;
         },
 
 	    /**

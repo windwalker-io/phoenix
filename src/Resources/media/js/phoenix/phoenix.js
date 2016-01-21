@@ -175,6 +175,23 @@
             return this.post(url, queries, 'DELETE');
         },
 
+        /**
+         * Confirm popup.
+         *
+         * @param {string}   message
+         * @param {Function} callback
+         */
+        confirm: function(message, callback)
+        {
+            message = message || 'Are you sure?';
+
+            var confirmed = confirm(message);
+
+            callback(confirmed);
+
+            return confirmed;
+        },
+
         addMessage: function(msg, type)
         {
             var messageContainer = $(this.options.selector.message);
