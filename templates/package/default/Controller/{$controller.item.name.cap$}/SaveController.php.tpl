@@ -37,4 +37,11 @@ class SaveController extends AbstractSaveController
 	 * @var  string
 	 */
 	protected $listName = '{$controller.list.name.lower$}';
+
+	/**
+	 * Property formControl.
+	 *
+	 * @var  string
+	 */
+	protected $formControl = 'item';
 }
