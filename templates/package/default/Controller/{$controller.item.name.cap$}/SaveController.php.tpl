@@ -1,19 +1,21 @@
 <?php
 /**
- * Part of phoenix project. 
+ * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
+use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
+use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
 use Phoenix\Controller\AbstractSaveController;
 
 /**
  * The SaveController class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  1.0
  */
 class SaveController extends AbstractSaveController
 {
@@ -44,4 +46,18 @@ class SaveController extends AbstractSaveController
 	 * @var  string
 	 */
 	protected $formControl = 'item';
+
+	/**
+	 * Property model.
+	 *
+	 * @var  {$controller.item.name.cap$}Model
+	 */
+	protected $model;
+
+	/**
+	 * Property view.
+	 *
+	 * @var  {$controller.item.name.cap$}HtmlView
+	 */
+	protected $view;
 }

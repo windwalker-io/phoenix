@@ -1,4 +1,4 @@
-{{-- Part of phoenix project. --}}
+{{-- Part of {$package.name.cap$} project. --}}
 <?php
 /**
  * @var $batchForm \Windwalker\Form\Form

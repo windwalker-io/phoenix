@@ -1,8 +1,8 @@
 <?php
 /**
- * Part of phoenix project. 
+ * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -19,7 +19,7 @@ use Windwalker\Filter\OutputFilter;
 /**
  * The {$controller.item.name.cap$}Seeder class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  1.0
  */
 class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 {

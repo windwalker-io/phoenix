@@ -1,8 +1,8 @@
 <?php
 /**
- * Part of Windwalker project.
+ * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
  */
 
@@ -30,7 +30,7 @@ if (!defined('{$package.name.upper$}_ROOT'))
 /**
  * The {$package.name.cap$}Package class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.0
  */
 class {$package.name.cap$}Package extends AbstractPackage
 {

@@ -1,4 +1,4 @@
-{{-- Part of Windwalker project. --}}
+{{-- Part of {$package.name.cap$} project. --}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
