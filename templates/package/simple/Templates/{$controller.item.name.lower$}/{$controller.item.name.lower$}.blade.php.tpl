@@ -1,4 +1,4 @@
-{{-- Part of phoenix project. --}}
+{{-- Part of {$package.name.cap$} project. --}}
 
 @extends('_global.html')
 
