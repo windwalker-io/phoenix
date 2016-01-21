@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Mapper;
+namespace {$package.namespace$}{$package.name.cap$}\DataMapper;
 
 use Windwalker\DataMapper\DataMapper;
 

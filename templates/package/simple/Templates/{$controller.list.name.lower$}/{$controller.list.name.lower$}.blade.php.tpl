@@ -18,5 +18,9 @@
         </div>
         @endforeach
     </div>
+    <hr />
+    <div class="pagination">
+        {!! $pagination->render('{$package.name.lower$}:{$controller.list.name.lower$}') !!}
+    </div>
 </div>
 @stop
