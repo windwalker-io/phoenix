@@ -9,7 +9,7 @@
 namespace Phoenix\View;
 
 use Phoenix\Html\Document;
-use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\BladeRenderer;
 use Windwalker\Renderer\RendererInterface;
@@ -19,7 +19,7 @@ use Windwalker\Renderer\RendererInterface;
  *
  * @since  1.0
  */
-abstract class AbstractPhoenixHtmView extends HtmlView
+abstract class AbstractPhoenixHtmView extends PhpHtmlView
 {
 	/**
 	 * Method to instantiate the view.

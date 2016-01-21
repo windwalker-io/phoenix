@@ -38,6 +38,13 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	protected $isNew = true;
 
 	/**
+	 * Property formControl.
+	 *
+	 * @var  string
+	 */
+	protected $formControl = 'item';
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
@@ -46,7 +53,14 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	{
 		parent::prepareExecute();
 
-		$this->data = $this->input->getVar('item');
+		if ($this->formControl)
+		{
+			$this->data = $this->input->getVar($this->formControl);
+		}
+		else
+		{
+			$this->data = $this->input->getArray();
+		}
 	}
 
 	/**

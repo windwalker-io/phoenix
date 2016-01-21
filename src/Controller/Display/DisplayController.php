@@ -13,6 +13,7 @@ use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\PhpHtmlView;
 
 /**
  * The AbstractGetController class.
@@ -22,11 +23,18 @@ use Windwalker\Core\View\HtmlView;
 class DisplayController extends AbstractPhoenixController
 {
 	/**
-	 * Property model.
+	 * Default model.
 	 *
 	 * @var  DatabaseModel
 	 */
 	protected $model;
+
+	/**
+	 * Property models.
+	 *
+	 * @var  DatabaseModel[]
+	 */
+	protected $subModels = array();
 
 	/**
 	 * Property view.
@@ -72,7 +80,16 @@ class DisplayController extends AbstractPhoenixController
 	{
 		$this->prepareUserState($this->model);
 
-		$this->view->setModel($this->model);
+		// Add default
+		$this->view->setModel($this->model, true);
+
+		// Push sub models
+		foreach ((array) $this->subModels as $name => $model)
+		{
+			$name = is_numeric($name) ? null : $name;
+
+			$this->view->setModel($model, false, $name);
+		}
 
 		$this->assignModels($this->view);
 
@@ -82,11 +99,11 @@ class DisplayController extends AbstractPhoenixController
 	/**
 	 * assignModels
 	 *
-	 * @param HtmlView $view
+	 * @param PhpHtmlView $view
 	 *
 	 * @return  void
 	 */
-	protected function assignModels(HtmlView $view)
+	protected function assignModels(PhpHtmlView $view)
 	{
 		// Implement it.
 	}

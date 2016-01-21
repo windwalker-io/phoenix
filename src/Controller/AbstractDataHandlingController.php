@@ -71,7 +71,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 		parent::prepareExecute();
 
 		$this->model  = $this->getModel();
-		$this->record = $this->model->getRecord($this->config['item_name']);
+		$this->record = $this->getRecord();
 		$this->task   = $this->input->get('task');
 
 		// Determine model
@@ -128,5 +128,24 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 		$this->useTransaction = (bool) $bool;
 
 		return $this;
+	}
+
+	/**
+	 * getRecord
+	 *
+	 * @param string $name
+	 *
+	 * @return  Record
+	 */
+	public function getRecord($name = null)
+	{
+		if (!$this->model)
+		{
+			$this->model = $this->getModel();
+		}
+
+		$name = $name ? : $this->config['item_name'];
+
+		return $this->model->getRecord($name);
 	}
 }
