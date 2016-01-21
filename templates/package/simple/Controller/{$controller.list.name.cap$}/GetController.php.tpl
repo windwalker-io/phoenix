@@ -10,6 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}Model;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
+use Phoenix\Controller\Display\ListDisplayController;
 use Windwalker\Core\Controller\Controller;
 
 /**
@@ -17,8 +18,29 @@ use Windwalker\Core\Controller\Controller;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class GetController extends Controller
+class GetController extends ListDisplayController
 {
+	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = '{$controller.list.name.lower$}';
+
+	/**
+	 * Property itemName.
+	 *
+	 * @var  string
+	 */
+	protected $itemName = '{$controller.item.name.lower$}';
+
+	/**
+	 * Property listName.
+	 *
+	 * @var  string
+	 */
+	protected $listName = '{$controller.list.name.lower$}';
+
 	/**
 	 * Property model.
 	 *
@@ -34,25 +56,16 @@ class GetController extends Controller
 	protected $view;
 
 	/**
-	 * prepareExecute
+	 * Property ordering.
 	 *
-	 * @return  void
+	 * @var  string
 	 */
-	protected function prepareExecute()
-	{
-		$this->model = $this->getModel();
-		$this->view = $this->getView();
-	}
+	protected $defaultOrdering = null;
 
 	/**
-	 * doExecute
+	 * Property direction.
 	 *
-	 * @return  mixed
+	 * @var  string
 	 */
-	protected function doExecute()
-	{
-		$this->view->setModel($this->model);
-
-		return $this->view->render();
-	}
+	protected $defaultDirection = null;
 }

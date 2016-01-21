@@ -22,5 +22,5 @@ class {$controller.item.name.cap$}Mapper extends DataMapper
 	 *
 	 * @var  string
 	 */
-	protected $table = '{$package.name.lower$}_{$controller.list.name.lower$}';
+	protected $table = '{$controller.list.name.lower$}';
 }

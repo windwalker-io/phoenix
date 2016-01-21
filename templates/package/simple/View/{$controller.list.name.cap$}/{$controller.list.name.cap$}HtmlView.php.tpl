@@ -8,15 +8,22 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
-use Windwalker\Core\View\BladeHtmlView;
+use Phoenix\View\ListView;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class {$controller.list.name.cap$}HtmlView extends BladeHtmlView
+class {$controller.list.name.cap$}HtmlView extends ListView
 {
+	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = '{$controller.list.name.lower$}';
+
 	/**
 	 * prepareData
 	 *
@@ -26,6 +33,17 @@ class {$controller.list.name.cap$}HtmlView extends BladeHtmlView
 	 */
 	protected function prepareData($data)
 	{
-		$data->items = $this->model->getSomething();
+	}
+
+	/**
+	 * setTitle
+	 *
+	 * @param string $title
+	 *
+	 * @return  static
+	 */
+	public function setTitle($title = null)
+	{
+		return parent::setTitle($title);
 	}
 }

@@ -8,7 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
-use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
+use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use Phoenix\Controller\AbstractSaveController;
 use Windwalker\Data\Data;
 
@@ -20,18 +20,49 @@ use Windwalker\Data\Data;
 class SaveController extends AbstractSaveController
 {
 	/**
-	 * doSave
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = '{$controller.item.name.lower$}';
+
+	/**
+	 * Property itemName.
+	 *
+	 * @var  string
+	 */
+	protected $itemName = '{$controller.item.name.lower$}';
+
+	/**
+	 * Property listName.
+	 *
+	 * @var  string
+	 */
+	protected $listName = '{$controller.list.name.lower$}';
+
+	/**
+	 * Property model.
+	 *
+	 * @var  {$controller.item.name.cap$}Model
+	 */
+	protected $model;
+
+	/**
+	 * Property useTransaction.
+	 *
+	 * @var  bool
+	 */
+	protected $useTransaction = false;
+
+	/**
+	 * postSave
 	 *
 	 * @param Data $data
 	 *
-	 * @return void
+	 * @return  void
 	 */
-	protected function doSave(Data $data)
+	protected function postSave(Data $data)
 	{
-		$record = new {$controller.item.name.cap$}Record;
-
-		$record->bind($data->dump())
-			->check()
-			->store($record::UPDATE_NULLS);
+		parent::postSave($data);
 	}
 }

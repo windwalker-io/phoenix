@@ -8,15 +8,22 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
 
-use Windwalker\Core\View\BladeHtmlView;
+use Phoenix\View\ItemView;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class {$controller.item.name.cap$}HtmlView extends BladeHtmlView
+class {$controller.item.name.cap$}HtmlView extends ItemView
 {
+	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = '{$controller.item.name.lower$}';
+
 	/**
 	 * prepareData
 	 *
@@ -26,6 +33,17 @@ class {$controller.item.name.cap$}HtmlView extends BladeHtmlView
 	 */
 	protected function prepareData($data)
 	{
-		$data->item = $this->model->getSomething();
+	}
+
+	/**
+	 * setTitle
+	 *
+	 * @param string $title
+	 *
+	 * @return  static
+	 */
+	public function setTitle($title = null)
+	{
+		return parent::setTitle($title);
 	}
 }
