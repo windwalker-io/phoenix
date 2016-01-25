@@ -286,7 +286,20 @@ class GridHelper
 	 */
 	public function createIconButton($value, $options = array())
 	{
-		return new IconButton($value, $this->row, $options);
+		return IconButton::create($value, $this->row, $options);
+	}
+
+	/**
+	 * published
+	 *
+	 * @param string $value
+	 * @param array  $options
+	 *
+	 * @return  static
+	 */
+	public function published($value, $options = array())
+	{
+		return StateButton::create($value, $this->row, $options);
 	}
 
 	/**
@@ -296,10 +309,30 @@ class GridHelper
 	 * @param array $options
 	 *
 	 * @return  string
+	 *
+	 * @deprecated Use published() instead.
 	 */
 	public function state($value, $options = array())
 	{
-		return StateButton::create($value, $this->row, $options);
+		$iconMapping = array(
+			-1 => 'trash fa fa-trash',
+			0 => 'remove fa fa-remove text-danger',
+			1 => 'ok fa fa-check text-success'
+		);
+
+		$taskMapping = array(
+			-1 => 'publish',
+			0 => 'publish',
+			1 => 'unpublish'
+		);
+
+		$options['titleMapping'] = isset($options['titleMapping']) ? (array) $options['titleMapping'] : array(
+			-1 => 'phoenix.grid.state.trashed',
+			0 => 'phoenix.grid.state.unpublished',
+			1 => 'phoenix.grid.state.published'
+		);
+
+		return $this->stateButton($value, $taskMapping, $iconMapping, $options);
 	}
 
 	/**
@@ -309,6 +342,8 @@ class GridHelper
 	 * @param array  $options
 	 *
 	 * @return  string
+	 *
+	 * @deprecated Use createIconButton() instead.
 	 */
 	public function booleanButton($value, $options = array())
 	{
@@ -334,6 +369,8 @@ class GridHelper
 	 * @param   array  $options     Some options.
 	 *
 	 * @return string A boolean icon HTML string.
+	 *
+	 * @deprecated Use createIconButton() instead.
 	 */
 	public function stateButton($value, $taskMapping = array(), $iconMapping = array(), $options = array())
 	{

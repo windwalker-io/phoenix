@@ -116,6 +116,7 @@ class IconButton
 	 */
 	public function addState($value, $task, $icon = 'glyphicon glyphicon-ok', $title = null, $onlyIcon = null, $options = array())
 	{
+		// Force type to prevent null data
 		$this->states[$value] = array(
 			'value'   => $value,
 			'task'    => $task,
@@ -168,7 +169,7 @@ class IconButton
 
 		$data = $data ? : $this->getState('_default');
 
-		$data = array_merge($this->options, $data);
+		$data = array_merge($data, $this->options);
 		$data['row'] = (int) $this->row;
 
 		return WidgetHelper::render($this->template, $data, WidgetHelper::ENGINE_BLADE);
@@ -280,7 +281,7 @@ class IconButton
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setOptions($options)
+	public function setOptions(array $options)
 	{
 		$this->options = $options;
 

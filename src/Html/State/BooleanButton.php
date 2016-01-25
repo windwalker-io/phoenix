@@ -9,11 +9,11 @@
 namespace Phoenix\Html\State;
 
 /**
- * The StateButton class.
+ * The BooleanButton class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class StateButton extends BooleanButton
+class BooleanButton extends IconButton
 {
 	/**
 	 * configure
@@ -22,8 +22,7 @@ class StateButton extends BooleanButton
 	 */
 	protected function configure()
 	{
-		parent::configure();
-
-		$this->addState(-1, 'publish', 'trash fa fa-trash', 'phoenix.grid.state.trashed');
+		$this->addState(0, 'publish',   'remove fa fa-remove text-danger', 'phoenix.grid.state.unpublished')
+			->addState(1,  'unpublish', 'ok fa fa-check text-success',     'phoenix.grid.state.published');
 	}
 }

@@ -106,7 +106,7 @@
                         {{-- STATE --}}
                         <td>
                             <span class="btn-group">
-                                {!! $grid->state($item->state) !!}
+                                {!! $grid->published($item->state) !!}
                                 <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
                                     title="@translate('phoenix.toolbar.duplicate')">
                                     <span class="glyphicon glyphicon-duplicate fa fa-copy text-info"></span>
