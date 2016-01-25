@@ -69,6 +69,6 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 	 */
 	public function doClean()
 	{
-		$this->db->getTable(Table::{$controller.list.name.upper$})->truncate();
+		$this->truncate(Table::{$controller.list.name.upper$});
 	}
 }
