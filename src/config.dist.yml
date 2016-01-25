@@ -1,0 +1,8 @@
+# Mail
+mail:
+    transport: smtp
+    host:
+    username:
+    password:
+    security: ssl
+    port: 465

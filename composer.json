@@ -7,7 +7,8 @@
     "require": {
         "illuminate/view": ">=4.0 <6.0",
         "asika/muse": "~1.0",
-        "mrclay/minify": "~2.0"
+        "mrclay/minify": "~2.0",
+        "swiftmailer/swiftmailer": "^5.4"
     },
     "require-dev": {
 

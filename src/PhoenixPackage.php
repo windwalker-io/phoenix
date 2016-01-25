@@ -9,6 +9,7 @@
 namespace Phoenix;
 
 use Phoenix\Provider\PhoenixProvider;
+use Phoenix\Provider\SwiftMailerProvider;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
@@ -45,6 +46,7 @@ class PhoenixPackage extends AbstractPackage
 	 */
 	public function registerProviders(Container $container)
 	{
-		$container->registerServiceProvider(new PhoenixProvider);
+		$container->registerServiceProvider(new PhoenixProvider)
+			->registerServiceProvider(new SwiftMailerProvider);
 	}
 }
