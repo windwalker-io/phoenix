@@ -1,5 +1,7 @@
 {{-- Part of Phoenix project. --}}
 
+{{-- DO NOT USE THIS FILE NOW, USE: "icon-button-new.blade.php" INSTEAD. --}}
+
 @if (!empty($options['only_icon']))
     <span class="glyphicon glyphicon-{{ $iconMapping[$value] or null }}" title="@translate(isset($options['titleMapping'][$value]) ? $options['titleMapping'][$value] : null)"></span>
 @else

@@ -8,6 +8,8 @@
 
 namespace Phoenix\View\Helper;
 
+use Phoenix\Html\State\IconButton;
+use Phoenix\Html\State\StateButton;
 use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\View\HtmlView;
@@ -275,6 +277,19 @@ class GridHelper
 	}
 
 	/**
+	 * createIconButton
+	 *
+	 * @param mixed $value
+	 * @param array $options
+	 *
+	 * @return  IconButton
+	 */
+	public function createIconButton($value, $options = array())
+	{
+		return new IconButton($value, $this->row, $options);
+	}
+
+	/**
 	 * publishButton
 	 *
 	 * @param mixed $value
@@ -284,25 +299,7 @@ class GridHelper
 	 */
 	public function state($value, $options = array())
 	{
-		$iconMapping = array(
-			-1 => 'trash fa fa-trash',
-			0 => 'remove fa fa-remove text-danger',
-			1 => 'ok fa fa-check text-success'
-		);
-
-		$taskMapping = array(
-			-1 => 'publish',
-			0 => 'publish',
-			1 => 'unpublish'
-		);
-
-		$options['titleMapping'] = isset($options['titleMapping']) ? (array) $options['titleMapping'] : array(
-			-1 => 'phoenix.grid.state.trashed',
-			0 => 'phoenix.grid.state.unpublished',
-			1 => 'phoenix.grid.state.published'
-		);
-
-		return $this->stateButton($value, $taskMapping, $iconMapping, $options);
+		return StateButton::create($value, $this->row, $options);
 	}
 
 	/**
