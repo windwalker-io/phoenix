@@ -70,11 +70,6 @@
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
                     </th>
 
-                    {{-- LANGUAGE --}}
-                    <th>
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') !!}
-                    </th>
-
                     {{-- ID --}}
                     <th>
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
@@ -100,19 +95,14 @@
                             {!! $grid->state($item->state, array('only_icon' => true)) !!}
                         </td>
 
-                        {{-- AUTHIR --}}
+                        {{-- AUTHOR --}}
                         <td>
-                            {{ $item->created_by }}
+                            {{ $item->user_name ? : $item->created_by }}
                         </td>
 
                         {{-- CREATED --}}
                         <td>
                             {{ \Windwalker\Core\DateTime\DateTime::toLocalTime($item->created) }}
-                        </td>
-
-                        {{-- LANGUAGE --}}
-                        <td>
-                            {{ $item->language }}
                         </td>
 
                         {{-- ID --}}
