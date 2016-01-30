@@ -16,7 +16,7 @@ namespace Phoenix\Script;
  *
  * @since  1.0
  */
-abstract class CoreScript extends ScriptManager
+abstract class CoreScript extends AbstractScriptManager
 {
 	/**
 	 * requireJS
@@ -55,6 +55,13 @@ abstract class CoreScript extends ScriptManager
 		}
 	}
 
+	/**
+	 * underscoreString
+	 *
+	 * @param bool $noConflict
+	 *
+	 * @return  void
+	 */
 	public static function underscoreString($noConflict = true)
 	{
 		$asset = static::getAsset();

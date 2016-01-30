@@ -21,7 +21,7 @@ use Windwalker\Registry\Format\JsonFormat;
  *
  * @since  1.0
  */
-class PhoenixScript extends ScriptManager
+abstract class PhoenixScript extends AbstractScriptManager
 {
 	/**
 	 * core
@@ -312,7 +312,7 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			JQueryScript::core();
+			static::core();
 
 			$asset->addScript(static::phoenixName() . '/js/string/punycode.min.js');
 			$asset->addScript(static::phoenixName() . '/js/phoenix/validation.min.js');

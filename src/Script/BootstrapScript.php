@@ -16,7 +16,7 @@ namespace Phoenix\Script;
  *
  * @since  1.0
  */
-class BootstrapScript extends ScriptManager
+abstract class BootstrapScript extends AbstractScriptManager
 {
 	const GLYPHICONS = 'glyphicons';
 	const FONTAWESOME = 'fontawesome';
@@ -157,7 +157,8 @@ CSS;
 
 			$js = <<<JS
 // Init modal
-jQuery(document).ready(function($) {
+jQuery(document).ready(function($)
+{
 	var modalBox = $('<div class="modal fade" id="phoenix-iframe-modal"> \
     <div class="modal-dialog"> \
         <div class="modal-content"> \
@@ -179,15 +180,20 @@ JS;
 		{
 			$js = <<<JS
 // Modal task
-jQuery(document).ready(function($) {
-	$('{$selector}').click(function(event) {
-		var \$link = $(this);
+jQuery(document).ready(function($)
+{
+	$('{$selector}').click(function(event)
+	{
+		var link   = $(this);
 		var modal  = $('#phoenix-iframe-modal');
-		var href   = \$link.attr('href');
+		var href   = link.attr('href');
 		var iframe = modal.find('iframe');
 
 		iframe.attr('src', href);
 		modal.modal('show');
+		modal.on('hide.bs.modal', function() {
+		    iframe.attr('src', '');
+		})
 
 		event.stopPropagation();
 		event.preventDefault();

@@ -155,6 +155,13 @@ class ModalField extends TextField
 	 */
 	protected function prepareScript()
 	{
+		static $inited = false;
+
+		if ($inited)
+		{
+			return;
+		}
+
 		JQueryScript::ui(array('effect'));
 
 		$js = <<<JS
@@ -180,5 +187,7 @@ var Phoenix;
 JS;
 
 		Asset::internalScript($js);
+
+		$inited = true;
 	}
 }

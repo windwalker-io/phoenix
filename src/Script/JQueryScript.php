@@ -15,7 +15,7 @@ use Windwalker\Registry\Format\JsonFormat;
  *
  * @since  1.0
  */
-class JQueryScript extends ScriptManager
+abstract class JQueryScript extends AbstractScriptManager
 {
 	/**
 	 * jquery
