@@ -117,7 +117,7 @@ class FormModel extends ItemModel
 	 *
 	 * @param array $data
 	 *
-	 * @return  static
+	 * @return  array
 	 */
 	public function filter($data)
 	{

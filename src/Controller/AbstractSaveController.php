@@ -194,7 +194,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 		{
 			$result = $this->model->filter($data->dump());
 
-			return new Data($result);
+			return $data->bind($result);
 		}
 
 		return $data;
