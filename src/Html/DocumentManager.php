@@ -46,6 +46,13 @@ class DocumentManager
 	protected $metadata = array();
 
 	/**
+	 * Property openGraphs.
+	 *
+	 * @var  array
+	 */
+	protected $openGraphs = array();
+
+	/**
 	 * Property customTags.
 	 *
 	 * @var  array
@@ -185,10 +192,35 @@ class DocumentManager
 	 */
 	public function addMetadata($name, $content)
 	{
-		$this->metadata[] = new HtmlElement('meta', null, array(
-			'name' => $name,
-			'content' => $content
-		));
+		if (!isset($this->metadata[$name]))
+		{
+			$this->metadata[$name] = array();
+		}
+
+		foreach ((array) $content as $item)
+		{
+			$this->metadata[$name][] = new HtmlElement('meta', null, array(
+				'name' => $name,
+				'content' => $item
+			));
+		}
+
+		return $this;
+	}
+
+	/**
+	 * removeMetadata
+	 *
+	 * @param  string  $name
+	 *
+	 * @return  static
+	 */
+	public function removeMetadata($name)
+	{
+		if (isset($this->metadata[$name]))
+		{
+			unset($this->metadata[$name]);
+		}
 
 		return $this;
 	}
@@ -203,10 +235,35 @@ class DocumentManager
 	 */
 	public function addOpenGraph($type, $content)
 	{
-		$this->metadata[] = new HtmlElement('meta', null, array(
-			'property' => $type,
-			'content' => $content
-		));
+		if (!isset($this->openGraphs[$type]))
+		{
+			$this->openGraphs[$type] = array();
+		}
+
+		foreach ((array) $content as $item)
+		{
+			$this->openGraphs[$type][] = new HtmlElement('meta', null, array(
+				'property' => $type,
+				'content' => $item
+			));
+		}
+
+		return $this;
+	}
+
+	/**
+	 * removeOpenGraph
+	 *
+	 * @param  string  $type
+	 *
+	 * @return  static
+	 */
+	public function removeOpenGraph($type)
+	{
+		if (isset($this->openGraphs[$type]))
+		{
+			unset($this->openGraphs[$type]);
+		}
 
 		return $this;
 	}
@@ -224,13 +281,13 @@ class DocumentManager
 	/**
 	 * Method to set property metadata
 	 *
-	 * @param   array $openGraphs
+	 * @param   array $metadata
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setMetadata($openGraphs)
+	public function setMetadata($metadata)
 	{
-		$this->metadata = $openGraphs;
+		$this->metadata = $metadata;
 
 		return $this;
 	}
@@ -273,9 +330,20 @@ class DocumentManager
 	{
 		$html = array();
 
-		foreach ($this->metadata as $metadata)
+		foreach ((array) $this->metadata as $metadata)
 		{
-			$html[] = (string) $metadata;
+			foreach ($metadata as $item)
+			{
+				$html[] = (string) $item;
+			}
+		}
+
+		foreach ((array) $this->openGraphs as $opengraphs)
+		{
+			foreach ($opengraphs as $item)
+			{
+				$html[] = (string) $item;
+			}
 		}
 
 		return implode("\n" . $this->indents, $html);
@@ -342,6 +410,30 @@ class DocumentManager
 	public function setIndents($indents)
 	{
 		$this->indents = $indents;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property OpenGraphs
+	 *
+	 * @return  array
+	 */
+	public function getOpenGraphs()
+	{
+		return $this->openGraphs;
+	}
+
+	/**
+	 * Method to set property openGraphs
+	 *
+	 * @param   array $openGraphs
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setOpenGraphs($openGraphs)
+	{
+		$this->openGraphs = $openGraphs;
 
 		return $this;
 	}
