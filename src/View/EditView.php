@@ -18,6 +18,27 @@ use Windwalker\Core\Language\Translator;
 class EditView extends ItemView
 {
 	/**
+	 * Property formDefinition.
+	 *
+	 * @var  string
+	 */
+	protected $formDefinition = 'edit';
+
+	/**
+	 * Property formControl.
+	 *
+	 * @var  string
+	 */
+	protected $formControl = 'item';
+
+	/**
+	 * Property formLoadData.
+	 *
+	 * @var  boolean
+	 */
+	protected $formLoadData = true;
+
+	/**
 	 * setTitle
 	 *
 	 * @param string $title
@@ -42,6 +63,6 @@ class EditView extends ItemView
 	{
 		parent::prepareRender($data);
 
-		$data->form = $this->model->getForm('edit', 'item', true);
+		$data->form = $this->model->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
 	}
 }
