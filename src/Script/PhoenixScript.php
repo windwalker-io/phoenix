@@ -51,14 +51,14 @@ abstract class PhoenixScript extends AbstractScriptManager
 				'uri' => static::getContainer()->get('uri')->toArray()
 			);
 
-			$options = array_merge($defaultOptions, $options);
+			$options = ArrayHelper::merge($defaultOptions, $options);
 
 			if ($options['theme'] == 'bootstrap')
 			{
 				$asset->addScript(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
 			}
 
-			$options = json_encode((object) $options);
+			$options = $asset::getJSObject($options);
 
 			$js = <<<JS
 // Phoenix Core
@@ -146,7 +146,7 @@ JS;
 
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
-			$options = json_encode((object) $options);
+			$options = $asset::getJSObject($options);
 
 			$js = <<<JS
 // Gird and filter bar
@@ -194,7 +194,7 @@ JS;
 				'no_results_text'           => Translator::translate('phoenix.chosen.text.noresult')
 			);
 
-			$options = json_encode((object) array_merge($defaultOptions, $options), JsonFormat::prettyPrint());
+			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
 			$js = <<<JS
 // Chosen select
@@ -285,7 +285,7 @@ JS;
 
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
-			$options = json_encode((object) $options);
+			$options = $asset::getJSObject($options);
 
 			$js = <<<JS
 // Chosen select

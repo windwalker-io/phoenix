@@ -8,6 +8,8 @@
 
 namespace Phoenix\Script;
 
+use Windwalker\Utilities\ArrayHelper;
+
 /**
  * The BootstrapScript class.
  *
@@ -235,7 +237,7 @@ JS;
 				'calendarWeeks' => true
 			);
 
-			$options = json_encode((object) array_merge($defaultOptions, $options));
+			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
 			$js = <<<JS
 jQuery(document).ready(function($)

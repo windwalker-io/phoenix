@@ -9,6 +9,7 @@
 namespace Phoenix\Script;
 
 use Windwalker\Registry\Format\JsonFormat;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The JQuery class.
@@ -104,7 +105,7 @@ abstract class JQueryScript extends AbstractScriptManager
 				'theme' => 'bootstrap'
 			);
 
-			$options = json_encode((object) array_merge($defaultOptions, $options), JsonFormat::prettyPrint());
+			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
 			$js = <<<JS
 // Color picker
@@ -153,7 +154,7 @@ JS;
 				'className' => 'phoenix-highlight text-danger'
 			);
 
-			$options = json_encode((object) array_merge($defaultOptions, $options), JsonFormat::prettyPrint());
+			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
 			$js = <<<JS
 // Highlight Text

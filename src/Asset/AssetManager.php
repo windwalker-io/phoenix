@@ -15,6 +15,7 @@ use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Ioc;
 use Windwalker\String\StringHelper;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The AssetManager class.
@@ -507,52 +508,71 @@ class AssetManager
 	/**
 	 * Internal method to get a JavaScript object notation string from an array
 	 *
-	 * @param   array  $array  The array to convert to JavaScript object notation
+	 * @param mixed $data
+	 * @param bool  $quoteKey
 	 *
-	 * @return  string  JavaScript object notation representation of the array
+	 * @return string JavaScript object notation representation of the array
 	 */
-	public static function getJSObject(array $array)
+	public static function getJSObject($data, $quoteKey = true)
 	{
-		$elements = array();
-
-		foreach ($array as $k => $v)
+		if ($data === null)
 		{
-			// Don't encode either of these types
-			if (is_null($v) || is_resource($v))
-			{
-				continue;
-			}
+			return 'null';
+		};
 
-			// Safely encode as a Javascript string
-			$key = json_encode((string) $k);
+		$output = '';
 
-			if (is_bool($v))
-			{
-				$elements[] = $key . ': ' . ($v ? 'true' : 'false');
-			}
-			elseif (is_numeric($v))
-			{
-				$elements[] = $key . ': ' . ($v + 0);
-			}
-			elseif (is_string($v))
-			{
-				if (strpos($v, '\\') === 0)
+		switch (gettype($data))
+		{
+			case 'boolean':
+				$output .= $data ? 'true' : 'false';
+				break;
+
+			case 'float':
+			case 'double':
+			case 'integer':
+				$output .= $data + 0;
+				break;
+
+			case 'array':
+				if (!ArrayHelper::isAssociative($data))
 				{
-					// Items such as functions and JSON objects are prefixed with \, strip the prefix and don't encode them
-					$elements[] = $key . ': ' . substr($v, 1);
+					$child = array();
+
+					foreach ($data as $value)
+					{
+						$child[] = static::getJSObject($value, $quoteKey);
+					}
+
+					$output .= '[' . implode(',', $child) . ']';
+					break;
 				}
-				else
+
+			case 'object':
+				$array = is_object($data) ? get_object_vars($data) : $data;
+
+				$row = array();
+
+				foreach ($array as $key => $value)
 				{
-					// The safest way to insert a string
-					$elements[] = $key . ': ' . json_encode((string) $v);
+					$key = json_encode($key);
+
+					if (!$quoteKey)
+					{
+						$key = substr(substr($key, 0, -1), 1);
+					}
+
+					$row[] = $key . ':' . static::getJSObject($value, $quoteKey);
 				}
-			}
-			else
-			{
-				$elements[] = $key . ': ' . static::getJSObject(is_object($v) ? get_object_vars($v) : $v);
-			}
+
+				$output .= '{' . implode(',', $row) . '}';
+				break;
+
+			default:  // anything else is treated as a string
+				return strpos($data, '\\') === 0 ? substr($data, 1) : json_encode($data);
+				break;
 		}
 
-		return '{' . implode(',', $elements) . '}';
+		return $output;
 	}
 }
