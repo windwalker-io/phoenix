@@ -29,7 +29,7 @@ class FormModel extends ItemModel
 	 *
 	 * @var callable
 	 */
-	protected $formRenderer = array('Phoenix\Form\Renderer\BootstrapRenderer', 'render');
+	protected $formRenderer = array('Phoenix\Form\Renderer\InputRenderer', 'render');
 
 	/**
 	 * getDefaultData
