@@ -12,6 +12,7 @@ use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\ListDisplayController;
 use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Model\Model;
 
 /**
  * The GetController class.
@@ -68,4 +69,38 @@ class GetController extends ListDisplayController
 	 * @var  string
 	 */
 	protected $defaultDirection = null;
+
+	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+		parent::prepareExecute();
+	}
+
+	/**
+	 * prepareUserState
+	 *
+	 * @param   Model $model
+	 *
+	 * @return  void
+	 */
+	protected function prepareUserState(Model $model)
+	{
+		parent::prepareUserState($model);
+	}
+
+	/**
+	 * postExecute
+	 *
+	 * @param mixed $result
+	 *
+	 * @return  mixed
+	 */
+	protected function postExecute($result = null)
+	{
+		return parent::postExecute($result);
+	}
 }

@@ -27,6 +27,27 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	protected $name = '{$controller.item.name.lower$}';
 
 	/**
+	 * Property formDefinition.
+	 *
+	 * @var  string
+	 */
+	protected $formDefinition = 'edit';
+
+	/**
+	 * Property formControl.
+	 *
+	 * @var  string
+	 */
+	protected $formControl = 'item';
+
+	/**
+	 * Property formLoadData.
+	 *
+	 * @var  boolean
+	 */
+	protected $formLoadData = true;
+
+	/**
 	 * prepareData
 	 *
 	 * @param \Windwalker\Data\Data $data

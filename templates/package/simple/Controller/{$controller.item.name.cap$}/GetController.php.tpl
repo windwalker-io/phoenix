@@ -11,7 +11,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
 use Phoenix\Controller\Display\ItemDisplayController;
-use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Model\Model;
 
 /**
  * The GetController class.
@@ -63,5 +63,29 @@ class GetController extends ItemDisplayController
 	protected function prepareExecute()
 	{
 		parent::prepareExecute();
+	}
+
+	/**
+	 * prepareUserState
+	 *
+	 * @param   Model $model
+	 *
+	 * @return  void
+	 */
+	protected function prepareUserState(Model $model)
+	{
+		parent::prepareUserState($model);
+	}
+
+	/**
+	 * postExecute
+	 *
+	 * @param mixed $result
+	 *
+	 * @return  mixed
+	 */
+	protected function postExecute($result = null)
+	{
+		return parent::postExecute($result);
 	}
 }

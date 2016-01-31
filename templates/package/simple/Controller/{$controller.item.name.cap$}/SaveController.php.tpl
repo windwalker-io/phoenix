@@ -55,6 +55,28 @@ class SaveController extends AbstractSaveController
 	protected $useTransaction = false;
 
 	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+		parent::prepareExecute();
+	}
+
+	/**
+	 * preSave
+	 *
+	 * @param Data $data
+	 *
+	 * @return void
+	 */
+	protected function preSave(Data $data)
+	{
+		parent::preSave($data);
+	}
+
+	/**
 	 * postSave
 	 *
 	 * @param Data $data
@@ -64,5 +86,17 @@ class SaveController extends AbstractSaveController
 	protected function postSave(Data $data)
 	{
 		parent::postSave($data);
+	}
+
+	/**
+	 * postExecute
+	 *
+	 * @param mixed $result
+	 *
+	 * @return  mixed
+	 */
+	protected function postExecute($result = null)
+	{
+		return parent::postExecute($result);
 	}
 }
