@@ -11,6 +11,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
 use Phoenix\Controller\AbstractSaveController;
+use Windwalker\Data\Data;
 
 /**
  * The SaveController class.
@@ -60,4 +61,50 @@ class SaveController extends AbstractSaveController
 	 * @var  {$controller.item.name.cap$}HtmlView
 	 */
 	protected $view;
+
+	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+		parent::prepareExecute();
+	}
+
+	/**
+	 * preSave
+	 *
+	 * @param Data $data
+	 *
+	 * @return void
+	 */
+	protected function preSave(Data $data)
+	{
+		parent::preSave($data);
+	}
+
+	/**
+	 * postSave
+	 *
+	 * @param Data $data
+	 *
+	 * @return  void
+	 */
+	protected function postSave(Data $data)
+	{
+		parent::postSave($data);
+	}
+
+	/**
+	 * postExecute
+	 *
+	 * @param mixed $result
+	 *
+	 * @return  mixed
+	 */
+	protected function postExecute($result = null)
+	{
+		return parent::postExecute($result);
+	}
 }
