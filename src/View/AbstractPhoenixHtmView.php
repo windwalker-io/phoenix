@@ -8,7 +8,7 @@
 
 namespace Phoenix\View;
 
-use Phoenix\Html\Document;
+use Phoenix\Html\HtmlHeader;
 use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\BladeRenderer;
@@ -55,7 +55,7 @@ abstract class AbstractPhoenixHtmView extends PhpHtmlView
 	 */
 	public function setTitle($title = null)
 	{
-		Document::setTitle($title);
+		HtmlHeader::setTitle($title);
 
 		return $this;
 	}

@@ -27,7 +27,12 @@
     var handlers = {};
 
     var defaultOptions = {
-        events: ['change']
+        events: ['change'],
+        scroll: {
+            enabled: true,
+            offset: -100,
+            duration: 1000
+        }
     };
 
     /**
@@ -102,12 +107,23 @@
         validateAll: function()
         {
             var self = this, inValid = [];
+            var scroll = self.options.scroll.enabled;
 
-            this.inputs.each(function()
+            this.inputs.each(function(i)
             {
                 if (!self.validate(this))
                 {
                     inValid.push(this);
+
+                    // Scroll
+                    if (scroll)
+                    {
+                        $('html, body').animate({
+                            scrollTop: $(this).offset().top + self.options.scroll.offset
+                        }, self.options.scroll.duration);
+
+                        scroll = false;
+                    }
                 }
             });
 
@@ -302,6 +318,13 @@
         }
     };
 
+    /**
+     * Push to plugins.
+     *
+     * @param   {Object} options
+     *
+     * @returns {PhoenixValidation}
+     */
     $.fn[plugin] = function (options)
     {
         if (!this.data('phoenix.' + plugin))

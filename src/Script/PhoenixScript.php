@@ -12,6 +12,7 @@ use Windwalker\Core\Language\Translator;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
 use Windwalker\Registry\Format\JsonFormat;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The PhoenixScript class.
@@ -320,9 +321,15 @@ JS;
 
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
-			$defaultOptions = array();
+			$defaultOptions = array(
+				'scroll' => array(
+					'enabled'  => true,
+					'offset'   => -100,
+					'duration' => 1000
+				)
+			);
 
-			$options = json_encode((object) array_merge($defaultOptions, $options));
+			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
 			static::translate('phoenix.message.validation.required');
 			static::translate('phoenix.message.validation.failure');

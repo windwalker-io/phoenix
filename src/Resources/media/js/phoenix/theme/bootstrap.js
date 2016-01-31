@@ -50,25 +50,39 @@ var Phoenix;
                         break;
                 }
 
-                $control.addClass('has-' + color + ' has-feedback');
+                this.addValidateResponse($control, $input, icon, color, help)
+            }
+        },
 
-                var feedback = $('<span class="glyphicon glyphicon-' + icon + ' form-control-feedback" aria-hidden="true"></span>');
-                $control.prepend(feedback);
+        /**
+         * Add validate effect to input, just override this method to fit other templates.
+         *
+         * @param {jQuery} $control
+         * @param {jQuery} $input
+         * @param {string} icon
+         * @param {string} color
+         * @param {string} help
+         */
+        addValidateResponse: function($control, $input, icon, color, help)
+        {
+            $control.addClass('has-' + color + ' has-feedback');
 
-                if (help)
+            var feedback = $('<span class="glyphicon glyphicon-' + icon + ' form-control-feedback" aria-hidden="true"></span>');
+            $control.prepend(feedback);
+
+            if (help)
+            {
+                var helpElement = $('<small class="help-block">' + help + '</small>');
+
+                var tagName = $input.prop('tagName').toLowerCase();
+
+                if (tagName == 'div')
                 {
-                    var helpElement = $('<small class="help-block">' + help + '</small>');
-
-                    var tagName = $input.prop('tagName').toLowerCase();
-
-                    if (tagName == 'div')
-                    {
-                        $input.append(helpElement);
-                    }
-                    else
-                    {
-                        $input.parent().append(helpElement);
-                    }
+                    $input.append(helpElement);
+                }
+                else
+                {
+                    $input.parent().append(helpElement);
                 }
             }
         },

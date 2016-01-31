@@ -75,7 +75,7 @@ abstract class AbstractScriptManager
 	 *
 	 * @return  AssetManager
 	 */
-	public function getAsset()
+	public static function getAsset()
 	{
 		if (!static::$asset)
 		{
@@ -90,13 +90,11 @@ abstract class AbstractScriptManager
 	 *
 	 * @param   AssetManager $asset
 	 *
-	 * @return  static  Return self to support chaining.
+	 * @return  void
 	 */
-	public function setAsset($asset)
+	public static function setAsset($asset)
 	{
 		static::$asset = $asset;
-
-		return $this;
 	}
 
 	/**
