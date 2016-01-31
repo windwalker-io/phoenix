@@ -5,7 +5,7 @@
 @section('content')
 <section class="jumbotron admin-header">
     <div class="container-fluid">
-        <h1>{{ \Phoenix\Html\Document::getTitle() }}</h1>
+        <h1>{{ \Phoenix\Html\HtmlHeader::getTitle() }}</h1>
     </div>
 </section>
 <aside id="admin-toolbar" class="">

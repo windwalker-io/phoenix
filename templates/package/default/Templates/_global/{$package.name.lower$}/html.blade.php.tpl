@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
 
-    <title>{{ \Phoenix\Html\Document::getPageTitle() }}</title>
+    <title>{{ \Phoenix\Html\HtmlHeader::getPageTitle() }}</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ $uri['media.path'] }}images/favicon.ico" />
     <meta name="generator" content="Windwalker Framework" />
-    {!! \Phoenix\Html\Document::renderMetadata() !!}
+    {!! \Phoenix\Html\HtmlHeader::renderMetadata() !!}
     @yield('meta')
 
     {!! \Phoenix\Asset\Asset::renderStyles(true) !!}
@@ -17,7 +17,7 @@
 
     {!! \Phoenix\Asset\Asset::renderScripts(true) !!}
     @yield('script')
-    {!! \Phoenix\Html\Document::renderCustomTags() !!}
+    {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
 <body class="{{ $package->getName() }}-admin-body phoenix-admin view-{{ $view->name }} layout-{{ $view->layout }}">
 @section ('superbody')

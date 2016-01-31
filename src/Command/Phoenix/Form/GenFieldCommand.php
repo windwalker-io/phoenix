@@ -9,6 +9,7 @@
 namespace Phoenix\Command\Phoenix\Form;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Filesystem\Folder;
 use Windwalker\Ioc;
 
 /**
@@ -33,6 +34,18 @@ class GenFieldCommand extends Command
 	protected $description = 'Generate fields definition';
 
 	/**
+	 * initialise
+	 *
+	 * @return  void
+	 */
+	protected function initialise()
+	{
+		$this->addOption('o')
+			->alias('output')
+			->description('Output file');
+	}
+
+	/**
 	 * doExecute
 	 *
 	 * @return  bool
@@ -50,12 +63,40 @@ class GenFieldCommand extends Command
 
 		$columns = $db->getTable($table)->getColumnDetails();
 
-		$this->out()->out('Start Generate Fields')
-			->out('--------------------------------------------------')->out()->out();
-
-		foreach ($columns as $column)
+		if ($file = $this->getOption('o'))
 		{
-			$this->out($this->handleColumn($column));
+			if ($file == 1)
+			{
+				$file = '/form/fields/' . $table . '.php.tpl';
+			}
+
+			$file = new \SplFileInfo(WINDWALKER_TEMP . '/' . ltrim($file, '/\\'));
+
+			if (!is_dir($file))
+			{
+				Folder::create($file->getPath());
+			}
+
+			$output = '';
+
+			foreach ($columns as $column)
+			{
+				$output .= $this->handleColumn($column) . "\n";
+			}
+
+			file_put_contents($file->getPathname(), $output);
+
+			$this->out()->out('File output to: ' . $file->getPathname());
+		}
+		else
+		{
+			$this->out()->out('Start Generate Fields')
+				->out('--------------------------------------------------')->out()->out();
+
+			foreach ($columns as $column)
+			{
+				$this->out($this->handleColumn($column));
+			}
 		}
 
 		return true;
@@ -76,27 +117,13 @@ class GenFieldCommand extends Command
 
 		$name = $column->Field;
 
-		$className = 'Phoenix\Form\FieldDefinitionGenerator';
+		$className = $this->getOption('class', 'Phoenix\Form\FieldDefinitionGenerator');
 
-		$args = [$type, $name, ucfirst($name), $column];
-
-		$method = 'gen' . ucfirst($type) . ucfirst($name);
-
-		if (!is_callable([$className, $method]))
+		if (!is_callable(array($className, 'generate')))
 		{
-			$method = 'gen' . ucfirst($name);
+			throw new \LogicException('Method: ' . $className . "::generate() can not execute.");
 		}
 
-		if (!is_callable([$className, $method]))
-		{
-			$method = 'gen' . ucfirst($type);
-		}
-
-		if (!is_callable([$className, $method]))
-		{
-			$method = 'genVarchar';
-		}
-
-		return call_user_func_array([$className, $method], $args) . "\n";
+		return call_user_func(array($className, 'generate'), $type, $name, $column);
 	}
 }
