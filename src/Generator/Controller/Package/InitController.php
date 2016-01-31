@@ -31,6 +31,15 @@ class InitController extends AbstractPackageController
 	 */
 	public function execute()
 	{
+		$ns = $this->config['replace.package.namespace'];
+		$package = $this->config['replace.package.name.cap'];
+		$packageClass =  $ns . $package . '\\' . $package . 'Package';
+
+		if (class_exists($packageClass) || is_file(WINDWALKER_SOURCE . '/' . $packageClass . '.php'))
+		{
+			throw new \RuntimeException('Package: ' . $ns . $package . ' exists. Use add-subsystem, add-item or add-list.');
+		}
+
 		$this->doAction(new Action\CopyAllAction);
 		$this->doAction(new Action\Package\RenameMigrationAction);
 
