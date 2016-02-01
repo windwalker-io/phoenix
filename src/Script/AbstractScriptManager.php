@@ -65,7 +65,7 @@ abstract class AbstractScriptManager
 	 *
 	 * @return  string
 	 */
-	public static function getInitedId($data)
+	protected static function getInitedId($data)
 	{
 		return sha1(serialize($data));
 	}
@@ -119,7 +119,7 @@ abstract class AbstractScriptManager
 	 *
 	 * @return  \Windwalker\DI\Container
 	 */
-	public static function getContainer()
+	protected static function getContainer()
 	{
 		return Ioc::factory();
 	}
