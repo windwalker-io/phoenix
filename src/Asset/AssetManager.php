@@ -454,7 +454,7 @@ class AssetManager
 		// Check has .min
 		$uri = Uri::addBase($uri, 'media.path');
 
-		if (strpos('http', $uri) === 0 || strpos('//', $uri) === 0)
+		if (strpos($uri, 'http') === 0 || strpos($uri, '//') === 0)
 		{
 			return $uri;
 		}
