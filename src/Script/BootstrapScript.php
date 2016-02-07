@@ -161,7 +161,7 @@ CSS;
 // Init modal
 jQuery(document).ready(function($)
 {
-	var modalBox = $('<div class="modal fade" id="phoenix-iframe-modal"> \
+	var modalBox = $('<div class="modal fade hide" id="phoenix-iframe-modal"> \
     <div class="modal-dialog"> \
         <div class="modal-content"> \
             <div class="modal-body"> \

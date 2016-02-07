@@ -8,7 +8,6 @@
 
 namespace Phoenix\Script;
 
-use Windwalker\Registry\Format\JsonFormat;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
