@@ -302,6 +302,25 @@ class ListModel extends FormModel
 	}
 
 	/**
+	 * mapDataFields
+	 *
+	 * @param array $data
+	 *
+	 * @return  array
+	 */
+	public function mapDataFields(array $data)
+	{
+		$return = array();
+
+		foreach ($data as $field => $value)
+		{
+			$return[$this->mapField($field)] = $value;
+		}
+
+		return $return;
+	}
+
+	/**
 	 * addTable
 	 *
 	 * @param string  $alias
@@ -431,11 +450,7 @@ class ListModel extends FormModel
 		$filters = ArrayHelper::flatten($filters);
 
 		$filters = $this->filterDataFields($filters);
-
-		foreach ($filters as &$filter)
-		{
-			$filter = $this->mapField($filter);
-		}
+		$filters = $this->mapDataFields($filters);
 
 		$filterHelper = $this->getFilterHelper();
 
@@ -484,11 +499,7 @@ class ListModel extends FormModel
 		$searches = ArrayHelper::flatten($searches);
 
 		$searches = $this->filterDataFields($searches);
-
-		foreach ($searches as &$search)
-		{
-			$search = $this->mapField($search);
-		}
+		$searches = $this->mapDataFields($searches);
 
 		$searchHelper = $this->getSearchHelper();
 
@@ -555,6 +566,9 @@ class ListModel extends FormModel
 		$ordering = array_map(
 			function($value) use($query, $self)
 			{
+				// Remove extra spaces
+				preg_replace('/\s+/', ' ', $value);
+
 				$value = explode(' ', trim($value));
 
 				// Check it is an allowed field.
@@ -565,7 +579,7 @@ class ListModel extends FormModel
 
 				$field = $this->mapField($value[0]);
 
-				if ($field[strlen($field) - 1] != ')')
+				if (!empty($field) && $field[strlen($field) - 1] != ')')
 				{
 					$field = $query->quoteName($field);
 				}

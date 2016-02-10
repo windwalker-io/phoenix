@@ -133,15 +133,15 @@ class FormModel extends ItemModel
 	/**
 	 * validate
 	 *
-	 * @param   array  $data
+	 * @param   array $data
+	 * @param   Form  $form
 	 *
-	 * @return  boolean
-	 *
-	 * @throws  ValidFailException
+	 * @return bool
+	 * @throws ValidFailException
 	 */
-	public function validate($data)
+	public function validate($data, Form $form = null)
 	{
-		$form = $this->getForm('edit');
+		$form = $form ? : $this->getForm('edit');
 
 		$form->bind($data);
 
