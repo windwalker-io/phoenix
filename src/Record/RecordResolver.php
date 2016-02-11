@@ -33,7 +33,7 @@ class RecordResolver extends AbstractPackageObjectResolver
 	{
 		if (!is_subclass_of($class, 'Windwalker\Record\Record'))
 		{
-			throw new \UnexpectedValueException(sprintf('Class: %s is not vu class of Windwalker\Record\Record', $class));
+			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of Windwalker\Record\Record', $class));
 		}
 
 		$db = array_shift($args);

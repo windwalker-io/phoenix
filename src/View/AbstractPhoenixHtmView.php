@@ -9,6 +9,7 @@
 namespace Phoenix\View;
 
 use Phoenix\Html\HtmlHeader;
+use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\BladeRenderer;
@@ -19,21 +20,8 @@ use Windwalker\Renderer\RendererInterface;
  *
  * @since  1.0
  */
-abstract class AbstractPhoenixHtmView extends PhpHtmlView
+abstract class AbstractPhoenixHtmView extends BladeHtmlView
 {
-	/**
-	 * Method to instantiate the view.
-	 *
-	 * @param   array             $data     The data array.
-	 * @param   RendererInterface $renderer The renderer engine.
-	 */
-	public function __construct($data = array(), RendererInterface $renderer = null)
-	{
-		$renderer = $renderer ? : new BladeRenderer;
-
-		parent::__construct($data, $renderer);
-	}
-
 	/**
 	 * prepareRender
 	 *
