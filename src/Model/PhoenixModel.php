@@ -11,7 +11,7 @@ namespace Phoenix\Model;
 use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Record\RecordResolver;
 use Windwalker\Core\Model\DatabaseModel;
-use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\DataMapper\DataMapper;
 use Windwalker\Record\Record;
 

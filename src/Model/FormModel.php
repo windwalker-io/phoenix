@@ -38,6 +38,11 @@ class FormModel extends ItemModel
 	 */
 	public function getDefaultData()
 	{
+		if ($this['form.data'])
+		{
+			return (array) $this['form.data'];
+		}
+
 		$item = $this->getItem();
 
 		if ($item->notNull())
@@ -45,7 +50,7 @@ class FormModel extends ItemModel
 			return $item->dump();
 		}
 
-		return $this['form.data'];
+		return array();
 	}
 
 	/**

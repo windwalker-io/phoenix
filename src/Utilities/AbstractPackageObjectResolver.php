@@ -9,6 +9,7 @@
 namespace Phoenix\Utilities;
 
 use Windwalker\Ioc;
+use Windwalker\String\StringNormalise;
 use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Utilities\Queue\PriorityQueue;
 
@@ -133,6 +134,8 @@ abstract class AbstractPackageObjectResolver
 	 */
 	public static function addNamespace($namespace, $priority = Priority::NORMAL)
 	{
+		$namespace = StringNormalise::toClassNamespace($namespace);
+
 		static::getNamespaces()->insert($namespace, $priority);
 	}
 
@@ -182,6 +185,16 @@ abstract class AbstractPackageObjectResolver
 		}
 
 		static::$namespaces[$called] = $namespaces;
+	}
+
+	/**
+	 * dumpNamespaces
+	 *
+	 * @return  array
+	 */
+	public static function dumpNamespaces()
+	{
+		return static::getNamespaces()->toArray();
 	}
 
 	/**

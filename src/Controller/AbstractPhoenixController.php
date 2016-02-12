@@ -13,10 +13,13 @@ use Windwalker\Core\Controller\Controller;
 use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Security\CsrfProtection;
+use Windwalker\Core\View\BladeHtmlView;
+use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;
 use Windwalker\String\StringInflector;
+use Windwalker\View\AbstractView;
 
 /**
  * The AbstractRadController class.
@@ -200,5 +203,30 @@ abstract class AbstractPhoenixController extends Controller
 	protected function checkAccess($data)
 	{
 		return true;
+	}
+
+	/**
+	 * getView
+	 *
+	 * @param string $name
+	 * @param string $type
+	 * @param bool   $forceNew
+	 *
+	 * @return  BladeHtmlView|AbstractView
+	 */
+	public function getView($name = null, $type = 'html', $forceNew = false)
+	{
+		$view = parent::getView($name, $type, $forceNew);
+
+		if (get_class($view) == 'Windwalker\Core\View\PhpHtmlView')
+		{
+			$name = $name ? : $this->getName();
+
+			$name = ucfirst($name) . ucfirst($type) . 'View';
+
+			throw new \UnexpectedValueException('Phoenix only support BladeHtmlView, maybe you forgot to create ' . $name);
+		}
+
+		return $view;
 	}
 }

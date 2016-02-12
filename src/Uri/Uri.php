@@ -10,6 +10,7 @@ namespace Phoenix\Uri;
 
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Ioc;
+use Windwalker\Registry\Registry;
 
 /**
  * The Uri class.
@@ -39,11 +40,11 @@ class Uri extends \Windwalker\Uri\Uri
 	{
 		if ($relative == static::RELATIVE)
 		{
-			return static::getApplication()->get('uri.base.path');
+			return static::getUriData()->get('base.path');
 		}
 		else
 		{
-			return static::getApplication()->get('uri.base.full');
+			return static::getUriData()->get('base.full');
 		}
 	}
 
@@ -54,7 +55,7 @@ class Uri extends \Windwalker\Uri\Uri
 	 */
 	public static function host()
 	{
-		return static::getApplication()->get('uri.base.host');
+		return static::getUriData()->get('base.host');
 	}
 
 	/**
@@ -68,12 +69,22 @@ class Uri extends \Windwalker\Uri\Uri
 	{
 		if ($relative == static::RELATIVE)
 		{
-			return static::getApplication()->get('uri.route');
+			return static::getUriData()->get('route');
 		}
 		else
 		{
-			return static::getApplication()->get('uri.current');
+			return static::getUriData()->get('current');
 		}
+	}
+
+	/**
+	 * full
+	 *
+	 * @return  string
+	 */
+	public static function full()
+	{
+		return static::getUriData()->get('full');
 	}
 
 	/**
@@ -83,7 +94,7 @@ class Uri extends \Windwalker\Uri\Uri
 	 */
 	public static function route()
 	{
-		return static::getApplication()->get('uri.route');
+		return static::getUriData()->get('route');
 	}
 
 	/**
@@ -93,7 +104,7 @@ class Uri extends \Windwalker\Uri\Uri
 	 */
 	public static function script()
 	{
-		return static::getApplication()->get('uri.script');
+		return static::getUriData()->get('script');
 	}
 
 	/**
@@ -107,11 +118,11 @@ class Uri extends \Windwalker\Uri\Uri
 	{
 		if ($relative == static::RELATIVE)
 		{
-			return static::getApplication()->get('uri.media.path');
+			return static::getUriData()->get('media.path');
 		}
 		else
 		{
-			return static::getApplication()->get('uri.media.full');
+			return static::getUriData()->get('media.full');
 		}
 	}
 
@@ -127,16 +138,26 @@ class Uri extends \Windwalker\Uri\Uri
 	{
 		if (strpos($uri, 'http') !== 0 && strpos($uri, '/') !== 0)
 		{
-			$uri = static::getApplication()->get('uri.' . $path) . $uri;
+			$uri = static::getUriData()->get($path) . $uri;
 		}
 
 		return $uri;
 	}
 
 	/**
+	 * getUri
+	 *
+	 * @return  Registry
+	 */
+	public static function getUriData()
+	{
+		return static::getApplication()->getContainer()->get('uri');
+	}
+
+	/**
 	 * Method to get property Application
 	 *
-	 * @return  mixed
+	 * @return  WebApplication
 	 */
 	public static function getApplication()
 	{

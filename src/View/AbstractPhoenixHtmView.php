@@ -38,8 +38,6 @@ abstract class AbstractPhoenixHtmView extends BladeHtmlView
 	public function __construct(array $data = null, BladeRenderer $renderer = null)
 	{
 		parent::__construct($data, $renderer);
-
-		$this->langPrefix = $this->langPrefix ? : $this->getPackage()->getName();
 	}
 
 	/**
@@ -51,6 +49,8 @@ abstract class AbstractPhoenixHtmView extends BladeHtmlView
 	 */
 	protected function prepareRender($data)
 	{
+		$this->langPrefix = $this->langPrefix ? : $this->getPackage()->getName() . '.';
+
 		$this->setTitle();
 	}
 

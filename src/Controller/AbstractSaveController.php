@@ -226,7 +226,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function getFailRedirect(Data $data = null)
 	{
-		$pk = $this->model['item.pk'];
+		$pk = $data->{$this->pkName} ? : $this->model['item.pk'];
 
 		return $this->router->http($this->getName(), array($this->pkName => $pk));
 	}
