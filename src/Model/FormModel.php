@@ -78,8 +78,10 @@ class FormModel extends ItemModel
 		$form->setFieldRenderHandler($this->get('field.renderer', $this->formRenderer));
 
 		Ioc::getDispatcher()->triggerEvent('onModelAfterGetForm', array(
-			'form' => $form,
-			'model' => $this
+			'form'       => $form,
+			'model'      => $this,
+			'control'    => $control,
+			'definition' => $definition
 		));
 
 		return $form;

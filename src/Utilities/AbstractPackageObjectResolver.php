@@ -9,6 +9,8 @@
 namespace Phoenix\Utilities;
 
 use Windwalker\Ioc;
+use Windwalker\Utilities\Queue\Priority;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AbstractFactory class.
@@ -20,7 +22,7 @@ abstract class AbstractPackageObjectResolver
 	/**
 	 * Property namespaces.
 	 *
-	 * @var  array
+	 * @var  PriorityQueue[]
 	 */
 	protected static $namespaces = array();
 
@@ -43,14 +45,7 @@ abstract class AbstractPackageObjectResolver
 	{
 		$name = static::getClass($name);
 
-		$called = get_called_class();
-
-		if (!isset(static::$namespaces[$called]))
-		{
-			return null;
-		}
-
-		foreach (static::$namespaces[$called] as $namespace)
+		foreach (clone static::getNamespaces() as $namespace)
 		{
 			$class = $namespace . '\\' . $name;
 
@@ -132,19 +127,13 @@ abstract class AbstractPackageObjectResolver
 	 * addNamespace
 	 *
 	 * @param   string  $namespace
+	 * @param   int     $priority
 	 *
 	 * @return  void
 	 */
-	public static function addNamespace($namespace)
+	public static function addNamespace($namespace, $priority = Priority::NORMAL)
 	{
-		$called = get_called_class();
-
-		if (!isset(static::$namespaces[$called]))
-		{
-			static::$namespaces[$called] = array();
-		}
-
-		static::$namespaces[$called][] = $namespace;
+		static::getNamespaces()->insert($namespace, $priority);
 	}
 
 	/**
@@ -156,32 +145,22 @@ abstract class AbstractPackageObjectResolver
 	 */
 	public static function removeNamespace($namespace)
 	{
-		$called = get_called_class();
-
-		if (!isset(static::$namespaces[$called]))
-		{
-			return;
-		}
-
-		foreach (static::$namespaces[$called] as $k => $ns)
-		{
-			if (strcasecmp($namespace, $ns) === 0)
-			{
-				unset(static::$namespaces[$called][$k]);
-
-				break;
-			}
-		}
+		throw new \LogicException('No longer support remove namespace now. Just reset it.');
 	}
 
 	/**
 	 * Method to get property Namespaces
 	 *
-	 * @return  array
+	 * @return  PriorityQueue
 	 */
 	public static function getNamespaces()
 	{
 		$called = get_called_class();
+
+		if (!isset(static::$namespaces[$called]))
+		{
+			static::$namespaces[$called] = new PriorityQueue;
+		}
 
 		return static::$namespaces[$called];
 	}
@@ -189,7 +168,7 @@ abstract class AbstractPackageObjectResolver
 	/**
 	 * Method to set property namespaces
 	 *
-	 * @param   array $namespaces
+	 * @param   array|PriorityQueue  $namespaces
 	 *
 	 * @return  void
 	 */
@@ -197,6 +176,21 @@ abstract class AbstractPackageObjectResolver
 	{
 		$called = get_called_class();
 
+		if (!$namespaces instanceof PriorityQueue)
+		{
+			$namespaces = new PriorityQueue;
+		}
+
 		static::$namespaces[$called] = $namespaces;
+	}
+
+	/**
+	 * reset
+	 *
+	 * @return  void
+	 */
+	public static function reset()
+	{
+		static::setNamespaces(new PriorityQueue);
 	}
 }

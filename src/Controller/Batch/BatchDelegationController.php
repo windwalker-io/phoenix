@@ -40,7 +40,9 @@ class BatchDelegationController extends AbstractPhoenixController
 			throw new \InvalidArgumentException('Task of: ' . __CLASS__ . ' should not be empty.');
 		}
 
-		$class = PhoenixControllerResolver::getController($this->package, 'Batch\\' . $task, $this->getName());
+		$resolver = $this->package->getMvcResolver();
+
+		$class = $resolver->resolveController($this->package, $this->getName() . '\Batch\\' . $task . 'Controller');
 
 		/** @var Controller $controller */
 		$controller = new $class;

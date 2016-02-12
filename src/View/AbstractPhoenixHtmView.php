@@ -23,6 +23,26 @@ use Windwalker\Renderer\RendererInterface;
 abstract class AbstractPhoenixHtmView extends BladeHtmlView
 {
 	/**
+	 * Property langPrefix.
+	 *
+	 * @var  string
+	 */
+	protected $langPrefix;
+
+	/**
+	 * Class init.
+	 *
+	 * @param array         $data
+	 * @param BladeRenderer $renderer
+	 */
+	public function __construct(array $data = null, BladeRenderer $renderer = null)
+	{
+		parent::__construct($data, $renderer);
+
+		$this->langPrefix = $this->langPrefix ? : $this->getPackage()->getName();
+	}
+
+	/**
 	 * prepareRender
 	 *
 	 * @param   Data $data

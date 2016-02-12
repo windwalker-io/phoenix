@@ -26,7 +26,7 @@ class ItemView extends AbstractPhoenixHtmView
 	 */
 	public function setTitle($title = null)
 	{
-		$title = $title ? : Translator::sprintf('phoenix.title.item', Translator::translate($this->package->getName() . '.' . $this->getName() . '.title'));
+		$title = $title ? : Translator::sprintf('phoenix.title.item', Translator::translate($this->langPrefix . $this->getName() . '.title'));
 
 		return parent::setTitle($title);
 	}

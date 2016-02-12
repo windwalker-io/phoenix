@@ -114,15 +114,15 @@ class IconButton
 	 *
 	 * @return static
 	 */
-	public function addState($value, $task, $icon = 'glyphicon glyphicon-ok', $title = null, $onlyIcon = null, $options = array())
+	public function addState($value, $task, $icon = 'ok', $title = null, $onlyIcon = null, $options = array())
 	{
 		// Force type to prevent null data
 		$this->states[$value] = array(
-			'value'   => $value,
-			'task'    => $task,
-			'icon'    => $icon,
-			'title'   => $title,
-			'only_icon' => $onlyIcon,
+			'value'   => (string) $value,
+			'task'    => (string) $task,
+			'icon'    => (string) $icon,
+			'title'   => (string) $title,
+			'only_icon' => (bool) $onlyIcon,
 			'options' => $options
 		);
 

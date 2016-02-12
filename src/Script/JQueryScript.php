@@ -149,8 +149,8 @@ JS;
 			}
 
 			$defaultOptions = array(
-				'element' => 'em',
-				'className' => 'phoenix-highlight text-danger'
+				'element' => 'mark',
+				'className' => 'phoenix-highlight'
 			);
 
 			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
