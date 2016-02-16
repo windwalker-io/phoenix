@@ -206,4 +206,24 @@ abstract class AbstractPackageObjectResolver
 	{
 		static::setNamespaces(new PriorityQueue);
 	}
+
+	/**
+	 * dumpAll
+	 *
+	 * @return  array
+	 */
+	public static function dumpAll()
+	{
+		$array = array();
+
+		foreach (static::$namespaces as $class => $namespaces)
+		{
+			foreach ($namespaces as $namespace)
+			{
+				$array[$class][] = $namespace;
+			}
+		}
+
+		return $array;
+	}
 }

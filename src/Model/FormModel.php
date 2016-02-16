@@ -8,10 +8,11 @@
 
 namespace Phoenix\Model;
 
+use Phoenix\Form\FieldDefinitionResolver;
 use Phoenix\Form\NullFiledDefinition;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidFailException;
-use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
@@ -104,16 +105,19 @@ class FormModel extends ItemModel
 	{
 		$name = $name ? : $this->getName();
 
-		$class = sprintf(
-			'%s\Form\%s\%sDefinition',
-			MvcHelper::getPackageNamespace($this, 2),
-			ucfirst($name),
-			ucfirst($definition)
-		);
-
-		if (!class_exists($class))
+		if (!$class = FieldDefinitionResolver::create(ucfirst($name) . '\\' . ucfirst($definition)))
 		{
-			return new NullFiledDefinition;
+			$class = sprintf(
+				'%s\Form\%s\%sDefinition',
+				MvcHelper::getPackageNamespace($this, 2),
+				ucfirst($name),
+				ucfirst($definition)
+			);
+
+			if (!class_exists($class))
+			{
+				return new NullFiledDefinition;
+			}
 		}
 
 		return new $class;
