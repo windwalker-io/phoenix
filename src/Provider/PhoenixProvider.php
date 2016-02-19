@@ -10,7 +10,9 @@ namespace Phoenix\Provider;
 
 use Phoenix\Asset\AssetManager;
 use Phoenix\Html\DocumentManager;
+use Phoenix\Html\HtmlHeaderManager;
 use Phoenix\Toolbar\ToolbarFactory;
+use Windwalker\Core\Console\WindwalkerConsole;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -37,10 +39,15 @@ class PhoenixProvider implements ServiceProviderInterface
 			$container = $container->getParent();
 		}
 
+		if ($container->get('app') instanceof WindwalkerConsole)
+		{
+			return;
+		}
+
 		// Html document
 		$closure = function(Container $container)
 		{
-			return new DocumentManager;
+			return new HtmlHeaderManager;
 		};
 
 		$container->share('phoenix.document', $closure);
@@ -52,15 +59,6 @@ class PhoenixProvider implements ServiceProviderInterface
 		};
 
 		$container->share('phoenix.asset', $closure);
-
-		$container->share('toolbar.factory', $closure);
-
-		$closure = function(Container $container)
-		{
-			return $container->get('toolbar.factory')->getToolbar('windwalker');
-		};
-
-		$container->share('toolbar', $closure);
 
 		RendererHelper::addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', Priority::LOW - 25);
 	}
