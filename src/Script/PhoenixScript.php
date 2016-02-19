@@ -358,6 +358,8 @@ JS;
 	{
 		if (!static::inited(__METHOD__))
 		{
+			static::core();
+
 			if ($time === null)
 			{
 				$config = Ioc::getConfig();
@@ -366,7 +368,11 @@ JS;
 				$time = $time * 60000;
 			}
 
-			$js = "Phoenix.keepAlive('$url', $time);";
+			$js = <<<JS
+jQuery(document).ready(function($) {
+    Phoenix.keepAlive('$url', $time);
+});
+JS;
 
 			static::getAsset()->internalScript($js);
 		}

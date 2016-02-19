@@ -192,6 +192,14 @@
             return confirmed;
         },
 
+        /**
+         * Add message.
+         *
+         * @param {string} msg
+         * @param {string} type
+         *
+         * @returns {PhoenixCore}
+         */
         addMessage: function(msg, type)
         {
             var messageContainer = $(this.options.selector.message);
@@ -201,6 +209,11 @@
             return this;
         },
 
+        /**
+         * Remove all messages.
+         *
+         * @returns {PhoenixCore}
+         */
         removeMessages: function()
         {
             var messageContainer = $(this.options.selector.message);
@@ -210,6 +223,12 @@
             return this;
         },
 
+        /**
+         * Keep alive.
+         *
+         * @param {string} url
+         * @param {Number} time
+         */
         keepAlive: function(url, time)
         {
             window.setInterval(function()
@@ -231,6 +250,12 @@
         }
     };
 
+    /**
+     * Push to plugin.
+     *
+     * @param {Object} options
+     * @returns {PhoenixCore}
+     */
     $.fn[plugin] = function(options)
     {
         if (!this.data('phoenix.' + plugin))
