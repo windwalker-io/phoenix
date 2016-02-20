@@ -17,6 +17,7 @@ use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
 use Windwalker\Ioc;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The AbstractFormModel class.
@@ -39,19 +40,18 @@ class FormModel extends ItemModel
 	 */
 	public function getDefaultData()
 	{
-		if ($this['form.data'])
-		{
-			return (array) $this['form.data'];
-		}
+		$sessionData = (array) $this['form.data'];
+
+		$pkName = $this['pkName'] ? : 'id';
 
 		$item = $this->getItem();
 
-		if ($item->notNull())
+		if ($item->notNull() || ArrayHelper::getValue($sessionData, $pkName) != $item->$pkName)
 		{
 			return $item->dump();
 		}
 
-		return array();
+		return $sessionData;
 	}
 
 	/**
