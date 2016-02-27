@@ -84,12 +84,11 @@ class GridView extends ListView
 	{
 		parent::prepareRender($data);
 
-		$data->filterForm = $this->model->getForm('filter', null, true);
-		$data->batchForm  = $this->model->getForm('batch', null, true);
-		$data->state      = $this->model->getState();
+		$data->filterForm = $data->filterForm ? : $this->model->getForm('filter', null, true);
+		$data->batchForm  = $data->batchForm ? : $this->model->getForm('batch', null, true);
 
 		// Widget
-		$data->filterBar = new BladeWidget('phoenix.grid.filterbar', $this->package->getName());
+		$data->filterBar = $data->filterBar ? : new BladeWidget('phoenix.grid.filterbar', $this->package->getName());
 		$data->showFilterBar = false;
 
 		// Handler filter bar

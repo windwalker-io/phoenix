@@ -72,6 +72,6 @@ class EditView extends ItemView
 //			throw new \UnexpectedValueException('You must use FormModel in EditView');
 //		}
 
-		$data->form = $this->model->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
+		$data->form = $data->form ? : $this->model->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
 	}
 }
