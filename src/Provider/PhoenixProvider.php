@@ -13,6 +13,7 @@ use Phoenix\Html\DocumentManager;
 use Phoenix\Html\HtmlHeaderManager;
 use Phoenix\Toolbar\ToolbarFactory;
 use Windwalker\Core\Console\WindwalkerConsole;
+use Windwalker\Core\Renderer\RendererFactory;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -60,6 +61,9 @@ class PhoenixProvider implements ServiceProviderInterface
 
 		$container->share('phoenix.asset', $closure);
 
-		RendererHelper::addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', Priority::LOW - 25);
+		/** @var RendererFactory $factory */
+		$factory = $container->get('renderer.factory');
+
+		$factory->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', Priority::LOW - 25);
 	}
 }

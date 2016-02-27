@@ -273,7 +273,7 @@ class AssetManager
 			}
 			else
 			{
-				return $this->detectVersion();
+				return $this->version = $this->detectVersion();
 			}
 		}
 
@@ -294,7 +294,18 @@ class AssetManager
 			return $version;
 		}
 
-		$media = Ioc::getEnvironment()->server->getServerPublicRoot() . '/' . Uri::media(Uri::RELATIVE);
+		$config = Ioc::getConfig();
+
+		$mediaUri = $config->get('media_uri', 'media');
+
+		if (strpos($mediaUri, '://') !== false)
+		{
+			return $version = md5($mediaUri . $config->get('system.secret'));
+		}
+		else
+		{
+			$media = WINDWALKER_PUBLIC . '/' . trim($mediaUri, '/\\');
+		}
 
 		$time = '';
 		$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($media, \FilesystemIterator::FOLLOW_SYMLINKS));
@@ -305,7 +316,7 @@ class AssetManager
 			$time .= $file->getMTime();
 		}
 
-		return $version = md5(Ioc::getConfig()->get('system.secret') . $time);
+		return $version = md5($config->get('system.secret') . $time);
 	}
 
 	/**
@@ -460,7 +471,17 @@ class AssetManager
 		}
 
 		$ext = File::getExtension($uri);
-		$root = Ioc::getEnvironment()->server->getServerPublicRoot();
+
+		$config = Ioc::getConfig();
+
+		$mediaUri = trim($config->get('media_uri', 'media'), '/');
+
+		if (strpos($mediaUri, '://') !== false)
+		{
+			return $mediaUri . '/' . ltrim($uri, '/');
+		}
+
+		$root = WINDWALKER_PUBLIC . '/' . trim($mediaUri, '/\\');
 
 		if (StringHelper::endsWith($uri, '.min.' . $ext))
 		{
