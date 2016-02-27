@@ -9,6 +9,7 @@
 namespace Phoenix\Mail;
 
 use Windwalker\Core\Facade\AbstractProxyFacade;
+use Windwalker\Registry\Registry;
 
 /**
  * The SwiftMailer class.
@@ -16,7 +17,6 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @see  \Swift_Mailer
  *
  * @method  static  \Swift_Transport  getTransport()
- * @method  static  int               send(\Swift_Mime_Message $message, &$failedRecipients = null)
  *
  * @since  {DEPLOY_VERSION}
  */
@@ -46,5 +46,27 @@ class SwiftMailer extends AbstractProxyFacade
 	public static function newMessage($subject = null, $body = null, $contentType = self::CONTENT_TYPE_HTML, $charset = null)
 	{
 		return \Swift_Message::newInstance($subject, $body, $contentType, $charset);
+	}
+
+	/**
+	 * send
+	 *
+	 * @param \Swift_Message $message
+	 * @param array          &$failedRecipients
+	 *
+	 * @return  int
+	 */
+	public static function send($message, &$failedRecipients = null)
+	{
+		$from = $message->getFrom();
+
+		if (!$from)
+		{
+			/** @var Registry $config */
+			$config = static::getContainer()->get('system.config');
+			$message->addFrom($config->get('mail.from.email'), $config->get('mail.from.name'));
+		}
+
+		return static::getInstance()->send($message, $failedRecipients);
 	}
 }
