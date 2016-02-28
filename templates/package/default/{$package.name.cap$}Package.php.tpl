@@ -84,7 +84,10 @@ class {$package.name.cap$}Package extends AbstractPackage
 			}
 
 			// Un comment this line, Translator will export all orphans to /cache/language
-			// TranslatorHelper::dumpOrphans('ini');
+			if ($this->app->get('language.debug'))
+			{
+				TranslatorHelper::dumpOrphans('ini');
+			}
 		}
 
 		return $result;
@@ -109,19 +112,16 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	public function loadRouting()
 	{
+		$routes = parent::loadRouting();
+
 		$files = Folder::files(__DIR__ . '/Resources/routing');
-		$routes = array();
 
 		foreach ($files as $file)
 		{
-			$ext = File::getExtension($file);
-
-			if ($ext != 'yml')
+			if (File::getExtension($file) == 'yml')
 			{
-				continue;
+				$routes = array_merge($routes, Yaml::parse(file_get_contents($file)));
 			}
-
-			$routes = array_merge($routes, Yaml::parse(file_get_contents($file)));
 		}
 
 		return $routes;

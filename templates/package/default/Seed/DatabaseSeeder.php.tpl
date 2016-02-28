@@ -6,8 +6,6 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Seed;
-
 use Windwalker\Core\Seeder\AbstractSeeder;
 
 /**

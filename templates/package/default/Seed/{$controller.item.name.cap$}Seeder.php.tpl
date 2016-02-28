@@ -6,8 +6,6 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Seed;
-
 use {$package.namespace$}{$package.name.cap$}\DataMapper\{$controller.item.name.cap$}Mapper;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Faker\Factory;
@@ -43,14 +41,14 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 			$data['url']         = $faker->url;
 			$data['introtext']   = $faker->paragraph(5);
 			$data['fulltext']    = $faker->paragraph(5);
-			$data['images']      = $faker->imageUrl();
+			$data['image']       = $faker->imageUrl();
+			$data['state']       = $faker->randomElement(array(1, 1, 1, 1, 0, 0));
 			$data['version']     = rand(1, 50);
 			$data['created']     = $faker->dateTime->format(DateTime::FORMAT_SQL);
 			$data['created_by']  = rand(20, 100);
 			$data['modified']    = $faker->dateTime->format(DateTime::FORMAT_SQL);
 			$data['modified_by'] = rand(20, 100);
 			$data['ordering']    = $i;
-			$data['state']       = $faker->randomElement(array(1, 1, 1, 1, 0, 0));
 			$data['language']    = 'en-GB';
 			$data['params']      = '';
 
