@@ -127,7 +127,7 @@ class GridView extends ListView
 	{
 		if (!$this->gridHelper)
 		{
-			$config['field'] = !empty($config['field']) ? $config['field'] : $this->configureFields();
+			$this->gridConfig['field'] = $this->configureFields();
 
 			$this->gridHelper = new GridHelper($this, array_merge($this->gridConfig, $options));
 		}
