@@ -51,7 +51,7 @@ class PhoenixProvider implements ServiceProviderInterface
 			return new HtmlHeaderManager;
 		};
 
-		$container->share('phoenix.document', $closure);
+		$container->share('phoenix.html.header', $closure)->alias('phoenix.document', 'phoenix.html.header');
 
 		// Asset
 		$closure = function(Container $container)

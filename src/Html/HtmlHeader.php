@@ -19,7 +19,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  string             getTitle()
  * @method  static  HtmlHeaderManager  setTitle($title)
  * @method  static  string             getFavicon()
- * @method  static  HtmlHeaderManager  etFavicon($favicon)
+ * @method  static  HtmlHeaderManager  setFavicon($favicon)
  * @method  static  HtmlHeaderManager  addCustomTag($tag, $content = null, $attribs = array())
  * @method  static  string             getCustomTags()
  * @method  static  HtmlHeaderManager  setCustomTags($customTags)
@@ -47,5 +47,5 @@ abstract class HtmlHeader extends AbstractProxyFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'phoenix.document';
+	protected static $_key = 'phoenix.html.header';
 }
