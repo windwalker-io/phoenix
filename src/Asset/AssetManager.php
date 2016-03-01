@@ -19,7 +19,7 @@ use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The AssetManager class.
- * 
+ *
  * @since  1.0
  */
 class AssetManager
@@ -463,7 +463,7 @@ class AssetManager
 	protected function handleUri($uri)
 	{
 		// Check has .min
-		$uri = Uri::addBase($uri, 'media.path');
+		// $uri = Uri::addBase($uri, 'media.path');
 
 		if (strpos($uri, 'http') === 0 || strpos($uri, '//') === 0)
 		{
@@ -499,12 +499,12 @@ class AssetManager
 		{
 			if (is_file($root . '/' . $assetFile))
 			{
-				return $assetFile;
+				return Uri::addBase($assetFile, 'media.path');
 			}
 
 			if (is_file($root . '/' . $assetMinFile))
 			{
-				return $assetMinFile;
+				return Uri::addBase($assetMinFile, 'media.path');
 			}
 		}
 
@@ -513,17 +513,17 @@ class AssetManager
 		{
 			if (is_file($root . '/' . $assetMinFile))
 			{
-				return $assetMinFile;
+				return Uri::addBase($assetMinFile, 'media.path');
 			}
 
 			if (is_file($root . '/' . $assetFile))
 			{
-				return $assetFile;
+				return Uri::addBase($assetFile, 'media.path');
 			}
 		}
 
 		// All file not found, fallback to default uri.
-		return $uri;
+		return Uri::addBase($uri, 'media.path');
 	}
 
 	/**
