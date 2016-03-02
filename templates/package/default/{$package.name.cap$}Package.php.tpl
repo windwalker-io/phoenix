@@ -58,6 +58,8 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	protected function prepareExecute()
 	{
+		$this->checkAccess();
+
 		// Assets
 		BootstrapScript::css();
 		BootstrapScript::script();
@@ -65,6 +67,16 @@ class {$package.name.cap$}Package extends AbstractPackage
 
 		// Language
 		TranslatorHelper::loadAll($this, 'ini');
+	}
+
+	/**
+	 * checkAccess
+	 *
+	 * @return  void
+	 */
+	protected function checkAccess()
+	{
+
 	}
 
 	/**
