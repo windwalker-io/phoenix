@@ -83,20 +83,17 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	public function loadRouting()
 	{
-		$files = Folder::files(__DIR__ . '/Resources/routing');
-		$routes = array();
+		$routes = parent::loadRouting();
 
-		foreach ($files as $file)
+		foreach (Folder::files(__DIR__ . '/Resources/routing') as $file)
 		{
-			$ext = File::getExtension($file);
-
-			if ($ext != 'yml')
+			if (File::getExtension($file) == 'yml')
 			{
-				continue;
+				$routes = array_merge($routes, Yaml::parse(file_get_contents($file)));
 			}
-
-			$routes = array_merge($routes, Yaml::parse(file_get_contents($file)));
 		}
+
+		// Merge other routes here...
 
 		return $routes;
 	}
