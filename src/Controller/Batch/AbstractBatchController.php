@@ -116,7 +116,7 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 
 			foreach ((array) $this->pks as $pk)
 			{
-				$this->save($pk, $data);
+				$this->save($pk, clone $data);
 			}
 
 			$this->postSave($data);
