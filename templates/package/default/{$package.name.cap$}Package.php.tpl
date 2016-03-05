@@ -58,6 +58,8 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	protected function prepareExecute()
 	{
+		$this->checkAccess();
+
 		// Assets
 		BootstrapScript::css();
 		BootstrapScript::script();
@@ -65,6 +67,16 @@ class {$package.name.cap$}Package extends AbstractPackage
 
 		// Language
 		TranslatorHelper::loadAll($this, 'ini');
+	}
+
+	/**
+	 * checkAccess
+	 *
+	 * @return  void
+	 */
+	protected function checkAccess()
+	{
+
 	}
 
 	/**
@@ -114,15 +126,15 @@ class {$package.name.cap$}Package extends AbstractPackage
 	{
 		$routes = parent::loadRouting();
 
-		$files = Folder::files(__DIR__ . '/Resources/routing');
-
-		foreach ($files as $file)
+		foreach (Folder::files(__DIR__ . '/Resources/routing') as $file)
 		{
 			if (File::getExtension($file) == 'yml')
 			{
 				$routes = array_merge($routes, Yaml::parse(file_get_contents($file)));
 			}
 		}
+
+		// Merge other routes here...
 
 		return $routes;
 	}
