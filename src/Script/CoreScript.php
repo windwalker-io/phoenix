@@ -48,7 +48,15 @@ abstract class CoreScript extends AbstractScriptManager
 		{
 			$asset->addScript(static::phoenixName() . '/js/core/underscore.min.js');
 
-			$asset->internalScript('_.templateSettings = { interpolate: /\{\{(.+?)\}\}/g };');
+			$js = <<<JS
+_.templateSettings = {
+	evaluate: /\{\%(.+?)\%\}/g,
+	interpolate: /\{\!\!(.+?)\!\!\}/g,
+	escape: /\{\{(.+?)\}\}/g
+};
+JS;
+
+			$asset->internalScript($js);
 		}
 
 		if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict)
