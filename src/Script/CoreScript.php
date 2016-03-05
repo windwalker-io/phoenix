@@ -8,6 +8,8 @@
 
 namespace Phoenix\Script;
 
+use Windwalker\Utilities\ArrayHelper;
+
 /**
  * The CoreScript class.
  *
@@ -85,6 +87,32 @@ abstract class CoreScript extends AbstractScriptManager
 JS;
 
 			$asset->internalScript($js);
+		}
+	}
+
+	/**
+	 * backbone
+	 *
+	 * @param bool  $noConflict
+	 * @param array $options
+	 *
+	 * @return  void
+	 */
+	public static function backbone($noConflict = false, $options = array())
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
+		{
+			JQueryScript::core(ArrayHelper::getValue($options, 'jquery_no_conflict', false));
+			static::underscore(ArrayHelper::getValue($options, 'jquery_no_conflict', true));
+
+			$asset->addScript(static::phoenixName() . '/js/core/backbone.min.js');
+		}
+
+		if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict)
+		{
+			$asset->internalScript(';var backbone = Backbone.noConflict();');
 		}
 	}
 }
