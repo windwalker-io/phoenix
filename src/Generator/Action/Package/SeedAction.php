@@ -11,10 +11,9 @@ namespace Phoenix\Generator\Action\Package;
 use Phoenix\Generator\Action\AbstractAction;
 use Windwalker\Console\IO\IOInterface;
 use Windwalker\Core\Console\WindwalkerConsole;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Ioc;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The SeedAction class.
@@ -50,7 +49,8 @@ class SeedAction extends AbstractAction
 			PackageHelper::getInstance()->addPackage($package, $packageClass);
 		}
 
-		$seedClass = MvcHelper::getPackageNamespace($packageClass, 1) . '\Seed\\' . $this->config['replace.controller.item.name.cap'] . 'Seeder';
+		$seedClass = $this->config['replace.controller.item.name.cap'] . 'Seeder';
+		$dir = WINDWALKER_SOURCE . '/' . str_replace('\\', '/', MvcHelper::getPackageNamespace($packageClass, 1)) . '/Seed';
 
 		/** @var WindwalkerConsole $app */
 		$app = Ioc::getApplication();
@@ -60,6 +60,7 @@ class SeedAction extends AbstractAction
 		$io = clone $this->io->getIO();
 		$io->setArguments(array('seed', 'import'));
 		$io->setOption('c', $seedClass);
+		$io->setOption('dir', $dir);
 		$io->setOption('no-backup', true);
 
 		$app->getRootCommand()->setIO($io)->execute();
