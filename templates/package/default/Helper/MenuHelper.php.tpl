@@ -36,7 +36,7 @@ class MenuHelper extends AbstractHelper
 	{
 		$view = $this->getParent()->getView();
 
-		if ($view['app']->get('route.matched') == $view->getPackage()->getName() . ':' . $name)
+		if ($view['app']->get('route.matched') == $view->getPackage()->getName() . '@' . $name)
 		{
 			return 'active';
 		}
