@@ -11,6 +11,7 @@ namespace Phoenix\Generator\Action\Package;
 use Phoenix\Generator\Action\AbstractAction;
 use Windwalker\Console\IO\IOInterface;
 use Windwalker\Core\Console\WindwalkerConsole;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Ioc;
 
@@ -44,6 +45,8 @@ class MigrateAction extends AbstractAction
 			PackageHelper::getInstance()->addPackage($package, $packageClass);
 		}
 
+		$dir = WINDWALKER_SOURCE . '/' . str_replace('\\', '/', MvcHelper::getPackageNamespace($packageClass, 1)) . '/Migration';
+
 		/** @var WindwalkerConsole $app */
 		$app = Ioc::getApplication();
 
@@ -51,7 +54,7 @@ class MigrateAction extends AbstractAction
 		/** @var IOInterface $io */
 		$io = clone $this->io->getIO();
 		$io->setArguments(array('migration', 'migrate'));
-		$io->setOption('p', $package);
+		$io->setOption('d', $dir);
 		$io->setOption('seed', null);
 		$io->setOption('s', null);
 		$io->setOption('no-backup', true);
