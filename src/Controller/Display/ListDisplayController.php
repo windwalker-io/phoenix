@@ -11,6 +11,7 @@ namespace Phoenix\Controller\Display;
 use Phoenix\Model\ListModel;
 use Windwalker\Core\Model\Model;
 use Windwalker\Filter\InputFilter;
+use Windwalker\Form\Field\ListField;
 use Windwalker\Form\Form;
 
 /**
@@ -64,12 +65,6 @@ class ListDisplayController extends DisplayController
 	 */
 	protected function prepareUserState(Model $model)
 	{
-		// Pagination
-		$model['list.limit'] = $this->limit === null ? $this->app->get('list.limit', 15) : $this->limit;
-		$model['list.page']  = $this->getUserStateFromInput($this->getContext('list.page'), 'page', 1, InputFilter::INTEGER);
-		$model['list.page']  = $model['list.page'] < 1 ? 1 : $model['list.page'];
-		$model['list.start'] = ($model['list.page'] - 1) * $model['list.limit'];
-
 		// Filter & Search
 		$model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', array(), InputFilter::ARRAY_TYPE);
 		$model['input.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', array(), InputFilter::ARRAY_TYPE);
@@ -80,6 +75,12 @@ class ListDisplayController extends DisplayController
 		// Ordering
 		$model['list.ordering'] = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering', $this->defaultOrdering);
 		$model['list.direction'] = $this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction', $this->defaultDirection);
+
+		// Pagination
+		$model['list.limit'] = $this->limit === null ? $this->app->get('list.limit', 15) : $this->limit;
+		$model['list.page']  = $this->getUserStateFromInput($this->getContext('list.page'), 'page', 1, InputFilter::INTEGER);
+		$model['list.page']  = $model['list.page'] < 1 ? 1 : $model['list.page'];
+		$model['list.start'] = ($model['list.page'] - 1) * $model['list.limit'];
 	}
 
 	/**
@@ -109,6 +110,7 @@ class ListDisplayController extends DisplayController
 				return array();
 			}
 
+			/** @var ListField $searchField */
 			$options = $searchField->getOptions();
 
 			$fields = array();
@@ -122,5 +124,30 @@ class ListDisplayController extends DisplayController
 		}
 
 		return array($search['field'] => $search['content']);
+	}
+
+	/**
+	 * Gets the value from session and input and sets it back to session
+	 *
+	 * @param string $name
+	 * @param string $inputName
+	 * @param mixed  $default
+	 * @param string $filter
+	 * @param string $namespace
+	 *
+	 * @return  mixed
+	 */
+	public function getUserStateFromInput($name, $inputName, $default = null, $filter = InputFilter::STRING, $namespace = 'default')
+	{
+		$oldState = $this->getUserState($name, $default, $namespace);
+		$newState = $this->input->get($inputName, null, $filter);
+
+		// Id state different, reset page to 1.
+		if ($oldState != $newState)
+		{
+			$this->input->set('page', 1);
+		}
+
+		return parent::getUserStateFromInput($name, $inputName, $default, $filter, $namespace);
 	}
 }
