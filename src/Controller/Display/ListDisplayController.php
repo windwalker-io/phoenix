@@ -125,29 +125,4 @@ class ListDisplayController extends DisplayController
 
 		return array($search['field'] => $search['content']);
 	}
-
-	/**
-	 * Gets the value from session and input and sets it back to session
-	 *
-	 * @param string $name
-	 * @param string $inputName
-	 * @param mixed  $default
-	 * @param string $filter
-	 * @param string $namespace
-	 *
-	 * @return  mixed
-	 */
-	public function getUserStateFromInput($name, $inputName, $default = null, $filter = InputFilter::STRING, $namespace = 'default')
-	{
-		$oldState = $this->getUserState($name, $default, $namespace);
-		$newState = $this->input->get($inputName, null, $filter);
-
-		// Id state different, reset page to 1.
-		if ($oldState != $newState)
-		{
-			$this->input->set('page', 1);
-		}
-
-		return parent::getUserStateFromInput($name, $inputName, $default, $filter, $namespace);
-	}
 }
