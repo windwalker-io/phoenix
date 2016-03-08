@@ -46,17 +46,9 @@ abstract class CoreScript extends AbstractScriptManager
 
 		if (!static::inited(__METHOD__))
 		{
-			$asset->addScript(static::phoenixName() . '/js/core/underscore.min.js');
+			$onload = '_.erbTemplate = _.templateSettings; _.bladeTemplate = _.templateSettings = { evaluate: /\{\%(.+?)\%\}/g, interpolate: /\{\!\!(.+?)\!\!\}/g, escape: /\{\{(.+?)\}\}/g };';
 
-			$js = <<<JS
-_.templateSettings = {
-	evaluate: /\{\%(.+?)\%\}/g,
-	interpolate: /\{\!\!(.+?)\!\!\}/g,
-	escape: /\{\{(.+?)\}\}/g
-};
-JS;
-
-			$asset->internalScript($js);
+			$asset->addScript(static::phoenixName() . '/js/core/underscore.min.js', null, array('onload' => $onload));
 		}
 
 		if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict)
