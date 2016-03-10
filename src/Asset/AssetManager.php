@@ -10,9 +10,7 @@ namespace Phoenix\Asset;
 
 use Phoenix\Uri\Uri;
 use Windwalker\Dom\HtmlElement;
-use Windwalker\Environment\ServerHelper;
 use Windwalker\Filesystem\File;
-use Windwalker\Filesystem\Filesystem;
 use Windwalker\Ioc;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\ArrayHelper;
@@ -58,6 +56,13 @@ class AssetManager
 	 * @var string
 	 */
 	protected $version;
+
+	/**
+	 * Property templates.
+	 *
+	 * @var  AssetTemplate
+	 */
+	protected $template;
 
 	/**
 	 * Property indents.
@@ -524,6 +529,35 @@ class AssetManager
 
 		// All file not found, fallback to default uri.
 		return Uri::addBase($uri, 'media.path');
+	}
+
+	/**
+	 * Method to get property Template
+	 *
+	 * @return  AssetTemplate
+	 */
+	public function getTemplate()
+	{
+		if (!$this->template)
+		{
+			return $this->template = new AssetTemplate;
+		}
+
+		return $this->template;
+	}
+
+	/**
+	 * Method to set property template
+	 *
+	 * @param   AssetTemplate $template
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setTemplate(AssetTemplate $template)
+	{
+		$this->template = $template;
+
+		return $this;
 	}
 
 	/**

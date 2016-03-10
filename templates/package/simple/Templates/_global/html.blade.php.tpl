@@ -68,5 +68,6 @@
         </div>
     </div>
     @show
+{!! \Phoenix\Asset\Asset::getTemplate()->renderTemplates() !!}
 </body>
 </html>

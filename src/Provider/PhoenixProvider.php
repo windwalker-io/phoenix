@@ -17,6 +17,7 @@ use Windwalker\Core\Renderer\RendererFactory;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Renderer\Blade\GlobalContainer;
 use Windwalker\Utilities\Queue\Priority;
 
 /**
@@ -65,5 +66,16 @@ class PhoenixProvider implements ServiceProviderInterface
 		$factory = $container->get('renderer.factory');
 
 		$factory->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', Priority::LOW - 25);
+
+		// Register Blade directive
+		GlobalContainer::addCompiler('assetTemplate', function($expression)
+		{
+			return "<?php \\Phoenix\\Asset\\Asset::getTemplate()->startTemplate{$expression} ?>";
+		});
+
+		GlobalContainer::addCompiler('endTemplate', function($expression)
+		{
+			return "<?php \\Phoenix\\Asset\\Asset::getTemplate()->endTemplate{$expression} ?>";
+		});
 	}
 }

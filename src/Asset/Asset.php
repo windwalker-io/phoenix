@@ -26,6 +26,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  string        getVersion()              getVersion()
  * @method  static  AssetManager  setIndents()              setIndents(string $indents)
  * @method  static  string        getIndents()              getIndents()
+ * @method  static  AssetTemplate getTemplate()             getTemplate()
+ * @method  static  string        setTemplate()             setTemplate(AssetTemplate $template)
  * @method  static  string        getJSObject()             getJSObject(array $array)
  *
  * @since  1.0
