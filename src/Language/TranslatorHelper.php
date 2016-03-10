@@ -34,11 +34,6 @@ class TranslatorHelper
 	 */
 	public static function loadAll($package, $format = 'ini')
 	{
-		$config = Ioc::getConfig();
-
-		$locale = $config['language.locale']  ? : 'en-GB';
-		$locale = LanguageNormalize::toLanguageTag($locale);
-
 		if (is_string($package))
 		{
 			$package = PackageHelper::getPackage($package);
@@ -49,7 +44,7 @@ class TranslatorHelper
 			return;
 		}
 
-		$path = $package->getDir() . '/Resources/language/' . $locale;
+		$path = $package->getDir() . '/Resources/language';
 
 		static::loadAllFromPath($path, $format, $package);
 	}
@@ -57,13 +52,34 @@ class TranslatorHelper
 	/**
 	 * loadAllFromPath
 	 *
-	 * @param   string  $path
-	 * @param   string  $format
-	 * @param   string  $package
+	 * @param   string $path
+	 * @param   string $format
+	 * @param   string $package
 	 */
 	public static function loadAllFromPath($path, $format, $package = null)
 	{
-		$files = (array) Folder::files($path);
+		$config = Ioc::getConfig();
+
+		$locale = $config['language.locale']  ? : 'en-GB';
+		$default = $config['language.default'] ? : 'en-GB';
+		$locale = LanguageNormalize::toLanguageTag($locale);
+		$default = LanguageNormalize::toLanguageTag($default);
+
+		$localePath = $path . '/' . $locale;
+
+		$files = array();
+
+		if (is_dir($localePath))
+		{
+			$files = array_merge($files, (array) Folder::files($localePath, false, Folder::PATH_BASENAME));
+		}
+
+		$defaultPath = $path . '/' . $default;
+
+		if (is_dir($defaultPath))
+		{
+			$files = array_merge($files, (array) Folder::files($defaultPath, false, Folder::PATH_BASENAME));
+		}
 
 		foreach ($files as $file)
 		{
@@ -74,9 +90,7 @@ class TranslatorHelper
 				continue;
 			}
 
-			$fileName = pathinfo($file, PATHINFO_BASENAME);
-
-			Translator::loadFile(File::stripExtension($fileName), strtolower($format), $package);
+			Translator::loadFile(File::stripExtension($file), strtolower($format), $package);
 		}
 	}
 
