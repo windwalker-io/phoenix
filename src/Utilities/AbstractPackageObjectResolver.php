@@ -46,6 +46,27 @@ abstract class AbstractPackageObjectResolver
 	{
 		$name = static::getClass($name);
 
+		$class = static::findClass($name);
+
+		if ($class)
+		{
+			$args = (array) $args;
+
+			return static::createObject($class, $args);
+		}
+
+		return null;
+	}
+
+	/**
+	 * findClass
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  string
+	 */
+	public static function findClass($name)
+	{
 		foreach (clone static::getNamespaces() as $namespace)
 		{
 			$class = $namespace . '\\' . $name;
@@ -55,9 +76,7 @@ abstract class AbstractPackageObjectResolver
 				continue;
 			}
 
-			$args = (array) $args;
-
-			return static::createObject($class, $args);
+			return $class;
 		}
 
 		return null;
