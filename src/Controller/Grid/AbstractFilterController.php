@@ -10,6 +10,7 @@ namespace Phoenix\Controller\Grid;
 
 use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Filter\InputFilter;
+use Windwalker\Uri\Uri;
 
 /**
  * The AbstractFilterController class.
@@ -37,14 +38,10 @@ abstract class AbstractFilterController extends AbstractPhoenixController
 		$model['list.ordering']  = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering');
 		$model['list.direction'] = $this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction');
 
-		if ($this->input->get('layout') == 'modal')
-		{
-			$this->setRedirect($this->app->get('uri.full'));
-		}
-		else
-		{
-			$this->setRedirect($this->router->http($this->app->get('route.matched'), array('page' => $this->getUserState($this->getContext('list.page')))));
-		}
+		$uri = new Uri($this->app->get('uri.full'));
+		$uri->delVar('filter');
+
+		$this->setRedirect($uri->toString());
 
 		return true;
 	}
