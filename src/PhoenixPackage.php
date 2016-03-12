@@ -8,13 +8,11 @@
 
 namespace Phoenix;
 
-use Phoenix\Listener\ProfilerListener;
 use Phoenix\Provider\PhoenixProvider;
 use Phoenix\Provider\SwiftMailerProvider;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
-use Windwalker\Event\Dispatcher;
 
 define('PHOENIX_ROOT', dirname(__DIR__));
 define('PHOENIX_SOURCE', PHOENIX_ROOT . '/src');
@@ -50,12 +48,5 @@ class PhoenixPackage extends AbstractPackage
 	{
 		$container->registerServiceProvider(new PhoenixProvider)
 			->registerServiceProvider(new SwiftMailerProvider);
-	}
-
-	public function registerListeners(Dispatcher $dispatcher)
-	{
-		parent::registerListeners($dispatcher);
-
-		$dispatcher->addListener(new ProfilerListener);
 	}
 }
