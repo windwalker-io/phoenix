@@ -63,6 +63,15 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	protected $useTransaction = true;
 
 	/**
+	 * Property allowRedirectQuery.
+	 *
+	 * @var  array
+	 */
+	protected $redirectQueryFields = array(
+		'return'
+	);
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
@@ -89,18 +98,6 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	}
 
 	/**
-	 * getFailRedirect
-	 *
-	 * @param  Data $data
-	 *
-	 * @return  string
-	 */
-	protected function getFailRedirect(Data $data = null)
-	{
-		return $this->app->get('uri.full');
-	}
-
-	/**
 	 * getSuccessRedirect
 	 *
 	 * @param  Data $data
@@ -109,7 +106,43 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	 */
 	protected function getSuccessRedirect(Data $data = null)
 	{
-		return $this->app->get('uri.full');
+		$uri = new Uri($this->app->get('uri.full'));
+
+		foreach ($this->getRedirectQuery() as $field => $value)
+		{
+			$uri->setVar($field, $value);
+		}
+
+		return $uri->toString();
+	}
+
+	/**
+	 * getFailRedirect
+	 *
+	 * @param  Data $data
+	 *
+	 * @return  string
+	 */
+	protected function getFailRedirect(Data $data = null)
+	{
+		return $this->getSuccessRedirect($data);
+	}
+
+	/**
+	 * getRedirectQuery
+	 *
+	 * @param array $query
+	 *
+	 * @return  array
+	 */
+	protected function getRedirectQuery($query = array())
+	{
+		foreach ((array) $this->redirectQueryFields as $field)
+		{
+			$query[$field] = $this->input->getString($field);
+		}
+
+		return $query;
 	}
 
 	/**

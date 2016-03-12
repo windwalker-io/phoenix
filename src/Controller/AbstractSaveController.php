@@ -228,7 +228,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	{
 		$pk = $data->{$this->pkName} ? : $this->model['item.pk'];
 
-		return $this->router->http($this->getName(), array($this->pkName => $pk));
+		return $this->router->http($this->getName(), $this->getRedirectQuery(array($this->pkName => $pk)));
 	}
 
 	/**
@@ -245,10 +245,10 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 		switch ($this->task)
 		{
 			case 'save2close':
-				return $this->router->http($this->config['list_name']);
+				return $this->router->http($this->config['list_name'], $this->getRedirectQuery());
 
 			case 'save2new':
-				return $this->router->http($this->getName(), array('new' => ''));
+				return $this->router->http($this->getName(), $this->getRedirectQuery(array('new' => '')));
 
 			case 'save2copy':
 				$data->{$this->pkName} = null;
@@ -263,16 +263,14 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 					$data->alias = StringHelper::increment($data->alias, StringHelper::INCREMENT_STYLE_DASH);
 				}
 
-				$this->model->save($data);
+				$this->setUserState($this->getContext('edit.data'), $data->dump());
 
-				$pk = $this->model['item.pk'];
-
-				return $this->router->http($this->getName(), array($this->pkName => $pk));
+				return $this->router->http($this->getName(), $this->getRedirectQuery());
 
 			default:
 				$pk = $this->model['item.pk'];
 
-				return $this->router->http($this->getName(), array($this->pkName => $pk));
+				return $this->router->http($this->getName(), $this->getRedirectQuery(array($this->pkName => $pk)));
 		}
 	}
 }
