@@ -8,7 +8,6 @@
 
 namespace Phoenix\Listener;
 
-use Phoenix\Profiler\Profiler;
 use Windwalker\Event\Event;
 use Windwalker\Ioc;
 
@@ -20,7 +19,7 @@ use Windwalker\Ioc;
 class ProfilerListener
 {
 	/**
-	 * onControllerAfterExecute
+	 * onControllerBeforeExecute
 	 *
 	 * @param Event $event
 	 *
@@ -28,33 +27,54 @@ class ProfilerListener
 	 */
 	public function onControllerBeforeExecute(Event $event)
 	{
-		/** @var Profiler $profiler */
-		$profiler = Ioc::get('system.profiler');
-
-		$profiler->mark(__FUNCTION__);
+		if (Ioc::exists('system.profiler'))
+		{
+			Ioc::get('system.profiler')->mark(__FUNCTION__);
+		}
 	}
 
+	/**
+	 * onControllerAfterExecute
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
 	public function onControllerAfterExecute(Event $event)
 	{
-		/** @var Profiler $profiler */
-		$profiler = Ioc::get('system.profiler');
-
-		$profiler->mark(__FUNCTION__);
+		if (Ioc::exists('system.profiler'))
+		{
+			Ioc::get('system.profiler')->mark(__FUNCTION__);
+		}
 	}
 
+	/**
+	 * onViewBeforeRender
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
 	public function onViewBeforeRender(Event $event)
 	{
-		/** @var Profiler $profiler */
-		$profiler = Ioc::get('system.profiler');
-
-		$profiler->mark(__FUNCTION__);
+		if (Ioc::exists('system.profiler'))
+		{
+			Ioc::get('system.profiler')->mark(__FUNCTION__);
+		}
 	}
 
+	/**
+	 * onViewAfterRender
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
 	public function onViewAfterRender(Event $event)
 	{
-		/** @var Profiler $profiler */
-		$profiler = Ioc::get('system.profiler');
-
-		$profiler->mark(__FUNCTION__);
+		if (Ioc::exists('system.profiler'))
+		{
+			Ioc::get('system.profiler')->mark(__FUNCTION__);
+		}
 	}
 }
