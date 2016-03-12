@@ -11,6 +11,7 @@ namespace Phoenix\Controller;
 use Phoenix\Model\CrudModel;
 use Windwalker\Data\Data;
 use Windwalker\Record\Record;
+use Windwalker\Uri\Uri;
 
 /**
  * The AbstractAdminController class.
@@ -96,7 +97,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	 */
 	protected function getFailRedirect(Data $data = null)
 	{
-		return $this->router->http($this->getName());
+		return $this->app->get('uri.full');
 	}
 
 	/**
@@ -108,7 +109,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	 */
 	protected function getSuccessRedirect(Data $data = null)
 	{
-		return $this->router->http($this->getName());
+		return $this->app->get('uri.full');
 	}
 
 	/**
