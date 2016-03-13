@@ -51,7 +51,7 @@ abstract class AbstractCopyController extends AbstractBatchController
 	{
 		parent::prepareExecute();
 
-		$this->data = array_merge($this->input->getVar('batch', array()), $this->data);
+		$this->data = array_merge($this->input->getVar('batch', array()), (array) $this->data);
 	}
 
 	/**
