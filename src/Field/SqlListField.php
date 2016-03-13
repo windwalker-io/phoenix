@@ -50,20 +50,35 @@ class SqlListField extends ListField
 
 		foreach ($items as $item)
 		{
-			$value = isset($item->$valueField) ? $item->$valueField : null;
-			$text  = isset($item->$textField)  ? $item->$textField : null;
-
-			$level = !empty($item->level) ? $item->level - 1 : 0;
-
-			if ($level < 0)
-			{
-				$level = 0;
-			}
-
-			$options[] = new Option(str_repeat('- ', $level) . $text, $value, $attribs);
+			$options[] = $this->createOption($item, $valueField, $textField, $attribs);
 		}
 
 		return $options;
+	}
+
+	/**
+	 * createOption
+	 *
+	 * @param object $item
+	 * @param string $valueField
+	 * @param string $textField
+	 * @param array  $attribs
+	 *
+	 * @return  Option
+	 */
+	protected function createOption($item, $valueField = 'id', $textField = 'title', $attribs = array())
+	{
+		$value = isset($item->$valueField) ? $item->$valueField : null;
+		$text  = isset($item->$textField)  ? $item->$textField : null;
+
+		$level = !empty($item->level) ? $item->level - 1 : 0;
+
+		if ($level < 0)
+		{
+			$level = 0;
+		}
+
+		return new Option(str_repeat('- ', $level) . $text, $value, $attribs);
 	}
 
 	/**

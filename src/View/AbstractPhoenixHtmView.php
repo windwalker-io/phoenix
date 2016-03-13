@@ -49,6 +49,8 @@ abstract class AbstractPhoenixHtmView extends BladeHtmlView
 	 */
 	protected function prepareRender($data)
 	{
+		$data->state = $data->state ? : $this->model->getState();
+
 		$this->langPrefix = $this->langPrefix ? : $this->getPackage()->getName() . '.';
 
 		$this->setTitle();
