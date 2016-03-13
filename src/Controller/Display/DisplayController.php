@@ -68,7 +68,7 @@ class DisplayController extends AbstractPhoenixController
 		$this->layout = $this->layout ? : $this->app->get('route.extra.layout', 'default');
 
 		$this->model = $this->getModel();
-		$this->view = $this->getView(null, $this->format);
+		$this->view = $this->getView();
 	}
 
 	/**
@@ -165,5 +165,21 @@ class DisplayController extends AbstractPhoenixController
 		$this->format = $format;
 
 		return $this;
+	}
+
+	/**
+	 * getView
+	 *
+	 * @param string $name
+	 * @param string $type
+	 * @param bool   $forceNew
+	 *
+	 * @return  BladeHtmlView
+	 */
+	public function getView($name = null, $type = null, $forceNew = false)
+	{
+		$type = $type ? : $this->format;
+
+		return parent::getView($name, $type, $forceNew);
 	}
 }
