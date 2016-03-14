@@ -27,16 +27,18 @@ abstract class DataMapperResolver extends AbstractPackageObjectResolver
 	 * @param  string $class
 	 * @param  array  $args
 	 *
-	 * @return string
+	 * @return DataMapper
 	 */
 	protected static function createObject($class, $args = array())
 	{
-		if (!is_subclass_of($class, 'Lyrasoft\Luna\Module\AbstractModule'))
+		if (!is_subclass_of($class, 'Windwalker\DataMapper\DataMapper'))
 		{
-			throw new \UnexpectedValueException(sprintf('Class: %s is not vu class of Lyrasoft\Luna\Module\AbstractModule', $class));
+			throw new \UnexpectedValueException(sprintf('Class: %s is not vu class of Windwalker\DataMapper\DataMapper', $class));
 		}
 
-		return $class;
+		$db = array_shift($args);
+
+		return new $class($db ? : static::getContainer()->get('system.db'));
 	}
 
 	/**
@@ -48,6 +50,6 @@ abstract class DataMapperResolver extends AbstractPackageObjectResolver
 	 */
 	public static function getClass($name)
 	{
-		return ucfirst($name) . '\\' . ucfirst($name) . 'Module';
+		return ucfirst($name) . 'Mapper';
 	}
 }
