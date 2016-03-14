@@ -21,7 +21,7 @@ use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The AbstractFormModel class.
- * 
+ *
  * @since  1.0
  */
 class FormModel extends ItemModel
@@ -105,16 +105,16 @@ class FormModel extends ItemModel
 	{
 		$name = $name ? : $this->getName();
 
-		if (!$class = FieldDefinitionResolver::create(ucfirst($name) . '\\' . ucfirst($definition)))
-		{
-			$class = sprintf(
-				'%s\Form\%s\%sDefinition',
-				MvcHelper::getPackageNamespace($this, 2),
-				ucfirst($name),
-				ucfirst($definition)
-			);
+		$class = sprintf(
+			'%s\Form\%s\%sDefinition',
+			MvcHelper::getPackageNamespace($this, 2),
+			ucfirst($name),
+			ucfirst($definition)
+		);
 
-			if (!class_exists($class))
+		if (!class_exists($class))
+		{
+			if (!$class = FieldDefinitionResolver::create(ucfirst($name) . '\\' . ucfirst($definition)))
 			{
 				return new NullFiledDefinition;
 			}
