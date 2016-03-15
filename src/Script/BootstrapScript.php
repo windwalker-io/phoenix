@@ -253,17 +253,30 @@ JS;
 	/**
 	 * tabState
 	 *
-	 * @return  void
+	 * @param string $selector
+	 * @param int    $time
 	 */
-	public static function tabState()
+	public static function tabState($selector = '#admin-form', $time = 100)
 	{
+		$asset = static::getAsset();
+
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset = static::getAsset();
-
 			$asset->addScript(static::phoenixName() . '/js/bootstrap/tab-state.min.js');
+		}
+
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			$time = (int) $time;
+
+			$asset->internalScript(<<<JS
+jQuery(document).ready(function($) {
+    new LoadTab($('$selector'), $time);
+});
+JS
+);
 		}
 	}
 
