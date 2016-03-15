@@ -377,4 +377,21 @@ JS;
 			static::getAsset()->internalScript($js);
 		}
 	}
+
+	/**
+	 * crypto
+	 *
+	 * @return  void
+	 */
+	public static function crypto()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			$asset = static::getAsset();
+
+			CoreScript::underscore();
+
+			$asset->addScript(static::phoenixName() . '/js/phoenix/crypto.min.js');
+		}
+	}
 }

@@ -115,4 +115,26 @@ JS;
 			$asset->internalScript(';var backbone = Backbone.noConflict();');
 		}
 	}
+
+	/**
+	 * simpleUri
+	 *
+	 * @param bool $noConflict
+	 *
+	 * @return  void
+	 */
+	public static function simpleUri($noConflict = false)
+	{
+		$asset = static::getAsset();
+
+		if (!static::inited(__METHOD__))
+		{
+			$asset->addScript(static::phoenixName() . '/js/core/simple-uri.min.js');
+		}
+
+		if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict)
+		{
+			$asset->internalScript(';var SimpleURI = URI.noConflict();');
+		}
+	}
 }
