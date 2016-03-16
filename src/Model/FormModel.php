@@ -105,16 +105,16 @@ class FormModel extends ItemModel
 	{
 		$name = $name ? : $this->getName();
 
-		$class = sprintf(
-			'%s\Form\%s\%sDefinition',
-			MvcHelper::getPackageNamespace($this, 2),
-			ucfirst($name),
-			ucfirst($definition)
-		);
-
-		if (!class_exists($class))
+		if (!$class = FieldDefinitionResolver::create(ucfirst($name) . '\\' . ucfirst($definition)))
 		{
-			if (!$class = FieldDefinitionResolver::create(ucfirst($name) . '\\' . ucfirst($definition)))
+			$class = sprintf(
+				'%s\Form\%s\%sDefinition',
+				MvcHelper::getPackageNamespace($this, 2),
+				ucfirst($name),
+				ucfirst($definition)
+			);
+
+			if (!class_exists($class))
 			{
 				return new NullFiledDefinition;
 			}
