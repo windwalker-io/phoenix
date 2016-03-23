@@ -11,13 +11,10 @@ namespace Phoenix\View\Helper;
 use Phoenix\Html\State\IconButton;
 use Phoenix\Html\State\StateButton;
 use Windwalker\Core\DateTime\DateTime;
-use Windwalker\Core\Language\Translator;
-use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
 use Windwalker\Dom\HtmlElement;
-use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
 
 /**
@@ -565,7 +562,7 @@ class GridHelper
 	/**
 	 * Method to get property View
 	 *
-	 * @return  HtmlView
+	 * @return  PhpHtmlView
 	 */
 	public function getView()
 	{
@@ -575,7 +572,7 @@ class GridHelper
 	/**
 	 * Method to set property view
 	 *
-	 * @param   HtmlView $view
+	 * @param   PhpHtmlView $view
 	 *
 	 * @return  static  Return self to support chaining.
 	 */

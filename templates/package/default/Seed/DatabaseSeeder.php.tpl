@@ -32,9 +32,9 @@ class DatabaseSeeder extends AbstractSeeder
 	 *
 	 * @return  void
 	 */
-	public function doClean()
+	public function doClear()
 	{
-		$this->clean(new {$controller.item.name.cap$}Seeder);
+		$this->clear(new {$controller.item.name.cap$}Seeder);
 
 		// @muse-placeholder  seeder-clean  Do not remove this.
 	}

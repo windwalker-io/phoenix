@@ -12,7 +12,6 @@ use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\View\BladeHtmlView;
-use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\PhpHtmlView;
 
 /**

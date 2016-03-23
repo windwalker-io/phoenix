@@ -9,12 +9,9 @@
 namespace Phoenix\Provider;
 
 use Phoenix\Asset\AssetManager;
-use Phoenix\Html\DocumentManager;
 use Phoenix\Html\HtmlHeaderManager;
-use Phoenix\Toolbar\ToolbarFactory;
 use Windwalker\Core\Console\WindwalkerConsole;
 use Windwalker\Core\Renderer\RendererFactory;
-use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Renderer\Blade\GlobalContainer;
