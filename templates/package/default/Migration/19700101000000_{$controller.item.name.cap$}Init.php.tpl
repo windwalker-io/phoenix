@@ -42,9 +42,9 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
 			$schema->char('language')->length(7)->comment('Language');
 			$schema->text('params')->comment('Params');
 
-			$schema->addIndex('idx_{$controller.list.name.lower$}_alias', 'alias');
-			$schema->addIndex('idx_{$controller.list.name.lower$}_language', 'language');
-			$schema->addIndex('idx_{$controller.list.name.lower$}_created_by', 'created_by');
+			$schema->addIndex($schema->indexName('alias'), 'alias');
+			$schema->addIndex($schema->indexName('language'), 'language');
+			$schema->addIndex($schema->indexName('created_by'), 'created_by');
 		});
 	}
 
