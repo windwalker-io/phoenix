@@ -71,7 +71,7 @@ class FilterHelper extends AbstractFilterHelper
 		 */
 		return function(Query $query, $field, $value)
 		{
-			if ((string) $value !== '' && $value != '*')
+			if ((string) $value !== '')
 			{
 				$query->where($query->quoteName($field) . ' = ' . $query->quote($value));
 			}
