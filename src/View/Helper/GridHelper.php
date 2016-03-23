@@ -315,9 +315,9 @@ class GridHelper
 	public function state($value, $options = array())
 	{
 		$iconMapping = array(
-			-1 => 'trash fa fa-trash',
-			0 => 'remove fa fa-remove text-danger',
-			1 => 'ok fa fa-check text-success'
+			-1 => 'trash fa fa-fw fa-trash',
+			0 => 'remove fa fa-fw fa-remove text-danger',
+			1 => 'ok fa fa-fw fa-check text-success'
 		);
 
 		$taskMapping = array(
@@ -475,20 +475,20 @@ class GridHelper
 //		return $this->state->get('access.' . $action, true);
 //	}
 
-//	/**
-//	 * Method to escape output.
-//	 *
-//	 * @param   string $output The output to escape.
-//	 *
-//	 * @return  string  The escaped output.
-//	 *
-//	 * @see     \JView::escape()
-//	 */
-//	public function escape($output)
-//	{
-//		// Escape the output.
-//		return htmlspecialchars($output, ENT_COMPAT, 'UTF-8');
-//	}
+	/**
+	 * Method to escape output.
+	 *
+	 * @param   string $output The output to escape.
+	 *
+	 * @return  string  The escaped output.
+	 *
+	 * @see     \JView::escape()
+	 */
+	public function escape($output)
+	{
+		// Escape the output.
+		return htmlspecialchars($output, ENT_COMPAT, 'UTF-8');
+	}
 
 	/**
 	 * Method to get property Row
