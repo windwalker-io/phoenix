@@ -42,16 +42,17 @@ class FormModel extends ItemModel
 	{
 		$sessionData = (array) $this['form.data'];
 
-		$pkName = $this['pkName'] ? : 'id';
+		$pkName = $this['pkName'] ? : $this->getRecord()->getKeyName();
+		$pkName = $pkName ? : 'id';
 
 		$item = $this->getItem();
 
-		if ($item->notNull() || ArrayHelper::getValue($sessionData, $pkName) != $item->$pkName)
+		if (ArrayHelper::getValue($sessionData, $pkName) == $item->$pkName)
 		{
-			return $item->dump();
+			return $sessionData;
 		}
 
-		return $sessionData;
+		return $item->dump();
 	}
 
 	/**
