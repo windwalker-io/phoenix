@@ -144,7 +144,7 @@ class ModalField extends TextField
 		return $package->router->html($route, array_merge(array(
 			'layout'   => 'modal',
 			'selector' => '#' . $this->getId() . '-wrap',
-			'function' => 'Phoenix.Field.Modal.select'
+			'function' => $this->get('function', 'Phoenix.Field.Modal.select')
 		), $query));
 	}
 
