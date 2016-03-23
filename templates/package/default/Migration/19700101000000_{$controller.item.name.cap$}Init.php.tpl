@@ -23,29 +23,29 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
 	 */
 	public function up()
 	{
-		$this->getTable(Table::{$controller.list.name.upper$}, function(Schema $sc)
+		$this->createTable(Table::{$controller.list.name.upper$}, function(Schema $schema)
 		{
-			$sc->addColumn('id',          new Column\Primary)->comment('Primary Key');
-			$sc->addColumn('title',       new Column\Varchar)->comment('Title');
-			$sc->addColumn('alias',       new Column\Varchar)->comment('Alias');
-			$sc->addColumn('url',         new Column\Varchar)->comment('URL');
-			$sc->addColumn('introtext',   new Column\Text)->comment('Intro Text');
-			$sc->addColumn('fulltext',    new Column\Text)->comment('Full Text');
-			$sc->addColumn('image',       new Column\Varchar)->comment('Main Image');
-			$sc->addColumn('state',       new Column\Tinyint)->signed(true)->comment('0: unpublished, 1:published');
-			$sc->addColumn('ordering',    new Column\Integer)->comment('Ordering');
-			$sc->addColumn('version',     new Column\Integer)->comment('Version');
-			$sc->addColumn('created',     new Column\Datetime)->comment('Created Date');
-			$sc->addColumn('created_by',  new Column\Integer)->comment('Author');
-			$sc->addColumn('modified',    new Column\Datetime)->comment('Modified Date');
-			$sc->addColumn('modified_by', new Column\Integer)->comment('Modified User');
-			$sc->addColumn('language',    new Column\Char)->length(7)->comment('Language');
-			$sc->addColumn('params',      new Column\Text)->comment('Params');
+			$schema->primary('id')->comment('Primary Key');
+			$schema->varchar('title')->comment('Title');
+			$schema->varchar('alias')->comment('Alias');
+			$schema->varchar('url')->comment('URL');
+			$schema->text('introtext')->comment('Intro Text');
+			$schema->text('fulltext')->comment('Full Text');
+			$schema->varchar('image')->comment('Main Image');
+			$schema->tinyint('state')->signed(true)->comment('0: unpublished, 1:published');
+			$schema->integer('ordering')->comment('Ordering');
+			$schema->integer('version')->comment('Version');
+			$schema->datetime('created')->comment('Created Date');
+			$schema->integer('created_by')->comment('Author');
+			$schema->datetime('modified')->comment('Modified Date');
+			$schema->integer('modified_by')->comment('Modified User');
+			$schema->char('language')->length(7)->comment('Language');
+			$schema->text('params')->comment('Params');
 
-			$sc->addIndex(Key::TYPE_INDEX, 'idx_{$controller.list.name.lower$}_alias', 'alias');
-			$sc->addIndex(Key::TYPE_INDEX, 'idx_{$controller.list.name.lower$}_language', 'language');
-			$sc->addIndex(Key::TYPE_INDEX, 'idx_{$controller.list.name.lower$}_created_by', 'created_by');
-		})->create(true);
+			$schema->addIndex('idx_{$controller.list.name.lower$}_alias', 'alias');
+			$schema->addIndex('idx_{$controller.list.name.lower$}_language', 'language');
+			$schema->addIndex('idx_{$controller.list.name.lower$}_created_by', 'created_by');
+		});
 	}
 
 	/**

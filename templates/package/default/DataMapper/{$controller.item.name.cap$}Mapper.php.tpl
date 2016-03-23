@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\DataMapper;
 
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
+use Windwalker\Core\DataMapper\AbstractDataMapperProxy;
 use Windwalker\DataMapper\DataMapper;
 use Windwalker\Event\Event;
 
@@ -17,14 +18,14 @@ use Windwalker\Event\Event;
  * 
  * @since  1.0
  */
-class {$controller.item.name.cap$}Mapper extends DataMapper
+class {$controller.item.name.cap$}Mapper extends AbstractDataMapperProxy
 {
 	/**
 	 * Property table.
 	 *
 	 * @var  string
 	 */
-	protected $table = Table::{$controller.list.name.upper$};
+	protected static $table = Table::{$controller.list.name.upper$};
 
 	/**
 	 * onAfterFind

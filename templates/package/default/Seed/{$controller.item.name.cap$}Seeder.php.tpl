@@ -30,8 +30,6 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 	{
 		$faker = Factory::create();
 
-		$mapper = new {$controller.item.name.cap$}Mapper;
-
 		foreach (range(1, 30) as $i)
 		{
 			$data = new Data;
@@ -52,7 +50,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 			$data['language']    = 'en-GB';
 			$data['params']      = '';
 
-			$mapper->createOne($data);
+			{$controller.item.name.cap$}Mapper::createOne($data);
 
 			$this->command->out('.', false);
 		}
@@ -65,7 +63,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 	 *
 	 * @return  void
 	 */
-	public function doClean()
+	public function doClear()
 	{
 		$this->truncate(Table::{$controller.list.name.upper$});
 	}
