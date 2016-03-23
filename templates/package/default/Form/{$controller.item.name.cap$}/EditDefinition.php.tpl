@@ -101,7 +101,8 @@ class EditDefinition implements FieldDefinitionInterface
 
 			// Modified
 			$form->add('modified', new Phoenix\Field\CalendarField)
-				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'));
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'))
+				->disabled();
 
 			// Author
 			$form->add('created_by', new Field\TextField)
@@ -109,7 +110,8 @@ class EditDefinition implements FieldDefinitionInterface
 
 			// Modified User
 			$form->add('modified_by', new Field\TextField)
-				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'));
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'))
+				->disabled();
 		});
 	}
 }
