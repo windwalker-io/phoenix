@@ -132,7 +132,7 @@
 
                         {{-- AUTHOR --}}
                         <td>
-                            {{ $item->created_by }}
+                            {{ $item->user_name ? : $item->created_by }}
                         </td>
 
                         {{-- CREATED --}}
