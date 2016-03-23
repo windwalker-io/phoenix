@@ -60,22 +60,22 @@
                     </th>
 
                     {{-- STATE --}}
-                    <th>
+                    <th width="5%">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
                     </th>
 
                     {{-- AUTHOR --}}
-                    <th>
+                    <th width="15%">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
                     </th>
 
                     {{-- CREATED --}}
-                    <th>
+                    <th width="15%">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
                     </th>
 
                     {{-- ID --}}
-                    <th>
+                    <th width="5%">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
                     </th>
                 </tr>
@@ -101,12 +101,12 @@
 
                         {{-- AUTHOR --}}
                         <td>
-                            {{ $item->user_name ? : $item->created_by }}
+                            {{ property_exists($item, 'user_name') ? $item->user_name : $item->created_by }}
                         </td>
 
                         {{-- CREATED --}}
                         <td>
-                            {{ \Windwalker\Core\DateTime\DateTime::toLocalTime($item->created) }}
+                            {{ \Windwalker\Core\DateTime\DateTime::toLocalTime($item->created, 'Y-m-d') }}
                         </td>
 
                         {{-- ID --}}
