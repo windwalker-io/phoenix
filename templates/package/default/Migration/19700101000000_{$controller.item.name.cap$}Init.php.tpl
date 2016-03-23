@@ -34,7 +34,6 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
 			$schema->varchar('image')->comment('Main Image');
 			$schema->tinyint('state')->signed(true)->comment('0: unpublished, 1:published');
 			$schema->integer('ordering')->comment('Ordering');
-			$schema->integer('version')->comment('Version');
 			$schema->datetime('created')->comment('Created Date');
 			$schema->integer('created_by')->comment('Author');
 			$schema->datetime('modified')->comment('Modified Date');

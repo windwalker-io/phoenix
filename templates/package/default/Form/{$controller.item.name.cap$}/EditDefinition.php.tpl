@@ -51,9 +51,9 @@ class EditDefinition implements FieldDefinitionInterface
 			$form->add('alias', new Field\TextField)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'));
 
-			// Images
-			$form->add('images', new Field\TextField)
-				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.images'));
+			// Image
+			$form->add('image', new Field\TextField)
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.image'));
 
 			// URL
 			$form->add('url', new Field\TextField)
@@ -94,10 +94,6 @@ class EditDefinition implements FieldDefinitionInterface
 				->set('default', 1)
 				->addOption(new Option(Translator::translate('phoenix.grid.state.published'), '1'))
 				->addOption(new Option(Translator::translate('phoenix.grid.state.unpublished'), '0'));
-
-			// Version
-			$form->add('version', new Field\TextField)
-				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.version'));
 
 			// Created
 			$form->add('created', new Phoenix\Field\CalendarField)

@@ -41,12 +41,11 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 			$data['fulltext']    = $faker->paragraph(5);
 			$data['image']       = $faker->imageUrl();
 			$data['state']       = $faker->randomElement(array(1, 1, 1, 1, 0, 0));
-			$data['version']     = rand(1, 50);
+			$data['ordering']    = $i;
 			$data['created']     = $faker->dateTime->format(DateTime::FORMAT_SQL);
 			$data['created_by']  = rand(20, 100);
 			$data['modified']    = $faker->dateTime->format(DateTime::FORMAT_SQL);
 			$data['modified_by'] = rand(20, 100);
-			$data['ordering']    = $i;
 			$data['language']    = 'en-GB';
 			$data['params']      = '';
 
