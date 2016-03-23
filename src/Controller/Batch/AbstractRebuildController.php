@@ -10,6 +10,7 @@ namespace Phoenix\Controller\Batch;
 
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
+use Windwalker\Data\Data;
 use Windwalker\Record\NestedRecord;
 
 /**
@@ -67,10 +68,20 @@ class AbstractRebuildController extends AbstractBatchController
 			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), Bootstrap::MSG_DANGER);
 		}
 
-		$msg = Translator::translate($this->langPrefix . 'message.batch.' . $this->action . '.success');
-
-		$this->setRedirect($this->getSuccessRedirect(), $msg, Bootstrap::MSG_SUCCESS);
+		$this->setRedirect($this->getSuccessRedirect(), $this->getSuccessMessage(), Bootstrap::MSG_SUCCESS);
 
 		return true;
+	}
+
+	/**
+	 * getSuccessMessage
+	 *
+	 * @param Data $data
+	 *
+	 * @return  string
+	 */
+	public function getSuccessMessage($data = null)
+	{
+		return Translator::translate($this->langPrefix . 'message.batch.' . $this->action . '.success');
 	}
 }

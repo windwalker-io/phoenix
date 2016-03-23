@@ -145,11 +145,21 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 
 		!$this->useTransaction or $this->model->transactionCommit();
 
-		$msg = Translator::plural($this->langPrefix . 'message.batch.' . $this->action . '.success', count($this->pks), count($this->pks));
-
-		$this->setRedirect($this->getSuccessRedirect(), $msg, Bootstrap::MSG_SUCCESS);
+		$this->setRedirect($this->getSuccessRedirect(), $this->getSuccessMessage($data), Bootstrap::MSG_SUCCESS);
 
 		return true;
+	}
+
+	/**
+	 * getSuccessMessage
+	 *
+	 * @param Data $data
+	 *
+	 * @return  string
+	 */
+	public function getSuccessMessage($data = null)
+	{
+		return Translator::plural($this->langPrefix . 'message.batch.' . $this->action . '.success', count($this->pks), count($this->pks));
 	}
 
 	/**

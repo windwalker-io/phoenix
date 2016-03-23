@@ -98,6 +98,18 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	}
 
 	/**
+	 * getSuccessMessage
+	 *
+	 * @param Data $data
+	 *
+	 * @return  string
+	 */
+	public function getSuccessMessage($data = null)
+	{
+		return '';
+	}
+
+	/**
 	 * getSuccessRedirect
 	 *
 	 * @param  Data $data

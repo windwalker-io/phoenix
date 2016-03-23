@@ -154,9 +154,21 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 
 		$this->removeUserState($this->getContext('edit.data'));
 
-		$this->setRedirect($this->getSuccessRedirect($data), Translator::translate($this->langPrefix . 'message.save.success'), Bootstrap::MSG_SUCCESS);
+		$this->setRedirect($this->getSuccessRedirect($data), $this->getSuccessMessage($data), Bootstrap::MSG_SUCCESS);
 
 		return true;
+	}
+
+	/**
+	 * getSuccessMessage
+	 *
+	 * @param Data $data
+	 *
+	 * @return  string
+	 */
+	public function getSuccessMessage($data = null)
+	{
+		return Translator::translate($this->langPrefix . 'message.save.success');
 	}
 
 	/**
