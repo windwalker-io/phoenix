@@ -34,5 +34,7 @@ class EditDisplayController extends ItemDisplayController
 		}
 
 		$model['form.data'] = $this->getUserState($this->getContext('edit.data'));
+
+		$this->removeUserState($this->getContext('edit.data'));
 	}
 }
