@@ -49,4 +49,6 @@ var Phoenix;
             return null;
         }
     };
+
+    Phoenix.Uri = {};
 })(Phoenix || (Phoenix = {}));

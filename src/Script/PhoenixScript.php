@@ -118,6 +118,14 @@ JS;
 		{
 			$asset = static::getAsset();
 			$asset->addScript(static::phoenixName() . '/js/phoenix/router.min.js');
+
+			$uri = Ioc::get('uri');
+			$uri = $asset::getJSObject($uri->toArray());
+
+			$asset->internalScript(<<<JS
+Phoenix.Uri = $uri;
+JS
+);
 		}
 	}
 
