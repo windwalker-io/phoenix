@@ -118,14 +118,14 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 
 			if (isset($messages[ValidateResult::STATUS_REQUIRED]))
 			{
-				$this->addFlash((array) $messages[ValidateResult::STATUS_REQUIRED], Bootstrap::MSG_DANGER);
+				$this->addMessage((array) $messages[ValidateResult::STATUS_REQUIRED], Bootstrap::MSG_DANGER);
 
 				unset($messages[ValidateResult::STATUS_REQUIRED]);
 			}
 
 			if (isset($messages[ValidateResult::STATUS_FAILURE]))
 			{
-				$this->addFlash((array) $messages[ValidateResult::STATUS_FAILURE], Bootstrap::MSG_WARNING);
+				$this->addMessage((array) $messages[ValidateResult::STATUS_FAILURE], Bootstrap::MSG_WARNING);
 
 				unset($messages[ValidateResult::STATUS_FAILURE]);
 			}
