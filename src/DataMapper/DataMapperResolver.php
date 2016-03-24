@@ -31,9 +31,9 @@ abstract class DataMapperResolver extends AbstractPackageObjectResolver
 	 */
 	protected static function createObject($class, $args = array())
 	{
-		if (!is_subclass_of($class, 'Windwalker\DataMapper\DataMapper'))
+		if (!is_subclass_of($class, 'Windwalker\DataMapper\DataMapper') && !is_subclass_of($class, 'Windwalker\Core\DataMapper\AbstractDataMapperProxy'))
 		{
-			throw new \UnexpectedValueException(sprintf('Class: %s is not vu class of Windwalker\DataMapper\DataMapper', $class));
+			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of Windwalker\DataMapper\DataMapper', $class));
 		}
 
 		$db = array_shift($args);
