@@ -8,8 +8,10 @@
 
 namespace Phoenix\Record;
 
+use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Ioc;
+use Windwalker\Record\Record;
 
 /**
  * The RecordHelper class.
@@ -51,6 +53,33 @@ class RecordHelper
 		$this->db = $db ? : $this->getDb();
 		$this->table = $table;
 		$this->pkName = $pkName;
+	}
+
+	/**
+	 * initNewRow
+	 *
+	 * @param string|Record           $table
+	 * @param string|integer          $id
+	 * @param array                   $row
+	 * @param string                  $keys
+	 * @param AbstractDatabaseDriver  $db
+	 *
+	 * @return  bool|string|int Return init id.
+	 */
+	public static function initNewRow($table, $id, $row = array(), $keys = 'id', AbstractDatabaseDriver $db = null)
+	{
+		if ($table instanceof Record)
+		{
+			$keys  = $table->getKeyName();
+			$db    = $table->getDb();
+			$table = $table->getTableName();
+		}
+
+		$db = $db ? : DatabaseFactory::getDbo();
+
+		$helper = new static($table, $db, $keys);
+
+		return $helper->initRow($id, $row);
 	}
 
 	/**

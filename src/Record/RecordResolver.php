@@ -28,6 +28,7 @@ class RecordResolver extends AbstractPackageObjectResolver
 	 * @param  array  $args
 	 *
 	 * @return Record
+	 * @throws \Exception
 	 */
 	protected static function createObject($class, $args = array())
 	{
@@ -38,7 +39,20 @@ class RecordResolver extends AbstractPackageObjectResolver
 
 		$db = array_shift($args);
 
-		return new $class($db ? : static::getContainer()->get('system.db'));
+		// TODO: Make Record support set DB after construct.
+		try
+		{
+			return new $class;
+		}
+		catch (\Exception $e)
+		{
+			if ($e instanceof \InvalidArgumentException || $e->getPrevious() instanceof \PDOException)
+			{
+				return new NullRecord;
+			}
+
+			throw $e;
+		}
 	}
 
 	/**
