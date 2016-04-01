@@ -47,7 +47,7 @@ class PhoenixModel extends DatabaseModel
 			throw new \DomainException($class . ' not exists.');
 		}
 
-		return new $class($this->db);
+		return new $class;
 	}
 
 	/**
