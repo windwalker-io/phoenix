@@ -46,8 +46,8 @@ class ListView extends AbstractPhoenixHtmView
 		$data->items      = $data->items ? : $this->model->getItems();
 		$data->pagination = $data->pagination ? : $this->model->getPagination();
 		$data->total      = $data->total ? : $this->model->getTotal();
-		$data->limit      = $data->limit ? : $this->model->get('list.limit');
+		$data->limit      = $data->limit ? : $this->model->getLimit();
 		$data->start      = $data->start ? : $this->model->getStart();
-		$data->page       = $data->page ? : $this->model->getPagination();
+		$data->page       = $data->page ? : $this->model->getPage();
 	}
 }
