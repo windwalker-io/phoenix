@@ -53,7 +53,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	 *
 	 * @var  string
 	 */
-	protected $pkName = 'id';
+	protected $pkName = null;
 
 	/**
 	 * Property useTransition.
@@ -93,7 +93,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 		// Determine the name of the primary key for the data.
 		if (empty($this->pkName))
 		{
-			$this->pkName = $this->record->getKeyName();
+			$this->pkName = $this->record->getKeyName() ? : 'id';
 		}
 	}
 
