@@ -364,7 +364,7 @@ class ListModel extends FormModel
 	{
 		$total = $total ? : $this->getTotal();
 
-		return new Pagination($total, $this->get('list.page', 1), $this['list.limit']);
+		return new Pagination($total, $this->getPage() ? : 1, $this->getLimit());
 	}
 
 	/**
@@ -419,7 +419,7 @@ class ListModel extends FormModel
 		return $this->fetch('start', function() use ($state)
 		{
 			$start = $this['list.start'];
-			$limit = $this['list.limit'];
+			$limit = $this->getLimit();
 
 			$total = $this->getTotal();
 
@@ -428,11 +428,69 @@ class ListModel extends FormModel
 				$page = (int) ceil($total / $limit);
 				$start = max(0, ($page - 1) * $limit);
 
-				$this['list.page'] = $page;
+				$this->setPage($page);
 			}
 
 			return $start;
 		});
+	}
+
+	/**
+	 * setLimit
+	 *
+	 * @param   integer  $limit
+	 *
+	 * @return  static
+	 */
+	public function setLimit($limit)
+	{
+		if ($limit < 0)
+		{
+			$limit = 0;
+		}
+
+		$this->set('list.limit', (int) $limit);
+
+		return $this;
+	}
+
+	/**
+	 * getLimit
+	 *
+	 * @return  integer
+	 */
+	public function getLimit()
+	{
+		return (int) $this->get('list.limit');
+	}
+
+	/**
+	 * setLimit
+	 *
+	 * @param   integer $page
+	 *
+	 * @return  static
+	 */
+	public function setPage($page)
+	{
+		if ($page < 1)
+		{
+			$page = 1;
+		}
+
+		$this->set('list.page', (int) $page);
+
+		return $this;
+	}
+
+	/**
+	 * getLimit
+	 *
+	 * @return  integer
+	 */
+	public function getPage()
+	{
+		return (int) $this->get('list.page');
 	}
 
 	/**
