@@ -42,7 +42,15 @@ class FormModel extends ItemModel
 	{
 		$sessionData = (array) $this['form.data'];
 
-		$pkName = $this['pkName'] ? : $this->getRecord()->getKeyName();
+		try
+		{
+			$pkName = $this['pkName'] ? : $this->getRecord()->getKeyName();
+		}
+		catch (\DomainException $e)
+		{
+			$pkName = null;
+		}
+
 		$pkName = $pkName ? : 'id';
 
 		$item = $this->getItem();
