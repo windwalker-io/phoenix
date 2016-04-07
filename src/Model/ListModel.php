@@ -15,6 +15,7 @@ use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
+use Windwalker\Query\QueryElement;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -505,7 +506,7 @@ class ListModel extends FormModel
 	{
 		$filters = $filters ? : $this->state->get('list.filter', array());
 
-		$filters = ArrayHelper::flatten($filters);
+		$filters = static::flatten($filters, '.', '', 2);
 
 		$filters = $this->filterDataFields($filters);
 		$filters = $this->mapDataFields($filters);
@@ -554,7 +555,7 @@ class ListModel extends FormModel
 	{
 		$searches = $searches ? : $this->state->get('list.search', array());
 
-		$searches = ArrayHelper::flatten($searches);
+		$searches = static::flatten($searches, '.', '', 2);
 
 		$searches = $this->filterDataFields($searches);
 		$searches = $this->mapDataFields($searches);
@@ -771,5 +772,121 @@ class ListModel extends FormModel
 		}
 
 		return $this;
+	}
+
+	/**
+	 * appendWhere
+	 *
+	 * @param   string|array $wheres
+	 *
+	 * @return  static
+	 */
+	public function appendWhere($wheres)
+	{
+		if (is_array($wheres))
+		{
+			foreach ($wheres as $subWhere)
+			{
+				$this->appendWhere($subWhere);
+			}
+		}
+		else
+		{
+			$this->state->push('query.where', $wheres);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * appendWhereOr
+	 *
+	 * @param   string|array $wheres
+	 *
+	 * @return  static
+	 */
+	public function appendWhereOr($wheres)
+	{
+		$wheres = (array) $wheres;
+
+		return $this->appendWhere((string) new QueryElement('()', $wheres, ' OR '));
+	}
+
+	/**
+	 * appendHaving
+	 *
+	 * @param   string|array $having
+	 *
+	 * @return  static
+	 */
+	public function appendHaving($having)
+	{
+		if (is_array($having))
+		{
+			foreach ($having as $subWhere)
+			{
+				$this->appendWhere($subWhere);
+			}
+		}
+		else
+		{
+			$this->state->push('query.having', $having);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * appendWhereOr
+	 *
+	 * @param   string|array $havings
+	 *
+	 * @return  static
+	 */
+	public function appendHavingOr($havings)
+	{
+		$havings = (array) $havings;
+
+		return $this->appendHaving((string) new QueryElement('()', $havings, ' OR '));
+	}
+
+	/**
+	 * Method to recursively convert data to one dimension array.
+	 *
+	 * @param   array|object $array     The array or object to convert.
+	 * @param   string       $separator The key separator.
+	 * @param   string       $prefix    Last level key prefix.
+	 * @param int            $level     Max level.
+	 *
+	 * @return array
+	 */
+	public static function flatten($array, $separator = '.', $prefix = '', $level = null)
+	{
+		$return = array();
+
+		if ($array instanceof \Traversable)
+		{
+			$array = iterator_to_array($array);
+		}
+		elseif (is_object($array))
+		{
+			$array = get_object_vars($array);
+		}
+
+		foreach ($array as $k => $v)
+		{
+			$key = $prefix ? $prefix . $separator . $k : $k;
+
+			if ((is_object($v) || is_array($v)) && ($level === null || $level > 1))
+			{
+				$return = array_merge($return, static::flatten($v, $separator, $key, $level === null ? $level : $level - 1));
+			}
+			else
+			{
+				$return[$key] = $v;
+			}
+		}
+
+		return $return;
 	}
 }

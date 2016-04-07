@@ -30,31 +30,39 @@ class SearchHelper extends AbstractFilterHelper
 	{
 		$searchValue = array();
 
-		foreach ($searches as $field => $value)
+		foreach ($searches as $field => $values)
 		{
-			$value = (string) $value;
-
 			// If handler is FALSE, means skip this field.
 			if (array_key_exists($field, $this->handler) && $this->handler[$field] === static::SKIP)
 			{
 				continue;
 			}
 
-			if (!empty($this->handler[$field]) && is_callable($this->handler[$field]))
+			if (is_string($values))
 			{
-				$condition = call_user_func_array($this->handler[$field], array($query, $field, $value));
-			}
-			else
-			{
-				$handler = $this->defaultHandler;
-
-				/** @see SearchHelper::registerDefaultHandler() */
-				$condition = $handler($query, $field, $value);
+				$values = explode(' ', $values);
 			}
 
-			if ($condition)
+			$values = array_filter(array_map('trim', (array) $values), 'strlen');
+
+			foreach ($values as $value)
 			{
-				$searchValue[] = $condition;
+				if (!empty($this->handler[$field]) && is_callable($this->handler[$field]))
+				{
+					$condition = call_user_func_array($this->handler[$field], array($query, $field, $value));
+				}
+				else
+				{
+					$handler = $this->defaultHandler;
+
+					/** @see SearchHelper::registerDefaultHandler() */
+					$condition = $handler($query, $field, $value);
+				}
+
+				if ($condition)
+				{
+					$searchValue[] = $condition;
+				}
 			}
 		}
 
@@ -86,7 +94,10 @@ class SearchHelper extends AbstractFilterHelper
 		{
 			if ($value && $field != '*')
 			{
-				return $query->quoteName($field) . ' LIKE ' . $query->quote('%' . $value . '%');
+				if ((string) $value !== '')
+				{
+					return $query->quoteName($field) . ' LIKE ' . $query->quote('%' . $value . '%');
+				}
 			}
 
 			return null;

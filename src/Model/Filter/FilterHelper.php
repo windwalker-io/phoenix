@@ -9,6 +9,7 @@
 namespace Phoenix\Model\Filter;
 
 use Windwalker\Query\Query;
+use Windwalker\Query\QueryElement;
 
 /**
  * Filter helper.
@@ -29,8 +30,6 @@ class FilterHelper extends AbstractFilterHelper
 	{
 		foreach ($filters as $field => $value)
 		{
-			$value = (string) $value;
-
 			// If handler is FALSE, means skip this field.
 			if (array_key_exists($field, $this->handler) && $this->handler[$field] === static::SKIP)
 			{
@@ -71,6 +70,20 @@ class FilterHelper extends AbstractFilterHelper
 		 */
 		return function(Query $query, $field, $value)
 		{
+			if (is_object($value))
+			{
+				$value = get_object_vars($value);
+			}
+
+			// Filter array IN()
+			if (is_array($value) && count($value))
+			{
+				$query->where($query->quoteName($field) . ' ' . new QueryElement('IN()', $query->quote($value)));
+
+				return $query;
+			}
+
+			// Filter String
 			if ((string) $value !== '')
 			{
 				$query->where($query->quoteName($field) . ' = ' . $query->quote($value));
