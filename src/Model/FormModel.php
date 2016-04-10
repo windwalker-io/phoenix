@@ -55,7 +55,7 @@ class FormModel extends ItemModel
 
 		$item = $this->getItem();
 
-		if (ArrayHelper::getValue($sessionData, $pkName) == $item->$pkName)
+		if ($sessionData && ArrayHelper::getValue($sessionData, $pkName) == $item->$pkName)
 		{
 			return $sessionData;
 		}
