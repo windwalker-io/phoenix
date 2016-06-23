@@ -86,7 +86,7 @@ trait FormModelTrait
 
 		if ($loadData)
 		{
-			$data = $this->getDefaultData();
+			$data = $this->getFormDefaultData();
 
 			$form->bind($data);
 		}
@@ -118,6 +118,11 @@ trait FormModelTrait
 	 */
 	public function getFieldDefinition($definition = null, $name = null)
 	{
+		if (class_exists($definition) && is_subclass_of($definition, FieldDefinitionInterface::class))
+		{
+			return new $definition;
+		}
+
 		$name = $name ? : $this->getName();
 
 		if (!$class = FieldDefinitionResolver::create(ucfirst($name) . '\\' . ucfirst($definition)))
