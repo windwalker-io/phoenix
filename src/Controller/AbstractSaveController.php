@@ -11,7 +11,7 @@ namespace Phoenix\Controller;
 use Phoenix\Model\FormModel;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Model\Exception\ValidFailException;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Data\Data;
 use Windwalker\Form\Validate\ValidateResult;
 use Windwalker\String\StringHelper;
@@ -59,7 +59,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 		}
 		else
 		{
-			$this->data = $this->input->getArray();
+			$this->data = $this->input->toArray();
 		}
 	}
 
@@ -108,7 +108,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 
 			$this->postSave($data);
 		}
-		catch (ValidFailException $e)
+		catch (ValidateFailException $e)
 		{
 			!$this->useTransaction or $this->model->transactionRollback();
 
@@ -219,7 +219,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 *
 	 * @return  void
 	 *
-	 * @throws ValidFailException
+	 * @throws ValidateFailException
 	 */
 	protected function validate(Data $data)
 	{
@@ -240,7 +240,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	{
 		$pk = $data->{$this->pkName} ? : $this->model['item.pk'];
 
-		return $this->router->http($this->getName(), $this->getRedirectQuery(array($this->pkName => $pk)));
+		return $this->route->get($this->getName(), $this->getRedirectQuery(array($this->pkName => $pk)));
 	}
 
 	/**
@@ -257,10 +257,10 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 		switch ($this->task)
 		{
 			case 'save2close':
-				return $this->router->http($this->config['list_name'], $this->getRedirectQuery());
+				return $this->route->get($this->config['list_name'], $this->getRedirectQuery());
 
 			case 'save2new':
-				return $this->router->http($this->getName(), $this->getRedirectQuery(array('new' => '')));
+				return $this->route->get($this->getName(), $this->getRedirectQuery(array('new' => '')));
 
 			case 'save2copy':
 				$data->{$this->pkName} = null;
@@ -277,12 +277,12 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 
 				$this->setUserState($this->getContext('edit.data'), $data->dump());
 
-				return $this->router->http($this->getName(), $this->getRedirectQuery());
+				return $this->route->get($this->getName(), $this->getRedirectQuery());
 
 			default:
 				$pk = $this->model['item.pk'];
 
-				return $this->router->http($this->getName(), $this->getRedirectQuery(array($this->pkName => $pk)));
+				return $this->route->get($this->getName(), $this->getRedirectQuery(array($this->pkName => $pk)));
 		}
 	}
 }

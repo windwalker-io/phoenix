@@ -8,8 +8,8 @@
 
 namespace Phoenix\Field;
 
-use Phoenix\Asset\Asset;
 use Phoenix\Script\JQueryScript;
+use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
@@ -141,7 +141,7 @@ class ModalField extends TextField
 		$route = $this->get('route', $this->route) ? : $this->view;
 		$query = $this->get('query', $this->query);
 
-		return $package->router->html($route, array_merge(array(
+		return $package->route->encode($route, array_merge(array(
 			'layout'   => 'modal',
 			'selector' => '#' . $this->getId() . '-wrap',
 			'function' => $this->get('function', 'Phoenix.Field.Modal.select')

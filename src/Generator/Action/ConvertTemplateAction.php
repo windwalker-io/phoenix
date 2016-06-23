@@ -20,7 +20,6 @@ use Windwalker\Utilities\ArrayHelper;
  */
 class ConvertTemplateAction extends AbstractAction
 {
-
 	/**
 	 * Do this execute.
 	 *

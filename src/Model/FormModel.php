@@ -12,7 +12,7 @@ use Phoenix\Form\FieldDefinitionResolver;
 use Phoenix\Form\NullFiledDefinition;
 use Phoenix\Form\Renderer\InputRenderer;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Model\Exception\ValidFailException;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
@@ -163,7 +163,7 @@ class FormModel extends ItemModel
 	 * @param   Form  $form
 	 *
 	 * @return bool
-	 * @throws ValidFailException
+	 * @throws ValidateFailException
 	 */
 	public function validate($data, Form $form = null)
 	{
@@ -194,7 +194,7 @@ class FormModel extends ItemModel
 			}
 		}
 
-		throw new ValidFailException($msg);
+		throw new ValidateFailException($msg);
 	}
 
 	/**

@@ -48,7 +48,7 @@ class ItemModel extends PhoenixModel
 				return new Data;
 			}
 
-			$item = new Data($item->toArray());
+			$item = new Data($item->dump());
 
 			$this->postGetItem($item);
 

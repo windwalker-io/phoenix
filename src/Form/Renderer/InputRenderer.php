@@ -45,37 +45,6 @@ class InputRenderer implements FormRendererInterface
 	protected static $templatePrefix = 'phoenix.bootstrap.';
 
 	/**
-	 * render
-	 *
-	 * @param AbstractField $field
-	 * @param Form          $form
-	 *
-	 * @return  string
-	 */
-	public static function render(AbstractField $field, Form $form)
-	{
-		
-
-		$type = $field->getType();
-
-		$type = static::resolveAlias($type);
-
-		$handler = static::getRenderer($type);
-
-		if ($handler)
-		{
-			return call_user_func($handler, $field, $form);
-		}
-
-		if (is_callable(array(__CLASS__, 'render' . ucfirst($type))))
-		{
-			return call_user_func(array(__CLASS__, 'render' . ucfirst($type)), $field, $form);
-		}
-
-		return static::renderInput($field, $form);
-	}
-
-	/**
 	 * renderField
 	 *
 	 * @param AbstractField $field
@@ -102,7 +71,7 @@ class InputRenderer implements FormRendererInterface
 	 */
 	public function renderLabel(AbstractField $field, array $attribs = array())
 	{
-		$attribs['class'] .= ' hasTooltip';
+		$attribs['class'] .= ' hasTooltip ' . $field->getAttribute('labelWidth', 'col-md-3');
 
 		$label = $field->getLabel();
 
@@ -142,6 +111,8 @@ class InputRenderer implements FormRendererInterface
 			return $this->$method($field, $attribs);
 		}
 
+		$attribs['class'] .= ' form-control';
+
 		return $field->buildInput($attribs);
 	}
 
@@ -154,6 +125,8 @@ class InputRenderer implements FormRendererInterface
 	 */
 	public static function renderRadio(AbstractField $field, array $attribs = [])
 	{
+		$attribs['class'] .= ' radio-container input-list-container';
+
 		return WidgetHelper::render(static::getTemplatePrefix() . 'field.radio', array(
 			'attribs' => $attribs,
 			'field' => $field
@@ -164,11 +137,14 @@ class InputRenderer implements FormRendererInterface
 	 * renderRadio
 	 *
 	 * @param AbstractField $field
+	 * @param array         $attribs
 	 *
-	 * @return  string
+	 * @return string
 	 */
 	public static function renderCheckboxes(AbstractField $field, array $attribs = [])
 	{
+		$attribs['class'] .= ' checkbox-container input-list-container';
+
 		return WidgetHelper::render(static::getTemplatePrefix() . 'field.checkboxes', array(
 			'attribs' => $attribs,
 			'field' => $field
@@ -179,8 +155,9 @@ class InputRenderer implements FormRendererInterface
 	 * renderSpacer
 	 *
 	 * @param AbstractField $field
+	 * @param array         $attribs
 	 *
-	 * @return  string
+	 * @return string
 	 */
 	public static function renderSpacer(AbstractField $field, array $attribs = [])
 	{
@@ -194,24 +171,13 @@ class InputRenderer implements FormRendererInterface
 	 * renderHidden
 	 *
 	 * @param AbstractField $field
+	 * @param array         $attribs
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	protected static function renderHidden(AbstractField $field)
+	protected static function renderHidden(AbstractField $field, array $attribs = [])
 	{
-		return $field->renderInput();
-	}
-
-	/**
-	 * renderDefault
-	 *
-	 * @param   AbstractField $field
-	 *
-	 * @return  string
-	 */
-	protected static function renderDefault(AbstractField $field)
-	{
-		return $field->render();
+		return $field->buildInput($attribs);
 	}
 
 	/**

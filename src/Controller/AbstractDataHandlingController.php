@@ -118,7 +118,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	 */
 	protected function getSuccessRedirect(Data $data = null)
 	{
-		$uri = new Uri($this->app->get('uri.full'));
+		$uri = new Uri($this->app->uri->full);
 
 		foreach ($this->getRedirectQuery() as $field => $value)
 		{

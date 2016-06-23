@@ -69,9 +69,9 @@ abstract class AbstractCopyController extends AbstractBatchController
 
 		$this->record->load($pk);
 
-		$this->record->bind($data->dump());
+		$this->record->bind($data);
 
-		$item = $this->record->toArray();
+		$item = $this->record;
 
 		$recordClone = $this->model->getRecord();
 
@@ -110,8 +110,6 @@ abstract class AbstractCopyController extends AbstractBatchController
 			}
 		}
 		while ($result);
-
-		$item = new Data($item);
 
 		unset($item->{$this->pkName});
 

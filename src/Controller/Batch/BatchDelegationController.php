@@ -10,6 +10,7 @@ namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractPhoenixController;
 use Phoenix\Controller\ControllerResolver as PhoenixControllerResolver;
+use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Controller\Controller;
 use Windwalker\String\StringNormalise;
 
@@ -50,7 +51,7 @@ class BatchDelegationController extends AbstractPhoenixController
 			throw new \DomainException(StringNormalise::toClassNamespace($this->getName() . '\Batch\\' . $task) . 'Controller not found');
 		}
 
-		/** @var Controller $controller */
+		/** @var AbstractController $controller */
 		$controller = new $class;
 		$controller->setName($this->getName());
 		$controller->config->set('item_name', $this->config['item_name']);

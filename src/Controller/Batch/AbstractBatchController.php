@@ -11,7 +11,7 @@ namespace Phoenix\Controller\Batch;
 use Phoenix\Controller\AbstractDataHandlingController;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Model\Exception\ValidFailException;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Model\Model;
 use Windwalker\Data\Data;
 
@@ -102,12 +102,12 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 
 			if ($data->isNull() && !$this->allowNullData)
 			{
-				throw new ValidFailException(Translator::translate('phoenix.message.batch.error.empty'));
+				throw new ValidateFailException(Translator::translate('phoenix.message.batch.error.empty'));
 			}
 
 			if (count($this->pks) < 1)
 			{
-				throw new ValidFailException(Translator::translate($this->langPrefix . '.message.' . $this->action . '.empty'));
+				throw new ValidateFailException(Translator::translate($this->langPrefix . '.message.' . $this->action . '.empty'));
 			}
 
 			$this->validate($data);
@@ -121,7 +121,7 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 
 			$this->postSave($data);
 		}
-		catch (ValidFailException $e)
+		catch (ValidateFailException $e)
 		{
 			!$this->useTransaction or $this->model->transactionRollback();
 
@@ -214,7 +214,7 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 	 *
 	 * @return  void
 	 *
-	 * @throws  ValidFailException
+	 * @throws  ValidateFailException
 	 */
 	protected function validate(Data $data)
 	{

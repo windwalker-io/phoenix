@@ -38,7 +38,7 @@ abstract class AbstractFilterController extends AbstractPhoenixController
 		$model['list.ordering']  = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering');
 		$model['list.direction'] = $this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction');
 
-		$uri = new Uri($this->app->get('uri.full'));
+		$uri = new Uri($this->app->uri->full);
 		$uri->delVar('filter');
 
 		$this->setRedirect($uri->toString());
