@@ -5,10 +5,10 @@
     "license": "LGPL-2.0+",
     "minimum-stability": "beta",
     "require": {
-        "illuminate/view": ">=4.0 <6.0",
+        "illuminate/view": "~5.0",
         "asika/muse": "~1.0",
         "mrclay/minify": "~2.0",
-        "swiftmailer/swiftmailer": "^5.4"
+        "swiftmailer/swiftmailer": "~5.0"
     },
     "require-dev": {
 
@@ -20,7 +20,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.x-dev"
+            "dev-master": "2.x-dev"
         }
     }
 }
