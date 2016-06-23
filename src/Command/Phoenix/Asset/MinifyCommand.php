@@ -36,11 +36,11 @@ class MinifyCommand extends Command
 	protected $description = 'Minify resources';
 
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */
-	public function initialise()
+	public function init()
 	{
 		$this->addGlobalOption('p')
 			->alias('package')

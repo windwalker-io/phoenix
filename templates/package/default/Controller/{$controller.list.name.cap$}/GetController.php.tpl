@@ -9,7 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}Model;
-use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
+use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}View;
 use Phoenix\Controller\Display\ListDisplayController;
 use Windwalker\Core\Model\Model;
 
@@ -51,7 +51,7 @@ class GetController extends ListDisplayController
 	/**
 	 * Property view.
 	 *
-	 * @var  {$controller.list.name.cap$}HtmlView
+	 * @var  {$controller.list.name.cap$}View
 	 */
 	protected $view;
 

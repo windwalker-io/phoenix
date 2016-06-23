@@ -476,7 +476,7 @@ module.exports = function levenshtein(str1, str2) {
   // two rows
   var prevRow = new Array(str2.length + 1);
 
-  // initialise previous row
+  // init previous row
   for (var i = 0; i < prevRow.length; ++i) {
     prevRow[i] = i;
   }

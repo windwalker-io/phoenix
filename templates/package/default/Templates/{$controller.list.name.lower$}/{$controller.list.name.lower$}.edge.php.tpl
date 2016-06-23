@@ -34,7 +34,7 @@
 
 @section('admin-body')
 <div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
-    <form name="admin-form" id="admin-form" action="{{ $router->html('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
+    <form name="admin-form" id="admin-form" action="{{ $route->encode('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
 
         {{-- FILTER BAR --}}
         <div class="filter-bar">
@@ -120,7 +120,7 @@
 
                         {{-- TITLE --}}
                         <td>
-                            <a href="{{ $router->html('{$controller.item.name.lower$}', array('id' => $item->id)) }}">
+                            <a href="{{ $route->encode('{$controller.item.name.lower$}', array('id' => $item->id)) }}">
                                 {{ $item->title }}
                             </a>
                         </td>

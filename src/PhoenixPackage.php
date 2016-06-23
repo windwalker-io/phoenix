@@ -23,7 +23,7 @@ define('PHOENIX_TEMPLATES', PHOENIX_ROOT . '/templates');
 class PhoenixPackage extends AbstractPackage
 {
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */

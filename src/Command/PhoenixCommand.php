@@ -34,11 +34,11 @@ class PhoenixCommand extends Command
 	protected $description = 'The Phoenix RAD package.';
 
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 		$this->addCommand(new AssetCommand);
 		$this->addCommand(new FormCommand);

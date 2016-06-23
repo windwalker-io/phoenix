@@ -43,11 +43,11 @@ class SyncCommand extends Command
 	protected $description = 'Sync asset to main media folder';
 
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */
-	public function initialise()
+	public function init()
 	{
 		$this->addOption('s')
 			->alias('symbol')

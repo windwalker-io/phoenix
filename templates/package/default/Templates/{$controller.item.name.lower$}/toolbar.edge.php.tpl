@@ -33,7 +33,7 @@
     @translate('phoenix.toolbar.save2new')
 </button>
 
-<a type="button" class="btn btn-default btn-sm" href="{{ $router->html('{$controller.list.name.lower$}') }}">
+<a type="button" class="btn btn-default btn-sm" href="{{ $route->encode('{$controller.list.name.lower$}') }}">
     <span class="glyphicon glyphicon-remove fa fa-remove text-danger"></span>
     @translate('phoenix.toolbar.cancel')
 </a>

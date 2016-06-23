@@ -11,13 +11,14 @@ namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
+use Windwalker\Core\Renderer\RendererHelper;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
  * 
  * @since  1.0
  */
-class {$controller.list.name.cap$}HtmlView extends GridView
+class {$controller.list.name.cap$}View extends GridView
 {
 	/**
 	 * Property name.
@@ -25,6 +26,13 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	 * @var  string
 	 */
 	protected $name = '{$controller.list.name.lower$}';
+
+	/**
+	 * Property renderer.
+	 *
+	 * @var  string
+	 */
+	protected $renderer = RendererHelper::EDGE;
 
 	/**
 	 * The fields mapper.

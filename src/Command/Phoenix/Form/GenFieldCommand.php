@@ -34,11 +34,11 @@ class GenFieldCommand extends Command
 	protected $description = 'Generate fields definition';
 
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 		$this->addOption('o')
 			->alias('output')

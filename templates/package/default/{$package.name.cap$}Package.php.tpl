@@ -8,15 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$};
 
-use Phoenix\Asset\Asset;
 use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Language\TranslatorHelper;
 use Phoenix\Record\RecordResolver;
 use Phoenix\Script\BootstrapScript;
 use Symfony\Component\Yaml\Yaml;
+use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Debugger\Helper\DebuggerHelper;
-use Windwalker\Event\Dispatcher;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Form\FieldHelper;
@@ -40,7 +39,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 * @throws  \LogicException
 	 * @return  void
 	 */
-	public function initialise()
+	public function boot()
 	{
 		// Prepare Resolvers
 		RecordResolver::addNamespace(__NAMESPACE__ . '\Record');
@@ -48,7 +47,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 		FieldHelper::addNamespace(__NAMESPACE__ . '\Field');
 		ValidatorHelper::addNamespace(__NAMESPACE__ . 'Validator');
 
-		parent::initialise();
+		parent::boot();
 	}
 
 	/**
@@ -63,7 +62,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 		// Assets
 		BootstrapScript::css();
 		BootstrapScript::script();
-		Asset::addStyle('{$package.name.lower$}/css/{$package.name.lower$}.css');
+		Asset::addCSS($this->name . '/css/{$package.name.lower$}.css');
 
 		// Language
 		TranslatorHelper::loadAll($this, 'ini');
@@ -103,18 +102,6 @@ class {$package.name.cap$}Package extends AbstractPackage
 		}
 
 		return $result;
-	}
-
-	/**
-	 * registerListeners
-	 *
-	 * @param Dispatcher $dispatcher
-	 *
-	 * @return  void
-	 */
-	public function registerListeners(Dispatcher $dispatcher)
-	{
-		parent::registerListeners($dispatcher);
 	}
 
 	/**

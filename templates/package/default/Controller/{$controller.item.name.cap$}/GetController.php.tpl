@@ -9,7 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
-use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
+use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}View;
 use Phoenix\Controller\Display\EditDisplayController;
 use Windwalker\Core\Model\Model;
 
@@ -51,7 +51,7 @@ class GetController extends EditDisplayController
 	/**
 	 * Property view.
 	 *
-	 * @var  {$controller.item.name.cap$}HtmlView
+	 * @var  {$controller.item.name.cap$}View
 	 */
 	protected $view;
 

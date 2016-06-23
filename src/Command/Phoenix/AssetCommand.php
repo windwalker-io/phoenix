@@ -35,11 +35,11 @@ class AssetCommand extends Command
 	protected $description = 'Asset management';
 
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 		$this->addCommand(new SyncCommand);
 		$this->addCommand(new MakesumCommand);

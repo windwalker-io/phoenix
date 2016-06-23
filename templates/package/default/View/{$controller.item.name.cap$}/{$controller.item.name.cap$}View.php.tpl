@@ -11,13 +11,14 @@ namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\EditView;
+use Windwalker\Core\Renderer\RendererHelper;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
  * 
  * @since  1.0
  */
-class {$controller.item.name.cap$}HtmlView extends EditView
+class {$controller.item.name.cap$}View extends EditView
 {
 	/**
 	 * Property name.
@@ -25,6 +26,13 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	 * @var  string
 	 */
 	protected $name = '{$controller.item.name.lower$}';
+
+	/**
+	 * Property renderer.
+	 *
+	 * @var  string
+	 */
+	protected $renderer = RendererHelper::EDGE;
 
 	/**
 	 * Property formDefinition.

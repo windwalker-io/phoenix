@@ -36,80 +36,80 @@ class EditDefinition implements FieldDefinitionInterface
 	public function define(Form $form)
 	{
 		// Basic fieldset
-		$form->wrap('basic', null, function(Form $form)
+		$form->fieldset('basic', function(Form $form)
 		{
 			// ID
-			$form->add('id', new Field\HiddenField);
+			$form->add('id', Field\HiddenField::class);
 
 			// Title
-			$form->add('title', new Field\TextField)
+			$form->add('title', Field\TextField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
 				->setFilter('trim')
 				->required(true);
 
 			// Alias
-			$form->add('alias', new Field\TextField)
+			$form->add('alias', Field\TextField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'));
 
 			// Image
-			$form->add('image', new Field\TextField)
+			$form->add('image', Field\TextField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.image'));
 
 			// URL
-			$form->add('url', new Field\TextField)
+			$form->add('url', Field\TextField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
-				->setValidator(new Rule\UrlValidator)
+				->setValidator(Rule\UrlValidator::class)
 				->set('class', 'validate-url');
 
 			// Example: {$controller.item.name.cap$} List
-			$form->add('{$controller.item.name.lower$}_list', new {$controller.item.name.cap$}ListField)
+			$form->add('{$controller.item.name.lower$}_list', {$controller.item.name.cap$}ListField::class)
 				->label('List Example');
 
 			// Example: {$controller.item.name.cap$} Modal
-			$form->add('{$controller.item.name.lower$}_modal', new {$controller.item.name.cap$}ModalField)
+			$form->add('{$controller.item.name.lower$}_modal', {$controller.item.name.cap$}ModalField::class)
 				->label('Modal Example');
 		});
 
 		// Text Fieldset
-		$form->wrap('text', null, function(Form $form)
+		$form->fieldset('text', function(Form $form)
 		{
 			// Introtext
-			$form->add('introtext', new Field\TextareaField)
+			$form->add('introtext', Field\TextareaField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
 				->set('rows', 10);
 
 			// Fulltext
-			$form->add('fulltext', new Field\TextareaField)
+			$form->add('fulltext', Field\TextareaField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
 				->set('rows', 10);
 		});
 
 		// Created fieldset
-		$form->wrap('created', null, function(Form $form)
+		$form->fieldset('created', function(Form $form)
 		{
 			// State
-			$form->add('state', new Field\RadioField)
+			$form->add('state', Field\RadioField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.state'))
 				->set('class', 'btn-group')
 				->set('default', 1)
-				->addOption(new Option(Translator::translate('phoenix.grid.state.published'), '1'))
-				->addOption(new Option(Translator::translate('phoenix.grid.state.unpublished'), '0'));
+				->option(Translator::translate('phoenix.grid.state.published'), '1')
+				->option(Translator::translate('phoenix.grid.state.unpublished'), '0');
 
 			// Created
-			$form->add('created', new Phoenix\Field\CalendarField)
+			$form->add('created', Phoenix\Field\CalendarField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.created'));
 
 			// Modified
-			$form->add('modified', new Phoenix\Field\CalendarField)
+			$form->add('modified', Phoenix\Field\CalendarField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'))
 				->disabled();
 
 			// Author
-			$form->add('created_by', new Field\TextField)
+			$form->add('created_by', Field\TextField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.author'));
 
 			// Modified User
-			$form->add('modified_by', new Field\TextField)
+			$form->add('modified_by', Field\TextField::class)
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'))
 				->disabled();
 		});

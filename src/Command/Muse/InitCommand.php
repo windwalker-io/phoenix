@@ -44,11 +44,11 @@ class InitCommand extends Command
 	protected $usage = 'init <cmd><package_name></cmd> <option>[option]</option>';
 
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 		$this->addGlobalOption('table')
 			->description('The database table name.');

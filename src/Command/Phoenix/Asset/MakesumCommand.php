@@ -33,11 +33,11 @@ class MakesumCommand extends Command
 	protected $description = 'Make media sum files';
 
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */
-	public function initialise()
+	public function init()
 	{
 	}
 

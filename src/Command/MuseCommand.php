@@ -33,11 +33,11 @@ class MuseCommand extends Command
 	protected $description = 'The template generator.';
 
 	/**
-	 * initialise
+	 * init
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 		$this->addCommand(new Muse\InitCommand);
 		$this->addCommand(new Muse\SubsystemCommand);
