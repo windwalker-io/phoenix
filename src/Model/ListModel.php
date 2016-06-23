@@ -11,20 +11,25 @@ namespace Phoenix\Model;
 use Phoenix\Model\Filter\FilterHelper;
 use Phoenix\Model\Filter\FilterHelperInterface;
 use Phoenix\Model\Filter\SearchHelper;
+use Phoenix\Model\Traits\FormModelTrait;
+use Phoenix\Model\Traits\PhoenixDatabaseModelTrait;
+use Windwalker\Core\Model\Model;
 use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
 use Windwalker\Query\QueryElement;
-use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The ListModel class.
  * 
  * @since  1.0
  */
-class ListModel extends FormModel
+class ListModel extends Model implements FormModelInterface, PhoenixDatabaseModelInterface
 {
+	use PhoenixDatabaseModelTrait;
+	use FormModelTrait;
+
 	/**
 	 * Property allowFields.
 	 *
@@ -133,7 +138,7 @@ class ListModel extends FormModel
 	 *
 	 * @return  array
 	 */
-	public function getDefaultData()
+	public function getFormDefaultData()
 	{
 		return array(
 			'search' => $this['input.search'],
@@ -429,7 +434,7 @@ class ListModel extends FormModel
 				$page = (int) ceil($total / $limit);
 				$start = max(0, ($page - 1) * $limit);
 
-				$this->setPage($page);
+				$this->page($page);
 			}
 
 			return $start;
@@ -443,7 +448,7 @@ class ListModel extends FormModel
 	 *
 	 * @return  static
 	 */
-	public function setLimit($limit)
+	public function limit($limit)
 	{
 		if ($limit < 0)
 		{
@@ -472,7 +477,7 @@ class ListModel extends FormModel
 	 *
 	 * @return  static
 	 */
-	public function setPage($page)
+	public function page($page)
 	{
 		if ($page < 1)
 		{
@@ -762,7 +767,7 @@ class ListModel extends FormModel
 	 *
 	 * @return  static
 	 */
-	public function setOrdering($order, $direction = false)
+	public function ordering($order, $direction = false)
 	{
 		$this->set('list.ordering', $order);
 
@@ -781,13 +786,13 @@ class ListModel extends FormModel
 	 *
 	 * @return  static
 	 */
-	public function appendWhere($wheres)
+	public function where($wheres)
 	{
 		if (is_array($wheres))
 		{
 			foreach ($wheres as $subWhere)
 			{
-				$this->appendWhere($subWhere);
+				$this->where($subWhere);
 			}
 		}
 		else
@@ -805,11 +810,11 @@ class ListModel extends FormModel
 	 *
 	 * @return  static
 	 */
-	public function appendWhereOr($wheres)
+	public function whereOr($wheres)
 	{
 		$wheres = (array) $wheres;
 
-		return $this->appendWhere((string) new QueryElement('()', $wheres, ' OR '));
+		return $this->where((string) new QueryElement('()', $wheres, ' OR '));
 	}
 
 	/**
@@ -819,13 +824,13 @@ class ListModel extends FormModel
 	 *
 	 * @return  static
 	 */
-	public function appendHaving($having)
+	public function having($having)
 	{
 		if (is_array($having))
 		{
 			foreach ($having as $subWhere)
 			{
-				$this->appendWhere($subWhere);
+				$this->where($subWhere);
 			}
 		}
 		else
@@ -843,11 +848,11 @@ class ListModel extends FormModel
 	 *
 	 * @return  static
 	 */
-	public function appendHavingOr($havings)
+	public function havingOr($havings)
 	{
 		$havings = (array) $havings;
 
-		return $this->appendHaving((string) new QueryElement('()', $havings, ' OR '));
+		return $this->having((string) new QueryElement('()', $havings, ' OR '));
 	}
 
 	/**

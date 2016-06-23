@@ -8,6 +8,8 @@
 
 namespace Phoenix\Model;
 
+use Phoenix\Model\Traits\PhoenixDatabaseModelTrait;
+use Windwalker\Core\Model\Model;
 use Windwalker\Data\Data;
 
 /**
@@ -15,8 +17,10 @@ use Windwalker\Data\Data;
  * 
  * @since  1.0
  */
-class ItemModel extends PhoenixModel
+class ItemModel extends Model implements PhoenixDatabaseModelInterface
 {
+	use PhoenixDatabaseModelTrait;
+
 	/**
 	 * getItem
 	 *

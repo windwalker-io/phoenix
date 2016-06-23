@@ -64,8 +64,8 @@ class DisplayController extends AbstractPhoenixController
 		$this->format = $this->format ? : $this->app->get('route.extra.format', 'html');
 		$this->layout = $this->layout ? : $this->app->get('route.extra.layout', 'default');
 
-		$this->model = $this->getModel();
-		$this->view = $this->getView();
+		$this->model = $this->getModel($this->model);
+		$this->view = $this->getView($this->view);
 	}
 
 	/**

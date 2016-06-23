@@ -1,31 +1,43 @@
 <?php
 /**
- * Part of Phoenix project.
+ * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\Model;
+namespace Phoenix\Model\Traits;
 
 use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Record\RecordResolver;
-use Windwalker\Core\Model\DatabaseModel;
-use Windwalker\Core\Model\Model;
 use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\DataMapper\DataMapper;
 use Windwalker\Record\Record;
 
 /**
- * The AbstractRadModel class.
+ * The PhoenixModelTrait class.
  *
- * @since  1.0
+ * @since  {DEPLOY_VERSION}
  */
-class PhoenixModel extends Model
+trait PhoenixDatabaseModelTrait
 {
 	use DatabaseModelTrait;
 
+	/**
+	 * Default Record name
+	 *
+	 * @var  string
+	 */
+	protected $record;
+
+	/**
+	 * Default DataMapper name.
+	 *
+	 * @var  string
+	 */
+	protected $dataMapper;
+	
 	/**
 	 * getRecord
 	 *
@@ -35,6 +47,7 @@ class PhoenixModel extends Model
 	 */
 	public function getRecord($name = null)
 	{
+		$name = $name ? : $this->record;
 		$name = $name ? : $this->getName();
 
 		$record = RecordResolver::create($name, array($this->db));
@@ -63,6 +76,7 @@ class PhoenixModel extends Model
 	 */
 	public function getDataMapper($name = null)
 	{
+		$name = $name ? : $this->dataMapper;
 		$name = $name ? : $this->getName();
 
 		$mapper = DataMapperResolver::create($name, array($this->db));

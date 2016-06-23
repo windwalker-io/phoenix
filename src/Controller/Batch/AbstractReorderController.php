@@ -9,6 +9,7 @@
 namespace Phoenix\Controller\Batch;
 
 use Phoenix\Model\AdminModel;
+use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Data\Data;
 
@@ -19,6 +20,8 @@ use Windwalker\Data\Data;
  */
 abstract class AbstractReorderController extends AbstractBatchController
 {
+	use CsrfProtectionTrait;
+
 	/**
 	 * Property action.
 	 *
@@ -69,11 +72,6 @@ abstract class AbstractReorderController extends AbstractBatchController
 
 		try
 		{
-			if (!$this->checkToken())
-			{
-				throw new \RuntimeException('Invalid Token');
-			}
-
 			$this->model['order.column'] = $this->orderField;
 
 			$this->model->reorder((array) $this->data);

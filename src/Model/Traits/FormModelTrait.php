@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Phoenix\Model;
+namespace Phoenix\Model\Traits;
 
 use Phoenix\Form\FieldDefinitionResolver;
 use Phoenix\Form\NullFiledDefinition;
@@ -25,7 +25,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  1.0
  */
-class FormModel extends ItemModel
+trait FormModelTrait
 {
 	/**
 	 * Property formRenderer.
@@ -39,7 +39,7 @@ class FormModel extends ItemModel
 	 *
 	 * @return array
 	 */
-	public function getDefaultData()
+	public function getFormDefaultData()
 	{
 		$sessionData = (array) $this['form.data'];
 

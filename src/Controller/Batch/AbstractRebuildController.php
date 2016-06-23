@@ -8,6 +8,7 @@
 
 namespace Phoenix\Controller\Batch;
 
+use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Data\Data;
@@ -20,6 +21,8 @@ use Windwalker\Record\NestedRecord;
  */
 class AbstractRebuildController extends AbstractBatchController
 {
+	use CsrfProtectionTrait;
+
 	/**
 	 * Property record.
 	 *
@@ -44,11 +47,6 @@ class AbstractRebuildController extends AbstractBatchController
 	{
 		try
 		{
-			if (!$this->checkToken())
-			{
-				throw new \RuntimeException('Invalid Token');
-			}
-
 			$this->record->rebuild();
 
 			$ids = $this->model->getDataMapper()->findColumn('id', array('parent_id != 0'));

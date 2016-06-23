@@ -9,13 +9,12 @@
 namespace Phoenix\Controller;
 
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;
 use Windwalker\String\StringInflector;
+
 /**
  * The AbstractRadController class.
  * 
@@ -176,26 +175,13 @@ abstract class AbstractPhoenixController extends AbstractController
 	}
 
 	/**
-	 * checkToken
-	 *
-	 * @return  boolean
-	 */
-	protected function checkToken()
-	{
-		// TODO: Use middleware
-		return CsrfProtection::checkToken();
-	}
-
-	/**
 	 * checkAccess
 	 *
-	 * @param   mixed  $data
+	 * @param   array  $data
 	 *
 	 * @return  boolean
-	 *
-	 * @throws  ValidateFailException
 	 */
-	protected function checkAccess($data)
+	public function checkAccess($data)
 	{
 		return true;
 	}

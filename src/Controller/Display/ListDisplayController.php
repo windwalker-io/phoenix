@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Display;
 
-use Phoenix\Model\ListModel;
+use Phoenix\Model\ListModelTrait;
 use Windwalker\Core\Model\Model;
 use Windwalker\Filter\InputFilter;
 use Windwalker\Form\Field\ListField;
@@ -31,7 +31,7 @@ class ListDisplayController extends DisplayController
 	/**
 	 * Property model.
 	 *
-	 * @var  ListModel
+	 * @var  ListModelTrait
 	 */
 	protected $model;
 

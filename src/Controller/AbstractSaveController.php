@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\FormModel;
+use Phoenix\Model\Traits\FormModelTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
@@ -95,13 +95,6 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 
 		try
 		{
-			if (!$this->checkToken())
-			{
-				throw new \RuntimeException('Invalid Token');
-			}
-
-			$this->checkAccess($data);
-
 			$this->preSave($data);
 
 			$this->doSave($data);
@@ -202,7 +195,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function filter(Data $data)
 	{
-		if ($this->model instanceof FormModel)
+		if ($this->model instanceof FormModelTrait)
 		{
 			$result = $this->model->filter($data->dump());
 
@@ -223,7 +216,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function validate(Data $data)
 	{
-		if ($this->model instanceof FormModel)
+		if ($this->model instanceof FormModelTrait)
 		{
 			$this->model->validate($data->dump());
 		}

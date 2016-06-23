@@ -220,7 +220,7 @@ abstract class AdminModel extends CrudModel
 	{
 		$orderField  = $orderField ? : $this->state->get('order.column', 'ordering');
 
-		$mapper = $this->getDataMapper();
+		$mapper = $this->getDataMapper()->f;
 
 		$dataset = $mapper->find($conditions);
 

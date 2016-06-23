@@ -9,6 +9,7 @@
 namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractDataHandlingController;
+use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
@@ -22,6 +23,8 @@ use Windwalker\Data\Data;
  */
 abstract class AbstractBatchController extends AbstractDataHandlingController
 {
+	use CsrfProtectionTrait;
+
 	/**
 	 * Property action.
 	 *
@@ -89,11 +92,6 @@ abstract class AbstractBatchController extends AbstractDataHandlingController
 
 		try
 		{
-			if (!$this->checkToken())
-			{
-				throw new \RuntimeException('Invalid Token');
-			}
-
 			$data = new Data($this->data);
 
 			$data = $this->cleanData($data);

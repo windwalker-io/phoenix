@@ -8,6 +8,7 @@
 
 namespace Phoenix\Model;
 
+use Phoenix\Model\Traits\FormModelTrait;
 use Windwalker\Data\Data;
 use Windwalker\Record\Record;
 
@@ -16,8 +17,13 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class CrudModel extends FormModel
+class CrudModel extends ItemModel implements FormModelInterface
 {
+	use FormModelTrait;
+
+	const ORDER_POSITION_FIRST = 'first';
+	const ORDER_POSITION_LAST  = 'last';
+	
 	/**
 	 * Property updateNulls.
 	 *
