@@ -151,7 +151,7 @@ abstract class AbstractPackageObjectResolver
 	 *
 	 * @return  void
 	 */
-	public static function addNamespace($namespace, $priority = Priority::NORMAL)
+	public static function addNamespace($namespace, $priority = PriorityQueue::NORMAL)
 	{
 		$namespace = StringNormalise::toClassNamespace($namespace);
 

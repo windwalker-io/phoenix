@@ -10,6 +10,7 @@ namespace Phoenix\View;
 
 use Phoenix\Html\HtmlHeader;
 use Windwalker\Core\View\BladeHtmlView;
+use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\BladeRenderer;
@@ -20,7 +21,7 @@ use Windwalker\Renderer\RendererInterface;
  *
  * @since  1.0
  */
-abstract class AbstractPhoenixHtmView extends BladeHtmlView
+abstract class AbstractPhoenixHtmView extends HtmlView
 {
 	/**
 	 * Property langPrefix.
@@ -28,17 +29,6 @@ abstract class AbstractPhoenixHtmView extends BladeHtmlView
 	 * @var  string
 	 */
 	protected $langPrefix;
-
-	/**
-	 * Class init.
-	 *
-	 * @param array         $data
-	 * @param BladeRenderer $renderer
-	 */
-	public function __construct(array $data = null, BladeRenderer $renderer = null)
-	{
-		parent::__construct($data, $renderer);
-	}
 
 	/**
 	 * prepareRender

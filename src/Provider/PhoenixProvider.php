@@ -10,12 +10,13 @@ namespace Phoenix\Provider;
 
 use Phoenix\Asset\AssetManager;
 use Phoenix\Html\HtmlHeaderManager;
-use Windwalker\Core\Console\WindwalkerConsole;
-use Windwalker\Core\Renderer\RendererFactory;
+use Windwalker\Core\Console\CoreConsole;
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Renderer\Blade\GlobalContainer;
-use Windwalker\Utilities\Queue\Priority;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AssetProvider class.
@@ -24,6 +25,23 @@ use Windwalker\Utilities\Queue\Priority;
  */
 class PhoenixProvider implements ServiceProviderInterface
 {
+	/**
+	 * Property package.
+	 *
+	 * @var  AbstractPackage
+	 */
+	protected $package;
+
+	/**
+	 * PhoenixProvider constructor.
+	 *
+	 * @param AbstractPackage $package
+	 */
+	public function __construct(AbstractPackage $package)
+	{
+		$this->package = $package;
+	}
+
 	/**
 	 * Registers the service provider with a DI container.
 	 *
@@ -38,7 +56,7 @@ class PhoenixProvider implements ServiceProviderInterface
 			$container = $container->getParent();
 		}
 
-		if ($container->get('app') instanceof WindwalkerConsole)
+		if ($this->package->app->isConsole())
 		{
 			return;
 		}
@@ -46,33 +64,15 @@ class PhoenixProvider implements ServiceProviderInterface
 		// Html document
 		$closure = function(Container $container)
 		{
-			return new HtmlHeaderManager;
+			return $container->createSharedObject(HtmlHeaderManager::class);
 		};
 
-		$container->share('phoenix.html.header', $closure)->alias('phoenix.document', 'phoenix.html.header');
+		$container->share(HtmlHeaderManager::class, $closure)
+			->alias('html.header', HtmlHeaderManager::class);
 
-		// Asset
-		$closure = function(Container $container)
-		{
-			return new AssetManager;
-		};
+		/** @var RendererManager $factory */
+		$factory = $container->get('renderer.manager');
 
-		$container->share('phoenix.asset', $closure);
-
-		/** @var RendererFactory $factory */
-		$factory = $container->get('renderer.factory');
-
-		$factory->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', Priority::LOW - 25);
-
-		// Register Blade directive
-		GlobalContainer::addCompiler('assetTemplate', function($expression)
-		{
-			return "<?php \\Phoenix\\Asset\\Asset::getTemplate()->startTemplate{$expression} ?>";
-		});
-
-		GlobalContainer::addCompiler('endTemplate', function($expression)
-		{
-			return "<?php \\Phoenix\\Asset\\Asset::getTemplate()->endTemplate{$expression} ?>";
-		});
+		$factory->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', PriorityQueue::LOW - 25);
 	}
 }

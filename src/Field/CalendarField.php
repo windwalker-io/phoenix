@@ -49,6 +49,6 @@ class CalendarField extends TextField
 			'attrs'  => $attrs,
 			'format' => $format,
 			'field'  => $this
-		), WidgetHelper::ENGINE_BLADE);
+		), WidgetHelper::EDGE);
 	}
 }

@@ -18,7 +18,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  1.0
  */
-abstract class CoreScript extends AbstractScriptManager
+abstract class CoreScript extends AbstractPhoenixScript
 {
 	/**
 	 * requireJS

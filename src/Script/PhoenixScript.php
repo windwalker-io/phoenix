@@ -8,21 +8,20 @@
 
 namespace Phoenix\Script;
 
+use Windwalker\Core\Asset\AbstractScript;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
-use Windwalker\Registry\Format\JsonFormat;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The PhoenixScript class.
  *
- * @see  \Phoenix\Script\ScriptManager
- * @see  \Phoenix\Script\Module\ModuleManager
+ * @see  AbstractScript
  *
  * @since  1.0
  */
-abstract class PhoenixScript extends AbstractScriptManager
+abstract class PhoenixScript extends AbstractPhoenixScript
 {
 	/**
 	 * core
@@ -35,30 +34,28 @@ abstract class PhoenixScript extends AbstractScriptManager
 	 */
 	public static function core($formSelector = '#admin-form', $variable = 'Phoenix', $options = array())
 	{
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset->addScript(static::phoenixName() . '/js/phoenix/phoenix.js');
+			static::addJS(static::phoenixName() . '/js/phoenix/phoenix.js');
 		}
 
 		if (!static::inited(__METHOD__, func_get_args()))
 		{
 			$defaultOptions = array(
 				'theme' => 'bootstrap',
-				'uri' => static::getContainer()->get('uri')->toArray()
+				'uri' => get_object_vars(Ioc::getUriData())
 			);
 
-			$options = ArrayHelper::merge($defaultOptions, $options);
+			$options = static::mergeOptions($defaultOptions, $options);
 
 			if ($options['theme'] == 'bootstrap')
 			{
-				$asset->addScript(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
+				static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
 			}
 
-			$options = $asset::getJSObject($options);
+			$options = static::getJSObject($defaultOptions, $options);
 
 			$js = <<<JS
 // Phoenix Core
@@ -71,7 +68,7 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
+			static::internalJS($js);
 		}
 	}
 
@@ -87,24 +84,7 @@ JS;
 	{
 		static::router();
 
-		$asset = static::getAsset();
-
-		$asset->internalScript("Phoenix.Router.add('$route', '$url')");
-	}
-
-	/**
-	 * route
-	 *
-	 * @param   string  $route
-	 * @param   string  $url
-	 *
-	 * @return  void
-	 *
-	 * @deprecated  1.1  Use addRoute() instead.
-	 */
-	public static function route($route, $url)
-	{
-		static::addRoute($route, $url);
+		static::internalJS("Phoenix.Router.add('$route', '$url')");
 	}
 
 	/**
@@ -116,13 +96,11 @@ JS;
 	{
 		if (!static::inited(__METHOD__))
 		{
-			$asset = static::getAsset();
-			$asset->addScript(static::phoenixName() . '/js/phoenix/router.min.js');
+			static::addJS(static::phoenixName() . '/js/phoenix/router.min.js');
 
-			$uri = Ioc::get('uri');
-			$uri = $asset::getJSObject($uri->toArray());
+			$uri = static::getJSObject((array) Ioc::get('uri'));
 
-			$asset->internalScript(<<<JS
+			static::internalJS(<<<JS
 Phoenix.Uri = $uri;
 JS
 );

@@ -9,10 +9,8 @@
 namespace Phoenix\Controller\Display;
 
 use Phoenix\Controller\AbstractPhoenixController;
-use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Model\Model;
-use Windwalker\Core\View\BladeHtmlView;
-use Windwalker\Core\View\PhpHtmlView;
+use Windwalker\Core\View\HtmlView;
 
 /**
  * The AbstractGetController class.
@@ -24,21 +22,21 @@ class DisplayController extends AbstractPhoenixController
 	/**
 	 * Default model.
 	 *
-	 * @var  DatabaseModel
+	 * @var  Model
 	 */
 	protected $model;
 
 	/**
 	 * Property models.
 	 *
-	 * @var  DatabaseModel[]
+	 * @var  Model[]
 	 */
 	protected $subModels = array();
 
 	/**
 	 * Property view.
 	 *
-	 * @var  BladeHtmlView
+	 * @var  HtmlView
 	 */
 	protected $view;
 
@@ -98,11 +96,11 @@ class DisplayController extends AbstractPhoenixController
 	/**
 	 * assignModels
 	 *
-	 * @param PhpHtmlView $view
+	 * @param HtmlView $view
 	 *
 	 * @return  void
 	 */
-	protected function assignModels(PhpHtmlView $view)
+	protected function assignModels(HtmlView $view)
 	{
 		// Implement it.
 	}
@@ -164,21 +162,5 @@ class DisplayController extends AbstractPhoenixController
 		$this->format = $format;
 
 		return $this;
-	}
-
-	/**
-	 * getView
-	 *
-	 * @param string $name
-	 * @param string $type
-	 * @param bool   $forceNew
-	 *
-	 * @return  BladeHtmlView
-	 */
-	public function getView($name = null, $type = null, $forceNew = false)
-	{
-		$type = $type ? : $this->format;
-
-		return parent::getView($name, $type, $forceNew);
 	}
 }

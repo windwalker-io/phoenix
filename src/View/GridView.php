@@ -11,6 +11,7 @@ namespace Phoenix\View;
 use Phoenix\View\Helper\GridHelper;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Widget\BladeWidget;
+use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Ioc;
 
 /**
@@ -88,7 +89,7 @@ class GridView extends ListView
 		$data->batchForm  = $data->batchForm ? : $this->model->getForm('batch', null, true);
 
 		// Widget
-		$data->filterBar = $data->filterBar ? : new BladeWidget('phoenix.grid.filterbar', $this->package->getName());
+		$data->filterBar = $data->filterBar ? : WidgetHelper::createWidget('phoenix.grid.filterbar', 'edge', $this->package);
 		$data->showFilterBar = false;
 
 		// Handler filter bar

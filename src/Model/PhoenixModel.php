@@ -11,6 +11,8 @@ namespace Phoenix\Model;
 use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Record\RecordResolver;
 use Windwalker\Core\Model\DatabaseModel;
+use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\DataMapper\DataMapper;
 use Windwalker\Record\Record;
@@ -20,8 +22,10 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class PhoenixModel extends DatabaseModel
+class PhoenixModel extends Model
 {
+	use DatabaseModelTrait;
+
 	/**
 	 * getRecord
 	 *

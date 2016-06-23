@@ -105,7 +105,7 @@ class ModalField extends TextField
 			'url'   => $url,
 			'attrs' => $attrs,
 			'field' => $this
-		), WidgetHelper::ENGINE_BLADE);
+		), WidgetHelper::EDGE);
 	}
 
 	/**

@@ -8,7 +8,6 @@
 
 namespace Phoenix\Generator\Controller\Package\Add;
 
-use Phoenix\Generator\Action\Package\AddRoutingAction;
 use Phoenix\Generator\Action\Package\AddSeederAction;
 use Phoenix\Generator\Action\Package\MigrateAction;
 use Phoenix\Generator\Action\Package\AddTableNameAction;

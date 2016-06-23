@@ -11,7 +11,7 @@ namespace Phoenix\View\Helper;
 use Phoenix\Html\State\IconButton;
 use Phoenix\Html\State\StateButton;
 use Windwalker\Core\DateTime\DateTime;
-use Windwalker\Core\View\PhpHtmlView;
+use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
 use Windwalker\Dom\HtmlElement;
@@ -34,7 +34,7 @@ class GridHelper
 	/**
 	 * View instance.
 	 *
-	 * @var PhpHtmlView
+	 * @var HtmlView
 	 */
 	protected $view;
 
@@ -87,10 +87,10 @@ class GridHelper
 	/**
 	 * Constructor.
 	 *
-	 * @param PhpHtmlView $view   The view object.
-	 * @param array       $config The config object.
+	 * @param HtmlView $view   The view object.
+	 * @param array    $config The config object.
 	 */
-	public function __construct(PhpHtmlView $view, $config = array())
+	public function __construct(HtmlView $view, $config = array())
 	{
 		$this->view   = $view;
 		$this->config = $config = ($config instanceof Registry) ? $config : new Registry($config);
@@ -134,7 +134,7 @@ class GridHelper
 			'ordering'  => $listOrder,
 			'direction' => strtoupper($listDirn),
 			'selector'  => $selector
-		), WidgetHelper::ENGINE_BLADE);
+		), WidgetHelper::EDGE);
 	}
 
 	/**
@@ -186,7 +186,7 @@ class GridHelper
 			'pkName' => $pkName,
 			'orderField'  => $orderField,
 			'saveOrder' => $saveOrder
-		), WidgetHelper::ENGINE_BLADE);
+		), WidgetHelper::EDGE);
 	}
 
 	/**
@@ -198,7 +198,7 @@ class GridHelper
 	{
 		if ($this->state->get('list.saveorder'))
 		{
-			return WidgetHelper::render('phoenix.grid.table.saveorder-button', array(), WidgetHelper::ENGINE_BLADE);
+			return WidgetHelper::render('phoenix.grid.table.saveorder-button', array(), WidgetHelper::EDGE);
 		}
 
 		return '';
@@ -215,7 +215,7 @@ class GridHelper
 	{
 		$options['duration'] = isset($options['duration']) ? $options['duration'] : 0;
 
-		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', array('options' => $options), WidgetHelper::ENGINE_BLADE);
+		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', array('options' => $options), WidgetHelper::EDGE);
 	}
 
 	/**
@@ -231,7 +231,7 @@ class GridHelper
 			'pkName' => $pkName,
 			'item'   => $this->current,
 			'row'    => $this->row
-		), WidgetHelper::ENGINE_BLADE);
+		), WidgetHelper::EDGE);
 	}
 
 	/**
@@ -381,7 +381,7 @@ class GridHelper
 			'item' => $this->current,
 			'row'  => $this->row,
 			'options' => $options
-		), WidgetHelper::ENGINE_BLADE);
+		), WidgetHelper::EDGE);
 	}
 
 //	/**
@@ -572,7 +572,7 @@ class GridHelper
 	/**
 	 * Method to set property view
 	 *
-	 * @param   PhpHtmlView $view
+	 * @param   HtmlView $view
 	 *
 	 * @return  static  Return self to support chaining.
 	 */

@@ -5,7 +5,7 @@
     "license": "LGPL-2.0+",
     "minimum-stability": "beta",
     "require": {
-        "illuminate/view": "~5.0",
+        "php": ">=5.6",
         "asika/muse": "~1.0",
         "mrclay/minify": "~2.0",
         "swiftmailer/swiftmailer": "~5.0"

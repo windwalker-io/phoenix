@@ -10,6 +10,7 @@ namespace Phoenix\Model;
 
 use Phoenix\Form\FieldDefinitionResolver;
 use Phoenix\Form\NullFiledDefinition;
+use Phoenix\Form\Renderer\InputRenderer;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidFailException;
 use Windwalker\Core\Mvc\MvcHelper;
@@ -31,7 +32,7 @@ class FormModel extends ItemModel
 	 *
 	 * @var callable
 	 */
-	protected $formRenderer = array('Phoenix\Form\Renderer\InputRenderer', 'render');
+	protected $formRenderer = InputRenderer::class;
 
 	/**
 	 * getDefaultData
@@ -90,7 +91,12 @@ class FormModel extends ItemModel
 			$form->bind($data);
 		}
 
-		$form->setFieldRenderHandler($this->get('field.renderer', $this->formRenderer));
+		$renderer = $this->get('field.renderer', $this->formRenderer);
+
+		if (class_exists($renderer))
+		{
+			$form->setRenderer(new $renderer);
+		}
 
 		Ioc::getDispatcher()->triggerEvent('onModelAfterGetForm', array(
 			'form'       => $form,

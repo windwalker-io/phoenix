@@ -8,11 +8,8 @@
 
 namespace Phoenix;
 
-use Phoenix\Provider\PhoenixProvider;
-use Phoenix\Provider\SwiftMailerProvider;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\DI\Container;
 
 define('PHOENIX_ROOT', dirname(__DIR__));
 define('PHOENIX_SOURCE', PHOENIX_ROOT . '/src');
@@ -30,23 +27,10 @@ class PhoenixPackage extends AbstractPackage
 	 *
 	 * @return  void
 	 */
-	public function initialise()
+	public function boot()
 	{
-		parent::initialise();
+		parent::boot();
 
 		Translator::loadFile('phoenix', 'ini', $this);
-	}
-
-	/**
-	 * registerProviders
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	public function registerProviders(Container $container)
-	{
-		$container->registerServiceProvider(new PhoenixProvider)
-			->registerServiceProvider(new SwiftMailerProvider);
 	}
 }

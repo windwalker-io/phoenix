@@ -47,5 +47,5 @@ abstract class HtmlHeader extends AbstractProxyFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'phoenix.html.header';
+	protected static $_key = 'html.header';
 }

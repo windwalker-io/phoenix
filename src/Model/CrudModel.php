@@ -50,7 +50,7 @@ class CrudModel extends FormModel
 
 		$this->prepareRecord($record);
 
-		$record->check()
+		$record->validate()
 			->store($this->updateNulls);
 
 		if ($record->$key)
@@ -63,7 +63,7 @@ class CrudModel extends FormModel
 
 		$this->postSaveHook($record);
 
-		$data->bind($record->toArray());
+		$data->bind($record->dump());
 
 		return true;
 	}

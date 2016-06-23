@@ -172,7 +172,7 @@ class IconButton
 		$data = array_merge($data, $this->options);
 		$data['row'] = (int) $this->row;
 
-		return WidgetHelper::render($this->template, $data, WidgetHelper::ENGINE_BLADE);
+		return WidgetHelper::render($this->template, $data, WidgetHelper::EDGE);
 	}
 
 	/**
@@ -187,6 +187,10 @@ class IconButton
 			return $this->render();
 		}
 		catch (\Exception $e)
+		{
+			return (string) $e;
+		}
+		catch (\Throwable $e)
 		{
 			return (string) $e;
 		}

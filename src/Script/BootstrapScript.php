@@ -18,7 +18,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  1.0
  */
-abstract class BootstrapScript extends AbstractScriptManager
+abstract class BootstrapScript extends AbstractPhoenixScript
 {
 	const GLYPHICONS = 'glyphicons';
 	const FONTAWESOME = 'fontawesome';

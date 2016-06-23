@@ -8,25 +8,20 @@
 
 namespace Phoenix\Controller;
 
-use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Controller\Controller;
-use Windwalker\Core\Model\Exception\ValidFailException;
+use Windwalker\Core\Controller\AbstractController;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Security\CsrfProtection;
-use Windwalker\Core\View\BladeHtmlView;
-use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;
 use Windwalker\String\StringInflector;
-use Windwalker\View\AbstractView;
-
 /**
  * The AbstractRadController class.
  * 
  * @since  1.0
  */
-abstract class AbstractPhoenixController extends Controller
+abstract class AbstractPhoenixController extends AbstractController
 {
 	const SINGULAR = 'singular';
 	const PLURAL   = 'plural';
@@ -63,11 +58,10 @@ abstract class AbstractPhoenixController extends Controller
 	 * Class init.
 	 *
 	 * @param Input           $input
-	 * @param WebApplication  $app
 	 * @param Container       $container
 	 * @param AbstractPackage $package
 	 */
-	public function __construct(Input $input = null, WebApplication $app = null, Container $container = null, AbstractPackage $package = null)
+	public function __construct(Input $input = null, AbstractPackage $package = null, Container $container = null)
 	{
 		$this->config = $this->getConfig();
 
@@ -88,7 +82,7 @@ abstract class AbstractPhoenixController extends Controller
 			$this->config['item_name'] = $this->itemName ? : $inflector->toSingular($this->config['list_name']);
 		}
 
-		parent::__construct($input, $app, $container, $package);
+		parent::__construct($input, $package, $container);
 	}
 
 	/**
@@ -188,6 +182,7 @@ abstract class AbstractPhoenixController extends Controller
 	 */
 	protected function checkToken()
 	{
+		// TODO: Use middleware
 		return CsrfProtection::checkToken();
 	}
 
@@ -198,35 +193,10 @@ abstract class AbstractPhoenixController extends Controller
 	 *
 	 * @return  boolean
 	 *
-	 * @throws  ValidFailException
+	 * @throws  ValidateFailException
 	 */
 	protected function checkAccess($data)
 	{
 		return true;
-	}
-
-	/**
-	 * getView
-	 *
-	 * @param string $name
-	 * @param string $type
-	 * @param bool   $forceNew
-	 *
-	 * @return  BladeHtmlView|AbstractView
-	 */
-	public function getView($name = null, $type = 'html', $forceNew = false)
-	{
-		$view = parent::getView($name, $type, $forceNew);
-
-		if (get_class($view) == 'Windwalker\Core\View\PhpHtmlView')
-		{
-			$name = $name ? : $this->getName();
-
-			$name = ucfirst($name) . ucfirst($type) . 'View';
-
-			throw new \UnexpectedValueException('Phoenix only support BladeHtmlView, maybe you forgot to create ' . $name);
-		}
-
-		return $view;
 	}
 }

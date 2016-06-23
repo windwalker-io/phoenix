@@ -8,7 +8,7 @@
 
 namespace Phoenix\Model;
 
-use Windwalker\Core\Authentication\User;
+use Windwalker\Core\User\User;
 use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Data\Data;
 use Windwalker\Database\Query\QueryHelper;

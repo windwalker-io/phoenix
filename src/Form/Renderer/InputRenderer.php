@@ -9,15 +9,17 @@
 namespace Phoenix\Form\Renderer;
 
 use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Dom\HtmlElement;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Form;
+use Windwalker\Form\Renderer\FormRendererInterface;
 
 /**
  * The BootstrapRenderer class.
  *
  * @since  1.0.13
  */
-class InputRenderer
+class InputRenderer implements FormRendererInterface
 {
 	/**
 	 * Property renderers.
@@ -52,7 +54,7 @@ class InputRenderer
 	 */
 	public static function render(AbstractField $field, Form $form)
 	{
-		$field->appendAttribute('labelClass', ' hasTooltip');
+		
 
 		$type = $field->getType();
 
@@ -74,51 +76,118 @@ class InputRenderer
 	}
 
 	/**
-	 * renderRadio
+	 * renderField
 	 *
 	 * @param AbstractField $field
-	 * @param Form          $form
+	 * @param array         $attribs
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public static function renderRadio(AbstractField $field, Form $form)
+	public function renderField(AbstractField $field, array $attribs = array())
 	{
-		return WidgetHelper::render(static::getTemplatePrefix() . 'field.radio', array(
-			'form' => $form,
-			'field' => $field
-		), WidgetHelper::ENGINE_BLADE);
+		return WidgetHelper::render('phoenix.bootstrap.field.control', [
+			'field' => $field,
+			'labelHtml' => $field->renderLabel(),
+			'inputHtml' => $field->renderInput(),
+		], WidgetHelper::EDGE);
+	}
+
+	/**
+	 * renderLabel
+	 *
+	 * @param AbstractField $field
+	 * @param array         $attribs
+	 *
+	 * @return string
+	 */
+	public function renderLabel(AbstractField $field, array $attribs = array())
+	{
+		$attribs['class'] .= ' hasTooltip';
+
+		$label = $field->getLabel();
+
+		if ($field->get('required'))
+		{
+			$label = '<span class="windwalker-input-required-hint">*</span> ' . $label;
+		}
+
+		return (string) new HtmlElement('label', $label, $attribs);
+	}
+
+	/**
+	 * renderDefault
+	 *
+	 * @param   AbstractField $field
+	 * @param   array         $attribs
+	 *
+	 * @return string
+	 */
+	public function renderInput(AbstractField $field, array $attribs = [])
+	{
+		$type = $field->getType();
+
+		$type = static::resolveAlias($type);
+
+		$handler = static::getRenderer($type);
+
+		if ($handler)
+		{
+			return $handler($field);
+		}
+
+		$method = 'render' . ucfirst($type);
+
+		if (is_callable(array($this, $method)))
+		{
+			return $this->$method($field, $attribs);
+		}
+
+		return $field->buildInput($attribs);
 	}
 
 	/**
 	 * renderRadio
 	 *
 	 * @param AbstractField $field
-	 * @param Form          $form
 	 *
 	 * @return  string
 	 */
-	public static function renderCheckboxes(AbstractField $field, Form $form)
+	public static function renderRadio(AbstractField $field, array $attribs = [])
+	{
+		return WidgetHelper::render(static::getTemplatePrefix() . 'field.radio', array(
+			'attribs' => $attribs,
+			'field' => $field
+		), WidgetHelper::EDGE);
+	}
+
+	/**
+	 * renderRadio
+	 *
+	 * @param AbstractField $field
+	 *
+	 * @return  string
+	 */
+	public static function renderCheckboxes(AbstractField $field, array $attribs = [])
 	{
 		return WidgetHelper::render(static::getTemplatePrefix() . 'field.checkboxes', array(
-			'form' => $form,
+			'attribs' => $attribs,
 			'field' => $field
-		), WidgetHelper::ENGINE_BLADE);
+		), WidgetHelper::EDGE);
 	}
 
 	/**
 	 * renderSpacer
 	 *
 	 * @param AbstractField $field
-	 * @param Form          $form
 	 *
 	 * @return  string
 	 */
-	public static function renderSpacer(AbstractField $field, Form $form)
+	public static function renderSpacer(AbstractField $field, array $attribs = [])
 	{
 		return WidgetHelper::render(static::getTemplatePrefix() . 'field.spacer', array(
-			'form' => $form,
+			'attribs' => $attribs,
 			'field' => $field
-		), WidgetHelper::ENGINE_BLADE);
+		), WidgetHelper::EDGE);
 	}
 
 	/**
@@ -131,22 +200,6 @@ class InputRenderer
 	protected static function renderHidden(AbstractField $field)
 	{
 		return $field->renderInput();
-	}
-
-	/**
-	 * renderDefault
-	 *
-	 * @param   AbstractField $field
-	 * @param   Form          $form
-	 *
-	 * @return  string
-	 */
-	protected static function renderInput(AbstractField $field, Form $form)
-	{
-		return WidgetHelper::render(static::getTemplatePrefix() . 'field.input', array(
-			'form' => $form,
-			'field' => $field
-		), WidgetHelper::ENGINE_BLADE);
 	}
 
 	/**
