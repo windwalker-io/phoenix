@@ -11,8 +11,10 @@ return [
 		\Phoenix\Provider\PhoenixProvider::class
 	],
 
-	'commands' => [
-		\Phoenix\Command\MuseCommand::class,
-		\Phoenix\Command\PhoenixCommand::class
+	'console' => [
+		'commands' => [
+			\Phoenix\Command\MuseCommand::class,
+			\Phoenix\Command\PhoenixCommand::class
+		]
 	]
 ];
