@@ -194,4 +194,28 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 
 		return $this->model->getRecord($name);
 	}
+
+	/**
+	 * Method to get property Data
+	 *
+	 * @return  array
+	 */
+	public function getData()
+	{
+		return $this->data;
+	}
+
+	/**
+	 * Method to set property data
+	 *
+	 * @param   array $data
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setData($data)
+	{
+		$this->data = $data;
+
+		return $this;
+	}
 }
