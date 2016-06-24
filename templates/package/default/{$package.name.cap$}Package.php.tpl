@@ -15,15 +15,17 @@ use Phoenix\Script\BootstrapScript;
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Form\FieldHelper;
 use Windwalker\Form\ValidatorHelper;
+use Windwalker\Registry\RegistryHelper;
 
-if (!defined('{$package.name.upper$}_ROOT'))
+if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
 {
-	define('{$package.name.upper$}_ROOT', __DIR__);
+	define('PACKAGE_{$package.name.upper$}_ROOT', __DIR__);
 }
 
 /**
@@ -107,22 +109,25 @@ class {$package.name.cap$}Package extends AbstractPackage
 	/**
 	 * loadRouting
 	 *
-	 * @return  mixed
+	 * @param CoreRouter $router
+	 * @param string     $group
+	 *
+	 * @return CoreRouter
 	 */
-	public function loadRouting()
+	public function loadRouting(CoreRouter $router, $group = null)
 	{
-		$routes = parent::loadRouting();
+		$router = parent::loadRouting($router);
 
-		foreach (Folder::files(__DIR__ . '/Resources/routing') as $file)
+		$router->group($group, function (CoreRouter $router)
 		{
-			if (File::getExtension($file) == 'yml')
-			{
-				$routes = array_merge($routes, Yaml::parse(file_get_contents($file)));
-			}
-		}
+			$router->addRouteByConfigs(
+				$router::loadRoutingFromFiles(Folder::files(__DIR__ . '/Resources/routing')),
+				$this->getName()
+			);
+		});
 
 		// Merge other routes here...
 
-		return $routes;
+		return $router;
 	}
 }

@@ -11,6 +11,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}View;
 use Phoenix\Controller\AbstractSaveController;
+use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Data\Data;
 
 /**
@@ -20,6 +21,8 @@ use Windwalker\Data\Data;
  */
 class SaveController extends AbstractSaveController
 {
+	use CsrfProtectionTrait;
+	
 	/**
 	 * Property name.
 	 *

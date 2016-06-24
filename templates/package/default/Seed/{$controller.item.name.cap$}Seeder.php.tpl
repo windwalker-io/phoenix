@@ -30,7 +30,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 	{
 		$faker = Factory::create();
 
-		foreach (range(1, 30) as $i)
+		foreach (range(1, 150) as $i)
 		{
 			$data = new Data;
 
@@ -42,19 +42,19 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 			$data['image']       = $faker->imageUrl();
 			$data['state']       = $faker->randomElement(array(1, 1, 1, 1, 0, 0));
 			$data['ordering']    = $i;
-			$data['created']     = $faker->dateTime->format(DateTime::FORMAT_SQL);
+			$data['created']     = $faker->dateTime->format(DateTime::getSqlFormat());
 			$data['created_by']  = rand(20, 100);
-			$data['modified']    = $faker->dateTime->format(DateTime::FORMAT_SQL);
+			$data['modified']    = $faker->dateTime->format(DateTime::getSqlFormat());
 			$data['modified_by'] = rand(20, 100);
 			$data['language']    = 'en-GB';
 			$data['params']      = '';
 
 			{$controller.item.name.cap$}Mapper::createOne($data);
 
-			$this->command->out('.', false);
+			$this->outCounting();
 		}
 
-		$this->command->out();
+		$this->command->out()->out('  Complete...');
 	}
 
 	/**

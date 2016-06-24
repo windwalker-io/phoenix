@@ -31,7 +31,7 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	 *
 	 * @var  array
 	 */
-	protected $reorderConditions = array();
+	protected $reorderConditions = [];
 
 	/**
 	 * postGetItem

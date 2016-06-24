@@ -8,10 +8,10 @@
 
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Windwalker\Core\Migration\AbstractMigration;
-use Windwalker\Core\Migration\Schema;
 use Windwalker\Database\Schema\Column;
 use Windwalker\Database\Schema\DataType;
 use Windwalker\Database\Schema\Key;
+use Windwalker\Database\Schema\Schema;
 
 /**
  * Migration class of {$controller.item.name.cap$}Init.
@@ -41,10 +41,12 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
 			$schema->char('language')->length(7)->comment('Language');
 			$schema->text('params')->comment('Params');
 
-			$schema->addIndex($schema->indexName('alias'), 'alias');
-			$schema->addIndex($schema->indexName('language'), 'language');
-			$schema->addIndex($schema->indexName('created_by'), 'created_by');
+			$schema->addIndex('alias');
+			$schema->addIndex('language');
+			$schema->addIndex('created_by');
 		});
+
+		$this->getTable(Table::{$controller.list.name.upper$})->addIndex(Key::TYPE_INDEX, 'alias', 'idx_{$controller.list.name.lower$}_alias');
 	}
 
 	/**

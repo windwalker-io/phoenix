@@ -157,7 +157,7 @@
                 <tr>
                     {{-- PAGINATION --}}
                     <td colspan="25">
-                        {!! $pagination->render($package->getName() . '@{$controller.list.name.lower$}', 'windwalker.pagination.phoenix') !!}
+                        {!! $pagination->setRoute($route)->render('{$controller.list.name.lower$}', [], 'windwalker.pagination.phoenix') !!}
                     </td>
                 </tr>
                 </tfoot>
