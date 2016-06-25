@@ -59,7 +59,7 @@ class CopyMigrationAction extends AbstractAction
 			return;
 		}
 
-		$migFile = array_shift(Folder::files($src . '/Migration'));
+		$migFile = Folder::files($src . '/Migration')[0];
 
 		$newName = gmdate('YmdHis') . '_' . $migName . '.php';
 

@@ -45,7 +45,7 @@ class ConvertController extends AbstractPackageController
 		// Rename migration
 		if (is_dir($src . '/Migration'))
 		{
-			$file = array_shift(Folder::files($src . '/Migration'));
+			$file = Folder::files($src . '/Migration')[0];
 
 			$time = '19700101000000';
 
