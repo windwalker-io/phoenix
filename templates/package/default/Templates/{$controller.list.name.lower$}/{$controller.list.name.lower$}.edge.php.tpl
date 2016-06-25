@@ -137,7 +137,9 @@
 
                         {{-- CREATED --}}
                         <td>
-                            {{ Windwalker\Core\DateTime\DateTime::toLocalTime($item->created, 'Y-m-d') }}
+                            <span class="hasTooltip" title="{{ $datetime::toLocalTime($item->created, 'Y-m-d H:i:s') }}">
+                                {{ $datetime::toLocalTime($item->created, 'Y-m-d') }}
+                            </span>
                         </td>
 
                         {{-- LANGUAGE --}}
