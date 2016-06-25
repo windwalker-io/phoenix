@@ -13,16 +13,16 @@ namespace Phoenix\Html\State;
  *
  * @since  {DEPLOY_VERSION}
  */
-class StateButton extends BooleanButton
+class StateButton extends PublishedButton
 {
 	/**
 	 * configure
 	 *
 	 * @return  void
 	 */
-	protected function configure()
+	protected function init()
 	{
-		parent::configure();
+		parent::init();
 
 		$this->addState(-1, 'publish', 'trash fa fa-trash', 'phoenix.grid.state.trashed');
 	}

@@ -65,31 +65,28 @@ class IconButton
 	/**
 	 * create
 	 *
-	 * @param mixed $value
 	 * @param int   $row
 	 * @param array $options
 	 *
 	 * @return static
 	 */
-	public static function create($value, $row, $options = array())
+	public static function create($row, $options=array())
 	{
-		return new static($value, $row, $options);
+		return new static($row, $options);
 	}
 
 	/**
 	 * StateButton constructor.
 	 *
-	 * @param mixed   $value
 	 * @param integer $row
 	 * @param array   $options
 	 */
-	public function __construct($value, $row, array $options = array())
+	public function __construct($row, array $options=array())
 	{
 		$this->row = $row;
 		$this->options = $options;
-		$this->value = $value;
 
-		$this->configure();
+		$this->init();
 	}
 
 	/**
@@ -97,7 +94,7 @@ class IconButton
 	 *
 	 * @return  void
 	 */
-	protected function configure()
+	protected function init()
 	{
 		// Implement this method.
 	}
@@ -161,11 +158,13 @@ class IconButton
 	/**
 	 * render
 	 *
-	 * @return  string
+	 * @param  mixed $value
+	 *
+	 * @return string
 	 */
-	public function render()
+	public function render($value = null)
 	{
-		$data = $this->getState($this->value);
+		$data = $this->getState($value);
 
 		$data = $data ? : $this->getState('_default');
 

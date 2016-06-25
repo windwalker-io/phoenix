@@ -13,14 +13,14 @@ namespace Phoenix\Html\State;
  *
  * @since  {DEPLOY_VERSION}
  */
-class BooleanButton extends IconButton
+class PublishedButton extends IconButton
 {
 	/**
 	 * configure
 	 *
 	 * @return  void
 	 */
-	protected function configure()
+	protected function init()
 	{
 		$this->addState(0, 'publish',   'remove fa fa-remove text-danger', 'phoenix.grid.state.unpublished')
 			->addState(1,  'unpublish', 'ok fa fa-check text-success',     'phoenix.grid.state.published');

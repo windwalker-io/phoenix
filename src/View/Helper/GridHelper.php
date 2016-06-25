@@ -111,7 +111,7 @@ class GridHelper
 		$orderColumn = $state->get('list.orderColumn', $config->get('order_column'));
 		$listDirn    = $this->state->get('list.direction');
 
-		$state->set('list.saveorder', ($listOrder == $orderColumn) && strtoupper($listDirn) == 'ASC');
+		$state->set('list.saveorder', ($listOrder == $orderColumn) && strtoupper($listDirn) === 'ASC');
 	}
 
 	/**
@@ -244,7 +244,7 @@ class GridHelper
 	 *
 	 * @return string Link element.
 	 */
-	public function foreignLink($title = null, $url, $attribs = array(), $options = array())
+	public function foreignLink($title = null, $url = null, array $attribs = array(), array $options = array())
 	{
 		$defaultAttribs['href']   = $url;
 		$defaultAttribs['class']  = 'text-muted muted';
@@ -268,22 +268,26 @@ class GridHelper
 	public function createdDate($format = '', $local = false)
 	{
 		$field = $this->config->get('field.created', 'created');
-		$format  = $format ? : DateTime::$format;
+		$format = $format ? : DateTime::$format;
 
-		return DateTime::create($this->current->$field, $local)->format($format, true);
+		if ($local)
+		{
+			return DateTime::toLocalTime($this->current->$field, $format);
+		}
+
+		return DateTime::create($this->current->$field)->format($format);
 	}
 
 	/**
 	 * createIconButton
 	 *
-	 * @param mixed $value
 	 * @param array $options
 	 *
 	 * @return  IconButton
 	 */
-	public function createIconButton($value, $options = array())
+	public function createIconButton(array $options = array())
 	{
-		return IconButton::create($value, $this->row, $options);
+		return IconButton::create($this->row, $options);
 	}
 
 	/**
@@ -294,9 +298,9 @@ class GridHelper
 	 *
 	 * @return  static
 	 */
-	public function published($value, $options = array())
+	public function published($value, array $options = array())
 	{
-		return StateButton::create($value, $this->row, $options);
+		return StateButton::create($this->row, $options)->render($value);
 	}
 
 	/**
@@ -309,52 +313,9 @@ class GridHelper
 	 *
 	 * @deprecated Use published() instead.
 	 */
-	public function state($value, $options = array())
+	public function state($value, array $options = array())
 	{
-		$iconMapping = array(
-			-1 => 'trash fa fa-fw fa-trash',
-			0 => 'remove fa fa-fw fa-remove text-danger',
-			1 => 'ok fa fa-fw fa-check text-success'
-		);
-
-		$taskMapping = array(
-			-1 => 'publish',
-			0 => 'publish',
-			1 => 'unpublish'
-		);
-
-		$options['titleMapping'] = isset($options['titleMapping']) ? (array) $options['titleMapping'] : array(
-			-1 => 'phoenix.grid.state.trashed',
-			0 => 'phoenix.grid.state.unpublished',
-			1 => 'phoenix.grid.state.published'
-		);
-
-		return $this->stateButton($value, $taskMapping, $iconMapping, $options);
-	}
-
-	/**
-	 * booleanButton
-	 *
-	 * @param string $value
-	 * @param array  $options
-	 *
-	 * @return  string
-	 *
-	 * @deprecated Use createIconButton() instead.
-	 */
-	public function booleanButton($value, $options = array())
-	{
-		$iconMapping = array(
-			0 => 'remove text-danger',
-			1 => 'ok text-success'
-		);
-
-		$taskMapping = array(
-			0 => 'publish',
-			1 => 'unpublish'
-		);
-
-		return $this->stateButton($value, $taskMapping, $iconMapping, $options);
+		return StateButton::create($this->row, $options)->render($value);
 	}
 
 	/**
@@ -562,7 +523,7 @@ class GridHelper
 	/**
 	 * Method to get property View
 	 *
-	 * @return  PhpHtmlView
+	 * @return  HtmlView
 	 */
 	public function getView()
 	{
@@ -586,9 +547,11 @@ class GridHelper
 	/**
 	 * __get
 	 *
-	 * @param   string  $name
+	 * @param   string $name
 	 *
 	 * @return  mixed
+	 *
+	 * @throws \OutOfRangeException
 	 */
 	public function __get($name)
 	{
@@ -605,7 +568,7 @@ class GridHelper
 			return $this->$name;
 		}
 
-		if ($name == 'item')
+		if ($name === 'item')
 		{
 			return $this->current;
 		}

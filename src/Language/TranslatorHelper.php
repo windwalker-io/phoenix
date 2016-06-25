@@ -182,7 +182,7 @@ class TranslatorHelper
 				$returns = $orphans;
 		}
 
-		return call_user_func(array($formatter, 'structToString'), $returns, $options);
+		return $formatter::structToString($returns, $options);
 	}
 
 	/**
@@ -191,11 +191,13 @@ class TranslatorHelper
 	 * @param string $format
 	 *
 	 * @return  void
+	 *
+	 * @throws \Windwalker\Filesystem\Exception\FilesystemException
 	 */
 	public static function dumpOrphans($format = 'ini')
 	{
 		$format = strtolower($format);
-		$ext = $format == 'yaml' ? 'yml' : $format;
+		$ext = ($format === 'yaml') ? 'yml' : $format;
 
 		$file = WINDWALKER_TEMP . '/language/orphans.' . $ext;
 
@@ -216,9 +218,11 @@ class TranslatorHelper
 	/**
 	 * getFormatter
 	 *
-	 * @param   string  $format
+	 * @param   string $format
 	 *
 	 * @return  string
+	 *
+	 * @throws \DomainException
 	 */
 	public static function getFormatter($format)
 	{
