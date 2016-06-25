@@ -9,6 +9,7 @@
 namespace Phoenix\Generator\FileOperator;
 
 use Windwalker\Filesystem\File;
+use Windwalker\String\SimpleTemplate;
 use Windwalker\String\StringHelper;
 
 /**
@@ -30,7 +31,7 @@ class CopyOperator extends \Muse\FileOperator\CopyOperator
 	protected function copyFile($src, $dest, $replace = array())
 	{
 		// Replace dest file name.
-		$dest = StringHelper::parseVariable($dest, $replace, $this->tagVariable);
+		$dest = SimpleTemplate::render($dest, $replace, $this->tagVariable);
 
 		if (substr($dest, -4) == '.tpl')
 		{
@@ -43,7 +44,7 @@ class CopyOperator extends \Muse\FileOperator\CopyOperator
 		}
 		else
 		{
-			$content = StringHelper::parseVariable(file_get_contents($src), $replace, $this->tagVariable);
+			$content = SimpleTemplate::render(file_get_contents($src), $replace, $this->tagVariable);
 			if (File::write($dest, $content))
 			{
 				$this->io->out('[<info>File created</info>] ' . $dest);
