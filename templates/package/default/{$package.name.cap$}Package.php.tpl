@@ -12,16 +12,14 @@ use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Language\TranslatorHelper;
 use Phoenix\Record\RecordResolver;
 use Phoenix\Script\BootstrapScript;
-use Symfony\Component\Yaml\Yaml;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
-use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Form\FieldHelper;
 use Windwalker\Form\ValidatorHelper;
-use Windwalker\Registry\RegistryHelper;
+use Windwalker\Router\Exception\RouteNotFoundException;
 
 if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
 {
@@ -74,6 +72,9 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 * checkAccess
 	 *
 	 * @return  void
+	 *
+	 * @throws  RouteNotFoundException
+	 * @throws  \Exception
 	 */
 	protected function checkAccess()
 	{
@@ -94,12 +95,6 @@ class {$package.name.cap$}Package extends AbstractPackage
 			if (class_exists('Windwalker\Debugger\Helper\DebuggerHelper'))
 			{
 				DebuggerHelper::addCustomData('Language Orphans', '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
-			}
-
-			// Un comment this line, Translator will export all orphans to /cache/language
-			if ($this->app->get('language.debug'))
-			{
-				TranslatorHelper::dumpOrphans('ini');
 			}
 		}
 
