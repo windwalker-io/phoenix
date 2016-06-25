@@ -10,6 +10,7 @@ namespace Phoenix\Controller\Display;
 
 use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Model\Model;
+use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
 
 /**
@@ -76,6 +77,7 @@ class DisplayController extends AbstractPhoenixController
 	protected function doExecute()
 	{
 		$this->prepareUserState($this->model);
+		$this->prepareViewData($this->view);
 
 		// Add default
 		$this->view->setModel($this->model, true);
@@ -113,6 +115,17 @@ class DisplayController extends AbstractPhoenixController
 	 * @return  void
 	 */
 	protected function prepareUserState(Model $model)
+	{
+	}
+
+	/**
+	 * prepareViewData
+	 *
+	 * @param   AbstractView  $view
+	 *
+	 * @return  void
+	 */
+	protected function prepareViewData(AbstractView $view)
 	{
 	}
 
