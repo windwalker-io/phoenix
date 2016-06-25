@@ -14,7 +14,7 @@ defined('WINDWALKER') or die('Forbidden');
  * @var $app      \Windwalker\Web\Application                 Global Application
  * @var $package  \Windwalker\Core\Package\AbstractPackage    Package object.
  * @var $view     \Windwalker\Data\Data                       Some information of this view.
- * @var $uri      \Windwalker\Registry\Registry               Uri information, example: $uri['media.path']
+ * @var $uri      \Windwalker\Uri\UriData                     Uri information, example: $uri['media.path']
  * @var $datetime \Windwalker\Core\DateTime\DateTime          PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
  * @var $route    \Windwalker\Core\Router\CoreRoute           Route builder object.
@@ -28,8 +28,8 @@ defined('WINDWALKER') or die('Forbidden');
  * @var $showFilterBar boolean
  * @var $grid          \Phoenix\View\Helper\GridHelper
  * @var $state         \Windwalker\Registry\Registry
- * @var $items         \Windwalker\Data\DataSet
- * @var $item          \Windwalker\Data\Data
+ * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record[]
+ * @var $item          \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
  * @var $i             integer
  * @var $pagination    \Windwalker\Core\Pagination\Pagination
  */

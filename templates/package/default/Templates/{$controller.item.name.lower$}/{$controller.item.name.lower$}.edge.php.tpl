@@ -9,11 +9,11 @@
  * @var $uri      \Windwalker\Registry\Registry               Uri information, example: $uri['media.path']
  * @var $datetime \DateTime                                   PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
- * @var $router   \Windwalker\Core\Router\PackageRouter       Router object.
+ * @var $router   \Windwalker\Core\Router\CoreRoute           The package route object.
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \Windwalker\Data\Data
+ * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
  * @var $state \Windwalker\Registry\Registry
  * @var $form  \Windwalker\Form\Form
  */

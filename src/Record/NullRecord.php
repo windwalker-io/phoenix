@@ -8,6 +8,8 @@
 
 namespace Phoenix\Record;
 
+use Phoenix\DataMapper\NullDataMapper;
+use Windwalker\Core\Object\NullObject;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Record\Record;
@@ -46,9 +48,10 @@ class NullRecord extends Record
 	 *
 	 * @since   2.0
 	 */
-	public function __construct($table = null, $keys = null, AbstractDatabaseDriver $db = null)
+	public function __construct($table = null, $keys = null, $mapper = null)
 	{
 		$this->data = new \stdClass;
-		$this->db = $db ? : DatabaseFactory::getDbo();
+		$this->mapper = new NullDataMapper;
+		$this->db = DatabaseFactory::getDbo();
 	}
 }

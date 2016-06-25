@@ -8,9 +8,9 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\DataMapper;
 
+use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Windwalker\Core\DataMapper\AbstractDataMapperProxy;
-use Windwalker\DataMapper\DataMapper;
 use Windwalker\Event\Event;
 
 /**
@@ -26,6 +26,13 @@ class {$controller.item.name.cap$}Mapper extends AbstractDataMapperProxy
 	 * @var  string
 	 */
 	protected static $table = Table::{$controller.list.name.upper$};
+
+	/**
+	 * Property dataClass.
+	 *
+	 * @var  string
+	 */
+	protected static $dataClass = {$controller.item.name.cap$}Record::class;
 
 	/**
 	 * onAfterFind

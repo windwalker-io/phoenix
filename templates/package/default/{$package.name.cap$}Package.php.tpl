@@ -121,7 +121,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 		$router->group($group, function (CoreRouter $router)
 		{
 			$router->addRouteByConfigs(
-				$router::loadRoutingFromFiles(Folder::files(__DIR__ . '/Resources/routing')),
+				$router::loadRoutingFiles(Folder::files(__DIR__ . '/Resources/routing')),
 				$this->getName()
 			);
 		});

@@ -13,14 +13,14 @@
  *
  * View variables
  * --------------------------------------------------------------
- * @var $filterBar     \Windwalker\Core\Widget\BladeWidget
+ * @var $filterBar     \Windwalker\Core\Widget\Widget
  * @var $filterForm    \Windwalker\Form\Form
  * @var $batchForm     \Windwalker\Form\Form
  * @var $showFilterBar boolean
  * @var $grid          \Phoenix\View\Helper\GridHelper
  * @var $state         \Windwalker\Registry\Registry
- * @var $items         \Windwalker\Data\DataSet
- * @var $item          \Windwalker\Data\Data
+ * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record[]
+ * @var $item          \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
  * @var $i             integer
  * @var $pagination    \Windwalker\Core\Pagination\Pagination
  */

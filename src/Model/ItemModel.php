@@ -38,7 +38,7 @@ class ItemModel extends Model implements PhoenixDatabaseModelInterface
 		{
 			if (!$pk)
 			{
-				return new Data;
+				return $this->getRecord();
 			}
 
 			$item = $this->getRecord();
@@ -49,10 +49,8 @@ class ItemModel extends Model implements PhoenixDatabaseModelInterface
 			}
 			catch (\RuntimeException $e)
 			{
-				return new Data;
+				return $item;
 			}
-
-			$item = new Data($item->dump());
 
 			$this->postGetItem($item);
 

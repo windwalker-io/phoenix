@@ -69,6 +69,11 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 * @param Data $data
 	 *
 	 * @return void
+	 *
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
+	 * @throws \Windwalker\Core\Model\Exception\ValidateFailException
+	 * @throws \Windwalker\Record\Exception\NoResultException
 	 */
 	protected function doSave(Data $data)
 	{
@@ -82,24 +87,27 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	/**
 	 * doExecute
 	 *
-	 * @return  mixed
+	 * @return mixed
+	 * 
 	 * @throws \Exception
+	 * @throws \Throwable
 	 */
 	protected function doExecute()
 	{
-		$data = new Data($this->data);
+		$record = $this->record;
+		$record->bind($this->data);
 
-		$this->isNew = !(bool) $data->{$this->pkName};
+		$this->isNew = !(bool) $record->{$this->pkName};
 
 		!$this->useTransaction or $this->model->transactionStart();
 
 		try
 		{
-			$this->preSave($data);
+			$this->preSave($record);
 
-			$this->doSave($data);
+			$this->doSave($record);
 
-			$this->postSave($data);
+			$this->postSave($record);
 		}
 		catch (ValidateFailException $e)
 		{
@@ -123,7 +131,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 				unset($messages[ValidateResult::STATUS_FAILURE]);
 			}
 
-			$this->setRedirect($this->getFailRedirect($data), $messages, Bootstrap::MSG_DANGER);
+			$this->setRedirect($this->getFailRedirect($record), $messages, Bootstrap::MSG_DANGER);
 
 			return false;
 		}
@@ -138,16 +146,24 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 				throw $e;
 			}
 
-			$this->setRedirect($this->getFailRedirect($data), $e->getMessage(), Bootstrap::MSG_DANGER);
+			$this->setRedirect($this->getFailRedirect($record), $e->getMessage(), Bootstrap::MSG_DANGER);
 
 			return false;
+		}
+		catch (\Throwable $e)
+		{
+			!$this->useTransaction or $this->model->transactionRollback();
+
+			$this->setUserState($this->getContext('edit.data'), $this->data);
+
+			throw $e;
 		}
 
 		!$this->useTransaction or $this->model->transactionCommit();
 
 		$this->removeUserState($this->getContext('edit.data'));
 
-		$this->setRedirect($this->getSuccessRedirect($data), $this->getSuccessMessage($data), Bootstrap::MSG_SUCCESS);
+		$this->setRedirect($this->getSuccessRedirect($record), $this->getSuccessMessage($record), Bootstrap::MSG_SUCCESS);
 
 		return true;
 	}

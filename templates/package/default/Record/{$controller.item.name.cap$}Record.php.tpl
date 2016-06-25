@@ -14,8 +14,14 @@ use Windwalker\Record\Record;
 
 /**
  * The {$controller.item.name.cap$}Record class.
- * 
+ *
+ * @property  integer  id
+ * @property  string   title
+ * @property  string   alias
+ *
  * @since  1.0
+ *
+ * @note   Do not change this docblock
  */
 class {$controller.item.name.cap$}Record extends Record
 {

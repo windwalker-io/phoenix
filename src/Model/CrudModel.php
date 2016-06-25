@@ -37,6 +37,10 @@ class CrudModel extends ItemModel implements FormModelInterface
 	 * @param Data $data
 	 *
 	 * @return  boolean
+	 *
+	 * @throws  \Windwalker\Record\Exception\NoResultException
+	 * @throws  \InvalidArgumentException
+	 * @throws  \RuntimeException
 	 */
 	public function save(Data $data)
 	{
@@ -102,8 +106,11 @@ class CrudModel extends ItemModel implements FormModelInterface
 	 * @param array $pk
 	 *
 	 * @return  boolean
+	 *
+	 * @throws \UnexpectedValueException
+	 * @throws \Windwalker\Record\Exception\NoResultException
 	 */
-	public function delete($pk = array())
+	public function delete(array $pk = [])
 	{
 		$pk = $pk ? : $this['item.pk'];
 
