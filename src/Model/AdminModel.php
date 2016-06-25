@@ -89,15 +89,29 @@ abstract class AdminModel extends CrudModel
 		}
 
 		// Created date
-		if ($record->hasField('created') && !$record->created)
+		if ($record->hasField('created'))
 		{
-			$record->created = $date->toSql();
+			if ($record->created)
+			{
+				$record->created = DateTime::toServerTime($record->created);
+			}
+			else
+			{
+				$record->created = $date->toSql();
+			}
 		}
 
 		// Modified date
 		if ($record->hasField('modified') && $record->$key)
 		{
-			$record->modified = $date->toSql();
+			if ($record->modified)
+			{
+				$record->modified = DateTime::toServerTime($record->modified);
+			}
+			else
+			{
+				$record->modified = $date->toSql();
+			}
 		}
 
 		// Created user

@@ -8,6 +8,8 @@
 
 namespace Phoenix\Field;
 
+use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Form\Field\TextField;
 
@@ -39,6 +41,12 @@ class CalendarField extends TextField
 	 */
 	public function buildInput($attrs)
 	{
+		// Convert timezone
+		$from = $this->get('from', 'UTC');
+		$to   = $this->get('to', Ioc::getConfig()->get('system.timezone', 'UTC'));
+
+		$attrs['value'] = DateTime::convert($attrs['value'], $from, $to);
+
 		$input  = parent::buildInput($attrs);
 		$format = $this->get('format', 'YYYY-MM-DD HH:mm:ss');
 		$id     = $this->getId();
