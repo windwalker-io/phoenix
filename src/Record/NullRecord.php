@@ -9,7 +9,6 @@
 namespace Phoenix\Record;
 
 use Phoenix\DataMapper\NullDataMapper;
-use Windwalker\Core\Object\NullObject;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Record\Record;

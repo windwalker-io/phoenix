@@ -146,17 +146,18 @@ trait FormModelTrait
 	/**
 	 * filter
 	 *
-	 * @param array $data
+	 * @param array  $data
+	 * @param string $formDefine
 	 *
-	 * @return  array
+	 * @return array
 	 */
-	public function filter($data)
+	public function prepareStore($data, $formDefine = 'edit')
 	{
-		$form = $this->getForm('edit');
+		$form = $this->getForm($formDefine);
 
 		$form->bind($data);
-
 		$form->filter();
+		$form->prepareStore();
 
 		return $form->getValues();
 	}

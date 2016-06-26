@@ -14,7 +14,7 @@ use Windwalker\Record\Record;
 /**
  * The RecordResolver class.
  *
- * @method  static  Record  create($name, $args = array())
+ * @method  static  Record  create($name, ...$args)
  * @method  static  Record  getInstance($name, $args = array(), $forceNew = false)
  *
  * @since  1.0
@@ -30,19 +30,17 @@ class RecordResolver extends AbstractPackageObjectResolver
 	 * @return Record
 	 * @throws \Exception
 	 */
-	protected static function createObject($class, $args = array())
+	protected static function createObject($class, ...$args)
 	{
-		if (!is_subclass_of($class, 'Windwalker\Record\Record'))
+		if (!is_subclass_of($class, Record::class))
 		{
-			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of Windwalker\Record\Record', $class));
+			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of ' . Record::class, $class));
 		}
-
-		$db = array_shift($args);
 
 		// TODO: Make Record support set DB after construct.
 		try
 		{
-			return new $class;
+			return new $class(...$args);
 		}
 		catch (\Exception $e)
 		{

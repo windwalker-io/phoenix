@@ -9,12 +9,8 @@
 namespace Phoenix\View;
 
 use Phoenix\Html\HtmlHeader;
-use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\HtmlView;
-use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Data\Data;
-use Windwalker\Renderer\BladeRenderer;
-use Windwalker\Renderer\RendererInterface;
 
 /**
  * The AbstractRadHtmView class.

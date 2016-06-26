@@ -9,12 +9,13 @@
 namespace Phoenix\DataMapper;
 
 use Phoenix\Utilities\AbstractPackageObjectResolver;
+use Windwalker\Core\DataMapper\AbstractDataMapperProxy;
 use Windwalker\DataMapper\DataMapper;
 
 /**
  * The DataMapperResolver class.
  *
- * @method  static  DataMapper  create($name, $args = array())
+ * @method  static  DataMapper  create($name, ...$args)
  * @method  static  DataMapper  getInstance($name, $args = array(), $forceNew = false)
  *
  * @since  1.0
@@ -29,16 +30,14 @@ abstract class DataMapperResolver extends AbstractPackageObjectResolver
 	 *
 	 * @return DataMapper
 	 */
-	protected static function createObject($class, $args = array())
+	protected static function createObject($class, ...$args)
 	{
-		if (!is_subclass_of($class, 'Windwalker\DataMapper\DataMapper') && !is_subclass_of($class, 'Windwalker\Core\DataMapper\AbstractDataMapperProxy'))
+		if (!is_subclass_of($class, DataMapper::class) && !is_subclass_of($class, AbstractDataMapperProxy::class))
 		{
-			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of Windwalker\DataMapper\DataMapper', $class));
+			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of ' . DataMapper::class, $class));
 		}
 
-		$db = array_shift($args);
-
-		return new $class($db ? : static::getContainer()->get('system.db'));
+		return new $class(...$args);
 	}
 
 	/**

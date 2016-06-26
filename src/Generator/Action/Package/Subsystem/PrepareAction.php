@@ -11,7 +11,6 @@ namespace Phoenix\Generator\Action\Package\Subsystem;
 use Phoenix\Generator\Action;
 use Phoenix\Generator\Action\AbstractAction;
 use Phoenix\Generator\FileOperator\CopyOperator;
-use Windwalker\String\StringHelper;
 
 /**
  * The PrepareAction class.

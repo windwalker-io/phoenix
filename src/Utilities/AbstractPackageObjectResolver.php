@@ -42,7 +42,7 @@ abstract class AbstractPackageObjectResolver
 	 *
 	 * @return  object
 	 */
-	public static function create($name, $args = array())
+	public static function create($name, ...$args)
 	{
 		$name = static::getClass($name);
 
@@ -50,9 +50,7 @@ abstract class AbstractPackageObjectResolver
 
 		if ($class)
 		{
-			$args = (array) $args;
-
-			return static::createObject($class, $args);
+			return static::createObject($class, ...$args);
 		}
 
 		return null;
@@ -90,7 +88,7 @@ abstract class AbstractPackageObjectResolver
 	 *
 	 * @return object
 	 */
-	protected static function createObject($class, $args = array())
+	protected static function createObject($class, ...$args)
 	{
 		throw new \LogicException('Please implement: ' . get_called_class() . '::' . __FUNCTION__ . '()');
 	}
@@ -112,7 +110,7 @@ abstract class AbstractPackageObjectResolver
 
 		if (empty(static::$instances[$called][$key]) || $forceNew)
 		{
-			static::$instances[$called][$key] = static::create($name, $args);
+			static::$instances[$called][$key] = static::create($name, ...$args);
 		}
 
 		return static::$instances[$called][$key];

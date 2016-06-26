@@ -9,7 +9,6 @@
 namespace Phoenix\Command\Phoenix\Asset;
 
 use Windwalker\Console\Command\Command;
-use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Filesystem\File;
 use Windwalker\String\StringHelper;

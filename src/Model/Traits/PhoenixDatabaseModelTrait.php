@@ -10,6 +10,7 @@ namespace Phoenix\Model\Traits;
 
 use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Record\RecordResolver;
+use Windwalker\Core\DataMapper\AbstractDataMapperProxy;
 use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\DataMapper\DataMapper;
@@ -50,7 +51,14 @@ trait PhoenixDatabaseModelTrait
 		$name = $name ? : $this->record;
 		$name = $name ? : $this->getName();
 
-		$record = RecordResolver::create($name, array($this->db));
+		$mapper = $this->getDataMapper();
+
+		if ($mapper instanceof AbstractDataMapperProxy)
+		{
+			$mapper = $mapper->getInstance();
+		}
+
+		$record = RecordResolver::create($name, null, 'id', $mapper);
 
 		if ($record)
 		{
@@ -79,7 +87,7 @@ trait PhoenixDatabaseModelTrait
 		$name = $name ? : $this->dataMapper;
 		$name = $name ? : $this->getName();
 
-		$mapper = DataMapperResolver::create($name, array($this->db));
+		$mapper = DataMapperResolver::create($name);
 
 		if ($mapper)
 		{

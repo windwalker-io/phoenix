@@ -9,6 +9,8 @@
 namespace Phoenix\Controller;
 
 use Phoenix\Model\CrudModel;
+use Windwalker\Core\Controller\Middleware\ErrorHandlingMiddleware;
+use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
 use Windwalker\Record\Record;
 use Windwalker\Uri\Uri;
@@ -72,6 +74,18 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	);
 
 	/**
+	 * init
+	 *
+	 * @return  void
+	 */
+	protected function init()
+	{
+		parent::init();
+
+		$this->addMiddleware(ErrorHandlingMiddleware::class);
+	}
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
@@ -87,7 +101,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 		// Determine model
 		if (!$this->model instanceof CrudModel)
 		{
-			throw new \UnexpectedValueException(sprintf('%s model need extend to CrudModel', $this->getName()));
+			throw new \DomainException(sprintf('%s model need extend to CrudModel', $this->getName()));
 		}
 
 		// Determine the name of the primary key for the data.
@@ -95,6 +109,48 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 		{
 			$this->pkName = $this->record->getKeyName() ? : 'id';
 		}
+
+		!$this->useTransaction or $this->model->transactionStart();
+	}
+
+	/**
+	 * processSuccess
+	 *
+	 * @param string $message
+	 * @param string $type
+	 *
+	 * @return bool
+	 */
+	public function processSuccess($message = null, $type = Bootstrap::MSG_INFO)
+	{
+		!$this->useTransaction or $this->model->transactionCommit();
+
+		$this->removeUserState($this->getContext('edit.data'));
+
+		$message = $message ? : $this->getSuccessMessage($this->record);
+
+		$this->setRedirect($this->getSuccessRedirect($this->record), $message, $type);
+
+		return true;
+	}
+
+	/**
+	 * processFailure
+	 *
+	 * @param string $message
+	 * @param string $type
+	 *
+	 * @return bool
+	 */
+	public function processFailure($message = null, $type = 'warning')
+	{
+		!$this->useTransaction or $this->model->transactionRollback();
+
+		$this->setUserState($this->getContext('edit.data'), $this->data);
+
+		$this->setRedirect($this->getFailRedirect($this->record), $message, $type);
+
+		return false;
 	}
 
 	/**

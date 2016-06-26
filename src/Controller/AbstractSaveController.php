@@ -9,11 +9,9 @@
 namespace Phoenix\Controller;
 
 use Phoenix\Model\Traits\FormModelTrait;
-use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Data\Data;
-use Windwalker\Form\Validate\ValidateResult;
 use Windwalker\String\StringHelper;
 
 /**
@@ -77,7 +75,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function doSave(Data $data)
 	{
-		$data = $this->filter($data);
+		$data = $this->prepareStore($data);
 
 		$this->validate($data);
 
@@ -99,71 +97,11 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 
 		$this->isNew = !(bool) $record->{$this->pkName};
 
-		!$this->useTransaction or $this->model->transactionStart();
+		$this->preSave($record);
 
-		try
-		{
-			$this->preSave($record);
+		$this->doSave($record);
 
-			$this->doSave($record);
-
-			$this->postSave($record);
-		}
-		catch (ValidateFailException $e)
-		{
-			!$this->useTransaction or $this->model->transactionRollback();
-
-			$this->setUserState($this->getContext('edit.data'), $this->data);
-
-			$messages = $e->getMessages();
-
-			if (isset($messages[ValidateResult::STATUS_REQUIRED]))
-			{
-				$this->addMessage((array) $messages[ValidateResult::STATUS_REQUIRED], Bootstrap::MSG_DANGER);
-
-				unset($messages[ValidateResult::STATUS_REQUIRED]);
-			}
-
-			if (isset($messages[ValidateResult::STATUS_FAILURE]))
-			{
-				$this->addMessage((array) $messages[ValidateResult::STATUS_FAILURE], Bootstrap::MSG_WARNING);
-
-				unset($messages[ValidateResult::STATUS_FAILURE]);
-			}
-
-			$this->setRedirect($this->getFailRedirect($record), $messages, Bootstrap::MSG_DANGER);
-
-			return false;
-		}
-		catch (\Exception $e)
-		{
-			!$this->useTransaction or $this->model->transactionRollback();
-
-			$this->setUserState($this->getContext('edit.data'), $this->data);
-
-			if (WINDWALKER_DEBUG)
-			{
-				throw $e;
-			}
-
-			$this->setRedirect($this->getFailRedirect($record), $e->getMessage(), Bootstrap::MSG_DANGER);
-
-			return false;
-		}
-		catch (\Throwable $e)
-		{
-			!$this->useTransaction or $this->model->transactionRollback();
-
-			$this->setUserState($this->getContext('edit.data'), $this->data);
-
-			throw $e;
-		}
-
-		!$this->useTransaction or $this->model->transactionCommit();
-
-		$this->removeUserState($this->getContext('edit.data'));
-
-		$this->setRedirect($this->getSuccessRedirect($record), $this->getSuccessMessage($record), Bootstrap::MSG_SUCCESS);
+		$this->postSave($record);
 
 		return true;
 	}
@@ -209,13 +147,13 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 *
 	 * @return  Data
 	 */
-	protected function filter(Data $data)
+	protected function prepareStore(Data $data)
 	{
 		if ($this->model instanceof FormModelTrait)
 		{
-			$result = $this->model->filter($data->dump());
+			$result = $this->model->prepareStore($data->dump());
 
-			return $data->bind($result);
+			return $data->bind($result, true);
 		}
 
 		return $data;

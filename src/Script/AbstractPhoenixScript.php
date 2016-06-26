@@ -8,12 +8,9 @@
 
 namespace Phoenix\Script;
 
-use Phoenix\Asset\Asset;
-use Phoenix\Asset\AssetManager;
 use Phoenix\PhoenixPackage;
 use Windwalker\Core\Asset\AbstractScript;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Ioc;
 
 /**
  * The ScriptManager class.

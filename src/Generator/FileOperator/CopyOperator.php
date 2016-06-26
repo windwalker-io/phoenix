@@ -10,7 +10,6 @@ namespace Phoenix\Generator\FileOperator;
 
 use Windwalker\Filesystem\File;
 use Windwalker\String\SimpleTemplate;
-use Windwalker\String\StringHelper;
 
 /**
  * The CopyOperator class.

@@ -54,7 +54,7 @@ interface FormModelInterface
 	 *
 	 * @return  array
 	 */
-	public function filter($data);
+	public function prepareStore($data);
 
 	/**
 	 * validate

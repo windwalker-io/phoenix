@@ -8,14 +8,11 @@
 
 namespace Phoenix\Provider;
 
-use Phoenix\Asset\AssetManager;
 use Phoenix\Html\HtmlHeaderManager;
-use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Renderer\Blade\GlobalContainer;
 use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
@@ -70,9 +67,11 @@ class PhoenixProvider implements ServiceProviderInterface
 		$container->share(HtmlHeaderManager::class, $closure)
 			->alias('html.header', HtmlHeaderManager::class);
 
-		/** @var RendererManager $factory */
-		$factory = $container->get('renderer.manager');
+		$container->extend(RendererManager::class, function (RendererManager $manager, Container $container)
+		{
+		    $manager->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', PriorityQueue::LOW - 25);
 
-		$factory->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', PriorityQueue::LOW - 25);
+			return $manager;
+		});
 	}
 }

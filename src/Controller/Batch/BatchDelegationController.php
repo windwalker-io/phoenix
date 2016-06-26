@@ -9,9 +9,7 @@
 namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractPhoenixController;
-use Phoenix\Controller\ControllerResolver as PhoenixControllerResolver;
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Core\Controller\Controller;
 use Windwalker\String\StringNormalise;
 
 /**

@@ -8,7 +8,6 @@
 
 namespace Phoenix\View;
 
-use Phoenix\Model\Traits\FormModelTrait;
 use Windwalker\Core\Language\Translator;
 
 /**
