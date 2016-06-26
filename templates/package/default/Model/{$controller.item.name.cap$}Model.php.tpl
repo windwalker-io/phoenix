@@ -27,6 +27,20 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	protected $name = '{$controller.item.name.lower$}';
 
 	/**
+	 * Property record.
+	 *
+	 * @var  string
+	 */
+	protected $record = '{$controller.item.name.lower$}';
+
+	/**
+	 * Property mapper.
+	 *
+	 * @var  string
+	 */
+	protected $mapper = '{$controller.item.name.lower$}';
+
+	/**
 	 * Property reorderConditions.
 	 *
 	 * @var  array

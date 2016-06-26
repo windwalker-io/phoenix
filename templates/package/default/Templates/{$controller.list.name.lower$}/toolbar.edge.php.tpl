@@ -13,7 +13,7 @@
  */
 ?>
 
-<a type="button" class="btn btn-success btn-sm" href="{{ $route->encode('{$controller.item.name.lower$}', array('new' => true)) }}">
+<a type="button" class="btn btn-success btn-sm" href="{{ $router->route('{$controller.item.name.lower$}', array('new' => true)) }}">
     <span class="glyphicon glyphicon-plus fa fa-plus"></span>
     @translate('phoenix.toolbar.new')
 </a>

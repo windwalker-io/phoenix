@@ -17,7 +17,7 @@
     </li>
 
     <li class="{{ $helper->menu->active('{$controller.list.name.lower$}') }}">
-        <a href="{{ $route->encode('{$controller.list.name.lower$}') }}">
+        <a href="{{ $router->route('{$controller.list.name.lower$}') }}">
             @translate('{$package.name.lower$}.{$controller.list.name.lower$}.title')
         </a>
     </li>

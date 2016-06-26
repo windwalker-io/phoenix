@@ -6,26 +6,26 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
+namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
-use Phoenix\View\EditView;
+use Phoenix\View\GridView;
 use Windwalker\Core\Renderer\RendererHelper;
 
 /**
- * The {$controller.item.name.cap$}HtmlView class.
+ * The {$controller.list.name.cap$}HtmlView class.
  * 
  * @since  1.0
  */
-class {$controller.item.name.cap$}View extends EditView
+class {$controller.list.name.cap$}HtmlView extends GridView
 {
 	/**
 	 * Property name.
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.item.name.lower$}';
+	protected $name = '{$controller.list.name.lower$}';
 
 	/**
 	 * Property renderer.
@@ -35,25 +35,31 @@ class {$controller.item.name.cap$}View extends EditView
 	protected $renderer = RendererHelper::EDGE;
 
 	/**
-	 * Property formDefinition.
+	 * The fields mapper.
 	 *
-	 * @var  string
+	 * @var  array
 	 */
-	protected $formDefinition = 'edit';
+	protected $fields = array(
+		'pk'          => 'id',
+		'title'       => 'title',
+		'alias'       => 'alias',
+		'state'       => 'state',
+		'ordering'    => 'ordering',
+		'author'      => 'created_by',
+		'author_name' => 'user_name',
+		'created'     => 'created',
+		'language'    => 'language',
+		'lang_title'  => 'lang_title'
+	);
 
 	/**
-	 * Property formControl.
+	 * The grid config.
 	 *
-	 * @var  string
+	 * @var  array
 	 */
-	protected $formControl = 'item';
-
-	/**
-	 * Property formLoadData.
-	 *
-	 * @var  boolean
-	 */
-	protected $formLoadData = true;
+	protected $gridConfig = array(
+		'order_column' => '{$controller.item.name.lower$}.ordering'
+	);
 
 	/**
 	 * prepareData
@@ -75,10 +81,10 @@ class {$controller.item.name.cap$}View extends EditView
 	protected function prepareScripts()
 	{
 		PhoenixScript::core();
+		PhoenixScript::grid();
 		PhoenixScript::chosen();
-		PhoenixScript::formValidation();
+		PhoenixScript::multiSelect('#admin-form table', array('duration' => 100));
 		BootstrapScript::checkbox(BootstrapScript::GLYPHICONS);
-		BootstrapScript::buttonRadio();
 		BootstrapScript::tooltip();
 	}
 

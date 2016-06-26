@@ -9,8 +9,9 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}Model;
-use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}View;
+use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\ListDisplayController;
+use Windwalker\Core\Controller\Middleware\JsonResponseMiddleware;
 use Windwalker\Core\Model\Model;
 
 /**
@@ -51,7 +52,7 @@ class GetController extends ListDisplayController
 	/**
 	 * Property view.
 	 *
-	 * @var  {$controller.list.name.cap$}View
+	 * @var  {$controller.list.name.cap$}HtmlView
 	 */
 	protected $view;
 
@@ -77,8 +78,14 @@ class GetController extends ListDisplayController
 	protected function prepareExecute()
 	{
 		$this->layout = $this->input->get('layout');
+		$this->format = $this->input->get('format', 'html');
 
 		parent::prepareExecute();
+
+		if ($this->format == 'json')
+		{
+			$this->addMiddleware(JsonResponseMiddleware::class);
+		}
 	}
 
 	/**

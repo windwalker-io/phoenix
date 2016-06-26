@@ -5,9 +5,7 @@
 @section('admin-area')
     <div class="col-md-12">
 
-        @section('message')
-            {!! \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) !!}
-        @show
+        @messages
 
         @yield('admin-body', 'Body')
     </div>

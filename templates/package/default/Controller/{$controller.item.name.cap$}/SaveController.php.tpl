@@ -9,7 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
-use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}View;
+use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
 use Phoenix\Controller\AbstractSaveController;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Data\Data;
@@ -61,7 +61,7 @@ class SaveController extends AbstractSaveController
 	/**
 	 * Property view.
 	 *
-	 * @var  {$controller.item.name.cap$}View
+	 * @var  {$controller.item.name.cap$}HtmlView
 	 */
 	protected $view;
 

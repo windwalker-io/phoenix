@@ -12,11 +12,9 @@ use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ModalField;
 use Phoenix;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Filter\InputFilter;
 use Windwalker\Form\Field;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
-use Windwalker\Html\Option;
 use Windwalker\Validator\Rule;
 
 /**

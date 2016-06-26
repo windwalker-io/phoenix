@@ -19,8 +19,8 @@
  * @var $showFilterBar boolean
  * @var $grid          \Phoenix\View\Helper\GridHelper
  * @var $state         \Windwalker\Registry\Registry
- * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record[]
- * @var $item          \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
+ * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait[]
+ * @var $item          \{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait
  * @var $i             integer
  * @var $pagination    \Windwalker\Core\Pagination\Pagination
  */
@@ -34,7 +34,7 @@
 
 @section('admin-body')
 <div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
-    <form name="admin-form" id="admin-form" action="{{ $route->encode('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
+    <form name="admin-form" id="admin-form" action="{{ $router->route('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
 
         {{-- FILTER BAR --}}
         <div class="filter-bar">
@@ -120,7 +120,7 @@
 
                         {{-- TITLE --}}
                         <td>
-                            <a href="{{ $route->encode('{$controller.item.name.lower$}', array('id' => $item->id)) }}">
+                            <a href="{{ $router->route('{$controller.item.name.lower$}', ['id' => $item->id, 'test' => '123', 'a' => 'b']) }}">
                                 {{ $item->title }}
                             </a>
                         </td>
@@ -159,7 +159,7 @@
                 <tr>
                     {{-- PAGINATION --}}
                     <td colspan="25">
-                        {!! $pagination->setRoute($route)->render('{$controller.list.name.lower$}', [], 'windwalker.pagination.phoenix') !!}
+                        {!! $pagination->setRoute($router)->render('{$controller.list.name.lower$}', [], 'windwalker.pagination.phoenix') !!}
                     </td>
                 </tr>
                 </tfoot>

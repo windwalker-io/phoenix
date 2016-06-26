@@ -28,13 +28,6 @@ class {$controller.item.name.cap$}Mapper extends AbstractDataMapperProxy
 	protected static $table = Table::{$controller.list.name.upper$};
 
 	/**
-	 * Property dataClass.
-	 *
-	 * @var  string
-	 */
-	protected static $dataClass = {$controller.item.name.cap$}Record::class;
-
-	/**
 	 * onAfterFind
 	 *
 	 * @param Event $event

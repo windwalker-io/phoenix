@@ -9,11 +9,11 @@
  * @var $uri      \Windwalker\Registry\Registry               Uri information, example: $uri['media.path']
  * @var $datetime \DateTime                                   PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
- * @var $router   \Windwalker\Core\Router\CoreRoute           The package route object.
+ * @var $router   \Windwalker\Core\Router\PackageRouter       The package route object.
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
+ * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait
  * @var $state \Windwalker\Registry\Registry
  * @var $form  \Windwalker\Form\Form
  */
@@ -26,7 +26,7 @@
 @stop
 
 @section('admin-body')
-<form name="admin-form" id="admin-form" action="{{ $route->encode('{$controller.item.name.lower$}', array('id' => $item->id)) }}" method="POST" enctype="multipart/form-data">
+<form name="admin-form" id="admin-form" action="{{ $router->route('{$controller.item.name.lower$}', array('id' => $item->id)) }}" method="POST" enctype="multipart/form-data">
 
     <div class="row">
         <div class="col-md-7">

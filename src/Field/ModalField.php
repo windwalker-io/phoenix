@@ -136,12 +136,12 @@ class ModalField extends TextField
 	{
 		$package = PackageHelper::getPackage($this->package);
 
-		$package = $package ? : Ioc::get('current.package');
+		$package = $package ? : PackageHelper::getPackage();
 
 		$route = $this->get('route', $this->route) ? : $this->view;
 		$query = $this->get('query', $this->query);
 
-		return $package->route->encode($route, array_merge(array(
+		return $package->router->route($route, array_merge(array(
 			'layout'   => 'modal',
 			'selector' => '#' . $this->getId() . '-wrap',
 			'function' => $this->get('function', 'Phoenix.Field.Modal.select')

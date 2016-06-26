@@ -10,8 +10,11 @@ namespace Phoenix\Controller\Display;
 
 use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Model\Model;
+use Windwalker\Core\Response\HtmlViewResponse;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
+use Windwalker\Debugger\Helper\DebuggerHelper;
+use Windwalker\Http\Response;
 
 /**
  * The AbstractGetController class.
@@ -67,6 +70,16 @@ class DisplayController extends AbstractPhoenixController
 
 		$this->model = $this->getModel($this->model);
 		$this->view = $this->getView($this->view);
+
+		// Prepare response
+		$response = $this->response;
+
+		$this->response = $this->createResponse(
+			$this->format,
+			$response->getBody()->__toString(),
+			$response->getStatusCode(),
+			$response->getHeaders()
+		);
 	}
 
 	/**
@@ -77,7 +90,6 @@ class DisplayController extends AbstractPhoenixController
 	protected function doExecute()
 	{
 		$this->prepareUserState($this->model);
-		$this->prepareViewData($this->view);
 
 		// Add default
 		$this->view->setModel($this->model, true);
@@ -91,18 +103,47 @@ class DisplayController extends AbstractPhoenixController
 		}
 
 		$this->assignModels($this->view);
+		$this->prepareViewData($this->view);
 
-		return $this->view->setLayout($this->layout)->render();
+		if ($this->view instanceof HtmlView)
+		{
+			$this->view->setLayout($this->layout);
+		}
+		elseif (class_exists(DebuggerHelper::class))
+		{
+			DebuggerHelper::disableConsole();
+		}
+
+		return $this->view;
+	}
+
+	/**
+	 * getView
+	 *
+	 * @param string $name
+	 * @param string $format
+	 * @param string $engine
+	 * @param bool   $forceNew
+	 *
+	 * @return AbstractView|HtmlView
+	 *
+	 * @throws \UnexpectedValueException
+	 */
+	public function getView($name = null, $format = null, $engine = null, $forceNew = false)
+	{
+		$format = $format ? : $this->format;
+
+		return parent::getView($name, $format, $engine, $forceNew);
 	}
 
 	/**
 	 * assignModels
 	 *
-	 * @param HtmlView $view
+	 * @param AbstractView $view
 	 *
 	 * @return  void
 	 */
-	protected function assignModels(HtmlView $view)
+	protected function assignModels(AbstractView $view)
 	{
 		// Implement it.
 	}
@@ -175,5 +216,28 @@ class DisplayController extends AbstractPhoenixController
 		$this->format = $format;
 
 		return $this;
+	}
+
+	/**
+	 * createResponse
+	 *
+	 * @param string $format
+	 * @param array  ...$args
+	 *
+	 * @return  Response\AbstractContentTypeResponse
+	 */
+	public function createResponse($format, ...$args)
+	{
+		switch (strtolower($format))
+		{
+			case 'html':
+				return new HtmlViewResponse(...$args);
+			case 'json':
+				return new Response\JsonResponse(...$args);
+			case 'xml':
+				return new Response\XmlResponse(...$args);
+		}
+
+		return new Response\TextResponse(...$args);
 	}
 }
