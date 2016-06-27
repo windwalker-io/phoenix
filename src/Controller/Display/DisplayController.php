@@ -114,7 +114,7 @@ class DisplayController extends AbstractPhoenixController
 			DebuggerHelper::disableConsole();
 		}
 
-		return $this->view;
+		return $this->view->render();
 	}
 
 	/**

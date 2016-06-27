@@ -6,7 +6,7 @@
  * @var $app      \Windwalker\Web\Application                 Global Application
  * @var $package  \{$package.namespace$}{$package.name.cap$}\{$package.name.cap$}Package                 Package object.
  * @var $view     \Windwalker\Data\Data                       Some information of this view.
- * @var $uri      \Windwalker\Registry\Registry               Uri information, example: $uri['media.path']
+ * @var $uri      \Windwalker\Uri\UriData               Uri information, example: $uri->path
  * @var $datetime \DateTime                                   PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
  * @var $router   \Windwalker\Core\Router\PackageRouter       The package route object.

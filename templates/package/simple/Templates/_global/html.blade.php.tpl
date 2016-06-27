@@ -7,7 +7,7 @@
 
     <title>{{ \Phoenix\Html\HtmlHeader::getPageTitle() }}</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="{{ $uri['media.path'] }}images/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $asset->path }}/images/favicon.ico" />
     <meta name="generator" content="Windwalker Framework" />
     {!! \Phoenix\Html\HtmlHeader::renderMetadata() !!}
     @yield('meta')
@@ -38,7 +38,7 @@
                      @show
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    {{-- <li class="pull-right"><a href="{{ $uri['base.path'] }}admin">Admin</a></li> --}}
+                    {{-- <li class="pull-right"><a href="{{ $uri->path }}/admin">Admin</a></li> --}}
                 </ul>
             </div>
             <!--/.nav-collapse -->

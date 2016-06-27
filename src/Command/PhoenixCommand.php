@@ -10,6 +10,7 @@ namespace Phoenix\Command;
 
 use Phoenix\Command\Phoenix\AssetCommand;
 use Phoenix\Command\Phoenix\FormCommand;
+use Phoenix\Command\Phoenix\RecordCommand;
 use Windwalker\Console\Command\Command;
 
 /**
@@ -42,5 +43,6 @@ class PhoenixCommand extends Command
 	{
 		$this->addCommand(new AssetCommand);
 		$this->addCommand(new FormCommand);
+		$this->addCommand(new RecordCommand);
 	}
 }
