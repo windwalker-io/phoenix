@@ -10,6 +10,7 @@ namespace Phoenix\Model;
 
 use Phoenix\Model\Traits\FormModelTrait;
 use Windwalker\Data\Data;
+use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Record\Record;
 
 /**
@@ -34,7 +35,7 @@ class CrudModel extends ItemModel implements FormModelInterface
 	/**
 	 * save
 	 *
-	 * @param Data $data
+	 * @param Data|Entity $data
 	 *
 	 * @return  boolean
 	 *
@@ -56,7 +57,7 @@ class CrudModel extends ItemModel implements FormModelInterface
 			$isNew = false;
 		}
 
-		$record->bind($data->dump());
+		$record->bind($data->dump(true));
 
 		$this->prepareRecord($record);
 
@@ -110,7 +111,7 @@ class CrudModel extends ItemModel implements FormModelInterface
 	 * @throws \UnexpectedValueException
 	 * @throws \Windwalker\Record\Exception\NoResultException
 	 */
-	public function delete(array $pk = [])
+	public function delete($pk = [])
 	{
 		$pk = $pk ? : $this['item.pk'];
 

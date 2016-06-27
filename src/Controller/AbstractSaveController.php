@@ -10,9 +10,13 @@ namespace Phoenix\Controller;
 
 use Phoenix\Model\Traits\FormModelTrait;
 use Windwalker\Core\Language\Translator;
+use Windwalker\Core\Logger\Logger;
 use Windwalker\Core\Model\Exception\ValidateFailException;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Data\Data;
+use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\String\StringHelper;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The AbstractSaveController class.
@@ -92,16 +96,29 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function doExecute()
 	{
-		$record = $this->record;
-		$record->bind($this->data);
+		// Get primary key from form data
+		$pk = ArrayHelper::getValue($this->data, $this->pkName);
 
-		$this->isNew = !(bool) $record->{$this->pkName};
+		// If primary key not exists, this is a new record.
+		$this->isNew = !$pk;
 
-		$this->preSave($record);
+		if (!$this->isNew)
+		{
+			// If not new record, we load old data then override it by new data.
+			$this->record->load($pk);
+		}
 
-		$this->doSave($record);
+		// Merge it into Record / Data object.
+		$this->record->bind($this->data);
 
-		$this->postSave($record);
+		// Process pre save hook, you may add your own logic in this method
+		$this->preSave($this->record);
+
+		// Just dave it.
+		$this->doSave($this->record);
+
+		// Process post save hook, you may add your own logic in this method
+		$this->postSave($this->record);
 
 		return true;
 	}
@@ -143,7 +160,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	/**
 	 * filter
 	 *
-	 * @param Data $data
+	 * @param Data|Entity $data
 	 *
 	 * @return  Data
 	 */
@@ -151,7 +168,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	{
 		if ($this->model instanceof FormModelTrait)
 		{
-			$result = $this->model->prepareStore($data->dump());
+			$result = $this->model->prepareStore($data->dump(true));
 
 			return $data->bind($result, true);
 		}
@@ -162,7 +179,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	/**
 	 * validate
 	 *
-	 * @param   Data  $data
+	 * @param   Data|Entity  $data
 	 *
 	 * @return  void
 	 *
@@ -172,14 +189,14 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	{
 		if ($this->model instanceof FormModelTrait)
 		{
-			$this->model->validate($data->dump());
+			$this->model->validate($data->dump(true));
 		}
 	}
 
 	/**
 	 * getFailRedirect
 	 *
-	 * @param  Data $data
+	 * @param  Data|Entity $data
 	 *
 	 * @return  string
 	 */
@@ -193,13 +210,13 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	/**
 	 * getSuccessRedirect
 	 *
-	 * @param  Data $data
+	 * @param  Data|Entity $data
 	 *
 	 * @return  string
 	 */
 	protected function getSuccessRedirect(Data $data = null)
 	{
-		$data = $data ? : new Data;
+		$data = $data ? : new Entity;
 
 		switch ($this->task)
 		{
@@ -222,7 +239,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 					$data->alias = StringHelper::increment($data->alias, StringHelper::INCREMENT_STYLE_DASH);
 				}
 
-				$this->setUserState($this->getContext('edit.data'), $data->dump());
+				$this->setUserState($this->getContext('edit.data'), $data->dump(true));
 
 				return $this->router->route($this->getName(), $this->getRedirectQuery());
 

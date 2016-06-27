@@ -11,6 +11,7 @@ namespace Phoenix\Form\Renderer;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Form\Field\AbstractField;
+use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Renderer\FormRendererInterface;
 
 /**
@@ -70,6 +71,11 @@ class InputRenderer implements FormRendererInterface
 	 */
 	public function renderLabel(AbstractField $field, array $attribs = array())
 	{
+		if ($field instanceof HiddenField)
+		{
+			return '';
+		}
+
 		$attribs['class'] .= ' hasTooltip ' . $field->getAttribute('labelWidth', 'col-md-3');
 
 		$label = $field->getLabel();

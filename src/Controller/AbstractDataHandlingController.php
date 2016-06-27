@@ -12,6 +12,7 @@ use Phoenix\Model\CrudModel;
 use Windwalker\Core\Controller\Middleware\ErrorHandlingMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
+use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Record\Record;
 use Windwalker\Uri\Uri;
 
@@ -168,7 +169,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	/**
 	 * getSuccessRedirect
 	 *
-	 * @param  Data $data
+	 * @param  Data|Entity $data
 	 *
 	 * @return  string
 	 */

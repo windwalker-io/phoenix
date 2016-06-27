@@ -11,6 +11,7 @@ namespace Phoenix\Model;
 use Phoenix\Model\Traits\PhoenixDatabaseModelTrait;
 use Windwalker\Core\Model\Model;
 use Windwalker\Data\Data;
+use Windwalker\Record\Record;
 
 /**
  * The AbstractFormModel class.
@@ -26,7 +27,7 @@ class ItemModel extends Model implements PhoenixDatabaseModelInterface
 	 *
 	 * @param   mixed  $pk
 	 *
-	 * @return  Data
+	 * @return  Record
 	 */
 	public function getItem($pk = null)
 	{

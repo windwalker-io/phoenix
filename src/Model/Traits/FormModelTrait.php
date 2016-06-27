@@ -61,7 +61,7 @@ trait FormModelTrait
 			return $sessionData;
 		}
 
-		return $item->dump();
+		return $item->dump(true);
 	}
 
 	/**

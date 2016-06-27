@@ -8,6 +8,7 @@
 
 namespace Phoenix\View;
 
+use Phoenix\Model\FormModelInterface;
 use Windwalker\Core\Language\Translator;
 
 /**
@@ -64,12 +65,12 @@ class EditView extends ItemView
 		parent::prepareRender($data);
 
 		// TODO: Test if we need a exception or not.
-//		$mdoel = $this->model->getModel();
-//
-//		if (!$mdoel instanceof FormModel)
-//		{
-//			throw new \UnexpectedValueException('You must use FormModel in EditView');
-//		}
+		$mdoel = $this->model->getModel();
+
+		if (!$mdoel instanceof FormModelInterface)
+		{
+			throw new \UnexpectedValueException('You must use a Model implemented ' . FormModelInterface::class . ' in EditView');
+		}
 
 		$data->form = $data->form ? : $this->model->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
 	}
