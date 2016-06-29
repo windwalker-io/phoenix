@@ -60,9 +60,9 @@ class EditView extends ItemView
 	 *
 	 * @return  void
 	 */
-	protected function prepareRender($data)
+	protected function prepareData($data)
 	{
-		parent::prepareRender($data);
+		parent::prepareData($data);
 
 		// TODO: Test if we need a exception or not.
 		$mdoel = $this->model->getModel();

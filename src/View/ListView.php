@@ -33,15 +33,15 @@ class ListView extends AbstractPhoenixHtmView
 	}
 
 	/**
-	 * prepareRender
+	 * prepareData
 	 *
 	 * @param   Data $data
 	 *
 	 * @return  void
 	 */
-	protected function prepareRender($data)
+	protected function prepareData($data)
 	{
-		parent::prepareRender($data);
+		parent::prepareData($data);
 
 		$data->items      = $data->items ? : $this->model->getItems();
 		$data->pagination = $data->pagination ? : $this->model->getPagination();

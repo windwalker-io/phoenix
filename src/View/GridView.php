@@ -81,9 +81,9 @@ class GridView extends ListView
 	 *
 	 * @return  void
 	 */
-	protected function prepareRender($data)
+	protected function prepareData($data)
 	{
-		parent::prepareRender($data);
+		parent::prepareData($data);
 
 		$data->filterForm = $data->filterForm ? : $this->model->getForm('filter', null, true);
 		$data->batchForm  = $data->batchForm ? : $this->model->getForm('batch', null, true);
