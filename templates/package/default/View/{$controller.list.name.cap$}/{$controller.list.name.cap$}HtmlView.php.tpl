@@ -11,7 +11,9 @@ namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
+use Phoenix\View\ListView;
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Utilities\Classes\DocblockHelper;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
@@ -66,10 +68,30 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	 *
 	 * @param \Windwalker\Data\Data $data
 	 *
+	 * @see ListView
+	 * ------------------------------------------------------
+	 * @var  $data->state          \Windwalker\Registry\Registry
+	 * @var  $data->items          \Windwalker\Data\DataSet
+	 * @var  $data->pagination     \Windwalker\Core\Pagination\Pagination
+	 * @var  $data->total          integer
+	 * @var  $data->limit          integer
+	 * @var  $data->start          integer
+	 * @var  $data->page           integer
+	 * 
+	 * @see GridView
+	 * ------------------------------------------------------
+	 * @var  $data->filterForm     \Windwalker\Form\Form
+	 * @var  $data->batchForm      \Windwalker\Form\Form
+	 * @var  $data->filterBar      \Windwalker\Core\Widget\Widget
+	 * @var  $data->showFilterBar  boolean
+	 * @var  $data->grid           \Phoenix\View\Helper\GridHelper
+	 *
 	 * @return  void
 	 */
 	protected function prepareData($data)
 	{
+		parent::prepareData($data);
+
 		$this->prepareScripts();
 	}
 

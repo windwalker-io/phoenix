@@ -120,7 +120,7 @@
 
                         {{-- TITLE --}}
                         <td>
-                            <a href="{{ $router->route('{$controller.item.name.lower$}', ['id' => $item->id, 'test' => '123', 'a' => 'b']) }}">
+                            <a href="{{ $router->route('{$controller.item.name.lower$}', ['id' => $item->id]) }}">
                                 {{ $item->title }}
                             </a>
                         </td>
@@ -171,7 +171,7 @@
             <input type="hidden" name="_method" value="PUT" />
 
             {{-- TOKEN --}}
-            {!! \Windwalker\Core\Security\CsrfProtection::input() !!}
+            @formToken()
         </div>
 
         @include('batch')

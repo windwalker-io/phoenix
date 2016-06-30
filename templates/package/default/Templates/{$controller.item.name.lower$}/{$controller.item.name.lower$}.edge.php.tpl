@@ -52,7 +52,7 @@
     </div>
 
     <div class="hidden-inputs">
-        {!! \Windwalker\Core\Security\CsrfProtection::input() !!}
+        @formToken()
     </div>
 
 </form>

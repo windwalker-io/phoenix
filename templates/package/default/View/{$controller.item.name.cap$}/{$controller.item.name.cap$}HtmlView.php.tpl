@@ -11,7 +11,9 @@ namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\EditView;
+use Phoenix\View\ItemView;
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Utilities\Classes\DocblockHelper;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
@@ -60,10 +62,21 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	 *
 	 * @param \Windwalker\Data\Data $data
 	 *
+	 * @see  ItemView
+	 * ------------------------------------------------------
+	 * @var  $data->state  \Windwalker\Registry\Registry
+	 * @var  $data->item   \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
+	 *
+	 * @see  EditView
+	 * ------------------------------------------------------
+	 * @var  $data->form   \Windwalker\Form\Form
+	 *
 	 * @return  void
 	 */
 	protected function prepareData($data)
 	{
+		parent::prepareData($data);
+
 		$this->prepareScripts();
 	}
 
