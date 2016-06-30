@@ -8,8 +8,9 @@
 
 namespace Phoenix\Model;
 
-use Phoenix\Model\Traits\ModelRepositoryTrait;
+use Windwalker\Core\Model\Traits\ModelRepositoryTrait;
 use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepositoryInterface;
 use Windwalker\Data\Data;
 use Windwalker\Record\Record;
 

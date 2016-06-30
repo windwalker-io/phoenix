@@ -8,7 +8,7 @@
 
 namespace Phoenix\Model\Traits;
 
-use Phoenix\Form\FieldDefinitionResolver;
+use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
 use Phoenix\Form\NullFiledDefinition;
 use Phoenix\Form\Renderer\InputRenderer;
 use Windwalker\Core\Language\Translator;

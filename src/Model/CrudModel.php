@@ -9,6 +9,7 @@
 namespace Phoenix\Model;
 
 use Phoenix\Model\Traits\FormAwareRepositoryTrait;
+use Windwalker\Core\Model\ModelRepositoryInterface;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Record\Record;
