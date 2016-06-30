@@ -11,24 +11,25 @@ namespace Phoenix\Model;
 use Phoenix\Model\Filter\FilterHelper;
 use Phoenix\Model\Filter\FilterHelperInterface;
 use Phoenix\Model\Filter\SearchHelper;
-use Phoenix\Model\Traits\FormModelTrait;
-use Phoenix\Model\Traits\PhoenixDatabaseModelTrait;
+use Phoenix\Model\Traits\FormAwareRepositoryTrait;
+use Phoenix\Model\Traits\ModelRepositoryTrait;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
 use Windwalker\Query\QueryElement;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The ListModel class.
  * 
  * @since  1.0
  */
-class ListModel extends Model implements FormModelInterface, PhoenixDatabaseModelInterface
+class ListModel extends Model implements FormAwareRepositoryInterface, ModelRepositoryInterface
 {
-	use PhoenixDatabaseModelTrait;
-	use FormModelTrait;
+	use ModelRepositoryTrait;
+	use FormAwareRepositoryTrait;
 
 	/**
 	 * Property allowFields.
@@ -784,9 +785,9 @@ class ListModel extends Model implements FormModelInterface, PhoenixDatabaseMode
 	 *
 	 * @param   string|array $wheres
 	 *
-	 * @return  static
+	 * @return static
 	 */
-	public function where($wheres)
+	public function where(...$wheres)
 	{
 		if (is_array($wheres))
 		{
@@ -808,11 +809,23 @@ class ListModel extends Model implements FormModelInterface, PhoenixDatabaseMode
 	 *
 	 * @param   string|array $wheres
 	 *
-	 * @return  static
+	 * @return static
 	 */
-	public function whereOr($wheres)
+	public function orWhere(...$wheres)
 	{
-		$wheres = (array) $wheres;
+		if (count($wheres) && is_callable($wheres[0]))
+		{
+			$query = $this->db->getQuery(true);
+
+			$wheres[0]($query);
+
+			$wheres = $query->where->getElements();
+		}
+		else
+		{
+			$wheres = (array) $wheres;
+			$wheres = ArrayHelper::flatten($wheres);
+		}
 
 		return $this->where((string) new QueryElement('()', $wheres, ' OR '));
 	}
@@ -824,7 +837,7 @@ class ListModel extends Model implements FormModelInterface, PhoenixDatabaseMode
 	 *
 	 * @return  static
 	 */
-	public function having($having)
+	public function having(...$having)
 	{
 		if (is_array($having))
 		{
@@ -848,9 +861,21 @@ class ListModel extends Model implements FormModelInterface, PhoenixDatabaseMode
 	 *
 	 * @return  static
 	 */
-	public function havingOr($havings)
+	public function orHaving($havings)
 	{
-		$havings = (array) $havings;
+		if (count($havings) && is_callable($havings[0]))
+		{
+			$query = $this->db->getQuery(true);
+
+			$havings[0]($query);
+
+			$havings = $query->having->getElements();
+		}
+		else
+		{
+			$havings = (array) $havings;
+			$havings = ArrayHelper::flatten($havings);
+		}
 
 		return $this->having((string) new QueryElement('()', $havings, ' OR '));
 	}

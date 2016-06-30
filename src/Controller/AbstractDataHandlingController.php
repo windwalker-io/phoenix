@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\CrudModel;
+use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Controller\Middleware\ErrorHandlingMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
@@ -26,7 +26,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	/**
 	 * Property model.
 	 *
-	 * @var  CrudModel
+	 * @var  CrudRepositoryInterface
 	 */
 	protected $model;
 
@@ -100,7 +100,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 		$this->task   = $this->input->get('task');
 
 		// Determine model
-		if (!$this->model instanceof CrudModel)
+		if (!$this->model instanceof CrudRepositoryInterface)
 		{
 			throw new \DomainException(sprintf('%s model need extend to CrudModel', $this->getName()));
 		}

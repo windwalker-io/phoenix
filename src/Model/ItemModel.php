@@ -8,7 +8,7 @@
 
 namespace Phoenix\Model;
 
-use Phoenix\Model\Traits\PhoenixDatabaseModelTrait;
+use Phoenix\Model\Traits\ModelRepositoryTrait;
 use Windwalker\Core\Model\Model;
 use Windwalker\Data\Data;
 use Windwalker\Record\Record;
@@ -18,9 +18,9 @@ use Windwalker\Record\Record;
  * 
  * @since  1.0
  */
-class ItemModel extends Model implements PhoenixDatabaseModelInterface
+class ItemModel extends Model implements ModelRepositoryInterface
 {
-	use PhoenixDatabaseModelTrait;
+	use ModelRepositoryTrait;
 
 	/**
 	 * getItem

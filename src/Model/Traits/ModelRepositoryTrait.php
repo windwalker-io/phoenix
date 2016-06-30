@@ -21,7 +21,7 @@ use Windwalker\Record\Record;
  *
  * @since  {DEPLOY_VERSION}
  */
-trait PhoenixDatabaseModelTrait
+trait ModelRepositoryTrait
 {
 	use DatabaseModelTrait;
 

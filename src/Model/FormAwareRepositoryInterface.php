@@ -17,7 +17,7 @@ use Windwalker\Form\Form;
  *
  * @since  {DEPLOY_VERSION}
  */
-interface FormModelInterface
+interface FormAwareRepositoryInterface
 {
 	/**
 	 * getDefaultData

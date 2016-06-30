@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\Traits\FormModelTrait;
+use Phoenix\Model\Traits\FormAwareRepositoryTrait;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Logger\Logger;
 use Windwalker\Core\Model\Exception\ValidateFailException;
@@ -166,7 +166,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function prepareStore(Data $data)
 	{
-		if ($this->model instanceof FormModelTrait)
+		if ($this->model instanceof FormAwareRepositoryTrait)
 		{
 			$result = $this->model->prepareStore($data->dump(true));
 
@@ -187,7 +187,7 @@ abstract class AbstractSaveController extends AbstractDataHandlingController
 	 */
 	protected function validate(Data $data)
 	{
-		if ($this->model instanceof FormModelTrait)
+		if ($this->model instanceof FormAwareRepositoryTrait)
 		{
 			$this->model->validate($data->dump(true));
 		}

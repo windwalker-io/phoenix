@@ -25,7 +25,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  1.0
  */
-trait FormModelTrait
+trait FormAwareRepositoryTrait
 {
 	/**
 	 * Property formRenderer.

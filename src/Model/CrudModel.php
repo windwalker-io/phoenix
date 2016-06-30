@@ -8,7 +8,7 @@
 
 namespace Phoenix\Model;
 
-use Phoenix\Model\Traits\FormModelTrait;
+use Phoenix\Model\Traits\FormAwareRepositoryTrait;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Record\Record;
@@ -18,9 +18,9 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class CrudModel extends ItemModel implements FormModelInterface
+class CrudModel extends ItemModel implements ModelRepositoryInterface, FormAwareRepositoryInterface, CrudRepositoryInterface
 {
-	use FormModelTrait;
+	use FormAwareRepositoryTrait;
 
 	const ORDER_POSITION_FIRST = 'first';
 	const ORDER_POSITION_LAST  = 'last';
@@ -111,7 +111,7 @@ class CrudModel extends ItemModel implements FormModelInterface
 	 * @throws \UnexpectedValueException
 	 * @throws \Windwalker\Record\Exception\NoResultException
 	 */
-	public function delete($pk = [])
+	public function delete($pk = null)
 	{
 		$pk = $pk ? : $this['item.pk'];
 

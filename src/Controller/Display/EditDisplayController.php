@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Display;
 
-use Phoenix\Model\FormModelInterface;
+use Phoenix\Model\FormAwareRepositoryInterface;
 use Phoenix\View\EditView;
 use Windwalker\Core\Model\Model;
 
@@ -28,9 +28,9 @@ class EditDisplayController extends ItemDisplayController
 	{
 		parent::prepareExecute();
 
-		if (!$this->model instanceof FormModelInterface)
+		if (!$this->model instanceof FormAwareRepositoryInterface)
 		{
-			throw new \LogicException(sprintf('Model: %s should be sub class of %s in %s.', get_class($this->model), FormModelInterface::class, __CLASS__));
+			throw new \LogicException(sprintf('Model: %s should be sub class of %s in %s.', get_class($this->model), FormAwareRepositoryInterface::class, __CLASS__));
 		}
 
 		if (!$this->view instanceof EditView)
