@@ -22,10 +22,6 @@ class NullDataMapper extends DataMapper
 {
 	/**
 	 * NullDataMapper constructor.
-	 *
-	 * @param string                   $table
-	 * @param array|string             $keys
-	 * @param DatabaseAdapterInterface $db
 	 */
 	public function __construct()
 	{

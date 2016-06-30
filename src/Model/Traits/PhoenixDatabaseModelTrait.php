@@ -10,7 +10,7 @@ namespace Phoenix\Model\Traits;
 
 use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Record\RecordResolver;
-use Windwalker\Core\DataMapper\AbstractDataMapperProxy;
+use Windwalker\Core\DataMapper\CoreDataMapper;
 use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\DataMapper\DataMapper;
@@ -53,7 +53,7 @@ trait PhoenixDatabaseModelTrait
 
 		$mapper = $this->getDataMapper();
 
-		if ($mapper instanceof AbstractDataMapperProxy)
+		if ($mapper instanceof CoreDataMapper)
 		{
 			$mapper = $mapper->getInstance();
 		}
