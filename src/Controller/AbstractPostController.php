@@ -8,6 +8,7 @@
 
 namespace Phoenix\Controller;
 
+use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Controller\Middleware\ErrorHandlingMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
@@ -15,18 +16,19 @@ use Windwalker\Data\Data;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Record\Record;
 use Windwalker\Uri\Uri;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AbstractAdminController class.
  *
  * @since  1.0
  */
-abstract class AbstractDataHandlingController extends AbstractPhoenixController
+abstract class AbstractPostController extends AbstractPhoenixController
 {
 	/**
 	 * Property model.
 	 *
-	 * @var  CrudRepositoryInterface
+	 * @var  CrudModel
 	 */
 	protected $model;
 
@@ -83,7 +85,7 @@ abstract class AbstractDataHandlingController extends AbstractPhoenixController
 	{
 		parent::init();
 
-		$this->addMiddleware(ErrorHandlingMiddleware::class);
+		$this->addMiddleware(ErrorHandlingMiddleware::class, PriorityQueue::HIGH + 10);
 	}
 
 	/**

@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Phoenix\Controller\AbstractDataHandlingController;
+use Phoenix\Controller\AbstractPostController;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
@@ -21,7 +21,7 @@ use Windwalker\Data\Data;
  *
  * @since  1.0.5
  */
-abstract class AbstractBatchController extends AbstractDataHandlingController
+abstract class AbstractBatchController extends AbstractPostController
 {
 	use CsrfProtectionTrait;
 

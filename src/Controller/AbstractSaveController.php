@@ -23,7 +23,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  1.0.5
  */
-abstract class AbstractSaveController extends AbstractDataHandlingController
+abstract class AbstractSaveController extends AbstractPostController
 {
 	/**
 	 * Property inflection.
