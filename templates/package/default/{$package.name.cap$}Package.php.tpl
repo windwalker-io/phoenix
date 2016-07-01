@@ -103,7 +103,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	public function loadRouting(CoreRouter $router, $group = null)
 	{
-		$router = parent::loadRouting($router);
+		$router = parent::loadRouting($router, $group);
 
 		$router->group($group, function (CoreRouter $router)
 		{

@@ -9,11 +9,11 @@
 use Windwalker\Core\Seeder\AbstractSeeder;
 
 /**
- * The DatabaseSeeder class.
+ * The MainSeeder class.
  * 
  * @since  1.0
  */
-class DatabaseSeeder extends AbstractSeeder
+class MainSeeder extends AbstractSeeder
 {
 	/**
 	 * doExecute
