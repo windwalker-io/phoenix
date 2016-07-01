@@ -1,6 +1,8 @@
 body {
   margin: 0;
   padding: 0;
+}
+body.phoenix-admin {
   background: #f8f8f8;
 }
 .nowrap {

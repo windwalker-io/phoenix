@@ -36,7 +36,7 @@ class ItemModel extends DatabaseModelRepository
 		{
 			if (!$pk)
 			{
-				return $this->getRecord();
+				return new Data;
 			}
 
 			$item = $this->getRecord();
@@ -47,7 +47,7 @@ class ItemModel extends DatabaseModelRepository
 			}
 			catch (\RuntimeException $e)
 			{
-				return $item;
+				return new Data;
 			}
 
 			$this->postGetItem($item);

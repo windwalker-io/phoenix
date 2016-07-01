@@ -30,6 +30,13 @@ class {$controller.item.name.cap$}Record extends Record
 	protected $table = Table::{$controller.list.name.upper$};
 
 	/**
+	 * Property keys.
+	 *
+	 * @var  string
+	 */
+	protected $keys = 'id';
+
+	/**
 	 * onAfterLoad
 	 *
 	 * @param Event $event

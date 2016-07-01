@@ -8,11 +8,10 @@
 
 namespace Phoenix\Controller;
 
+use Phoenix\Model\FormAwareRepositoryInterface;
 use Phoenix\Model\Traits\FormAwareRepositoryTrait;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Logger\Logger;
 use Windwalker\Core\Model\Exception\ValidateFailException;
-use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\String\StringHelper;
@@ -166,7 +165,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	 */
 	protected function prepareStore(Data $data)
 	{
-		if ($this->model instanceof FormAwareRepositoryTrait)
+		if ($this->model instanceof FormAwareRepositoryInterface)
 		{
 			$result = $this->model->prepareStore($data->dump(true));
 

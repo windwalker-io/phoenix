@@ -2,7 +2,10 @@
 body {
     margin: 0;
     padding: 0;
-    background: #f8f8f8;
+
+    &.phoenix-admin {
+        background: #f8f8f8;
+    }
 }
 
 .nowrap {
