@@ -10,12 +10,8 @@ namespace {$package.namespace$}{$package.name.cap$};
 
 use Phoenix\Language\TranslatorHelper;
 use Phoenix\Script\BootstrapScript;
-use Symfony\Component\Yaml\Yaml;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\CoreRouter;
-use Windwalker\Debugger\Helper\DebuggerHelper;
-use Windwalker\Event\Dispatcher;
-use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
 
 /**
@@ -72,14 +68,6 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	protected function postExecute($result = null)
 	{
-		if (WINDWALKER_DEBUG)
-		{
-			if (class_exists('Windwalker\Debugger\Helper\DebuggerHelper'))
-			{
-				DebuggerHelper::addCustomData('Language Orphans', '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
-			}
-		}
-
 		return $result;
 	}
 
