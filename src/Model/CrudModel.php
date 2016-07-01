@@ -19,7 +19,7 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class CrudModel extends ItemModel implements ModelRepositoryInterface, FormAwareRepositoryInterface, CrudRepositoryInterface
+class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudRepositoryInterface
 {
 	use FormAwareRepositoryTrait;
 
