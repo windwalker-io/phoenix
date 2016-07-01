@@ -16,6 +16,7 @@ use Windwalker\Core\Model\Model;
 use Windwalker\Core\Model\ModelRepositoryInterface;
 use Windwalker\Core\Model\Traits\ModelRepositoryTrait;
 use Windwalker\Core\Pagination\Pagination;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
@@ -366,13 +367,25 @@ class ListModel extends Model implements FormAwareRepositoryInterface, ModelRepo
 	 *
 	 * @param integer $total
 	 *
-	 * @return  Pagination
+	 * @return Pagination
 	 */
 	public function getPagination($total = null)
 	{
-		$total = $total ? : $this->getTotal();
+		$total = $total !== null ? $total : $this->getTotal();
 
-		return new Pagination($total, $this->getPage() ? : 1, $this->getLimit());
+		return new Pagination($this->getPage() ? : 1, $this->getLimit(), $total);
+	}
+
+	/**
+	 * getPagination
+	 *
+	 * @return Pagination
+	 */
+	public function getSimplePagination()
+	{
+		$this->set('list.fix_page', false);
+		
+		return (new Pagination($this->getPage() ? : 1, $this->getLimit(), -1, 1))->template('windwalker.pagination.simple');
 	}
 
 	/**
@@ -382,11 +395,9 @@ class ListModel extends Model implements FormAwareRepositoryInterface, ModelRepo
 	 */
 	public function getTotal()
 	{
-		$self = $this;
-
-		return $this->fetch('total', function() use ($self)
+		return $this->fetch('total', function()
 		{
-			$query = $self->getListQuery();
+			$query = clone $this->getListQuery();
 
 			// Use fast COUNT(*) on Query objects if there no GROUP BY or HAVING clause:
 			if ($query instanceof Query && $query->type == 'select'
@@ -422,21 +433,22 @@ class ListModel extends Model implements FormAwareRepositoryInterface, ModelRepo
 	 */
 	public function getStart()
 	{
-		$state = $this->state;
-
-		return $this->fetch('start', function() use ($state)
+		return $this->fetch('start', function()
 		{
-			$start = $this['list.start'];
-			$limit = $this->getLimit();
+			$start = $this->state['list.start'];
 
-			$total = $this->getTotal();
-
-			if ($start > $total - $limit)
+			if ($this['list.fix_page'])
 			{
-				$page = (int) ceil($total / $limit);
-				$start = max(0, ($page - 1) * $limit);
+				$limit = $this->getLimit();
+				$total = $this->getTotal();
 
-				$this->page($page);
+				if ($total && $start > $total - $limit)
+				{
+					$page = (int) ceil($total / $limit);
+					$start = max(0, ($page - 1) * $limit);
+
+					$this->page($page);
+				}
 			}
 
 			return $start;

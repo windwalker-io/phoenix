@@ -9,6 +9,7 @@
 namespace Phoenix\View;
 
 use Windwalker\Core\Language\Translator;
+use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\Data;
 
 /**
@@ -18,6 +19,20 @@ use Windwalker\Data\Data;
  */
 class ListView extends AbstractPhoenixHtmView
 {
+	/**
+	 * Property simplePagination.
+	 *
+	 * @var  boolean
+	 */
+	protected $simplePagination = false;
+
+	/**
+	 * Property pagination.
+	 *
+	 * @var  Pagination
+	 */
+	protected $pagination;
+
 	/**
 	 * setTitle
 	 *
@@ -43,11 +58,57 @@ class ListView extends AbstractPhoenixHtmView
 	{
 		parent::prepareData($data);
 
-		$data->items      = $data->items ? : $this->model->getItems();
-		$data->pagination = $data->pagination ? : $this->model->getPagination();
-		$data->total      = $data->total ? : $this->model->getTotal();
-		$data->limit      = $data->limit ? : $this->model->getLimit();
-		$data->start      = $data->start ? : $this->model->getStart();
-		$data->page       = $data->page ? : $this->model->getPage();
+		$data->items = $data->items ? : $this->model->getItems();
+
+		$this->preparePagination($data);
+
+		$data->limit = $data->limit ? : $this->model->getLimit();
+		$data->start = $data->start ? : $this->model->getStart();
+		$data->page  = $data->page ? : $this->model->getPage();
+	}
+
+	/**
+	 * preparePagination
+	 *
+	 * @param Data $data
+	 *
+	 * @return  void
+	 */
+	protected function preparePagination(Data $data)
+	{
+		if ($this->simplePagination)
+		{
+			$data->total = null;
+			$data->pagination = $this->model->getSimplePagination()
+				->template('phoenix.pagination.simple')
+				->setRouter($this->getRouter());
+		}
+		else
+		{
+			$data->total = $data->total ? : $this->model->getTotal();
+			$data->pagination = $this->model->getPagination()
+				->template('phoenix.pagination.default')
+				->setRouter($this->getRouter());
+		}
+	}
+
+	/**
+	 * getPagination
+	 *
+	 * @param int $page
+	 * @param int $total
+	 * @param int $limit
+	 * @param int $neighbours
+	 *
+	 * @return Pagination
+	 */
+	public function getPagination($page = 1, $total = 0, $limit = 15, $neighbours = 4)
+	{
+		if ($this->pagination)
+		{
+			return $this->pagination;
+		}
+
+		return $this->pagination = new Pagination($page, $limit, $total, $neighbours);
 	}
 }

@@ -12,6 +12,7 @@ use Phoenix\View\Helper\GridHelper;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Widget\BladeWidget;
 use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Data\Data;
 use Windwalker\Ioc;
 
 /**
@@ -84,10 +85,26 @@ class GridView extends ListView
 	protected function prepareData($data)
 	{
 		parent::prepareData($data);
-
+		
 		$data->filterForm = $data->filterForm ? : $this->model->getForm('filter', null, true);
 		$data->batchForm  = $data->batchForm ? : $this->model->getForm('batch', null, true);
 
+		$this->handleFilterBar($data);
+		$this->handleModal($data);
+
+		// Grid helper
+		$data->grid = $this->getGridHelper();
+	}
+
+	/**
+	 * handleFilterBar
+	 *
+	 * @param   Data  $data
+	 *
+	 * @return  void
+	 */
+	protected function handleFilterBar(Data $data)
+	{
 		// Widget
 		$data->filterBar = $data->filterBar ? : WidgetHelper::createWidget('phoenix.grid.filterbar', 'edge', $this->package);
 		$data->showFilterBar = false;
@@ -102,15 +119,21 @@ class GridView extends ListView
 				break;
 			}
 		}
+	}
 
-		// Grid
-		$data->grid = $this->getGridHelper();
-
-		// Modal
+	/**
+	 * handleModal
+	 *
+	 * @param Data $data
+	 *
+	 * @return  void
+	 */
+	protected function handleModal(Data $data)
+	{
 		if ($this->getLayout() == 'modal')
 		{
 			// Should make this operation out of view
-			$input = Ioc::getInput();
+			$input = $this->package->app->input;
 
 			$data->selector = $input->getString('selector');
 			$data->function = $input->getString('function', 'Phoenix.Field.Modal.select');
