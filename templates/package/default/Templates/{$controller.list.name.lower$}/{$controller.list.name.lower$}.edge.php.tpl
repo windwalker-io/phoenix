@@ -159,7 +159,7 @@
                 <tr>
                     {{-- PAGINATION --}}
                     <td colspan="25">
-                        {!! $pagination->setRoute($router)->render('{$controller.list.name.lower$}', [], 'windwalker.pagination.phoenix') !!}
+                        {!! $pagination->route('{$controller.list.name.lower$}', [])->render() !!}
                     </td>
                 </tr>
                 </tfoot>

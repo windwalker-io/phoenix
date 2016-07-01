@@ -8,17 +8,13 @@
 
 namespace {$package.namespace$}{$package.name.cap$};
 
-use Phoenix\DataMapper\DataMapperResolver;
 use Phoenix\Language\TranslatorHelper;
-use Phoenix\Record\RecordResolver;
 use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Filesystem\Folder;
-use Windwalker\Form\FieldHelper;
-use Windwalker\Form\ValidatorHelper;
 use Windwalker\Router\Exception\RouteNotFoundException;
 
 if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
@@ -41,13 +37,9 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	public function boot()
 	{
-		// Prepare Resolvers
-		RecordResolver::addNamespace(__NAMESPACE__ . '\Record');
-		DataMapperResolver::addNamespace(__NAMESPACE__ . '\DataMapper');
-		FieldHelper::addNamespace(__NAMESPACE__ . '\Field');
-		ValidatorHelper::addNamespace(__NAMESPACE__ . 'Validator');
-
 		parent::boot();
+
+		// Add your own boot logic
 	}
 
 	/**
@@ -78,7 +70,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 */
 	protected function checkAccess()
 	{
-
+		// Add your access checking
 	}
 
 	/**
@@ -92,7 +84,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 	{
 		if (WINDWALKER_DEBUG)
 		{
-			if (class_exists('Windwalker\Debugger\Helper\DebuggerHelper'))
+			if (class_exists(DebuggerHelper::class))
 			{
 				DebuggerHelper::addCustomData('Language Orphans', '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
 			}
@@ -115,13 +107,10 @@ class {$package.name.cap$}Package extends AbstractPackage
 
 		$router->group($group, function (CoreRouter $router)
 		{
-			$router->addRouteByConfigs(
-				$router::loadRoutingFiles(Folder::files(__DIR__ . '/Resources/routing')),
-				$this->getName()
-			);
-		});
+			$router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
 
-		// Merge other routes here...
+			// Merge other routes here...
+		});
 
 		return $router;
 	}

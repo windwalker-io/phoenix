@@ -13,7 +13,6 @@ use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
 use Phoenix\View\ListView;
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Core\Utilities\Classes\DocblockHelper;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
@@ -62,6 +61,13 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	protected $gridConfig = array(
 		'order_column' => '{$controller.item.name.lower$}.ordering'
 	);
+
+	/**
+	 * Property simplePagination.
+	 *
+	 * @var  boolean
+	 */
+	protected $simplePagination = false;
 
 	/**
 	 * prepareData
