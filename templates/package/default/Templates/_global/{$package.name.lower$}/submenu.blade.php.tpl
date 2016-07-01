@@ -16,7 +16,7 @@
         </a>
     </li>
 
-    <li class="{{ $helper->menu->active('{$controller.list.name.lower$}') }}">
+    <li class="{{ $helper->menu->active('{$controller.list.name.lower$}', ['type' => '{$controller.item.name.lower$}', 'a' => 'b']) }}">
         <a href="{{ $router->route('{$controller.list.name.lower$}') }}">
             @translate('{$package.name.lower$}.{$controller.list.name.lower$}.title')
         </a>

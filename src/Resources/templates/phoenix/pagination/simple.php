@@ -11,12 +11,9 @@ use Windwalker\Core\Pagination\PaginationResult;
 use Windwalker\Data\Data;
 
 /**
- * @var Data             $data
  * @var PaginationResult $pagination
- * @var string           $route
+ * @var callable         $route
  */
-$pagination = $data->pagination;
-$route = $data->route;
 ?>
 <div class="windwalker-pagination">
     <div class="btn-group pull-left">

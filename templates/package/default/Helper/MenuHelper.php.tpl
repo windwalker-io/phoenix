@@ -12,7 +12,9 @@ use Windwalker\Core\Language\Translator;
 use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Ioc;
 use Windwalker\String\StringInflector;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The MenuHelper class.
@@ -27,26 +29,58 @@ class MenuHelper extends AbstractHelper
 	/**
 	 * active
 	 *
-	 * @param   string  $name
-	 * @param   string  $menu
+	 * @param string $path
+	 * @param array  $query
+	 * @param string $menu
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public function active($name, $menu = 'mainmenu')
+	public function active($path, $query = [], $menu = 'mainmenu')
 	{
 		$view = $this->getParent()->getView();
 
-		if ($view['app']->get('route.matched') == $view->getPackage()->getName() . '@' . $name)
+		// Match route
+		$route = $path;
+
+		if (strpos($route, '@') === false)
+		{
+			$route = $view->getPackage()->getName() . '@' . $route;
+		}
+
+		if ($view['app']->get('route.matched') == $route && $this->matchRequest($query))
 		{
 			return 'active';
 		}
 
-		if ($view['app']->get('route.extra.active.' . $menu) == $name)
+		// If route not matched, we match extra values from routing.
+		$routePath = $view['app']->get('route.extra.active.' . $menu);
+
+		$path = array_filter(explode('/', trim($path, '/')), 'strlen');
+		$routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
+
+		foreach ($routePath as $key => $routeSegment)
 		{
-			return 'active';
+			if (isset($path[$key]) && $path[$key] == $routeSegment && $this->matchRequest($query))
+			{
+				return 'active';
+			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * matchRequest
+	 *
+	 * @param array $query
+	 *
+	 * @return  boolean
+	 */
+	protected function matchRequest($query = [])
+	{
+		$input = Ioc::getInput();
+
+		return !empty(ArrayHelper::query([$input->toArray()], $query));
 	}
 
 	/**
