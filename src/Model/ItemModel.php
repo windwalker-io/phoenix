@@ -9,7 +9,7 @@
 namespace Phoenix\Model;
 
 use Windwalker\Core\Model\Traits\ModelRepositoryTrait;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Model\ModelRepositoryInterface;
 use Windwalker\Data\Data;
 use Windwalker\Record\Record;
@@ -19,7 +19,7 @@ use Windwalker\Record\Record;
  * 
  * @since  1.0
  */
-class ItemModel extends Model implements ModelRepositoryInterface
+class ItemModel extends ModelRepository implements ModelRepositoryInterface
 {
 	use ModelRepositoryTrait;
 

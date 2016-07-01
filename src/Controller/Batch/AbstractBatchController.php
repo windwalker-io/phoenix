@@ -13,7 +13,7 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Data\Data;
 
 /**
@@ -225,7 +225,7 @@ abstract class AbstractBatchController extends AbstractPostController
 	 * @param string $name
 	 * @param bool   $forceNew
 	 *
-	 * @return  Model
+	 * @return  ModelRepository
 	 */
 	public function getModel($name = null, $forceNew = false)
 	{

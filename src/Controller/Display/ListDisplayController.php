@@ -9,7 +9,7 @@
 namespace Phoenix\Controller\Display;
 
 use Phoenix\Model\ListModel;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Filter\InputFilter;
 use Windwalker\Form\Field\ListField;
 use Windwalker\Form\Form;
@@ -59,11 +59,11 @@ class ListDisplayController extends DisplayController
 	/**
 	 * prepareUserState
 	 *
-	 * @param   Model  $model
+	 * @param   ModelRepository $model
 	 *
 	 * @return  void
 	 */
-	protected function prepareUserState(Model $model)
+	protected function prepareUserState(ModelRepository $model)
 	{
 		// Filter & Search
 		$model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', array(), InputFilter::ARRAY_TYPE);

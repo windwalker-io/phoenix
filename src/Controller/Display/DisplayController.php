@@ -9,7 +9,7 @@
 namespace Phoenix\Controller\Display;
 
 use Phoenix\Controller\AbstractPhoenixController;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Response\HtmlViewResponse;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
@@ -26,14 +26,14 @@ class DisplayController extends AbstractPhoenixController
 	/**
 	 * Default model.
 	 *
-	 * @var  Model
+	 * @var  ModelRepository
 	 */
 	protected $model;
 
 	/**
 	 * Property models.
 	 *
-	 * @var  Model[]
+	 * @var  ModelRepository[]
 	 */
 	protected $subModels = array();
 
@@ -151,11 +151,11 @@ class DisplayController extends AbstractPhoenixController
 	/**
 	 * prepareUserState
 	 *
-	 * @param   Model $model
+	 * @param   ModelRepository $model
 	 *
 	 * @return  void
 	 */
-	protected function prepareUserState(Model $model)
+	protected function prepareUserState(ModelRepository $model)
 	{
 	}
 

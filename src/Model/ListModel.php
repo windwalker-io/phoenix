@@ -12,7 +12,7 @@ use Phoenix\Model\Filter\FilterHelper;
 use Phoenix\Model\Filter\FilterHelperInterface;
 use Phoenix\Model\Filter\SearchHelper;
 use Phoenix\Model\Traits\FormAwareRepositoryTrait;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Model\ModelRepositoryInterface;
 use Windwalker\Core\Model\Traits\ModelRepositoryTrait;
 use Windwalker\Core\Pagination\Pagination;
@@ -28,7 +28,7 @@ use Windwalker\Utilities\ArrayHelper;
  * 
  * @since  1.0
  */
-class ListModel extends Model implements FormAwareRepositoryInterface, ModelRepositoryInterface
+class ListModel extends ModelRepository implements FormAwareRepositoryInterface, ModelRepositoryInterface
 {
 	use ModelRepositoryTrait;
 	use FormAwareRepositoryTrait;

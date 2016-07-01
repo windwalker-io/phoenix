@@ -10,7 +10,7 @@ namespace Phoenix\Controller\Display;
 
 use Phoenix\Model\FormAwareRepositoryInterface;
 use Phoenix\View\EditView;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 
 /**
  * The EditGetController class.
@@ -42,11 +42,11 @@ class EditDisplayController extends ItemDisplayController
 	/**
 	 * prepareExecute
 	 *
-	 * @param Model $model
+	 * @param ModelRepository $model
 	 *
 	 * @return void
 	 */
-	protected function prepareUserState(Model $model)
+	protected function prepareUserState(ModelRepository $model)
 	{
 		parent::prepareUserState($model);
 
