@@ -29,13 +29,6 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	protected $name = '{$controller.list.name.lower$}';
 
 	/**
-	 * Property renderer.
-	 *
-	 * @var  string
-	 */
-	protected $renderer = RendererHelper::EDGE;
-
-	/**
 	 * The fields mapper.
 	 *
 	 * @var  array

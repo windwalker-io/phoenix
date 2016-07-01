@@ -11,8 +11,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}Model;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\ListDisplayController;
-use Windwalker\Core\Controller\Controller;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 
 /**
  * The GetController class.
@@ -83,11 +82,11 @@ class GetController extends ListDisplayController
 	/**
 	 * prepareUserState
 	 *
-	 * @param   Model $model
+	 * @param   ModelRepository $model
 	 *
 	 * @return  void
 	 */
-	protected function prepareUserState(Model $model)
+	protected function prepareUserState(ModelRepository $model)
 	{
 		parent::prepareUserState($model);
 	}

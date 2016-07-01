@@ -13,7 +13,7 @@
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \Windwalker\Data\Data
+ * @var $item  \{$package.namespace$}Flower\Record\Traits\{$controller.item.name.cap$}DataTrait
  * @var $state \Windwalker\Registry\Registry
  */
 ?>
@@ -24,12 +24,13 @@
 <div class="container {$controller.item.name.lower$}-item">
     <h1>{$controller.item.name.cap$} Item</h1>
     <p>
-        <a class="btn btn-default" href="{{ $router->html('{$controller.list.name.lower$}') }}">
+        <a class="btn btn-default" href="{{ $router->route('{$controller.list.name.lower$}') }}">
             <span class="glyphicon glyphicon-chevron-left fa fa-chervon-left"></span>
             Back to List
         </a>
     </p>
     <hr />
+    <img src="{{ $item->image }}" alt="Image">
     <h2>{{ $item->title }}</h2>
     <p>{{ $item->introtext }}</p>
     <p>{{ $item->fulltext }}</p>

@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
 
 use Phoenix\View\ItemView;
+use Windwalker\Core\Renderer\RendererHelper;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
@@ -33,6 +34,7 @@ class {$controller.item.name.cap$}HtmlView extends ItemView
 	 */
 	protected function prepareData($data)
 	{
+		parent::prepareData($data);
 	}
 
 	/**

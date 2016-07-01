@@ -30,13 +30,6 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	protected $name = '{$controller.item.name.lower$}';
 
 	/**
-	 * Property renderer.
-	 *
-	 * @var  string
-	 */
-	protected $renderer = RendererHelper::EDGE;
-
-	/**
 	 * Property formDefinition.
 	 *
 	 * @var  string

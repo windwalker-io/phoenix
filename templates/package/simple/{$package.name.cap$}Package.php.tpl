@@ -12,6 +12,7 @@ use Phoenix\Language\TranslatorHelper;
 use Phoenix\Script\BootstrapScript;
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Filesystem\File;
@@ -30,9 +31,9 @@ class {$package.name.cap$}Package extends AbstractPackage
 	 * @throws  \LogicException
 	 * @return  void
 	 */
-	public function initialise()
+	public function boot()
 	{
-		parent::initialise();
+		parent::boot();
 	}
 
 	/**
@@ -77,45 +78,30 @@ class {$package.name.cap$}Package extends AbstractPackage
 			{
 				DebuggerHelper::addCustomData('Language Orphans', '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
 			}
-
-			// Un comment this line, Translator will export all orphans to /cache/language
-			// TranslatorHelper::dumpOrphans('ini');
 		}
 
 		return $result;
 	}
 
 	/**
-	 * registerListeners
-	 *
-	 * @param Dispatcher $dispatcher
-	 *
-	 * @return  void
-	 */
-	public function registerListeners(Dispatcher $dispatcher)
-	{
-		parent::registerListeners($dispatcher);
-	}
-
-	/**
 	 * loadRouting
 	 *
-	 * @return  mixed
+	 * @param CoreRouter $router
+	 * @param string     $group
+	 *
+	 * @return CoreRouter
 	 */
-	public function loadRouting()
+	public function loadRouting(CoreRouter $router, $group = null)
 	{
-		$routes = parent::loadRouting();
+		$router = parent::loadRouting($router);
 
-		foreach (Folder::files(__DIR__ . '/Resources/routing') as $file)
+		$router->group($group, function (CoreRouter $router)
 		{
-			if (File::getExtension($file) == 'yml')
-			{
-				$routes = array_merge($routes, Yaml::parse(file_get_contents($file)));
-			}
-		}
+			$router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
 
-		// Merge other routes here...
+			// Merge other routes here...
+		});
 
-		return $routes;
+		return $router;
 	}
 }

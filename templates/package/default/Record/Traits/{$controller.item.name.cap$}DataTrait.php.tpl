@@ -9,7 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\Record\Traits;
 
 /**
- * The {$controller.item.name.cap$}AutocompleteTrait class.
+ * The {$controller.item.name.cap$}DataTrait class.
  *
  * @property  integer  id
  * @property  string   title

@@ -9,6 +9,7 @@
 namespace Phoenix\View;
 
 use Phoenix\Html\HtmlHeader;
+use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Data\Data;
 
@@ -19,6 +20,13 @@ use Windwalker\Data\Data;
  */
 abstract class AbstractPhoenixHtmView extends HtmlView
 {
+	/**
+	 * Property renderer.
+	 *
+	 * @var  string
+	 */
+	protected $renderer = RendererHelper::EDGE;
+
 	/**
 	 * Property langPrefix.
 	 *

@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
 use Phoenix\View\ListView;
+use Windwalker\Core\Renderer\RendererHelper;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
@@ -33,6 +34,7 @@ class {$controller.list.name.cap$}HtmlView extends ListView
 	 */
 	protected function prepareData($data)
 	{
+		parent::prepareData($data);
 	}
 
 	/**

@@ -12,14 +12,14 @@
     {!! \Phoenix\Html\HtmlHeader::renderMetadata() !!}
     @yield('meta')
 
-    {!! \Phoenix\Asset\Asset::renderStyles(true) !!}
+    {!! $asset->renderStyles(true) !!}
     @yield('style')
 
-    {!! \Phoenix\Asset\Asset::renderScripts(true) !!}
+    {!! $asset->renderScripts(true) !!}
     @yield('script')
     {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
-<body class="package-{{ $package->name }} {{ $helper->page->getClass($view) }}" style="padding-top: 50px">
+<body class="package-{{ $package->name }} view-{{ $view->name }} layout-{{ $view->layout }}" style="padding-top: 50px">
     @section('navbar')
     <div class="navbar navbar-default navbar-fixed-top">
         <div class="container">
@@ -29,12 +29,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ $router->html('home') }}">Windwalker</a>
+                <a class="navbar-brand" href="{{ $router->route('home') }}">Windwalker</a>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                      @section('nav')
-                        <li class="active"><a href="{{ $router->html('home') }}">Home</a></li>
+                        <li class="active"><a href="{{ $router->route('home') }}">Home</a></li>
                      @show
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -68,6 +68,6 @@
         </div>
     </div>
     @show
-{!! \Phoenix\Asset\Asset::getTemplate()->renderTemplates() !!}
+{!! $asset->getTemplate()->renderTemplates() !!}
 </body>
 </html>

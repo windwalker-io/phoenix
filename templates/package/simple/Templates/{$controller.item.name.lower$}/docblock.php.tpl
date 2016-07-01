@@ -21,7 +21,7 @@ defined('WINDWALKER') or die('Forbidden');
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \Windwalker\Data\Data
+ * @var $item  \{$package.namespace$}Flower\Record\Traits\{$controller.item.name.cap$}DataTrait
  * @var $state \Windwalker\Registry\Registry
  */
 

@@ -17,12 +17,12 @@ defined('WINDWALKER') or die('Forbidden');
  * @var $uri      \Windwalker\Uri\UriData                     Uri information, example: $uri->path
  * @var $datetime \Windwalker\Core\DateTime\DateTime          PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
- * @var $route    \Windwalker\Core\Router\CoreRoute           Route builder object.
+ * @var $router   \Windwalker\Core\Router\CoreRouter          Route builder object.
  * @var $asset    \Windwalker\Core\Asset\AssetManager         The Asset manager.
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
+ * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait
  * @var $state \Windwalker\Registry\Registry
  * @var $form  \Windwalker\Form\Form
  */
