@@ -31,7 +31,7 @@
     @yield('script')
     {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
-<body class="{{ $package->getName() }}-admin-body phoenix-admin view-{{ $view->name }} layout-{{ $view->layout }} {{ $app->get('sidebar.hide') ? 'sidebar-hide' : null }}">
+<body class="{{ $package->getName() }}-admin-body phoenix-admin view-{{ $view->name }} layout-{{ $view->layout }} {{ isset($hideSidebar) ? 'sidebar-hide' : null }}">
 @section('superbody')
 
     @yield('body', 'Body Section')

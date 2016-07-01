@@ -68,8 +68,6 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	 */
 	protected function prepareData($data)
 	{
-		$this->package->app->set('sidebar.hide', true);
-
 		parent::prepareData($data);
 
 		$this->prepareScripts();

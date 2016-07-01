@@ -73,5 +73,6 @@ class EditView extends ItemView
 		}
 
 		$data->form = $data->form ? : $this->model->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
+		$data->hideSidebar = true;
 	}
 }
