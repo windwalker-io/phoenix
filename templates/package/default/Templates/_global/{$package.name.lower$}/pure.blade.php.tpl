@@ -3,6 +3,8 @@
 @extends('_global.{$package.name.lower$}.html')
 
 @section('superbody')
-    @yield('body', 'Body')
+    {{-- Force Background white i template has colored bg --}}
+    <div style="background: white;">
+        @yield('body', 'Body')
+    </div>
 @stop
-

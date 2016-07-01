@@ -53,7 +53,7 @@ class MenuHelper extends AbstractHelper
 		}
 
 		// If route not matched, we match extra values from routing.
-		$routePath = $view['app']->get('route.extra.active.' . $menu);
+		$routePath = $view['app']->get('route.extra.menu.' . $menu);
 
 		$path = array_filter(explode('/', trim($path, '/')), 'strlen');
 		$routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
@@ -79,6 +79,11 @@ class MenuHelper extends AbstractHelper
 	protected function matchRequest($query = [])
 	{
 		$input = Ioc::getInput();
+
+		if (!$query)
+		{
+			return true;
+		}
 
 		return !empty(ArrayHelper::query([$input->toArray()], $query));
 	}

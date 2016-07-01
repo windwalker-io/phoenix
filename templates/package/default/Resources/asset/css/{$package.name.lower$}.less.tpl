@@ -1,6 +1,8 @@
 // Global
 body {
-    padding-bottom : 20px;
+    margin: 0;
+    padding: 0;
+    background: #f8f8f8;
 }
 
 .nowrap {
@@ -11,15 +13,15 @@ body {
     clear : both;
 }
 
-// Admin Layout
-.jumbotron.admin-header {
-    margin-bottom : 0;
+// Main Layout
+.main-body {
+    padding-right: 0;
+    padding-left: 0;
+    background-color: white;
+    border-left: 1px solid #e7e7e7;
 }
 
-#admin-area {
-    margin-top : 30px;
-}
-
+// Header
 .navbar-fixed-top {
     position      : relative;
     margin-bottom : 0;
@@ -30,19 +32,34 @@ body {
     margin-top : -8px;
 }
 
+// Banner
 .jumbotron {
     h1 {
         margin : 0;
     }
 }
 
+.container .jumbotron,
+.container-fluid .jumbotron {
+    border-radius: 0;
+    padding-left: 0;
+}
+
 .admin-header.jumbotron {
-    padding-top    : 24px;
+    padding-top: 24px;
     padding-bottom : 24px;
+    margin-bottom : 0;
 
     h1 {
         font-size : 48px;
     }
+}
+
+// Admin Layout
+#admin-area {
+    padding-top : 30px;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 #admin-toolbar {
@@ -62,6 +79,37 @@ body {
     z-index    : 100;
     box-shadow : 0 3px 8px rgba(0, 0, 0, .1);
 }
+
+// Sidebar
+.main-sidebar {
+    #submenu.list-group {
+        border-radius: 0;
+        margin-left: -15px;
+        margin-right: -15px;
+
+        a {
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid #ddd;
+        }
+    }
+}
+
+body.sidebar-hide {
+    .main-sidebar {
+        display: none;
+    }
+
+    .main-body {
+        width: 100%;
+    }
+}
+
+// Copyright
+#copyright {
+    padding-bottom: 20px;
+}
+
 
 // Mobile
 @media (max-width : 767px) {
@@ -102,7 +150,6 @@ body {
 }
 
 // Grid
-
 .search-container {
     margin-bottom : 15px;
 }
@@ -119,6 +166,10 @@ body {
 .input-xs {
     height  : 22px;
     padding : 0 5px;
+}
+
+.sr-only {
+    padding: 0;
 }
 
 // Modal

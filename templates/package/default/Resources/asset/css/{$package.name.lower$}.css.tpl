@@ -1,5 +1,7 @@
 body {
-  padding-bottom: 20px;
+  margin: 0;
+  padding: 0;
+  background: #f8f8f8;
 }
 .nowrap {
   white-space: nowrap;
@@ -7,11 +9,11 @@ body {
 .clearfix {
   clear: both;
 }
-.jumbotron.admin-header {
-  margin-bottom: 0;
-}
-#admin-area {
-  margin-top: 30px;
+.main-body {
+  padding-right: 0;
+  padding-left: 0;
+  background-color: white;
+  border-left: 1px solid #e7e7e7;
 }
 .navbar-fixed-top {
   position: relative;
@@ -24,12 +26,23 @@ body {
 .jumbotron h1 {
   margin: 0;
 }
+.container .jumbotron,
+.container-fluid .jumbotron {
+  border-radius: 0;
+  padding-left: 0;
+}
 .admin-header.jumbotron {
   padding-top: 24px;
   padding-bottom: 24px;
+  margin-bottom: 0;
 }
 .admin-header.jumbotron h1 {
   font-size: 48px;
+}
+#admin-area {
+  padding-top: 30px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 #admin-toolbar {
   background-color: #f6f6f6;
@@ -45,6 +58,25 @@ body {
   top: 0;
   z-index: 100;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+.main-sidebar #submenu.list-group {
+  border-radius: 0;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+.main-sidebar #submenu.list-group a {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #ddd;
+}
+body.sidebar-hide .main-sidebar {
+  display: none;
+}
+body.sidebar-hide .main-body {
+  width: 100%;
+}
+#copyright {
+  padding-bottom: 20px;
 }
 @media (max-width: 767px) {
   #admin-toolbar button.btn,
@@ -86,6 +118,9 @@ body {
 .input-xs {
   height: 22px;
   padding: 0 5px;
+}
+.sr-only {
+  padding: 0;
 }
 #phoenix-iframe-modal .modal-dialog {
   min-width: 900px;

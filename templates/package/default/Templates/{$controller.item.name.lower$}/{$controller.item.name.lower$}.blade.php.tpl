@@ -19,7 +19,7 @@
  */
 ?>
 
-@extends('_global.{$package.name.lower$}.admin-edit')
+@extends('_global.{$package.name.lower$}.admin')
 
 @section('toolbar')
     @include('toolbar')
