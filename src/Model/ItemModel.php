@@ -22,9 +22,10 @@ class ItemModel extends DatabaseModelRepository
 	/**
 	 * getItem
 	 *
-	 * @param   mixed  $pk
+	 * @param   mixed $pk
 	 *
 	 * @return  Record
+	 * @throws \InvalidArgumentException
 	 */
 	public function getItem($pk = null)
 	{
@@ -36,7 +37,7 @@ class ItemModel extends DatabaseModelRepository
 		{
 			if (!$pk)
 			{
-				return new Data;
+				return $this->getRecord()->reset(true);
 			}
 
 			$item = $this->getRecord();
@@ -47,7 +48,7 @@ class ItemModel extends DatabaseModelRepository
 			}
 			catch (\RuntimeException $e)
 			{
-				return new Data;
+				return $item->reset(true);
 			}
 
 			$this->postGetItem($item);
