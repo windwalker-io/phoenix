@@ -69,7 +69,7 @@ trait FormAwareRepositoryTrait
 	 *
 	 * @param string|FieldDefinitionInterface $definition
 	 * @param string                          $control
-	 * @param bool                            $loadData
+	 * @param bool|mixed                      $loadData
 	 *
 	 * @return Form
 	 */
@@ -84,11 +84,13 @@ trait FormAwareRepositoryTrait
 
 		$form->defineFormFields($definition);
 
-		if ($loadData)
+		if ($loadData === true)
 		{
-			$data = $this->getFormDefaultData();
-
-			$form->bind($data);
+			$form->bind($this->getFormDefaultData());
+		}
+		elseif ($loadData)
+		{
+			$form->bind($loadData);
 		}
 
 		$renderer = $this->get('field.renderer', $this->formRenderer);

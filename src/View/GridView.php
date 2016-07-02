@@ -85,9 +85,8 @@ class GridView extends ListView
 	protected function prepareData($data)
 	{
 		parent::prepareData($data);
-		
-		$data->filterForm = $data->filterForm ? : $this->model->getForm('filter', null, true);
-		$data->batchForm  = $data->batchForm ? : $this->model->getForm('batch', null, true);
+
+		$data->form  = $data->form ? : $this->model->getForm('grid', null, true);
 
 		$this->handleFilterBar($data);
 		$this->handleModal($data);
@@ -130,7 +129,7 @@ class GridView extends ListView
 	 */
 	protected function handleModal(Data $data)
 	{
-		if ($this->getLayout() == 'modal')
+		if ($this->getLayout() === 'modal')
 		{
 			// Should make this operation out of view
 			$input = $this->package->app->input;

@@ -34,7 +34,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 		{
 			$data = new Data;
 
-			$data['title']       = $faker->sentence(rand(3, 5));
+			$data['title']       = trim($faker->sentence(rand(3, 5)), '.');
 			$data['alias']       = OutputFilter::stringURLSafe($data['title']);
 			$data['url']         = $faker->url;
 			$data['introtext']   = $faker->paragraph(5);
@@ -42,9 +42,9 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 			$data['image']       = $faker->imageUrl();
 			$data['state']       = $faker->randomElement(array(1, 1, 1, 1, 0, 0));
 			$data['ordering']    = $i;
-			$data['created']     = $faker->dateTime->format(DateTime::getSqlFormat());
+			$data['created']     = $faker->dateTimeThisYear->format(DateTime::getSqlFormat());
 			$data['created_by']  = rand(20, 100);
-			$data['modified']    = $faker->dateTime->format(DateTime::getSqlFormat());
+			$data['modified']    = $faker->dateTimeThisYear->format(DateTime::getSqlFormat());
 			$data['modified_by'] = rand(20, 100);
 			$data['language']    = 'en-GB';
 			$data['params']      = '';
@@ -53,8 +53,6 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 
 			$this->outCounting();
 		}
-
-		$this->command->out()->out('  Complete...');
 	}
 
 	/**

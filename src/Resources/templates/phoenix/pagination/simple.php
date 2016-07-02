@@ -18,7 +18,7 @@ use Windwalker\Data\Data;
 <div class="windwalker-pagination">
     <div class="btn-group pull-left">
         <?php if ($pagination->getFirst()): ?>
-            <a href="<?php echo $route(array('page' => $pagination->getFirst())); ?>"
+            <a href="<?php echo $this->escape($route(['page'=> $pagination->getFirst()])); ?>"
                 class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
                 <span class="glyphicon glyphicon-fast-backward"></span>
                 <span class="sr-only">
@@ -28,7 +28,7 @@ use Windwalker\Data\Data;
         <?php endif; ?>
 
         <?php if ($pagination->getPrevious()): ?>
-            <a href="<?php echo $route(array('page' => $pagination->getPrevious())); ?>"
+            <a href="<?php echo $this->escape($route(['page'=> $pagination->getPrevious()])); ?>"
                 class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
                 <span class="glyphicon glyphicon-backward"></span>
                 <span class="sr-only">
@@ -40,7 +40,7 @@ use Windwalker\Data\Data;
 
     <div class="pull-right">
 	    <?php if ($pagination->getNext()): ?>
-			<a href="<?php echo $route(array('page' => $pagination->getNext())); ?>"
+			<a href="<?php echo $this->escape($route(['page'=> $pagination->getNext()])); ?>"
 				class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
 				<span class="glyphicon glyphicon-forward"></span>
 				<span class="sr-only">

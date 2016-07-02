@@ -18,7 +18,7 @@ use Windwalker\Data\Data;
 <ul class="pagination windwalker-pagination">
 	<?php if ($pagination->getFirst()): ?>
 		<li>
-			<a href="<?php echo $route(array('page' => $pagination->getFirst())); ?>"
+			<a href="<?php echo $this->escape($route(['page'=> $pagination->getFirst()])); ?>"
 				class="hasTooltip" title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
 				<span class="glyphicon glyphicon-fast-backward"></span>
 				<span class="sr-only">
@@ -30,7 +30,7 @@ use Windwalker\Data\Data;
 
 	<?php if ($pagination->getPrevious()): ?>
 		<li>
-			<a href="<?php echo $route(array('page' => $pagination->getPrevious())); ?>"
+			<a href="<?php echo $this->escape($route(['page'=> $pagination->getPrevious()])); ?>"
 				class="hasTooltip" title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
 				<span class="glyphicon glyphicon-backward"></span>
 				<span class="sr-only">
@@ -42,7 +42,7 @@ use Windwalker\Data\Data;
 
 	<?php if ($pagination->getLess()): ?>
 		<li>
-			<a href="<?php echo $route(array('page' => $pagination->getLess())); ?>">
+			<a href="<?php echo $this->escape($route(['page'=> $pagination->getLess()])); ?>">
 				<span class="glyphicon glyphicon-menu-left"></span>
 				<?php echo Translator::translate('phoenix.pagination.less'); ?>
 			</a>
@@ -53,7 +53,7 @@ use Windwalker\Data\Data;
 		<?php $active = ($page == 'current') ? 'active' : ''; ?>
 		<li class="<?php echo $active; ?>">
 			<?php if (!$active): ?>
-				<a href="<?php echo $route(array('page' => $k)); ?>">
+				<a href="<?php echo $this->escape($route(['page'=> $k])); ?>">
 					<?php echo $k; ?>
 				</a>
 			<?php else: ?>
@@ -66,7 +66,7 @@ use Windwalker\Data\Data;
 
 	<?php if ($pagination->getMore()): ?>
 		<li>
-			<a href="<?php echo $route(array('page' => $pagination->getMore())); ?>">
+			<a href="<?php echo $this->escape($route(['page'=> $pagination->getMore()])); ?>">
 				<?php echo Translator::translate('phoenix.pagination.more'); ?>
 				<span class="glyphicon glyphicon-menu-right"></span>
 			</a>
@@ -75,7 +75,7 @@ use Windwalker\Data\Data;
 
 	<?php if ($pagination->getNext()): ?>
 		<li>
-			<a href="<?php echo $route(array('page' => $pagination->getNext())); ?>"
+			<a href="<?php echo $this->escape($route(['page'=> $pagination->getNext()])); ?>"
 				class="hasTooltip" title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
 				<span class="glyphicon glyphicon-forward"></span>
 				<span class="sr-only">
@@ -87,7 +87,7 @@ use Windwalker\Data\Data;
 
 	<?php if ($pagination->getLast()): ?>
 		<li>
-			<a href="<?php echo $route(array('page' => $pagination->getLast())); ?>"
+			<a href="<?php echo $this->escape($route(['page'=> $pagination->getLast()])); ?>"
 				class="hasTooltip" title="<?php echo Translator::translate('phoenix.pagination.last'); ?>">
 				<span class="glyphicon glyphicon-fast-forward"></span>
 				<span class="sr-only">
