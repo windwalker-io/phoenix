@@ -15,7 +15,7 @@ use Phoenix\Generator\Provider\MuseProvider;
 use Windwalker\Console\Command\Command;
 use Windwalker\DI\Container;
 use Windwalker\Ioc;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\String\StringNormalise;
 
 /**
@@ -134,7 +134,7 @@ class GeneratorController extends AbstractController
 		}
 
 		/** @var AbstractTaskController $controller */
-		$controller = new $class($this->container, $this->io, new Registry($config));
+		$controller = new $class($this->container, $this->io, new Structure($config));
 
 		$controller->execute();
 

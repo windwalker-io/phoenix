@@ -12,7 +12,7 @@ use Muse\Controller\AbstractTaskController;
 use Muse\IO\IOInterface;
 use Windwalker\DI\Container;
 use Windwalker\Filesystem\Path;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\String\StringInflector;
 use Windwalker\String\StringNormalise;
 
@@ -33,11 +33,11 @@ abstract class AbstractPackageController extends AbstractTaskController
 	/**
 	 * Constructor.
 	 *
-	 * @param   \Windwalker\DI\Container      $container
-	 * @param   \Muse\IO\IOInterface $io
-	 * @param   Registry                      $config
+	 * @param   \Windwalker\DI\Container $container
+	 * @param   \Muse\IO\IOInterface     $io
+	 * @param   Structure                $config
 	 */
-	public function __construct(Container $container, IOInterface $io, Registry $config = null)
+	public function __construct(Container $container, IOInterface $io, Structure $config = null)
 	{
 		// Get item & list name
 		$ctrl = $config['ctrl'] ? : $io->getArgument(1);
@@ -68,7 +68,7 @@ abstract class AbstractPackageController extends AbstractTaskController
 		$config['package.name'] = $name;
 		$config['package.namespace'] = $class;
 
-		$this->replace = new Registry;
+		$this->replace = new Structure;
 
 		$this->replace['package.namespace'] = $class;
 

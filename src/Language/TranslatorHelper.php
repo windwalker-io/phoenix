@@ -14,8 +14,8 @@ use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Ioc;
 use Windwalker\Language\LanguageNormalize;
-use Windwalker\Registry\Registry;
-use Windwalker\Registry\RegistryHelper;
+use Windwalker\Structure\Structure;
+use Windwalker\Structure\StructureHelper;
 
 /**
  * The TranslatorHelper class.
@@ -124,7 +124,7 @@ class TranslatorHelper
 
 		if (!$flatten)
 		{
-			$reg = new Registry;
+			$reg = new Structure;
 
 			foreach ($orphans as $key => $value)
 			{
@@ -146,7 +146,7 @@ class TranslatorHelper
 	 */
 	public static function getFormattedOrphans($format = 'ini')
 	{
-		$formatter = RegistryHelper::getFormatClass($format);
+		$formatter = StructureHelper::getFormatClass($format);
 
 		$returns = array();
 		$options = array();
@@ -207,7 +207,7 @@ class TranslatorHelper
 			file_put_contents($file, '');
 		}
 
-		$orphans = new Registry;
+		$orphans = new Structure;
 		$orphans->loadFile($file, $format, array('processSections' => true));
 
 		$orphans->loadString(static::getFormattedOrphans($format), $format, array('processSections' => true));

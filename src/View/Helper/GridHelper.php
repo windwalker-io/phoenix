@@ -15,14 +15,14 @@ use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
 use Windwalker\Dom\HtmlElement;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The GridHelper class.
  *
  * @property-read  HtmlView  $view
- * @property-read  Registry  $config
- * @property-read  Registry  $state
+ * @property-read  Structure $config
+ * @property-read  Structure $state
  * @property-read  Data      $current
  * @property-read  Data      $item
  * @property-read  integer   $row
@@ -41,7 +41,7 @@ class GridHelper
 	/**
 	 * Config object.
 	 *
-	 * @var Registry
+	 * @var Structure
 	 */
 	protected $config = array();
 
@@ -66,7 +66,7 @@ class GridHelper
 	/**
 	 * State object.
 	 *
-	 * @var Registry
+	 * @var Structure
 	 */
 	protected $state;
 
@@ -93,8 +93,8 @@ class GridHelper
 	public function __construct(HtmlView $view, $config = array())
 	{
 		$this->view   = $view;
-		$this->config = $config = ($config instanceof Registry) ? $config : new Registry($config);
-		$this->state  = $state = $view['state'] ? : new Registry;
+		$this->config = $config = ($config instanceof Structure) ? $config : new Structure($config);
+		$this->state  = $state = $view['state'] ? : new Structure;
 
 		// Merge fields
 		$fields = $config->get('field');
@@ -387,7 +387,7 @@ class GridHelper
 	/**
 	 * Method to get property State
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function getState()
 	{
@@ -397,11 +397,11 @@ class GridHelper
 	/**
 	 * Method to set property state
 	 *
-	 * @param   Registry $state
+	 * @param   Structure $state
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setState(Registry $state)
+	public function setState(Structure $state)
 	{
 		$this->state = $state;
 
@@ -411,7 +411,7 @@ class GridHelper
 	/**
 	 * Method to get property Config
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function getConfig()
 	{
@@ -421,11 +421,11 @@ class GridHelper
 	/**
 	 * Method to set property config
 	 *
-	 * @param   Registry $config
+	 * @param   Structure $config
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setConfig(Registry $config)
+	public function setConfig(Structure $config)
 	{
 		$this->config = $config;
 
