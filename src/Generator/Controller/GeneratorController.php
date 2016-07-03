@@ -8,7 +8,7 @@
 
 namespace Phoenix\Generator\Controller;
 
-use Muse\Controller\AbstractController;
+use Muse\Controller\AbstractMuseController;
 use Muse\Controller\AbstractTaskController;
 use Muse\IO\IOInterface;
 use Phoenix\Generator\Provider\MuseProvider;
@@ -23,7 +23,7 @@ use Windwalker\String\StringNormalise;
  * 
  * @since  1.0
  */
-class GeneratorController extends AbstractController
+class GeneratorController extends AbstractMuseController
 {
 	/**
 	 * Property task.
