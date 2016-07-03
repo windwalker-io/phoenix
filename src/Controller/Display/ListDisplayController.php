@@ -101,7 +101,7 @@ class ListDisplayController extends DisplayController
 		{
 			// Get search fields
 			$form = new Form;
-			$form->defineFormFields($this->model->getFieldDefinition('filter', $this->getName()));
+			$form->defineFormFields($this->model->getFieldDefinition('grid', $this->getName()));
 
 			$searchField = $form->getField('field', 'search');
 

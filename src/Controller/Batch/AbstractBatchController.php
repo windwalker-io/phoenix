@@ -223,15 +223,18 @@ abstract class AbstractBatchController extends AbstractPostController
 	 * getModel
 	 *
 	 * @param string $name
+	 * @param mixed  $source
 	 * @param bool   $forceNew
 	 *
-	 * @return  ModelRepository
+	 * @return ModelRepository
+	 *
+	 * @throws \DomainException
 	 */
-	public function getModel($name = null, $forceNew = false)
+	public function getModel($name = null, $source = null, $forceNew = false)
 	{
 		// Force the singular model
 		$name = $name ? : $this->config['item_name'];
 
-		return parent::getModel($name, $forceNew);
+		return parent::getModel($name, $source, $forceNew);
 	}
 }
