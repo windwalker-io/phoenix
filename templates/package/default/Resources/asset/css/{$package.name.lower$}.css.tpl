@@ -69,7 +69,8 @@ body.phoenix-admin {
 .main-sidebar #submenu.list-group a {
   border-radius: 0;
   border: none;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 0;
 }
 body.sidebar-hide .main-sidebar {
   display: none;

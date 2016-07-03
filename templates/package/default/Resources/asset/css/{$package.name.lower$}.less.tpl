@@ -93,7 +93,8 @@ body {
         a {
             border-radius: 0;
             border: none;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 0;
         }
     }
 }
