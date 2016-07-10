@@ -1,6 +1,6 @@
 {{-- Part of phoenix project. --}}
 
-@if (isset($disableToolbar))
+@if (!isset($disableToolbar))
 <aside id="admin-toolbar" class="">
     <button data-toggle="collapse" class="btn btn-default toolbar-toggle-button" data-target=".admin-toolbar-buttons">
         <span class="glyphicon glyphicon-wrench"></span>

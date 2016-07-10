@@ -10,7 +10,7 @@ namespace Phoenix\Controller;
 
 use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
-use Windwalker\Core\Controller\Middleware\ErrorHandlingMiddleware;
+use Windwalker\Core\Controller\Middleware\ValidateErrorHandlingMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\Entity\Entity;
@@ -85,7 +85,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	{
 		parent::init();
 
-		$this->addMiddleware(ErrorHandlingMiddleware::class, PriorityQueue::HIGH + 10);
+		$this->addMiddleware(ValidateErrorHandlingMiddleware::class, PriorityQueue::HIGH + 10);
 	}
 
 	/**
