@@ -14,6 +14,7 @@ use Windwalker\Core\Controller\Middleware\ValidateErrorHandlingMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\Entity\Entity;
+use Windwalker\Http\Response\JsonResponse;
 use Windwalker\Record\Record;
 use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Queue\PriorityQueue;
@@ -119,40 +120,43 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	/**
 	 * processSuccess
 	 *
-	 * @param string $message
-	 * @param string $type
-	 *
 	 * @return bool
 	 */
-	public function processSuccess($message = null, $type = Bootstrap::MSG_INFO)
+	public function processSuccess()
 	{
 		!$this->useTransaction or $this->model->transactionCommit();
 
 		$this->removeUserState($this->getContext('edit.data'));
 
-		$message = $message ? : $this->getSuccessMessage($this->record);
+		$this->addMessage($this->getSuccessMessage($this->record), Bootstrap::MSG_SUCCESS);
 
-		$this->setRedirect($this->getSuccessRedirect($this->record), $message, $type);
+		$this->setRedirect($this->getSuccessRedirect($this->record));
 
+		if ($this->response instanceof JsonResponse)
+		{
+			return $this->record->dump(true);
+		}
+		
 		return true;
 	}
 
 	/**
-	 * processFailure
+	 * Process failure.
 	 *
-	 * @param string $message
-	 * @param string $type
+	 * @param \Exception $e
 	 *
 	 * @return bool
 	 */
-	public function processFailure($message = null, $type = 'warning')
+	public function processFailure(\Exception $e = null)
 	{
 		!$this->useTransaction or $this->model->transactionRollback();
 
 		$this->setUserState($this->getContext('edit.data'), $this->data);
 
-		$this->setRedirect($this->getFailRedirect($this->record), $message, $type);
+		$this->addMessage($e->getMessage(), Bootstrap::MSG_WARNING);
 
+		$this->setRedirect($this->getFailRedirect($this->record));
+		
 		return false;
 	}
 
