@@ -61,7 +61,7 @@ class PhoenixProvider implements ServiceProviderInterface
 		// Html document
 		$closure = function(Container $container)
 		{
-			return $container->createSharedObject(HtmlHeaderManager::class);
+			return $container->newInstance(HtmlHeaderManager::class);
 		};
 
 		$container->share(HtmlHeaderManager::class, $closure)

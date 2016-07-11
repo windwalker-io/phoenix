@@ -120,9 +120,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	/**
 	 * processSuccess
 	 *
-	 * @return bool
+	 * @param mixed  $result
+	 *
+	 * @return mixed
 	 */
-	public function processSuccess()
+	public function processSuccess($result)
 	{
 		!$this->useTransaction or $this->model->transactionCommit();
 
@@ -137,7 +139,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 			return $this->record->dump(true);
 		}
 		
-		return true;
+		return $result;
 	}
 
 	/**
