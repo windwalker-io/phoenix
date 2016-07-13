@@ -1,6 +1,5 @@
 {{-- Part of phoenix project. --}}
 
-@section('copyright')
 <div id="copyright">
     <div class="container-fluid">
         <div class="row">
@@ -15,4 +14,3 @@
         </div>
     </div>
 </div>
-@show

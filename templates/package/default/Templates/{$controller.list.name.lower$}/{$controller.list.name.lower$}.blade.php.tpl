@@ -19,8 +19,8 @@
  * @var $batchForm     \Windwalker\Form\Form
  * @var $showFilterBar boolean
  * @var $grid          \Phoenix\View\Helper\GridHelper
- * @var $state         \Windwalker\Registry\Registry
- * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait[]
+ * @var $state         \Windwalker\Structure\Structure
+ * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record[]
  * @var $item          \{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait
  * @var $i             integer
  * @var $pagination    \Windwalker\Core\Pagination\Pagination
@@ -29,7 +29,7 @@
 
 @extends('_global.{$package.name.lower$}.admin')
 
-@section('toolbar')
+@section('toolbar-buttons')
     @include('toolbar')
 @stop
 

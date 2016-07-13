@@ -8,6 +8,8 @@
 
 namespace Phoenix\Script;
 
+use Phoenix\Html\HtmlHeader;
+use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -135,6 +137,22 @@ JS;
 		if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict)
 		{
 			$asset->internalScript(';var SimpleURI = URI.noConflict();');
+		}
+	}
+
+	/**
+	 * csrfToken
+	 *
+	 * @param string $token
+	 *
+	 * @return  void
+	 */
+	public static function csrfToken($token = null)
+	{
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			// Inject Token to meta
+			HtmlHeader::addMetadata('csrf-token', $token ?: CsrfProtection::getFormToken());
 		}
 	}
 }

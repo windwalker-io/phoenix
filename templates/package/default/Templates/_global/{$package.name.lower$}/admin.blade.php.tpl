@@ -3,9 +3,13 @@
 @extends('_global.{$package.name.lower$}.admin-wrapper')
 
 @section('content')
-    @include('_global.{$package.name.lower$}.widget.banner')
+    @section('banner')
+        @include('_global.{$package.name.lower$}.widget.banner')
+    @show
 
-    @include('_global.{$package.name.lower$}.widget.toolbar')
+    @section('toolbar')
+        @include('_global.{$package.name.lower$}.widget.toolbar')
+    @show
 
     @section('admin-area')
     <section id="admin-area">

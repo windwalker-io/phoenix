@@ -21,6 +21,11 @@ use Windwalker\Form\Field\TextField;
 class CalendarField extends TextField
 {
 	/**
+	 * @const string
+	 */
+	const EMPTY_DATETIME = '0000-00-00 00:00:00';
+
+	/**
 	 * prepare
 	 *
 	 * @param array $attrs
@@ -45,7 +50,7 @@ class CalendarField extends TextField
 		$from = $this->get('from', 'UTC');
 		$to   = $this->get('to', Ioc::getConfig()->get('system.timezone', 'UTC'));
 
-		if ($attrs['value'])
+		if ($attrs['value'] && $attrs['value'] != static::EMPTY_DATETIME)
 		{
 			$attrs['value'] = DateTime::convert($attrs['value'], $from, $to);
 		}

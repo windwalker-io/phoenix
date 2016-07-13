@@ -165,4 +165,31 @@ JS;
 			$asset->internalScript($js);
 		}
 	}
+
+	/**
+	 * csrfToken
+	 *
+	 * @param string $token
+	 *
+	 * @return  void
+	 *
+	 * @since   1.1
+	 */
+	public static function csrfToken($token = null)
+	{
+		if (!static::inited(__METHOD__))
+		{
+			CoreScript::csrfToken($token);
+
+			$js = <<<JS
+jQuery.ajaxSetup({
+    headers: {
+        'X-Csrf-Token': jQuery('meta[name="csrf-token"]').attr('content')
+    }
+});
+JS;
+
+			static::internalJS($js);
+		}
+	}
 }

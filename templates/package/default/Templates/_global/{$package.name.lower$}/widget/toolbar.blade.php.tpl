@@ -1,6 +1,5 @@
 {{-- Part of phoenix project. --}}
 
-@if (!isset($disableToolbar))
 <aside id="admin-toolbar" class="">
     <button data-toggle="collapse" class="btn btn-default toolbar-toggle-button" data-target=".admin-toolbar-buttons">
         <span class="glyphicon glyphicon-wrench"></span>
@@ -8,17 +7,15 @@
     </button>
     <div class="admin-toolbar-buttons">
         <hr />
-        @yield('toolbar')
+        @yield('toolbar-buttons')
     </div>
 </aside>
-@endif
 
 @section('script')
     @parent
 
     <script>
-        jQuery(function($)
-        {
+        jQuery(function ($) {
 
             var navTop;
             var isFixed = false;
@@ -48,6 +45,7 @@
             {
                 if (toolbar.length) {
                     var scrollTop = $(window).scrollTop();
+
                     if (scrollTop >= navTop && !isFixed) {
                         isFixed = true;
                         toolbar.addClass('admin-toolbar-fixed');

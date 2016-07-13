@@ -14,15 +14,15 @@
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait
- * @var $state \Windwalker\Registry\Registry
+ * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
+ * @var $state \Windwalker\Structure\Structure
  * @var $form  \Windwalker\Form\Form
  */
 ?>
 
 @extends('_global.{$package.name.lower$}.admin')
 
-@section('toolbar')
+@section('toolbar-buttons')
     @include('toolbar')
 @stop
 

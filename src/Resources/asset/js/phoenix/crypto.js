@@ -45,7 +45,7 @@ var Phoenix;
          * @param {string} key
          * @param {string} data
          */
-        ecrypt: function(key, data) {
+        encrypt: function(key, data) {
             var self = this;
 
             var code = underscore.map(data, function(c, i) {
@@ -63,7 +63,7 @@ var Phoenix;
          *
          * @returns {string}
          */
-        dcrypt: function(key, data) {
+        decrypt: function(key, data) {
             var self = this;
 
             data = this.base64Decode(data);
@@ -86,8 +86,7 @@ var Phoenix;
      *
      * @link  https://github.com/blueimp/JavaScript-MD5
      */
-    (function($)
-    {
+    (function(Crypto) {
         /*
          * Add integers, wrapping at 2^32. This uses 16-bit operations internally
          * to work around bugs in some JS interpreters.
@@ -382,7 +381,7 @@ var Phoenix;
         }
         else
         {
-            $.md5 = md5
+            Crypto.md5 = md5
         }
     })(Phoenix.Crypto);
 })(Phoenix || (Phoenix = {}));
