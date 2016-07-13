@@ -39,7 +39,7 @@ class ModalField extends TextField
 	protected $titleField = 'title';
 
 	/**
-	 * Property pkName.
+	 * Property keyName.
 	 *
 	 * @var  string
 	 */

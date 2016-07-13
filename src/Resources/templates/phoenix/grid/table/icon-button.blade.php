@@ -1,13 +1,16 @@
 {{-- Part of Phoenix project. --}}
 
-{{-- DO NOT USE THIS FILE NOW, USE: "icon-button-new.blade.php" INSTEAD. --}}
-
-@if (!empty($options['only_icon']))
-    <span class="glyphicon glyphicon-{{ $iconMapping[$value] or null }}" title="@translate(isset($options['titleMapping'][$value]) ? $options['titleMapping'][$value] : null)"></span>
+@if (!empty($only_icon))
+    <span class="glyphicon glyphicon-{{ $icon or null }} hasTooltip" title="@translate($title)"></span>
 @else
-    <button type="button" class="grid-boolean-icon data-state-{{ $value }} btn btn-default btn-xs hasTooltip"
-        title="@translate(isset($options['titleMapping'][$value]) ? $options['titleMapping'][$value] : null)"
-        onclick="Phoenix.Grid.doTask('{{ $taskMapping[$value] or null }}', {{ $row }})">
-        <span class="glyphicon glyphicon-{{ $iconMapping[$value] or null }}"></span>
+    <button type="button" class="grid-boolean-icon data-state-{{ $value or null }} btn btn-default btn-xs hasTooltip"
+        title="@translate($title)"
+        {{ !empty($disabled) ? 'disabled' : null }}
+
+        @if (!empty($task))
+        onclick="Phoenix.Grid.doTask('{{ $task or null }}', {{ $row or null }})"
+        @endif
+    >
+        <span class="glyphicon glyphicon-{{ $icon or null }}"></span>
     </button>
 @endif

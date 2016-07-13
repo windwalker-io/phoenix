@@ -43,7 +43,7 @@ abstract class AbstractDeleteController extends AbstractBatchController
 	 */
 	protected function save($pk, Data $data)
 	{
-		$data->{$this->pkName} = $pk;
+		$data->{$this->keyName} = $pk;
 
 		$this->model->delete($pk);
 	}

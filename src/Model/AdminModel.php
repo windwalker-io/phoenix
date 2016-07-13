@@ -10,7 +10,7 @@ namespace Phoenix\Model;
 
 use Windwalker\Core\User\User;
 use Windwalker\Core\DateTime\DateTime;
-use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 use Windwalker\Filter\OutputFilter;
 use Windwalker\Record\Record;
 
@@ -34,18 +34,18 @@ abstract class AdminModel extends CrudModel
 	/**
 	 * save
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return  boolean
 	 */
-	public function save(Data $data)
+	public function save(DataInterface $data)
 	{
 		$result = parent::save($data);
 
 		// Reorder
 		if ($result && $this->get('order.position') == static::ORDER_POSITION_FIRST)
 		{
-			$pk = $this->get('item.pk');
+			$pk = $data->{$this->getRecord()->getKeyName()};
 
 			$this->reorder(array($pk => 0));
 
@@ -233,7 +233,7 @@ abstract class AdminModel extends CrudModel
 	{
 		$orderField  = $orderField ? : $this->state->get('order.column', 'ordering');
 
-		$mapper = $this->getDataMapper()->f;
+		$mapper = $this->getDataMapper();
 
 		$dataset = $mapper->find($conditions);
 

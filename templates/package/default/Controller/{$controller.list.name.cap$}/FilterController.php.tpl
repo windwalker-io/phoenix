@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
 use Phoenix\Controller\Grid\AbstractFilterController;
+use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 
 /**
  * The FilterController class.
@@ -17,6 +18,8 @@ use Phoenix\Controller\Grid\AbstractFilterController;
  */
 class FilterController extends AbstractFilterController
 {
+	use CsrfProtectionTrait;
+	
 	/**
 	 * Property name.
 	 *

@@ -8,7 +8,8 @@
 
 namespace Phoenix\Model;
 
-use Windwalker\Data\Data;
+use Windwalker\Core\Model\DatabaseRepositoryInterface;
+use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 
 /**
@@ -16,36 +17,36 @@ use Windwalker\DataMapper\Entity\Entity;
  *
  * @since  {DEPLOY_VERSION}
  */
-interface CrudRepositoryInterface
+interface CrudRepositoryInterface extends DatabaseRepositoryInterface
 {
 	/**
 	 * getItem
 	 *
 	 * @param   mixed  $pk
 	 *
-	 * @return  Data|Entity
+	 * @return  DataInterface|Entity
 	 */
 	public function getItem($pk = null);
 
 	/**
 	 * save
 	 *
-	 * @param Data|Entity $data
+	 * @param DataInterface|Entity $data
 	 *
 	 * @return  boolean
 	 *
 	 * @throws  \RuntimeException
 	 */
-	public function save(Data $data);
+	public function save(DataInterface $data);
 
 	/**
 	 * delete
 	 *
-	 * @param array $pk
+	 * @param array $conditions
 	 *
 	 * @return  boolean
 	 *
 	 * @throws \UnexpectedValueException
 	 */
-	public function delete($pk = null);
+	public function delete($conditions = null);
 }

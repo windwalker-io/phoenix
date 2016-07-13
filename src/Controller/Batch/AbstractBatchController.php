@@ -75,7 +75,7 @@ abstract class AbstractBatchController extends AbstractPostController
 	 */
 	protected function save($pk, Data $data)
 	{
-		$data->{$this->pkName} = $pk;
+		$data->{$this->keyName} = $pk;
 
 		$this->model->save($data);
 	}
@@ -88,62 +88,32 @@ abstract class AbstractBatchController extends AbstractPostController
 	 */
 	protected function doExecute()
 	{
-		!$this->useTransaction or $this->model->transactionStart();
+		$data = new Data($this->data);
 
-		try
+		$data = $this->cleanData($data);
+
+		$this->checkAccess($data);
+
+		if ($data->isNull() && !$this->allowNullData)
 		{
-			$data = new Data($this->data);
-
-			$data = $this->cleanData($data);
-
-			$this->checkAccess($data);
-
-			if ($data->isNull() && !$this->allowNullData)
-			{
-				throw new ValidateFailException(Translator::translate('phoenix.message.batch.error.empty'));
-			}
-
-			if (count($this->pks) < 1)
-			{
-				throw new ValidateFailException(Translator::translate($this->langPrefix . '.message.' . $this->action . '.empty'));
-			}
-
-			$this->validate($data);
-
-			$this->preSave($data);
-
-			foreach ((array) $this->pks as $pk)
-			{
-				$this->save($pk, clone $data);
-			}
-
-			$this->postSave($data);
-		}
-		catch (ValidateFailException $e)
-		{
-			!$this->useTransaction or $this->model->transactionRollback();
-
-			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), Bootstrap::MSG_WARNING);
-
-			return false;
-		}
-		catch (\Exception $e)
-		{
-			!$this->useTransaction or $this->model->transactionRollback();
-
-			if (WINDWALKER_DEBUG)
-			{
-				throw $e;
-			}
-
-			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), Bootstrap::MSG_DANGER);
-
-			return false;
+			throw new ValidateFailException(Translator::translate('phoenix.message.batch.error.empty'));
 		}
 
-		!$this->useTransaction or $this->model->transactionCommit();
+		if (count($this->pks) < 1)
+		{
+			throw new ValidateFailException(Translator::translate($this->langPrefix . '.message.' . $this->action . '.empty'));
+		}
 
-		$this->setRedirect($this->getSuccessRedirect(), $this->getSuccessMessage($data), Bootstrap::MSG_SUCCESS);
+		$this->validate($data);
+
+		$this->preSave($data);
+
+		foreach ((array) $this->pks as $pk)
+		{
+			$this->save($pk, clone $data);
+		}
+
+		$this->postSave($data);
 
 		return true;
 	}

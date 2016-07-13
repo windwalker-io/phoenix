@@ -96,7 +96,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	protected function doExecute()
 	{
 		// Get primary key from form data
-		$pk = ArrayHelper::getValue($this->data, $this->pkName);
+		$pk = ArrayHelper::getValue($this->data, $this->keyName);
 
 		// If primary key not exists, this is a new record.
 		$this->isNew = !$pk;
@@ -201,9 +201,9 @@ abstract class AbstractSaveController extends AbstractPostController
 	 */
 	protected function getFailRedirect(Data $data = null)
 	{
-		$pk = $data->{$this->pkName} ? : $this->model['item.pk'];
+		$pk = $this->record->{$this->keyName};
 
-		return $this->router->route($this->getName(), $this->getRedirectQuery(array($this->pkName => $pk)));
+		return $this->router->route($this->getName(), $this->getRedirectQuery(array($this->keyName => $pk)));
 	}
 
 	/**
@@ -226,7 +226,7 @@ abstract class AbstractSaveController extends AbstractPostController
 				return $this->router->route($this->getName(), $this->getRedirectQuery(array('new' => '')));
 
 			case 'save2copy':
-				$data->{$this->pkName} = null;
+				$data->{$this->keyName} = null;
 
 				if ($data->title)
 				{
@@ -243,9 +243,9 @@ abstract class AbstractSaveController extends AbstractPostController
 				return $this->router->route($this->getName(), $this->getRedirectQuery());
 
 			default:
-				$pk = $this->model['item.pk'];
+				$pk = $this->record->{$this->keyName};
 
-				return $this->router->route($this->getName(), $this->getRedirectQuery(array($this->pkName => $pk)));
+				return $this->router->route($this->getName(), $this->getRedirectQuery(array($this->keyName => $pk)));
 		}
 	}
 }

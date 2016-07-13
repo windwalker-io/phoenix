@@ -176,14 +176,14 @@ class GridHelper
 	 */
 	public function orderButton()
 	{
-		$pkName = $this->config->get('field.pk');
+		$keyName = $this->config->get('field.pk');
 		$orderField = $this->config['field.ordering'];
 		$saveOrder = $this->state->get('list.saveorder');
 
 		return WidgetHelper::render('phoenix.grid.table.order-button', array(
 			'item'   => $this->current,
 			'row'    => $this->row,
-			'pkName' => $pkName,
+			'keyName' => $keyName,
 			'orderField'  => $orderField,
 			'saveOrder' => $saveOrder
 		), WidgetHelper::EDGE);
@@ -225,10 +225,10 @@ class GridHelper
 	 */
 	public function checkbox()
 	{
-		$pkName = $this->config->get('field.pk');
+		$keyName = $this->config->get('field.pk');
 
 		return WidgetHelper::render('phoenix.grid.table.checkbox', array(
-			'pkName' => $pkName,
+			'keyName' => $keyName,
 			'item'   => $this->current,
 			'row'    => $this->row
 		), WidgetHelper::EDGE);
@@ -316,33 +316,6 @@ class GridHelper
 	public function state($value, array $options = array())
 	{
 		return StateButton::create($this->row, $options)->render($value);
-	}
-
-	/**
-	 * Show a boolean icon.
-	 *
-	 * @param   mixed  $value       A variable has value or not.
-	 * @param   array  $taskMapping Click to call a component task. Not available yet.
-	 * @param   array  $iconMapping The state to icon mapping.
-	 * @param   array  $options     Some options.
-	 *
-	 * @return string A boolean icon HTML string.
-	 *
-	 * @deprecated Use createIconButton() instead.
-	 */
-	public function stateButton($value, $taskMapping = array(), $iconMapping = array(), $options = array())
-	{
-		$options['titleMapping'] = isset($options['titleMapping']) ? (array) $options['titleMapping'] : array();
-		$options['template'] = isset($options['template']) ? $options['template'] : 'phoenix.grid.table.icon-button';
-
-		return WidgetHelper::render($options['template'], array(
-			'value' => (string) $value,
-			'taskMapping' => $taskMapping,
-			'iconMapping' => $iconMapping,
-			'item' => $this->current,
-			'row'  => $this->row,
-			'options' => $options
-		), WidgetHelper::EDGE);
 	}
 
 	/**

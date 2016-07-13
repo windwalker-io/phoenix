@@ -45,18 +45,18 @@ trait FormAwareRepositoryTrait
 
 		try
 		{
-			$pkName = $this['pkName'] ? : $this->getRecord()->getKeyName();
+			$keyName = $this['keyName'] ? : $this->getRecord()->getKeyName();
 		}
 		catch (\DomainException $e)
 		{
-			$pkName = null;
+			$keyName = null;
 		}
 
-		$pkName = $pkName ? : 'id';
+		$keyName = $keyName ? : 'id';
 
 		$item = $this->getItem();
 
-		if ($sessionData && ArrayHelper::getValue($sessionData, $pkName) == $item->$pkName)
+		if ($sessionData && ArrayHelper::getValue($sessionData, $keyName) == $item->$keyName)
 		{
 			return $sessionData;
 		}

@@ -10,6 +10,8 @@ namespace Phoenix\Model;
 
 use Windwalker\Core\Model\DatabaseModelRepository;
 use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
+use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
 
 /**
@@ -22,33 +24,33 @@ class ItemModel extends DatabaseModelRepository
 	/**
 	 * getItem
 	 *
-	 * @param   mixed $pk
+	 * @param   mixed $conditions
 	 *
 	 * @return  Record
 	 * @throws \InvalidArgumentException
 	 */
-	public function getItem($pk = null)
+	public function getItem($conditions = null)
 	{
 		$state = $this->state;
 
-		$pk = $pk ? : $state['item.pk'];
+		$conditions = $conditions ? : $state['load.conditions'];
 
-		return $this->fetch('item.' . json_encode($pk), function() use ($pk, $state)
+		return $this->fetch('item.' . json_encode($conditions), function() use ($conditions, $state)
 		{
-			if (!$pk)
+			if (!$conditions)
 			{
-				return $this->getRecord()->reset(true);
+				return $this->getRecord()->reset(false);
 			}
 
 			$item = $this->getRecord();
 
 			try
 			{
-				$item->load($pk);
+				$item->load($conditions);
 			}
-			catch (\RuntimeException $e)
+			catch (NoResultException $e)
 			{
-				return $item->reset(true);
+				return $item->reset(false);
 			}
 
 			$this->postGetItem($item);
@@ -60,11 +62,11 @@ class ItemModel extends DatabaseModelRepository
 	/**
 	 * postGetItem
 	 *
-	 * @param Data $item
+	 * @param DataInterface $item
 	 *
 	 * @return  void
 	 */
-	protected function postGetItem(Data $item)
+	protected function postGetItem(DataInterface $item)
 	{
 	}
 }

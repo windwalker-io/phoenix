@@ -9,8 +9,7 @@
 namespace Phoenix\Model;
 
 use Phoenix\Model\Traits\FormAwareRepositoryTrait;
-use Windwalker\Core\Model\ModelRepositoryInterface;
-use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Record\Record;
 
@@ -22,9 +21,6 @@ use Windwalker\Record\Record;
 class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudRepositoryInterface
 {
 	use FormAwareRepositoryTrait;
-
-	const ORDER_POSITION_FIRST = 'first';
-	const ORDER_POSITION_LAST  = 'last';
 	
 	/**
 	 * Property updateNulls.
@@ -36,7 +32,7 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 	/**
 	 * save
 	 *
-	 * @param Data|Entity $data
+	 * @param DataInterface|Entity $data
 	 *
 	 * @return  boolean
 	 *
@@ -44,18 +40,16 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 	 * @throws  \InvalidArgumentException
 	 * @throws  \RuntimeException
 	 */
-	public function save(Data $data)
+	public function save(DataInterface $data)
 	{
 		$record = $this->getRecord();
 		$key = $record->getKeyName();
 
-		$isNew = true;
-		$pk    = $data->$key;
+		$pk = $data->$key;
 
 		if ($pk)
 		{
 			$record->load($pk);
-			$isNew = false;
 		}
 
 		$record->bind($data->dump(true));
@@ -64,14 +58,6 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 
 		$record->validate()
 			->store($this->updateNulls);
-
-		if ($record->$key)
-		{
-			$this['item.pk'] = $data->$key = $record->$key;
-		}
-
-		$this['item.new'] = $isNew;
-		$this['item.pkName'] = $key;
 
 		$this->postSaveHook($record);
 
@@ -105,20 +91,20 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 	/**
 	 * delete
 	 *
-	 * @param array $pk
+	 * @param array $conditions
 	 *
 	 * @return  boolean
 	 *
 	 * @throws \UnexpectedValueException
 	 * @throws \Windwalker\Record\Exception\NoResultException
 	 */
-	public function delete($pk = null)
+	public function delete($conditions = null)
 	{
-		$pk = $pk ? : $this['item.pk'];
+		$conditions = $conditions ? : $this['load.conditions'];
 
 		$record = $this->getRecord();
 
-		$record->load($pk)->delete();
+		$record->load($conditions)->delete();
 
 		return true;
 	}

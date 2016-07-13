@@ -111,7 +111,7 @@ abstract class AbstractCopyController extends AbstractBatchController
 		}
 		while ($result);
 
-		unset($item->{$this->pkName});
+		unset($item->{$this->keyName});
 
 		$this->model->save($item);
 	}

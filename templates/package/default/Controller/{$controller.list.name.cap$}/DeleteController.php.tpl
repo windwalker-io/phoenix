@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
 use Phoenix\Controller\Batch\AbstractDeleteController;
+use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 
 /**
  * The DeleteController class.
@@ -17,6 +18,8 @@ use Phoenix\Controller\Batch\AbstractDeleteController;
  */
 class DeleteController extends AbstractDeleteController
 {
+	use CsrfProtectionTrait;
+	
 	/**
 	 * Property name.
 	 *

@@ -89,7 +89,7 @@ class DisplayController extends AbstractPhoenixController
 	 */
 	protected function doExecute()
 	{
-		$this->prepareUserState($this->model);
+		$this->prepareModelState($this->model);
 
 		// Add default
 		$this->view->setModel($this->model, true);
@@ -155,7 +155,7 @@ class DisplayController extends AbstractPhoenixController
 	 *
 	 * @return  void
 	 */
-	protected function prepareUserState(ModelRepository $model)
+	protected function prepareModelState(ModelRepository $model)
 	{
 	}
 

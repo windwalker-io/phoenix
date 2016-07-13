@@ -25,11 +25,11 @@ class ItemDisplayController extends DisplayController
 	protected $inflection = self::SINGULAR;
 
 	/**
-	 * Property pkName.
+	 * Property keyName.
 	 *
 	 * @var  string
 	 */
-	protected $pkName = 'id';
+	protected $keyName = 'id';
 
 	/**
 	 * prepareExecute
@@ -38,8 +38,8 @@ class ItemDisplayController extends DisplayController
 	 *
 	 * @return void
 	 */
-	protected function prepareUserState(ModelRepository $model)
+	protected function prepareModelState(ModelRepository $model)
 	{
-		$model['item.pk'] = $this->input->get($this->pkName);
+		$model['load.conditions'] = $this->input->get($this->keyName);
 	}
 }

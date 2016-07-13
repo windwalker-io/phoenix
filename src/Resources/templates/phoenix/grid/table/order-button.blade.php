@@ -2,7 +2,7 @@
 
 @if ($saveOrder)
 <div class="input-group ordering-control">
-    <input type="text" class="form-control input-xs" data-order-row="{{ $row }}" name="ordering[{{ $item->$pkName }}]" value="{{ $item->$orderField }}" onkeydown="if(event.keyCode == 13) return false;" />
+    <input type="text" class="form-control input-xs" data-order-row="{{ $row }}" name="ordering[{{ $item->$keyName }}]" value="{{ $item->$orderField }}" onkeydown="if(event.keyCode == 13) return false;" />
     <div class="input-group-btn">
         <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.reorder({{ $row }}, -1);"
             title="@translate('phoenix.grid.ordering.moveup')">

@@ -10,14 +10,12 @@ namespace Phoenix\Controller;
 
 use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
-use Windwalker\Core\Controller\Middleware\ValidateErrorHandlingMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Http\Response\JsonResponse;
 use Windwalker\Record\Record;
 use Windwalker\Uri\Uri;
-use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AbstractAdminController class.
@@ -55,18 +53,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	protected $record;
 
 	/**
-	 * Property pkName.
+	 * Property keyName.
 	 *
 	 * @var  string
 	 */
-	protected $pkName = null;
-
-	/**
-	 * Property useTransition.
-	 *
-	 * @var  boolean
-	 */
-	protected $useTransaction = true;
+	protected $keyName = null;
 
 	/**
 	 * Property allowRedirectQuery.
@@ -85,8 +76,6 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	protected function init()
 	{
 		parent::init();
-
-		$this->addMiddleware(ValidateErrorHandlingMiddleware::class, PriorityQueue::HIGH + 10);
 	}
 
 	/**
@@ -109,12 +98,10 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		}
 
 		// Determine the name of the primary key for the data.
-		if (empty($this->pkName))
+		if (empty($this->keyName))
 		{
-			$this->pkName = $this->record->getKeyName() ? : 'id';
+			$this->keyName = $this->record->getKeyName() ? : 'id';
 		}
-
-		!$this->useTransaction or $this->model->transactionStart();
 	}
 
 	/**
@@ -126,8 +113,6 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 */
 	public function processSuccess($result)
 	{
-		!$this->useTransaction or $this->model->transactionCommit();
-
 		$this->removeUserState($this->getContext('edit.data'));
 
 		$this->addMessage($this->getSuccessMessage($this->record), Bootstrap::MSG_SUCCESS);
@@ -151,8 +136,6 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 */
 	public function processFailure(\Exception $e = null)
 	{
-		!$this->useTransaction or $this->model->transactionRollback();
-
 		$this->setUserState($this->getContext('edit.data'), $this->data);
 
 		$this->addMessage($e->getMessage(), Bootstrap::MSG_WARNING);

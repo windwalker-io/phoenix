@@ -60,7 +60,7 @@ class IconButton
 	 *
 	 * @var  string
 	 */
-	protected $template = 'phoenix.grid.table.icon-button-new';
+	protected $template = 'phoenix.grid.table.icon-button';
 
 	/**
 	 * create

@@ -45,7 +45,10 @@ class CalendarField extends TextField
 		$from = $this->get('from', 'UTC');
 		$to   = $this->get('to', Ioc::getConfig()->get('system.timezone', 'UTC'));
 
-		$attrs['value'] = DateTime::convert($attrs['value'], $from, $to);
+		if ($attrs['value'])
+		{
+			$attrs['value'] = DateTime::convert($attrs['value'], $from, $to);
+		}
 
 		$input  = parent::buildInput($attrs);
 		$format = $this->get('format', 'YYYY-MM-DD HH:mm:ss');
