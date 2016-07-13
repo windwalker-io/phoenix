@@ -31,13 +31,6 @@ class DisplayController extends AbstractPhoenixController
 	protected $model;
 
 	/**
-	 * Property models.
-	 *
-	 * @var  ModelRepository[]
-	 */
-	protected $subModels = array();
-
-	/**
 	 * Property view.
 	 *
 	 * @var  HtmlView
@@ -74,7 +67,7 @@ class DisplayController extends AbstractPhoenixController
 		// Prepare response
 		$response = $this->response;
 
-		$this->response = $this->createResponse(
+		$this->response = $this::createResponse(
 			$this->format,
 			$response->getBody()->__toString(),
 			$response->getStatusCode(),
@@ -93,14 +86,6 @@ class DisplayController extends AbstractPhoenixController
 
 		// Add default
 		$this->view->setModel($this->model, true);
-
-		// Push sub models
-		foreach ((array) $this->subModels as $name => $model)
-		{
-			$name = is_numeric($name) ? null : $name;
-
-			$this->view->setModel($model, false, $name);
-		}
 
 		$this->assignModels($this->view);
 		$this->prepareViewData($this->view);
@@ -226,7 +211,7 @@ class DisplayController extends AbstractPhoenixController
 	 *
 	 * @return  Response\AbstractContentTypeResponse
 	 */
-	public function createResponse($format, ...$args)
+	public static function createResponse($format, ...$args)
 	{
 		switch (strtolower($format))
 		{

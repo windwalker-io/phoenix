@@ -11,6 +11,7 @@ namespace Phoenix\Model;
 use Phoenix\Model\Traits\FormAwareRepositoryTrait;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
+use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
 
 /**
@@ -34,7 +35,7 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 	 *
 	 * @param DataInterface|Entity $data
 	 *
-	 * @return  boolean
+	 * @return  DataInterface|Entity
 	 *
 	 * @throws  \Windwalker\Record\Exception\NoResultException
 	 * @throws  \InvalidArgumentException
@@ -42,17 +43,20 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 	 */
 	public function save(DataInterface $data)
 	{
+		// Prepare Record object, primary keys and dump input data
 		$record = $this->getRecord();
-		$key = $record->getKeyName();
+		$keys   = $record->getKeyName(true);
+		$dumped = $data->dump(true);
 
-		$pk = $data->$key;
+		// Let's check if primary exists, do action for update.
+		$conditions = array_intersect_key($dumped, array_flip($keys));
 
-		if ($pk)
+		if (array_filter($conditions))
 		{
-			$record->load($pk);
+			$record->load($conditions);
 		}
 
-		$record->bind($data->dump(true));
+		$record->bind($dumped);
 
 		$this->prepareRecord($record);
 
@@ -61,9 +65,9 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 
 		$this->postSaveHook($record);
 
-		$data->bind($record->dump());
+		$data->bind($record->dump(true));
 
-		return true;
+		return $data;
 	}
 
 	/**
@@ -104,7 +108,15 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 
 		$record = $this->getRecord();
 
-		$record->load($conditions)->delete();
+		try
+		{
+			// Find record first to check we can delete it.
+			$record->load($conditions)->delete();
+		}
+		catch (NoResultException $e)
+		{
+			return false;
+		}
 
 		return true;
 	}

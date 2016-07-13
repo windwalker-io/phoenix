@@ -10,11 +10,11 @@ namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractPostController;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
-use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 
 /**
  * The AbstractBatchController class.
@@ -62,22 +62,22 @@ abstract class AbstractBatchController extends AbstractPostController
 	{
 		parent::prepareExecute();
 
-		$this->pks = $this->input->getVar('cid');
+		$this->pks = (array) $this->input->getArray($this->keyName, $this->input->getArray('id'));
 	}
 
 	/**
 	 * save
 	 *
-	 * @param   string|int $pk
-	 * @param   Data       $data
+	 * @param   string|int     $pk
+	 * @param   DataInterface  $data
 	 *
-	 * @return  mixed
+	 * @return  boolean
 	 */
-	protected function save($pk, Data $data)
+	protected function save($pk, DataInterface $data)
 	{
 		$data->{$this->keyName} = $pk;
 
-		$this->model->save($data);
+		return $this->model->save($data);
 	}
 
 	/**

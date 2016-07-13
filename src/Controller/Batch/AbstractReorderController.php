@@ -68,31 +68,9 @@ abstract class AbstractReorderController extends AbstractBatchController
 	 */
 	protected function doExecute()
 	{
-		!$this->useTransaction or $this->model->transactionStart();
+		$this->model['order.column'] = $this->orderField;
 
-		try
-		{
-			$this->model['order.column'] = $this->orderField;
-
-			$this->model->reorder((array) $this->data);
-		}
-		catch (\Exception $e)
-		{
-			!$this->useTransaction or $this->model->transactionRollback();
-
-			if (WINDWALKER_DEBUG)
-			{
-				throw $e;
-			}
-
-			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), 'warning');
-
-			return false;
-		}
-
-		!$this->useTransaction or $this->model->transactionCommit();
-
-		$this->setRedirect($this->getSuccessRedirect(), $this->getSuccessMessage(), 'success');
+		$this->model->reorder((array) $this->data);
 
 		return true;
 	}

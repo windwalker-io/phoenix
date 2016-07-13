@@ -100,8 +100,7 @@ class ListDisplayController extends DisplayController
 		if ($search['field'] == '*' && isset($search['content']))
 		{
 			// Get search fields
-			$form = new Form;
-			$form->defineFormFields($this->model->getFieldDefinition('grid', $this->getName()));
+			$form = $this->model->getForm('grid');
 
 			$searchField = $form->getField('field', 'search');
 

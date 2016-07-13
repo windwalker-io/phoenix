@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 use Windwalker\String\StringHelper;
 
 /**
@@ -57,12 +57,12 @@ abstract class AbstractCopyController extends AbstractBatchController
 	/**
 	 * save
 	 *
-	 * @param int|string $pk
-	 * @param Data       $data
+	 * @param int|string     $pk
+	 * @param DataInterface  $data
 	 *
-	 * @return  void
+	 * @return  boolean
 	 */
-	protected function save($pk, Data $data)
+	protected function save($pk, DataInterface $data)
 	{
 		// We load existing item first and bind data into it.
 		$this->record->reset();
@@ -113,6 +113,6 @@ abstract class AbstractCopyController extends AbstractBatchController
 
 		unset($item->{$this->keyName});
 
-		$this->model->save($item);
+		return $this->model->save($item);
 	}
 }

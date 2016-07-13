@@ -19,17 +19,21 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-abstract class AdminModel extends CrudModel
+abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 {
-	const ORDER_POSITION_FIRST = 'first';
-	const ORDER_POSITION_LAST  = 'last';
-
 	/**
 	 * Property reorderConditions.
 	 *
 	 * @var  array
 	 */
 	protected $reorderConditions = array();
+
+	/**
+	 * Property reorderPosition.
+	 *
+	 * @var  string
+	 */
+	protected $reorderPosition = self::ORDER_POSITION_LAST;
 
 	/**
 	 * save
@@ -130,7 +134,7 @@ abstract class AdminModel extends CrudModel
 		{
 			if (empty($record->$key))
 			{
-				$this->setOrderPosition($record);
+				$this->setOrderPosition($record, $this->reorderPosition);
 			}
 		}
 	}
@@ -180,10 +184,10 @@ abstract class AdminModel extends CrudModel
 		$orderField = $orderField ? : $this->state->get('order.column', 'ordering');
 
 		// Update ordering values
-		foreach ($orders as $pk => $order)
+		foreach ($orders as $pk => $orderNumber)
 		{
 			$record->load($pk);
-			$record->$orderField = $order;
+			$record->$orderField = $orderNumber;
 
 			$record->store();
 
@@ -272,7 +276,7 @@ abstract class AdminModel extends CrudModel
 	 */
 	public function getReorderConditions(Record $record)
 	{
-		$fields = (array) $this->state->get('order.condition.fields', $this->reorderConditions);
+		$fields = (array) $this->state->get('order.condition_fields', $this->reorderConditions);
 
 		$conditions = array();
 
@@ -303,6 +307,8 @@ abstract class AdminModel extends CrudModel
 		{
 			return;
 		}
+
+		$position = $this->get('order.position', $position);
 
 		if ($position == static::ORDER_POSITION_FIRST)
 		{

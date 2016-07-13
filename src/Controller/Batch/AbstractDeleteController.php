@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 
 /**
  * The DeleteController class.
@@ -36,15 +36,15 @@ abstract class AbstractDeleteController extends AbstractBatchController
 	/**
 	 * save
 	 *
-	 * @param   string|int $pk
-	 * @param   Data       $data
+	 * @param   string|int     $pk
+	 * @param   DataInterface  $data
 	 *
-	 * @return  mixed
+	 * @return  boolean
 	 */
-	protected function save($pk, Data $data)
+	protected function save($pk, DataInterface $data)
 	{
 		$data->{$this->keyName} = $pk;
 
-		$this->model->delete($pk);
+		return $this->model->delete($pk);
 	}
 }

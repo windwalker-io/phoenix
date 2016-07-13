@@ -88,19 +88,19 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		parent::prepareExecute();
 
 		$this->model  = $this->getModel($this->model);
-		$this->record = $this->getRecord($this->record);
+		$this->record = $this->model->getRecord($this->record);
 		$this->task   = $this->input->get('task');
 
 		// Determine model
 		if (!$this->model instanceof CrudRepositoryInterface)
 		{
-			throw new \DomainException(sprintf('%s model need extend to CrudModel', $this->getName()));
+			throw new \DomainException(sprintf('%s model should be instance of ' . CrudRepositoryInterface::class, $this->getName()));
 		}
 
 		// Determine the name of the primary key for the data.
 		if (empty($this->keyName))
 		{
-			$this->keyName = $this->record->getKeyName() ? : 'id';
+			$this->keyName = $this->model->getKeyName() ? : 'id';
 		}
 	}
 
@@ -203,44 +203,6 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		}
 
 		return $query;
-	}
-
-	/**
-	 * useTransaction
-	 *
-	 * @param   boolean  $bool
-	 *
-	 * @return  static|bool
-	 */
-	public function useTransaction($bool = null)
-	{
-		if ($bool === null)
-		{
-			return $this->useTransaction;
-		}
-
-		$this->useTransaction = (bool) $bool;
-
-		return $this;
-	}
-
-	/**
-	 * getRecord
-	 *
-	 * @param string $name
-	 *
-	 * @return  Record
-	 */
-	public function getRecord($name = null)
-	{
-		if (!$this->model)
-		{
-			$this->model = $this->getModel();
-		}
-
-		$name = $name ? : $this->config['item_name'];
-
-		return $this->model->getRecord($name);
 	}
 
 	/**

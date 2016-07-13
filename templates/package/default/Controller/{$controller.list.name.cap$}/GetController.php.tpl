@@ -11,7 +11,6 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}Model;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\ListDisplayController;
-use Windwalker\Core\Controller\Middleware\JsonResponseMiddleware;
 use Windwalker\Core\Model\ModelRepository;
 
 /**
@@ -81,11 +80,6 @@ class GetController extends ListDisplayController
 		$this->format = $this->input->get('format', 'html');
 
 		parent::prepareExecute();
-
-		if ($this->format == 'json')
-		{
-			$this->addMiddleware(JsonResponseMiddleware::class);
-		}
 	}
 
 	/**
