@@ -13,11 +13,13 @@ use Windwalker\Core\Controller\AbstractController;
 use Windwalker\String\StringNormalise;
 
 /**
- * The AbstractBatchDelegatingController class.
+ * The BatchDelegatingController class.
+ * 
+ * @see  AbstractBatchController
  *
  * @since  1.0
  */
-class BatchDelegationController extends AbstractPhoenixController
+class BatchDelegatingController extends AbstractPhoenixController
 {
 	/**
 	 * Property inflection.
@@ -40,7 +42,7 @@ class BatchDelegationController extends AbstractPhoenixController
 			throw new \InvalidArgumentException('Task of: ' . __CLASS__ . ' should not be empty.');
 		}
 
-		$resolver = $this->package->getMvcResolver();
+		$resolver = $this->getPackage()->getMvcResolver();
 
 		$class = $resolver->resolveController($this->package, $this->getName() . '\Batch\\' . $task . 'Controller');
 
@@ -54,13 +56,13 @@ class BatchDelegationController extends AbstractPhoenixController
 		$controller->setName($this->getName());
 		$controller->config->set('item_name', $this->config['item_name']);
 		$controller->config->set('list_name', $this->config['list_name']);
+		
+		$this->hmvc($controller, $this->input->compact(array(
+			'id'       => 'array',
+			'batch'    => 'var',
+			'ordering' => 'var',
+		)));
 
-		$result = $this->hmvc($controller, array(
-			'cid'      => $this->input->getVar('cid'),
-			'batch'    => $this->input->getVar('batch'),
-			'ordering' => $this->input->getVar('ordering'),
-		));
-
-		return $result;
+		return true;
 	}
 }

@@ -8,8 +8,10 @@
 
 namespace Phoenix\Script;
 
+use Phoenix\Html\HtmlHeader;
 use Windwalker\Core\Asset\AbstractScript;
 use Windwalker\Core\Language\Translator;
+use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
 use Windwalker\Utilities\ArrayHelper;
@@ -37,6 +39,7 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
+			static::csrfToken();
 
 			static::addJS(static::phoenixName() . '/js/phoenix/phoenix.js');
 		}
@@ -378,6 +381,32 @@ JS;
 			CoreScript::underscore();
 
 			$asset->addScript(static::phoenixName() . '/js/phoenix/crypto.min.js');
+		}
+	}
+
+	/**
+	 * csrfToken
+	 *
+	 * @param string $token
+	 *
+	 * @return  void
+	 */
+	public static function csrfToken($token = null)
+	{
+		if (!static::inited(__METHOD__, func_get_args()))
+		{
+			// Inject Token to meta
+			HtmlHeader::addMetadata('csrf-token', $token ? : CsrfProtection::getFormToken());
+
+			$js = <<<JS
+jQuery.ajaxSetup({
+    headers: {
+        'X-Csrf-Token': jQuery('meta[name="csrf-token"]').attr('content')
+    }
+});
+JS;
+
+			static::internalJS($js);
 		}
 	}
 }

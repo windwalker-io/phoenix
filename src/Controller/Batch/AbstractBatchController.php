@@ -19,6 +19,8 @@ use Windwalker\Data\DataInterface;
 /**
  * The AbstractBatchController class.
  *
+ * @see  BatchDelegatingController
+ *
  * @since  1.0.5
  */
 abstract class AbstractBatchController extends AbstractPostController
@@ -96,12 +98,12 @@ abstract class AbstractBatchController extends AbstractPostController
 
 		if ($data->isNull() && !$this->allowNullData)
 		{
-			throw new ValidateFailException(Translator::translate('phoenix.message.batch.error.empty'));
+			throw new ValidateFailException(Translator::translate('phoenix.message.batch.data.empty'));
 		}
 
 		if (count($this->pks) < 1)
 		{
-			throw new ValidateFailException(Translator::translate($this->langPrefix . '.message.' . $this->action . '.empty'));
+			throw new ValidateFailException(Translator::translate($this->langPrefix . 'message.batch.item.empty'));
 		}
 
 		$this->validate($data);

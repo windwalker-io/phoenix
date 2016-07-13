@@ -13,7 +13,8 @@ use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\Entity\Entity;
-use Windwalker\Http\Response\JsonResponse;
+use Windwalker\Http\Response\HtmlResponse;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Record\Record;
 use Windwalker\Uri\Uri;
 
@@ -119,7 +120,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 
 		$this->setRedirect($this->getSuccessRedirect($this->record));
 
-		if ($this->response instanceof JsonResponse)
+		if (!$this->response instanceof HtmlResponse && !$this->response instanceof RedirectResponse)
 		{
 			return $this->record->dump(true);
 		}
