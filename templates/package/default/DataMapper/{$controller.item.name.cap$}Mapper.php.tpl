@@ -28,6 +28,20 @@ class {$controller.item.name.cap$}Mapper extends CoreDataMapper
 	protected static $table = Table::{$controller.list.name.upper$};
 
 	/**
+	 * Property keys.
+	 *
+	 * @var  string
+	 */
+	protected static $keys = 'id';
+
+	/**
+	 * Property dataClass.
+	 *
+	 * @var  string
+	 */
+	protected static $dataClass = {$controller.item.name.cap$}Record::class;
+
+	/**
 	 * onAfterFind
 	 *
 	 * @param Event $event

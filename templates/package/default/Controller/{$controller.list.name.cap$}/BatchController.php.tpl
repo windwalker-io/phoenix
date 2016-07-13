@@ -8,7 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use Phoenix\Controller\Batch\BatchDelegationController;
+use Phoenix\Controller\Batch\BatchDelegatingController;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 
 /**
@@ -16,7 +16,7 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
  *
  * @since  1.0
  */
-class BatchController extends BatchDelegationController
+class BatchController extends BatchDelegatingController
 {
 	use CsrfProtectionTrait;
 	
