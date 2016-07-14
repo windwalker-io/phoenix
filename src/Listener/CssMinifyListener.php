@@ -10,6 +10,7 @@ namespace Phoenix\Listener;
 
 use Phoenix\Minify\CssMinify;
 use Windwalker\Event\Event;
+use Windwalker\Uri\UriData;
 
 /**
  * The CssMinifyListener class.
@@ -25,7 +26,7 @@ class CssMinifyListener
 	 *
 	 * @return  void
 	 */
-	public function onPhoenixRenderStyles(Event $event)
+	public function onAssetRenderStyles(Event $event)
 	{
 		$minify = new CssMinify($event['asset']);
 

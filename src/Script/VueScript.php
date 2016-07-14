@@ -96,4 +96,66 @@ class VueScript extends AbstractPhoenixScript
 			static::addJS(static::phoenixName() . '/js/vue/vue-router.min.js');
 		}
 	}
+
+	/**
+	 * Add VueStrap.js
+	 *
+	 * @see  https://yuche.github.io/vue-strap/
+	 *
+	 * @return  void
+	 */
+	public static function strap()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::core();
+			BootstrapScript::css();
+			BootstrapScript::script();
+
+			static::addJS(static::phoenixName() . '/js/vue/vue-strap.min.js');
+		}
+	}
+
+	/**
+	 * Vuex storage library.
+	 *
+	 * @see  http://vuex.vuejs.org/en/index.html
+	 *
+	 * @return  void
+	 */
+	public static function vuex(array $stores = [])
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::core();
+
+			static::addJS(static::phoenixName() . '/js/vue/vuex.min.js');
+		}
+
+		if ($stores)
+		{
+			foreach ($stores as $name => $store)
+			{
+				static::store($name, $store);
+			}
+		}
+	}
+
+	/**
+	 * store
+	 *
+	 * @param string $name
+	 * @param array  $store
+	 *
+	 * @return  void
+	 */
+	public static function store($name, array $store = [])
+	{
+		static::vuex();
+
+		if (!static::inited(__METHOD__, $name))
+		{
+			static::internalJS("const $name = " . static::getJSObject($store) . ';');
+		}
+	}
 }
