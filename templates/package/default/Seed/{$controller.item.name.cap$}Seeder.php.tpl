@@ -56,7 +56,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 	}
 
 	/**
-	 * doClean
+	 * doClear
 	 *
 	 * @return  void
 	 */
