@@ -9,14 +9,18 @@
 namespace Phoenix\Controller\Display;
 
 use Phoenix\Model\ListModel;
+use Phoenix\View\GridView;
+use Phoenix\View\ListView;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Filter\InputFilter;
 use Windwalker\Form\Field\ListField;
-use Windwalker\Form\Form;
 
 /**
  * The ListGetController class.
- * 
+ *
+ * @method  ListModel          getModel($name = null, $source = null, $forceNew)
+ * @method  ListView|GridView  getView($name = null, $format = 'html', $engine = null, $forceNew = false)
+ *
  * @since  1.0
  */
 class ListDisplayController extends DisplayController

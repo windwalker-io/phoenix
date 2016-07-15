@@ -17,12 +17,12 @@ use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
-use Windwalker\Query\QueryElement;
+use Windwalker\Query\QueryInterface;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The ListModel class.
- * 
+ *
  * @since  1.0
  */
 class ListModel extends DatabaseModelRepository implements FormAwareRepositoryInterface
@@ -63,6 +63,13 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	 * @var  FilterHelperInterface
 	 */
 	protected $searchHelper;
+
+	/**
+	 * Property query.
+	 *
+	 * @var  QueryInterface
+	 */
+	protected $query;
 
 	/**
 	 * prepareState
@@ -124,7 +131,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 
 			$this->configureTables();
 
-			$query = $this->getListQuery($this->db->getQuery(true));
+			$query = $this->getListQuery($this->getQuery());
 
 			$items = $this->getList($query, $this->getStart(), $this->get('list.limit'));
 
@@ -159,7 +166,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 			return $this->getCache('list.query');
 		}
 
-		$query = $query ? : $this->db->getQuery(true);
+		$query = $query ? : $this->getQuery();
 
 		$queryHelper = $this->getQueryHelper();
 
@@ -185,6 +192,12 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		foreach ((array) $this['query.having'] as $k => $v)
 		{
 			$query->having($v);
+		}
+
+		// Custom Binding
+		foreach ((array) $this['query.bounded'] as $k => $v)
+		{
+			$query->bind(...$v);
 		}
 
 		// Build query
@@ -379,8 +392,8 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	 */
 	public function getSimplePagination()
 	{
-		$this->set('list.fix_page', false);
-		
+		$this->config->set('list.fix_page', false);
+
 		return (new Pagination($this->getPage() ? : 1, $this->getLimit(), -1, 1))->template('windwalker.pagination.simple');
 	}
 
@@ -433,7 +446,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		{
 			$start = $this->state['list.start'];
 
-			if ($this['list.fix_page'])
+			if ($this->config['list.fix_page'])
 			{
 				$limit = $this->getLimit();
 				$total = $this->getTotal();
@@ -792,72 +805,98 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	/**
 	 * appendWhere
 	 *
-	 * @param   string|array $wheres
+	 * @param   string|array $conditions
+	 * @param   array        ...$args
 	 *
 	 * @return static
 	 */
-	public function where(...$wheres)
+	public function where($conditions, ...$args)
 	{
-		if (is_array($wheres))
+		foreach ((array) $conditions as $condition)
 		{
-			foreach ($wheres as $subWhere)
+			if ($args)
 			{
-				$this->where($subWhere);
+				$condition = $this->getQuery()->format($condition, ...$args);
 			}
-		}
-		else
-		{
-			$this->state->push('query.where', $wheres);
+
+			$this->state->push('query.where', $condition);
 		}
 
 		return $this;
 	}
 
 	/**
-	 * appendWhereOr
+	 * Or Where.
 	 *
-	 * @param   string|array $wheres
+	 * @param   mixed|callable   $conditions  A string, array of where conditions or callback to support logic.
 	 *
 	 * @return static
 	 */
-	public function orWhere(...$wheres)
+	public function orWhere($conditions)
 	{
-		if (count($wheres) && is_callable($wheres[0]))
+		if (is_callable($conditions))
 		{
 			$query = $this->db->getQuery(true);
 
-			$wheres[0]($query);
+			$conditions($query);
 
-			$wheres = $query->where->getElements();
+			$wheres = (string) $query->where->setName('()')->setGlue(' OR ');
+
+			foreach ($query->getBounded() as $key => $bound)
+			{
+				$this->bind($key, $bound->value, $bound->dataType, $bound->lengeh, $bound->driverOptions);
+			}
 		}
 		else
 		{
-			$wheres = (array) $wheres;
+			$wheres = (array) $conditions;
 			$wheres = ArrayHelper::flatten($wheres);
 		}
 
-		return $this->where((string) new QueryElement('()', $wheres, ' OR '));
+		return $this->where($wheres);
+	}
+
+	/**
+	 * Method to add a variable to an internal array that will be bound to a prepared SQL statement before query execution. Also
+	 * removes a variable that has been bounded from the internal bounded array when the passed in value is null.
+	 *
+	 * @param   string|integer|array $key            The key that will be used in your SQL query to reference the value. Usually of
+	 *                                               the form ':key', but can also be an integer.
+	 * @param   mixed                &$value         The value that will be bound. The value is passed by reference to support output
+	 *                                               parameters such as those possible with stored procedures.
+	 * @param   integer              $dataType       Constant corresponding to a SQL datatype.
+	 * @param   integer              $length         The length of the variable. Usually required for OUTPUT parameters.
+	 * @param   array                $driverOptions  Optional driver options to be used.
+	 *
+	 * @return  static
+	 *
+	 * @since   3.0
+	 */
+	public function bind($key = null, $value = null, $dataType = \PDO::PARAM_STR, $length = 0, $driverOptions = array())
+	{
+		$this->state->push('query.bounded', [$key, $value, $dataType, $length, $driverOptions]);
+
+		return $this;
 	}
 
 	/**
 	 * appendHaving
 	 *
-	 * @param   string|array $having
+	 * @param string|array  $conditions
+	 * @param array         ...$args
 	 *
-	 * @return  static
+	 * @return static
 	 */
-	public function having(...$having)
+	public function having($conditions, ...$args)
 	{
-		if (is_array($having))
+		foreach ((array) $conditions as $condition)
 		{
-			foreach ($having as $subWhere)
+			if ($args)
 			{
-				$this->where($subWhere);
+				$condition = $this->getQuery()->format($condition, ...$args);
 			}
-		}
-		else
-		{
-			$this->state->push('query.having', $having);
+
+			$this->state->push('query.having', $condition);
 		}
 
 		return $this;
@@ -866,27 +905,32 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	/**
 	 * appendWhereOr
 	 *
-	 * @param   string|array $havings
+	 * @param   mixed|callable $conditions
 	 *
 	 * @return  static
 	 */
-	public function orHaving($havings)
+	public function orHaving($conditions)
 	{
-		if (count($havings) && is_callable($havings[0]))
+		if (is_callable($conditions))
 		{
 			$query = $this->db->getQuery(true);
 
-			$havings[0]($query);
+			$conditions($query);
 
-			$havings = $query->having->getElements();
+			$having = (string) $query->having->setName('()')->setGlue(' OR ');
+
+			foreach ($query->getBounded() as $key => $bound)
+			{
+				$this->bind($key, $bound->value, $bound->dataType, $bound->lengeh, $bound->driverOptions);
+			}
 		}
 		else
 		{
-			$havings = (array) $havings;
-			$havings = ArrayHelper::flatten($havings);
+			$having = (array) $conditions;
+			$having = ArrayHelper::flatten($having);
 		}
 
-		return $this->having((string) new QueryElement('()', $havings, ' OR '));
+		return $this->having($having);
 	}
 
 	/**
@@ -927,5 +971,53 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		}
 
 		return $return;
+	}
+
+	/**
+	 * Method to get property Query
+	 *
+	 * @param bool $new
+	 *
+	 * @return Query
+	 */
+	public function getQuery($new = false)
+	{
+		if (!$this->query || $new)
+		{
+			$this->query = $this->db->getQuery(true);
+		}
+
+		return $this->query;
+	}
+
+	/**
+	 * Method to set property query
+	 *
+	 * @param   Query $query
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setQuery(Query $query)
+	{
+		$this->query = $query;
+
+		return $this;
+	}
+
+	/**
+	 * getCacheId
+	 *
+	 * @param   string $id
+	 *
+	 * @return  string
+	 */
+	public function getCacheId($id = null)
+	{
+		$query = $this->getQuery();
+
+		// We must add query wheres and havings to make sure state changed if user call where() and having()
+		$id = $id . ':' . $query->where . ':' . $query->having;
+
+		return parent::getCacheId($id);
 	}
 }

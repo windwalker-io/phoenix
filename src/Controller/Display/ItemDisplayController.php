@@ -8,10 +8,15 @@
 
 namespace Phoenix\Controller\Display;
 
+use Phoenix\Model\ItemModel;
+use Phoenix\View\ItemView;
 use Windwalker\Core\Model\ModelRepository;
 
 /**
  * The GetController class.
+ *
+ * @method  ItemModel getModel($name = null, $source = null, $forceNew)
+ * @method  ItemView  getView($name = null, $format = 'html', $engine = null, $forceNew = false)
  * 
  * @since  1.0
  */
