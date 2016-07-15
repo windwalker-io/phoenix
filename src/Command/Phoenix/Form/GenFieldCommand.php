@@ -8,6 +8,7 @@
 
 namespace Phoenix\Command\Phoenix\Form;
 
+use Phoenix\Form\FieldDefinitionGenerator;
 use Windwalker\Console\Command\Command;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Ioc;
@@ -117,7 +118,7 @@ class GenFieldCommand extends Command
 
 		$name = $column->Field;
 
-		$className = $this->getOption('class', 'Phoenix\Form\FieldDefinitionGenerator');
+		$className = $this->getOption('class', FieldDefinitionGenerator::class);
 
 		if (!is_callable(array($className, 'generate')))
 		{

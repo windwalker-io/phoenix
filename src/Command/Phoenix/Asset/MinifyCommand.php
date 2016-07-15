@@ -8,7 +8,7 @@
 
 namespace Phoenix\Command\Phoenix\Asset;
 
-use Windwalker\Console\Command\Command;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Filesystem\File;
 use Windwalker\String\StringHelper;
@@ -18,7 +18,7 @@ use Windwalker\String\StringHelper;
  *
  * @since  1.0
  */
-class MinifyCommand extends Command
+class MinifyCommand extends CoreCommand
 {
 	/**
 	 * Property name.
@@ -61,13 +61,15 @@ class MinifyCommand extends Command
 
 		$package = $this->getOption('p');
 
+		$folder = $this->console->get('asset.folder', 'asset');
+
 		if ($package = PackageHelper::getPackage($package))
 		{
-			$path = $package->getDir() . '/Resources/media/' . $path;
+			$path = $package->getDir() . '/Resources/asset/' . $path;
 		}
 		else
 		{
-			$path = WINDWALKER_PUBLIC . '/media/' . $path;
+			$path = WINDWALKER_PUBLIC . '/' . trim($folder, '/') . '/' . $path;
 		}
 
 		if (is_file($path))

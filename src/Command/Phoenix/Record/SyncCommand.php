@@ -14,10 +14,9 @@ use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Ioc;
 use Windwalker\Edge\Edge;
-use Windwalker\Edge\Loader\EdgeTextLoader;
+use Windwalker\Edge\Loader\EdgeStringLoader;
 use Windwalker\Filesystem\File;
 use Windwalker\Record\Record;
-use Windwalker\String\SimpleTemplate;
 use Windwalker\String\StringNormalise;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
@@ -89,11 +88,11 @@ class SyncCommand extends CoreCommand
 		}
 
 		$recordClass = StringNormalise::toClassNamespace($recordClass);
-		$pkgNanespace = ReflectionHelper::getNamespaceName($package);
+		$pkgNamespace = ReflectionHelper::getNamespaceName($package);
 
 		if (!class_exists($recordClass))
 		{
-			$recordClass = $pkgNanespace. '\\Record\\' . ucfirst($recordClass) . 'Record';
+			$recordClass = $pkgNamespace. '\\Record\\' . ucfirst($recordClass) . 'Record';
 		}
 
 		$table = null;
@@ -119,7 +118,7 @@ class SyncCommand extends CoreCommand
 
 		$columns = Ioc::getDatabase()->getTable($table, true)->getColumnDetails(true);
 		$fields = [];
-		$dataType = Ioc::getDatabase()->getTable($table)->getTypeMapper();
+		$dataType = Ioc::getDatabase()->getTable($table)->getDataType();
 
 		foreach ($columns as $column)
 		{
@@ -135,12 +134,12 @@ class SyncCommand extends CoreCommand
 		$shortName = ucfirst($name) . 'DataTrait';
 
 		$data = [
-			'package_namespace' => $pkgNanespace . '\\Record\\Traits',
+			'package_namespace' => $pkgNamespace . '\\Record\\Traits',
 			'short_name' => $shortName,
 			'columns' => $fields
 		];
 
-		$content = (new Edge(new EdgeTextLoader))->render($this->getTemplate(), $data);
+		$content = (new Edge(new EdgeStringLoader))->render($this->getTemplate(), $data);
 
 		$file = $package->getDir() . '/Record/Traits/' . $shortName . '.php';
 

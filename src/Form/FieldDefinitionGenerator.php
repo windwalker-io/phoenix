@@ -64,7 +64,7 @@ class FieldDefinitionGenerator
 	{
 		return <<<HTML
 // $label
-\$form->add('$name', new Field\TextField)
+\$this->text('$name')
 	->label('$label')
 	->set('class', '')
 	->set('labelClass', '')
@@ -86,7 +86,7 @@ HTML;
 	{
 		return <<<HTML
 // $label
-\$form->add('$name', new Field\RadioField)
+\$this->radio('$name')
 	->label('$label')
 	->addOption(new Option('Yes', 1))
 	->addOption(new Option('No', 0))
@@ -122,7 +122,7 @@ HTML;
 
 		return <<<HTML
 // $label
-\$form->add('$name', new Field\ListField)
+\$this->list('$name')
 	->label('$label')
 	$options
 	->set('class', '')
@@ -145,7 +145,7 @@ HTML;
 	{
 		return <<<HTML
 // $label
-\$form->add('$name', new Field\TextareaField)
+\$this->textarea('$name')
 	->label('$label')
 	->set('class', '')
 	->set('labelClass', '')
@@ -198,7 +198,7 @@ HTML;
 	{
 		return <<<HTML
 // $label
-\$form->add('$name', new Field\TextField)
+\$this->text('$name')
 	->label('$label')
 	->set('class', '')
 	->set('labelClass', '')
@@ -220,14 +220,14 @@ HTML;
 	{
 		return <<<HTML
 // $label
-\$form->add('$name', new Field\PasswordField)
+\$this->password('$name')
 	->label('$label')
 	->set('class', '')
 	->set('labelClass', '')
 	->set('autocomplete', 'off');
 
 // Confirm Password
-\$form->add('password2', new Field\PasswordField)
+\$this->password('password2')
 	->label('Confirm Password')
 	->set('class', '')
 	->set('labelClass', '')
@@ -249,7 +249,7 @@ HTML;
 	{
 		return <<<HTML
 // $label
-\$form->add('$name', new Phoenix\Field\CalendarField)
+\$this->calendar('$name')
 	->label('$label')
 	->set('class', '')
 	->set('labelClass', '')
