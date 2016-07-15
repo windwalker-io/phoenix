@@ -25,7 +25,7 @@ class JsMinifyListener
 	 *
 	 * @return  void
 	 */
-	public function onPhoenixRenderScripts(Event $event)
+	public function onAssetRenderScripts(Event $event)
 	{
 		$minify = new JsMinify($event['asset']);
 

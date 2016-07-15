@@ -88,7 +88,7 @@ class CssMinify extends AbstractAssetMinify
 		$that = $this;
 
 		$path = dirname($url);
-		$path = str_replace(trim(Uri::root(), '/'), WINDWALKER_PUBLIC, $path);
+		$path = str_replace($this->asset->uri->root, WINDWALKER_PUBLIC, $path);
 
 		// Rewrite Url
 		$newFile = Minify_CSS_UriRewriter::rewrite(

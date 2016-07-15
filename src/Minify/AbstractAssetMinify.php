@@ -8,10 +8,9 @@
 
 namespace Phoenix\Minify;
 
-use Phoenix\Asset\AssetManager;
-use Phoenix\Uri\Uri;
-use Windwalker\Environment\ServerHelper;
-use Windwalker\Filesystem\Folder;
+use Windwalker\Core\Asset\AssetManager;
+use Windwalker\Environment\PlatformHelper;
+use Windwalker\Filesystem\File;
 use Windwalker\Http\HttpClient;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -41,7 +40,7 @@ abstract class AbstractAssetMinify
 	 *
 	 * @param AssetManager $asset
 	 */
-	public function __construct($asset)
+	public function __construct(AssetManager $asset)
 	{
 		$this->asset = $asset;
 	}
@@ -64,7 +63,7 @@ abstract class AbstractAssetMinify
 		// Cache file path.
 		$path = $this->getCachePath($name);
 
-		$assetPath = WINDWALKER_PUBLIC . '/media/' . $path;
+		$assetPath = WINDWALKER_PUBLIC . '/' . $this->asset->getAssetFolder() . '/' . $path;
 
 		// Prepare to minify and combine files.
 		if (!is_file($assetPath))
@@ -73,12 +72,7 @@ abstract class AbstractAssetMinify
 			$data = $this->combineData($list);
 			$data = $this->doCompress($data);
 
-			if (!is_dir(dirname($assetPath)))
-			{
-				Folder::create(dirname($assetPath));
-			}
-
-			file_put_contents($assetPath, $data);
+			File::write($assetPath, $data);
 		}
 
 		$this->addAsset($path);
@@ -182,7 +176,7 @@ abstract class AbstractAssetMinify
 		$file = $this->regularizeUrl($url);
 
 		// Init Http
-		if (ServerHelper::isWindows())
+		if (PlatformHelper::isWindows())
 		{
 			// $file = str_replace('localhost', '127.0.0.1', $file);
 		}
@@ -221,12 +215,12 @@ abstract class AbstractAssetMinify
 		// Convert url to local path.
 		if (substr($file, 0, 1) == '/')
 		{
-			$file = Uri::host() . $file;
+			$file = $this->asset->uri->host . '/' . ltrim($file, '/');
 		}
 		// Absolute path.
 		elseif (substr($file, 0, 4) != 'http')
 		{
-			$file = Uri::root() . ltrim($file, '/');
+			$file = $this->asset->uri->path . '/' . ltrim($file, '/');
 		}
 
 		return $file;
