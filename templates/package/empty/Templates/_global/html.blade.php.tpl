@@ -29,12 +29,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ $router->route('home') }}">Windwalker</a>
+                <a class="navbar-brand" href="{{ $uri->path }}">Windwalker</a>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                      @section('nav')
-                        <li class="active"><a href="{{ $router->route('home') }}">Home</a></li>
+                        <li class="active"><a href="{{ $uri->path }}">Home</a></li>
                      @show
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -47,7 +47,7 @@
     @show
 
     @section('message')
-        {!! \Windwalker\Core\Widget\WidgetHelper::render('windwalker.message.default', array('flashes' => $flashes)) !!}
+        @messages()
     @show
 
     @yield('content', 'Content')

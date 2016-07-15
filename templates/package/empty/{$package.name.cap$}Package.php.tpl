@@ -14,6 +14,11 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Filesystem\Folder;
 
+if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
+{
+	define('PACKAGE_{$package.name.upper$}_ROOT', __DIR__);
+}
+
 /**
  * The {$package.name.cap$}Package class.
  *
