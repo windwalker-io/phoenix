@@ -10,13 +10,15 @@ namespace {$package.namespace$}{$package.name.cap$};
 
 use Phoenix\Language\TranslatorHelper;
 use Phoenix\Script\BootstrapScript;
-use Symfony\Component\Yaml\Yaml;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
-use Windwalker\Event\Dispatcher;
-use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
+
+if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
+{
+	define('PACKAGE_{$package.name.upper$}_ROOT', __DIR__);
+}
 
 /**
  * The {$package.name.cap$}Package class.

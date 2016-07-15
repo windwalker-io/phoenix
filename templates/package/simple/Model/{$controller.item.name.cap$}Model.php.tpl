@@ -8,11 +8,8 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
-use {$package.namespace$}{$package.name.cap$}\Mapper\{$controller.item.name.cap$}Mapper;
 use Phoenix\Model\ItemModel;
-use Windwalker\Core\Model\DatabaseModel;
-use Windwalker\Data\Data;
-use Windwalker\Data\DataSet;
+use Windwalker\Data\DataInterface;
 
 /**
  * The {$controller.item.name.cap$}Model class.
@@ -24,11 +21,11 @@ class {$controller.item.name.cap$}Model extends ItemModel
 	/**
 	 * postGetItem
 	 *
-	 * @param Data $item
+	 * @param DataInterface $item
 	 *
 	 * @return  void
 	 */
-	protected function postGetItem(Data $item)
+	protected function postGetItem(DataInterface $item)
 	{
 	}
 }
