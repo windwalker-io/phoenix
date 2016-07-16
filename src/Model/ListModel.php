@@ -834,13 +834,13 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	 */
 	public function orWhere($conditions)
 	{
+		$query = $this->db->getQuery(true);
+
 		if (is_callable($conditions))
 		{
-			$query = $this->db->getQuery(true);
-
 			$conditions($query);
 
-			$wheres = (string) $query->where->setName('()')->setGlue(' OR ');
+			$wheres = $query->where->getElements();
 
 			foreach ($query->getBounded() as $key => $bound)
 			{
@@ -852,6 +852,8 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 			$wheres = (array) $conditions;
 			$wheres = ArrayHelper::flatten($wheres);
 		}
+
+		$wheres = (string) $query->element('()', $wheres, ' OR ');
 
 		return $this->where($wheres);
 	}
@@ -911,13 +913,13 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	 */
 	public function orHaving($conditions)
 	{
+		$query = $this->db->getQuery(true);
+
 		if (is_callable($conditions))
 		{
-			$query = $this->db->getQuery(true);
-
 			$conditions($query);
 
-			$having = (string) $query->having->setName('()')->setGlue(' OR ');
+			$having = $query->having->getElements();
 
 			foreach ($query->getBounded() as $key => $bound)
 			{
@@ -929,6 +931,8 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 			$having = (array) $conditions;
 			$having = ArrayHelper::flatten($having);
 		}
+
+		$having = $query->element('()', $having, ' OR ');
 
 		return $this->having($having);
 	}
