@@ -10,10 +10,10 @@ namespace {$package.namespace$}{$package.name.cap$}\Form\{$controller.item.name.
 
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ListField;
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ModalField;
-use Phoenix;
+use Phoenix\Form\PhoenixFieldTrait;
+use Windwalker\Core\Form\AbstractFieldDefinition;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Form\Field;
-use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Validator\Rule;
 
@@ -22,8 +22,10 @@ use Windwalker\Validator\Rule;
  *
  * @since  1.0
  */
-class EditDefinition implements FieldDefinitionInterface
+class EditDefinition extends AbstractFieldDefinition
 {
+	use PhoenixFieldTrait;
+
 	/**
 	 * Define the form fields.
 	 *
@@ -31,62 +33,62 @@ class EditDefinition implements FieldDefinitionInterface
 	 *
 	 * @return  void
 	 */
-	public function define(Form $form)
+	public function doDefine(Form $form)
 	{
 		// Basic fieldset
-		$form->fieldset('basic', function(Form $form)
+		$this->fieldset('basic', function(Form $form)
 		{
 			// ID
-			$form->add('id', Field\HiddenField::class);
+			$this->hidden('id');
 
 			// Title
-			$form->add('title', Field\TextField::class)
+			$this->text('title')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
 				->setFilter('trim')
 				->required(true);
 
 			// Alias
-			$form->add('alias', Field\TextField::class)
+			$this->text('alias')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'));
 
 			// Image
-			$form->add('image', Field\TextField::class)
+			$this->text('image')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.image'));
 
 			// URL
-			$form->add('url', Field\TextField::class)
+			$this->text('url')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
 				->setValidator(Rule\UrlValidator::class)
 				->set('class', 'validate-url');
 
 			// Example: {$controller.item.name.cap$} List
-			$form->add('{$controller.item.name.lower$}_list', {$controller.item.name.cap$}ListField::class)
+			$this->add('{$controller.item.name.lower$}_list', {$controller.item.name.cap$}ListField::class)
 				->label('List Example');
 
 			// Example: {$controller.item.name.cap$} Modal
-			$form->add('{$controller.item.name.lower$}_modal', {$controller.item.name.cap$}ModalField::class)
+			$this->add('{$controller.item.name.lower$}_modal', {$controller.item.name.cap$}ModalField::class)
 				->label('Modal Example');
 		});
 
 		// Text Fieldset
-		$form->fieldset('text', function(Form $form)
+		$this->fieldset('text', function(Form $form)
 		{
 			// Introtext
-			$form->add('introtext', Field\TextareaField::class)
+			$this->textarea('introtext')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
 				->set('rows', 10);
 
 			// Fulltext
-			$form->add('fulltext', Field\TextareaField::class)
+			$this->textarea('fulltext')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
 				->set('rows', 10);
 		});
 
 		// Created fieldset
-		$form->fieldset('created', function(Form $form)
+		$this->fieldset('created', function(Form $form)
 		{
 			// State
-			$form->add('state', Field\RadioField::class)
+			$this->radio('state')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.state'))
 				->set('class', 'btn-group')
 				->set('default', 1)
@@ -94,20 +96,20 @@ class EditDefinition implements FieldDefinitionInterface
 				->option(Translator::translate('phoenix.grid.state.unpublished'), '0');
 
 			// Created
-			$form->add('created', Phoenix\Field\CalendarField::class)
+			$this->calendar('created')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.created'));
 
 			// Modified
-			$form->add('modified', Phoenix\Field\CalendarField::class)
+			$this->calendar('modified')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'))
 				->disabled();
 
 			// Author
-			$form->add('created_by', Field\TextField::class)
+			$this->text('created_by')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.author'));
 
 			// Modified User
-			$form->add('modified_by', Field\TextField::class)
+			$this->text('modified_by')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'))
 				->disabled();
 		});
