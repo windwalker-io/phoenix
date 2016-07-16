@@ -287,7 +287,7 @@ class GridHelper
 	 */
 	public function createIconButton(array $options = array())
 	{
-		return IconButton::create($this->row, $options);
+		return IconButton::create($options);
 	}
 
 	/**
@@ -300,7 +300,7 @@ class GridHelper
 	 */
 	public function published($value, array $options = array())
 	{
-		return StateButton::create($this->row, $options)->render($value);
+		return StateButton::create($options)->render($value, $this->row);
 	}
 
 	/**
@@ -315,7 +315,7 @@ class GridHelper
 	 */
 	public function state($value, array $options = array())
 	{
-		return StateButton::create($this->row, $options)->render($value);
+		return StateButton::create($options)->render($value, $this->row);
 	}
 
 	/**
@@ -324,13 +324,11 @@ class GridHelper
 	 * @param   string $output The output to escape.
 	 *
 	 * @return  string  The escaped output.
-	 *
-	 * @see     \JView::escape()
 	 */
 	public function escape($output)
 	{
 		// Escape the output.
-		return htmlspecialchars($output, ENT_COMPAT, 'UTF-8');
+		return htmlentities($output, ENT_COMPAT, 'UTF-8');
 	}
 
 	/**

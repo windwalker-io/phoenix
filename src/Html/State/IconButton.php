@@ -65,25 +65,22 @@ class IconButton
 	/**
 	 * create
 	 *
-	 * @param int   $row
 	 * @param array $options
 	 *
 	 * @return static
 	 */
-	public static function create($row, $options=array())
+	public static function create($options = [])
 	{
-		return new static($row, $options);
+		return new static($options);
 	}
 
 	/**
 	 * StateButton constructor.
 	 *
-	 * @param integer $row
 	 * @param array   $options
 	 */
-	public function __construct($row, array $options=array())
+	public function __construct(array $options = [])
 	{
-		$this->row = $row;
 		$this->options = $options;
 
 		$this->init();
@@ -158,20 +155,21 @@ class IconButton
 	/**
 	 * render
 	 *
-	 * @param  mixed $value
+	 * @param  mixed   $value
+	 * @param  integer $row
 	 *
 	 * @return string
 	 */
-	public function render($value = null)
+	public function render($value = null, $row = null)
 	{
-		$data = $this->getState($value);
+		$default = $this->getState($value);
 
-		$data = $data ? : $this->getState('_default');
+		$default = $default ? : $this->getState('_default');
 
-		$data = array_merge($data, $this->options);
-		$data['row'] = (int) $this->row;
+		$default = array_merge($default, $this->options);
+		$default['row'] = (int) $row;
 
-		return WidgetHelper::render($this->template, $data, WidgetHelper::EDGE);
+		return WidgetHelper::render($this->template, $default, WidgetHelper::EDGE);
 	}
 
 	/**
