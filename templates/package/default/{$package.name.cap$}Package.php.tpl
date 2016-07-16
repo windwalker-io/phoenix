@@ -12,7 +12,7 @@ use Phoenix\Language\TranslatorHelper;
 use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\MainRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Router\Exception\RouteNotFoundException;
@@ -96,16 +96,16 @@ class {$package.name.cap$}Package extends AbstractPackage
 	/**
 	 * loadRouting
 	 *
-	 * @param CoreRouter $router
+	 * @param MainRouter $router
 	 * @param string     $group
 	 *
-	 * @return CoreRouter
+	 * @return MainRouter
 	 */
-	public function loadRouting(CoreRouter $router, $group = null)
+	public function loadRouting(MainRouter $router, $group = null)
 	{
 		$router = parent::loadRouting($router, $group);
 
-		$router->group($group, function (CoreRouter $router)
+		$router->group($group, function (MainRouter $router)
 		{
 			$router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
 
