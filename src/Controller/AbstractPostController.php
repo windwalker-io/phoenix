@@ -142,7 +142,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		$this->addMessage($e->getMessage(), Bootstrap::MSG_WARNING);
 
 		$this->setRedirect($this->getFailRedirect($this->record));
-		
+
 		return false;
 	}
 
