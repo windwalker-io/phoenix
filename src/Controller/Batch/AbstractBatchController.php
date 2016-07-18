@@ -135,11 +135,11 @@ abstract class AbstractBatchController extends AbstractPostController
 	/**
 	 * preSave
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return  void
 	 */
-	protected function preSave(Data $data)
+	protected function preSave(DataInterface $data)
 	{
 		// Do some stuff
 	}
@@ -147,11 +147,11 @@ abstract class AbstractBatchController extends AbstractPostController
 	/**
 	 * postSave
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return  void
 	 */
-	protected function postSave(Data $data)
+	protected function postSave(DataInterface $data)
 	{
 		// Do some stuff
 	}
@@ -159,11 +159,11 @@ abstract class AbstractBatchController extends AbstractPostController
 	/**
 	 * cleanData
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
-	 * @return  Data
+	 * @return  DataInterface
 	 */
-	protected function cleanData(Data $data)
+	protected function cleanData(DataInterface $data)
 	{
 		// Remove empty data
 		foreach ($data as $k => $value)
@@ -180,13 +180,13 @@ abstract class AbstractBatchController extends AbstractPostController
 	/**
 	 * validate
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return  void
 	 *
 	 * @throws  ValidateFailException
 	 */
-	protected function validate(Data $data)
+	protected function validate(DataInterface $data)
 	{
 		// Do some stuff
 	}

@@ -68,7 +68,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	/**
 	 * doSave
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return void
 	 *
@@ -77,7 +77,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	 * @throws \Windwalker\Core\Model\Exception\ValidateFailException
 	 * @throws \Windwalker\Record\Exception\NoResultException
 	 */
-	protected function doSave(Data $data)
+	protected function doSave(DataInterface $data)
 	{
 		$data = $this->prepareStore($data);
 
@@ -138,33 +138,33 @@ abstract class AbstractSaveController extends AbstractPostController
 	/**
 	 * preSave
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return void
 	 */
-	protected function preSave(Data $data)
+	protected function preSave(DataInterface $data)
 	{
 	}
 
 	/**
 	 * postSave
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return  void
 	 */
-	protected function postSave(Data $data)
+	protected function postSave(DataInterface $data)
 	{
 	}
 
 	/**
 	 * filter
 	 *
-	 * @param Data|Entity $data
+	 * @param DataInterface|Entity $data
 	 *
-	 * @return  Data
+	 * @return  DataInterface|Entity
 	 */
-	protected function prepareStore(Data $data)
+	protected function prepareStore(DataInterface $data)
 	{
 		if ($this->model instanceof FormAwareRepositoryInterface)
 		{
@@ -179,13 +179,13 @@ abstract class AbstractSaveController extends AbstractPostController
 	/**
 	 * validate
 	 *
-	 * @param   Data|Entity  $data
+	 * @param   DataInterface|Entity  $data
 	 *
 	 * @return  void
 	 *
 	 * @throws ValidateFailException
 	 */
-	protected function validate(Data $data)
+	protected function validate(DataInterface $data)
 	{
 		if ($this->model instanceof FormAwareRepositoryTrait)
 		{
@@ -196,11 +196,11 @@ abstract class AbstractSaveController extends AbstractPostController
 	/**
 	 * getFailRedirect
 	 *
-	 * @param  Data|Entity $data
+	 * @param  DataInterface|Entity $data
 	 *
 	 * @return  string
 	 */
-	protected function getFailRedirect(Data $data = null)
+	protected function getFailRedirect(DataInterface $data = null)
 	{
 		$pk = $this->record->{$this->keyName};
 

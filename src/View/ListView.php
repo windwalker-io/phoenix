@@ -11,6 +11,7 @@ namespace Phoenix\View;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 
 /**
  * The ListHtmlView class.
@@ -70,11 +71,11 @@ class ListView extends AbstractPhoenixHtmView
 	/**
 	 * preparePagination
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return  void
 	 */
-	protected function preparePagination(Data $data)
+	protected function preparePagination(DataInterface $data)
 	{
 		if ($this->simplePagination)
 		{

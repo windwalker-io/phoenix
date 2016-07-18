@@ -38,10 +38,11 @@ class EditDisplayController extends ItemDisplayController
 			throw new \LogicException(sprintf('Model: %s should be sub class of %s in %s.', get_class($this->model), FormAwareRepositoryInterface::class, __CLASS__));
 		}
 
+		/* TODO: Check we need EditViewInterface or not.
 		if (!$this->view instanceof EditView)
 		{
 			throw new \LogicException(sprintf('View: %s should be sub class of %s in %s.', get_class($this->view), EditView::class, __CLASS__));
-		}
+		}*/
 	}
 
 	/**

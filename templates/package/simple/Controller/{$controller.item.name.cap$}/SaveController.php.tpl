@@ -10,6 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use Phoenix\Controller\AbstractSaveController;
+use Windwalker\Data\DataInterface;
 use Windwalker\Data\Data;
 
 /**
@@ -67,11 +68,11 @@ class SaveController extends AbstractSaveController
 	/**
 	 * preSave
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return void
 	 */
-	protected function preSave(Data $data)
+	protected function preSave(DataInterface $data)
 	{
 		parent::preSave($data);
 	}
@@ -79,11 +80,11 @@ class SaveController extends AbstractSaveController
 	/**
 	 * postSave
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return  void
 	 */
-	protected function postSave(Data $data)
+	protected function postSave(DataInterface $data)
 	{
 		parent::postSave($data);
 	}
