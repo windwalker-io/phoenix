@@ -310,8 +310,6 @@ class GridHelper
 	 * @param array $options
 	 *
 	 * @return  string
-	 *
-	 * @deprecated Use published() instead.
 	 */
 	public function state($value, array $options = array())
 	{

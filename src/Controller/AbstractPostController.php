@@ -23,6 +23,8 @@ use Windwalker\Uri\Uri;
 /**
  * The AbstractAdminController class.
  *
+ * @method  CrudModel  getModel($name = null, $source = null, $forceNew = false)
+ *
  * @since  1.0
  */
 abstract class AbstractPostController extends AbstractPhoenixController
@@ -235,44 +237,21 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	}
 
 	/**
-	 * getModel
-	 *
-	 * @param string $name
-	 * @param mixed  $source
-	 * @param bool   $forceNew
-	 *
-	 * @return  CrudModel
-	 */
-	public function getModel($name = null, $source = null, $forceNew = false)
-	{
-		if ($name)
-		{
-			return parent::getModel($name, $source, $forceNew);
-		}
-
-		if (!$this->model instanceof ModelRepository)
-		{
-			$this->model = parent::getModel($this->model, $source, $forceNew);
-		}
-
-		return $this->model;
-	}
-
-	/**
 	 * getRecord
 	 *
 	 * @param string $name
+	 * @param bool   $forceNew
 	 *
-	 * @return  Record
+	 * @return Record
 	 */
-	public function getRecord($name = null)
+	public function getRecord($name = null, $forceNew = false)
 	{
 		if ($name)
 		{
 			return $this->getModel()->getRecord($name);
 		}
 
-		if (!$this->record instanceof Record)
+		if (!$this->record instanceof Record || $forceNew)
 		{
 			$this->record = $this->getModel()->getRecord($this->record);
 		}

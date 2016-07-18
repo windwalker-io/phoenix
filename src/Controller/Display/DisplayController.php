@@ -61,8 +61,8 @@ class DisplayController extends AbstractPhoenixController
 		$this->format = $this->format ? : $this->app->get('route.extra.format', 'html');
 		$this->layout = $this->layout ? : $this->app->get('route.extra.layout', $this->name);
 
-		$this->model = $this->getModel($this->model);
-		$this->view = $this->getView($this->view);
+		$this->model = $this->getModel();
+		$this->view = $this->getView();
 
 		// Prepare response
 		$response = $this->response;
@@ -94,6 +94,7 @@ class DisplayController extends AbstractPhoenixController
 		{
 			$this->view->setLayout($this->layout);
 		}
+		// Only show debugger in HTML view
 		elseif (class_exists(DebuggerHelper::class))
 		{
 			DebuggerHelper::disableConsole();
@@ -118,7 +119,17 @@ class DisplayController extends AbstractPhoenixController
 	{
 		$format = $format ? : $this->format;
 
-		return parent::getView($name, $format, $engine, $forceNew);
+		if ($name)
+		{
+			return parent::getView($name, $format, $engine, $forceNew);
+		}
+
+		if (!$this->view instanceof AbstractView || $forceNew)
+		{
+			$this->view = parent::getView($name, $format, $engine, $forceNew);
+		}
+
+		return $this->view;
 	}
 
 	/**

@@ -9,6 +9,7 @@
 namespace Phoenix\Controller;
 
 use Windwalker\Core\Controller\AbstractController;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
@@ -186,5 +187,29 @@ abstract class AbstractPhoenixController extends AbstractController
 	public function checkAccess($data)
 	{
 		return true;
+	}
+
+	/**
+	 * getModel
+	 *
+	 * @param string $name
+	 * @param mixed  $source
+	 * @param bool   $forceNew
+	 *
+	 * @return  ModelRepository
+	 */
+	public function getModel($name = null, $source = null, $forceNew = false)
+	{
+		if ($name)
+		{
+			return parent::getModel($name, $source, $forceNew);
+		}
+
+		if (!$this->model instanceof ModelRepository || $forceNew)
+		{
+			$this->model = parent::getModel($this->model, $source, $forceNew);
+		}
+
+		return $this->model;
 	}
 }
