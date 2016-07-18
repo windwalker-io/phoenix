@@ -57,11 +57,11 @@ abstract class AbstractSaveController extends AbstractPostController
 
 		if ($this->formControl)
 		{
-			$this->data = $this->input->getVar($this->formControl);
+			$this->data = (array) $this->input->getArray($this->formControl);
 		}
 		else
 		{
-			$this->data = $this->input->toArray();
+			$this->data = (array) $this->input->toArray();
 		}
 	}
 
@@ -97,28 +97,23 @@ abstract class AbstractSaveController extends AbstractPostController
 	protected function doExecute()
 	{
 		// Get primary key from form data
-		$pk = ArrayHelper::getValue($this->data, $this->keyName);
+		$pk = ArrayHelper::getValue((array) $this->data, $this->keyName);
 
 		// If primary key not exists, this is a new record.
 		$this->isNew = !$pk;
 
-		if (!$this->isNew)
-		{
-			// If not new record, we load old data then override it by new data.
-			$this->record->load($pk);
-		}
+		$record = $this->getRecord();
 
-		// Merge it into Record / Data object.
-		$this->record->bind($this->data);
+		$record->bind($this->data);
 
 		// Process pre save hook, you may add your own logic in this method
-		$this->preSave($this->record);
+		$this->preSave($record);
 
 		// Just dave it.
-		$this->doSave($this->record);
+		$this->doSave($record);
 
 		// Process post save hook, you may add your own logic in this method
-		$this->postSave($this->record);
+		$this->postSave($record);
 
 		return true;
 	}

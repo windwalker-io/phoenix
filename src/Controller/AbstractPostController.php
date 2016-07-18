@@ -11,6 +11,7 @@ namespace Phoenix\Controller;
 use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Frontend\Bootstrap;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
@@ -38,7 +39,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 *
 	 * @var  array
 	 */
-	protected $data;
+	protected $data = [];
 
 	/**
 	 * Property task.
@@ -89,8 +90,8 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	{
 		parent::prepareExecute();
 
-		$this->model  = $this->getModel($this->model);
-		$this->record = $this->model->getRecord($this->record);
+		$this->model  = $this->getModel();
+		$this->record = $this->getRecord();
 		$this->task   = $this->input->get('task');
 
 		// Determine model
@@ -117,9 +118,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	{
 		$this->removeUserState($this->getContext('edit.data'));
 
-		$this->addMessage($this->getSuccessMessage($this->record), Bootstrap::MSG_SUCCESS);
+		$record = $this->getRecord();
 
-		$this->setRedirect($this->getSuccessRedirect($this->record));
+		$this->addMessage($this->getSuccessMessage($record), Bootstrap::MSG_SUCCESS);
+
+		$this->setRedirect($this->getSuccessRedirect($record));
 
 		if (!$this->response instanceof HtmlResponse && !$this->response instanceof RedirectResponse)
 		{
@@ -142,7 +145,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 
 		$this->addMessage($e->getMessage(), Bootstrap::MSG_WARNING);
 
-		$this->setRedirect($this->getFailRedirect($this->record));
+		$this->setRedirect($this->getFailRedirect($this->getRecord()));
 
 		return false;
 	}
@@ -229,5 +232,51 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		$this->data = $data;
 
 		return $this;
+	}
+
+	/**
+	 * getModel
+	 *
+	 * @param string $name
+	 * @param mixed  $source
+	 * @param bool   $forceNew
+	 *
+	 * @return  CrudModel
+	 */
+	public function getModel($name = null, $source = null, $forceNew = false)
+	{
+		if ($name)
+		{
+			return parent::getModel($name, $source, $forceNew);
+		}
+
+		if (!$this->model instanceof ModelRepository)
+		{
+			$this->model = parent::getModel($this->model, $source, $forceNew);
+		}
+
+		return $this->model;
+	}
+
+	/**
+	 * getRecord
+	 *
+	 * @param string $name
+	 *
+	 * @return  Record
+	 */
+	public function getRecord($name = null)
+	{
+		if ($name)
+		{
+			return $this->getModel()->getRecord($name);
+		}
+
+		if (!$this->record instanceof Record)
+		{
+			$this->record = $this->getModel()->getRecord($this->record);
+		}
+
+		return $this->record;
 	}
 }
