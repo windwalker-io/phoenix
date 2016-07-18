@@ -11,6 +11,7 @@ namespace Phoenix\Controller;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;
@@ -178,7 +179,7 @@ abstract class AbstractPhoenixController extends AbstractController
 	/**
 	 * checkAccess
 	 *
-	 * @param   array|Data  $data
+	 * @param   array|DataInterface  $data
 	 *
 	 * @return  boolean
 	 */

@@ -12,6 +12,7 @@ use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
@@ -161,11 +162,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	/**
 	 * getSuccessRedirect
 	 *
-	 * @param  Data|Entity $data
+	 * @param  DataInterface|Entity $data
 	 *
 	 * @return  string
 	 */
-	protected function getSuccessRedirect(Data $data = null)
+	protected function getSuccessRedirect(DataInterface $data = null)
 	{
 		$uri = new Uri($this->app->uri->full);
 
@@ -180,11 +181,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	/**
 	 * getFailRedirect
 	 *
-	 * @param  Data $data
+	 * @param  DataInterface $data
 	 *
 	 * @return  string
 	 */
-	protected function getFailRedirect(Data $data = null)
+	protected function getFailRedirect(DataInterface $data = null)
 	{
 		return $this->getSuccessRedirect($data);
 	}

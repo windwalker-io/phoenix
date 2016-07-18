@@ -13,6 +13,7 @@ use Phoenix\Model\Traits\FormAwareRepositoryTrait;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\ArrayHelper;
@@ -209,11 +210,11 @@ abstract class AbstractSaveController extends AbstractPostController
 	/**
 	 * getSuccessRedirect
 	 *
-	 * @param  Data|Entity $data
+	 * @param  DataInterface|Entity $data
 	 *
 	 * @return  string
 	 */
-	protected function getSuccessRedirect(Data $data = null)
+	protected function getSuccessRedirect(DataInterface $data = null)
 	{
 		$data = $data ? : new Entity;
 
