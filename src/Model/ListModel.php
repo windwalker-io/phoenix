@@ -166,7 +166,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 			return $this->getCache('list.query');
 		}
 
-		$query = $query ? : $this->getQuery();
+		$query = $query ? : $this->getQuery(true);
 
 		$queryHelper = $this->getQueryHelper();
 
@@ -446,7 +446,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		{
 			$start = $this->state['list.start'];
 
-			if ($this->config['list.fix_page'])
+			if ($this->config->get('list.fix_page', true))
 			{
 				$limit = $this->getLimit();
 				$total = $this->getTotal();
@@ -816,7 +816,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		{
 			if ($args)
 			{
-				$condition = $this->getQuery()->format($condition, ...$args);
+				$condition = $this->db->getQuery(true)->format($condition, ...$args);
 			}
 
 			$this->state->push('query.where', $condition);
@@ -895,7 +895,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		{
 			if ($args)
 			{
-				$condition = $this->getQuery()->format($condition, ...$args);
+				$condition = $this->db->getQuery(true)->format($condition, ...$args);
 			}
 
 			$this->state->push('query.having', $condition);
