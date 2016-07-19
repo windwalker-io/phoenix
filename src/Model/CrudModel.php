@@ -45,7 +45,7 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 	{
 		// Prepare Record object, primary keys and dump input data
 		$record = $this->getRecord();
-		$keys   = $record->getKeyName(true);
+		$keys   = $record->getKeyName(true) ? : []; // Fix because Record return empty string
 		$dumped = $data->dump(true);
 
 		// Let's check if primary exists, do action for update.

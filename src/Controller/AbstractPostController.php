@@ -51,11 +51,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	protected $task;
 
 	/**
-	 * Property record.
+	 * Property entity.
 	 *
-	 * @var  Record
+	 * @var  DataInterface|Entity
 	 */
-	protected $record;
+	protected $dataObject;
 
 	/**
 	 * Property keyName.
@@ -92,9 +92,9 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	{
 		parent::prepareExecute();
 
-		$this->model  = $this->getModel();
-		$this->record = $this->getRecord();
-		$this->task   = $this->input->get('task');
+		$this->model      = $this->getModel();
+		$this->dataObject = $this->getDataObject();
+		$this->task       = $this->input->get('task');
 
 		// Determine model
 		if (!$this->model instanceof CrudRepositoryInterface)
@@ -105,7 +105,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		// Determine the name of the primary key for the data.
 		if (empty($this->keyName))
 		{
-			$this->keyName = $this->model->getKeyName() ? : 'id';
+			$this->keyName = $this->model->getKeyName(false) ? : 'id';
 		}
 	}
 
@@ -120,17 +120,17 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	{
 		$this->removeUserState($this->getContext('edit.data'));
 
-		$record = $this->getRecord();
+		$entity = $this->getDataObject();
 
-		$this->addMessage($this->getSuccessMessage($record), Bootstrap::MSG_SUCCESS);
+		$this->addMessage($this->getSuccessMessage($entity), Bootstrap::MSG_SUCCESS);
 
-		$this->setRedirect($this->getSuccessRedirect($record));
+		$this->setRedirect($this->getSuccessRedirect($entity));
 
 		if (!$this->response instanceof HtmlResponse && !$this->response instanceof RedirectResponse)
 		{
-			return $this->record->dump(true);
+			return $entity->dump(true);
 		}
-		
+
 		return $result;
 	}
 
@@ -147,7 +147,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 
 		$this->addMessage($e->getMessage(), Bootstrap::MSG_WARNING);
 
-		$this->setRedirect($this->getFailRedirect($this->getRecord()));
+		$this->setRedirect($this->getFailRedirect($this->getDataObject()));
 
 		return false;
 	}
@@ -237,25 +237,31 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	}
 
 	/**
-	 * getRecord
+	 * Method to get property Entity
 	 *
-	 * @param string $name
-	 * @param bool   $forceNew
-	 *
-	 * @return Record
+	 * @return  DataInterface|Entity
 	 */
-	public function getRecord($name = null, $forceNew = false)
+	public function getDataObject()
 	{
-		if ($name)
+		if (!$this->dataObject)
 		{
-			return $this->getModel()->getRecord($name);
+			return $this->dataObject = new Data;
 		}
 
-		if (!$this->record instanceof Record || $forceNew)
-		{
-			$this->record = $this->getModel()->getRecord($this->record);
-		}
+		return $this->dataObject;
+	}
 
-		return $this->record;
+	/**
+	 * Method to set property entity
+	 *
+	 * @param   DataInterface|Entity $dataObject
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setDataObject(DataInterface $dataObject)
+	{
+		$this->dataObject = $dataObject;
+
+		return $this;
 	}
 }

@@ -24,13 +24,6 @@ class AbstractRebuildController extends AbstractBatchController
 	use CsrfProtectionTrait;
 
 	/**
-	 * Property record.
-	 *
-	 * @var  NestedRecord
-	 */
-	protected $record;
-
-	/**
 	 * Property action.
 	 *
 	 * @var  string

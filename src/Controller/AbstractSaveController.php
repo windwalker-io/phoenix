@@ -83,7 +83,7 @@ abstract class AbstractSaveController extends AbstractPostController
 
 		$this->validate($data);
 
-		$this->model->save($data);
+		$this->getModel()->save($data);
 	}
 
 	/**
@@ -102,18 +102,18 @@ abstract class AbstractSaveController extends AbstractPostController
 		// If primary key not exists, this is a new record.
 		$this->isNew = !$pk;
 
-		$record = $this->getRecord();
+		$data = $this->getDataObject();
 
-		$record->bind($this->data);
+		$data->bind($this->data);
 
 		// Process pre save hook, you may add your own logic in this method
-		$this->preSave($record);
+		$this->preSave($data);
 
 		// Just dave it.
-		$this->doSave($record);
+		$this->doSave($data);
 
 		// Process post save hook, you may add your own logic in this method
-		$this->postSave($record);
+		$this->postSave($data);
 
 		return true;
 	}
@@ -161,9 +161,11 @@ abstract class AbstractSaveController extends AbstractPostController
 	 */
 	protected function prepareStore(DataInterface $data)
 	{
-		if ($this->model instanceof FormAwareRepositoryInterface)
+		$model = $this->getModel();
+
+		if ($model instanceof FormAwareRepositoryInterface)
 		{
-			$result = $this->model->prepareStore($data->dump(true));
+			$result = $model->prepareStore($data->dump(true));
 
 			return $data->bind($result, true);
 		}
@@ -182,9 +184,11 @@ abstract class AbstractSaveController extends AbstractPostController
 	 */
 	protected function validate(DataInterface $data)
 	{
-		if ($this->model instanceof FormAwareRepositoryTrait)
+		$model = $this->getModel();
+
+		if ($model instanceof FormAwareRepositoryTrait)
 		{
-			$this->model->validate($data->dump(true));
+			$model->validate($data->dump(true));
 		}
 	}
 
@@ -197,7 +201,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	 */
 	protected function getFailRedirect(DataInterface $data = null)
 	{
-		$pk = $this->record->{$this->keyName};
+		$pk = $this->getDataObject()->{$this->keyName};
 
 		return $this->router->route($this->getName(), $this->getRedirectQuery(array($this->keyName => $pk)));
 	}
@@ -211,7 +215,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	 */
 	protected function getSuccessRedirect(DataInterface $data = null)
 	{
-		$data = $data ? : new Entity;
+		$data = $data ? : $this->getDataObject();
 
 		switch ($this->task)
 		{
@@ -239,7 +243,7 @@ abstract class AbstractSaveController extends AbstractPostController
 				return $this->router->route($this->getName(), $this->getRedirectQuery());
 
 			default:
-				$pk = $this->record->{$this->keyName};
+				$pk = $data->{$this->keyName};
 
 				return $this->router->route($this->getName(), $this->getRedirectQuery(array($this->keyName => $pk)));
 		}
