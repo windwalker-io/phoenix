@@ -45,7 +45,7 @@ trait FormAwareRepositoryTrait
 
 		try
 		{
-			$keyName = $this['keyName'] ? : $this->getRecord()->getKeyName();
+			$keyName = $this['keyName'] ? : $this->getKeyName();
 		}
 		catch (\DomainException $e)
 		{
