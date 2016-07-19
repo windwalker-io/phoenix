@@ -49,7 +49,7 @@ class SearchHelper extends AbstractFilterHelper
 			{
 				if (!empty($this->handler[$field]) && is_callable($this->handler[$field]))
 				{
-					$condition = call_user_func_array($this->handler[$field], array($query, $field, $value));
+					$condition = call_user_func($this->handler[$field], $query, $field, $value);
 				}
 				else
 				{

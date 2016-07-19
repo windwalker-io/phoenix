@@ -29,11 +29,11 @@ interface FilterHelperInterface
 	 * ```
 	 *
 	 * @param string   $name    The handler name.
-	 * @param callback $handler Handler callback.
+	 * @param callable $handler Handler callback.
 	 *
 	 * @return  FilterHelperInterface Return self to support chaining.
 	 */
-	public function setHandler($name, $handler);
+	public function setHandler($name, callable $handler);
 
 	/**
 	 * Execute the filter and add in query object.

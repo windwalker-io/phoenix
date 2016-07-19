@@ -71,6 +71,7 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 		parent::prepareData($data);
 
 		$this->prepareScripts();
+		$this->prepareMetadata();
 	}
 
 	/**
@@ -89,14 +90,12 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	}
 
 	/**
-	 * setTitle
+	 * prepareMetadata
 	 *
-	 * @param string $title
-	 *
-	 * @return  static
+	 * @return  void
 	 */
-	public function setTitle($title = null)
+	protected function prepareMetadata()
 	{
-		return parent::setTitle($title);
+		$this->setTitle();
 	}
 }

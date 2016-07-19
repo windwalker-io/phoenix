@@ -35,6 +35,13 @@ class {$controller.item.name.cap$}Mapper extends CoreDataMapper
 	protected static $keys = 'id';
 
 	/**
+	 * Property alias.
+	 *
+	 * @var  string
+	 */
+	protected static $alias = '{$controller.item.name.lower$}';
+
+	/**
 	 * Property dataClass.
 	 *
 	 * @var  string

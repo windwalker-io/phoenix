@@ -49,7 +49,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		// Reorder
 		if ($result && $this->get('order.position') == static::ORDER_POSITION_FIRST)
 		{
-			$pk = $data->{$this->getRecord()->getKeyName()};
+			$pk = $data->{$this->getKeyName()};
 
 			$this->reorder(array($pk => 0));
 
@@ -71,7 +71,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		$date = $this->getDate();
 
 		$user = User::get();
-		$key  = $record->getKeyName();
+		$key  = $this->getKeyName();
 
 		// Alias
 		if ($record->hasField('alias'))
@@ -208,7 +208,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 			// If not found, we add this condition to cache.
 			if (!$found)
 			{
-				$key = $record->getKeyName();
+				$key = $this->getKeyName();
 				$conditions[] = array(
 					'pk'   => $record->$key,
 					'cond' => $condition

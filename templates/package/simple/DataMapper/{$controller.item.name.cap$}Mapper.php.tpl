@@ -8,19 +8,33 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\DataMapper;
 
-use Windwalker\DataMapper\DataMapper;
+use Windwalker\Core\DataMapper\CoreDataMapper;
 
 /**
  * The {$controller.item.name.cap$}Mapper class.
  * 
  * @since  1.0
  */
-class {$controller.item.name.cap$}Mapper extends DataMapper
+class {$controller.item.name.cap$}Mapper extends CoreDataMapper
 {
 	/**
 	 * Property table.
 	 *
 	 * @var  string
 	 */
-	protected $table = '{$controller.list.name.lower$}';
+	protected static $table = '{$controller.list.name.lower$}';
+
+	/**
+	 * Property keys.
+	 *
+	 * @var  string
+	 */
+	protected static $keys = 'id';
+
+	/**
+	 * Property alias.
+	 *
+	 * @var  string
+	 */
+	protected static $alias = '{$controller.item.name.lower$}';
 }

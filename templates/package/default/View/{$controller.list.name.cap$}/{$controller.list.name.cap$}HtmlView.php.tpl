@@ -92,6 +92,7 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 		parent::prepareData($data);
 
 		$this->prepareScripts();
+		$this->prepareMetadata();
 	}
 
 	/**
@@ -110,14 +111,12 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	}
 
 	/**
-	 * setTitle
+	 * prepareMetadata
 	 *
-	 * @param string $title
-	 *
-	 * @return  static
+	 * @return  void
 	 */
-	public function setTitle($title = null)
+	protected function prepareMetadata()
 	{
-		return parent::setTitle($title);
+		$this->setTitle();
 	}
 }

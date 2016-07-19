@@ -48,6 +48,13 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	protected $reorderConditions = [];
 
 	/**
+	 * Property reorderPosition.
+	 *
+	 * @var  string
+	 */
+	protected $reorderPosition = self::ORDER_POSITION_LAST;
+
+	/**
 	 * postGetItem
 	 *
 	 * @param DataInterface $item
@@ -69,6 +76,18 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	protected function prepareRecord(Record $record)
 	{
 		parent::prepareRecord($record);
+	}
+
+	/**
+	 * postSaveHook
+	 *
+	 * @param Record $record
+	 *
+	 * @return  void
+	 */
+	protected function postSaveHook(Record $record)
+	{
+		parent::postSaveHook($record);
 	}
 
 	/**

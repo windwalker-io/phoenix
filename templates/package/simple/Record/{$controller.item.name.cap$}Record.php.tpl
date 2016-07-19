@@ -23,4 +23,11 @@ class {$controller.item.name.cap$}Record extends Record
 	 * @var  string
 	 */
 	protected $table = '{$controller.list.name.lower$}';
+
+	/**
+	 * Property keys.
+	 *
+	 * @var  string
+	 */
+	protected $keys = 'id';
 }
