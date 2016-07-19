@@ -12,6 +12,7 @@ use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
 use Phoenix\Controller\Display\DisplayController;
 use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\View\AbstractView;
 
 /**
  * The GetController class.
@@ -46,14 +47,14 @@ class GetController extends DisplayController
 	 *
 	 * @var  {$controller.item.name.cap$}Model
 	 */
-	protected $model;
+	protected $model = '{$controller.item.name.lower$}';
 
 	/**
 	 * Property view.
 	 *
 	 * @var  {$controller.item.name.cap$}HtmlView
 	 */
-	protected $view;
+	protected $view = '{$controller.item.name.lower$}';
 
 	/**
 	 * prepareExecute
@@ -66,15 +67,27 @@ class GetController extends DisplayController
 	}
 
 	/**
-	 * prepareUserState
+	 * prepareModelState
 	 *
 	 * @param   ModelRepository $model
 	 *
 	 * @return  void
 	 */
-	protected function prepareUserState(ModelRepository $model)
+	protected function prepareModelState(ModelRepository $model)
 	{
-		parent::prepareUserState($model);
+		parent::prepareModelState($model);
+	}
+
+	/**
+	 * prepareViewData
+	 *
+	 * @param   AbstractView $view
+	 *
+	 * @return  void
+	 */
+	protected function prepareViewData(AbstractView $view)
+	{
+		parent::prepareViewData($view);
 	}
 
 	/**

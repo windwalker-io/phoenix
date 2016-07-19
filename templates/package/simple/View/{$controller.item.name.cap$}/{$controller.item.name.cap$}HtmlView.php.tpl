@@ -35,17 +35,27 @@ class {$controller.item.name.cap$}HtmlView extends ItemView
 	protected function prepareData($data)
 	{
 		parent::prepareData($data);
+
+		$this->prepareScripts();
+		$this->prepareMetadata();
 	}
 
 	/**
-	 * setTitle
+	 * prepareDocument
 	 *
-	 * @param string $title
-	 *
-	 * @return  static
+	 * @return  void
 	 */
-	public function setTitle($title = null)
+	protected function prepareScripts()
 	{
-		return parent::setTitle($title);
+	}
+
+	/**
+	 * prepareMetadata
+	 *
+	 * @return  void
+	 */
+	protected function prepareMetadata()
+	{
+		$this->setTitle();
 	}
 }
