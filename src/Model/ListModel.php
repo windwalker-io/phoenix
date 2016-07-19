@@ -422,7 +422,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 			// Otherwise fall back to inefficient way of counting all results.
 			$subQuery = clone $query;
 
-			$subQuery->clear('select')->clear('order')->select('COUNT(*) AS ' . $query->quoteName('count'));
+			$subQuery->clear('select')->clear('order')->clear('limit')->select('COUNT(*) AS ' . $query->quoteName('count'));
 
 			$query = $this->db->getQuery(true);
 
