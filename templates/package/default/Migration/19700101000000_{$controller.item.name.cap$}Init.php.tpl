@@ -45,8 +45,6 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
 			$schema->addIndex('language');
 			$schema->addIndex('created_by');
 		});
-
-		$this->getTable(Table::{$controller.list.name.upper$})->addIndex(Key::TYPE_INDEX, 'alias', 'idx_{$controller.list.name.lower$}_alias');
 	}
 
 	/**
