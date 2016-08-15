@@ -111,7 +111,7 @@ class GridHelper
 		$orderColumn = $state->get('list.orderColumn', $config->get('order_column'));
 		$listDirn    = $this->state->get('list.direction');
 
-		$state->set('list.saveorder', ($listOrder == $orderColumn) && strtoupper($listDirn) === 'ASC');
+		$this->config->set('list.saveorder', ($listOrder == $orderColumn) && strtoupper($listDirn) === 'ASC');
 	}
 
 	/**
@@ -178,7 +178,7 @@ class GridHelper
 	{
 		$keyName = $this->config->get('field.pk');
 		$orderField = $this->config['field.ordering'];
-		$saveOrder = $this->state->get('list.saveorder');
+		$saveOrder = $this->config->get('list.saveorder');
 
 		return WidgetHelper::render('phoenix.grid.table.order-button', array(
 			'item'   => $this->current,
@@ -196,7 +196,7 @@ class GridHelper
 	 */
 	public function saveOrderButton()
 	{
-		if ($this->state->get('list.saveorder'))
+		if ($this->config->get('list.saveorder'))
 		{
 			return WidgetHelper::render('phoenix.grid.table.saveorder-button', array(), WidgetHelper::EDGE);
 		}
