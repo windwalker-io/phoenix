@@ -88,8 +88,8 @@ HTML;
 // $label
 \$this->radio('$name')
 	->label('$label')
-	->addOption(new Option('Yes', 1))
-	->addOption(new Option('No', 0))
+	->option('Yes', 1)
+	->option('No', 0)
 	->set('class', '')
 	->set('labelClass', '')
 	->set('default', 1);
@@ -115,7 +115,7 @@ HTML;
 			$value = trim($value);
 			$text = ucfirst($value);
 
-			return "->addOption(new Option('$text', '$value'))";
+			return "->option('$text', '$value')";
 		}, explode(',', $comment));
 
 		$options = implode("\n\t", $options);
