@@ -15,8 +15,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The CoreScript class.
  *
- * @see  \Phoenix\Script\ScriptManager
- * @see  \Phoenix\Script\Module\ModuleManager
+ * @see  AbstractPhoenixScript
  *
  * @since  1.0
  */
@@ -149,7 +148,7 @@ JS;
 	 */
 	public static function csrfToken($token = null)
 	{
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
 			// Inject Token to meta
 			HtmlHeader::addMetadata('csrf-token', $token ?: CsrfProtection::getFormToken());

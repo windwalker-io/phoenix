@@ -44,7 +44,7 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 			static::addJS(static::phoenixName() . '/js/phoenix/phoenix.js');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
 			$defaultOptions = array(
 				'theme' => 'bootstrap',
@@ -121,21 +121,19 @@ JS
 	 */
 	public static function grid($selector = '#admin-form', $variable = 'Phoenix' ,$options = array())
 	{
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
 			static::core($selector);
 
-			$asset->addScript(static::phoenixName() . '/js/phoenix/grid.js');
+			static::addJS(static::phoenixName() . '/js/phoenix/grid.js');
 
 			static::translate('phoenix.message.delete.confirm');
 			static::translate('phoenix.message.grid.checked');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
-			$options = $asset::getJSObject($options);
+			$options = static::getJSObject($options);
 
 			$js = <<<JS
 // Gird and filter bar
@@ -149,7 +147,7 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
+			static::internalJS($js);
 		}
 	}
 
@@ -163,17 +161,15 @@ JS;
 	 */
 	public static function chosen($selector = 'select', $options = array())
 	{
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset->addScript(static::phoenixName() . '/js/chosen/chosen.min.js');
-			$asset->addStyle(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
+			static::addJS(static::phoenixName() . '/js/chosen/chosen.min.js');
+			static::addCSS(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
 			$defaultOptions = array(
 				'allow_single_deselect'     => true,
@@ -183,7 +179,7 @@ JS;
 				'no_results_text'           => Translator::translate('phoenix.chosen.text.noresult')
 			);
 
-			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
+			$options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
 			$js = <<<JS
 // Chosen select
@@ -211,7 +207,7 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
+			static::internalJS($js);
 		}
 	}
 
@@ -263,18 +259,16 @@ JS;
 	 */
 	public static function multiSelect($selector = '#admin-form table', $options = array())
 	{
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset->addScript(static::phoenixName() . '/js/phoenix/multiselect.min.js');
+			static::addJS(static::phoenixName() . '/js/phoenix/multiselect.min.js');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
-			$options = $asset::getJSObject($options);
+			$options = static::getJSObject($options);
 
 			$js = <<<JS
 // Chosen select
@@ -284,7 +278,7 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
+			static::internalJS($js);
 		}
 	}
 
@@ -298,17 +292,15 @@ JS;
 	 */
 	public static function formValidation($selector = '#admin-form', $options = array())
 	{
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
 			static::core();
 
-			$asset->addScript(static::phoenixName() . '/js/string/punycode.min.js');
-			$asset->addScript(static::phoenixName() . '/js/phoenix/validation.min.js');
+			static::addJS(static::phoenixName() . '/js/string/punycode.min.js');
+			static::addJS(static::phoenixName() . '/js/phoenix/validation.min.js');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
 			$defaultOptions = array(
 				'scroll' => array(
@@ -318,7 +310,7 @@ JS;
 				)
 			);
 
-			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
+			$options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
 			static::translate('phoenix.message.validation.required');
 			static::translate('phoenix.message.validation.failure');
@@ -331,7 +323,7 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
+			static::internalJS($js);
 		}
 	}
 

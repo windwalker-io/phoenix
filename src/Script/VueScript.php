@@ -121,7 +121,9 @@ class VueScript extends AbstractPhoenixScript
 	 *
 	 * @see  http://vuex.vuejs.org/en/index.html
 	 *
-	 * @return  void
+	 * @param array $stores
+	 *
+	 * @return void
 	 */
 	public static function vuex(array $stores = [])
 	{

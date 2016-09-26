@@ -258,6 +258,8 @@ JS;
 	 */
 	public static function tabState($selector = '#admin-form', $time = 100)
 	{
+		$args = get_defined_vars();
+
 		$asset = static::getAsset();
 
 		if (!static::inited(__METHOD__))
@@ -267,7 +269,7 @@ JS;
 			$asset->addScript(static::phoenixName() . '/js/bootstrap/tab-state.min.js');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, $args))
 		{
 			$time = (int) $time;
 

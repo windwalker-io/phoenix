@@ -48,6 +48,8 @@ abstract class JQueryScript extends AbstractPhoenixScript
 	 */
 	public static function ui(array $components)
 	{
+		sort($components);
+
 		static::core();
 		$asset = static::getAsset();
 
@@ -56,7 +58,7 @@ abstract class JQueryScript extends AbstractPhoenixScript
 			$asset->addScript(static::phoenixName() . '/js/jquery/jquery.ui.core.min.js');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, $components))
 		{
 			$allowedComponents = array(
 				'draggable',
@@ -87,6 +89,8 @@ abstract class JQueryScript extends AbstractPhoenixScript
 	 */
 	public static function colorPicker($selector = '.colorpicker', $options = array())
 	{
+		$args = get_defined_vars();
+
 		static::core();
 		$asset = static::getAsset();
 
@@ -96,7 +100,7 @@ abstract class JQueryScript extends AbstractPhoenixScript
 			$asset->addStyle(static::phoenixName() . '/css/jquery/jquery.minicolors.min.css');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, $args))
 		{
 			$defaultOptions = array(
 				'control' => 'hue',
@@ -132,6 +136,7 @@ JS;
 	 */
 	public static function highlight($selector = null, $text = null, $options = array())
 	{
+		$args = get_defined_vars();
 		$asset = static::getAsset();
 
 		if (!static::inited(__METHOD__))
@@ -141,7 +146,7 @@ JS;
 			$asset->addScript(static::phoenixName() . '/js/jquery/jquery.highlight.js');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()) && $selector && $text)
+		if (!static::inited(__METHOD__, $args) && $selector && $text)
 		{
 			if (is_array($text))
 			{
