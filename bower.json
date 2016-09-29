@@ -1,0 +1,19 @@
+{
+  "name": "phoenix",
+  "homepage": "https://github.com/ventoviro/phoenix",
+  "authors": [
+    "Simon Asika <asika32764@gmail.com>"
+  ],
+  "description": "Windwalker RAD package",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "jquery": "1.*",
+    "vue": "2.*",
+    "vue-resource": "1.*",
+    "vue-router": "2.*",
+    "vue-strap": "1.*",
+    "vuex": "2.*"
+  }
+}

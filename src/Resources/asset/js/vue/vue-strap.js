@@ -5516,8 +5516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      default: 'default'
 	    },
 	    key: {
-	      type: String,
-	      default: null
+	      type: String
 	    },
 	    matchCase: {
 	      type: Boolean,
@@ -5584,7 +5583,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      if (this.async) {
 	        (0, _callAjax2.default)(this.async + this.query, function (data) {
-	          _this2.items = (_this2.key ? data[_this2.key] : data).slice(0, _this2.limit);
+	          _this2.items = data[_this2.key].slice(0, _this2.limit);
 	          _this2.showDropdown = _this2.items.length ? true : false;
 	        });
 	      }
