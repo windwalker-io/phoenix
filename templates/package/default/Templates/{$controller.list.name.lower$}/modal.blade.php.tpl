@@ -5,7 +5,7 @@
  * --------------------------------------------------------------
  * @var $app      \Windwalker\Web\Application                 Global Application
  * @var $package  \Windwalker\Core\Package\AbstractPackage    Package object.
- * @var $view     \Windwalker\Data\Data                       Some information of this view.
+ * @var $view     \{$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView  View object.
  * @var $uri      \Windwalker\Uri\UriData                     Uri information, example: $uri->path
  * @var $datetime \Windwalker\Core\DateTime\DateTime          PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
@@ -19,7 +19,7 @@
  * @var $batchForm     \Windwalker\Form\Form
  * @var $showFilterBar boolean
  * @var $grid          \Phoenix\View\Helper\GridHelper
- * @var $state         \Windwalker\Registry\Registry
+ * @var $state         \Windwalker\Structure\Structure
  * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait[]
  * @var $item          \{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait
  * @var $i             integer

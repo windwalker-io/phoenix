@@ -4,8 +4,8 @@
  * Global variables
  * --------------------------------------------------------------
  * @var $app      \Windwalker\Web\Application                 Global Application
- * @var $package  \Windwalker\Core\Package\AbstractPackage    Package object.
- * @var $view     \Windwalker\Data\Data                       Some information of this view.
+ * @var $package  \{$package.namespace$}{$package.name.cap$}\{$package.name.cap$}Package                 Package object.
+ * @var $view     \{$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView  View object.
  * @var $uri      \Windwalker\Uri\UriData                     Uri information, example: $uri->path
  * @var $datetime \Windwalker\Core\DateTime\DateTime          PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
@@ -68,7 +68,7 @@
 
                     {{-- ORDERING --}}
                     <th width="5%" class="nowrap">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!} {!! $grid->saveorderButton() !!}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!} {!! $grid->saveOrderButton() !!}
                     </th>
 
                     {{-- AUTHOR --}}
