@@ -375,4 +375,25 @@ JS;
 			$asset->addScript(static::phoenixName() . '/js/phoenix/crypto.min.js');
 		}
 	}
+
+	/**
+	 * ajax
+	 *
+	 * @param bool $token
+	 *
+	 * @return  void
+	 */
+	public static function ajax($token = true)
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::addJS(static::phoenixName() . '/js/phoenix/ajax.min.js');
+		}
+
+		if (!static::inited(__METHOD__) && $token)
+		{
+			$token = CsrfProtection::getFormToken();
+			static::internalJS("Phoenix.Ajax.headers._global['X-Csrf-Token'] = '{$token}'");
+		}
+	}
 }
