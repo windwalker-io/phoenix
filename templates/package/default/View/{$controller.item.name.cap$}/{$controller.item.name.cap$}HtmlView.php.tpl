@@ -27,14 +27,14 @@ class {$controller.item.name.cap$}HtmlView extends EditView
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.item.name.lower$}';
+	protected $name = '{$controller.item.name.cap$}';
 
 	/**
 	 * Property formDefinition.
 	 *
 	 * @var  string
 	 */
-	protected $formDefinition = 'edit';
+	protected $formDefinition = 'Edit';
 
 	/**
 	 * Property formControl.

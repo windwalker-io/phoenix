@@ -24,21 +24,21 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.item.name.lower$}';
+	protected $name = '{$controller.item.name.cap$}';
 
 	/**
 	 * Property record.
 	 *
 	 * @var  string
 	 */
-	protected $record = '{$controller.item.name.lower$}';
+	protected $record = '{$controller.item.name.cap$}';
 
 	/**
 	 * Property mapper.
 	 *
 	 * @var  string
 	 */
-	protected $mapper = '{$controller.item.name.lower$}';
+	protected $mapper = '{$controller.item.name.cap$}';
 
 	/**
 	 * Property reorderConditions.

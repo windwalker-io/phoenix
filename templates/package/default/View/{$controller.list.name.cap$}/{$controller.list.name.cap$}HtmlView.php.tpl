@@ -26,7 +26,7 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.list.name.lower$}';
+	protected $name = '{$controller.list.name.cap$}';
 
 	/**
 	 * The fields mapper.

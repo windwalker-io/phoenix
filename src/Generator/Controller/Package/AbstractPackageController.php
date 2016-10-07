@@ -72,10 +72,12 @@ abstract class AbstractPackageController extends AbstractTaskController
 
 		$this->replace['package.namespace'] = $class;
 
-		$this->replace['package.name.lower'] = strtolower($name);
+		$this->replace['package.name.lower'] = lcfirst($name);
 		$this->replace['package.name.upper'] = strtoupper($name);
 		$this->replace['package.name.cap']   = ucfirst($name);
 
+		$this->replace['table.name'] = $io->getOption('table', strtolower(StringNormalise::toUnderscoreSeparated(StringNormalise::fromCamelCase(ucfirst($listName)))));
+		
 		$this->replace['controller.list.name.lower'] = strtolower($listName);
 		$this->replace['controller.list.name.upper'] = strtoupper($listName);
 		$this->replace['controller.list.name.cap']   = ucfirst($listName);

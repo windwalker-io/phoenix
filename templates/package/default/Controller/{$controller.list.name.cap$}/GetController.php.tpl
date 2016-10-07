@@ -26,35 +26,35 @@ class GetController extends ListDisplayController
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.list.name.lower$}';
+	protected $name = '{$controller.list.name.cap$}';
 
 	/**
 	 * Property itemName.
 	 *
 	 * @var  string
 	 */
-	protected $itemName = '{$controller.item.name.lower$}';
+	protected $itemName = '{$controller.item.name.cap$}';
 
 	/**
 	 * Property listName.
 	 *
 	 * @var  string
 	 */
-	protected $listName = '{$controller.list.name.lower$}';
+	protected $listName = '{$controller.list.name.cap$}';
 
 	/**
 	 * Property model.
 	 *
 	 * @var  {$controller.list.name.cap$}Model
 	 */
-	protected $model = '{$controller.list.name.lower$}';
+	protected $model = '{$controller.list.name.cap$}';
 
 	/**
 	 * Property view.
 	 *
 	 * @var  {$controller.list.name.cap$}HtmlView
 	 */
-	protected $view = '{$controller.list.name.lower$}';
+	protected $view = '{$controller.list.name.cap$}';
 
 	/**
 	 * Property ordering.

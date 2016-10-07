@@ -29,21 +29,21 @@ class SaveController extends AbstractSaveController
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.item.name.lower$}';
+	protected $name = '{$controller.item.name.cap$}';
 
 	/**
 	 * Property itemName.
 	 *
 	 * @var  string
 	 */
-	protected $itemName = '{$controller.item.name.lower$}';
+	protected $itemName = '{$controller.item.name.cap$}';
 
 	/**
 	 * Property listName.
 	 *
 	 * @var  string
 	 */
-	protected $listName = '{$controller.list.name.lower$}';
+	protected $listName = '{$controller.list.name.cap$}';
 
 	/**
 	 * Property formControl.

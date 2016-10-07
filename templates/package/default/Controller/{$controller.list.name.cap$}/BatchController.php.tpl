@@ -25,19 +25,19 @@ class BatchController extends BatchDelegatingController
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.list.name.lower$}';
+	protected $name = '{$controller.list.name.cap$}';
 
 	/**
 	 * Property itemName.
 	 *
 	 * @var  string
 	 */
-	protected $itemName = '{$controller.item.name.lower$}';
+	protected $itemName = '{$controller.item.name.cap$}';
 
 	/**
 	 * Property listName.
 	 *
 	 * @var  string
 	 */
-	protected $listName = '{$controller.list.name.lower$}';
+	protected $listName = '{$controller.list.name.cap$}';
 }
