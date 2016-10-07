@@ -27,7 +27,7 @@ class AddSeederAction extends AbstractAction
 	{
 		$name = $this->config['replace.controller.item.name.cap'];
 
-		$file = $this->config['dir.dest'] . '/Seed/DatabaseSeeder.php';
+		$file = $this->config['dir.dest'] . '/Seed/MainSeeder.php';
 
 		if (!is_file($file))
 		{
@@ -37,20 +37,20 @@ class AddSeederAction extends AbstractAction
 		$code = file_get_contents($file);
 		$added = false;
 
-		if (strpos($code, '$this->execute(new ' . $name . 'Seeder);') === false)
+		if (strpos($code, '$this->execute(' . $name . 'Seeder::class);') === false)
 		{
-			$replace = "\t\t\$this->execute(new {$name}Seeder);\n\n";
+			$replace = "\t\t\$this->execute({$name}Seeder::class);\n\n";
 
 			$code = GeneratorHelper::addBeforePlaceholder('seeder-execute', $code, $replace);
 
 			$added = true;
 		}
 
-		if (strpos($code, '$this->clean(new ' . $name . 'Seeder);') === false)
+		if (strpos($code, '$this->clear(' . $name . 'Seeder::class);') === false)
 		{
-			$replace = "\t\t\$this->clean(new {$name}Seeder);\n\n";
+			$replace = "\t\t\$this->clear({$name}Seeder::class);\n\n";
 
-			$code = GeneratorHelper::addBeforePlaceholder('seeder-clean', $code, $replace);
+			$code = GeneratorHelper::addBeforePlaceholder('seeder-clear', $code, $replace);
 
 			$added = true;
 		}
@@ -59,7 +59,7 @@ class AddSeederAction extends AbstractAction
 		{
 			file_put_contents($file, $code);
 
-			$this->io->out('[<info>Action</info>] Add seeder to DatabaseSeeder');
+			$this->io->out('[<info>Action</info>] Add seeder to MainSeeder');
 		}
 	}
 }
