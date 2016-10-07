@@ -22,7 +22,7 @@ class MainSeeder extends AbstractSeeder
 	 */
 	public function doExecute()
 	{
-		$this->execute(new {$controller.item.name.cap$}Seeder);
+		$this->execute({$controller.item.name.cap$}Seeder::class);
 
 		// @muse-placeholder  seeder-execute  Do not remove this.
 	}
@@ -34,8 +34,8 @@ class MainSeeder extends AbstractSeeder
 	 */
 	public function doClear()
 	{
-		$this->clear(new {$controller.item.name.cap$}Seeder);
+		$this->clear({$controller.item.name.cap$}Seeder::class);
 
-		// @muse-placeholder  seeder-clean  Do not remove this.
+		// @muse-placeholder  seeder-clear  Do not remove this.
 	}
 }
