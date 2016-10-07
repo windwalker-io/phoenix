@@ -24,7 +24,7 @@ class {$controller.list.name.cap$}Model extends ListModel
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.list.name.lower$}';
+	protected $name = '{$controller.list.name.cap$}';
 
 	/**
 	 * Property allowFields.

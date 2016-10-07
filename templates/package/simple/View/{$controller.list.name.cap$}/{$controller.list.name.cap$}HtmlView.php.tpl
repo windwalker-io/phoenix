@@ -23,7 +23,7 @@ class {$controller.list.name.cap$}HtmlView extends ListView
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.list.name.lower$}';
+	protected $name = '{$controller.list.name.cap$}';
 
 	/**
 	 * prepareData
