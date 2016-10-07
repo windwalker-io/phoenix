@@ -25,5 +25,5 @@ class {$controller.list.name.cap$}Model extends ModelRepository
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.list.name.lower$}';
+	protected $name = '{$controller.list.name.cap$}';
 }

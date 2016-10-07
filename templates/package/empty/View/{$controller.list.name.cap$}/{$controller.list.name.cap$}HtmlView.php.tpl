@@ -22,7 +22,7 @@ class {$controller.list.name.cap$}HtmlView extends AbstractPhoenixHtmView
 	 *
 	 * @var  string
 	 */
-	protected $name = '{$controller.list.name.lower$}';
+	protected $name = '{$controller.list.name.cap$}';
 
 	/**
 	 * prepareData
