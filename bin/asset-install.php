@@ -11,6 +11,24 @@ use Windwalker\Core\Asset\AssetInstaller;
 include_once __DIR__ . '/../../../autoload.php';
 
 $assets = [
+	'underscore' => [
+		'underscore.js' => 'js/core/underscore.js',
+		'underscore.min.js' => 'js/core/underscore.min.js',
+	],
+	'underscore.string' => [
+		'dist/underscore.string.js' => 'js/core/underscore.string.js',
+		'dist/underscore.string.min.js' => 'js/core/underscore.string.min.js',
+	],
+	'requirejs' => [
+		'require.js' => 'js/core/require.js'
+	],
+	'backbone' => [
+		'backbone.js' => 'js/core/backbone.js',
+		'backbone.min.js' => 'js/core/backbone.min.js',
+	],
+	'punycode' => [
+		'punycode.js' => 'js/string/punycode.js'
+	],
 	'jquery' => [
 		'dist/jquery.js' => 'js/jquery/jquery.js',
 		'dist/jquery.min.js' => 'js/jquery/jquery.min.js',
@@ -47,6 +65,18 @@ $assets = [
 		'dist/vuex.min.js' => 'js/vue/vuex.min.js',
 		'dist/vuex.js.map' => 'js/vue/vuex.js.map',
 	],
+	'vue2-animate' => [
+		'dist/vue2-animate.css' => 'css/vue/vue2-animate.css',
+		'dist/vue2-animate.min.css' => 'css/vue/vue2-animate.min.css',
+	],
+	'moment' => [
+		'moment.js' => 'js/datetime/moment.js',
+		'min/moment.min.js' => 'js/datetime/moment.min.js',
+	],
+	'moment-timezone' => [
+		'moment-timezone.js' => 'js/datetime/moment-timezone.js',
+		'builds/moment-timezone.min.js' => 'js/datetime/moment-timezone.min.js',
+	]
 ];
 
 $app = new AssetInstaller(
@@ -120,5 +150,17 @@ $app = new AssetInstaller(
 //		$app->out('Minify file to: ' . $dest);
 //	}
 //});
+
+// @After RequireJS
+$app->addHook('after-requirejs', function (AssetInstaller $app, $vendorName)
+{
+	$app->minify($app->getAssetPath() . '/js/core/require.js');
+});
+
+// @After Punycode
+$app->addHook('after-punycode', function (AssetInstaller $app, $vendorName)
+{
+	$app->minify($app->getAssetPath() . '/js/string/punycode.js');
+});
 
 $app->execute();

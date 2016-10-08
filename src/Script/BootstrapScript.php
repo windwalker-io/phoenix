@@ -218,18 +218,16 @@ JS;
 	 */
 	public static function calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = array())
 	{
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset->addScript(static::phoenixName() . '/js/datetime/moment.min.js');
-			$asset->addScript(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
-			$asset->addStyle(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
+			static::addJS(static::phoenixName() . '/js/datetime/moment.min.js');
+			static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
+			static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
 		}
 
-		if (!static::inited(__METHOD__, func_get_args()))
+		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
 			$defaultOptions = array(
 				'format' => $format,
@@ -237,7 +235,7 @@ JS;
 				'calendarWeeks' => true
 			);
 
-			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
+			$options = static::getJSObject($defaultOptions, $options);
 
 			$js = <<<JS
 jQuery(document).ready(function($)
@@ -246,7 +244,7 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
+			static::internalJS($js);
 		}
 	}
 

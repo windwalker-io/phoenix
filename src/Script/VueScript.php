@@ -16,7 +16,7 @@ use Windwalker\Ioc;
  *
  * @since  {DEPLOY_VERSION}
  */
-class VueScript extends AbstractPhoenixScript
+abstract class VueScript extends AbstractPhoenixScript
 {
 	/**
 	 * Vue core.
@@ -109,7 +109,6 @@ class VueScript extends AbstractPhoenixScript
 		if (!static::inited(__METHOD__))
 		{
 			static::core();
-			BootstrapScript::css();
 			BootstrapScript::script();
 
 			static::addJS(static::phoenixName() . '/js/vue/vue-strap.min.js');
@@ -158,6 +157,23 @@ class VueScript extends AbstractPhoenixScript
 		if (!static::inited(__METHOD__, $name))
 		{
 			static::internalJS("const $name = " . static::getJSObject($store) . ';');
+		}
+	}
+
+	/**
+	 * Animate.css for Vue.js 2.0.
+	 *
+	 * @see  https://github.com/asika32764/vue2-animate
+	 *
+	 * @return  void
+	 */
+	public static function animate()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::core();
+
+			static::addCSS(static::phoenixName() . '/css/vue/vue2-animate.min.css');
 		}
 	}
 }

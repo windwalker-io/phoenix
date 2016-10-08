@@ -140,6 +140,26 @@ JS;
 	}
 
 	/**
+	 * moment
+	 *
+	 * @param bool $timezone
+	 *
+	 * @return  void
+	 */
+	public static function moment($timezone = false)
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::addJS(static::phoenixName() . '/js/datetime/moment.min.js');
+		}
+
+		if (!static::inited(__METHOD__) && $timezone)
+		{
+			static::addJS(static::phoenixName() . '/js/datetime/moment-timezone.min.js');
+		}
+	}
+
+	/**
 	 * csrfToken
 	 *
 	 * @param string $token
