@@ -37,6 +37,8 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 	 *
 	 * @return  DataInterface|Entity
 	 *
+	 * @throws  \LogicException
+	 * @throws  \UnexpectedValueException
 	 * @throws  \Windwalker\Record\Exception\NoResultException
 	 * @throws  \InvalidArgumentException
 	 * @throws  \RuntimeException
@@ -53,7 +55,14 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 
 		if (array_filter($conditions))
 		{
-			$record->load($conditions);
+			try
+			{
+				$record->load($conditions);
+			}
+			catch (NoResultException $e)
+			{
+				throw new NoResultException('Try to update a non-exists record to database.', $e->getCode(), $e);
+			}
 		}
 
 		$record->bind($dumped);
