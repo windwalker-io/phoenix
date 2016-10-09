@@ -31,11 +31,28 @@ abstract class AbstractPackageController extends AbstractTaskController
 	protected $container;
 
 	/**
+	 * Property reserved.
+	 *
+	 * @var  array
+	 */
+	protected static $keywords = [
+		'__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case',
+		'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif',
+		'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends',
+		'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once',
+		'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private',
+		'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try',
+		'unset', 'use', 'var', 'while', 'xor', 'object', 'resource', 'mixed', 'numeric'
+	];
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   \Windwalker\DI\Container $container
 	 * @param   \Muse\IO\IOInterface     $io
 	 * @param   Structure                $config
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function __construct(Container $container, IOInterface $io, Structure $config = null)
 	{
@@ -64,6 +81,22 @@ abstract class AbstractPackageController extends AbstractTaskController
 
 		$class = StringNormalise::toClassNamespace(implode('\\', $class));
 		$class = $class ? $class . '\\' : null;
+
+		// Check keywords
+		if (in_array(strtolower($name), static::$keywords))
+		{
+			throw new \InvalidArgumentException('Do not use reserved keywords: ' . $name);
+		}
+
+		if (in_array(strtolower($listName), static::$keywords))
+		{
+			throw new \InvalidArgumentException('Do not use reserved keywords: ' . $listName);
+		}
+
+		if (in_array(strtolower($itemName), static::$keywords))
+		{
+			throw new \InvalidArgumentException('Do not use reserved keywords: ' . $itemName);
+		}
 
 		$config['package.name'] = $name;
 		$config['package.namespace'] = $class;
