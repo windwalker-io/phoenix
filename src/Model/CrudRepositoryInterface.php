@@ -2,7 +2,7 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -15,7 +15,7 @@ use Windwalker\DataMapper\Entity\Entity;
 /**
  * The CrudModelInterface class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 interface CrudRepositoryInterface extends DatabaseRepositoryInterface
 {

@@ -2,7 +2,7 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -23,7 +23,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The SyncCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 class SyncCommand extends CoreCommand
 {
@@ -167,7 +167,7 @@ class SyncCommand extends CoreCommand
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -180,7 +180,7 @@ namespace {{ \$package_namespace }};
  * @property  {{ \$column['type'] }}  {{ \$column['name'] }}
 @endforeach
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 trait {{ \$short_name }}
 {

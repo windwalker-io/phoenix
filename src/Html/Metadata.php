@@ -14,7 +14,7 @@ use Windwalker\Dom\HtmlElement;
 /**
  * The Metadata class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 class Metadata extends Data
 {

@@ -13,7 +13,7 @@ use Windwalker\Core\Widget\WidgetHelper;
 /**
  * The StateButton class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 class IconButton
 {
