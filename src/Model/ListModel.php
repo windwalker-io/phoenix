@@ -17,7 +17,6 @@ use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
-use Windwalker\Query\QueryInterface;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -25,7 +24,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  1.0
  */
-class ListModel extends DatabaseModelRepository implements FormAwareRepositoryInterface
+class ListModel extends DatabaseModelRepository implements ListRepositoryInterface, FormAwareRepositoryInterface
 {
 	use FormAwareRepositoryTrait;
 
@@ -248,6 +247,8 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	 *
 	 * @return  \stdClass[]
 	 * @throws \RuntimeException
+	 *
+	 * @deprecated  No use in current version. Will combine into getItems().
 	 */
 	public function getList(Query $query, $start = null, $limit = null)
 	{
