@@ -65,9 +65,9 @@ class EditView extends ItemView
 		parent::prepareData($data);
 
 		// TODO: Test if we need a exception or not.
-		$mdoel = $this->model->getModel();
+		$model = $this->model->getModel();
 
-		if (!$mdoel instanceof FormAwareRepositoryInterface)
+		if (!$model instanceof FormAwareRepositoryInterface)
 		{
 			throw new \UnexpectedValueException('You must use a Model implemented ' . FormAwareRepositoryInterface::class . ' in EditView');
 		}
