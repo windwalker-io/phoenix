@@ -11,13 +11,11 @@ namespace Phoenix\Controller;
 use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Frontend\Bootstrap;
-use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
-use Windwalker\Record\Record;
 use Windwalker\Uri\Uri;
 
 /**

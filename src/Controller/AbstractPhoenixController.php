@@ -11,7 +11,6 @@ namespace Phoenix\Controller;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;

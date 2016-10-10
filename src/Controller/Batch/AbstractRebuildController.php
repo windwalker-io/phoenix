@@ -12,7 +12,6 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Data\Data;
-use Windwalker\Record\NestedRecord;
 
 /**
  * The AbstractRebuildController class.

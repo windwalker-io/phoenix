@@ -8,7 +8,6 @@
 
 namespace Phoenix\Script;
 
-use Phoenix\Html\HtmlHeader;
 use Windwalker\Core\Asset\AbstractScript;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Security\CsrfProtection;

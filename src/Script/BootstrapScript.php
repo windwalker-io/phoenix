@@ -8,8 +8,6 @@
 
 namespace Phoenix\Script;
 
-use Windwalker\Utilities\ArrayHelper;
-
 /**
  * The BootstrapScript class.
  *

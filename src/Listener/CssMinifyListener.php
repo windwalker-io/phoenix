@@ -10,7 +10,6 @@ namespace Phoenix\Listener;
 
 use Phoenix\Minify\CssMinify;
 use Windwalker\Event\Event;
-use Windwalker\Uri\UriData;
 
 /**
  * The CssMinifyListener class.

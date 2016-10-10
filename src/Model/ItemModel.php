@@ -9,7 +9,6 @@
 namespace Phoenix\Model;
 
 use Windwalker\Core\Model\DatabaseModelRepository;
-use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
