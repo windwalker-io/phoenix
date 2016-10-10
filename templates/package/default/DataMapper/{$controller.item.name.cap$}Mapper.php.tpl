@@ -10,7 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\DataMapper;
 
 use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
-use Windwalker\Core\DataMapper\CoreDataMapper;
+use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 use Windwalker\Event\Event;
 
 /**
@@ -18,7 +18,7 @@ use Windwalker\Event\Event;
  * 
  * @since  1.0
  */
-class {$controller.item.name.cap$}Mapper extends CoreDataMapper
+class {$controller.item.name.cap$}Mapper extends AbstractDatabaseMapperProxy
 {
 	/**
 	 * Property table.
