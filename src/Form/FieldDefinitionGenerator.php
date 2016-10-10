@@ -28,7 +28,7 @@ class FieldDefinitionGenerator
 	{
 		$className = get_called_class();
 
-		$args = [$type, $name, ucfirst($name), $column];
+		$args = [$type, $name, str_replace('_', ' ', ucfirst($name)), $column];
 
 		$method = 'gen' . ucfirst($type) . ucfirst($name);
 
@@ -47,7 +47,7 @@ class FieldDefinitionGenerator
 			$method = 'genVarchar';
 		}
 
-		return call_user_func_array([$className, $method], $args) . "\n";
+		return $className::$method($type, $name, str_replace('_', ' ', ucfirst($name)), $column) . "\n";
 	}
 
 	/**
@@ -66,6 +66,7 @@ class FieldDefinitionGenerator
 // $label
 \$this->text('$name')
 	->label('$label')
+	->description('{$column->Comment}')
 	->set('class', '')
 	->set('labelClass', '')
 	->set('default', null);
@@ -88,6 +89,7 @@ HTML;
 // $label
 \$this->radio('$name')
 	->label('$label')
+	->description('{$column->Comment}')
 	->option('Yes', 1)
 	->option('No', 0)
 	->set('class', '')
@@ -124,6 +126,7 @@ HTML;
 // $label
 \$this->list('$name')
 	->label('$label')
+	->description('{$column->Comment}')
 	$options
 	->set('class', '')
 	->set('labelClass', '')
@@ -147,6 +150,7 @@ HTML;
 // $label
 \$this->textarea('$name')
 	->label('$label')
+	->description('{$column->Comment}')
 	->set('class', '')
 	->set('labelClass', '')
 	->set('rows', 7)
@@ -198,11 +202,7 @@ HTML;
 	{
 		return <<<HTML
 // $label
-\$this->text('$name')
-	->label('$label')
-	->set('class', '')
-	->set('labelClass', '')
-	->set('readonly', true);
+\$this->hidden('$name');
 HTML;
 	}
 
@@ -221,6 +221,7 @@ HTML;
 		return <<<HTML
 // $label
 \$this->password('$name')
+	->description('Password')
 	->label('$label')
 	->set('class', '')
 	->set('labelClass', '')
@@ -229,6 +230,7 @@ HTML;
 // Confirm Password
 \$this->password('password2')
 	->label('Confirm Password')
+	->description('Confirm Password')
 	->set('class', '')
 	->set('labelClass', '')
 	->set('autocomplete', 'off');
@@ -251,6 +253,7 @@ HTML;
 // $label
 \$this->calendar('$name')
 	->label('$label')
+	->description('{$column->Comment}')
 	->set('class', '')
 	->set('labelClass', '')
 	->set('default', null);
