@@ -12,7 +12,6 @@ use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
 use Phoenix\View\ListView;
-use Windwalker\Core\Renderer\RendererHelper;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.

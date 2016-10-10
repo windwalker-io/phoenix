@@ -8,10 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
-use Phoenix\Model\Filter\FilterHelperInterface;
-use Phoenix\Model\ListModel;
 use Windwalker\Core\Model\ModelRepository;
-use Windwalker\Query\Query;
 
 /**
  * The {$controller.list.name.cap$}Model class.

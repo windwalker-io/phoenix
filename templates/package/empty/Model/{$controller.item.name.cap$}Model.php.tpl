@@ -8,12 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
-use {$package.namespace$}{$package.name.cap$}\Mapper\{$controller.item.name.cap$}Mapper;
-use Phoenix\Model\ItemModel;
-use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Model\ModelRepository;
-use Windwalker\Data\Data;
-use Windwalker\Data\DataSet;
 
 /**
  * The {$controller.item.name.cap$}Model class.

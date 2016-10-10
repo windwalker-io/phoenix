@@ -13,7 +13,6 @@ use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\
 use Phoenix\Controller\AbstractSaveController;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Data\DataInterface;
-use Windwalker\Data\Data;
 
 /**
  * The SaveController class.

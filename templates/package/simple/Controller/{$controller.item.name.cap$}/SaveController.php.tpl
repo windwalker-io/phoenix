@@ -11,7 +11,6 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use Phoenix\Controller\AbstractSaveController;
 use Windwalker\Data\DataInterface;
-use Windwalker\Data\Data;
 
 /**
  * The SaveController class.

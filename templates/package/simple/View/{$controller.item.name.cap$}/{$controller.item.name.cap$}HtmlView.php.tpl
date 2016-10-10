@@ -9,7 +9,6 @@
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
 
 use Phoenix\View\ItemView;
-use Windwalker\Core\Renderer\RendererHelper;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
