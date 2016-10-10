@@ -370,8 +370,6 @@ JS;
 		{
 			$asset = static::getAsset();
 
-			CoreScript::underscore();
-
 			$asset->addScript(static::phoenixName() . '/js/phoenix/crypto.min.js');
 		}
 	}

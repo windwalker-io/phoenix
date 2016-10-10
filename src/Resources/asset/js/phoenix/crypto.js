@@ -1,5 +1,5 @@
 /**
- * Part of earth project.
+ * Part of Phoenix project.
  *
  * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -48,7 +48,7 @@ var Phoenix;
         encrypt: function(key, data) {
             var self = this;
 
-            var code = underscore.map(data, function(c, i) {
+            var code = data.split('').map(function(c, i) {
                 return c.charCodeAt(0) ^ self.keyCharAt(key, i);
             }).join(',');
 
@@ -70,7 +70,7 @@ var Phoenix;
 
             data = data.split(',');
 
-            return underscore.map(data, function(c, i) {
+            return data.map(function(c, i) {
                 return String.fromCharCode( c ^ self.keyCharAt(key, i) );
             }).join("");
         },
@@ -325,7 +325,7 @@ var Phoenix;
          */
         function str2rstr_utf8(input)
         {
-            return unescape(encodeURIComponent(input))
+            return decodeURIComponent(encodeURIComponent(input))
         }
 
         /*
