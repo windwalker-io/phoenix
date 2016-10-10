@@ -10,6 +10,7 @@ namespace Phoenix\Script;
 
 use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Ioc;
+use Windwalker\String\StringNormalise;
 
 /**
  * The VueScript class.
@@ -29,6 +30,38 @@ abstract class VueScript extends AbstractPhoenixScript
 		{
 			static::addJS(static::phoenixName() . '/js/vue/vue.min.js');
 		}
+	}
+
+	/**
+	 * instance
+	 *
+	 * @param string $selector
+	 * @param array  $data
+	 * @param array  $properties
+	 *
+	 * @return  void
+	 */
+	public static function instance($selector, array $data = [], array $properties = [])
+	{
+		static::core();
+		JQueryScript::core();
+
+		$var = lcfirst(StringNormalise::toCamelCase(trim($selector, '.#[]')));
+
+		$instance = [
+			'el' => $selector,
+			'data' => $data
+		];
+
+		$instance = static::getJSObject($instance, $properties);
+
+		static::internalJS(<<<JS
+jQuery(function($) {
+    window.vueInstances = window.vueInstances || {};
+    window.vueInstances.$var = new Vue($instance);
+});
+JS
+);
 	}
 
 	/**
