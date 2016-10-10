@@ -72,6 +72,8 @@ abstract class AbstractSaveController extends AbstractPostController
 	 *
 	 * @return void
 	 *
+	 * @throws \UnexpectedValueException
+	 * @throws \LogicException
 	 * @throws \RuntimeException
 	 * @throws \InvalidArgumentException
 	 * @throws \Windwalker\Core\Model\Exception\ValidateFailException
@@ -198,6 +200,8 @@ abstract class AbstractSaveController extends AbstractPostController
 	 * @param  DataInterface|Entity $data
 	 *
 	 * @return  string
+	 *
+	 * @throws \OutOfRangeException
 	 */
 	protected function getFailRedirect(DataInterface $data = null)
 	{
@@ -212,6 +216,8 @@ abstract class AbstractSaveController extends AbstractPostController
 	 * @param  DataInterface|Entity $data
 	 *
 	 * @return  string
+	 *
+	 * @throws \OutOfRangeException
 	 */
 	protected function getSuccessRedirect(DataInterface $data = null)
 	{

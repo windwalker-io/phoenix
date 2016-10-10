@@ -57,21 +57,28 @@ abstract class AbstractCopyController extends AbstractBatchController
 	/**
 	 * save
 	 *
-	 * @param int|string     $pk
-	 * @param DataInterface  $data
+	 * @param int|string    $pk
+	 * @param DataInterface $data
 	 *
 	 * @return  boolean
+	 *
+	 * @throws \Windwalker\Record\Exception\NoResultException
+	 * @throws \UnexpectedValueException
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
+	 * @throws \LogicException
+	 * @throws \DomainException
 	 */
 	protected function save($pk, DataInterface $data)
 	{
 		// We load existing item first and bind data into it.
-		$this->record->reset();
+		$record = $this->model->getRecord();
 
-		$this->record->load($pk);
+		$record->reset();
 
-		$this->record->bind($data);
+		$record->load($pk);
 
-		$item = $this->record;
+		$record->bind($data);
 
 		$recordClone = $this->model->getRecord();
 
@@ -80,9 +87,9 @@ abstract class AbstractCopyController extends AbstractBatchController
 		// Check table has increment fields, default is title and alias.
 		foreach ($this->incrementFields as $field => $type)
 		{
-			if ($this->record->hasField($field))
+			if ($record->hasField($field))
 			{
-				$condition[$field] = $item[$field];
+				$condition[$field] = $record[$field];
 			}
 		}
 
@@ -98,9 +105,9 @@ abstract class AbstractCopyController extends AbstractBatchController
 
 				foreach ($this->incrementFields as $field => $type)
 				{
-					if ($this->record->hasField($field))
+					if ($record->hasField($field))
 					{
-						$item[$field] = $condition[$field] = StringHelper::increment($item[$field], $type);
+						$record[$field] = $condition[$field] = StringHelper::increment($record[$field], $type);
 					}
 				}
 			}
@@ -108,11 +115,13 @@ abstract class AbstractCopyController extends AbstractBatchController
 			{
 				$result = false;
 			}
+
+			$recordClone->reset(false);
 		}
 		while ($result);
 
-		unset($item->{$this->keyName});
+		unset($record->{$this->keyName});
 
-		return $this->model->save($item);
+		return $this->model->save($record);
 	}
 }

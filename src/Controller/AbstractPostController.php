@@ -85,6 +85,9 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 * prepareExecute
 	 *
 	 * @return  void
+	 *
+	 * @throws \LogicException
+	 * @throws \DomainException
 	 */
 	protected function prepareExecute()
 	{
