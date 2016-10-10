@@ -8,14 +8,15 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\DataMapper;
 
-use Windwalker\Core\DataMapper\CoreDataMapper;
+use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
+use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 
 /**
  * The {$controller.item.name.cap$}Mapper class.
  * 
  * @since  1.0
  */
-class {$controller.item.name.cap$}Mapper extends CoreDataMapper
+class {$controller.item.name.cap$}Mapper extends AbstractDatabaseMapperProxy
 {
 	/**
 	 * Property table.
@@ -37,4 +38,11 @@ class {$controller.item.name.cap$}Mapper extends CoreDataMapper
 	 * @var  string
 	 */
 	protected static $alias = '{$controller.item.name.lower$}';
+
+	/**
+	 * Property dataClass.
+	 *
+	 * @var  string
+	 */
+	protected static $dataClass = {$controller.item.name.cap$}Record::class;
 }
