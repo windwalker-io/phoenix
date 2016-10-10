@@ -65,13 +65,6 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	protected $searchHelper;
 
 	/**
-	 * Property query.
-	 *
-	 * @var  QueryInterface
-	 */
-	protected $query;
-
-	/**
 	 * prepareState
 	 *
 	 * @return  void
@@ -120,18 +113,18 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	 * getItems
 	 *
 	 * @return  DataSet
+	 * @throws \RuntimeException
 	 */
 	public function getItems()
 	{
+		// Make sure we change state values before cache detected.
+		$this->prepareState();
+
 		$cid = $this['cache.id'] ? : 'items';
 
 		return $this->fetch($cid, function()
 		{
-			$this->prepareState();
-
-			$this->configureTables();
-
-			$query = $this->getListQuery($this->getQuery());
+			$query = $this->getListQuery($this->db->getQuery(true));
 
 			$items = $this->getList($query, $this->getStart(), $this->get('list.limit'));
 
@@ -158,6 +151,7 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	 * @param Query $query
 	 *
 	 * @return  Query
+	 * @throws \RuntimeException
 	 */
 	protected function getListQuery(Query $query = null)
 	{
@@ -166,9 +160,11 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 			return $this->getCache('list.query');
 		}
 
-		$query = $query ? : $this->getQuery(true);
+		$query = $query ? : $this->db->getQuery(true);
 
-		$queryHelper = $this->getQueryHelper();
+		$queryHelper = $this->getQueryHelper(true);
+
+		$this->configureTables();
 
 		// Prepare
 		$this->prepareGetQuery($query);
@@ -246,11 +242,12 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	/**
 	 * getList
 	 *
-	 * @param Query    $query
-	 * @param integer  $start
-	 * @param integer  $limit
+	 * @param Query   $query
+	 * @param integer $start
+	 * @param integer $limit
 	 *
 	 * @return  \stdClass[]
+	 * @throws \RuntimeException
 	 */
 	public function getList(Query $query, $start = null, $limit = null)
 	{
@@ -359,11 +356,13 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	/**
 	 * Method to get property QueryHelper
 	 *
-	 * @return  QueryHelper
+	 * @param bool $new
+	 *
+	 * @return QueryHelper
 	 */
-	public function getQueryHelper()
+	public function getQueryHelper($new = false)
 	{
-		if (!$this->queryHelper)
+		if (!$this->queryHelper || $new)
 		{
 			$this->queryHelper = new QueryHelper($this->getDb());
 		}
@@ -401,6 +400,8 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	 * getTotal
 	 *
 	 * @return  integer
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
 	 */
 	public function getTotal()
 	{
@@ -539,13 +540,11 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		$filters = $this->filterDataFields($filters);
 		$filters = $this->mapDataFields($filters);
 
-		$filterHelper = $this->getFilterHelper();
+		$filterHelper = $this->getFilterHelper(true);
 
 		$this->configureFilters($filterHelper);
 
-		$query = $filterHelper->execute($query, $filters);
-
-		return $query;
+		return $filterHelper->execute($query, $filters);
 	}
 
 	/**
@@ -588,13 +587,11 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		$searches = $this->filterDataFields($searches);
 		$searches = $this->mapDataFields($searches);
 
-		$searchHelper = $this->getSearchHelper();
+		$searchHelper = $this->getSearchHelper(true);
 
 		$this->configureSearches($searchHelper);
 
-		$query = $searchHelper->execute($query, $searches);
-
-		return $query;
+		return $searchHelper->execute($query, $searches);
 	}
 
 	/**
@@ -697,11 +694,13 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	/**
 	 * Method to get property FilterHelper
 	 *
-	 * @return  FilterHelper
+	 * @param bool $new
+	 *
+	 * @return FilterHelper
 	 */
-	public function getFilterHelper()
+	public function getFilterHelper($new = false)
 	{
-		if (!$this->filterHelper)
+		if (!$this->filterHelper || $new)
 		{
 			$this->filterHelper = new FilterHelper;
 		}
@@ -726,11 +725,13 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 	/**
 	 * Method to get property SearchHelper
 	 *
-	 * @return  SearchHelper
+	 * @param bool $new
+	 *
+	 * @return SearchHelper
 	 */
-	public function getSearchHelper()
+	public function getSearchHelper($new = false)
 	{
-		if (!$this->searchHelper)
+		if (!$this->searchHelper || $new)
 		{
 			$this->searchHelper = new SearchHelper;
 		}
@@ -975,53 +976,5 @@ class ListModel extends DatabaseModelRepository implements FormAwareRepositoryIn
 		}
 
 		return $return;
-	}
-
-	/**
-	 * Method to get property Query
-	 *
-	 * @param bool $new
-	 *
-	 * @return Query
-	 */
-	public function getQuery($new = false)
-	{
-		if (!$this->query || $new)
-		{
-			$this->query = $this->db->getQuery(true);
-		}
-
-		return $this->query;
-	}
-
-	/**
-	 * Method to set property query
-	 *
-	 * @param   Query $query
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setQuery(Query $query)
-	{
-		$this->query = $query;
-
-		return $this;
-	}
-
-	/**
-	 * getCacheId
-	 *
-	 * @param   string $id
-	 *
-	 * @return  string
-	 */
-	public function getCacheId($id = null)
-	{
-		$query = $this->getQuery();
-
-		// We must add query wheres and havings to make sure state changed if user call where() and having()
-		$id = $id . ':' . $query->where . ':' . $query->having;
-
-		return parent::getCacheId($id);
 	}
 }
