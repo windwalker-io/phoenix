@@ -222,7 +222,7 @@ JS;
 		{
 			JQueryScript::core();
 
-			static::addJS(static::phoenixName() . '/js/datetime/moment.min.js');
+			CoreScript::moment();
 			static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
 			static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
 		}
@@ -280,6 +280,11 @@ JS
 		}
 	}
 
+	/**
+	 * buttonRadio
+	 *
+	 * @return  void
+	 */
 	public static function buttonRadio()
 	{
 		if (!static::inited(__METHOD__))
