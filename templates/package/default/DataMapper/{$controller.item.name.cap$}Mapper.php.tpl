@@ -2,7 +2,7 @@
 /**
  * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -10,7 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\DataMapper;
 
 use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
-use Windwalker\Core\DataMapper\CoreDataMapper;
+use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 use Windwalker\Event\Event;
 
 /**
@@ -18,7 +18,7 @@ use Windwalker\Event\Event;
  * 
  * @since  1.0
  */
-class {$controller.item.name.cap$}Mapper extends CoreDataMapper
+class {$controller.item.name.cap$}Mapper extends AbstractDatabaseMapperProxy
 {
 	/**
 	 * Property table.

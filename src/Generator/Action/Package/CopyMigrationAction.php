@@ -23,6 +23,7 @@ class CopyMigrationAction extends AbstractAction
 	 * Do this execute.
 	 *
 	 * @return  mixed
+	 * @throws \Windwalker\Filesystem\Exception\FilesystemException
 	 */
 	protected function doExecute()
 	{
@@ -36,6 +37,11 @@ class CopyMigrationAction extends AbstractAction
 		if (!is_dir($src . '/Migration'))
 		{
 			return;
+		}
+
+		if (!is_dir($dest . '/Migration'))
+		{
+			Folder::create($dest . '/Migration');
 		}
 
 		// Copy migration

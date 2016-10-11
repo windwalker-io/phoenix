@@ -11,7 +11,7 @@ namespace Phoenix\Html\State;
 /**
  * The BooleanButton class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 class PublishedButton extends IconButton
 {

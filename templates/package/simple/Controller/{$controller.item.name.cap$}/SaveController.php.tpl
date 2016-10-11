@@ -2,7 +2,7 @@
 /**
  * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -11,7 +11,6 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use Phoenix\Controller\AbstractSaveController;
 use Windwalker\Data\DataInterface;
-use Windwalker\Data\Data;
 
 /**
  * The SaveController class.

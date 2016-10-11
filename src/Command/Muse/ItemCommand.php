@@ -8,7 +8,6 @@
 
 namespace Phoenix\Command\Muse;
 
-use Phoenix\Command\Muse;
 use Phoenix\Generator\Controller\GeneratorController;
 use Windwalker\Console\Command\Command;
 

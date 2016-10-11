@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /*!
- * vue2-animate v1.0.3
+ * vue2-animate v1.0.4
  * (c) 2016 Simon Asika
  * Released under the MIT License.
  * Documentation: https://github.com/asika32764/vue2-animate
@@ -201,6 +201,13 @@
     opacity: 0;
     transform: translate3d(0, -2000px, 0);
   }
+}
+.bounce-enter-active,
+.bounceIn,
+.bounce-leave-active,
+.bounceOut {
+  animation-duration: 1s;
+  animation-fill-mode: both;
 }
 .bounce-enter-active,
 .bounceIn {
@@ -437,6 +444,13 @@
     opacity: 0;
     transform: translate3d(0, -100%, 0);
   }
+}
+.fade-enter-active,
+.fadeIn,
+.fade-leave-active,
+.fadeOut {
+  animation-duration: 1s;
+  animation-fill-mode: both;
 }
 .fade-enter-active,
 .fadeIn {
@@ -682,6 +696,13 @@
   }
 }
 .rotate-enter-active,
+.rotateIn,
+.rotate-leave-active,
+.rotateOut {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+.rotate-enter-active,
 .rotateIn {
   animation-name: rotateIn;
 }
@@ -820,6 +841,13 @@
     visibility: hidden;
     transform: translate3d(0, -100%, 0);
   }
+}
+.slide-enter-active,
+.slideIn,
+.slide-leave-active,
+.slideOut {
+  animation-duration: 1s;
+  animation-fill-mode: both;
 }
 .slide-enter-active,
 .slideIn {
@@ -1005,6 +1033,13 @@
     transform-origin: center bottom;
     animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1);
   }
+}
+.zoom-enter-active,
+.zoomIn,
+.zoom-leave-active,
+.zoomOut {
+  animation-duration: 1s;
+  animation-fill-mode: both;
 }
 .zoom-enter-active,
 .zoomIn {

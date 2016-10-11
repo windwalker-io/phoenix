@@ -15,7 +15,6 @@ use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\DataMapper;
 use Windwalker\Form\Field\TextField;
-use Windwalker\Ioc;
 
 /**
  * The ModalField class.

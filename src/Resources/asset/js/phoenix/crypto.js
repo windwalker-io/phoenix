@@ -1,7 +1,7 @@
 /**
- * Part of earth project.
+ * Part of Phoenix project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -48,7 +48,7 @@ var Phoenix;
         encrypt: function(key, data) {
             var self = this;
 
-            var code = underscore.map(data, function(c, i) {
+            var code = data.split('').map(function(c, i) {
                 return c.charCodeAt(0) ^ self.keyCharAt(key, i);
             }).join(',');
 
@@ -70,14 +70,34 @@ var Phoenix;
 
             data = data.split(',');
 
-            return underscore.map(data, function(c, i) {
+            return data.map(function(c, i) {
                 return String.fromCharCode( c ^ self.keyCharAt(key, i) );
             }).join("");
         },
 
+        /**
+         * Key char at.
+         *
+         * @param {string} key
+         * @param {Number} i
+         *
+         * @returns {Number}
+         */
         keyCharAt: function(key, i)
         {
             return key.charCodeAt( Math.floor(i % key.length) );
+        },
+
+        /**
+         * UUID v4
+         *
+         * @see  https://gist.github.com/jed/982883
+         *
+         * @returns {string}
+         */
+        uuid4: function()
+        {
+            return (function b(a) {return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b)})();
         }
     };
 
@@ -325,7 +345,7 @@ var Phoenix;
          */
         function str2rstr_utf8(input)
         {
-            return unescape(encodeURIComponent(input))
+            return decodeURIComponent(encodeURIComponent(input))
         }
 
         /*

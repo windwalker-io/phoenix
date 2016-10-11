@@ -2,7 +2,7 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -10,11 +10,12 @@ namespace Phoenix\Script;
 
 use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Ioc;
+use Windwalker\String\StringNormalise;
 
 /**
  * The VueScript class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 abstract class VueScript extends AbstractPhoenixScript
 {
@@ -29,6 +30,38 @@ abstract class VueScript extends AbstractPhoenixScript
 		{
 			static::addJS(static::phoenixName() . '/js/vue/vue.min.js');
 		}
+	}
+
+	/**
+	 * instance
+	 *
+	 * @param string $selector
+	 * @param array  $data
+	 * @param array  $properties
+	 *
+	 * @return  void
+	 */
+	public static function instance($selector, array $data = [], array $properties = [])
+	{
+		static::core();
+		JQueryScript::core();
+
+		$var = lcfirst(StringNormalise::toCamelCase(trim($selector, '.#[]')));
+
+		$instance = [
+			'el' => $selector,
+			'data' => $data
+		];
+
+		$instance = static::getJSObject($instance, $properties);
+
+		static::internalJS(<<<JS
+jQuery(function($) {
+    window.vueInstances = window.vueInstances || {};
+    window.vueInstances.$var = new Vue($instance);
+});
+JS
+);
 	}
 
 	/**

@@ -2,7 +2,7 @@
 /**
  * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -13,7 +13,6 @@ use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\
 use Phoenix\Controller\AbstractSaveController;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Data\DataInterface;
-use Windwalker\Data\Data;
 
 /**
  * The SaveController class.

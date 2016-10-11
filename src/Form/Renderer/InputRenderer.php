@@ -55,9 +55,10 @@ class InputRenderer implements FormRendererInterface
 	public function renderField(AbstractField $field, array $attribs = array())
 	{
 		return WidgetHelper::render('phoenix.bootstrap.field.control', [
-			'field' => $field,
+			'field'     => $field,
 			'labelHtml' => $field->renderLabel(),
 			'inputHtml' => $field->renderInput(),
+			'attribs'   => $attribs
 		], WidgetHelper::EDGE);
 	}
 

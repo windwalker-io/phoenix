@@ -11,7 +11,7 @@ namespace Phoenix\Html\State;
 /**
  * The StateButton class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 class StateButton extends PublishedButton
 {

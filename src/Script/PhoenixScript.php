@@ -8,7 +8,6 @@
 
 namespace Phoenix\Script;
 
-use Phoenix\Html\HtmlHeader;
 use Windwalker\Core\Asset\AbstractScript;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Security\CsrfProtection;
@@ -369,8 +368,6 @@ JS;
 		if (!static::inited(__METHOD__))
 		{
 			$asset = static::getAsset();
-
-			CoreScript::underscore();
 
 			$asset->addScript(static::phoenixName() . '/js/phoenix/crypto.min.js');
 		}

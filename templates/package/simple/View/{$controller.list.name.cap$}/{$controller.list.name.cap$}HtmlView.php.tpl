@@ -2,14 +2,13 @@
 /**
  * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$};
 
 use Phoenix\View\ListView;
-use Windwalker\Core\Renderer\RendererHelper;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.

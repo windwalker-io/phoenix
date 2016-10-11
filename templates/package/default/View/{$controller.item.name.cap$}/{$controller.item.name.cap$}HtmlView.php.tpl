@@ -2,7 +2,7 @@
 /**
  * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -12,8 +12,6 @@ use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\EditView;
 use Phoenix\View\ItemView;
-use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Core\Utilities\Classes\DocblockHelper;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.

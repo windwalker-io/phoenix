@@ -10,10 +10,8 @@ namespace Phoenix\View;
 
 use Phoenix\View\Helper\GridHelper;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Widget\BladeWidget;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
-use Windwalker\Ioc;
 
 /**
  * The GridView class.

@@ -2,7 +2,7 @@
 /**
  * Part of earth project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -12,12 +12,11 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Data\Data;
-use Windwalker\Record\NestedRecord;
 
 /**
  * The AbstractRebuildController class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.1
  */
 class AbstractRebuildController extends AbstractBatchController
 {
