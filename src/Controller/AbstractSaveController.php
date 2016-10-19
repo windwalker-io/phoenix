@@ -9,7 +9,6 @@
 namespace Phoenix\Controller;
 
 use Phoenix\Model\FormAwareRepositoryInterface;
-use Phoenix\Model\Traits\FormAwareRepositoryTrait;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Data\Data;
@@ -188,7 +187,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	{
 		$model = $this->getModel();
 
-		if ($model instanceof FormAwareRepositoryTrait)
+		if ($model instanceof FormAwareRepositoryInterface)
 		{
 			$model->validate($data->dump(true));
 		}
@@ -207,7 +206,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	{
 		$pk = $this->getDataObject()->{$this->keyName};
 
-		return $this->router->route($this->getName(), $this->getRedirectQuery(array($this->keyName => $pk)));
+		return $this->router->route(lcfirst($this->getName()), $this->getRedirectQuery(array($this->keyName => $pk)));
 	}
 
 	/**
@@ -229,7 +228,7 @@ abstract class AbstractSaveController extends AbstractPostController
 				return $this->router->route($this->config['list_name'], $this->getRedirectQuery());
 
 			case 'save2new':
-				return $this->router->route($this->getName(), $this->getRedirectQuery(array('new' => '')));
+				return $this->router->route(lcfirst($this->getName()), $this->getRedirectQuery(array('new' => '')));
 
 			case 'save2copy':
 				$data->{$this->keyName} = null;
@@ -246,12 +245,12 @@ abstract class AbstractSaveController extends AbstractPostController
 
 				$this->setUserState($this->getContext('edit.data'), $data->dump(true));
 
-				return $this->router->route($this->getName(), $this->getRedirectQuery());
+				return $this->router->route(lcfirst($this->getName()), $this->getRedirectQuery());
 
 			default:
 				$pk = $data->{$this->keyName};
 
-				return $this->router->route($this->getName(), $this->getRedirectQuery(array($this->keyName => $pk)));
+				return $this->router->route(lcfirst($this->getName()), $this->getRedirectQuery(array($this->keyName => $pk)));
 		}
 	}
 }

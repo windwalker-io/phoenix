@@ -166,7 +166,7 @@ abstract class AbstractPhoenixController extends AbstractController
 	 */
 	public function getContext($task = null)
 	{
-		$context = $this->package->getName() . '.' . $this->getName();
+		$context = $this->package->getName() . '.' . strtolower($this->getName());
 
 		if ($task)
 		{
