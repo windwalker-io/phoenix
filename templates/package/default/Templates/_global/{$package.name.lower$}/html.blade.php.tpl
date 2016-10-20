@@ -31,7 +31,8 @@
     @yield('script')
     {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
-<body class="{{ $package->getName() }}-admin-body phoenix-admin view-{{ $view->name }} layout-{{ $view->layout }} {{ $helper->getView() instanceof \Phoenix\View\EditView ? 'sidebar-hide' : null }}">
+<body class="{{ $package->getName() }}-admin-body phoenix-admin package-{{ $package->getName() }}
+    view-{{ strtolower($view->getName()) }} layout-{{ $view->getLayout() }} {{ $helper->getView() instanceof \Phoenix\View\EditView ? 'sidebar-hide' : null }}">
 @section('superbody')
 
     @yield('body', 'Body Section')

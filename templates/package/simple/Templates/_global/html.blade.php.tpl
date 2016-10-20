@@ -19,7 +19,7 @@
     @yield('script')
     {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
-<body class="package-{{ $package->name }} view-{{ $view->name }} layout-{{ $view->layout }}" style="padding-top: 50px">
+<body class="package-{{ $package->name }} view-{{ strtolower($view->getName()) }} layout-{{ $view->getLayout() }}" style="padding-top: 50px">
     @section('navbar')
     <div class="navbar navbar-default navbar-fixed-top">
         <div class="container">
