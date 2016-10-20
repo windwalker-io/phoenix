@@ -22,6 +22,14 @@
         }
     };
 
+    /**
+     * Button Radio
+     *
+     * @param {HtmlElement} element
+     * @param {Object}      options
+     *
+     * @constructor
+     */
     var ButtonRadio = function(element, options)
     {
         this.element = $(element);

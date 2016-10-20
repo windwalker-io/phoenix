@@ -206,7 +206,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	{
 		$pk = $this->getDataObject()->{$this->keyName};
 
-		return $this->router->route(lcfirst($this->getName()), $this->getRedirectQuery(array($this->keyName => $pk)));
+		return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery(array($this->keyName => $pk)));
 	}
 
 	/**
@@ -225,10 +225,10 @@ abstract class AbstractSaveController extends AbstractPostController
 		switch ($this->task)
 		{
 			case 'save2close':
-				return $this->router->route($this->config['list_name'], $this->getRedirectQuery());
+				return $this->router->route(strtolower($this->config['list_name']), $this->getRedirectQuery());
 
 			case 'save2new':
-				return $this->router->route(lcfirst($this->getName()), $this->getRedirectQuery(array('new' => '')));
+				return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery(array('new' => '')));
 
 			case 'save2copy':
 				$data->{$this->keyName} = null;
@@ -245,12 +245,12 @@ abstract class AbstractSaveController extends AbstractPostController
 
 				$this->setUserState($this->getContext('edit.data'), $data->dump(true));
 
-				return $this->router->route(lcfirst($this->getName()), $this->getRedirectQuery());
+				return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery());
 
 			default:
 				$pk = $data->{$this->keyName};
 
-				return $this->router->route(lcfirst($this->getName()), $this->getRedirectQuery(array($this->keyName => $pk)));
+				return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery(array($this->keyName => $pk)));
 		}
 	}
 }
