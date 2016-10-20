@@ -118,8 +118,16 @@
                     // Scroll
                     if (scroll)
                     {
+                        // Find displayed element
+                        var target = $(this);
+
+                        if (!target.is(':visible'))
+                        {
+                            target = target.parents('#' + target.attr('id') + '-control');
+                        }
+
                         $('html, body').animate({
-                            scrollTop: $(this).offset().top + self.options.scroll.offset
+                            scrollTop: target.offset().top + self.options.scroll.offset
                         }, self.options.scroll.duration);
 
                         scroll = false;
