@@ -58,15 +58,21 @@ class MenuHelper extends AbstractHelper
 		$path = array_filter(explode('/', trim($path, '/')), 'strlen');
 		$routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
 
-		foreach ($routePath as $key => $routeSegment)
+		$success = false;
+
+		foreach ($path as $key => $pathSegment)
 		{
-			if (isset($path[$key]) && $path[$key] == $routeSegment && $this->matchRequest($query))
+			if (isset($routePath[$key]) && $routePath[$key] == $pathSegment && $this->matchRequest($query))
 			{
-				return 'active';
+				$success = true;
+			}
+			else
+			{
+				$success = false;
 			}
 		}
 
-		return null;
+		return $success ? 'active' : '';
 	}
 
 	/**
@@ -108,7 +114,7 @@ class MenuHelper extends AbstractHelper
 				'a',
 				Translator::translate($package->getName() . '.' . $menu),
 				array(
-					'href' => $view->getRouter()->html($menu),
+					'href' => $view->getRouter()->route($menu),
 					'class' => $active
 				)
 			);
@@ -128,7 +134,7 @@ class MenuHelper extends AbstractHelper
 	{
 		$inflector = StringInflector::getInstance();
 
-		$viewFolder = {$package.name.upper$}_ROOT . '/View';
+		$viewFolder = PACKAGE_{$package.name.upper$}_ROOT . '/View';
 
 		$views = Filesystem::folders($viewFolder);
 		$menus = array();
