@@ -7,12 +7,33 @@
 
 (function($)
 {
-    $(document).ready(function()
-    {
-        // Turn radios into btn-group
-        var $radios = $('.btn-group .radio');
+    "use strict";
 
-        $radios.addClass('btn btn-default');
+    var plugin = 'buttonRadio';
+
+    var defaultOptions = {
+        buttonClass: 'btn',
+        activeClass: 'active',
+        color: {
+            'default': 'btn-default',
+            green:   'btn-success',
+            red:     'btn-danger',
+            blue:    'btn-primary'
+        }
+    };
+
+    var ButtonRadio = function(element, options)
+    {
+        this.element = $(element);
+        this.options = $.extend(true, {}, defaultOptions, options);
+
+        // Turn radios into btn-group
+        var $radios = this.element.find('.btn-group .radio');
+
+        options = this.options;
+
+        $radios.addClass(options.buttonClass)
+            .addClass(options.color['default']);
 
         $radios.click(function()
         {
@@ -27,19 +48,22 @@
 
             if (!input.prop('checked'))
             {
-                group.removeClass('active btn-success btn-danger btn-primary');
+                group.removeClass(options.activeClass)
+                    .removeClass(options.color.green)
+                    .removeClass(options.color.red)
+                    .removeClass(options.color.blue);
 
                 if (input.val() == '')
                 {
-                    btn.addClass('active btn-primary');
+                    btn.addClass(options.activeClass).addClass(options.color.blue);
                 }
                 else if (input.val() == 0)
                 {
-                    btn.addClass('active btn-danger');
+                    btn.addClass(options.activeClass).addClass(options.color.red);
                 }
                 else
                 {
-                    btn.addClass('active btn-success');
+                    btn.addClass(options.activeClass).addClass(options.color.green);
                 }
 
                 input.prop('checked', true);
@@ -63,15 +87,15 @@
             {
                 if ($input.val() == '')
                 {
-                    $radio.addClass('active btn-primary');
+                    $radio.addClass(options.activeClass).addClass(options.color.blue);
                 }
                 else if ($input.val() == 0)
                 {
-                    $radio.addClass('active btn-danger');
+                    $radio.addClass(options.activeClass).addClass(options.color.red);
                 }
                 else
                 {
-                    $radio.addClass('active btn-success');
+                    $radio.addClass(options.activeClass).addClass(options.color.green);
                 }
             }
 
@@ -97,7 +121,23 @@
             {
                 container.attr('rel', 'value_' + select.val());
             });
-
         });
-    });
+    };
+
+    /**
+     * Push to plugins.
+     *
+     * @param   {Object} options
+     *
+     * @returns {ButtonRadio}
+     */
+    $.fn[plugin] = function (options)
+    {
+        if (!this.data('phoenix.' + plugin))
+        {
+            this.data('phoenix.' + plugin, new ButtonRadio(this, options));
+        }
+
+        return this.data('phoenix.' + plugin);
+    };
 })(jQuery);

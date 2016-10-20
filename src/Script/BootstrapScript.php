@@ -281,17 +281,30 @@ JS
 	/**
 	 * buttonRadio
 	 *
-	 * @return  void
+	 * @param string $selector
+	 * @param array  $options
 	 */
-	public static function buttonRadio()
+	public static function buttonRadio($selector = '#admin-form', array $options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset = static::getAsset();
+			static::addJS(static::phoenixName() . '/js/bootstrap/button-radio.min.js');
+		}
 
-			$asset->addScript(static::phoenixName() . '/js/bootstrap/button-radio.min.js');
+		if (!static::inited(__METHOD__, get_defined_vars()))
+		{
+			$options = static::getJSObject($options);
+
+			$js = <<<JS
+jQuery(function($) {
+    $('$selector').buttonRadio($options);
+})
+JS;
+
+
+			static::internalJS($js);
 		}
 	}
 }
