@@ -2,7 +2,7 @@
 /**
  * Part of {$package.name.cap$} project.
  *
- * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
  */
 
@@ -32,7 +32,7 @@ class MenuHelper extends AbstractHelper
 	{
 		$view = $this->getParent()->getView();
 
-		if ($view['app']->get('route.matched') == $view->getPackage()->getName() . ':' . $name)
+		if ($view['app']->get('route.matched') == $view->getPackage()->getName() . '@' . $name)
 		{
 			return 'active';
 		}
