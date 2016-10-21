@@ -12,6 +12,7 @@
     var plugin = 'buttonRadio';
 
     var defaultOptions = {
+        selector: '.btn-group .radio',
         buttonClass: 'btn',
         activeClass: 'active',
         color: {
@@ -36,7 +37,7 @@
         this.options = $.extend(true, {}, defaultOptions, options);
 
         // Turn radios into btn-group
-        var $radios = this.element.find('.btn-group .radio');
+        var $radios = this.element.find(this.options.selector);
 
         options = this.options;
 
@@ -46,7 +47,7 @@
         $radios.click(function()
         {
             var btn = $(this);
-            var group = btn.parent().find('.btn');
+            var group = btn.parent().find('.' + options.buttonClass);
             var input = btn.find('input[type=radio]');
 
             if (input.prop('disabled') || input.prop('readonly'))
