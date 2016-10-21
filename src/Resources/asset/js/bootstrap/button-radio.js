@@ -118,18 +118,19 @@
             }
         });
 
+        // TODO: Must rewrite to fix for strict mode: Octal literals are not allowed in strict mode.
         // add color classes to chosen field based on value
-        $('select[class^="chzn-color"], select[class*=" chzn-color"]').on('liszt:ready', function()
-        {
-            var select = $(this);
-            var cls = this.className.replace(/^.(chzn-color[a-z0-9-_]*)$.*/, '\1');
-            var container = select.next('.chzn-container').find('.chzn-single');
-            container.addClass(cls).attr('rel', 'value_' + select.val());
-            select.on('change click', function()
-            {
-                container.attr('rel', 'value_' + select.val());
-            });
-        });
+        // $('select[class^="chzn-color"], select[class*=" chzn-color"]').on('liszt:ready', function()
+        // {
+        //     var select = $(this);
+        //     var cls = this.className.replace(/^.(chzn-color[a-z0-9-_]*)$.*/, '\1');
+        //     var container = select.next('.chzn-container').find('.chzn-single');
+        //     container.addClass(cls).attr('rel', 'value_' + select.val());
+        //     select.on('change click', function()
+        //     {
+        //         container.attr('rel', 'value_' + select.val());
+        //     });
+        // });
     };
 
     /**
