@@ -79,6 +79,7 @@ class ListView extends AbstractPhoenixHtmView
 	{
 		if ($this->simplePagination)
 		{
+			$this->model->config->set('list.fix_page', false);
 			$data->total = null;
 			$data->pagination = $this->model->getSimplePagination()
 				->template('phoenix.pagination.simple')
