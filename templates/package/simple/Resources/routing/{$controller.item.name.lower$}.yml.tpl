@@ -5,7 +5,7 @@
     extra:
         layout: {$controller.item.name.lower$}
         active:
-            manimenu: {$controller.list.name.lower$}
+            mainmenu: {$controller.list.name.lower$}
 
 # {$controller.list.name.cap$}
 {$controller.list.name.lower$}:
@@ -14,4 +14,4 @@
     extra:
         layout: {$controller.list.name.lower$}
         active:
-            manimenu: {$controller.list.name.lower$}
+            mainmenu: {$controller.list.name.lower$}
