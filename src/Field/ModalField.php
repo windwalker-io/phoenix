@@ -176,7 +176,7 @@ var Phoenix;
                 var ele = $(selector);
 
                 ele.find('.input-group input').attr('value', title).delay(250).effect('highlight');
-                ele.find('input[data-value-store]').attr('value', id);
+                ele.find('input[data-value-store]').attr('value', id).trigger('change');
 
                 $('#phoenix-iframe-modal').modal('hide');
             }
