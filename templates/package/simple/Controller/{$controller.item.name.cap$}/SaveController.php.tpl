@@ -10,7 +10,11 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use Phoenix\Controller\AbstractSaveController;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Data\DataInterface;
+use Windwalker\Data\Data;
+use Windwalker\DataMapper\Entity\Entity;
+use Windwalker\Router\Exception\RouteNotFoundException;
 
 /**
  * The SaveController class.
@@ -55,6 +59,20 @@ class SaveController extends AbstractSaveController
 	protected $useTransaction = false;
 
 	/**
+	 * checkAccess
+	 *
+	 * @param   array|DataInterface $data
+	 *
+	 * @return  boolean
+	 *
+	 * @throws  RouteNotFoundException
+	 */
+	public function checkAccess($data)
+	{
+		return true;
+	}
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
@@ -74,6 +92,20 @@ class SaveController extends AbstractSaveController
 	protected function preSave(DataInterface $data)
 	{
 		parent::preSave($data);
+	}
+
+	/**
+	 * validate
+	 *
+	 * @param   DataInterface|Entity $data
+	 *
+	 * @return  void
+	 *
+	 * @throws ValidateFailException
+	 */
+	protected function validate(DataInterface $data)
+	{
+		parent::validate($data);
 	}
 
 	/**

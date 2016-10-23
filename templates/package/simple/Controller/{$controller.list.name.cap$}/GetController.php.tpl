@@ -13,6 +13,8 @@ use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\
 use Phoenix\Controller\Display\ListDisplayController;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\View\AbstractView;
+use Windwalker\Data\DataInterface;
+use Windwalker\Router\Exception\RouteNotFoundException;
 
 /**
  * The GetController class.
@@ -69,6 +71,20 @@ class GetController extends ListDisplayController
 	 * @var  string
 	 */
 	protected $defaultDirection = null;
+
+	/**
+	 * checkAccess
+	 *
+	 * @param   array|DataInterface $data
+	 *
+	 * @return  boolean
+	 *
+	 * @throws  RouteNotFoundException
+	 */
+	public function checkAccess($data)
+	{
+		return true;
+	}
 
 	/**
 	 * prepareExecute

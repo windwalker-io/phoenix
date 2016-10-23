@@ -13,6 +13,8 @@ use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\
 use Phoenix\Controller\Display\ItemDisplayController;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\View\AbstractView;
+use Windwalker\Data\DataInterface;
+use Windwalker\Router\Exception\RouteNotFoundException;
 
 /**
  * The GetController class.
@@ -55,6 +57,20 @@ class GetController extends ItemDisplayController
 	 * @var  {$controller.item.name.cap$}HtmlView
 	 */
 	protected $view = '{$controller.item.name.cap$}';
+
+	/**
+	 * checkAccess
+	 *
+	 * @param   array|DataInterface $data
+	 *
+	 * @return  boolean
+	 *
+	 * @throws  RouteNotFoundException
+	 */
+	public function checkAccess($data)
+	{
+		return true;
+	}
 
 	/**
 	 * prepareExecute
