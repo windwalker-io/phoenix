@@ -238,7 +238,9 @@ JS;
 			$js = <<<JS
 jQuery(document).ready(function($)
 {
-	$('$selector').datetimepicker($options);
+	$('$selector').datetimepicker($options).on('dp.change', function (event) {
+	    $(this).find('input').trigger('change');
+	});
 });
 JS;
 
