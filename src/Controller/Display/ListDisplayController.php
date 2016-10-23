@@ -9,6 +9,7 @@
 namespace Phoenix\Controller\Display;
 
 use Phoenix\Model\ListModel;
+use Phoenix\Model\ListRepositoryInterface;
 use Phoenix\View\GridView;
 use Phoenix\View\ListView;
 use Windwalker\Core\Model\ModelRepository;
@@ -63,7 +64,7 @@ class ListDisplayController extends DisplayController
 	/**
 	 * prepareUserState
 	 *
-	 * @param   ModelRepository $model
+	 * @param   ModelRepository|ListRepositoryInterface $model
 	 *
 	 * @return  void
 	 */

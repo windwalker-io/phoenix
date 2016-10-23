@@ -248,7 +248,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 * @return  \stdClass[]
 	 * @throws \RuntimeException
 	 *
-	 * @deprecated  No use in current version. Will combine into getItems().
+	 * @deprecated  No use in current version. Will combined into getItems().
 	 */
 	public function getList(Query $query, $start = null, $limit = null)
 	{
@@ -504,12 +504,10 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	public function page($page)
 	{
-		if ($page < 1)
-		{
-			$page = 1;
-		}
+		$page = $page < 1 ? 1 : $page;
 
 		$this->set('list.page', (int) $page);
+		$this->set('list.start', ($page - 1) * $this->getLimit());
 
 		return $this;
 	}
