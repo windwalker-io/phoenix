@@ -14,6 +14,7 @@ use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
 use Windwalker\DataMapper\DataMapper;
+use Windwalker\Dom\HtmlElement;
 use Windwalker\Form\Field\TextField;
 
 /**
@@ -88,15 +89,13 @@ class ModalField extends TextField
 
 		$attribs = $attrs;
 
-		unset($attribs['name']);
-
-		$attribs['value'] = $this->getTitle();
-		$attribs['disabled'] = true;
-
+		/** @var HtmlElement $input */
 		$input = parent::buildInput($attribs);
+		$input['type'] = 'hidden';
+		$input['data-value-store'] = true;
 
-		$url = $this->get('url') ? : $this->getUrl();
-		$id  = $this->getId();
+		$url   = $this->get('url') ? : $this->getUrl();
+		$id    = $this->getId();
 
 		return WidgetHelper::render('phoenix.form.field.modal', array(
 			'id'    => $id,
@@ -175,7 +174,7 @@ var Phoenix;
             {
                 var ele = $(selector);
 
-                ele.find('.input-group input').attr('value', title).delay(250).effect('highlight');
+                ele.find('.input-group input').attr('value', title).trigger('change').delay(250).effect('highlight');
                 ele.find('input[data-value-store]').attr('value', id).trigger('change');
 
                 $('#phoenix-iframe-modal').modal('hide');
