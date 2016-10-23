@@ -9,6 +9,7 @@
 namespace Phoenix\Script;
 
 use Windwalker\Core\Security\CsrfProtection;
+use Windwalker\Form\Field\AbstractField;
 use Windwalker\Ioc;
 use Windwalker\String\StringNormalise;
 
@@ -216,5 +217,37 @@ JS;
 
 			static::addCSS(static::phoenixName() . '/css/vue/vue2-animate.min.css');
 		}
+	}
+
+	/**
+	 * addVModelToFields
+	 *
+	 * @param string          $prefix
+	 * @param AbstractField[] $fields
+	 * @param array           $maps
+	 *
+	 * @return  AbstractField[]
+	 */
+	public static function addVModelToFields($prefix, $fields, array $maps = [])
+	{
+		/** @var AbstractField $field */
+		foreach ($fields as $field)
+		{
+			$name = $field->getName(true);
+
+			if (isset($maps[$name]))
+			{
+				if ($maps[$name] === false)
+				{
+					continue;
+				}
+
+				$name = $maps[$name];
+			}
+
+			$field->attr('v-model', $prefix . '.' . $name);
+		}
+
+		return $fields;
 	}
 }
