@@ -393,4 +393,34 @@ JS;
 			static::internalJS("Phoenix.Ajax.headers._global['X-Csrf-Token'] = '{$token}'");
 		}
 	}
+
+	/**
+	 * store
+	 *
+	 * @param string $name
+	 * @param array  $store
+	 *
+	 * @return  void
+	 */
+	public static function store($name, array $store)
+	{
+		if (!static::inited(__METHOD__))
+		{
+			$js = <<<JS
+// Init Phoenix Storage
+window.Phoenix = window.Phoenix || {};
+window.Phoenix.Store = window.Phoenix.Store || {};
+JS;
+
+			static::internalJS($js);
+		}
+
+		$store = static::getJSObject($store);
+
+		$js = <<<JS
+Phoenix.Store.$name = $store;
+JS;
+
+		static::internalJS($js);
+	}
 }

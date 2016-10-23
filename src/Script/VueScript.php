@@ -182,6 +182,8 @@ JS
 	 * @param array  $store
 	 *
 	 * @return  void
+	 *
+	 * @deprecated  Vue 2.0 must use new pattern.
 	 */
 	public static function store($name, array $store = [])
 	{
@@ -189,7 +191,13 @@ JS
 
 		if (!static::inited(__METHOD__, $name))
 		{
-			static::internalJS("const $name = " . static::getJSObject($store) . ';');
+			$state = static::getJSObject(['state' => $store]);
+
+			$js = <<<JS
+var $name = new Vuex.Store($state);
+JS;
+
+			static::internalJS($js);
 		}
 	}
 
