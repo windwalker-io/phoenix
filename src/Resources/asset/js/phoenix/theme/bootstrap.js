@@ -25,6 +25,7 @@ var Phoenix;
         showValidateResponse: function(validation, state, $input, help)
         {
             var $control = $input.parents('.form-group').first();
+            var self = this;
 
             this.removeValidateResponse($control);
 
@@ -50,7 +51,11 @@ var Phoenix;
                         break;
                 }
 
-                this.addValidateResponse($control, $input, icon, color, help)
+                // Delay 100 to make sure addClass after removeClass
+                setTimeout(function ()
+                {
+                    self.addValidateResponse($control, $input, icon, color, help);
+                }, 100);
             }
         },
 
@@ -69,6 +74,16 @@ var Phoenix;
 
             var feedback = $('<span class="glyphicon glyphicon-' + icon + ' form-control-feedback" aria-hidden="true"></span>');
             $control.prepend(feedback);
+
+            if ($control.attr('data-invalid-message'))
+            {
+                help = $control.attr('data-invalid-message');
+            }
+
+            if ($input.attr('data-invalid-message'))
+            {
+                help = $input.attr('data-invalid-message');
+            }
 
             if (help)
             {
@@ -99,6 +114,8 @@ var Phoenix;
                 .removeClass('has-success')
                 .removeClass('has-warning')
                 .removeClass('has-feedback');
+
+            $element.find('.help-block').remove();
         },
 
         /**
