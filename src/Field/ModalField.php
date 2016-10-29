@@ -99,6 +99,7 @@ class ModalField extends TextField
 
 		return WidgetHelper::render('phoenix.form.field.modal', array(
 			'id'    => $id,
+			'title' => $this->getTitle(),
 			'input' => $input,
 			'url'   => $url,
 			'attrs' => $attrs,
