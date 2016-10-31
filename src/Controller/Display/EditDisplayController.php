@@ -17,7 +17,7 @@ use Windwalker\Core\Model\ModelRepository;
 /**
  * The EditGetController class.
  *
- * @method  AdminModel|CrudModel  getModel($name = null, $source = null, $forceNew)
+ * @method  AdminModel|CrudModel  getModel($name = null, $source = null, $forceNew = false)
  * @method  EditView              getView($name = null, $format = 'html', $engine = null, $forceNew = false)
  *
  * @since  1.0.5
