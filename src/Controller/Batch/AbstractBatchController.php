@@ -205,7 +205,17 @@ abstract class AbstractBatchController extends AbstractPostController
 	public function getModel($name = null, $source = null, $forceNew = false)
 	{
 		// Force the singular model
-		$name = $name ? : $this->config['item_name'];
+		if ($name === null && !$this->model instanceof ModelRepository)
+		{
+			if (is_string($this->model))
+			{
+				$name = $this->model;
+			}
+			else
+			{
+				$name = $name ? : $this->config['item_name'];
+			}
+		}
 
 		return parent::getModel($name, $source, $forceNew);
 	}

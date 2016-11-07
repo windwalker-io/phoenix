@@ -100,7 +100,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		// Determine model
 		if (!$this->model instanceof CrudRepositoryInterface)
 		{
-			throw new \DomainException(sprintf('%s model should be instance of ' . CrudRepositoryInterface::class, $this->getName()));
+			throw new \DomainException(sprintf(
+				'%s model should be instance of %s, class: %s',
+				$this->model->getName(),
+				CrudRepositoryInterface::class, get_class($this->model)
+			));
 		}
 
 		// Determine the name of the primary key for the data.
