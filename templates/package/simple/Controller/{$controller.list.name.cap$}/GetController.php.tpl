@@ -99,7 +99,7 @@ class GetController extends ListDisplayController
 	/**
 	 * prepareModelState
 	 *
-	 * @param   ModelRepository $model
+	 * @param   ModelRepository|{$controller.list.name.cap$}Model $model
 	 *
 	 * @return  void
 	 */

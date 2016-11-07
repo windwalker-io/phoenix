@@ -85,7 +85,7 @@ class GetController extends ItemDisplayController
 	/**
 	 * prepareModelState
 	 *
-	 * @param   ModelRepository $model
+	 * @param   ModelRepository|{$controller.item.name.cap$}Model $model
 	 *
 	 * @return  void
 	 */
