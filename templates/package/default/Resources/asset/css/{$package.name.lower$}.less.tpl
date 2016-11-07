@@ -184,9 +184,6 @@
 
 // Modal
 #phoenix-iframe-modal {
-    .modal-dialog {
-        min-width : 900px;
-    }
 
     .modal-body iframe {
         height : 500px;

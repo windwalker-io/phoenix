@@ -125,9 +125,6 @@ body.sidebar-hide .main-body {
 .sr-only {
   padding: 0;
 }
-#phoenix-iframe-modal .modal-dialog {
-  min-width: 900px;
-}
 #phoenix-iframe-modal .modal-body iframe {
   height: 500px;
 }

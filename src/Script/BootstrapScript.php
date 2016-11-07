@@ -10,10 +10,6 @@ namespace Phoenix\Script;
 
 /**
  * The BootstrapScript class.
- *
- * @see  \Phoenix\Script\ScriptManager
- * @see  \Phoenix\Script\Module\ModuleManager
- *
  * @since  1.0
  */
 abstract class BootstrapScript extends AbstractPhoenixScript
@@ -160,7 +156,7 @@ CSS;
 jQuery(document).ready(function($)
 {
 	var modalBox = $('<div class="modal fade" id="phoenix-iframe-modal"> \
-    <div class="modal-dialog"> \
+    <div class="modal-dialog modal-lg"> \
         <div class="modal-content"> \
             <div class="modal-body"> \
                 <iframe width="100%" src="" frameborder="0"></iframe> \
