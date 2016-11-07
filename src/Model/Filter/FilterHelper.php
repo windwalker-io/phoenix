@@ -76,15 +76,17 @@ class FilterHelper extends AbstractFilterHelper
 			}
 
 			// Filter array IN()
-			if (is_array($value) && count($value))
+			if (is_array($value))
 			{
-				$query->where($query->quoteName($field) . ' ' . new QueryElement('IN()', $query->quote($value)));
+				if (count($value))
+				{
+					$query->where($query->quoteName($field) . ' ' . new QueryElement('IN()', $query->quote($value)));
+				}
 
 				return $query;
 			}
-
 			// Filter String
-			if ((string) $value !== '')
+			elseif ((string) $value !== '')
 			{
 				$query->where($query->quoteName($field) . ' = ' . $query->quote($value));
 			}
