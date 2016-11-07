@@ -9,6 +9,7 @@
 namespace Phoenix\Controller\Display;
 
 use Phoenix\Controller\AbstractPhoenixController;
+use Windwalker\Core\Controller\Middleware\JsonApiMiddleware;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Response\HtmlViewResponse;
 use Windwalker\Core\View\AbstractView;
@@ -73,6 +74,12 @@ class DisplayController extends AbstractPhoenixController
 			$response->getStatusCode(),
 			$response->getHeaders()
 		);
+
+		// Prepare Json Middleware
+		if ($this->format == 'json')
+		{
+			$this->addMiddleware(JsonApiMiddleware::class);
+		}
 	}
 
 	/**
