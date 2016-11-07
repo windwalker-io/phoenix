@@ -5,12 +5,6 @@ body {
 body.phoenix-admin {
   background: #f8f8f8;
 }
-.nowrap {
-  white-space: nowrap;
-}
-.clearfix {
-  clear: both;
-}
 .main-body {
   padding-right: 0;
   padding-left: 0;
@@ -108,6 +102,12 @@ body.sidebar-hide .main-body {
     margin-bottom: 5px;
     margin-left: 0;
   }
+}
+.nowrap {
+  white-space: nowrap;
+}
+.clearfix {
+  clear: both;
 }
 .search-container {
   margin-bottom: 15px;
