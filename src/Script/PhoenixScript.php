@@ -387,7 +387,7 @@ JS;
 			static::addJS(static::phoenixName() . '/js/phoenix/ajax.min.js');
 		}
 
-		if (!static::inited(__METHOD__) && $token)
+		if (!static::inited(__METHOD__, (bool) $token) && $token)
 		{
 			$token = CsrfProtection::getFormToken();
 			static::internalJS("Phoenix.Ajax.headers._global['X-Csrf-Token'] = '{$token}'");
