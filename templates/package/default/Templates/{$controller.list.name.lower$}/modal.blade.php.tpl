@@ -20,8 +20,8 @@
  * @var $showFilterBar boolean
  * @var $grid          \Phoenix\View\Helper\GridHelper
  * @var $state         \Windwalker\Structure\Structure
- * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait[]
- * @var $item          \{$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait
+ * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record[]
+ * @var $item          \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
  * @var $i             integer
  * @var $pagination    \Windwalker\Core\Pagination\Pagination
  */

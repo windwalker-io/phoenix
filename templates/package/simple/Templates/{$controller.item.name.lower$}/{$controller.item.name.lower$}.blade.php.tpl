@@ -13,8 +13,8 @@
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \{$package.namespace$}Flower\Record\Traits\{$controller.item.name.cap$}DataTrait
- * @var $state \Windwalker\Registry\Registry
+ * @var $item  \{$package.namespace$}Flower\Record\{$controller.item.name.cap$}Record
+ * @var $state \Windwalker\Structure\Structure
  */
 ?>
 
