@@ -534,7 +534,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	{
 		$filters = $filters ? : $this->state->get('list.filter', array());
 
-		$filters = static::flatten($filters, '.', '', 2);
+		$filters = static::flatten($filters, '.');
 
 		$filters = $this->filterDataFields($filters);
 		$filters = $this->mapDataFields($filters);
@@ -581,7 +581,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	{
 		$searches = $searches ? : $this->state->get('list.search', array());
 
-		$searches = static::flatten($searches, '.', '', 2);
+		$searches = static::flatten($searches, '.');
 
 		$searches = $this->filterDataFields($searches);
 		$searches = $this->mapDataFields($searches);
@@ -942,12 +942,10 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @param   array|object $array     The array or object to convert.
 	 * @param   string       $separator The key separator.
-	 * @param   string       $prefix    Last level key prefix.
-	 * @param int            $level     Max level.
 	 *
 	 * @return array
 	 */
-	public static function flatten($array, $separator = '.', $prefix = '', $level = null)
+	protected static function flatten($array, $separator = '.')
 	{
 		$return = array();
 
@@ -960,17 +958,23 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 			$array = get_object_vars($array);
 		}
 
+		// Loop first level
 		foreach ($array as $k => $v)
 		{
-			$key = $prefix ? $prefix . $separator . $k : $k;
+			$k = trim($k, '.');
 
-			if ((is_object($v) || is_array($v)) && ($level === null || $level > 1))
+			// Check key has separator
+			if (strpos($k, $separator) !== false || !is_array($v))
 			{
-				$return = array_merge($return, static::flatten($v, $separator, $key, $level === null ? $level : $level - 1));
+				$return[$k] = $v;
+
+				continue;
 			}
-			else
+
+			// Loop second level
+			foreach ($v as $key => $value)
 			{
-				$return[$key] = $v;
+				$return[$k . $separator . $key] = $value;
 			}
 		}
 
