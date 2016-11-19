@@ -133,7 +133,7 @@ class DisplayController extends AbstractPhoenixController
 
 		if (!$this->view instanceof AbstractView || $forceNew)
 		{
-			$this->view = parent::getView($name, $format, $engine, $forceNew);
+			$this->view = parent::getView($this->view, $format, $engine, $forceNew);
 		}
 
 		return $this->view;
