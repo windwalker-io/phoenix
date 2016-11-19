@@ -81,7 +81,7 @@ class GetController extends EditDisplayController
 	/**
 	 * prepareViewData
 	 *
-	 * @param   AbstractView $view
+	 * @param   AbstractView|{$controller.item.name.cap$}HtmlView $view
 	 *
 	 * @return  void
 	 */

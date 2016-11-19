@@ -112,6 +112,8 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		{
 			$this->keyName = $this->model->getKeyName(false) ? : 'id';
 		}
+
+		$this->checkAccess($this->dataObject);
 	}
 
 	/**

@@ -8,6 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
+use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
 use Phoenix\Model\AdminModel;
 use Windwalker\Data\DataInterface;
 use Windwalker\Record\Record;
@@ -57,7 +58,7 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	/**
 	 * postGetItem
 	 *
-	 * @param DataInterface $item
+	 * @param DataInterface|{$controller.item.name.cap$}Record $item
 	 *
 	 * @return  void
 	 */
@@ -69,7 +70,7 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	/**
 	 * prepareRecord
 	 *
-	 * @param Record $record
+	 * @param Record|{$controller.item.name.cap$}Record $record
 	 *
 	 * @return  void
 	 */
@@ -81,7 +82,7 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	/**
 	 * postSaveHook
 	 *
-	 * @param Record $record
+	 * @param Record|{$controller.item.name.cap$}Record $record
 	 *
 	 * @return  void
 	 */
@@ -93,7 +94,7 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	/**
 	 * getReorderConditions
 	 *
-	 * @param Record $record
+	 * @param Record|{$controller.item.name.cap$}Record $record
 	 *
 	 * @return  array  An array of conditions to add to ordering queries.
 	 */
@@ -105,8 +106,8 @@ class {$controller.item.name.cap$}Model extends AdminModel
 	/**
 	 * Method to set new item ordering as first or last.
 	 *
-	 * @param   Record $record   Item table to save.
-	 * @param   string $position `first` or other are `last`.
+	 * @param   Record|{$controller.item.name.cap$}Record $record   Item table to save.
+	 * @param   string              $position `first` or other are `last`.
 	 *
 	 * @return  void
 	 */

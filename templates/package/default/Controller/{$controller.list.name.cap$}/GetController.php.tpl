@@ -100,7 +100,7 @@ class GetController extends ListDisplayController
 	/**
 	 * prepareViewData
 	 *
-	 * @param   AbstractView $view
+	 * @param   AbstractView|{$controller.list.name.cap$}HtmlView $view
 	 *
 	 * @return  void
 	 */
