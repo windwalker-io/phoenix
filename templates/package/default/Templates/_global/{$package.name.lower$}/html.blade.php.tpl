@@ -8,7 +8,7 @@
  * @var $uri      \Windwalker\Uri\UriData                     Uri information, example: $uri->path
  * @var $datetime \DateTime                                   PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
- * @var $route    \Windwalker\Core\Router\PackageRouter       Route builder object.
+ * @var $router   \Windwalker\Core\Router\PackageRouter       Route builder object.
  * @var $asset    \Windwalker\Core\Asset\AssetManager         The Asset manager.
  */
 ?><!DOCTYPE html>
@@ -19,7 +19,7 @@
 
     <title>{{ \Phoenix\Html\HtmlHeader::getPageTitle() }}</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="{{ $asset->addBase('images/favicon.ico') }}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $asset->path('images/favicon.ico') }}" />
     <meta name="generator" content="Windwalker Framework" />
     {!! \Phoenix\Html\HtmlHeader::renderMetadata() !!}
     @yield('meta')
@@ -32,7 +32,7 @@
     {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
 <body class="{{ $package->getName() }}-admin-body phoenix-admin package-{{ $package->getName() }}
-    view-{{ strtolower($view->getName()) }} layout-{{ $view->getLayout() }} {{ $helper->getView() instanceof \Phoenix\View\EditView ? 'sidebar-hide' : null }}">
+    view-{{ strtolower($view->getName()) }} layout-{{ $view->getLayout() }} {{ $view instanceof \Phoenix\View\EditView ? 'sidebar-hide' : null }}">
 @section('superbody')
 
     @yield('body', 'Body Section')

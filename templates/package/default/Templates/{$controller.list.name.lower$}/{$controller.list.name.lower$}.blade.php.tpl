@@ -98,7 +98,7 @@
                     <?php
                     $grid->setItem($item, $i);
                     ?>
-                    <tr>
+                    <tr data-order-group="">
                         {{-- CHECKBOX --}}
                         <td>
                             {!! $grid->checkbox() !!}
