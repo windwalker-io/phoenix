@@ -65,12 +65,13 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 	 * @param Record $record
 	 *
 	 * @return  void
+	 *
+	 * @throws \LogicException
 	 */
 	protected function prepareRecord(Record $record)
 	{
 		$date = $this->getDate();
-
-		$user = User::get();
+		$user = $this->getUserData();
 		$key  = $this->getKeyName();
 
 		// Alias
@@ -107,14 +108,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		// Modified date
 		if ($record->hasField('modified') && $record->$key)
 		{
-			if ($record->modified)
-			{
-				$record->modified = DateTime::toServerTime($record->modified);
-			}
-			else
-			{
-				$record->modified = $date->toSql();
-			}
+			$record->modified = $date->toSql();
 		}
 
 		// Created user
@@ -162,6 +156,18 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 	public function getDate($date = 'now', $tz = DateTime::TZ_LOCALE)
 	{
 		return DateTime::create($date, $tz);
+	}
+
+	/**
+	 * getUserData
+	 *
+	 * @param array $conditions
+	 *
+	 * @return  \Windwalker\Core\User\UserDataInterface
+	 */
+	public function getUserData($conditions = [])
+	{
+		return User::getUser($conditions);
 	}
 
 	/**
