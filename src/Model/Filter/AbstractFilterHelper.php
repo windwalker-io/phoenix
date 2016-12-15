@@ -41,7 +41,7 @@ abstract class AbstractFilterHelper implements FilterHelperInterface
 	 */
 	public function __construct()
 	{
-		$this->defaultHandler = $this->registerDefaultHandler();
+		$this->defaultHandler = $this->getDefaultHandler();
 	}
 
 	/**
@@ -55,12 +55,12 @@ abstract class AbstractFilterHelper implements FilterHelperInterface
 	 * }
 	 * ```
 	 *
-	 * @param string   $name    The handler name.
-	 * @param callable $handler Handler callback.
+	 * @param string        $name    The handler name.
+	 * @param callable|bool $handler Handler callback.
 	 *
 	 * @return  AbstractFilterHelper Return self to support chaining.
 	 */
-	public function setHandler($name, callable $handler)
+	public function setHandler($name, $handler)
 	{
 		$this->handler[$name] = $handler;
 
@@ -72,7 +72,7 @@ abstract class AbstractFilterHelper implements FilterHelperInterface
 	 *
 	 * @return  callable The handler callback.
 	 */
-	abstract protected function registerDefaultHandler();
+	abstract protected function getDefaultHandler();
 
 	/**
 	 * Set default handler.

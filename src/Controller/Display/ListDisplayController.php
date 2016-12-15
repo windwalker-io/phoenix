@@ -62,6 +62,13 @@ class ListDisplayController extends DisplayController
 	protected $defaultDirection = null;
 
 	/**
+	 * Property fuzzingSearching.
+	 *
+	 * @var  bool
+	 */
+	protected $fuzzingSearching = true;
+
+	/**
 	 * prepareUserState
 	 *
 	 * @param   ModelRepository|ListRepositoryInterface $model
@@ -76,6 +83,8 @@ class ListDisplayController extends DisplayController
 
 		$model['list.search'] = $this->handleSearches($model['input.search']);
 		$model['list.filter'] = $model['input.filter'];
+
+		$model['fuzzy_searching'] = $this->fuzzingSearching;
 
 		// Ordering
 		$model['list.ordering'] = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering', $this->defaultOrdering);

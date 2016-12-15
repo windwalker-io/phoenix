@@ -44,7 +44,7 @@ class FilterHelper extends AbstractFilterHelper
 			{
 				$handler = $this->defaultHandler;
 
-				/** @see FilterHelper::registerDefaultHandler() */
+				/** @see FilterHelper::getDefaultHandler() */
 				$handler($query, $field, $value);
 			}
 		}
@@ -57,7 +57,7 @@ class FilterHelper extends AbstractFilterHelper
 	 *
 	 * @return  callable The handler callback.
 	 */
-	protected function registerDefaultHandler()
+	protected function getDefaultHandler()
 	{
 		/**
 		 * Default handler closure.

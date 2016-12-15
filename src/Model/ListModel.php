@@ -735,6 +735,8 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 			$this->searchHelper = new SearchHelper;
 		}
 
+		$this->searchHelper->fuzzySearching((bool) $this->fuzzySearching());
+
 		return $this->searchHelper;
 	}
 
@@ -748,6 +750,25 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	public function setSearchHelper(FilterHelperInterface $searchHelper)
 	{
 		$this->searchHelper = $searchHelper;
+
+		return $this;
+	}
+
+	/**
+	 * Method to set property fuzzySearching
+	 *
+	 * @param   bool $bool
+	 *
+	 * @return  bool|static  Return self to support chaining.
+	 */
+	public function fuzzySearching($bool = null)
+	{
+		if ($bool === null)
+		{
+			return $this->get('fuzzy_searching', true);
+		}
+
+		$this['fuzzy_searching'] = (bool) $bool;
 
 		return $this;
 	}
