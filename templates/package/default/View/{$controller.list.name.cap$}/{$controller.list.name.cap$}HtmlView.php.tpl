@@ -32,7 +32,7 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	 *
 	 * @var  array
 	 */
-	protected $fields = array(
+	protected $fields = [
 		'pk'          => 'id',
 		'title'       => 'title',
 		'alias'       => 'alias',
@@ -43,16 +43,16 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 		'created'     => 'created',
 		'language'    => 'language',
 		'lang_title'  => 'lang_title'
-	);
+	];
 
 	/**
 	 * The grid config.
 	 *
 	 * @var  array
 	 */
-	protected $gridConfig = array(
+	protected $gridConfig = [
 		'order_column' => '{$controller.item.name.lower$}.ordering'
-	);
+	];
 
 	/**
 	 * Property simplePagination.
@@ -104,7 +104,7 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 		PhoenixScript::core();
 		PhoenixScript::grid();
 		PhoenixScript::chosen();
-		PhoenixScript::multiSelect('#admin-form table', array('duration' => 100));
+		PhoenixScript::multiSelect('#admin-form table', ['duration' => 100]);
 		BootstrapScript::checkbox(BootstrapScript::GLYPHICONS);
 		BootstrapScript::tooltip();
 	}

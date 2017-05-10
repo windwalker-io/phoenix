@@ -32,14 +32,14 @@ class {$controller.list.name.cap$}Model extends ListModel
 	 *
 	 * @var  array
 	 */
-	protected $allowFields = array();
+	protected $allowFields = [];
 
 	/**
 	 * Property fieldMapping.
 	 *
 	 * @var  array
 	 */
-	protected $fieldMapping = array();
+	protected $fieldMapping = [];
 
 	/**
 	 * configureTables
