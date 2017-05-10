@@ -58,7 +58,7 @@ class GeneratorController extends AbstractMuseController
 	 *
 	 * @var  array
 	 */
-	protected $tagVariables = array('{$', '$}');
+	protected $tagVariables = ['{$', '$}'];
 
 	/**
 	 * Property command.
@@ -104,7 +104,7 @@ class GeneratorController extends AbstractMuseController
 	 */
 	public function execute()
 	{
-		$config = array();
+		$config = [];
 
 		$this->out()->out('Start generating...')->out();
 

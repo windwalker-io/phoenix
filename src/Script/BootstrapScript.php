@@ -210,7 +210,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = array())
+	public static function calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -223,11 +223,11 @@ JS;
 
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
-			$defaultOptions = array(
+			$defaultOptions = [
 				'format' => $format,
 				'sideBySide' => true,
 				'calendarWeeks' => true
-			);
+			];
 
 			$options = static::getJSObject($defaultOptions, $options);
 

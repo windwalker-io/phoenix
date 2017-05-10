@@ -26,7 +26,7 @@ class ConvertOperator extends CopyOperator
 	 *
 	 * @return  void
 	 */
-	protected function copyFile($src, $dest, $replace = array())
+	protected function copyFile($src, $dest, $replace = [])
 	{
 		// Replace dest file name.
 		$dest = strtr($dest, $replace);

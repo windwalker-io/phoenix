@@ -67,9 +67,9 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 *
 	 * @var  array
 	 */
-	protected $redirectQueryFields = array(
+	protected $redirectQueryFields = [
 		'return'
-	);
+	];
 
 	/**
 	 * init
@@ -209,7 +209,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 *
 	 * @return  array
 	 */
-	protected function getRedirectQuery($query = array())
+	protected function getRedirectQuery($query = [])
 	{
 		foreach ((array) $this->redirectQueryFields as $field)
 		{

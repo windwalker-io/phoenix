@@ -41,7 +41,7 @@ class AbstractRebuildController extends AbstractBatchController
 		{
 			$this->record->rebuild();
 
-			$ids = $this->model->getDataMapper()->findColumn('id', array('parent_id != 0'));
+			$ids = $this->model->getDataMapper()->findColumn('id', ['parent_id != 0']);
 
 			foreach ($ids as $id)
 			{

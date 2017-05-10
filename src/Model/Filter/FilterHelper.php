@@ -26,7 +26,7 @@ class FilterHelper extends AbstractFilterHelper
 	 *
 	 * @return  Query  Return the query object.
 	 */
-	public function execute(Query $query, $filters = array())
+	public function execute(Query $query, $filters = [])
 	{
 		foreach ($filters as $field => $value)
 		{

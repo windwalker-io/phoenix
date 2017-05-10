@@ -71,7 +71,7 @@ class ModalField extends TextField
 	 *
 	 * @var  array
 	 */
-	protected $query = array();
+	protected $query = [];
 
 	/**
 	 * buildInput
@@ -97,14 +97,14 @@ class ModalField extends TextField
 		$url   = $this->get('url') ? : $this->getUrl();
 		$id    = $this->getId();
 
-		return WidgetHelper::render('phoenix.form.field.modal', array(
+		return WidgetHelper::render('phoenix.form.field.modal', [
 			'id'    => $id,
 			'title' => $this->getTitle(),
 			'input' => $input,
 			'url'   => $url,
 			'attrs' => $attrs,
 			'field' => $this
-		), WidgetHelper::EDGE);
+		], WidgetHelper::EDGE);
 	}
 
 	/**
@@ -121,7 +121,7 @@ class ModalField extends TextField
 
 		$dataMapper = new DataMapper($table);
 
-		$data = $dataMapper->findOne(array($keyField => $value));
+		$data = $dataMapper->findOne([$keyField => $value]);
 
 		return $data->$titleField;
 	}
@@ -140,11 +140,12 @@ class ModalField extends TextField
 		$route = $this->get('route', $this->route) ? : $this->view;
 		$query = $this->get('query', $this->query);
 
-		return $package->router->route($route, array_merge(array(
+		return $package->router->route($route, array_merge(
+			[
 			'layout'   => 'modal',
 			'selector' => '#' . $this->getId() . '-wrap',
 			'function' => $this->get('function', 'Phoenix.Field.Modal.select')
-		), $query));
+			], $query));
 	}
 
 	/**
@@ -161,7 +162,7 @@ class ModalField extends TextField
 			return;
 		}
 
-		JQueryScript::ui(array('effect'));
+		JQueryScript::ui(['effect']);
 
 		$js = <<<JS
 // Phoenix.Field.Modal

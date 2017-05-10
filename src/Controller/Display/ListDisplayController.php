@@ -78,8 +78,8 @@ class ListDisplayController extends DisplayController
 	protected function prepareModelState(ModelRepository $model)
 	{
 		// Filter & Search
-		$model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', array(), InputFilter::ARRAY_TYPE);
-		$model['input.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', array(), InputFilter::ARRAY_TYPE);
+		$model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', [], InputFilter::ARRAY_TYPE);
+		$model['input.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', [], InputFilter::ARRAY_TYPE);
 
 		$model['list.search'] = $this->handleSearches($model['input.search']);
 		$model['list.filter'] = $model['input.filter'];
@@ -108,7 +108,7 @@ class ListDisplayController extends DisplayController
 	{
 		if (!isset($search['field']) || !isset($search['content']))
 		{
-			return array();
+			return [];
 		}
 
 		if ($search['field'] == '*' && isset($search['content']))
@@ -120,13 +120,13 @@ class ListDisplayController extends DisplayController
 
 			if (!$searchField)
 			{
-				return array();
+				return [];
 			}
 
 			/** @var ListField $searchField */
 			$options = $searchField->getOptions();
 
-			$fields = array();
+			$fields = [];
 
 			foreach ($options as $option)
 			{
@@ -136,6 +136,6 @@ class ListDisplayController extends DisplayController
 			return $fields;
 		}
 
-		return array($search['field'] => $search['content']);
+		return [$search['field'] => $search['content']];
 	}
 }

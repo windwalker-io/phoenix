@@ -51,7 +51,7 @@ abstract class AbstractReorderController extends AbstractBatchController
 	protected function prepareExecute()
 	{
 		$this->model = $this->getModel($this->config['item_name']);
-		$this->data  = $this->input->getVar('ordering', array());
+		$this->data  = $this->input->getVar('ordering', []);
 
 		// Determine model
 		if (!$this->model instanceof AdminModel)

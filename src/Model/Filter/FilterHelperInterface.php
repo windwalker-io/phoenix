@@ -43,5 +43,5 @@ interface FilterHelperInterface
 	 *
 	 * @return  Query Return the query object.
 	 */
-	public function execute(Query $query, $data = array());
+	public function execute(Query $query, $data = []);
 }

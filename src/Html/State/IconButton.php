@@ -36,24 +36,24 @@ class IconButton
 	 *
 	 * @var  array
 	 */
-	protected $states = array(
-		'_default' => array(
+	protected $states = [
+		'_default' => [
 			'value'     => '_default',
 			'task'      => '',
 			'icon'      => 'question-sign fa fa-question-circle',
 			'title'     => 'Unknown state',
 			'only_icon' => false,
 			'disabled'  => null,
-			'options'   => array()
-		)
-	);
+			'options'   => []
+		]
+	];
 
 	/**
 	 * Property options.
 	 *
 	 * @var  array
 	 */
-	protected $options = array();
+	protected $options = [];
 
 	/**
 	 * Property template.
@@ -108,17 +108,17 @@ class IconButton
 	 *
 	 * @return static
 	 */
-	public function addState($value, $task, $icon = 'ok', $title = null, $onlyIcon = null, $options = array())
+	public function addState($value, $task, $icon = 'ok', $title = null, $onlyIcon = null, $options = [])
 	{
 		// Force type to prevent null data
-		$this->states[$value] = array(
+		$this->states[$value] = [
 			'value'   => (string) $value,
 			'task'    => (string) $task,
 			'icon'    => (string) $icon,
 			'title'   => (string) $title,
 			'only_icon' => (bool) $onlyIcon,
 			'options' => $options
-		);
+		];
 
 		return $this;
 	}

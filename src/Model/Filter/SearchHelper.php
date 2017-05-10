@@ -33,9 +33,9 @@ class SearchHelper extends AbstractFilterHelper
 	 *
 	 * @return  Query Return the query object.
 	 */
-	public function execute(Query $query, $searches = array())
+	public function execute(Query $query, $searches = [])
 	{
-		$searchValue = array();
+		$searchValue = [];
 
 		foreach ($searches as $field => $value)
 		{

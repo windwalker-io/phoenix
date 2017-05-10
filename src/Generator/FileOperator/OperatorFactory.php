@@ -30,7 +30,7 @@ class OperatorFactory
 	 *
 	 * @var  array
 	 */
-	protected $tagVariable = array();
+	protected $tagVariable = [];
 
 	/**
 	 * Class init.

@@ -53,7 +53,7 @@ abstract class AbstractBatchController extends AbstractPostController
 	 *
 	 * @var  array
 	 */
-	protected $pks = array();
+	protected $pks = [];
 
 	/**
 	 * prepareExecute

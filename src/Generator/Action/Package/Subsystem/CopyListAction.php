@@ -33,14 +33,14 @@ class CopyListAction extends AbstractAction
 		$dest = $this->config['dir.dest'];
 		$list = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
 
-		$files = array(
+		$files = [
 			'Controller/%s',
 			'Field',
 			'Form/%s',
 			'Model/%sModel.php.tpl',
 			'Templates/' . StringHelper::quote('controller.list.name.lower', $this->config['tagVariables']),
 			'View/%s'
-		);
+		];
 
 		foreach ($files as $file)
 		{

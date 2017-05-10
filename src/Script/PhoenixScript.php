@@ -33,7 +33,7 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 	 *
 	 * @return void
 	 */
-	public static function core($formSelector = '#admin-form', $variable = 'Phoenix', $options = array())
+	public static function core($formSelector = '#admin-form', $variable = 'Phoenix', $options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -45,10 +45,10 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
-			$defaultOptions = array(
+			$defaultOptions = [
 				'theme' => 'bootstrap',
 				'uri' => get_object_vars(Ioc::getUriData())
-			);
+			];
 
 			$options = static::mergeOptions($defaultOptions, $options);
 
@@ -118,7 +118,7 @@ JS
 	 *
 	 * @return void
 	 */
-	public static function grid($selector = '#admin-form', $variable = 'Phoenix' ,$options = array())
+	public static function grid($selector = '#admin-form', $variable = 'Phoenix' ,$options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -158,7 +158,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function chosen($selector = 'select', $options = array())
+	public static function chosen($selector = 'select', $options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -170,13 +170,13 @@ JS;
 
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
-			$defaultOptions = array(
+			$defaultOptions = [
 				'allow_single_deselect'     => true,
 				'disable_search_threshold'  => 10,
 				'placeholder_text_multiple' => Translator::translate('phoenix.chosen.text,multiple'),
 				'placeholder_text_single'   => Translator::translate('phoenix.chosen.text.single'),
 				'no_results_text'           => Translator::translate('phoenix.chosen.text.noresult')
-			);
+			];
 
 			$options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
@@ -256,7 +256,7 @@ JS;
 	 * @param string $selector
 	 * @param array  $options
 	 */
-	public static function multiSelect($selector = '#admin-form table', $options = array())
+	public static function multiSelect($selector = '#admin-form table', $options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -289,7 +289,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function formValidation($selector = '#admin-form', $options = array())
+	public static function formValidation($selector = '#admin-form', $options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -301,13 +301,13 @@ JS;
 
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
-			$defaultOptions = array(
-				'scroll' => array(
+			$defaultOptions = [
+				'scroll' => [
 					'enabled'  => true,
 					'offset'   => -100,
 					'duration' => 1000
-				)
-			);
+				]
+			];
 
 			$options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 

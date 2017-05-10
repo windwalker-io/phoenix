@@ -33,14 +33,14 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @var  array
 	 */
-	protected $allowFields = array();
+	protected $allowFields = [];
 
 	/**
 	 * Property fieldMapping.
 	 *
 	 * @var  array
 	 */
-	protected $fieldMapping = array();
+	protected $fieldMapping = [];
 
 	/**
 	 * Property queryHelper.
@@ -138,10 +138,10 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	public function getFormDefaultData()
 	{
-		return array(
+		return [
 			'search' => $this['input.search'],
 			'filter' => $this['input.filter']
-		);
+		];
 	}
 
 	/**
@@ -286,7 +286,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	{
 		$allowFields = $this->getAllowFields();
 
-		$return = array();
+		$return = [];
 
 		foreach ($data as $field => $value)
 		{
@@ -326,7 +326,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	public function mapDataFields(array $data)
 	{
-		$return = array();
+		$return = [];
 
 		foreach ($data as $field => $value)
 		{
@@ -530,9 +530,9 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @return  Query The db query object.
 	 */
-	protected function processFilters(Query $query, $filters = array())
+	protected function processFilters(Query $query, $filters = [])
 	{
-		$filters = $filters ? : $this->state->get('list.filter', array());
+		$filters = $filters ? : $this->state->get('list.filter', []);
 
 		$filters = static::flatten($filters, '.');
 
@@ -577,9 +577,9 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @return  Query The db query object.
 	 */
-	protected function processSearches(Query $query, $searches = array())
+	protected function processSearches(Query $query, $searches = [])
 	{
-		$searches = $searches ? : $this->state->get('list.search', array());
+		$searches = $searches ? : $this->state->get('list.search', []);
 
 		$searches = static::flatten($searches, '.');
 
@@ -909,7 +909,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @since   3.0
 	 */
-	public function bind($key = null, $value = null, $dataType = \PDO::PARAM_STR, $length = 0, $driverOptions = array())
+	public function bind($key = null, $value = null, $dataType = \PDO::PARAM_STR, $length = 0, $driverOptions = [])
 	{
 		$this->state->push('query.bounded', [$key, $value, $dataType, $length, $driverOptions]);
 
@@ -982,7 +982,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	protected static function flatten($array, $separator = '.')
 	{
-		$return = array();
+		$return = [];
 
 		if ($array instanceof \Traversable)
 		{

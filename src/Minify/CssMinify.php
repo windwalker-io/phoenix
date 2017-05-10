@@ -57,7 +57,7 @@ class CssMinify extends AbstractAssetMinify
 	protected function addAsset($path, $md5sum = null)
 	{
 		// Clean assets list
-		$this->asset->setStyles(array());
+		$this->asset->setStyles([]);
 		$this->asset->setInternalStyles(null);
 
 		$this->asset->addStyle($path, $md5sum);

@@ -100,12 +100,13 @@ trait FormAwareRepositoryTrait
 			$form->setRenderer(new $renderer);
 		}
 
-		Ioc::getDispatcher()->triggerEvent('onModelAfterGetForm', array(
+		Ioc::getDispatcher()->triggerEvent('onModelAfterGetForm', [
 			'form'       => $form,
 			'model'      => $this,
 			'control'    => $control,
 			'definition' => $definition
-		));
+		]
+		);
 
 		return $form;
 	}
@@ -186,7 +187,7 @@ trait FormAwareRepositoryTrait
 
 		$errors = $form->getErrors();
 
-		$msg = array();
+		$msg = [];
 
 		foreach ($errors as $error)
 		{

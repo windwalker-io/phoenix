@@ -153,7 +153,7 @@ abstract class AbstractAssetMinify
 	 */
 	protected function combineData($list)
 	{
-		$data = array();
+		$data = [];
 
 		foreach ($list as $url)
 		{

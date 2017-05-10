@@ -26,7 +26,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 	 *
 	 * @var  array
 	 */
-	protected $reorderConditions = array();
+	protected $reorderConditions = [];
 
 	/**
 	 * Property reorderPosition.
@@ -51,7 +51,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		{
 			$pk = $data->{$this->getKeyName()};
 
-			$this->reorder(array($pk => 0));
+			$this->reorder([$pk => 0]);
 
 			$this->state->set('order.position', null);
 		}
@@ -178,7 +178,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 	 *
 	 * @return  boolean
 	 */
-	public function reorder($orders = array(), $orderField = null)
+	public function reorder($orders = [], $orderField = null)
 	{
 		if (!$orders)
 		{
@@ -186,7 +186,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		}
 
 		$record     = $this->getRecord();
-		$conditions = array();
+		$conditions = [];
 		$orderField = $orderField ? : $this->state->get('order.column', 'ordering');
 
 		// Update ordering values
@@ -215,10 +215,10 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 			if (!$found)
 			{
 				$key = $this->getKeyName();
-				$conditions[] = array(
+				$conditions[] = [
 					'pk'   => $record->$key,
 					'cond' => $condition
-				);
+				];
 			}
 		}
 
@@ -239,7 +239,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 	 *
 	 * @return bool
 	 */
-	public function reorderAll($conditions = array(), $orderField = null)
+	public function reorderAll($conditions = [], $orderField = null)
 	{
 		$orderField  = $orderField ? : $this->state->get('order.column', 'ordering');
 
@@ -284,7 +284,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 	{
 		$fields = (array) $this->state->get('order.condition_fields', $this->reorderConditions);
 
-		$conditions = array();
+		$conditions = [];
 
 		foreach ($fields as $field)
 		{

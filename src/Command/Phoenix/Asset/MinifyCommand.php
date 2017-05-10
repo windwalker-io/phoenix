@@ -74,7 +74,7 @@ class MinifyCommand extends CoreCommand
 
 		if (is_file($path))
 		{
-			$files = array(new \SplFileInfo($path));
+			$files = [new \SplFileInfo($path)];
 		}
 		elseif (is_dir($path))
 		{

@@ -27,7 +27,7 @@ abstract class AbstractFilterHelper implements FilterHelperInterface
 	 *
 	 * @var  array
 	 */
-	protected $handler = array();
+	protected $handler = [];
 
 	/**
 	 * The default handler.

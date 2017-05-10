@@ -50,7 +50,7 @@ class HtmlHeaderManager
 	 *
 	 * @var  array
 	 */
-	protected $customTags = array();
+	protected $customTags = [];
 
 	/**
 	 * Property indents.
@@ -149,7 +149,7 @@ class HtmlHeaderManager
 	 *
 	 * @return  static
 	 */
-	public function addCustomTag($tag, $content = null, $attribs = array())
+	public function addCustomTag($tag, $content = null, $attribs = [])
 	{
 		if (!$tag instanceof HtmlElement)
 		{
@@ -229,11 +229,12 @@ class HtmlHeaderManager
 			return null;
 		}
 
-		return (string) new HtmlElement('link', null, array(
+		return (string) new HtmlElement('link', null, [
 			'rel' => 'shortcut icon',
 			'type' => 'image/x-icon',
 			'href' => $this->favicon
-		));
+		]
+		);
 	}
 
 	/**
@@ -253,7 +254,7 @@ class HtmlHeaderManager
 	 */
 	public function renderMetadata()
 	{
-		$html = array();
+		$html = [];
 
 		foreach ($this->metadata->getMetadata() as $metadata)
 		{
@@ -281,7 +282,7 @@ class HtmlHeaderManager
 	 */
 	public function renderCustomTags()
 	{
-		$html = array();
+		$html = [];
 
 		foreach ($this->customTags as $tag)
 		{

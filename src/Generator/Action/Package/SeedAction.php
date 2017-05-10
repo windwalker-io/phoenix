@@ -58,7 +58,7 @@ class SeedAction extends AbstractAction
 		// A dirty work to call migration command.
 		/** @var IOInterface $io */
 		$io = clone $this->io->getIO();
-		$io->setArguments(array('seed', 'import'));
+		$io->setArguments(['seed', 'import']);
 		$io->setOption('c', $seedClass);
 		$io->setOption('dir', $dir);
 		$io->setOption('no-backup', true);

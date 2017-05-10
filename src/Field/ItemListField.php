@@ -46,7 +46,7 @@ class ItemListField extends SqlListField
 
 		if (!$table)
 		{
-			return array();
+			return [];
 		}
 
 		if ($this->get('published'))
