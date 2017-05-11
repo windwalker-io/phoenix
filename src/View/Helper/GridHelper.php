@@ -43,14 +43,14 @@ class GridHelper
 	 *
 	 * @var Structure
 	 */
-	protected $config = array();
+	protected $config = [];
 
 	/**
 	 * The fields mapper.
 	 *
 	 * @var array
 	 */
-	protected $fields = array(
+	protected $fields = [
 		'pk'          => 'id',
 		'title'       => 'title',
 		'alias'       => 'alias',
@@ -61,7 +61,7 @@ class GridHelper
 		'created'     => 'created',
 		'language'    => 'language',
 		'lang_title'  => 'lang_title'
-	);
+	];
 
 	/**
 	 * State object.
@@ -90,7 +90,7 @@ class GridHelper
 	 * @param HtmlView $view   The view object.
 	 * @param array    $config The config object.
 	 */
-	public function __construct(HtmlView $view, $config = array())
+	public function __construct(HtmlView $view, $config = [])
 	{
 		$this->view   = $view;
 		$this->config = $config = ($config instanceof Structure) ? $config : new Structure($config);
@@ -128,13 +128,13 @@ class GridHelper
 		$listDirn  = $this->state->get('list.direction');
 		$selector  = $this->config->get('form_selector', '#admin-form');
 
-		return WidgetHelper::render('phoenix.grid.table.sort', array(
+		return WidgetHelper::render('phoenix.grid.table.sort', [
 			'label'     => $label,
 			'field'     => $field,
 			'ordering'  => $listOrder,
 			'direction' => strtoupper($listDirn),
 			'selector'  => $selector
-		), WidgetHelper::EDGE);
+		], WidgetHelper::EDGE);
 	}
 
 	/**
@@ -180,13 +180,13 @@ class GridHelper
 		$orderField = $this->config['field.ordering'];
 		$saveOrder = $this->config->get('list.saveorder');
 
-		return WidgetHelper::render('phoenix.grid.table.order-button', array(
+		return WidgetHelper::render('phoenix.grid.table.order-button', [
 			'item'   => $this->current,
 			'row'    => $this->row,
 			'keyName' => $keyName,
 			'orderField'  => $orderField,
 			'saveOrder' => $saveOrder
-		), WidgetHelper::EDGE);
+		], WidgetHelper::EDGE);
 	}
 
 	/**
@@ -198,7 +198,7 @@ class GridHelper
 	{
 		if ($this->config->get('list.saveorder'))
 		{
-			return WidgetHelper::render('phoenix.grid.table.saveorder-button', array(), WidgetHelper::EDGE);
+			return WidgetHelper::render('phoenix.grid.table.saveorder-button', [], WidgetHelper::EDGE);
 		}
 
 		return '';
@@ -211,11 +211,11 @@ class GridHelper
 	 *
 	 * @return string
 	 */
-	public function checkboxesToggle($options = array())
+	public function checkboxesToggle($options = [])
 	{
 		$options['duration'] = isset($options['duration']) ? $options['duration'] : 0;
 
-		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', array('options' => $options), WidgetHelper::EDGE);
+		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', ['options' => $options], WidgetHelper::EDGE);
 	}
 
 	/**
@@ -227,11 +227,11 @@ class GridHelper
 	{
 		$keyName = $this->config->get('field.pk');
 
-		return WidgetHelper::render('phoenix.grid.table.checkbox', array(
+		return WidgetHelper::render('phoenix.grid.table.checkbox', [
 			'keyName' => $keyName,
 			'item'   => $this->current,
 			'row'    => $this->row
-		), WidgetHelper::EDGE);
+		], WidgetHelper::EDGE);
 	}
 
 	/**
@@ -244,7 +244,7 @@ class GridHelper
 	 *
 	 * @return string Link element.
 	 */
-	public function foreignLink($title = null, $url = null, array $attribs = array(), array $options = array())
+	public function foreignLink($title = null, $url = null, array $attribs = [], array $options = [])
 	{
 		$defaultAttribs['href']   = $url;
 		$defaultAttribs['class']  = 'text-muted muted';
@@ -285,7 +285,7 @@ class GridHelper
 	 *
 	 * @return  IconButton
 	 */
-	public function createIconButton(array $options = array())
+	public function createIconButton(array $options = [])
 	{
 		return IconButton::create($options);
 	}
@@ -298,7 +298,7 @@ class GridHelper
 	 *
 	 * @return  static
 	 */
-	public function published($value, array $options = array())
+	public function published($value, array $options = [])
 	{
 		return StateButton::create($options)->render($value, $this->row);
 	}
@@ -311,7 +311,7 @@ class GridHelper
 	 *
 	 * @return  string
 	 */
-	public function state($value, array $options = array())
+	public function state($value, array $options = [])
 	{
 		return StateButton::create($options)->render($value, $this->row);
 	}
@@ -436,13 +436,13 @@ class GridHelper
 	 */
 	public function __get($name)
 	{
-		$allowFields = array(
+		$allowFields = [
 			'view',
 			'config',
 			'state',
 			'current',
 			'row'
-		);
+		];
 
 		if (in_array($name, $allowFields))
 		{

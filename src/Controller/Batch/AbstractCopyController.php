@@ -37,10 +37,10 @@ abstract class AbstractCopyController extends AbstractBatchController
 	 *
 	 * @var array
 	 */
-	protected $incrementFields = array(
+	protected $incrementFields = [
 		'title' => StringHelper::INCREMENT_STYLE_DEFAULT,
 		'alias' => StringHelper::INCREMENT_STYLE_DASH
-	);
+	];
 
 	/**
 	 * prepareExecute
@@ -51,7 +51,7 @@ abstract class AbstractCopyController extends AbstractBatchController
 	{
 		parent::prepareExecute();
 
-		$this->data = array_merge($this->input->getVar('batch', array()), (array) $this->data);
+		$this->data = array_merge($this->input->getVar('batch', []), (array) $this->data);
 	}
 
 	/**
@@ -82,7 +82,7 @@ abstract class AbstractCopyController extends AbstractBatchController
 
 		$recordClone = $this->model->getRecord();
 
-		$condition = array();
+		$condition = [];
 
 		// Check table has increment fields, default is title and alias.
 		foreach ($this->incrementFields as $field => $type)

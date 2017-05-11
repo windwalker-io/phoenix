@@ -32,6 +32,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 
 		foreach (range(1, 150) as $i)
 		{
+			$created = $faker->dateTimeThisYear;
 			$data = new Data;
 
 			$data['title']       = trim($faker->sentence(mt_rand(3, 5)), '.');
@@ -40,11 +41,11 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 			$data['introtext']   = $faker->paragraph(5);
 			$data['fulltext']    = $faker->paragraph(5);
 			$data['image']       = $faker->imageUrl();
-			$data['state']       = $faker->randomElement(array(1, 1, 1, 1, 0, 0));
+			$data['state']       = $faker->randomElement([1, 1, 1, 1, 0, 0]);
 			$data['ordering']    = $i;
-			$data['created']     = $faker->dateTimeThisYear->format(DateTime::getSqlFormat());
+			$data['created']     = $created->format(DateTime::getSqlFormat());
 			$data['created_by']  = mt_rand(20, 100);
-			$data['modified']    = $faker->dateTimeThisYear->format(DateTime::getSqlFormat());
+			$data['modified']    = $created->modify('+5 days')->format(DateTime::getSqlFormat());
 			$data['modified_by'] = mt_rand(20, 100);
 			$data['language']    = 'en-GB';
 			$data['params']      = '';

@@ -54,7 +54,7 @@ class JsMinify extends AbstractAssetMinify
 	protected function addAsset($path, $md5sum = null)
 	{
 		// Clean assets list
-		$this->asset->setScripts(array());
+		$this->asset->setScripts([]);
 		$this->asset->setInternalScripts(null);
 
 		$this->asset->addScript($path, $md5sum);

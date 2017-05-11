@@ -10,10 +10,6 @@ namespace Phoenix\Script;
 
 /**
  * The BootstrapScript class.
- *
- * @see  \Phoenix\Script\ScriptManager
- * @see  \Phoenix\Script\Module\ModuleManager
- *
  * @since  1.0
  */
 abstract class BootstrapScript extends AbstractPhoenixScript
@@ -160,7 +156,7 @@ CSS;
 jQuery(document).ready(function($)
 {
 	var modalBox = $('<div class="modal fade" id="phoenix-iframe-modal"> \
-    <div class="modal-dialog"> \
+    <div class="modal-dialog modal-lg"> \
         <div class="modal-content"> \
             <div class="modal-body"> \
                 <iframe width="100%" src="" frameborder="0"></iframe> \
@@ -214,7 +210,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = array())
+	public static function calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -227,11 +223,11 @@ JS;
 
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
-			$defaultOptions = array(
+			$defaultOptions = [
 				'format' => $format,
 				'sideBySide' => true,
 				'calendarWeeks' => true
-			);
+			];
 
 			$options = static::getJSObject($defaultOptions, $options);
 

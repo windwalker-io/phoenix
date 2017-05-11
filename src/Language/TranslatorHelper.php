@@ -67,7 +67,7 @@ class TranslatorHelper
 
 		$localePath = $path . '/' . $locale;
 
-		$files = array();
+		$files = [];
 
 		if (is_dir($localePath))
 		{
@@ -148,8 +148,8 @@ class TranslatorHelper
 	{
 		$formatter = StructureHelper::getFormatClass($format);
 
-		$returns = array();
-		$options = array();
+		$returns = [];
+		$options = [];
 
 		switch (strtolower($format))
 		{
@@ -208,11 +208,11 @@ class TranslatorHelper
 		}
 
 		$orphans = new Structure;
-		$orphans->loadFile($file, $format, array('processSections' => true));
+		$orphans->loadFile($file, $format, ['processSections' => true]);
 
-		$orphans->loadString(static::getFormattedOrphans($format), $format, array('processSections' => true));
+		$orphans->loadString(static::getFormattedOrphans($format), $format, ['processSections' => true]);
 
-		file_put_contents($file, $orphans->toString($format, array('inline' => 99)));
+		file_put_contents($file, $orphans->toString($format, ['inline' => 99]));
 	}
 
 	/**

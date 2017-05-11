@@ -67,9 +67,9 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 *
 	 * @var  array
 	 */
-	protected $redirectQueryFields = array(
+	protected $redirectQueryFields = [
 		'return'
-	);
+	];
 
 	/**
 	 * init
@@ -100,7 +100,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		// Determine model
 		if (!$this->model instanceof CrudRepositoryInterface)
 		{
-			throw new \DomainException(sprintf('%s model should be instance of ' . CrudRepositoryInterface::class, $this->getName()));
+			throw new \DomainException(sprintf(
+				'%s model should be instance of %s, class: %s',
+				$this->model->getName(),
+				CrudRepositoryInterface::class, get_class($this->model)
+			));
 		}
 
 		// Determine the name of the primary key for the data.
@@ -108,6 +112,8 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		{
 			$this->keyName = $this->model->getKeyName(false) ? : 'id';
 		}
+
+		$this->checkAccess($this->dataObject);
 	}
 
 	/**
@@ -203,7 +209,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 *
 	 * @return  array
 	 */
-	protected function getRedirectQuery($query = array())
+	protected function getRedirectQuery($query = [])
 	{
 		foreach ((array) $this->redirectQueryFields as $field)
 		{

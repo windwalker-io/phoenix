@@ -32,14 +32,14 @@ class PrepareAction extends AbstractAction
 		$src  = $this->config['dir.src'];
 		$dest = $this->config['dir.dest'];
 
-		$files = array(
+		$files = [
 			'DataMapper',
 			'Field',
 			'Resources/language',
 			'Resources/routing',
 			'Record',
 			'Seed'
-		);
+		];
 
 		foreach ($files as $file)
 		{

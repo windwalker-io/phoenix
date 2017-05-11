@@ -33,14 +33,14 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @var  array
 	 */
-	protected $allowFields = array();
+	protected $allowFields = [];
 
 	/**
 	 * Property fieldMapping.
 	 *
 	 * @var  array
 	 */
-	protected $fieldMapping = array();
+	protected $fieldMapping = [];
 
 	/**
 	 * Property queryHelper.
@@ -138,10 +138,10 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	public function getFormDefaultData()
 	{
-		return array(
+		return [
 			'search' => $this['input.search'],
 			'filter' => $this['input.filter']
-		);
+		];
 	}
 
 	/**
@@ -286,7 +286,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	{
 		$allowFields = $this->getAllowFields();
 
-		$return = array();
+		$return = [];
 
 		foreach ($data as $field => $value)
 		{
@@ -326,7 +326,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	public function mapDataFields(array $data)
 	{
-		$return = array();
+		$return = [];
 
 		foreach ($data as $field => $value)
 		{
@@ -530,11 +530,11 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @return  Query The db query object.
 	 */
-	protected function processFilters(Query $query, $filters = array())
+	protected function processFilters(Query $query, $filters = [])
 	{
-		$filters = $filters ? : $this->state->get('list.filter', array());
+		$filters = $filters ? : $this->state->get('list.filter', []);
 
-		$filters = static::flatten($filters, '.', '', 2);
+		$filters = static::flatten($filters, '.');
 
 		$filters = $this->filterDataFields($filters);
 		$filters = $this->mapDataFields($filters);
@@ -577,11 +577,11 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @return  Query The db query object.
 	 */
-	protected function processSearches(Query $query, $searches = array())
+	protected function processSearches(Query $query, $searches = [])
 	{
-		$searches = $searches ? : $this->state->get('list.search', array());
+		$searches = $searches ? : $this->state->get('list.search', []);
 
-		$searches = static::flatten($searches, '.', '', 2);
+		$searches = static::flatten($searches, '.');
 
 		$searches = $this->filterDataFields($searches);
 		$searches = $this->mapDataFields($searches);
@@ -735,6 +735,8 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 			$this->searchHelper = new SearchHelper;
 		}
 
+		$this->searchHelper->fuzzySearching((bool) $this->fuzzySearching());
+
 		return $this->searchHelper;
 	}
 
@@ -748,6 +750,25 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	public function setSearchHelper(FilterHelperInterface $searchHelper)
 	{
 		$this->searchHelper = $searchHelper;
+
+		return $this;
+	}
+
+	/**
+	 * Method to set property fuzzySearching
+	 *
+	 * @param   bool $bool
+	 *
+	 * @return  bool|static  Return self to support chaining.
+	 */
+	public function fuzzySearching($bool = null)
+	{
+		if ($bool === null)
+		{
+			return $this->get('fuzzy_searching', true);
+		}
+
+		$this['fuzzy_searching'] = (bool) $bool;
 
 		return $this;
 	}
@@ -778,6 +799,20 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	public function addSearch($key, $value)
 	{
 		$this->set('list.search.' . $key, $value);
+
+		return $this;
+	}
+
+	/**
+	 * select
+	 *
+	 * @param   string|array  $fields
+	 *
+	 * @return  static
+	 */
+	public function select($fields)
+	{
+		$this->state->push('query.select', (array) $fields);
 
 		return $this;
 	}
@@ -874,7 +909,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @since   3.0
 	 */
-	public function bind($key = null, $value = null, $dataType = \PDO::PARAM_STR, $length = 0, $driverOptions = array())
+	public function bind($key = null, $value = null, $dataType = \PDO::PARAM_STR, $length = 0, $driverOptions = [])
 	{
 		$this->state->push('query.bounded', [$key, $value, $dataType, $length, $driverOptions]);
 
@@ -942,14 +977,12 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 *
 	 * @param   array|object $array     The array or object to convert.
 	 * @param   string       $separator The key separator.
-	 * @param   string       $prefix    Last level key prefix.
-	 * @param int            $level     Max level.
 	 *
 	 * @return array
 	 */
-	public static function flatten($array, $separator = '.', $prefix = '', $level = null)
+	protected static function flatten($array, $separator = '.')
 	{
-		$return = array();
+		$return = [];
 
 		if ($array instanceof \Traversable)
 		{
@@ -960,17 +993,23 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 			$array = get_object_vars($array);
 		}
 
+		// Loop first level
 		foreach ($array as $k => $v)
 		{
-			$key = $prefix ? $prefix . $separator . $k : $k;
+			$k = trim($k, '.');
 
-			if ((is_object($v) || is_array($v)) && ($level === null || $level > 1))
+			// Check key has separator
+			if (strpos($k, $separator) !== false || !is_array($v))
 			{
-				$return = array_merge($return, static::flatten($v, $separator, $key, $level === null ? $level : $level - 1));
+				$return[$k] = $v;
+
+				continue;
 			}
-			else
+
+			// Loop second level
+			foreach ($v as $key => $value)
 			{
-				$return[$key] = $v;
+				$return[$k . $separator . $key] = $value;
 			}
 		}
 

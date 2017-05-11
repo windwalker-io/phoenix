@@ -5,12 +5,6 @@ body {
 body.phoenix-admin {
   background: #f8f8f8;
 }
-.nowrap {
-  white-space: nowrap;
-}
-.clearfix {
-  clear: both;
-}
 .main-body {
   padding-right: 0;
   padding-left: 0;
@@ -109,6 +103,12 @@ body.sidebar-hide .main-body {
     margin-left: 0;
   }
 }
+.nowrap {
+  white-space: nowrap;
+}
+.clearfix {
+  clear: both;
+}
 .search-container {
   margin-bottom: 15px;
 }
@@ -124,9 +124,6 @@ body.sidebar-hide .main-body {
 }
 .sr-only {
   padding: 0;
-}
-#phoenix-iframe-modal .modal-dialog {
-  min-width: 900px;
 }
 #phoenix-iframe-modal .modal-body iframe {
   height: 500px;

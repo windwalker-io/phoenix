@@ -120,11 +120,11 @@ class GenFieldCommand extends Command
 
 		$className = $this->getOption('class', FieldDefinitionGenerator::class);
 
-		if (!is_callable(array($className, 'generate')))
+		if (!is_callable([$className, 'generate']))
 		{
 			throw new \LogicException('Method: ' . $className . "::generate() can not execute.");
 		}
 
-		return call_user_func(array($className, 'generate'), $type, $name, $column);
+		return call_user_func([$className, 'generate'], $type, $name, $column);
 	}
 }

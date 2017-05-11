@@ -26,7 +26,7 @@ class FilterHelper extends AbstractFilterHelper
 	 *
 	 * @return  Query  Return the query object.
 	 */
-	public function execute(Query $query, $filters = array())
+	public function execute(Query $query, $filters = [])
 	{
 		foreach ($filters as $field => $value)
 		{
@@ -44,7 +44,7 @@ class FilterHelper extends AbstractFilterHelper
 			{
 				$handler = $this->defaultHandler;
 
-				/** @see FilterHelper::registerDefaultHandler() */
+				/** @see FilterHelper::getDefaultHandler() */
 				$handler($query, $field, $value);
 			}
 		}
@@ -57,7 +57,7 @@ class FilterHelper extends AbstractFilterHelper
 	 *
 	 * @return  callable The handler callback.
 	 */
-	protected function registerDefaultHandler()
+	protected function getDefaultHandler()
 	{
 		/**
 		 * Default handler closure.
@@ -76,15 +76,17 @@ class FilterHelper extends AbstractFilterHelper
 			}
 
 			// Filter array IN()
-			if (is_array($value) && count($value))
+			if (is_array($value))
 			{
-				$query->where($query->quoteName($field) . ' ' . new QueryElement('IN()', $query->quote($value)));
+				if (count($value))
+				{
+					$query->where($query->quoteName($field) . ' ' . new QueryElement('IN()', $query->quote($value)));
+				}
 
 				return $query;
 			}
-
 			// Filter String
-			if ((string) $value !== '')
+			elseif ((string) $value !== '')
 			{
 				$query->where($query->quoteName($field) . ' = ' . $query->quote($value));
 			}

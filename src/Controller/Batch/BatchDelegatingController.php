@@ -60,11 +60,13 @@ class BatchDelegatingController extends AbstractPhoenixController
 		$controller->config->set('item_name', $this->config['item_name']);
 		$controller->config->set('list_name', $this->config['list_name']);
 		
-		$this->hmvc($controller, $this->input->compact(array(
+		$this->hmvc($controller, $this->input->compact(
+			[
 			'id'       => 'array',
 			'batch'    => 'var',
 			'ordering' => 'var',
-		)));
+			]
+		));
 
 		return true;
 	}

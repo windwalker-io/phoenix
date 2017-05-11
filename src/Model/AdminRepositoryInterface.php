@@ -28,7 +28,7 @@ interface AdminRepositoryInterface
 	 *
 	 * @return  boolean
 	 */
-	public function reorder($orders = array(), $orderField = null);
+	public function reorder($orders = [], $orderField = null);
 
 	/**
 	 * reorder
@@ -38,7 +38,7 @@ interface AdminRepositoryInterface
 	 *
 	 * @return bool
 	 */
-	public function reorderAll($conditions = array(), $orderField = null);
+	public function reorderAll($conditions = [], $orderField = null);
 
 	/**
 	 * getReorderConditions

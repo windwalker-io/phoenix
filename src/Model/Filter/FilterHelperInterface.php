@@ -28,12 +28,12 @@ interface FilterHelperInterface
 	 * }
 	 * ```
 	 *
-	 * @param string   $name    The handler name.
-	 * @param callable $handler Handler callback.
+	 * @param string        $name    The handler name.
+	 * @param callable|bool $handler Handler callback.
 	 *
 	 * @return  FilterHelperInterface Return self to support chaining.
 	 */
-	public function setHandler($name, callable $handler);
+	public function setHandler($name, $handler);
 
 	/**
 	 * Execute the filter and add in query object.
@@ -43,5 +43,5 @@ interface FilterHelperInterface
 	 *
 	 * @return  Query Return the query object.
 	 */
-	public function execute(Query $query, $data = array());
+	public function execute(Query $query, $data = []);
 }

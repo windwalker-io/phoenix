@@ -59,12 +59,12 @@ class CalendarField extends TextField
 		$format = $this->get('format', 'YYYY-MM-DD HH:mm:ss');
 		$id     = $this->getId();
 
-		return WidgetHelper::render('phoenix.form.field.calendar', array(
+		return WidgetHelper::render('phoenix.form.field.calendar', [
 			'id'     => $id,
 			'input'  => $input,
 			'attrs'  => $attrs,
 			'format' => $format,
 			'field'  => $this
-		), WidgetHelper::EDGE);
+		], WidgetHelper::EDGE);
 	}
 }

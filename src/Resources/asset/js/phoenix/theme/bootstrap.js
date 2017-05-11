@@ -75,14 +75,14 @@ var Phoenix;
             var feedback = $('<span class="glyphicon glyphicon-' + icon + ' form-control-feedback" aria-hidden="true"></span>');
             $control.prepend(feedback);
 
-            if ($control.attr('data-invalid-message'))
+            if ($control.attr('data-' + color + '-message'))
             {
-                help = $control.attr('data-invalid-message');
+                help = $control.attr('data-' + color + '-message');
             }
 
-            if ($input.attr('data-invalid-message'))
+            if ($input.attr('data-' + color + '-message'))
             {
-                help = $input.attr('data-invalid-message');
+                help = $input.attr('data-' + color + '-message');
             }
 
             if (help)

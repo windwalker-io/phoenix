@@ -42,11 +42,11 @@ class SqlListField extends ListField
 	{
 		$valueField = $this->get('value_field', $this->valueField);
 		$textField  = $this->get('text_field', $this->textField);
-		$attribs    = $this->get('option_attribs', array());
+		$attribs    = $this->get('option_attribs', []);
 
 		$items = $this->getItems();
 
-		$options = array();
+		$options = [];
 
 		foreach ($items as $item)
 		{
@@ -66,7 +66,7 @@ class SqlListField extends ListField
 	 *
 	 * @return  Option
 	 */
-	protected function createOption($item, $valueField = 'id', $textField = 'title', $attribs = array())
+	protected function createOption($item, $valueField = 'id', $textField = 'title', $attribs = [])
 	{
 		$value = isset($item->$valueField) ? $item->$valueField : null;
 		$text  = isset($item->$textField)  ? $item->$textField : null;
@@ -103,7 +103,7 @@ class SqlListField extends ListField
 
 		if (!$query)
 		{
-			return array();
+			return [];
 		}
 
 		return (array) $db->setQuery($query)->loadAll();

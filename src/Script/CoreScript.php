@@ -49,7 +49,7 @@ abstract class CoreScript extends AbstractPhoenixScript
 		{
 			$onload = '_.erbTemplate = _.templateSettings; _.bladeTemplate = _.templateSettings = { evaluate: /\{\%(.+?)\%\}/g, interpolate: /\{\!\!(.+?)\!\!\}/g, escape: /\{\{(.+?)\}\}/g };';
 
-			$asset->addScript(static::phoenixName() . '/js/core/underscore.min.js', null, array('onload' => $onload));
+			$asset->addScript(static::phoenixName() . '/js/core/underscore.min.js', null, ['onload' => $onload]);
 		}
 
 		if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict)
@@ -99,7 +99,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function backbone($noConflict = false, $options = array())
+	public static function backbone($noConflict = false, $options = [])
 	{
 		$asset = static::getAsset();
 

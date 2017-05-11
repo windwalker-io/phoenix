@@ -13,9 +13,9 @@
  *
  * View variables
  * --------------------------------------------------------------
- * @var $state         \Windwalker\Registry\Registry
- * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}Flower\Record\Traits\{$controller.item.name.cap$}DataTrait[]
- * @var $item          \{$package.namespace$}Flower\Record\Traits\{$controller.item.name.cap$}DataTrait
+ * @var $state         \Windwalker\Structure\Structure
+ * @var $items         \Windwalker\Data\DataSet|\{$package.namespace$}Flower\Record\{$controller.item.name.cap$}Record[]
+ * @var $item          \{$package.namespace$}Flower\Record\{$controller.item.name.cap$}Record
  * @var $pagination    \Windwalker\Core\Pagination\Pagination
  */
 ?>

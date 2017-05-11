@@ -27,7 +27,7 @@ class CopyOperator extends \Muse\FileOperator\CopyOperator
 	 *
 	 * @return  void
 	 */
-	protected function copyFile($src, $dest, $replace = array())
+	protected function copyFile($src, $dest, $replace = [])
 	{
 		// Replace dest file name.
 		$dest = SimpleTemplate::render($dest, $replace, $this->tagVariable);

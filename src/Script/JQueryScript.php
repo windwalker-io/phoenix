@@ -60,14 +60,14 @@ abstract class JQueryScript extends AbstractPhoenixScript
 
 		if (!static::inited(__METHOD__, $components))
 		{
-			$allowedComponents = array(
+			$allowedComponents = [
 				'draggable',
 				'droppable',
 				'resizable',
 				'selectable',
 				'sortable',
 				'effect'
-			);
+			];
 
 			foreach ($components as $component)
 			{
@@ -87,7 +87,7 @@ abstract class JQueryScript extends AbstractPhoenixScript
 	 *
 	 * @return  void
 	 */
-	public static function colorPicker($selector = '.colorpicker', $options = array())
+	public static function colorPicker($selector = '.colorpicker', $options = [])
 	{
 		$args = get_defined_vars();
 
@@ -102,11 +102,11 @@ abstract class JQueryScript extends AbstractPhoenixScript
 
 		if (!static::inited(__METHOD__, $args))
 		{
-			$defaultOptions = array(
+			$defaultOptions = [
 				'control' => 'hue',
 				'position' => 'left',
 				'theme' => 'bootstrap'
-			);
+			];
 
 			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
@@ -134,7 +134,7 @@ JS;
 	 *
 	 * @return  void
 	 */
-	public static function highlight($selector = null, $text = null, $options = array())
+	public static function highlight($selector = null, $text = null, $options = [])
 	{
 		$args = get_defined_vars();
 		$asset = static::getAsset();
@@ -153,10 +153,10 @@ JS;
 				$text = implode(' ', $text);
 			}
 
-			$defaultOptions = array(
+			$defaultOptions = [
 				'element' => 'mark',
 				'className' => 'phoenix-highlight'
-			);
+			];
 
 			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 

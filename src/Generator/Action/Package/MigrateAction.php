@@ -53,7 +53,7 @@ class MigrateAction extends AbstractAction
 		// A dirty work to call migration command.
 		/** @var IOInterface $io */
 		$io = clone $this->io->getIO();
-		$io->setArguments(array('migration', 'migrate'));
+		$io->setArguments(['migration', 'migrate']);
 		$io->setOption('d', $dir);
 		$io->setOption('seed', null);
 		$io->setOption('s', null);

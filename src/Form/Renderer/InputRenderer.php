@@ -26,16 +26,16 @@ class InputRenderer implements FormRendererInterface
 	 *
 	 * @var  callable[]
 	 */
-	protected static $renderers = array();
+	protected static $renderers = [];
 
 	/**
 	 * Property aliases.
 	 *
 	 * @var  array
 	 */
-	protected static $aliases = array(
+	protected static $aliases = [
 		'spacer' => 'default'
-	);
+	];
 
 	/**
 	 * Property templatePrefix.
@@ -52,7 +52,7 @@ class InputRenderer implements FormRendererInterface
 	 *
 	 * @return string
 	 */
-	public function renderField(AbstractField $field, array $attribs = array())
+	public function renderField(AbstractField $field, array $attribs = [])
 	{
 		return WidgetHelper::render('phoenix.bootstrap.field.control', [
 			'field'     => $field,
@@ -70,7 +70,7 @@ class InputRenderer implements FormRendererInterface
 	 *
 	 * @return string
 	 */
-	public function renderLabel(AbstractField $field, array $attribs = array())
+	public function renderLabel(AbstractField $field, array $attribs = [])
 	{
 		if ($field instanceof HiddenField)
 		{
@@ -112,7 +112,7 @@ class InputRenderer implements FormRendererInterface
 
 		$method = 'render' . ucfirst($type);
 
-		if (is_callable(array($this, $method)))
+		if (is_callable([$this, $method]))
 		{
 			return $this->$method($field, $attribs);
 		}
@@ -133,10 +133,10 @@ class InputRenderer implements FormRendererInterface
 	{
 		$attribs['class'] .= ' radio-container input-list-container';
 
-		return WidgetHelper::render(static::getTemplatePrefix() . 'field.radio', array(
+		return WidgetHelper::render(static::getTemplatePrefix() . 'field.radio', [
 			'attribs' => $attribs,
 			'field' => $field
-		), WidgetHelper::EDGE);
+		], WidgetHelper::EDGE);
 	}
 
 	/**
@@ -151,10 +151,10 @@ class InputRenderer implements FormRendererInterface
 	{
 		$attribs['class'] .= ' checkbox-container input-list-container';
 
-		return WidgetHelper::render(static::getTemplatePrefix() . 'field.checkboxes', array(
+		return WidgetHelper::render(static::getTemplatePrefix() . 'field.checkboxes', [
 			'attribs' => $attribs,
 			'field' => $field
-		), WidgetHelper::EDGE);
+		], WidgetHelper::EDGE);
 	}
 
 	/**
@@ -167,10 +167,10 @@ class InputRenderer implements FormRendererInterface
 	 */
 	public static function renderSpacer(AbstractField $field, array $attribs = [])
 	{
-		return WidgetHelper::render(static::getTemplatePrefix() . 'field.spacer', array(
+		return WidgetHelper::render(static::getTemplatePrefix() . 'field.spacer', [
 			'attribs' => $attribs,
 			'field' => $field
-		), WidgetHelper::EDGE);
+		], WidgetHelper::EDGE);
 	}
 
 	/**

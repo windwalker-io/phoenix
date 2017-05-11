@@ -25,7 +25,7 @@ class GridView extends ListView
 	 *
 	 * @var  array
 	 */
-	protected $fields = array(
+	protected $fields = [
 		'pk'          => 'id',
 		'title'       => 'title',
 		'alias'       => 'alias',
@@ -36,14 +36,14 @@ class GridView extends ListView
 		'created'     => 'created',
 		'language'    => 'language',
 		'lang_title'  => 'lang_title'
-	);
+	];
 
 	/**
 	 * The grid config.
 	 *
 	 * @var  array
 	 */
-	protected $gridConfig = array();
+	protected $gridConfig = [];
 
 	/**
 	 * Property gridHelper.
@@ -144,7 +144,7 @@ class GridView extends ListView
 	 *
 	 * @return  GridHelper
 	 */
-	public function getGridHelper($options = array())
+	public function getGridHelper($options = [])
 	{
 		if (!$this->gridHelper)
 		{

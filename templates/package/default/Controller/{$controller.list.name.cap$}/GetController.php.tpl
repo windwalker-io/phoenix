@@ -63,14 +63,14 @@ class GetController extends ListDisplayController
 	 *
 	 * @var  string
 	 */
-	protected $defaultOrdering = null;
+	protected $defaultOrdering = '{$controller.item.name.lower$}.id';
 
 	/**
 	 * Property direction.
 	 *
 	 * @var  string
 	 */
-	protected $defaultDirection = null;
+	protected $defaultDirection = 'DESC';
 
 	/**
 	 * prepareExecute
@@ -88,7 +88,7 @@ class GetController extends ListDisplayController
 	/**
 	 * prepareUserState
 	 *
-	 * @param   ModelRepository $model
+	 * @param   ModelRepository|{$controller.list.name.cap$}Model $model
 	 *
 	 * @return  void
 	 */
@@ -100,7 +100,7 @@ class GetController extends ListDisplayController
 	/**
 	 * prepareViewData
 	 *
-	 * @param   AbstractView $view
+	 * @param   AbstractView|{$controller.list.name.cap$}HtmlView $view
 	 *
 	 * @return  void
 	 */

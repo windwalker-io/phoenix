@@ -1,156 +1,162 @@
-// Global
-body {
-    margin: 0;
-    padding: 0;
+// This section is for default template, you can delete it if you use custom templates.
+// ------------------------------------------------------------------------------------
 
-    &.phoenix-admin {
-        background: #f8f8f8;
+    body {
+        margin: 0;
+        padding: 0;
+
+        &.phoenix-admin {
+            background: #f8f8f8;
+        }
     }
-}
 
+    // Main Layout
+    .main-body {
+        padding-right: 0;
+        padding-left: 0;
+        background-color: white;
+        border-left: 1px solid #e7e7e7;
+    }
+
+    // Header
+    .navbar-fixed-top {
+        position      : relative;
+        margin-bottom : 0;
+    }
+
+    .navbar-brand img {
+        height     : 35px;
+        margin-top : -8px;
+    }
+
+    // Banner
+    .jumbotron {
+        h1 {
+            margin : 0;
+        }
+    }
+
+    .container .jumbotron,
+    .container-fluid .jumbotron {
+        border-radius: 0;
+        padding-left: 0;
+    }
+
+    .admin-header.jumbotron {
+        padding-top: 24px;
+        padding-bottom : 24px;
+        margin-bottom : 0;
+
+        h1 {
+            font-size : 48px;
+        }
+    }
+
+    // Admin Layout
+    #admin-area {
+        padding-top : 30px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    #admin-toolbar {
+        background-color : #f6f6f6;
+        padding          : 7px 15px;
+
+        .toolbar-toggle-button,
+        .admin-toolbar-buttons hr {
+            display : none;
+        }
+    }
+
+    .admin-toolbar-fixed {
+        position   : fixed;
+        width      : 100%;
+        top        : 0;
+        z-index    : 100;
+        box-shadow : 0 3px 8px rgba(0, 0, 0, .1);
+    }
+
+    // Sidebar
+    .main-sidebar {
+        #submenu.list-group {
+            border-radius: 0;
+            margin-left: -15px;
+            margin-right: -15px;
+
+            a {
+                border-radius: 0;
+                border: none;
+                border-bottom: 1px solid #eee;
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    body.sidebar-hide {
+        .main-sidebar {
+            display: none;
+        }
+
+        .main-body {
+            width: 100%;
+        }
+    }
+
+    // Copyright
+    #copyright {
+        padding-bottom: 20px;
+    }
+
+
+    // Mobile
+    @media (max-width : 767px) {
+        #admin-toolbar {
+            button, a {
+                &.btn {
+                    display       : block;
+                    width         : 100%;
+                    margin-bottom : 5px;
+                }
+            }
+
+            .admin-toolbar-buttons {
+                height   : 0;
+                overflow : hidden;
+
+                &.collapse.in {
+                    height : auto;
+                }
+            }
+
+            .toolbar-toggle-button,
+            .admin-toolbar-buttons hr {
+                display : block;
+            }
+        }
+
+        .admin-toolbar-fixed {
+            position   : relative;
+            box-shadow : none;
+        }
+
+        #batch-modal .modal-footer .btn {
+            width: 100%;
+            margin-bottom: 5px;
+            margin-left: 0;
+        }
+    }
+
+// ------------------------------------------------------------------------------------
+// End deletable section
+
+// Global
 .nowrap {
     white-space : nowrap;
 }
 
 .clearfix {
     clear : both;
-}
-
-// Main Layout
-.main-body {
-    padding-right: 0;
-    padding-left: 0;
-    background-color: white;
-    border-left: 1px solid #e7e7e7;
-}
-
-// Header
-.navbar-fixed-top {
-    position      : relative;
-    margin-bottom : 0;
-}
-
-.navbar-brand img {
-    height     : 35px;
-    margin-top : -8px;
-}
-
-// Banner
-.jumbotron {
-    h1 {
-        margin : 0;
-    }
-}
-
-.container .jumbotron,
-.container-fluid .jumbotron {
-    border-radius: 0;
-    padding-left: 0;
-}
-
-.admin-header.jumbotron {
-    padding-top: 24px;
-    padding-bottom : 24px;
-    margin-bottom : 0;
-
-    h1 {
-        font-size : 48px;
-    }
-}
-
-// Admin Layout
-#admin-area {
-    padding-top : 30px;
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-#admin-toolbar {
-    background-color : #f6f6f6;
-    padding          : 7px 15px;
-
-    .toolbar-toggle-button,
-    .admin-toolbar-buttons hr {
-        display : none;
-    }
-}
-
-.admin-toolbar-fixed {
-    position   : fixed;
-    width      : 100%;
-    top        : 0;
-    z-index    : 100;
-    box-shadow : 0 3px 8px rgba(0, 0, 0, .1);
-}
-
-// Sidebar
-.main-sidebar {
-    #submenu.list-group {
-        border-radius: 0;
-        margin-left: -15px;
-        margin-right: -15px;
-
-        a {
-            border-radius: 0;
-            border: none;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 0;
-        }
-    }
-}
-
-body.sidebar-hide {
-    .main-sidebar {
-        display: none;
-    }
-
-    .main-body {
-        width: 100%;
-    }
-}
-
-// Copyright
-#copyright {
-    padding-bottom: 20px;
-}
-
-
-// Mobile
-@media (max-width : 767px) {
-    #admin-toolbar {
-        button, a {
-            &.btn {
-                display       : block;
-                width         : 100%;
-                margin-bottom : 5px;
-            }
-        }
-
-        .admin-toolbar-buttons {
-            height   : 0;
-            overflow : hidden;
-
-            &.collapse.in {
-                height : auto;
-            }
-        }
-
-        .toolbar-toggle-button,
-        .admin-toolbar-buttons hr {
-            display : block;
-        }
-    }
-
-    .admin-toolbar-fixed {
-        position   : relative;
-        box-shadow : none;
-    }
-
-    #batch-modal .modal-footer .btn {
-        width: 100%;
-        margin-bottom: 5px;
-        margin-left: 0;
-    }
 }
 
 // Grid
@@ -178,9 +184,6 @@ body.sidebar-hide {
 
 // Modal
 #phoenix-iframe-modal {
-    .modal-dialog {
-        min-width : 900px;
-    }
 
     .modal-body iframe {
         height : 500px;
@@ -257,8 +260,8 @@ body.sidebar-hide {
 
 // Tooltips
 .tooltip .tooltip-inner {
-    padding          : 8px;
-    background-color : rgba(0, 0, 0, .8);
-    font-size        : 13px;
-    min-width        : 100px;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, .8);
+    font-size: 13px;
+    min-width: 100px;
 }

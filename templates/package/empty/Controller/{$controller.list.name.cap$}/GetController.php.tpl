@@ -83,7 +83,7 @@ class GetController extends DisplayController
 	/**
 	 * prepareModelState
 	 *
-	 * @param   ModelRepository $model
+	 * @param   ModelRepository|{$controller.list.name.cap$}Model $model
 	 *
 	 * @return  void
 	 */
@@ -95,7 +95,7 @@ class GetController extends DisplayController
 	/**
 	 * prepareViewData
 	 *
-	 * @param   AbstractView $view
+	 * @param   AbstractView|{$controller.list.name.cap$}HtmlView $view
 	 *
 	 * @return  void
 	 */

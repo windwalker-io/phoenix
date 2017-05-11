@@ -31,20 +31,20 @@
 
     <div class="row">
         <div class="col-md-7">
-            <fieldset class="form-horizontal">
+            <fieldset id="fieldset-basic" class="form-horizontal">
                 <legend>@translate('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.basic')</legend>
 
                 {!! $form->renderFields('basic') !!}
             </fieldset>
 
-            <fieldset class="form-horizontal">
+            <fieldset id="fieldset-text" class="form-horizontal">
                 <legend>@translate('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.text')</legend>
 
                 {!! $form->renderFields('text') !!}
             </fieldset>
         </div>
         <div class="col-md-5">
-            <fieldset class="form-horizontal">
+            <fieldset id="fieldset-created" class="form-horizontal">
                 <legend>@translate('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.created')</legend>
 
                 {!! $form->renderFields('created') !!}

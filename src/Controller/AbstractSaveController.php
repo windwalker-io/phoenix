@@ -206,7 +206,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	{
 		$pk = $this->getDataObject()->{$this->keyName};
 
-		return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery(array($this->keyName => $pk)));
+		return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery([$this->keyName => $pk]));
 	}
 
 	/**
@@ -228,7 +228,7 @@ abstract class AbstractSaveController extends AbstractPostController
 				return $this->router->route(strtolower($this->config['list_name']), $this->getRedirectQuery());
 
 			case 'save2new':
-				return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery(array('new' => '')));
+				return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery(['new' => '']));
 
 			case 'save2copy':
 				$data->{$this->keyName} = null;
@@ -250,7 +250,7 @@ abstract class AbstractSaveController extends AbstractPostController
 			default:
 				$pk = $data->{$this->keyName};
 
-				return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery(array($this->keyName => $pk)));
+				return $this->router->route(strtolower($this->getName()), $this->getRedirectQuery([$this->keyName => $pk]));
 		}
 	}
 }

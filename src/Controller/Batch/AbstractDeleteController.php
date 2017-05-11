@@ -29,9 +29,9 @@ abstract class AbstractDeleteController extends AbstractBatchController
 	 *
 	 * @var  array
 	 */
-	protected $data = array(
+	protected $data = [
 		'state' => -9
-	);
+	];
 
 	/**
 	 * save

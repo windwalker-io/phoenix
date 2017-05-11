@@ -10,6 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
+use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\ItemDisplayController;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\View\AbstractView;
@@ -59,20 +60,6 @@ class GetController extends ItemDisplayController
 	protected $view = '{$controller.item.name.cap$}';
 
 	/**
-	 * checkAccess
-	 *
-	 * @param   array|DataInterface $data
-	 *
-	 * @return  boolean
-	 *
-	 * @throws  RouteNotFoundException
-	 */
-	public function checkAccess($data)
-	{
-		return true;
-	}
-
-	/**
 	 * prepareExecute
 	 *
 	 * @return  void
@@ -85,7 +72,7 @@ class GetController extends ItemDisplayController
 	/**
 	 * prepareModelState
 	 *
-	 * @param   ModelRepository $model
+	 * @param   ModelRepository|{$controller.item.name.cap$}Model $model
 	 *
 	 * @return  void
 	 */
@@ -97,7 +84,7 @@ class GetController extends ItemDisplayController
 	/**
 	 * prepareViewData
 	 *
-	 * @param   AbstractView $view
+	 * @param   AbstractView|{$controller.list.name.cap$}HtmlView $view
 	 *
 	 * @return  void
 	 */

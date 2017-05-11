@@ -20,7 +20,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  HtmlHeaderManager  setTitle($title)
  * @method  static  string             getFavicon()
  * @method  static  HtmlHeaderManager  setFavicon($favicon)
- * @method  static  HtmlHeaderManager  addCustomTag($tag, $content = null, $attribs = array())
+ * @method  static  HtmlHeaderManager  addCustomTag($tag, $content = null, $attribs = [])
  * @method  static  string             getCustomTags()
  * @method  static  HtmlHeaderManager  setCustomTags($customTags)
  * @method  static  HtmlHeaderManager  addMetadata($name, $content, $replace = false)

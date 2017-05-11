@@ -23,14 +23,14 @@ class Metadata extends Data
 	 *
 	 * @var  array
 	 */
-	protected $metadata = array();
+	protected $metadata = [];
 
 	/**
 	 * Property openGraphs.
 	 *
 	 * @var  array
 	 */
-	protected $openGraphs = array();
+	protected $openGraphs = [];
 
 	/**
 	 * addMetadata
@@ -45,15 +45,16 @@ class Metadata extends Data
 	{
 		if (!isset($this->metadata[$name]) || $replace)
 		{
-			$this->metadata[$name] = array();
+			$this->metadata[$name] = [];
 		}
 
 		foreach ((array) $content as $item)
 		{
-			$this->metadata[$name][] = new HtmlElement('meta', null, array(
+			$this->metadata[$name][] = new HtmlElement('meta', null, [
 				'name'    => $this->escape($name),
 				'content' => $this->escape($item)
-			));
+			]
+			);
 		}
 
 		return $this;
@@ -89,15 +90,16 @@ class Metadata extends Data
 	{
 		if (!isset($this->openGraphs[$type]) || $replace)
 		{
-			$this->openGraphs[$type] = array();
+			$this->openGraphs[$type] = [];
 		}
 
 		foreach ((array) $content as $item)
 		{
-			$this->openGraphs[$type][] = new HtmlElement('meta', null, array(
+			$this->openGraphs[$type][] = new HtmlElement('meta', null, [
 				'property' => $this->escape($type),
 				'content'  => $this->escape($item)
-			));
+			]
+			);
 		}
 
 		return $this;

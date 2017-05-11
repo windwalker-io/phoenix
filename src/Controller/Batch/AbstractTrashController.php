@@ -27,7 +27,7 @@ abstract class AbstractTrashController extends AbstractBatchController
 	 *
 	 * @var  array
 	 */
-	protected $data = array(
+	protected $data = [
 		'state' => -1
-	);
+	];
 }

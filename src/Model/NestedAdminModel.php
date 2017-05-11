@@ -27,7 +27,7 @@ class NestedAdminModel extends AdminModel
 	 *
 	 * @return bool
 	 */
-	public function reorderAll($conditions = array(), $orderField = null)
+	public function reorderAll($conditions = [], $orderField = null)
 	{
 		/** @var NestedRecord $record */
 		$record = $this->getRecord();
