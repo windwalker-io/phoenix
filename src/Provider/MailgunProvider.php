@@ -8,18 +8,19 @@
 
 namespace Phoenix\Provider;
 
-use Phoenix\Mailer\SendGridAdapter;
+use Mailgun\Mailgun;
+use Phoenix\Mailer\MailgunAdapter;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
 /**
- * The SendgridProvider class.
+ * The MailGunProvider class.
  *
  * @since  __DEPLOY_VERSION__
  */
-class SendgridProvider implements ServiceProviderInterface
+class MailgunProvider implements ServiceProviderInterface
 {
 	/**
 	 * Registers the service provider with a DI container.
@@ -30,12 +31,12 @@ class SendgridProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$container->share(\SendGrid::class, [$this, 'sendgrid'])
-			->alias('sendgrid', \SendGrid::class);
+		$container->share(Mailgun::class, [$this, 'mailgun'])
+			->alias('mailgun', Mailgun::class);
 
-		$container->prepareSharedObject(SendGridAdapter::class)
-			->alias('mailer.adapter.sendgrid', SendGridAdapter::class)
-			->alias(MailerAdapterInterface::class, SendGridAdapter::class);
+		$container->prepareSharedObject(MailgunAdapter::class)
+			->alias('mailer.adapter.mailgun', MailgunAdapter::class)
+			->alias(MailerAdapterInterface::class, MailgunAdapter::class);
 	}
 
 	/**
@@ -43,21 +44,21 @@ class SendgridProvider implements ServiceProviderInterface
 	 *
 	 * @param Container $container
 	 *
-	 * @return  \SendGrid
+	 * @return  Mailgun
 	 *
 	 * @throws \UnexpectedValueException
 	 * @throws \LogicException
 	 */
-	public function sendgrid(Container $container)
+	public function mailgun(Container $container)
 	{
 		if (!class_exists(\SendGrid::class))
 		{
-			throw new \LogicException('Please install sendgrid/sendgrid 5.* first.');
+			throw new \LogicException('Please install mailgun/mailgun-php first.');
 		}
 
 		/** @var Config $config */
 		$config = $container->get('config');
 
-		return new \SendGrid($config->get('mail.sendgrid.key'));
+		return Mailgun::create($config->get('mail.mailgun.key'));
 	}
 }
