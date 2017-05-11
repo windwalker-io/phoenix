@@ -9,7 +9,7 @@
 namespace Phoenix\Model;
 
 use Windwalker\Core\User\User;
-use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Data\DataInterface;
 use Windwalker\Filter\OutputFilter;
 use Windwalker\Record\Record;
@@ -96,7 +96,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		{
 			if ($record->created)
 			{
-				$record->created = DateTime::toServerTime($record->created);
+				$record->created = Chronos::toServerTime($record->created);
 			}
 			else
 			{
@@ -109,7 +109,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		{
 			if ($record->modified)
 			{
-				$record->modified = DateTime::toServerTime($record->modified);
+				$record->modified = Chronos::toServerTime($record->modified);
 			}
 			else
 			{
@@ -157,11 +157,11 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 	 * @param string $date
 	 * @param bool   $tz
 	 *
-	 * @return DateTime
+	 * @return Chronos
 	 */
-	public function getDate($date = 'now', $tz = DateTime::TZ_LOCALE)
+	public function getDate($date = 'now', $tz = Chronos::TZ_LOCALE)
 	{
-		return DateTime::create($date, $tz);
+		return Chronos::create($date, $tz);
 	}
 
 	/**

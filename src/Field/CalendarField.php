@@ -8,7 +8,7 @@
 
 namespace Phoenix\Field;
 
-use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Form\Field\TextField;
@@ -52,7 +52,7 @@ class CalendarField extends TextField
 
 		if ($attrs['value'] && $attrs['value'] != static::EMPTY_DATETIME)
 		{
-			$attrs['value'] = DateTime::convert($attrs['value'], $from, $to);
+			$attrs['value'] = Chronos::convert($attrs['value'], $from, $to);
 		}
 
 		$input  = parent::buildInput($attrs);

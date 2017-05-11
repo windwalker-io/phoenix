@@ -10,7 +10,7 @@ namespace Phoenix\View\Helper;
 
 use Phoenix\Html\State\IconButton;
 use Phoenix\Html\State\StateButton;
-use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
@@ -268,14 +268,14 @@ class GridHelper
 	public function createdDate($format = '', $local = false)
 	{
 		$field = $this->config->get('field.created', 'created');
-		$format = $format ? : DateTime::$format;
+		$format = $format ? : Chronos::$format;
 
 		if ($local)
 		{
-			return DateTime::toLocalTime($this->current->$field, $format);
+			return Chronos::toLocalTime($this->current->$field, $format);
 		}
 
-		return DateTime::create($this->current->$field)->format($format);
+		return Chronos::create($this->current->$field)->format($format);
 	}
 
 	/**
