@@ -197,4 +197,36 @@ JS;
 			static::internalJS($js);
 		}
 	}
+
+	/**
+	 * dependsOn
+	 *
+	 * @param string  $selector
+	 * @param array   $conditions
+	 * @param array   $options
+	 *
+	 * @return  void
+	 */
+	public static function dependsOn($selector = null, array $conditions = [], array $options = [])
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::core();
+			static::addJS(static::phoenixName() . '/js/depends-on/dependsOn.min.js');
+		}
+
+		if (!static::inited(__METHOD__, get_defined_vars()) && $selector !== null)
+		{
+			$conditions = static::getJSObject($conditions);
+			$options = static::getJSObject($options);
+
+			$js = <<<JS
+jQuery(function ($) {
+    $('$selector').dependsOn($conditions, $options);
+})
+JS;
+
+			static::internalJS($js);
+		}
+	}
 }

@@ -174,4 +174,17 @@ JS;
 			HtmlHeader::addMetadata('csrf-token', $token ?: CsrfProtection::getFormToken());
 		}
 	}
+
+	/**
+	 * silicone
+	 *
+	 * @return  void
+	 */
+	public static function silicone()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::addCSS(static::phoenixName() . '/css/silicone/silicone.min.css');
+		}
+	}
 }

@@ -1,8 +1,0 @@
-{
-    "timeout": 120000,
-    "scripts": {
-        "preinstall": "",
-        "postinstall": "php bin/asset-install.php %",
-        "preuninstall": ""
-    }
-}

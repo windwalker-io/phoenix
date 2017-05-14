@@ -1,0 +1,38 @@
+{
+  "name": "phoenix",
+  "version": "1.0.0",
+  "description": "Phoenix is a RAD (Rapid Application Development) package for Windwalker, it provides a set of Model, View and Controllers\r with different functions to quickly build web admin system, and a code generator to help us create application scaffold.",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "php bin/asset-install.php %"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ventoviro/phoenix.git"
+  },
+  "author": "",
+  "license": "LGPL",
+  "bugs": {
+    "url": "https://github.com/ventoviro/phoenix/issues"
+  },
+  "homepage": "https://github.com/ventoviro/phoenix#readme",
+  "dependencies": {
+    "underscore": "*",
+    "underscore.string": "*",
+    "requirejs": "*",
+    "backbone": "*",
+    "punycode": "1.*",
+    "jquery": "1.*",
+    "vue": "2.*",
+    "vue-resource": "1.*",
+    "vue-router": "2.*",
+    "vue-strap": "1.*",
+    "vuex": "2.*",
+    "vue2-animate": "1.*",
+    "moment": "2.*",
+    "moment-timezone": "*",
+    "ivia": "*",
+    "silicone": "*",
+    "jquery-depends-on": "1.*"
+  }
+}

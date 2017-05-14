@@ -14,6 +14,7 @@ $assets = [
 	'underscore' => [
 		'underscore.js' => 'js/core/underscore.js',
 		'underscore.min.js' => 'js/core/underscore.min.js',
+		'underscore.min.map' => 'js/core/underscore.min.map',
 	],
 	'underscore.string' => [
 		'dist/underscore.string.js' => 'js/core/underscore.string.js',
@@ -25,6 +26,7 @@ $assets = [
 	'backbone' => [
 		'backbone.js' => 'js/core/backbone.js',
 		'backbone.min.js' => 'js/core/backbone.min.js',
+		'backbone.min.map' => 'js/core/backbone.min.map',
 	],
 	'punycode' => [
 		'punycode.js' => 'js/string/punycode.js'
@@ -76,12 +78,16 @@ $assets = [
 	'moment-timezone' => [
 		'moment-timezone.js' => 'js/datetime/moment-timezone.js',
 		'builds/moment-timezone.min.js' => 'js/datetime/moment-timezone.min.js',
+	],
+	'silicone' => [
+		'dist/silicone.css' => 'css/silicone/silicone.css',
+		'dist/silicone.min.css' => 'css/silicone/silicone.min.css',
 	]
 ];
 
 $app = new AssetInstaller(
 	'phoenix',
-	__DIR__ . '/../bower_components',
+	__DIR__ . '/../node_modules',
 	__DIR__ . '/../src/Resources/asset',
 	$assets
 );
