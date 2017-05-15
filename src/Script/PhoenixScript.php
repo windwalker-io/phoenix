@@ -395,6 +395,37 @@ JS;
 	}
 
 	/**
+	 * listDependent
+	 *
+	 * @param string $selector
+	 * @param string $dependentSelector
+	 * @param array  $options
+	 *
+	 * @return void
+	 */
+	public static function listDependent($selector, $dependentSelector, array $options = [])
+	{
+		if (!static::inited(__METHOD__))
+		{
+			CoreScript::simpleUri();
+			static::addJS(static::phoenixName() . '/js/phoenix/list-dependent.min.js');
+		}
+
+		if (!static::inited(__METHOD__, get_defined_vars()))
+		{
+			$options = static::getJSObject($options);
+
+			$js = <<<JS
+jQuery(function ($) {
+    $('$selector').listDependent('$dependentSelector', $options);
+});
+JS;
+
+			static::internalJS($js);
+		}
+	}
+
+	/**
 	 * store
 	 *
 	 * @param string $name
