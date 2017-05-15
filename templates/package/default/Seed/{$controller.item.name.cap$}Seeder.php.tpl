@@ -9,7 +9,6 @@
 use {$package.namespace$}{$package.name.cap$}\DataMapper\{$controller.item.name.cap$}Mapper;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Faker\Factory;
-use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Seeder\AbstractSeeder;
 use Windwalker\Data\Data;
 use Windwalker\Filter\OutputFilter;
@@ -43,9 +42,9 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 			$data['image']       = $faker->imageUrl();
 			$data['state']       = $faker->randomElement([1, 1, 1, 1, 0, 0]);
 			$data['ordering']    = $i;
-			$data['created']     = $created->format(DateTime::getSqlFormat());
+			$data['created']     = $created->format($this->getDateFormat());
 			$data['created_by']  = mt_rand(20, 100);
-			$data['modified']    = $created->modify('+5 days')->format(DateTime::getSqlFormat());
+			$data['modified']    = $created->modify('+5 days')->format($this->getDateFormat());
 			$data['modified_by'] = mt_rand(20, 100);
 			$data['language']    = 'en-GB';
 			$data['params']      = '';

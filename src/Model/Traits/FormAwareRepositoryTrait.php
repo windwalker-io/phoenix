@@ -18,7 +18,7 @@ use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
 use Windwalker\Ioc;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The AbstractFormModel class.
@@ -56,7 +56,7 @@ trait FormAwareRepositoryTrait
 
 		$item = $this->getItem();
 
-		if ($sessionData && ArrayHelper::getValue($sessionData, $keyName) == $item->$keyName)
+		if ($sessionData && Arr::get($sessionData, $keyName) == $item->$keyName)
 		{
 			return $sessionData;
 		}

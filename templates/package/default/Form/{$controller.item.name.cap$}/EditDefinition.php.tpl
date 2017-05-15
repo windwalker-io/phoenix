@@ -32,6 +32,8 @@ class EditDefinition extends AbstractFieldDefinition
 	 * @param Form $form The Windwalker form object.
 	 *
 	 * @return  void
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function doDefine(Form $form)
 	{
@@ -44,7 +46,7 @@ class EditDefinition extends AbstractFieldDefinition
 			// Title
 			$this->text('title')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
-				->setFilter('trim')
+				->addFilter('trim')
 				->required(true);
 
 			// Alias
@@ -58,7 +60,7 @@ class EditDefinition extends AbstractFieldDefinition
 			// URL
 			$this->text('url')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
-				->setValidator(Rule\UrlValidator::class)
+				->addValidator(Rule\UrlValidator::class)
 				->set('class', 'validate-url');
 
 			// Example: {$controller.item.name.cap$} List

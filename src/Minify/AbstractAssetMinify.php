@@ -55,7 +55,7 @@ abstract class AbstractAssetMinify
 		// Get assets list from Document
 		$list = $this->getStorage();
 
-		$list = ArrayHelper::getColumn($list, 'url');
+		$list = array_column($list, 'url');
 
 		// Build assets hash per page.
 		$name = $this->buildHash($list);

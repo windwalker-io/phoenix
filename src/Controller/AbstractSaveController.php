@@ -15,7 +15,7 @@ use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\String\StringHelper;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The AbstractSaveController class.
@@ -98,7 +98,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	protected function doExecute()
 	{
 		// Get primary key from form data
-		$pk = ArrayHelper::getValue((array) $this->data, $this->keyName);
+		$pk = Arr::get((array) $this->data, $this->keyName);
 
 		// If primary key not exists, this is a new record.
 		$this->isNew = !$pk;

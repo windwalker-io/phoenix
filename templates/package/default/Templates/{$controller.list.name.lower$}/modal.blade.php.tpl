@@ -107,7 +107,7 @@
 
                         {{-- CREATED --}}
                         <td>
-                            {{ \Windwalker\Core\DateTime\DateTime::toLocalTime($item->created, 'Y-m-d') }}
+                            {{ \Windwalker\Core\DateTime\Chronos::toLocalTime($item->created, 'Y-m-d') }}
                         </td>
 
                         {{-- ID --}}

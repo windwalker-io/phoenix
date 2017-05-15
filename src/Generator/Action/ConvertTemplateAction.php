@@ -11,7 +11,7 @@ namespace Phoenix\Generator\Action;
 use Phoenix\Generator\FileOperator\ConvertOperator;
 use Windwalker\Filesystem\Folder;
 use Windwalker\String\StringHelper;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The ConvertTemplateAction class.
@@ -30,7 +30,7 @@ class ConvertTemplateAction extends AbstractAction
 		/** @var ConvertOperator $operator */
 		$operator = $this->container->get('operator.factory')->getOperator('convert');
 
-		$replace = ArrayHelper::flatten($this->replace);
+		$replace = Arr::flatten($this->replace);
 
 		// Flip replace array because we want to convert template.
 		$replace = array_flip($replace);

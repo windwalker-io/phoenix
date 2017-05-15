@@ -10,7 +10,7 @@ namespace Phoenix\Script;
 
 use Phoenix\Html\HtmlHeader;
 use Windwalker\Core\Security\CsrfProtection;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The CoreScript class.
@@ -105,8 +105,8 @@ JS;
 
 		if (!static::inited(__METHOD__))
 		{
-			JQueryScript::core(ArrayHelper::getValue($options, 'jquery_no_conflict', false));
-			static::underscore(ArrayHelper::getValue($options, 'jquery_no_conflict', true));
+			JQueryScript::core(Arr::get($options, 'jquery_no_conflict', false));
+			static::underscore(Arr::get($options, 'jquery_no_conflict', true));
 
 			$asset->addScript(static::phoenixName() . '/js/core/backbone.min.js');
 		}

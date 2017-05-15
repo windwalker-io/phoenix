@@ -17,7 +17,7 @@ use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The ListModel class.
@@ -885,7 +885,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 		else
 		{
 			$wheres = (array) $conditions;
-			$wheres = ArrayHelper::flatten($wheres);
+			$wheres = Arr::flatten($wheres);
 		}
 
 		$wheres = (string) $query->element('()', $wheres, ' OR ');
@@ -964,7 +964,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 		else
 		{
 			$having = (array) $conditions;
-			$having = ArrayHelper::flatten($having);
+			$having = Arr::flatten($having);
 		}
 
 		$having = $query->element('()', $having, ' OR ');

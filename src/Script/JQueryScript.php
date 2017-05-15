@@ -89,18 +89,15 @@ abstract class JQueryScript extends AbstractPhoenixScript
 	 */
 	public static function colorPicker($selector = '.colorpicker', $options = [])
 	{
-		$args = get_defined_vars();
-
-		static::core();
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
-			$asset->addScript(static::phoenixName() . '/js/jquery/jquery.minicolors.min.js');
-			$asset->addStyle(static::phoenixName() . '/css/jquery/jquery.minicolors.min.css');
+			static::core();
+
+			static::addJS(static::phoenixName() . '/js/jquery/jquery.minicolors.min.js');
+			static::addCSS(static::phoenixName() . '/css/jquery/jquery.minicolors.min.css');
 		}
 
-		if (!static::inited(__METHOD__, $args))
+		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
 			$defaultOptions = [
 				'control' => 'hue',
@@ -108,7 +105,7 @@ abstract class JQueryScript extends AbstractPhoenixScript
 				'theme' => 'bootstrap'
 			];
 
-			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
+			$options = static::getJSObject($defaultOptions, $options);
 
 			$js = <<<JS
 // Color picker
@@ -119,7 +116,7 @@ jQuery(document).ready(function($)
 	});
 });
 JS;
-			$asset->internalScript($js);
+			static::internalJS($js);
 		}
 	}
 
@@ -136,17 +133,14 @@ JS;
 	 */
 	public static function highlight($selector = null, $text = null, $options = [])
 	{
-		$args = get_defined_vars();
-		$asset = static::getAsset();
-
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset->addScript(static::phoenixName() . '/js/jquery/jquery.highlight.js');
+			static::addJS(static::phoenixName() . '/js/jquery/jquery.highlight.js');
 		}
 
-		if (!static::inited(__METHOD__, $args) && $selector && $text)
+		if (!static::inited(__METHOD__, get_defined_vars()) && $selector && $text)
 		{
 			if (is_array($text))
 			{
@@ -158,16 +152,15 @@ JS;
 				'className' => 'phoenix-highlight'
 			];
 
-			$options = $asset::getJSObject(ArrayHelper::merge($defaultOptions, $options));
+			$options = static::getJSObject($defaultOptions, $options);
 
 			$js = <<<JS
 // Highlight Text
-jQuery(document).ready(function($)
-{
+jQuery(document).ready(function($) {
 	$('$selector').highlight('$text', $options);
 });
 JS;
-			$asset->internalScript($js);
+			static::internalJS($js);
 		}
 	}
 
