@@ -26,11 +26,16 @@ abstract class CoreScript extends AbstractPhoenixScript
 	 *
 	 * @return  void
 	 */
-	public static function requireJS()
+	public static function requireJS($uri = null)
 	{
 		if (!static::inited(__METHOD__))
 		{
 			static::getAsset()->addScript(static::phoenixName() . '/js/core/require.min.js');
+		}
+
+		if (!static::inited(__METHOD__, get_defined_vars()) && $uri)
+		{
+			static::internalJS("require(['$uri']);");
 		}
 	}
 
