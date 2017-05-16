@@ -192,4 +192,19 @@ JS;
 			static::addCSS(static::phoenixName() . '/css/silicone/silicone.min.css');
 		}
 	}
+
+	/**
+	 * sprintf
+	 *
+	 * @return  void
+	 *
+	 * @since  1.3
+	 */
+	public static function sprintf()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::addJS(static::phoenixName() . '/js/core/sprintf.min.js');
+		}
+	}
 }

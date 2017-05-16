@@ -82,6 +82,9 @@ $assets = [
 	'silicone' => [
 		'dist/silicone.css' => 'css/silicone/silicone.css',
 		'dist/silicone.min.css' => 'css/silicone/silicone.min.css',
+	],
+	'sprintf-js' => [
+		'dist/sprintf.min.js' => 'js/core/sprintf.min.js'
 	]
 ];
 

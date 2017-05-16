@@ -219,7 +219,7 @@ JS;
 	{
 		if (!static::inited(__METHOD__))
 		{
-			CoreScript::underscoreString(true);
+			CoreScript::sprintf();
 
 			$asset = static::getAsset();
 			$asset->addScript(static::phoenixName() . '/js/phoenix/translator.min.js');

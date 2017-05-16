@@ -44,7 +44,7 @@ var Phoenix;
 
             args[0] = this.translate(text);
 
-            return underscore.string.sprintf.apply(underscore.string, args);
+            return sprintf.apply(sprintf, args);
         },
 
         /**

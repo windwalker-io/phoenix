@@ -11,28 +11,28 @@
     "url": "git+https://github.com/ventoviro/phoenix.git"
   },
   "author": "",
-  "license": "LGPL",
   "bugs": {
     "url": "https://github.com/ventoviro/phoenix/issues"
   },
   "homepage": "https://github.com/ventoviro/phoenix#readme",
   "dependencies": {
+    "backbone": "*",
+    "ivia": "*",
+    "jquery": "1.*",
+    "jquery-depends-on": "1.*",
+    "moment": "2.*",
+    "moment-timezone": "*",
+    "punycode": "1.*",
+    "requirejs": "*",
+    "silicone": "*",
+    "sprintf-js": "1.*",
     "underscore": "*",
     "underscore.string": "*",
-    "requirejs": "*",
-    "backbone": "*",
-    "punycode": "1.*",
-    "jquery": "1.*",
     "vue": "2.*",
     "vue-resource": "1.*",
     "vue-router": "2.*",
     "vue-strap": "1.*",
-    "vuex": "2.*",
     "vue2-animate": "1.*",
-    "moment": "2.*",
-    "moment-timezone": "*",
-    "ivia": "*",
-    "silicone": "*",
-    "jquery-depends-on": "1.*"
+    "vuex": "2.*"
   }
 }
