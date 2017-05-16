@@ -256,7 +256,7 @@
             {
                 if (isConfirm)
                 {
-                    self.core.sendDelete(url, queries);
+                    self.core['delete'](url, queries);
                 }
             });
 

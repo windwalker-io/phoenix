@@ -102,6 +102,21 @@ var Phoenix;
          */
         sendDelete: function (url, data, headers, options)
         {
+            return this['delete'](url, data, headers, options);
+        },
+
+        /**
+         * Send a DELETE request.
+         *
+         * @param {string} url
+         * @param {Object} data
+         * @param {Object} headers
+         * @param {Object} options
+         *
+         * @returns {jqXHR}
+         */
+        'delete': function (url, data, headers, options)
+        {
             return this.request('DELETE', url, data, headers, options);
         },
 
@@ -195,7 +210,5 @@ var Phoenix;
             return clone;
         }
     };
-
-    Phoenix.Ajax['delete'] = Phoenix.Ajax.sendDelete;
 
 })(jQuery, Phoenix || (Phoenix = {}));

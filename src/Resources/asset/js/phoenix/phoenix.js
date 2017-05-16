@@ -172,6 +172,19 @@
          */
         sendDelete: function(url, queries)
         {
+            return this['delete'](url, queries);
+        },
+
+        /**
+         * Make a DELETE request.
+         *
+         * @param  {string} url
+         * @param  {Object} queries
+         *
+         * @returns {boolean}
+         */
+        'delete': function(url, queries)
+        {
             return this.post(url, queries, 'DELETE');
         },
 
