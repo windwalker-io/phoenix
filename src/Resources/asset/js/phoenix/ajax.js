@@ -161,13 +161,29 @@ var Phoenix;
          *
          * @returns {jqXHR}
          */
+        sendRequest: function (method, url, data, headers, options)
+        {
+            return this.request(method, url, data, headers, options);
+        },
+
+        /**
+         * Send request.
+         *
+         * @param {string} method
+         * @param {string} url
+         * @param {Object} data
+         * @param {Object} headers
+         * @param {Object} options
+         *
+         * @returns {jqXHR}
+         */
         request: function (method, url, data, headers, options)
         {
             options = options || {};
             headers = headers || {};
             data = data || {};
 
-            if (typeof url == 'object')
+            if (typeof url === 'object')
             {
                 options = url;
                 url = options.url;
