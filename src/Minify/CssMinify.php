@@ -8,9 +8,8 @@
 
 namespace Phoenix\Minify;
 
-use Minify_CSS_Compressor;
-use Minify_CSS_UriRewriter;
-use Phoenix\Uri\Uri;
+use MatthiasMullie\Minify\CSS;
+use MatthiasMullie\Minify\Minify;
 
 /**
  * The CssMinify class.
@@ -25,6 +24,16 @@ class CssMinify extends AbstractAssetMinify
 	 * @var  string
 	 */
 	protected $type = 'css';
+
+	/**
+	 * getMinifier
+	 *
+	 * @return  Minify
+	 */
+	protected function createMinifier()
+	{
+		return new CSS;
+	}
 
 	/**
 	 * getStorage
@@ -64,18 +73,6 @@ class CssMinify extends AbstractAssetMinify
 	}
 
 	/**
-	 * doCompress
-	 *
-	 * @param string $data
-	 *
-	 * @return  string
-	 */
-	protected function doCompress($data)
-	{
-		return Minify_CSS_Compressor::process($data);
-	}
-
-	/**
 	 * handleCssFile
 	 *
 	 * @param string $file
@@ -85,13 +82,11 @@ class CssMinify extends AbstractAssetMinify
 	 */
 	protected function handleFile($file, $url)
 	{
-		$that = $this;
-
 		$path = dirname($url);
 		$path = str_replace($this->asset->uri->root, WINDWALKER_PUBLIC, $path);
 
 		// Rewrite Url
-		$newFile = Minify_CSS_UriRewriter::rewrite(
+		$newFile = CssUriRewriter::rewrite(
 			$file,
 			$path,
 			$_SERVER['DOCUMENT_ROOT']
@@ -100,9 +95,9 @@ class CssMinify extends AbstractAssetMinify
 		// Handle Imports
 		$newFile = preg_replace_callback(
 			'/@import\\s*url\(([^)]+)\)/',
-			function ($matches) use ($that)
+			function ($matches)
 			{
-				return $that->prepareAssetData(trim($matches[1], "\"'"));
+				return $this->prepareAssetData(trim($matches[1], "\"'"));
 			},
 			$newFile
 		);

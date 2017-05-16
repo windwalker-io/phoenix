@@ -8,7 +8,8 @@
 
 namespace Phoenix\Minify;
 
-use JSMin;
+use MatthiasMullie\Minify\JS;
+use MatthiasMullie\Minify\Minify;
 
 /**
  * The JsMinify class.
@@ -31,6 +32,16 @@ class JsMinify extends AbstractAssetMinify
 	protected function getStorage()
 	{
 		return $this->asset->getScripts();
+	}
+
+	/**
+	 * getMinifier
+	 *
+	 * @return  Minify
+	 */
+	protected function createMinifier()
+	{
+		return new JS;
 	}
 
 	/**
@@ -58,18 +69,6 @@ class JsMinify extends AbstractAssetMinify
 		$this->asset->setInternalScripts(null);
 
 		$this->asset->addScript($path, $md5sum);
-	}
-
-	/**
-	 * doCompress
-	 *
-	 * @param string $data
-	 *
-	 * @return  string
-	 */
-	protected function doCompress($data)
-	{
-		return JSMin::minify($data);
 	}
 
 	/**

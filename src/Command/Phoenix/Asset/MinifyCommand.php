@@ -8,6 +8,8 @@
 
 namespace Phoenix\Command\Phoenix\Asset;
 
+use MatthiasMullie\Minify\CSS;
+use MatthiasMullie\Minify\JS;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Filesystem\File;
@@ -95,21 +97,17 @@ class MinifyCommand extends CoreCommand
 				continue;
 			}
 
-			if ($ext == 'css')
+			if ($ext === 'css')
 			{
 				$this->out('[<comment>Compressing</comment>] ' . $file);
 
-				$data = \Minify_CSS_Compressor::process(file_get_contents($file));
-
-				$data = str_replace("\n", ' ', $data);
+				$data = $this->minifyCSS($file);
 			}
-			elseif ($ext == 'js')
+			elseif ($ext === 'js')
 			{
 				$this->out('[<comment>Compressing</comment>] ' . $file);
 
-				$data = \JSMinPlus::minify(file_get_contents($file));
-
-				$data = str_replace("\n", ';', $data);
+				$data = $this->minifyJS($file);
 			}
 			else
 			{
@@ -122,5 +120,39 @@ class MinifyCommand extends CoreCommand
 
 			$this->out('[<info>Compressed</info>] ' . $newName);
 		}
+
+		return true;
+	}
+
+	/**
+	 * minifyCSS
+	 *
+	 * @param string $file
+	 *
+	 * @return  string
+	 */
+	protected function minifyCSS($file)
+	{
+		$minify = new CSS;
+
+		$minify->add($file);
+
+		return str_replace("\n", ' ', $minify->minify());
+	}
+
+	/**
+	 * minifyJS
+	 *
+	 * @param string $file
+	 *
+	 * @return  string
+	 */
+	protected function minifyJS($file)
+	{
+		$minify = new JS;
+
+		$minify->add($file);
+
+		return str_replace("\n", ' ', $minify->minify());
 	}
 }

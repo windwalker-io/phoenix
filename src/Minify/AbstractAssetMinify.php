@@ -8,11 +8,12 @@
 
 namespace Phoenix\Minify;
 
+use MatthiasMullie\Minify\Minify;
 use Windwalker\Core\Asset\AssetManager;
 use Windwalker\Environment\PlatformHelper;
+use Windwalker\Filesystem\Exception\FilesystemException;
 use Windwalker\Filesystem\File;
 use Windwalker\Http\HttpClient;
-use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The AbstractAssetMinify class.
@@ -36,6 +37,13 @@ abstract class AbstractAssetMinify
 	protected $type = '';
 
 	/**
+	 * Property minifier.
+	 *
+	 * @var  Minify
+	 */
+	protected $minifier;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param AssetManager $asset
@@ -49,6 +57,8 @@ abstract class AbstractAssetMinify
 	 * compress
 	 *
 	 * @return  void
+	 *
+	 * @throws FilesystemException
 	 */
 	public function compress()
 	{
@@ -69,23 +79,42 @@ abstract class AbstractAssetMinify
 		if (!is_file($assetPath))
 		{
 			// Combine data by file list.
-			$data = $this->combineData($list);
-			$data = $this->doCompress($data);
+			$minify = $this->getMinifier();
 
-			File::write($assetPath, $data);
+			foreach ($list as $url)
+			{
+				$minify->add($this->prepareAssetData($url));
+			}
+
+			$minify->add($this->getInternalStorage());
+
+			File::write($assetPath, $this->getMinifier()->minify());
 		}
 
 		$this->addAsset($path);
 	}
 
 	/**
-	 * doCompress
+	 * getMinifier
 	 *
-	 * @param string $data
-	 *
-	 * @return  string
+	 * @return  Minify
 	 */
-	abstract protected function doCompress($data);
+	abstract protected function createMinifier();
+
+	/**
+	 * getMinifier
+	 *
+	 * @return  Minify
+	 */
+	protected function getMinifier()
+	{
+		if (!$this->minifier)
+		{
+			$this->minifier = $this->createMinifier();
+		}
+
+		return $this->minifier;
+	}
 
 	/**
 	 * getStorage
@@ -148,19 +177,17 @@ abstract class AbstractAssetMinify
 	 * combineData
 	 *
 	 * @param array  $list
-	 *
-	 * @return  string
 	 */
 	protected function combineData($list)
 	{
-		$data = [];
+		$minify = $this->getMinifier();
 
 		foreach ($list as $url)
 		{
-			$data[] = $this->prepareAssetData($url);
+			$minify->add($this->prepareAssetData($url));
 		}
 
-		return $this->implodeData($data) . "\n" . $this->getInternalStorage();
+		$minify->add($this->getInternalStorage());
 	}
 
 	/**
@@ -212,15 +239,16 @@ abstract class AbstractAssetMinify
 	 */
 	protected function regularizeUrl($file)
 	{
-		// Convert url to local path.
-		if (substr($file, 0, 1) == '/')
+		// Remote or absolute path
+		if (strpos($file, 'http') === 0 || strpos($file, '//') === 0)
 		{
-			$file = $this->asset->uri->host . '/' . ltrim($file, '/');
+			return $this->asset->uri->path . '/' . ltrim($file, '/');
 		}
-		// Absolute path.
-		elseif (substr($file, 0, 4) != 'http')
+
+		// Convert url to local path.
+		if (isset($file[0]) && $file[0] === '/')
 		{
-			$file = $this->asset->uri->path . '/' . ltrim($file, '/');
+			return $this->asset->uri->host . '/' . ltrim($file, '/');
 		}
 
 		return $file;
