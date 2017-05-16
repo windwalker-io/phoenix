@@ -18,8 +18,21 @@ use Windwalker\Utilities\Arr;
  *
  * @since  __DEPLOY_VERSION__
  */
-class ShowonHelper
+class FieldHelper
 {
+	/**
+	 * handle
+	 *
+	 * @param AbstractField $field
+	 * @param array         $attribs
+	 *
+	 * @return  void
+	 */
+	public static function handle(AbstractField $field, array $attribs)
+	{
+		static::showon($field, $attribs, $field->get('showon'));
+	}
+
 	/**
 	 * showon
 	 *

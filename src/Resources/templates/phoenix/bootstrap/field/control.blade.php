@@ -4,7 +4,7 @@
  * @var $field   \Windwalker\Form\Field\AbstractField|\Windwalker\Form\Field\ListField
  * @var $attribs array
  */
-\Phoenix\Form\ShowonHelper::showon($field, $attribs, $field->get('showon'));
+\Phoenix\Form\FieldHelper::handle($field, $attribs);
 
 ?>
 
