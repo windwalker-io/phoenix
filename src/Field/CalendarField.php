@@ -50,7 +50,7 @@ class CalendarField extends TextField
 		$from = $this->get('from', 'UTC');
 		$to   = $this->get('to', Ioc::getConfig()->get('system.timezone', 'UTC'));
 
-		if ($attrs['value'] && $attrs['value'] != static::EMPTY_DATETIME)
+		if ($attrs['value'] && $attrs['value'] !== static::EMPTY_DATETIME)
 		{
 			$attrs['value'] = Chronos::convert($attrs['value'], $from, $to);
 		}
@@ -64,7 +64,8 @@ class CalendarField extends TextField
 			'input'  => $input,
 			'attrs'  => $attrs,
 			'format' => $format,
-			'field'  => $this
+			'field'  => $this,
+			'options' => (array) $this->get('options')
 		], WidgetHelper::EDGE);
 	}
 }

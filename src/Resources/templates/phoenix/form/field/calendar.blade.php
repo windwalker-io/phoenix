@@ -5,7 +5,7 @@
  */
 ?>
 
-@php(\Phoenix\Script\BootstrapScript::calendar('#' . $id . '-wrapper', $format))
+@php(\Phoenix\Script\BootstrapScript::calendar('#' . $id . '-wrapper', $format, $options))
 
 <div id="{{ $id }}-wrapper" class="{{ $field->get('disabled') ? '' : 'input-group' }} date datetime-picker">
     {!! $input !!}
