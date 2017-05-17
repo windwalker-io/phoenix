@@ -103,7 +103,7 @@ class {$controller.list.name.cap$}HtmlView extends GridView
 	{
 		PhoenixScript::core();
 		PhoenixScript::grid();
-		PhoenixScript::chosen();
+		PhoenixScript::chosen('select.hasChosen');
 		PhoenixScript::multiSelect('#admin-form table', ['duration' => 100]);
 		BootstrapScript::checkbox(BootstrapScript::GLYPHICONS);
 		BootstrapScript::tooltip();

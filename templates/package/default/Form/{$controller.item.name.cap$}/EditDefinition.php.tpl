@@ -65,7 +65,8 @@ class EditDefinition extends AbstractFieldDefinition
 
 			// Example: {$controller.item.name.cap$} List
 			$this->add('{$controller.item.name.lower$}_list', {$controller.item.name.cap$}ListField::class)
-				->label('List Example');
+				->label('List Example')
+				->setClass('hasChosen');
 
 			// Example: {$controller.item.name.cap$} Modal
 			$this->add('{$controller.item.name.lower$}_modal', {$controller.item.name.cap$}ModalField::class)
@@ -92,7 +93,7 @@ class EditDefinition extends AbstractFieldDefinition
 			// State
 			$this->radio('state')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.state'))
-				->set('class', 'btn-group')
+				->set('class', 'btn-group hasChosen')
 				->set('default', 1)
 				->option(Translator::translate('phoenix.grid.state.published'), '1')
 				->option(Translator::translate('phoenix.grid.state.unpublished'), '0');
