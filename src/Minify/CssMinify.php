@@ -8,8 +8,9 @@
 
 namespace Phoenix\Minify;
 
-use MatthiasMullie\Minify\CSS;
-use MatthiasMullie\Minify\Minify;
+use Asika\Minifier\AbstractMinifier;
+use Asika\Minifier\CssMinifier;
+use Asika\Minifier\MinifierInterface;
 
 /**
  * The CssMinify class.
@@ -28,11 +29,11 @@ class CssMinify extends AbstractAssetMinify
 	/**
 	 * getMinifier
 	 *
-	 * @return  Minify
+	 * @return  MinifierInterface
 	 */
 	protected function createMinifier()
 	{
-		return new CSS;
+		return new CssMinifier;
 	}
 
 	/**

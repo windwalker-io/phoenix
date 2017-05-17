@@ -8,6 +8,8 @@
 
 namespace Phoenix\Command\Phoenix\Asset;
 
+use Asika\Minifier\CssMinifier;
+use Asika\Minifier\JsMinifier;
 use MatthiasMullie\Minify\CSS;
 use MatthiasMullie\Minify\JS;
 use Windwalker\Core\Console\CoreCommand;
@@ -133,11 +135,7 @@ class MinifyCommand extends CoreCommand
 	 */
 	protected function minifyCSS($file)
 	{
-		$minify = new CSS;
-
-		$minify->add($file);
-
-		return str_replace("\n", ' ', $minify->minify());
+		return str_replace("\n", ' ', CssMinifier::process($file));
 	}
 
 	/**
@@ -149,10 +147,6 @@ class MinifyCommand extends CoreCommand
 	 */
 	protected function minifyJS($file)
 	{
-		$minify = new JS;
-
-		$minify->add($file);
-
-		return str_replace("\n", ' ', $minify->minify());
+		return str_replace("\n", ' ', JsMinifier::process($file));
 	}
 }

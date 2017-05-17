@@ -8,7 +8,8 @@
 
 namespace Phoenix\Minify;
 
-use MatthiasMullie\Minify\Minify;
+use Asika\Minifier\AbstractMinifier;
+use Asika\Minifier\MinifierInterface;
 use Windwalker\Core\Asset\AssetManager;
 use Windwalker\Environment\PlatformHelper;
 use Windwalker\Filesystem\Exception\FilesystemException;
@@ -39,9 +40,16 @@ abstract class AbstractAssetMinify
 	/**
 	 * Property minifier.
 	 *
-	 * @var  Minify
+	 * @var  MinifierInterface
 	 */
 	protected $minifier;
+
+	/**
+	 * Property options.
+	 *
+	 * @var  array
+	 */
+	protected $minifyOptions = [AbstractMinifier::FLAGGED_COMMENTS => false];
 
 	/**
 	 * Constructor.
@@ -83,12 +91,12 @@ abstract class AbstractAssetMinify
 
 			foreach ($list as $url)
 			{
-				$minify->add($this->prepareAssetData($url));
+				$minify->addContent($this->prepareAssetData($url), $this->minifyOptions);
 			}
 
-			$minify->add($this->getInternalStorage());
+			$minify->addContent($this->getInternalStorage(), $this->minifyOptions);
 
-			File::write($assetPath, $this->getMinifier()->minify());
+			File::write($assetPath, $minify->minify());
 		}
 
 		$this->addAsset($path);
@@ -97,14 +105,14 @@ abstract class AbstractAssetMinify
 	/**
 	 * getMinifier
 	 *
-	 * @return  Minify
+	 * @return  MinifierInterface
 	 */
 	abstract protected function createMinifier();
 
 	/**
 	 * getMinifier
 	 *
-	 * @return  Minify
+	 * @return  MinifierInterface
 	 */
 	protected function getMinifier()
 	{
@@ -171,23 +179,6 @@ abstract class AbstractAssetMinify
 	protected function getCachePath($hash)
 	{
 		return 'min/' . $hash;
-	}
-
-	/**
-	 * combineData
-	 *
-	 * @param array  $list
-	 */
-	protected function combineData($list)
-	{
-		$minify = $this->getMinifier();
-
-		foreach ($list as $url)
-		{
-			$minify->add($this->prepareAssetData($url));
-		}
-
-		$minify->add($this->getInternalStorage());
 	}
 
 	/**

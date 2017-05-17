@@ -8,8 +8,8 @@
 
 namespace Phoenix\Minify;
 
-use MatthiasMullie\Minify\JS;
-use MatthiasMullie\Minify\Minify;
+use Asika\Minifier\JsMinifier;
+use Asika\Minifier\MinifierInterface;
 
 /**
  * The JsMinify class.
@@ -24,6 +24,7 @@ class JsMinify extends AbstractAssetMinify
 	 * @var  string
 	 */
 	protected $type = 'js';
+
 	/**
 	 * getStorage
 	 *
@@ -37,11 +38,11 @@ class JsMinify extends AbstractAssetMinify
 	/**
 	 * getMinifier
 	 *
-	 * @return  Minify
+	 * @return  MinifierInterface
 	 */
 	protected function createMinifier()
 	{
-		return new JS;
+		return new JsMinifier;
 	}
 
 	/**
