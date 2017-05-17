@@ -15,6 +15,7 @@ use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
+use Windwalker\Record\Exception\NoResultException;
 
 /**
  * The AbstractBatchController class.
@@ -77,10 +78,17 @@ abstract class AbstractBatchController extends AbstractPostController
 	/**
 	 * save
 	 *
-	 * @param   string|int     $pk
-	 * @param   DataInterface  $data
+	 * @param   string|int    $pk
+	 * @param   DataInterface $data
 	 *
 	 * @return  DataInterface
+	 *
+	 * @throws NoResultException
+	 * @throws ValidateFailException
+	 * @throws \UnexpectedValueException
+	 * @throws \LogicException
+	 * @throws \InvalidArgumentException
+	 * @throws \RuntimeException
 	 */
 	protected function save($pk, DataInterface $data)
 	{
@@ -92,7 +100,7 @@ abstract class AbstractBatchController extends AbstractPostController
 	/**
 	 * doExecute
 	 *
-	 * @return mixed
+	 * @return bool[]
 	 * @throws \Exception
 	 */
 	protected function doExecute()
@@ -117,13 +125,59 @@ abstract class AbstractBatchController extends AbstractPostController
 
 		$this->preSave($data);
 
+		$results = [];
+
 		foreach ((array) $this->pks as $pk)
 		{
+			if (!$this->checkItemAccess($pk, $data))
+			{
+				$results[] = false;
+				continue;
+			}
+
+			if (!$this->validateItem($pk, $data))
+			{
+				$results[] = false;
+				continue;
+			}
+
 			$this->save($pk, clone $data);
+
+			$results[] = true;
 		}
 
 		$this->postSave($data);
 
+		return $results;
+	}
+
+	/**
+	 * validateItem
+	 *
+	 * @param int           $pk
+	 * @param DataInterface $data
+	 *
+	 * @return  bool
+	 *
+	 * @throws ValidateFailException
+	 */
+	protected function validateItem($pk, DataInterface $data)
+	{
+		return true;
+	}
+
+	/**
+	 * checkItemAccess
+	 *
+	 * @param int           $pk
+	 * @param DataInterface $data
+	 *
+	 * @return  bool
+	 *
+	 * @throws \RuntimeException
+	 */
+	protected function checkItemAccess($pk, DataInterface $data)
+	{
 		return true;
 	}
 
@@ -148,7 +202,7 @@ abstract class AbstractBatchController extends AbstractPostController
 	 */
 	protected function preSave(DataInterface $data)
 	{
-
+		// Do some stuff
 	}
 
 	/**
