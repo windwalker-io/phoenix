@@ -5,6 +5,8 @@
 
 $search = !(isset($search) && $search === false);
 $filter = !(isset($filter) && $filter === false);
+
+$filterFields = $form->getFields(null, 'filter');
 ?>
 {{-- Mobile Title --}}
 <h3 class="visible-xs-block">
@@ -43,7 +45,7 @@ $filter = !(isset($filter) && $filter === false);
         {{-- Search Button --}}
         <div class="btn-group filter-buttons-group">
 
-            @if ($filter)
+            @if ($filter && count($filterFields))
             {{-- Filter Toggle Button --}}
             <button type="button" class="btn {{ $show ? 'btn-primary' : 'btn-default' }} filter-toggle-button hasTooltip"
                 data-class-show="btn-primary"
@@ -69,7 +71,7 @@ $filter = !(isset($filter) && $filter === false);
     </div>
 @endif
 
-@if ($filter)
+@if ($filter && count($filterFields))
     {{-- Filter Bar --}}
     <div class="filter-container row {{ $show ? 'shown' : null }}" style="{{ $show ? null : 'display: none;' }}">
         @foreach($form->getFields(null, 'filter') as $field)
