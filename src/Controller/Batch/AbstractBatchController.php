@@ -56,6 +56,13 @@ abstract class AbstractBatchController extends AbstractPostController
 	protected $pks = [];
 
 	/**
+	 * Property emptyMark.
+	 *
+	 * @var  string
+	 */
+	protected $emptyMark = '__EMPTY__';
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
@@ -73,7 +80,7 @@ abstract class AbstractBatchController extends AbstractPostController
 	 * @param   string|int     $pk
 	 * @param   DataInterface  $data
 	 *
-	 * @return  boolean
+	 * @return  DataInterface
 	 */
 	protected function save($pk, DataInterface $data)
 	{
@@ -108,14 +115,16 @@ abstract class AbstractBatchController extends AbstractPostController
 
 		$this->validate($data);
 
-		$this->preSave($data);
-
 		foreach ((array) $this->pks as $pk)
 		{
-			$this->save($pk, clone $data);
-		}
+			$temp = clone $data;
 
-		$this->postSave($data);
+			$this->preSave($temp);
+
+			$this->save($pk, $temp);
+
+			$this->postSave($temp);
+		}
 
 		return true;
 	}
@@ -141,7 +150,7 @@ abstract class AbstractBatchController extends AbstractPostController
 	 */
 	protected function preSave(DataInterface $data)
 	{
-		// Do some stuff
+
 	}
 
 	/**
@@ -171,6 +180,14 @@ abstract class AbstractBatchController extends AbstractPostController
 			if ((string) $value === '')
 			{
 				unset($data[$k]);
+			}
+			elseif ($value === $this->emptyMark)
+			{
+				$data[$k] = '';
+			}
+			elseif ($value === '\\' . $this->emptyMark)
+			{
+				$data[$k] = $this->emptyMark;
 			}
 		}
 
