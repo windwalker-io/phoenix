@@ -8,6 +8,8 @@
 
 namespace Phoenix\Controller\Batch;
 
+use Phoenix\Model\FormAwareRepositoryInterface;
+
 /**
  * The BatchController class.
  *
@@ -31,6 +33,43 @@ abstract class AbstractUpdateController extends AbstractBatchController
 	{
 		parent::prepareExecute();
 
-		$this->data = array_merge($this->input->getVar('batch', []), (array) $this->data);
+		$this->data = $this->getUpdateData();
+	}
+
+	/**
+	 * getUpdateData
+	 *
+	 * @return  array
+	 */
+	protected function getUpdateData()
+	{
+		$data = array_merge($this->input->getArray('batch'), (array) $this->data);
+
+		return $this->filter($data);
+	}
+
+	/**
+	 * filter
+	 *
+	 * @param array $data
+	 *
+	 * @return  array
+	 *
+	 * @throws \DomainException
+	 */
+	protected function filter($data)
+	{
+		/** @var FormAwareRepositoryInterface $model */
+		$model = $this->getModel($this->getName());
+
+		$form = $model->getForm('grid');
+
+		$form->bind(['batch' => $data]);
+
+		$form->filter();
+
+		$data = $form->getValues(null, 'batch');
+
+		return $data['batch'];
 	}
 }

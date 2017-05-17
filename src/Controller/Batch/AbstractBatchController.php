@@ -115,16 +115,14 @@ abstract class AbstractBatchController extends AbstractPostController
 
 		$this->validate($data);
 
+		$this->preSave($data);
+
 		foreach ((array) $this->pks as $pk)
 		{
-			$temp = clone $data;
-
-			$this->preSave($temp);
-
-			$this->save($pk, $temp);
-
-			$this->postSave($temp);
+			$this->save($pk, clone $data);
 		}
+
+		$this->postSave($data);
 
 		return true;
 	}
