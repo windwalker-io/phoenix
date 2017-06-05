@@ -8,7 +8,7 @@
 
 namespace Phoenix\View;
 
-use Phoenix\Model\FormAwareRepositoryInterface;
+use Phoenix\Repository\FormAwareRepositoryInterface;
 use Windwalker\Core\Language\Translator;
 
 /**

@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Phoenix\Model\FormAwareRepositoryInterface;
+use Phoenix\Repository\FormAwareRepositoryInterface;
 
 /**
  * The BatchController class.

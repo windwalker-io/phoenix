@@ -8,8 +8,8 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\CrudModel;
-use Phoenix\Model\CrudRepositoryInterface;
+use Phoenix\Repository\CrudRepository;
+use Phoenix\Repository\CrudRepositoryInterface;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
@@ -21,7 +21,7 @@ use Windwalker\Uri\Uri;
 /**
  * The AbstractAdminController class.
  *
- * @method  CrudModel  getModel($name = null, $source = null, $forceNew = false)
+ * @method  CrudRepository  getModel($name = null, $source = null, $forceNew = false)
  *
  * @since  1.0
  */
@@ -30,7 +30,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	/**
 	 * Property model.
 	 *
-	 * @var  CrudModel
+	 * @var  CrudRepository
 	 */
 	protected $model;
 

@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Phoenix\Model\AdminModel;
+use Phoenix\Repository\AdminRepository;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Data\Data;
@@ -32,7 +32,7 @@ abstract class AbstractReorderController extends AbstractBatchController
 	/**
 	 * Property model.
 	 *
-	 * @var  AdminModel
+	 * @var  AdminRepository
 	 */
 	protected $model;
 
@@ -54,7 +54,7 @@ abstract class AbstractReorderController extends AbstractBatchController
 		$this->data  = $this->input->getVar('ordering', []);
 
 		// Determine model
-		if (!$this->model instanceof AdminModel)
+		if (!$this->model instanceof AdminRepository)
 		{
 			throw new \UnexpectedValueException(sprintf('%s model need extend to AdminModel', $this->getName()));
 		}

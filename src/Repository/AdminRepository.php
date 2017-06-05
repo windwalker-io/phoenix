@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\Model;
+namespace Phoenix\Repository;
 
 use Windwalker\Core\User\User;
 use Windwalker\Core\DateTime\Chronos;
@@ -19,7 +19,7 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
+abstract class AdminRepository extends CrudRepository implements AdminRepositoryInterface
 {
 	/**
 	 * Property reorderConditions.

@@ -8,16 +8,16 @@
 
 namespace Phoenix\Controller\Display;
 
-use Phoenix\Model\AdminModel;
-use Phoenix\Model\CrudModel;
-use Phoenix\Model\FormAwareRepositoryInterface;
+use Phoenix\Repository\AdminRepository;
+use Phoenix\Repository\CrudRepository;
+use Phoenix\Repository\FormAwareRepositoryInterface;
 use Phoenix\View\EditView;
 use Windwalker\Core\Model\ModelRepository;
 
 /**
  * The EditGetController class.
  *
- * @method  AdminModel|CrudModel  getModel($name = null, $source = null, $forceNew = false)
+ * @method  AdminRepository|CrudRepository  getModel($name = null, $source = null, $forceNew = false)
  * @method  EditView              getView($name = null, $format = 'html', $engine = null, $forceNew = false)
  *
  * @since  1.0.5

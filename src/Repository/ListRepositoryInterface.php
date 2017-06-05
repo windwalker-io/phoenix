@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\Model;
+namespace Phoenix\Repository;
 
 use Windwalker\Data\DataSet;
 

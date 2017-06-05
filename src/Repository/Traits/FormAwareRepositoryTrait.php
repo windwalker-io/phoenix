@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Phoenix\Model\Traits;
+namespace Phoenix\Repository\Traits;
 
 use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
 use Phoenix\Form\NullFiledDefinition;

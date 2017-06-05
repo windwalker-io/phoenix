@@ -6,12 +6,12 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Phoenix\Model;
+namespace Phoenix\Repository;
 
-use Phoenix\Model\Filter\FilterHelper;
-use Phoenix\Model\Filter\FilterHelperInterface;
-use Phoenix\Model\Filter\SearchHelper;
-use Phoenix\Model\Traits\FormAwareRepositoryTrait;
+use Phoenix\Repository\Filter\FilterHelper;
+use Phoenix\Repository\Filter\FilterHelperInterface;
+use Phoenix\Repository\Filter\SearchHelper;
+use Phoenix\Repository\Traits\FormAwareRepositoryTrait;
 use Windwalker\Core\Model\DatabaseModelRepository;
 use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\DataSet;
@@ -24,7 +24,7 @@ use Windwalker\Utilities\Arr;
  *
  * @since  1.0
  */
-class ListModel extends DatabaseModelRepository implements ListRepositoryInterface, FormAwareRepositoryInterface
+class ListRepository extends DatabaseModelRepository implements ListRepositoryInterface, FormAwareRepositoryInterface
 {
 	use FormAwareRepositoryTrait;
 
