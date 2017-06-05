@@ -13,8 +13,8 @@ include_once __DIR__ . '/../../../autoload.php';
 $assets = [
 	'underscore' => [
 		'underscore.js' => 'js/core/underscore.js',
-		'underscore.min.js' => 'js/core/underscore.min.js',
-		'underscore.min.map' => 'js/core/underscore.min.map',
+		'underscore-min.js' => 'js/core/underscore.min.js',
+		'underscore-min.map' => 'js/core/underscore.min.map',
 	],
 	'underscore.string' => [
 		'dist/underscore.string.js' => 'js/core/underscore.string.js',
@@ -25,8 +25,8 @@ $assets = [
 	],
 	'backbone' => [
 		'backbone.js' => 'js/core/backbone.js',
-		'backbone.min.js' => 'js/core/backbone.min.js',
-		'backbone.min.map' => 'js/core/backbone.min.map',
+		'backbone-min.js' => 'js/core/backbone.min.js',
+		'backbone-min.map' => 'js/core/backbone.min.map',
 	],
 	'punycode' => [
 		'punycode.js' => 'js/string/punycode.js'
@@ -64,8 +64,7 @@ $assets = [
 	],
 	'vuex' => [
 		'dist/vuex.js' => 'js/vue/vuex.js',
-		'dist/vuex.min.js' => 'js/vue/vuex.min.js',
-		'dist/vuex.js.map' => 'js/vue/vuex.js.map',
+		'dist/vuex.min.js' => 'js/vue/vuex.min.js'
 	],
 	'vue2-animate' => [
 		'dist/vue2-animate.css' => 'css/vue/vue2-animate.css',
