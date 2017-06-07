@@ -131,19 +131,19 @@ abstract class AbstractBatchController extends AbstractPostController
 		{
 			if (!$this->checkItemAccess($pk, $data))
 			{
-				$results[] = false;
+				$results[$pk] = false;
 				continue;
 			}
 
 			if (!$this->validateItem($pk, $data))
 			{
-				$results[] = false;
+				$results[$pk] = false;
 				continue;
 			}
 
 			$this->save($pk, clone $data);
 
-			$results[] = true;
+			$results[$pk] = true;
 		}
 
 		$this->postSave($data);
