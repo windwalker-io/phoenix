@@ -137,7 +137,7 @@
             {!! \Windwalker\Core\Security\CsrfProtection::input() !!}
         </div>
 
-        @include('batch')
+        @include('_global.{$package.name.lower$}.widget.batch')
     </form>
 </div>
 @stop
