@@ -151,10 +151,6 @@
 // End deletable section
 
 // Global
-.nowrap {
-    white-space : nowrap;
-}
-
 .clearfix {
     clear : both;
 }

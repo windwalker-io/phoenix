@@ -103,9 +103,6 @@ body.sidebar-hide .main-body {
     margin-left: 0;
   }
 }
-.nowrap {
-  white-space: nowrap;
-}
 .clearfix {
   clear: both;
 }

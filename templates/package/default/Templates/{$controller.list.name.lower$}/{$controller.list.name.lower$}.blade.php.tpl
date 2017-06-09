@@ -67,7 +67,7 @@
                     </th>
 
                     {{-- ORDERING --}}
-                    <th width="5%" class="nowrap">
+                    <th width="5%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!} {!! $grid->saveOrderButton() !!}
                     </th>
 

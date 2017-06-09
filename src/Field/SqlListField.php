@@ -119,7 +119,7 @@ class SqlListField extends ListField
 	 *
 	 * @return  array
 	 *
-	 * @since   3.1.2
+	 * @since   1.3.2
 	 */
 	protected function getAccessors()
 	{
