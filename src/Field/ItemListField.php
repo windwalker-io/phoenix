@@ -14,6 +14,13 @@ use Windwalker\Query\Query;
 /**
  * The ItemlistField class.
  *
+ * @method $this table($value)
+ * @method $this published($value)
+ * @method $this stateField($value)
+ * @method $this ordering($value)
+ * @method $this select(mixed $value)
+ * @method $this postQueryHandler(callable $callback)
+ *
  * @since  1.0
  */
 class ItemListField extends SqlListField
@@ -51,7 +58,7 @@ class ItemListField extends SqlListField
 
 		if ($this->get('published'))
 		{
-			$query->where($query->quoteName($this->get('stateField', 'state')) . ' >= 1');
+			$query->where($query->quoteName($this->get('state_field', 'state')) . ' >= 1');
 		}
 
 		if ($ordering = $this->get('ordering', $this->ordering))
@@ -66,7 +73,7 @@ class ItemListField extends SqlListField
 
 		$this->postQuery($query);
 
-		$postQuery = $this->get('postQuery');
+		$postQuery = $this->get('post_query', $this->get('postQuery'));
 
 		if (is_callable($postQuery))
 		{
@@ -85,6 +92,25 @@ class ItemListField extends SqlListField
 	 */
 	protected function postQuery(Query $query)
 	{
+		//
+	}
 
+	/**
+	 * getAccessors
+	 *
+	 * @return  array
+	 *
+	 * @since   3.1.2
+	 */
+	protected function getAccessors()
+	{
+		return array_merge(parent::getAccessors(), [
+			'table',
+			'published',
+			'stateField' => 'state_field',
+			'ordering',
+			'select',
+			'postQueryHandler' => 'post_query'
+		]);
 	}
 }

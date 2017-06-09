@@ -66,7 +66,7 @@ class EditDefinition extends AbstractFieldDefinition
 			// Example: {$controller.item.name.cap$} List
 			$this->add('{$controller.item.name.lower$}_list', {$controller.item.name.cap$}ListField::class)
 				->label('List Example')
-				->setClass('hasChosen');
+				->addClass('hasChosen');
 
 			// Example: {$controller.item.name.cap$} Modal
 			$this->add('{$controller.item.name.lower$}_modal', {$controller.item.name.cap$}ModalField::class)
@@ -79,12 +79,12 @@ class EditDefinition extends AbstractFieldDefinition
 			// Introtext
 			$this->textarea('introtext')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
-				->set('rows', 10);
+				->rows(10);
 
 			// Fulltext
 			$this->textarea('fulltext')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
-				->set('rows', 10);
+				->rows(10);
 		});
 
 		// Created fieldset
@@ -93,8 +93,8 @@ class EditDefinition extends AbstractFieldDefinition
 			// State
 			$this->radio('state')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.state'))
-				->set('class', 'btn-group hasChosen')
-				->set('default', 1)
+				->addClass('btn-group hasChosen')
+				->defaultValue(1)
 				->option(Translator::translate('phoenix.grid.state.published'), '1')
 				->option(Translator::translate('phoenix.grid.state.unpublished'), '0');
 

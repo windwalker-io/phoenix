@@ -16,6 +16,11 @@ use Windwalker\Form\Field\TextField;
 /**
  * The CalendarField class.
  *
+ * @method $this from($value)
+ * @method $this to($value)
+ * @method $this format($value)
+ * @method $this calendarOptions(array $options)
+ *
  * @since  1.0
  */
 class CalendarField extends TextField
@@ -67,5 +72,22 @@ class CalendarField extends TextField
 			'field'  => $this,
 			'options' => (array) $this->get('options')
 		], WidgetHelper::EDGE);
+	}
+
+	/**
+	 * getAccessors
+	 *
+	 * @return  array
+	 *
+	 * @since   3.1.2
+	 */
+	protected function getAccessors()
+	{
+		return array_merge(parent::getAccessors(), [
+			'from',
+			'to',
+			'format',
+			'calendarOptions' => 'options'
+		]);
 	}
 }

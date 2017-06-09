@@ -15,6 +15,11 @@ use Windwalker\Ioc;
 /**
  * The SqlListField class.
  *
+ * @method $this textField($value)
+ * @method $this valueField($value)
+ * @method $this query($value)
+ * @method $this optionAttribs($value)
+ *
  * @since  1.0
  */
 class SqlListField extends ListField
@@ -107,5 +112,22 @@ class SqlListField extends ListField
 		}
 
 		return (array) $db->setQuery($query)->loadAll();
+	}
+
+	/**
+	 * getAccessors
+	 *
+	 * @return  array
+	 *
+	 * @since   3.1.2
+	 */
+	protected function getAccessors()
+	{
+		return array_merge(parent::getAccessors(), [
+			'query',
+			'textField' => 'text_field',
+			'valueField' => 'value_field',
+			'optionAttribs' => 'option_attribs'
+		]);
 	}
 }

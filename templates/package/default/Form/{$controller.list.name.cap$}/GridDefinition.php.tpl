@@ -48,7 +48,7 @@ class GridDefinition extends AbstractFieldDefinition
 			// Search Content
 			$this->text('content')
 				->label(Translator::translate('phoenix.grid.search.label'))
-				->set('placeholder', Translator::translate('phoenix.grid.search.label'));
+				->placeholder(Translator::translate('phoenix.grid.search.label'));
 		});
 
 		/*
@@ -64,13 +64,13 @@ class GridDefinition extends AbstractFieldDefinition
 			// State
 			$this->list('{$controller.item.name.lower$}.state')
 				->label('State')
-				->setClass('hasChosen')
+				->addClass('hasChosen')
 				// Add empty option to support single deselect button
 				->option('', '')
 				->option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select'), '')
 				->option(Translator::translate('phoenix.grid.state.published'), '1')
 				->option(Translator::translate('phoenix.grid.state.unpublished'), '0')
-				->set('onchange', 'this.form.submit()');
+				->onchange('this.form.submit()');
 		});
 		
 		/*
@@ -84,7 +84,7 @@ class GridDefinition extends AbstractFieldDefinition
 			// Language
 			$this->list('language')
 				->label('Language')
-				->setClass('col-md-12 hasChosen')
+				->addClass('col-md-12 hasChosen')
 				->option('-- Select Language --', '')
 				->option('English', 'en-GB')
 				->option('Chinese Traditional', 'zh-TW');
