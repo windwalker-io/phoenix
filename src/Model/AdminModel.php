@@ -8,8 +8,8 @@
 
 namespace Phoenix\Model;
 
-use Windwalker\Core\User\User;
 use Windwalker\Core\DateTime\Chronos;
+use Windwalker\Core\User\User;
 use Windwalker\Data\DataInterface;
 use Windwalker\Filter\OutputFilter;
 use Windwalker\Record\Record;

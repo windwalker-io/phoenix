@@ -8,7 +8,6 @@
 
 namespace Phoenix\Minify;
 
-use Asika\Minifier\AbstractMinifier;
 use Asika\Minifier\CssMinifier;
 use Asika\Minifier\MinifierInterface;
 
