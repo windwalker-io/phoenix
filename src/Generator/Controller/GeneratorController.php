@@ -15,8 +15,8 @@ use Phoenix\Generator\Provider\MuseProvider;
 use Windwalker\Console\Command\Command;
 use Windwalker\DI\Container;
 use Windwalker\Ioc;
-use Windwalker\Structure\Structure;
 use Windwalker\String\StringNormalise;
+use Windwalker\Structure\Structure;
 
 /**
  * The GeneratorController class.

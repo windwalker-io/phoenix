@@ -10,8 +10,6 @@ namespace Phoenix\Command\Phoenix\Asset;
 
 use Asika\Minifier\CssMinifier;
 use Asika\Minifier\JsMinifier;
-use MatthiasMullie\Minify\CSS;
-use MatthiasMullie\Minify\JS;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Filesystem\File;

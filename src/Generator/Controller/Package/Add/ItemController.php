@@ -9,9 +9,9 @@
 namespace Phoenix\Generator\Controller\Package\Add;
 
 use Phoenix\Generator\Action\Package\AddSeederAction;
-use Phoenix\Generator\Action\Package\MigrateAction;
 use Phoenix\Generator\Action\Package\AddTableNameAction;
 use Phoenix\Generator\Action\Package\CopyMigrationAction;
+use Phoenix\Generator\Action\Package\MigrateAction;
 use Phoenix\Generator\Action\Package\SeedAction;
 use Phoenix\Generator\Action\Package\Subsystem;
 use Phoenix\Generator\Controller\Package\AbstractPackageController;

@@ -8,7 +8,6 @@
 
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Pagination\PaginationResult;
-use Windwalker\Data\Data;
 
 /**
  * @var PaginationResult $pagination

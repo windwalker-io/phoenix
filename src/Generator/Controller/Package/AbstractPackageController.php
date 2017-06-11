@@ -12,9 +12,9 @@ use Muse\Controller\AbstractTaskController;
 use Muse\IO\IOInterface;
 use Windwalker\DI\Container;
 use Windwalker\Filesystem\Path;
-use Windwalker\Structure\Structure;
 use Windwalker\String\StringInflector;
 use Windwalker\String\StringNormalise;
+use Windwalker\Structure\Structure;
 
 /**
  * The AbstractPackageController class.

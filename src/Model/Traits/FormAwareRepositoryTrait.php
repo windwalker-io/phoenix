@@ -8,12 +8,12 @@
 
 namespace Phoenix\Model\Traits;
 
-use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
 use Phoenix\Form\NullFiledDefinition;
 use Phoenix\Form\Renderer\InputRenderer;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Mvc\MvcHelper;
+use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
