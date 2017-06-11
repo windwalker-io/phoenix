@@ -67,9 +67,9 @@ class FieldDefinitionGenerator
 \$this->text('$name')
 	->label('$label')
 	->description('{$column->Comment}')
-	->set('class', '')
-	->set('labelClass', '')
-	->set('default', null);
+	->class('')
+	->labelClass('')
+	->defaultValue(null);
 HTML;
 	}
 
@@ -92,9 +92,9 @@ HTML;
 	->description('{$column->Comment}')
 	->option('Yes', 1)
 	->option('No', 0)
-	->set('class', '')
-	->set('labelClass', '')
-	->set('default', 1);
+	->class('')
+	->labelClass('')
+	->defaultValue(1);
 HTML;
 	}
 
@@ -128,9 +128,9 @@ HTML;
 	->label('$label')
 	->description('{$column->Comment}')
 	$options
-	->set('class', '')
-	->set('labelClass', '')
-	->set('default', 1);
+	->class('')
+	->labelClass('')
+	->defaultValue(1);
 HTML;
 	}
 
@@ -151,10 +151,10 @@ HTML;
 \$this->textarea('$name')
 	->label('$label')
 	->description('{$column->Comment}')
-	->set('class', '')
-	->set('labelClass', '')
-	->set('rows', 7)
-	->set('default', null);
+	->class('')
+	->labelClass('')
+	->rows(7)
+	->defaultValue(null);
 HTML;
 	}
 
@@ -223,17 +223,17 @@ HTML;
 \$this->password('$name')
 	->description('Password')
 	->label('$label')
-	->set('class', '')
-	->set('labelClass', '')
-	->set('autocomplete', 'off');
+	->class('')
+	->labelClass('')
+	->autocomplete('off');
 
 // Confirm Password
 \$this->password('password2')
 	->label('Confirm Password')
 	->description('Confirm Password')
-	->set('class', '')
-	->set('labelClass', '')
-	->set('autocomplete', 'off');
+	->class('')
+	->labelClass('')
+	->autocomplete('off');
 HTML;
 	}
 
@@ -254,9 +254,9 @@ HTML;
 \$this->calendar('$name')
 	->label('$label')
 	->description('{$column->Comment}')
-	->set('class', '')
-	->set('labelClass', '')
-	->set('default', null);
+	->class('')
+	->labelClass('')
+	->defaultValue(null);
 HTML;
 	}
 }

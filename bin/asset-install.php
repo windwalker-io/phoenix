@@ -84,6 +84,11 @@ $assets = [
 	],
 	'sprintf-js' => [
 		'dist/sprintf.min.js' => 'js/core/sprintf.min.js'
+	],
+	'ivia' => [
+		'dist/ivia.js' => 'js/ivia/ivia.js',
+		'dist/ivia.min.js' => 'js/ivia/ivia.min.js',
+		'dist/ivia.js.map' => 'js/ivia/ivia.js.map',
 	]
 ];
 

@@ -36,7 +36,7 @@ class MailgunProvider implements ServiceProviderInterface
 
 		$container->prepareSharedObject(MailgunAdapter::class)
 			->alias('mailer.adapter.mailgun', MailgunAdapter::class)
-			->alias(MailerAdapterInterface::class, MailgunAdapter::class);
+			->bindShared(MailerAdapterInterface::class, MailgunAdapter::class);
 	}
 
 	/**
@@ -51,7 +51,7 @@ class MailgunProvider implements ServiceProviderInterface
 	 */
 	public function mailgun(Container $container)
 	{
-		if (!class_exists(\SendGrid::class))
+		if (!class_exists(Mailgun::class))
 		{
 			throw new \LogicException('Please install mailgun/mailgun-php first.');
 		}

@@ -207,4 +207,19 @@ JS;
 			static::addJS(static::phoenixName() . '/js/core/sprintf.min.js');
 		}
 	}
+
+	/**
+	 * ivia
+	 *
+	 * @return  void
+	 *
+	 * @since  1.3.3
+	 */
+	public static function ivia()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::addJS(static::phoenixName() . '/js/ivia/ivia.min.js');
+		}
+	}
 }

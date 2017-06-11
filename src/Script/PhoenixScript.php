@@ -429,11 +429,11 @@ JS;
 	 * store
 	 *
 	 * @param string $name
-	 * @param array  $store
+	 * @param mixed  $store
 	 *
 	 * @return  void
 	 */
-	public static function store($name, array $store)
+	public static function store($name, $store)
 	{
 		if (!static::inited(__METHOD__))
 		{

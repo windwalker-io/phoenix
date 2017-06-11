@@ -35,7 +35,7 @@ class SendgridProvider implements ServiceProviderInterface
 
 		$container->prepareSharedObject(SendGridAdapter::class)
 			->alias('mailer.adapter.sendgrid', SendGridAdapter::class)
-			->alias(MailerAdapterInterface::class, SendGridAdapter::class);
+			->bindShared(MailerAdapterInterface::class, SendGridAdapter::class);
 	}
 
 	/**

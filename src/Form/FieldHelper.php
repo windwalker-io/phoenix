@@ -57,7 +57,7 @@ class FieldHelper
 				JQueryScript::dependsOn(
 					'#' . Arr::get($attribs, 'id'),
 					[
-						sprintf('input[name="%s"]', $target->getFieldName()) => ['values' => $values]
+						sprintf('*[name="%s"]', $target->getFieldName()) => ['values' => $values]
 					]
 				);
 			}
