@@ -22,35 +22,18 @@ use Windwalker\Core\View\AbstractView;
 class GetController extends ListDisplayController
 {
 	/**
-	 * Property name.
+	 * The default Model.
 	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.list.name.cap$}';
-
-	/**
-	 * Property itemName.
-	 *
-	 * @var  string
-	 */
-	protected $itemName = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property listName.
-	 *
-	 * @var  string
-	 */
-	protected $listName = '{$controller.list.name.cap$}';
-
-	/**
-	 * Property model.
+	 * If set model name here, controller will get model object by this name.
 	 *
 	 * @var  {$controller.list.name.cap$}Model
 	 */
 	protected $model = '{$controller.list.name.cap$}';
 
 	/**
-	 * Property view.
+	 * Main View.
+	 *
+	 * If set view name here, controller will get model object by this name.
 	 *
 	 * @var  {$controller.list.name.cap$}HtmlView
 	 */
@@ -73,7 +56,16 @@ class GetController extends ListDisplayController
 	protected $defaultDirection = 'DESC';
 
 	/**
-	 * prepareExecute
+	 * The list limit per page..
+	 *
+	 * Use 0 to set unlimited.
+	 *
+	 * @var integer
+	 */
+	protected $limit;
+
+	/**
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -86,26 +78,36 @@ class GetController extends ListDisplayController
 	}
 
 	/**
-	 * prepareUserState
+	 * Prepare view and default model.
 	 *
-	 * @param   ModelRepository|{$controller.list.name.cap$}Model $model
+	 * You can configure default model state here, or add more sub models to view.
+	 * Remember to call parent to make sure default model already set in view.
+	 *
+	 * @param AbstractView    $view  The view to render page.
+	 * @param ModelRepository $model The default mode.
 	 *
 	 * @return  void
 	 */
-	protected function prepareModelState(ModelRepository $model)
+	protected function prepareViewModel(AbstractView $view, ModelRepository $model)
 	{
-		parent::prepareModelState($model);
+		/**
+		 * @var $view  {$controller.list.name.cap$}HtmlView
+		 * @var $model {$controller.list.name.cap$}Model
+		 */
+		parent::prepareViewModel($view, $model);
+
+		// Configure view and model here...
 	}
 
 	/**
-	 * prepareViewData
+	 * A hook after main process executing.
 	 *
-	 * @param   AbstractView|{$controller.list.name.cap$}HtmlView $view
+	 * @param mixed $result The result content to return, can be any value or boolean.
 	 *
-	 * @return  void
+	 * @return  mixed
 	 */
-	protected function prepareViewData(AbstractView $view)
+	protected function postExecute($result = null)
 	{
-		parent::prepareViewData($view);
+		return parent::postExecute($result);
 	}
 }

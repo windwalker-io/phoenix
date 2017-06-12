@@ -17,5 +17,5 @@ use Phoenix\Controller\Batch\AbstractPublishController;
  */
 class PublishController extends AbstractPublishController
 {
-
+	//
 }

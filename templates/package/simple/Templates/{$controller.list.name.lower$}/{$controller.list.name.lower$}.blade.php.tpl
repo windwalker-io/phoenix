@@ -39,7 +39,7 @@
     </div>
     <hr />
     <div class="pagination">
-        {!! $pagination->route('{$controller.list.name.lower$}', [])->render('{$controller.list.name.lower$}') !!}
+        {!! $pagination->route('{$controller.list.name.lower$}', [])->render() !!}
     </div>
 </div>
 @stop

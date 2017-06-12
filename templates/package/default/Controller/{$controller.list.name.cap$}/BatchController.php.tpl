@@ -19,25 +19,13 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 class BatchController extends BatchDelegatingController
 {
 	use CsrfProtectionTrait;
-	
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.list.name.cap$}';
 
 	/**
-	 * Property itemName.
+	 * The default model.
+	 *
+	 * Keep model name here to make sure controller get singular model to handle update.
 	 *
 	 * @var  string
 	 */
-	protected $itemName = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property listName.
-	 *
-	 * @var  string
-	 */
-	protected $listName = '{$controller.list.name.cap$}';
+	protected $model = '{$controller.item.name.cap$}';
 }

@@ -43,7 +43,7 @@ abstract class AbstractCopyController extends AbstractBatchController
 	];
 
 	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */

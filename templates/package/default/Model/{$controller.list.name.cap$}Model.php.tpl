@@ -9,8 +9,8 @@
 namespace {$package.namespace$}{$package.name.cap$}\Model;
 
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
-use Phoenix\Model\ListModel;
 use Phoenix\Model\Filter\FilterHelperInterface;
+use Phoenix\Model\ListModel;
 use Windwalker\Query\Query;
 
 /**

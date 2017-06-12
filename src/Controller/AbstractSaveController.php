@@ -46,7 +46,7 @@ abstract class AbstractSaveController extends AbstractPostController
 	protected $formControl = 'item';
 
 	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -132,9 +132,9 @@ abstract class AbstractSaveController extends AbstractPostController
 	}
 
 	/**
-	 * preSave
+	 * A hook before save.
 	 *
-	 * @param DataInterface $data
+	 * @param DataInterface $data Data to save.
 	 *
 	 * @return void
 	 */
@@ -143,9 +143,9 @@ abstract class AbstractSaveController extends AbstractPostController
 	}
 
 	/**
-	 * postSave
+	 * A hook after save.
 	 *
-	 * @param DataInterface $data
+	 * @param DataInterface $data Data saved.
 	 *
 	 * @return  void
 	 */

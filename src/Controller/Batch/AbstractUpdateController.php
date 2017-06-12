@@ -25,7 +25,7 @@ abstract class AbstractUpdateController extends AbstractBatchController
 	protected $action = 'move';
 
 	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */

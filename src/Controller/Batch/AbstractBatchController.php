@@ -64,7 +64,7 @@ abstract class AbstractBatchController extends AbstractPostController
 	protected $emptyMark = '__EMPTY__';
 
 	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */

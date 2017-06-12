@@ -10,6 +10,7 @@ namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Controller\AbstractController;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\String\StringNormalise;
 
 /**
@@ -54,19 +55,20 @@ class BatchDelegatingController extends AbstractPhoenixController
 			throw new \DomainException(StringNormalise::toClassNamespace($this->getName() . '\Batch\\' . $task) . 'Controller not found');
 		}
 
+		// Keep model is string or null.
+		$model = $this->model instanceof ModelRepository ? null : $this->model;
+
 		/** @var AbstractController $controller */
 		$controller = new $class;
 		$controller->setName($this->getName());
-		$controller->config->set('item_name', $this->config['item_name']);
+		$controller->config->set('item_name', $model ? : $this->config['item_name']);
 		$controller->config->set('list_name', $this->config['list_name']);
 		
-		$this->hmvc($controller, $this->input->compact(
-			[
+		$this->hmvc($controller, $this->input->compact([
 			'id'       => 'array',
 			'batch'    => 'var',
 			'ordering' => 'var',
-			]
-		));
+		]));
 
 		return true;
 	}

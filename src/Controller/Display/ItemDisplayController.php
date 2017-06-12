@@ -42,6 +42,8 @@ class ItemDisplayController extends DisplayController
 	 * @param ModelRepository $model
 	 *
 	 * @return void
+	 *
+	 * @deprecated Override prepareViewModel() instead.
 	 */
 	protected function prepareModelState(ModelRepository $model)
 	{

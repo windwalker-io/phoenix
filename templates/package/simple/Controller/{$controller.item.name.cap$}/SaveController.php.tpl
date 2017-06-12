@@ -10,11 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use Phoenix\Controller\AbstractSaveController;
-use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Data\DataInterface;
-use Windwalker\Data\Data;
-use Windwalker\DataMapper\Entity\Entity;
-use Windwalker\Router\Exception\RouteNotFoundException;
 
 /**
  * The SaveController class.
@@ -45,35 +41,16 @@ class SaveController extends AbstractSaveController
 	protected $listName = '{$controller.list.name.cap$}';
 
 	/**
-	 * Property model.
+	 * The default Model.
+	 *
+	 * If set model name here, controller will get model object by this name.
 	 *
 	 * @var  {$controller.item.name.cap$}Model
 	 */
-	protected $model;
+	protected $model = '{$controller.item.name.cap$}';
 
 	/**
-	 * Property useTransaction.
-	 *
-	 * @var  bool
-	 */
-	protected $useTransaction = false;
-
-	/**
-	 * checkAccess
-	 *
-	 * @param   array|DataInterface $data
-	 *
-	 * @return  boolean
-	 *
-	 * @throws  RouteNotFoundException
-	 */
-	public function checkAccess($data)
-	{
-		return true;
-	}
-
-	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -83,9 +60,9 @@ class SaveController extends AbstractSaveController
 	}
 
 	/**
-	 * preSave
+	 * A hook before save.
 	 *
-	 * @param DataInterface $data
+	 * @param DataInterface $data Data to save.
 	 *
 	 * @return void
 	 */
@@ -95,23 +72,9 @@ class SaveController extends AbstractSaveController
 	}
 
 	/**
-	 * validate
+	 * A hook after save.
 	 *
-	 * @param   DataInterface|Entity $data
-	 *
-	 * @return  void
-	 *
-	 * @throws ValidateFailException
-	 */
-	protected function validate(DataInterface $data)
-	{
-		parent::validate($data);
-	}
-
-	/**
-	 * postSave
-	 *
-	 * @param DataInterface $data
+	 * @param DataInterface $data Data saved.
 	 *
 	 * @return  void
 	 */
@@ -121,9 +84,9 @@ class SaveController extends AbstractSaveController
 	}
 
 	/**
-	 * postExecute
+	 * A hook after main process executing.
 	 *
-	 * @param mixed $result
+	 * @param mixed $result The result content to return, can be any value or boolean.
 	 *
 	 * @return  mixed
 	 */

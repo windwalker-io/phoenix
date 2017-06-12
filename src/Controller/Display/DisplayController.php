@@ -14,6 +14,7 @@ use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Response\HtmlViewResponse;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\LayoutRenderableInterface;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Response;
 
@@ -25,35 +26,30 @@ use Windwalker\Http\Response;
 class DisplayController extends AbstractPhoenixController
 {
 	/**
-	 * Default model.
+	 * Main View.
 	 *
-	 * @var  ModelRepository
-	 */
-	protected $model;
-
-	/**
-	 * Property view.
+	 * If set view name here, controller will get model object by this name.
 	 *
 	 * @var  HtmlView
 	 */
 	protected $view;
 
 	/**
-	 * Property format.
+	 * Format for rendering.
 	 *
 	 * @var  string
 	 */
 	protected $format;
 
 	/**
-	 * Property layout.
+	 * Layout name if is HTML format.
 	 *
 	 * @var  string
 	 */
 	protected $layout;
 
 	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -83,7 +79,7 @@ class DisplayController extends AbstractPhoenixController
 	}
 
 	/**
-	 * doExecute
+	 * The main execution process.
 	 *
 	 * @return  mixed
 	 */
@@ -91,7 +87,7 @@ class DisplayController extends AbstractPhoenixController
 	{
 		$this->prepareViewModel($this->view, $this->model);
 
-		if ($this->view instanceof HtmlView)
+		if ($this->view instanceof LayoutRenderableInterface)
 		{
 			$this->view->setLayout($this->layout);
 		}
@@ -134,10 +130,13 @@ class DisplayController extends AbstractPhoenixController
 	}
 
 	/**
-	 * prepareViewModel
+	 * Prepare view and default model.
 	 *
-	 * @param AbstractView    $view
-	 * @param ModelRepository $model
+	 * You can configure default model state here, or add more sub models to view.
+	 * Remember to call parent to make sure default model already set in view.
+	 *
+	 * @param AbstractView    $view  The view to render page.
+	 * @param ModelRepository $model The default mode.
 	 *
 	 * @return  void
 	 */

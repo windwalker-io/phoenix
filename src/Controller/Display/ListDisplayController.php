@@ -41,9 +41,11 @@ class ListDisplayController extends DisplayController
 	protected $model;
 
 	/**
-	 * Property limit.
+	 * The list limit per page..
 	 *
-	 * @var  integer
+	 * Use 0 to set unlimited.
+	 *
+	 * @var integer
 	 */
 	protected $limit;
 
@@ -74,6 +76,8 @@ class ListDisplayController extends DisplayController
 	 * @param   ModelRepository|ListRepositoryInterface $model
 	 *
 	 * @return  void
+	 *
+	 * @deprecated Override prepareViewModel() instead.
 	 */
 	protected function prepareModelState(ModelRepository $model)
 	{

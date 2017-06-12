@@ -63,7 +63,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	protected $keyName = null;
 
 	/**
-	 * Property allowRedirectQuery.
+	 * The query will auto add to redirect url.
 	 *
 	 * @var  array
 	 */
@@ -72,17 +72,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	];
 
 	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		parent::init();
-	}
-
-	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 *
@@ -101,9 +91,10 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		if (!$this->model instanceof CrudRepositoryInterface)
 		{
 			throw new \DomainException(sprintf(
-				'%s model should be instance of %s, class: %s',
+				'%s model should be instance of %s, class: %s given.',
 				$this->model->getName(),
-				CrudRepositoryInterface::class, get_class($this->model)
+				CrudRepositoryInterface::class,
+				get_class($this->model)
 			));
 		}
 
@@ -117,9 +108,9 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	}
 
 	/**
-	 * processSuccess
+	 * Process success.
 	 *
-	 * @param mixed  $result
+	 * @param  mixed  $result
 	 *
 	 * @return mixed
 	 */

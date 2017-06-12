@@ -11,10 +11,12 @@ namespace Phoenix\Controller;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\DataInterface;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\String\StringInflector;
 
 /**
@@ -47,6 +49,15 @@ abstract class AbstractPhoenixController extends AbstractController
 	 * @var  string
 	 */
 	protected $listName;
+
+	/**
+	 * The default Model.
+	 *
+	 * If set model name here, controller will get model object by this name.
+	 *
+	 * @var  ModelRepository
+	 */
+	protected $model;
 
 	/**
 	 * Property prefix.
@@ -177,11 +188,17 @@ abstract class AbstractPhoenixController extends AbstractController
 	}
 
 	/**
-	 * checkAccess
+	 * Check user has access to view this page.
+	 *
+	 * Throw exception with 4xx code to block unauthorised access.
 	 *
 	 * @param   array|DataInterface  $data
 	 *
 	 * @return  boolean
+	 *
+	 * @throws \RuntimeException
+	 * @throws RouteNotFoundException
+	 * @throws UnauthorizedException
 	 */
 	public function checkAccess($data)
 	{

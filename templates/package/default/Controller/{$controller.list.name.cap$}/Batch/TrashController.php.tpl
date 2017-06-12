@@ -17,5 +17,5 @@ use Phoenix\Controller\Batch\AbstractTrashController;
  */
 class TrashController extends AbstractTrashController
 {
-
+	//
 }

@@ -10,9 +10,9 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
-use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\ItemDisplayController;
 use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Data\DataInterface;
 use Windwalker\Router\Exception\RouteNotFoundException;
@@ -25,42 +25,43 @@ use Windwalker\Router\Exception\RouteNotFoundException;
 class GetController extends ItemDisplayController
 {
 	/**
-	 * Property name.
+	 * The default Model.
 	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property itemName.
-	 *
-	 * @var  string
-	 */
-	protected $itemName = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property listName.
-	 *
-	 * @var  string
-	 */
-	protected $listName = '{$controller.list.name.cap$}';
-
-	/**
-	 * Property model.
+	 * If set model name here, controller will get model object by this name.
 	 *
 	 * @var  {$controller.item.name.cap$}Model
 	 */
 	protected $model = '{$controller.item.name.cap$}';
 
 	/**
-	 * Property view.
+	 * Main View.
+	 *
+	 * If set view name here, controller will get model object by this name.
 	 *
 	 * @var  {$controller.item.name.cap$}HtmlView
 	 */
 	protected $view = '{$controller.item.name.cap$}';
 
 	/**
-	 * prepareExecute
+	 * Check user has access to view this page.
+	 *
+	 * Throw exception with 4xx code to block unauthorised access.
+	 *
+	 * @param   array|DataInterface $data
+	 *
+	 * @return  boolean
+	 *
+	 * @throws \RuntimeException
+	 * @throws RouteNotFoundException
+	 * @throws UnauthorizedException
+	 */
+	public function checkAccess($data)
+	{
+		return parent::checkAccess($data);
+	}
+
+	/**
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -70,33 +71,31 @@ class GetController extends ItemDisplayController
 	}
 
 	/**
-	 * prepareModelState
+	 * Prepare view and default model.
 	 *
-	 * @param   ModelRepository|{$controller.item.name.cap$}Model $model
+	 * You can configure default model state here, or add more sub models to view.
+	 * Remember to call parent to make sure default model already set in view.
 	 *
-	 * @return  void
-	 */
-	protected function prepareModelState(ModelRepository $model)
-	{
-		parent::prepareModelState($model);
-	}
-
-	/**
-	 * prepareViewData
-	 *
-	 * @param   AbstractView|{$controller.list.name.cap$}HtmlView $view
+	 * @param AbstractView    $view  The view to render page.
+	 * @param ModelRepository $model The default mode.
 	 *
 	 * @return  void
 	 */
-	protected function prepareViewData(AbstractView $view)
+	protected function prepareViewModel(AbstractView $view, ModelRepository $model)
 	{
-		parent::prepareViewData($view);
+		/**
+		 * @var $view  {$controller.item.name.cap$}HtmlView
+		 * @var $model {$controller.item.name.cap$}Model
+		 */
+		parent::prepareViewModel($view, $model);
+
+		// Configure view and model here...
 	}
 
 	/**
-	 * postExecute
+	 * A hook after main process executing.
 	 *
-	 * @param mixed $result
+	 * @param mixed $result The result content to return, can be any value or boolean.
 	 *
 	 * @return  mixed
 	 */

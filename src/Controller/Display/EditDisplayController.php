@@ -24,7 +24,7 @@ use Windwalker\Core\Model\ModelRepository;
 class EditDisplayController extends ItemDisplayController
 {
 	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -52,6 +52,8 @@ class EditDisplayController extends ItemDisplayController
 	 * @param ModelRepository $model
 	 *
 	 * @return void
+	 *
+	 * @deprecated Override prepareViewModel() instead.
 	 */
 	protected function prepareModelState(ModelRepository $model)
 	{

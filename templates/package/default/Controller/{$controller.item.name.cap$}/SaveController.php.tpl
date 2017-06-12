@@ -9,7 +9,6 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
-use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
 use Phoenix\Controller\AbstractSaveController;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Data\DataInterface;
@@ -22,27 +21,6 @@ use Windwalker\Data\DataInterface;
 class SaveController extends AbstractSaveController
 {
 	use CsrfProtectionTrait;
-	
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property itemName.
-	 *
-	 * @var  string
-	 */
-	protected $itemName = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property listName.
-	 *
-	 * @var  string
-	 */
-	protected $listName = '{$controller.list.name.cap$}';
 
 	/**
 	 * Property formControl.
@@ -52,21 +30,16 @@ class SaveController extends AbstractSaveController
 	protected $formControl = 'item';
 
 	/**
-	 * Property model.
+	 * The default Model.
+	 *
+	 * If set model name here, controller will get model object by this name.
 	 *
 	 * @var  {$controller.item.name.cap$}Model
 	 */
-	protected $model;
+	protected $model = '{$controller.item.name.cap$}';
 
 	/**
-	 * Property view.
-	 *
-	 * @var  {$controller.item.name.cap$}HtmlView
-	 */
-	protected $view;
-
-	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -76,9 +49,9 @@ class SaveController extends AbstractSaveController
 	}
 
 	/**
-	 * preSave
+	 * A hook before save.
 	 *
-	 * @param DataInterface $data
+	 * @param DataInterface $data Data to save.
 	 *
 	 * @return void
 	 */
@@ -88,9 +61,9 @@ class SaveController extends AbstractSaveController
 	}
 
 	/**
-	 * postSave
+	 * A hook after save.
 	 *
-	 * @param DataInterface $data
+	 * @param DataInterface $data Data saved.
 	 *
 	 * @return  void
 	 */
@@ -100,9 +73,9 @@ class SaveController extends AbstractSaveController
 	}
 
 	/**
-	 * postExecute
+	 * A hook after main process executing.
 	 *
-	 * @param mixed $result
+	 * @param mixed $result The result content to return, can be any value or boolean.
 	 *
 	 * @return  mixed
 	 */

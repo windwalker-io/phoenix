@@ -22,42 +22,25 @@ use Windwalker\Core\View\AbstractView;
 class GetController extends EditDisplayController
 {
 	/**
-	 * Property name.
+	 * The default Model.
 	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property itemName.
-	 *
-	 * @var  string
-	 */
-	protected $itemName = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property listName.
-	 *
-	 * @var  string
-	 */
-	protected $listName = '{$controller.list.name.cap$}';
-
-	/**
-	 * Property model.
+	 * If set model name here, controller will get model object by this name.
 	 *
 	 * @var  {$controller.item.name.cap$}Model
 	 */
 	protected $model = '{$controller.item.name.cap$}';
 
 	/**
-	 * Property view.
+	 * Main View.
+	 *
+	 * If set view name here, controller will get model object by this name.
 	 *
 	 * @var  {$controller.item.name.cap$}HtmlView
 	 */
 	protected $view = '{$controller.item.name.cap$}';
 
 	/**
-	 * prepareExecute
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -67,33 +50,31 @@ class GetController extends EditDisplayController
 	}
 
 	/**
-	 * prepareExecute
+	 * Prepare view and default model.
 	 *
-	 * @param ModelRepository|{$controller.item.name.cap$}Model $model
+	 * You can configure default model state here, or add more sub models to view.
+	 * Remember to call parent to make sure default model already set in view.
 	 *
-	 * @return void
-	 */
-	protected function prepareModelState(ModelRepository $model)
-	{
-		parent::prepareModelState($model);
-	}
-
-	/**
-	 * prepareViewData
-	 *
-	 * @param   AbstractView|{$controller.item.name.cap$}HtmlView $view
+	 * @param AbstractView    $view  The view to render page.
+	 * @param ModelRepository $model The default mode.
 	 *
 	 * @return  void
 	 */
-	protected function prepareViewData(AbstractView $view)
+	protected function prepareViewModel(AbstractView $view, ModelRepository $model)
 	{
-		parent::prepareViewData($view);
+		/**
+		 * @var $view  {$controller.item.name.cap$}HtmlView
+		 * @var $model {$controller.item.name.cap$}Model
+		 */
+		parent::prepareViewModel($view, $model);
+
+		// Configure view and model here...
 	}
 
 	/**
-	 * postExecute
+	 * A hook after main process executing.
 	 *
-	 * @param mixed $result
+	 * @param mixed $result The result content to return, can be any value or boolean.
 	 *
 	 * @return  mixed
 	 */

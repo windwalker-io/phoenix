@@ -17,4 +17,5 @@ use Phoenix\Controller\Batch\AbstractUnpublishController;
  */
 class UnpublishController extends AbstractUnpublishController
 {
+	//
 }

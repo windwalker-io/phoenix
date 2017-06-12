@@ -19,25 +19,4 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 class CopyController extends AbstractCopyController
 {
 	use CsrfProtectionTrait;
-	
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.list.name.cap$}';
-
-	/**
-	 * Property itemName.
-	 *
-	 * @var  string
-	 */
-	protected $itemName = '{$controller.item.name.cap$}';
-
-	/**
-	 * Property listName.
-	 *
-	 * @var  string
-	 */
-	protected $listName = '{$controller.list.name.cap$}';
 }
