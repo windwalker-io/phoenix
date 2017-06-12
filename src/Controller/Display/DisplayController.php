@@ -89,13 +89,7 @@ class DisplayController extends AbstractPhoenixController
 	 */
 	protected function doExecute()
 	{
-		$this->prepareModelState($this->model);
-
-		// Add default
-		$this->view->setModel($this->model, true);
-
-		$this->assignModels($this->view);
-		$this->prepareViewData($this->view);
+		$this->prepareViewModel($this->view, $this->model);
 
 		if ($this->view instanceof HtmlView)
 		{
@@ -140,11 +134,34 @@ class DisplayController extends AbstractPhoenixController
 	}
 
 	/**
+	 * prepareViewModel
+	 *
+	 * @param AbstractView    $view
+	 * @param ModelRepository $model
+	 *
+	 * @return  void
+	 */
+	protected function prepareViewModel(AbstractView $view, ModelRepository $model)
+	{
+		// Add default
+		$this->view->setModel($this->model, true, function (ModelRepository $model)
+		{
+			$this->prepareModelState($model);
+		});
+
+		$this->assignModels($this->view);
+
+		$this->prepareViewData($this->view);
+	}
+
+	/**
 	 * assignModels
 	 *
 	 * @param AbstractView $view
 	 *
 	 * @return  void
+	 *
+	 * @deprecated Override prepareViewModel() instead.
 	 */
 	protected function assignModels(AbstractView $view)
 	{
@@ -157,6 +174,8 @@ class DisplayController extends AbstractPhoenixController
 	 * @param   ModelRepository $model
 	 *
 	 * @return  void
+	 *
+	 * @deprecated Override prepareViewModel() instead.
 	 */
 	protected function prepareModelState(ModelRepository $model)
 	{
@@ -168,6 +187,8 @@ class DisplayController extends AbstractPhoenixController
 	 * @param   AbstractView  $view
 	 *
 	 * @return  void
+	 *
+	 * @deprecated Override prepareViewModel() instead.
 	 */
 	protected function prepareViewData(AbstractView $view)
 	{

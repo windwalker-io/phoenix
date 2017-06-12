@@ -81,20 +81,29 @@ class ListDisplayController extends DisplayController
 		$model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', [], InputFilter::ARRAY_TYPE);
 		$model['input.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', [], InputFilter::ARRAY_TYPE);
 
-		$model['list.search'] = $this->handleSearches($model['input.search']);
-		$model['list.filter'] = $model['input.filter'];
+		foreach ((array) $this->handleSearches($model['input.search']) as $key => $value)
+		{
+			$model->addSearch($key, $value);
+		}
 
-		$model['fuzzy_searching'] = $this->fuzzingSearching;
+		foreach ((array) $model['input.filter'] as $key => $value)
+		{
+			$model->addFilter($key, $value);
+		}
+
+		// Fuzzing searching
+		$model->fuzzySearching($this->fuzzingSearching);
 
 		// Ordering
-		$model['list.ordering'] = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering', $this->defaultOrdering);
-		$model['list.direction'] = $this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction', $this->defaultDirection);
+		$model->ordering(
+			$this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering', $this->defaultOrdering),
+			$this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction', $this->defaultDirection)
+		);
 
 		// Pagination
-		$model['list.limit'] = $this->limit === null ? $this->app->get('list.limit', 15) : $this->limit;
-		$model['list.page']  = $this->getUserStateFromInput($this->getContext('list.page'), 'page', 1, InputFilter::INTEGER);
-		$model['list.page']  = $model['list.page'] < 1 ? 1 : $model['list.page'];
-		$model['list.start'] = ($model['list.page'] - 1) * $model['list.limit'];
+		$model->limit($this->limit !== null ? $this->limit : $this->app->get('list.limit', 15));
+
+		$model->page($this->getUserStateFromInput($this->getContext('list.page'), 'page', 1, InputFilter::INTEGER));
 	}
 
 	/**
@@ -111,7 +120,7 @@ class ListDisplayController extends DisplayController
 			return [];
 		}
 
-		if ($search['field'] == '*' && isset($search['content']))
+		if ($search['field'] === '*' && isset($search['content']))
 		{
 			// Get search fields
 			$form = $this->model->getForm('grid');

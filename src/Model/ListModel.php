@@ -475,12 +475,10 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	public function limit($limit)
 	{
-		if ($limit < 0)
-		{
-			$limit = 0;
-		}
+		$limit = $limit < 0 ? 0 : $limit;
 
 		$this->set('list.limit', (int) $limit);
+		$this->set('list.start', ($this->getPage() - 1) * $limit);
 
 		return $this;
 	}
