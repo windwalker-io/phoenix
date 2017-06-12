@@ -21,7 +21,7 @@ use Windwalker\Structure\Structure;
 /**
  * The SendGridAdapter class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.3
  */
 class SendGridAdapter implements MailerAdapterInterface
 {

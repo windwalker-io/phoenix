@@ -14,9 +14,9 @@ use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Arr;
 
 /**
- * The ShowonHelper class.
+ * The FieldHelper class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.3
  */
 class FieldHelper
 {

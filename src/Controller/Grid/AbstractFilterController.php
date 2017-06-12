@@ -62,7 +62,7 @@ abstract class AbstractFilterController extends AbstractPhoenixController
 		$oldState = $this->getUserState($name, $default, $namespace);
 		$newState = $this->input->get($inputName, null, $filter);
 
-		// Id state different, reset page to 1.
+		// If state different, reset page to 1.
 		if ($oldState != $newState)
 		{
 			$this->setUserState($this->getContext('list.page'), 1);

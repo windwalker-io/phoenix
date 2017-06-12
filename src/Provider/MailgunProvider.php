@@ -18,7 +18,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The MailGunProvider class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.3
  */
 class MailgunProvider implements ServiceProviderInterface
 {

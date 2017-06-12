@@ -17,7 +17,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The SendgridProvider class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.3
  */
 class SendgridProvider implements ServiceProviderInterface
 {
