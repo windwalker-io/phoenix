@@ -399,12 +399,12 @@ JS;
 	 *
 	 * @param string $selector
 	 * @param string $dependentSelector
-	 * @param string $url
+	 * @param mixed  $source
 	 * @param array  $options
 	 *
 	 * @return void
 	 */
-	public static function listDependent($selector, $dependentSelector, $url, array $options = [])
+	public static function listDependent($selector, $dependentSelector, $source, array $options = [])
 	{
 		if (!static::inited(__METHOD__))
 		{
@@ -414,7 +414,14 @@ JS;
 
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
-			$options['ajax_url'] = $url;
+			if (is_string($source))
+			{
+				$options['ajax']['url'] = $source;
+			}
+			else
+			{
+				$options['source'] = $source;
+			}
 
 			$options = static::getJSObject($options);
 

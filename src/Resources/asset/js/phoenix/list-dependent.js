@@ -13,16 +13,17 @@
     var nope = function (value, ele, dep) {};
 
     var defaultOptions = {
-        ajax_url: '',
-        default_value: null,
-        initial_load: true,
-        request: {
+        ajax: {
+            url: null,
             value_field: 'value'
         },
-        response: {
-            text_field: 'title',
-            value_field: 'id'
-        },
+        source: null,
+        text_field: 'title',
+        value_field: 'id',
+        first_option: null,
+        default_value: null,
+        initial_load: true,
+        empty_mark: '__EMPTY__',
         hooks: {
             before_request: nope,
             after_request: nope
@@ -44,7 +45,7 @@
         this.bindEvents();
 
         if (this.options.initial_load) {
-            this.changeList(this.dependent.val());
+            this.changeList(this.dependent.val(), true);
         }
     };
 
@@ -65,51 +66,140 @@
         /**
          * Update the list elements.
          *
-         * @param {*} value
+         * @param {*}    value
+         * @param {bool} initial
          */
-        changeList: function(value) {
+        changeList: function(value, initial) {
             value = value || this.dependent.val();
-            var self   = this;
-            var before = this.options.hooks.before_request;
-            var after  = this.options.hooks.after_request;
-            var uri    = new SimpleURI(this.options.ajax_url);
-            uri.setVar(this.options.request.value_field, value);
 
-            before.call(self, value, self.element, self.dependent);
+            // Empty mark
+            if (value === '') {
+                value = this.options.empty_mark;
+            }
+
+            if (this.options.ajax.url) {
+                this.ajaxUpdate(value);
+            } else if (this.options.source) {
+                this.sourceUpdate(value, initial);
+            }
+        },
+
+        /**
+         * Update list by source.
+         *
+         * @param {string} value
+         * @param {bool}   initial
+         */
+        sourceUpdate: function (value, initial) {
+            var self = this;
+            var source = this.options.source;
+
+            this.beforeHook(value, self.element, self.dependent);
+
+            if (source[value]) {
+                this.updateListElements(source[value]);
+            } else {
+                this.updateListElements([]);
+
+                if (!initial && value !== '' && parseInt(value) !== 0) {
+                    console.log('List for value: ' + value + ' not found.');
+                }
+            }
+
+            this.afterHook(value, self.element, self.dependent);
+        },
+
+        /**
+         * Do ajax.
+         *
+         * @param {string} value
+         */
+        ajaxUpdate: function (value) {
+            var self = this;
+            var uri = new SimpleURI(this.options.ajax.url);
+            uri.setVar(this.options.ajax.value_field, value);
+
+            self.beforeHook(value, self.element, self.dependent);
 
             $.get(uri.toString())
                 .done(function (response) {
                     if (response.success) {
-                        self.element.empty();
-
-                        $.each(response.data, function() {
-                            var value = this[self.options.response.value_field];
-                            var option = $('<option>' + this[self.options.response.text_field] + '</option>');
-                            option.attr('value', value);
-
-                            if (this.attributes) {
-                                $.each(this.attributes, function (index) {
-                                    option.attr(index, this);
-                                });
-                            }
-
-                            if (self.options.default_value == value) {
-                                option.attr('selected', 'selected');
-                            }
-
-                            self.element.append(option);
-                        });
-
-                        self.element.trigger('chosen:updated');
-                        self.element.trigger('change');
+                        self.updateListElements(response.data);
                     } else {
                         console.error(response.message);
                     }
                 }).fail(function(response) {
                     console.error(response.message);
                 }).always(function () {
-                    after.call(self, value, self.element, self.dependent);
+                    self.afterHook(value, self.element, self.dependent);
                 });
+        },
+
+        /**
+         * Update list elements.
+         *
+         * @param {Array} items
+         */
+        updateListElements: function (items) {
+            var self = this;
+            var textField = this.options.text_field;
+            var valueField = this.options.value_field;
+            self.element.empty();
+
+            if (this.options.first_option) {
+                items.unshift({});
+                items[0][textField] = this.options.first_option[textField];
+                items[0][valueField] = this.options.first_option[valueField];
+            }
+
+            $.each(items, function() {
+                var value = this[valueField];
+                var option = $('<option>' + this[textField] + '</option>');
+                option.attr('value', value);
+
+                if (this.attributes) {
+                    $.each(this.attributes, function (index) {
+                        option.attr(index, this);
+                    });
+                }
+
+                if (self.options.default_value == value) {
+                    option.attr('selected', 'selected');
+                }
+
+                self.element.append(option);
+            });
+
+            self.element.trigger('chosen:updated');
+            self.element.trigger('change');
+        },
+
+        /**
+         * Before hook.
+         *
+         * @param {string} value
+         * @param {jQuery} element
+         * @param {jQuery} dependent
+         * @returns {*}
+         */
+        beforeHook: function (value, element, dependent) {
+            var before = this.options.hooks.before_request;
+
+            return before.call(this, value, element, dependent);
+        },
+
+        /**
+         * After hook.
+         *
+         * @param {string} value
+         * @param {jQuery} element
+         * @param {jQuery} dependent
+         * @returns {*}
+         */
+        afterHook: function (value, element, dependent) {
+            var after = this.options.hooks.after_request;
+
+            return after.call(this, value, element, dependent);
         }
     };
 
