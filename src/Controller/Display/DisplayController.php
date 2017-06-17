@@ -87,6 +87,8 @@ class DisplayController extends AbstractPhoenixController
 	{
 		$this->prepareViewModel($this->view, $this->model);
 
+		$this->authorise();
+
 		if ($this->view instanceof LayoutRenderableInterface)
 		{
 			$this->view->setLayout($this->layout);

@@ -199,10 +199,27 @@ abstract class AbstractPhoenixController extends AbstractController
 	 * @throws \RuntimeException
 	 * @throws RouteNotFoundException
 	 * @throws UnauthorizedException
+	 *
+	 * @deprecated Use authorise() instead.
 	 */
 	public function checkAccess($data)
 	{
 		return true;
+	}
+
+	/**
+	 * Check user has access to view this page.
+	 *
+	 * Throw exception with 4xx code to block unauthorised access.
+	 *
+	 * @return  void
+	 *
+	 * @throws \RuntimeException
+	 * @throws RouteNotFoundException
+	 * @throws UnauthorizedException
+	 */
+	public function authorise()
+	{
 	}
 
 	/**

@@ -47,6 +47,13 @@ class ItemDisplayController extends DisplayController
 	 */
 	protected function prepareModelState(ModelRepository $model)
 	{
-		$model['load.conditions'] = $this->input->get($this->keyName);
+		$pk = $this->input->get($this->keyName);
+
+		if ($pk)
+		{
+			$pk = [$this->keyName => $pk];
+		}
+
+		$model['load.conditions'] = $pk;
 	}
 }
