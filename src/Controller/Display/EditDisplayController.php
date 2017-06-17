@@ -12,6 +12,7 @@ use Phoenix\Model\AdminModel;
 use Phoenix\Model\CrudModel;
 use Phoenix\View\EditView;
 use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\View\AbstractView;
 
 /**
  * The EditGetController class.
@@ -47,17 +48,19 @@ class EditDisplayController extends ItemDisplayController
 	}
 
 	/**
-	 * prepareExecute
+	 * Prepare view and default model.
 	 *
-	 * @param ModelRepository $model
+	 * You can configure default model state here, or add more sub models to view.
+	 * Remember to call parent to make sure default model already set in view.
 	 *
-	 * @return void
+	 * @param AbstractView    $view  The view to render page.
+	 * @param ModelRepository $model The default mode.
 	 *
-	 * @deprecated Override prepareViewModel() instead.
+	 * @return  void
 	 */
-	protected function prepareModelState(ModelRepository $model)
+	protected function prepareViewModel(AbstractView $view, ModelRepository $model)
 	{
-		parent::prepareModelState($model);
+		parent::prepareViewModel($view, $model);
 
 		if ($this->input->get('new') !== null)
 		{

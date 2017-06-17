@@ -10,6 +10,7 @@ namespace Phoenix\Form;
 
 use Phoenix\Script\JQueryScript;
 use Windwalker\Form\Field\AbstractField;
+use Windwalker\Form\Field\HiddenField;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Arr;
 
@@ -28,9 +29,16 @@ class FieldHelper
 	 *
 	 * @return  void
 	 */
-	public static function handle(AbstractField $field, array $attribs)
+	public static function handle(AbstractField $field, array &$attribs)
 	{
 		static::showon($field, $attribs, $field->get('showon'));
+
+		// Hidden
+		if ($field instanceof HiddenField)
+		{
+			$attribs['style'] = isset($attribs['style']) ? $attribs['style'] : '';
+			$attribs['style'] .= 'display: none;';
+		}
 	}
 
 	/**

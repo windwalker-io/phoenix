@@ -309,7 +309,7 @@ JS;
 				]
 			];
 
-			$options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
+			$options = static::getJSObject($defaultOptions, $options);
 
 			static::translate('phoenix.message.validation.required');
 			static::translate('phoenix.message.validation.failure');
