@@ -43,23 +43,9 @@ trait FormAwareRepositoryTrait
 	{
 		$sessionData = (array) $this['form.data'];
 
-		try
-		{
-			$keyName = $this['keyName'] ? : $this->getKeyName();
-		}
-		catch (\DomainException $e)
-		{
-			$keyName = null;
-		}
-
-		$keyName = $keyName ? : 'id';
-
 		$item = $this->getItem();
 
-		if ($sessionData && Arr::get($sessionData, $keyName) == $item->$keyName)
-		{
-			return $sessionData;
-		}
+		$item->bind($sessionData);
 
 		return $item->dump(true);
 	}
