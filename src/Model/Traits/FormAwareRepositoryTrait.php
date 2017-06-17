@@ -14,6 +14,8 @@ use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
+use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
@@ -38,16 +40,21 @@ trait FormAwareRepositoryTrait
 	 * getDefaultData
 	 *
 	 * @return array
+	 * @throws \InvalidArgumentException
 	 */
 	public function getFormDefaultData()
 	{
-		$sessionData = (array) $this['form.data'];
-
 		$item = $this->getItem();
 
-		$item->bind($sessionData);
+		if ($item instanceof DataInterface)
+		{
+			$item = $item->dump(true);
+		}
 
-		return $item->dump(true);
+		return (new Data)
+			->bind($item)
+			->bind($this['form.data'])
+			->dump(true);
 	}
 
 	/**
@@ -91,8 +98,7 @@ trait FormAwareRepositoryTrait
 			'model'      => $this,
 			'control'    => $control,
 			'definition' => $definition
-		]
-		);
+		]);
 
 		return $form;
 	}
