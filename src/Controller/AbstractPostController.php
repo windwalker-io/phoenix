@@ -12,11 +12,13 @@ use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
+use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Uri\Uri;
 
 /**
@@ -108,6 +110,24 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		}
 
 		$this->checkAccess($this->dataObject);
+	}
+
+	/**
+	 * Check user has access to view this page.
+	 *
+	 * Throw exception with 4xx code to block unauthorised access.
+	 *
+	 * @param   array|DataInterface  $data
+	 *
+	 * @return  boolean
+	 *
+	 * @throws \RuntimeException
+	 * @throws RouteNotFoundException
+	 * @throws UnauthorizedException
+	 */
+	public function checkAccess($data)
+	{
+		return true;
 	}
 
 	/**
