@@ -18,7 +18,6 @@ use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
-use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Uri\Uri;
 
 /**
@@ -81,6 +80,9 @@ abstract class AbstractPostController extends AbstractPhoenixController
 	 *
 	 * @return  void
 	 *
+	 * @throws \Windwalker\Router\Exception\RouteNotFoundException
+	 * @throws \RuntimeException
+	 * @throws \Windwalker\Core\Security\Exception\UnauthorizedException
 	 * @throws \LogicException
 	 * @throws \DomainException
 	 */
@@ -109,21 +111,23 @@ abstract class AbstractPostController extends AbstractPhoenixController
 			$this->keyName = $this->model->getKeyName(false) ? : 'id';
 		}
 
-		$this->checkAccess($this->dataObject);
+		if (!$this->checkAccess($this->dataObject))
+		{
+			throw new UnauthorizedException('You have no access to modify this resource.');
+		}
 	}
 
 	/**
-	 * Check user has access to view this page.
+	 * Check user has access to modify this resource or not.
 	 *
-	 * Throw exception with 4xx code to block unauthorised access.
+	 * Throw exception with 4xx code or return false to block unauthorised access.
 	 *
-	 * @param   array|DataInterface  $data
+	 * @param   array|DataInterface $data
 	 *
 	 * @return  boolean
 	 *
 	 * @throws \RuntimeException
-	 * @throws RouteNotFoundException
-	 * @throws UnauthorizedException
+	 * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
 	 */
 	public function checkAccess($data)
 	{

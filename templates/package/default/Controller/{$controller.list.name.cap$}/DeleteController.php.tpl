@@ -20,7 +20,7 @@ class DeleteController extends AbstractDeleteController
 	/**
 	 * The default model.
 	 *
-	 * Keep model name here to make sure controller get singular model to handle update.
+	 * Keep model name here to make sure controller get singular model to handle delete.
 	 *
 	 * @var  string
 	 */

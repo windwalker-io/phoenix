@@ -53,6 +53,23 @@ class SaveController extends AbstractSaveController
 	}
 
 	/**
+	 * Check user has access to modify this resource or not.
+	 *
+	 * Throw exception with 4xx code or return false to block unauthorised access.
+	 *
+	 * @param   array|DataInterface $data
+	 *
+	 * @return  boolean
+	 *
+	 * @throws \RuntimeException
+	 * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
+	 */
+	public function checkAccess($data)
+	{
+		return parent::checkAccess($data);
+	}
+
+	/**
 	 * A hook before save.
 	 *
 	 * @param DataInterface $data Data to save.

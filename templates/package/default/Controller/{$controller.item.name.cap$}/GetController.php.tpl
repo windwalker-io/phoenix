@@ -72,6 +72,22 @@ class GetController extends EditDisplayController
 	}
 
 	/**
+	 * Check user has access to view this page.
+	 *
+	 * Throw exception with 4xx code to block unauthorised access.
+	 *
+	 * @return  bool Return FALSE if use has no access to view page.
+	 *
+	 * @throws \RuntimeException
+	 * @throws \Windwalker\Router\Exception\RouteNotFoundException (404)
+	 * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
+	 */
+	public function authorise()
+	{
+		return parent::authorise();
+	}
+
+	/**
 	 * A hook after main process executing.
 	 *
 	 * @param mixed $result The result content to return, can be any value or boolean.

@@ -11,12 +11,9 @@ namespace Phoenix\Controller;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Security\Exception\UnauthorizedException;
-use Windwalker\Data\DataInterface;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;
-use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\String\StringInflector;
 
 /**
@@ -192,14 +189,15 @@ abstract class AbstractPhoenixController extends AbstractController
 	 *
 	 * Throw exception with 4xx code to block unauthorised access.
 	 *
-	 * @return  void
+	 * @return  bool Return FALSE if use has no access to view page.
 	 *
 	 * @throws \RuntimeException
-	 * @throws RouteNotFoundException
-	 * @throws UnauthorizedException
+	 * @throws \Windwalker\Router\Exception\RouteNotFoundException (404)
+	 * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
 	 */
 	public function authorise()
 	{
+		return true;
 	}
 
 	/**

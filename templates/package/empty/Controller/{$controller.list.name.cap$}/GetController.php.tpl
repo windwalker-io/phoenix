@@ -12,10 +12,7 @@ use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\DisplayController;
 use Windwalker\Core\Model\ModelRepository;
-use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Core\View\AbstractView;
-use Windwalker\Data\DataInterface;
-use Windwalker\Router\Exception\RouteNotFoundException;
 
 /**
  * The GetController class.
@@ -41,24 +38,6 @@ class GetController extends DisplayController
 	 * @var  {$controller.list.name.cap$}HtmlView
 	 */
 	protected $view = '{$controller.list.name.cap$}';
-
-	/**
-	 * Check user has access to view this page.
-	 *
-	 * Throw exception with 4xx code to block unauthorised access.
-	 *
-	 * @param   array|DataInterface  $data
-	 *
-	 * @return  boolean
-	 *
-	 * @throws \RuntimeException
-	 * @throws RouteNotFoundException
-	 * @throws UnauthorizedException
-	 */
-	public function checkAccess($data)
-	{
-		return true;
-	}
 
 	/**
 	 * A hook before main process executing.
@@ -93,6 +72,22 @@ class GetController extends DisplayController
 		parent::prepareViewModel($view, $model);
 
 		// Configure view and model here...
+	}
+
+	/**
+	 * Check user has access to view this page.
+	 *
+	 * Throw exception with 4xx code to block unauthorised access.
+	 *
+	 * @return  bool Return FALSE if use has no access to view page.
+	 *
+	 * @throws \RuntimeException
+	 * @throws \Windwalker\Router\Exception\RouteNotFoundException (404)
+	 * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
+	 */
+	public function authorise()
+	{
+		return parent::authorise();
 	}
 
 	/**

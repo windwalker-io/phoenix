@@ -12,6 +12,7 @@ use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Controller\Middleware\JsonApiMiddleware;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Response\HtmlViewResponse;
+use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\LayoutRenderableInterface;
@@ -82,12 +83,16 @@ class DisplayController extends AbstractPhoenixController
 	 * The main execution process.
 	 *
 	 * @return  mixed
+	 * @throws \RuntimeException
 	 */
 	protected function doExecute()
 	{
 		$this->prepareViewModel($this->view, $this->model);
 
-		$this->authorise();
+		if (!$this->authorise())
+		{
+			throw new UnauthorizedException('You have no access to view this page.');
+		}
 
 		if ($this->view instanceof LayoutRenderableInterface)
 		{
@@ -144,7 +149,7 @@ class DisplayController extends AbstractPhoenixController
 	 */
 	protected function prepareViewModel(AbstractView $view, ModelRepository $model)
 	{
-		// Add default
+		// Here is B/C code
 		$this->view->setModel($this->model, true, function (ModelRepository $model)
 		{
 			$this->prepareModelState($model);
@@ -153,6 +158,8 @@ class DisplayController extends AbstractPhoenixController
 		$this->assignModels($this->view);
 
 		$this->prepareViewData($this->view);
+
+		// Add your logic after parent...
 	}
 
 	/**
