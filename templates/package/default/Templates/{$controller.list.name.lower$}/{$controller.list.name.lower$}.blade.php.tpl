@@ -175,7 +175,7 @@
             @formToken()
         </div>
 
-        @include('_global.{$package.name.lower$}.widget.batch')
+        @include('batch')
     </form>
 </div>
 @stop
