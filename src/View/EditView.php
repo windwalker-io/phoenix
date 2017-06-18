@@ -59,12 +59,12 @@ class EditView extends ItemView
 	 * @param \Windwalker\Data\Data $data
 	 *
 	 * @return  void
+	 * @throws \UnexpectedValueException
 	 */
 	protected function prepareData($data)
 	{
 		parent::prepareData($data);
 
-		// TODO: Test if we need a exception or not.
 		$model = $this->model->getModel();
 
 		if (!$model instanceof FormAwareRepositoryInterface)
