@@ -10,7 +10,6 @@ namespace Phoenix\Controller;
 
 use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
@@ -28,8 +27,6 @@ use Windwalker\Uri\Uri;
  */
 abstract class AbstractPostController extends AbstractPhoenixController
 {
-	use CsrfProtectionTrait;
-
 	/**
 	 * Property model.
 	 *

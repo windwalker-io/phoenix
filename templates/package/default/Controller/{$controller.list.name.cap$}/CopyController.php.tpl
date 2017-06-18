@@ -19,4 +19,13 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 class CopyController extends AbstractCopyController
 {
 	use CsrfProtectionTrait;
+
+	/**
+	 * The default model.
+	 *
+	 * Keep model name here to make sure controller get singular model to handle update.
+	 *
+	 * @var  string
+	 */
+	protected $model = '{$controller.item.name.cap$}';
 }

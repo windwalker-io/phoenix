@@ -8,7 +8,6 @@
 
 namespace Phoenix\Field;
 
-use Lyrasoft\Luna\Helper\LunaHelper;
 use Phoenix\Script\JQueryScript;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\PackageHelper;
@@ -94,8 +93,6 @@ class ModalField extends TextField
 	 */
 	public function buildInput($attrs)
 	{
-		$this->package = LunaHelper::getPackage()->getCurrentPackage()->getName();
-
 		$this->prepareScript();
 
 		$this->package = $this->get('package', $this->package);

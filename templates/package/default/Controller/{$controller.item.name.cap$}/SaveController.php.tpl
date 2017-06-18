@@ -23,6 +23,13 @@ class SaveController extends AbstractSaveController
 	use CsrfProtectionTrait;
 
 	/**
+	 * Keep this property so save & close can find routing.
+	 *
+	 * @var  string
+	 */
+	protected $listName = '{$controller.list.name.cap$}';
+
+	/**
 	 * Property formControl.
 	 *
 	 * @var  string
