@@ -20,7 +20,6 @@ use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
 use Windwalker\Ioc;
-use Windwalker\Utilities\Arr;
 
 /**
  * The AbstractFormModel class.
