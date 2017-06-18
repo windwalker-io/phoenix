@@ -43,7 +43,7 @@
                 <span class="glyphicon glyphicon-remove fa fa-remove text-danger"></span>
                 @translate('phoenix.grid.modal.button.cancel')
             </button>
-            {!! $filterBar->render(array('form' => $form, 'show' => $showFilterBar)) !!}
+            {!! $filterBar->render(['form' => $form, 'show' => $showFilterBar]) !!}
         </div>
 
         {{-- RESPONSIVE TABLE DESC --}}
@@ -97,7 +97,7 @@
 
                         {{-- STATE --}}
                         <td class="text-center">
-                            {!! $grid->published($item->state, array('only_icon' => true)) !!}
+                            {!! $grid->published($item->state, ['only_icon' => true]) !!}
                         </td>
 
                         {{-- AUTHOR --}}

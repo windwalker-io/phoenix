@@ -39,7 +39,7 @@
 
         {{-- FILTER BAR --}}
         <div class="filter-bar">
-            {!! $filterBar->render(array('form' => $form, 'show' => $showFilterBar)) !!}
+            {!! $filterBar->render(['form' => $form, 'show' => $showFilterBar]) !!}
         </div>
 
         {{-- RESPONSIVE TABLE DESC --}}
@@ -53,7 +53,7 @@
                 <tr>
                     {{-- CHECKBOX --}}
                     <th width="1%">
-                        {!! $grid->checkboxesToggle(array('duration' => 150)) !!}
+                        {!! $grid->checkboxesToggle(['duration' => 150]) !!}
                     </th>
 
                     {{-- STATE --}}
