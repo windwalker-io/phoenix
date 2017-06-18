@@ -9,7 +9,6 @@
 namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractPostController;
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Model\ModelRepository;
@@ -26,8 +25,6 @@ use Windwalker\Record\Exception\NoResultException;
  */
 abstract class AbstractBatchController extends AbstractPostController
 {
-	use CsrfProtectionTrait;
-
 	/**
 	 * Property action.
 	 *

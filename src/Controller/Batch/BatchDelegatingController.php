@@ -10,6 +10,7 @@ namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Controller\AbstractController;
+use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\String\StringNormalise;
 
@@ -22,6 +23,8 @@ use Windwalker\String\StringNormalise;
  */
 class BatchDelegatingController extends AbstractPhoenixController
 {
+	use CsrfProtectionTrait;
+
 	/**
 	 * Property inflection.
 	 *

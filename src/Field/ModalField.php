@@ -8,6 +8,7 @@
 
 namespace Phoenix\Field;
 
+use Lyrasoft\Luna\Helper\LunaHelper;
 use Phoenix\Script\JQueryScript;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\PackageHelper;
@@ -19,6 +20,17 @@ use Windwalker\Form\Field\TextField;
 
 /**
  * The ModalField class.
+ *
+ * @method  mixed|$this  package(string $value = null)
+ * @method  mixed|$this  view(string $value = null)
+ * @method  mixed|$this  url(string $value = null)
+ * @method  mixed|$this  table(string $value = null)
+ * @method  mixed|$this  route(string $value = null)
+ * @method  mixed|$this  query(string $value = null)
+ * @method  mixed|$this  keyField(string $value = null)
+ * @method  mixed|$this  titleField(string $value = null)
+ * @method  mixed|$this  titleClass(string $value = null)
+ * @method  mixed|$this  buttonText(string $value = null)
  *
  * @since  1.0
  */
@@ -82,10 +94,12 @@ class ModalField extends TextField
 	 */
 	public function buildInput($attrs)
 	{
+		$this->package = LunaHelper::getPackage()->getCurrentPackage()->getName();
+
 		$this->prepareScript();
 
-		$this->package = $this->package ? : $this->get('package');
-		$this->view = $this->view ? : $this->get('view');
+		$this->package = $this->get('package', $this->package);
+		$this->view = $this->get('view', $this->view);
 
 		$attribs = $attrs;
 
@@ -130,6 +144,7 @@ class ModalField extends TextField
 	 * getUrl
 	 *
 	 * @return  string
+	 * @throws \OutOfRangeException
 	 */
 	protected function getUrl()
 	{
@@ -140,12 +155,11 @@ class ModalField extends TextField
 		$route = $this->get('route', $this->route) ? : $this->view;
 		$query = $this->get('query', $this->query);
 
-		return $package->router->route($route, array_merge(
-			[
+		return $package->router->route($route, array_merge([
 			'layout'   => 'modal',
 			'selector' => '#' . $this->getId() . '-wrap',
 			'function' => $this->get('function', 'Phoenix.Field.Modal.select')
-			], $query));
+		], $query));
 	}
 
 	/**
@@ -189,5 +203,26 @@ JS;
 		Asset::internalScript($js);
 
 		$inited = true;
+	}
+
+	/**
+	 * getAccessors
+	 *
+	 * @return  array
+	 */
+	protected function getAccessors()
+	{
+		return array_merge(parent::getAccessors(), [
+			'package',
+			'view',
+			'url',
+			'table',
+			'route',
+			'query',
+			'keyField' => 'key_field',
+			'titleField' => 'title_field',
+			'titleClass',
+			'buttonText'
+		]);
 	}
 }

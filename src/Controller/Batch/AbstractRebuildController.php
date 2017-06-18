@@ -8,7 +8,6 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Data\Data;
@@ -20,8 +19,6 @@ use Windwalker\Data\Data;
  */
 class AbstractRebuildController extends AbstractBatchController
 {
-	use CsrfProtectionTrait;
-
 	/**
 	 * Property action.
 	 *

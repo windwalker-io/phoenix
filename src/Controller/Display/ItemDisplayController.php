@@ -11,6 +11,7 @@ namespace Phoenix\Controller\Display;
 use Phoenix\Model\ItemModel;
 use Phoenix\View\ItemView;
 use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\View\AbstractView;
 
 /**
  * The GetController class.
@@ -37,6 +38,31 @@ class ItemDisplayController extends DisplayController
 	protected $keyName = 'id';
 
 	/**
+	 * Prepare view and default model.
+	 *
+	 * You can configure default model state here, or add more sub models to view.
+	 * Remember to call parent to make sure default model already set in view.
+	 *
+	 * @param AbstractView    $view  The view to render page.
+	 * @param ModelRepository $model The default mode.
+	 *
+	 * @return  void
+	 */
+	protected function prepareViewModel(AbstractView $view, ModelRepository $model)
+	{
+		parent::prepareViewModel($view, $model);
+
+		$pk = $this->input->get($this->keyName);
+
+		if ($pk)
+		{
+			$pk = [$this->keyName => $pk];
+		}
+
+		$model['load.conditions'] = $pk;
+	}
+
+	/**
 	 * prepareExecute
 	 *
 	 * @param ModelRepository $model
@@ -47,13 +73,6 @@ class ItemDisplayController extends DisplayController
 	 */
 	protected function prepareModelState(ModelRepository $model)
 	{
-		$pk = $this->input->get($this->keyName);
 
-		if ($pk)
-		{
-			$pk = [$this->keyName => $pk];
-		}
-
-		$model['load.conditions'] = $pk;
 	}
 }
