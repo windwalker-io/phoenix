@@ -55,16 +55,23 @@ body.phoenix-admin {
   z-index: 100;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
-.main-sidebar #submenu.list-group {
-  border-radius: 0;
+.main-sidebar ul.nav {
   margin-left: -15px;
   margin-right: -15px;
 }
-.main-sidebar #submenu.list-group a {
+.main-sidebar ul.nav > li {
+  margin: 0;
+  background-color: #fff;
+}
+.main-sidebar ul.nav > li > a {
   border-radius: 0;
-  border: none;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 0;
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+}
+.main-sidebar ul.nav > li:first-child > a {
+  border-top: 1px solid #ddd;
 }
 body.sidebar-hide .main-sidebar {
   display: none;
