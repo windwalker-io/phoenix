@@ -9,16 +9,18 @@
     @translate('phoenix.title.submenu')
 </h3>
 
-<div id="submenu" class="list-group">
-    <a href="#"
-        class="list-group-item {{ $helper->menu->active('categories') }}">
-        @translate('{$package.name.lower$}.categories.title')
-    </a>
+<ul id="submenu" class="nav nav-pills nav-stacked">
+    <li class="{{ $helper->menu->active('categories') }}">
+        <a href="#">
+            @translate('{$package.name.lower$}.categories.title')
+        </a>
+    </li>
 
-    <a href="{{ $router->route('{$controller.list.name.lower$}') }}"
-        class="list-group-item {{ $helper->menu->active('{$controller.list.name.lower$}') }}">
-        @translate('{$package.name.lower$}.{$controller.list.name.lower$}.title')
-    </a>
+    <li class="{{ $helper->menu->active('{$controller.list.name.lower$}') }}">
+        <a href="{{ $router->route('{$controller.list.name.lower$}') }}">
+            @translate('{$package.name.lower$}.{$controller.list.name.lower$}.title')
+        </a>
+    </li>
 
     {{-- @muse-placeholder  submenu  Do not remove this line --}}
-</div>
+</ul>

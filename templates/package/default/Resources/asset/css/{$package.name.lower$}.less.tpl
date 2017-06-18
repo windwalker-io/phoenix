@@ -79,16 +79,25 @@
 
     // Sidebar
     .main-sidebar {
-        #submenu.list-group {
-            border-radius: 0;
+        ul.nav {
             margin-left: -15px;
             margin-right: -15px;
 
-            a {
-                border-radius: 0;
-                border: none;
-                border-bottom: 1px solid #eee;
-                margin-bottom: 0;
+            > li {
+                margin: 0;
+                background-color: #fff;
+
+                > a {
+                    border-radius: 0;
+                    position: relative;
+                    display: block;
+                    padding: 10px 15px;
+                    border-bottom: 1px solid #ddd;
+                }
+
+                &:first-child > a {
+                    border-top: 1px solid #ddd;
+                }
             }
         }
     }
