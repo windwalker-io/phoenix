@@ -9,7 +9,6 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$}\Batch;
 
 use Phoenix\Controller\Batch\AbstractReorderController;
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 
 /**
  * The ReorderController class.
@@ -18,5 +17,5 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
  */
 class ReorderController extends AbstractReorderController
 {
-	use CsrfProtectionTrait;
+	//
 }

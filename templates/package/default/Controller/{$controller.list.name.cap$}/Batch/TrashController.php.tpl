@@ -9,7 +9,6 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$}\Batch;
 
 use Phoenix\Controller\Batch\AbstractTrashController;
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 
 /**
  * The TrashController class.
@@ -18,5 +17,5 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
  */
 class TrashController extends AbstractTrashController
 {
-	use CsrfProtectionTrait;
+	//
 }

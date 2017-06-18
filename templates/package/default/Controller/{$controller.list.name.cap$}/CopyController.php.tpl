@@ -9,7 +9,6 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
 use Phoenix\Controller\Batch\AbstractCopyController;
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 
 /**
  * The CopyController class.
@@ -18,8 +17,6 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
  */
 class CopyController extends AbstractCopyController
 {
-	use CsrfProtectionTrait;
-
 	/**
 	 * The default model.
 	 *

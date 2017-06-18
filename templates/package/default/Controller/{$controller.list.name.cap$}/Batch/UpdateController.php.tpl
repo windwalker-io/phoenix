@@ -9,7 +9,6 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$}\Batch;
 
 use Phoenix\Controller\Batch\AbstractUpdateController;
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 
 /**
  * The MoveController class.
@@ -18,5 +17,5 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
  */
 class UpdateController extends AbstractUpdateController
 {
-	use CsrfProtectionTrait;
+	//
 }

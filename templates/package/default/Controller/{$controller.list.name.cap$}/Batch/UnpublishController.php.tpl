@@ -9,7 +9,6 @@
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$}\Batch;
 
 use Phoenix\Controller\Batch\AbstractUnpublishController;
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 
 /**
  * The UnpublishController class.
@@ -18,5 +17,5 @@ use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
  */
 class UnpublishController extends AbstractUnpublishController
 {
-	use CsrfProtectionTrait;
+	//
 }

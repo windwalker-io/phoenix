@@ -10,7 +10,6 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item
 
 use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
 use Phoenix\Controller\AbstractSaveController;
-use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Data\DataInterface;
 
 /**
@@ -20,8 +19,6 @@ use Windwalker\Data\DataInterface;
  */
 class SaveController extends AbstractSaveController
 {
-	use CsrfProtectionTrait;
-
 	/**
 	 * Keep this property so save & close can find routing.
 	 *
