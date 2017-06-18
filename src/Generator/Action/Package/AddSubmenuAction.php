@@ -41,14 +41,15 @@ class AddSubmenuAction extends AbstractAction
 			return;
 		}
 
-		$replace = <<<MENU
-	<a href="{{ \$router->route('$name') }}"
-        class="list-group-item {{ \$helper->menu->active('$name') }}">
-        @translate('$package.$name.title')
-    </a>
+		$replace = <<<HTML
+	<li class="{{ \$helper->menu->active('$name') }}">
+		<a href="{{ \$router->route('$name') }}">
+	        @translate('$package.$name.title')
+	    </a>
+	</li>
 
 
-MENU;
+HTML;
 
 		$code = GeneratorHelper::addBeforePlaceholder('submenu', $code, $replace, '{{--');
 
