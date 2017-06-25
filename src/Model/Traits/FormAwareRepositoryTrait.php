@@ -16,6 +16,7 @@ use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
+use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 use Windwalker\Form\Validate\ValidateResult;
@@ -45,7 +46,12 @@ trait FormAwareRepositoryTrait
 	{
 		$item = $this->getItem();
 
-		if ($item instanceof DataInterface)
+		if ($item instanceof Entity)
+		{
+			// Use toArray() on Entity to make sure we dump data as casts.
+			$item = $item->toArray(true);
+		}
+		elseif ($item instanceof DataInterface)
 		{
 			$item = $item->dump(true);
 		}
