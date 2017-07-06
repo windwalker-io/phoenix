@@ -12,7 +12,7 @@
     <transition name="{{ $attribs['transition'] }}">
 @endif
 
-    @php( isset($attribs['class']) ? $attribs['class'] = '' : null )
+    @php( isset($attribs['class']) ? $attribs['class'] : null )
     @php( $attribs['class'] .= ' form-group' )
 
     <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attribs) !!}>
