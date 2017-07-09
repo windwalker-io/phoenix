@@ -29,7 +29,7 @@
         @foreach ($items as $i => $item)
         <div class="{$controller.item.name.lower$}-item">
             <p>
-                <span class="glyphicon glyphicon-menu-right fa fa-angle-right text-muted"></span>
+                <span class="fa fa-angle-right text-muted"></span>
                 <a href="{{ $router->route('{$controller.item.name.lower$}', ['id' => $item->id]) }}">
                     {{ $item->title }}
                 </a>

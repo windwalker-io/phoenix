@@ -22,7 +22,7 @@ class PublishedButton extends IconButton
 	 */
 	protected function init()
 	{
-		$this->addState(0, 'publish',   'remove fa fa-remove text-danger', 'phoenix.grid.state.unpublished')
-			->addState(1,  'unpublish', 'ok fa fa-check text-success',     'phoenix.grid.state.published');
+		$this->addState(0, 'publish',   'fa fa-remove text-danger', 'phoenix.grid.state.unpublished')
+			->addState(1,  'unpublish', 'fa fa-check text-success', 'phoenix.grid.state.published');
 	}
 }

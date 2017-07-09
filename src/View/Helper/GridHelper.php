@@ -250,7 +250,7 @@ class GridHelper
 		$defaultAttribs['class']  = 'text-muted muted';
 		$defaultAttribs['target'] = '_blank';
 
-		$options['icon'] = isset($options['icon']) ? $options['icon'] : 'icon-out-2 glyphicon glyphicon-share fa fa-external-link';
+		$options['icon'] = isset($options['icon']) ? $options['icon'] : 'fa fa-external-link';
 
 		$title = $title . ' <small class="' . $options['icon'] . '"></small>';
 

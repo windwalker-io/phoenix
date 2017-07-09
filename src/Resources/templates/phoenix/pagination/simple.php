@@ -19,7 +19,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         <?php if ($pagination->getFirst()): ?>
             <a href="<?php echo $this->escape($route(['page'=> $pagination->getFirst()])); ?>"
                 class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
-                <span class="glyphicon glyphicon-fast-backward fa fa-fast-backward"></span>
+                <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
                     <?php echo Translator::translate('phoenix.pagination.first'); ?>
                 </span>
@@ -29,7 +29,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         <?php if ($pagination->getPrevious()): ?>
             <a href="<?php echo $this->escape($route(['page'=> $pagination->getPrevious()])); ?>"
                 class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
-                <span class="glyphicon glyphicon-backward fa fa-backward"></span>
+                <span class="fa fa-backward"></span>
                 <span class="sr-only">
                     <?php echo Translator::translate('phoenix.pagination.previous'); ?>
                 </span>
@@ -41,7 +41,7 @@ use Windwalker\Core\Pagination\PaginationResult;
 	    <?php if ($pagination->getNext()): ?>
 			<a href="<?php echo $this->escape($route(['page'=> $pagination->getNext()])); ?>"
 				class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
-				<span class="glyphicon glyphicon-forward fa fa-forward"></span>
+				<span class="fa fa-forward"></span>
 				<span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.next'); ?>
 				</span>

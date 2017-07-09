@@ -68,26 +68,27 @@
 
                     {{-- ORDERING --}}
                     <th width="5%" class="text-nowrap">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!} {!! $grid->saveOrderButton() !!}
+                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!}
+                        {!! $grid->saveOrderButton() !!}
                     </th>
 
                     {{-- AUTHOR --}}
-                    <th width="10%">
+                    <th width="10%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
                     </th>
 
                     {{-- CREATED --}}
-                    <th width="10%">
+                    <th width="10%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
                     </th>
 
                     {{-- LANGUAGE --}}
-                    <th width="7%">
+                    <th width="7%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') !!}
                     </th>
 
                     {{-- ID --}}
-                    <th width="3%">
+                    <th width="3%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
                     </th>
                 </tr>
@@ -110,11 +111,11 @@
                                 {!! $grid->published($item->state) !!}
                                 <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
                                     title="@translate('phoenix.toolbar.duplicate')">
-                                    <span class="glyphicon glyphicon-duplicate fa fa-fw fa-copy text-info"></span>
+                                    <span class="fa fa-fw fa-copy text-info"></span>
                                 </button>
                                 <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
                                     title="@translate('phoenix.toolbar.delete')">
-                                    <span class="glyphicon glyphicon-trash fa fa-fw fa-trash"></span>
+                                    <span class="fa fa-fw fa-trash"></span>
                                 </button>
                             </span>
                         </td>
@@ -175,7 +176,7 @@
             @formToken()
         </div>
 
-        @include('batch')
+        @include('_global.{$package.name.lower$}.widget.batch')
     </form>
 </div>
 @stop

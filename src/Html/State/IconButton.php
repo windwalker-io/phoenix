@@ -40,7 +40,7 @@ class IconButton
 		'_default' => [
 			'value'     => '_default',
 			'task'      => '',
-			'icon'      => 'question-sign fa fa-question-circle',
+			'icon'      => 'fa fa-question-circle',
 			'title'     => 'Unknown state',
 			'only_icon' => false,
 			'disabled'  => null,

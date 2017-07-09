@@ -24,6 +24,6 @@ class StateButton extends PublishedButton
 	{
 		parent::init();
 
-		$this->addState(-1, 'publish', 'trash fa fa-trash', 'phoenix.grid.state.trashed');
+		$this->addState(-1, 'publish', 'fa fa-trash', 'phoenix.grid.state.trashed');
 	}
 }

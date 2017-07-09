@@ -36,7 +36,7 @@ $filterFields = $form->getFields(null, 'filter');
                 <span class="input-group-btn">
             <button class="btn btn-default hasTooltip" type="submit"
                 title="@translate('phoenix.grid.search.button.desc')">
-                <span class="glyphicon glyphicon-search fa fa-search"></span>
+                <span class="fa fa-search"></span>
             </button>
         </span>
             </div>
@@ -55,9 +55,9 @@ $filterFields = $form->getFields(null, 'filter');
 
                 {{-- Button Icon --}}
                 <span
-                    class="filter-button-icon glyphicon glyphicon-menu-{{ $show ? 'up' : 'down' }} fa fa-angle-{{ $show ? 'up' : 'down' }}"
-                    data-class-show="glyphicon glyphicon-menu-up fa fa-angle-up"
-                    data-class-hide="glyphicon glyphicon-menu-down fa fa-angle-down"
+                    class="filter-button-icon fa fa-angle-{{ $show ? 'up' : 'down' }}"
+                    data-class-show="fa fa-angle-up"
+                    data-class-hide="fa fa-angle-down"
                 ></span>
             </button>
             @endif
@@ -65,7 +65,7 @@ $filterFields = $form->getFields(null, 'filter');
             {{-- Clear Button --}}
             <button type="button" class="btn btn-default search-clear-button hasTooltip"
                 title="@translate('phoenix.grid.clear.button.desc')">
-                <span class="glyphicon glyphicon-remove fa fa-remove"></span>
+                <span class="fa fa-remove"></span>
             </button>
         </div>
     </div>

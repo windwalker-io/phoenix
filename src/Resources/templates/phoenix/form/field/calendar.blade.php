@@ -12,7 +12,7 @@
 
     @if (!$field->get('disabled'))
         <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar fa fa-calendar"></span>
+            <span class="fa fa-calendar"></span>
         </span>
     @endif
 </div>

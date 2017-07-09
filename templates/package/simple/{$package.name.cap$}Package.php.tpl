@@ -50,6 +50,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 		// Assets
 		BootstrapScript::css();
 		BootstrapScript::script();
+		BootstrapScript::fontAwesome();
 
 		// Language
 		TranslatorHelper::loadAll($this, 'ini');

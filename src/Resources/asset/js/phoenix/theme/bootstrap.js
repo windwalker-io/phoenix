@@ -37,17 +37,17 @@ var Phoenix;
                 {
                     case validation.STATE_SUCCESS:
                         color = 'success';
-                        icon  = 'ok fa fa-check';
+                        icon  = 'fa fa-check';
                         break;
 
                     case validation.STATE_EMPTY:
                         color = 'error';
-                        icon  = 'remove fa fa-remove';
+                        icon  = 'fa fa-remove';
                         break;
 
                     case validation.STATE_FAIL:
                         color = 'warning';
-                        icon  = 'warning-sign fa fa-warning';
+                        icon  = 'fa fa-warning';
                         break;
                 }
 
@@ -72,7 +72,7 @@ var Phoenix;
         {
             $control.addClass('has-' + color + ' has-feedback');
 
-            var feedback = $('<span class="glyphicon glyphicon-' + icon + ' form-control-feedback" aria-hidden="true"></span>');
+            var feedback = $('<span class="' + icon + ' form-control-feedback" aria-hidden="true"></span>');
             $control.prepend(feedback);
 
             if ($control.attr('data-' + color + '-message'))
@@ -91,7 +91,7 @@ var Phoenix;
 
                 var tagName = $input.prop('tagName').toLowerCase();
 
-                if (tagName == 'div')
+                if (tagName === 'div')
                 {
                     $input.append(helpElement);
                 }
@@ -138,7 +138,7 @@ var Phoenix;
                 messageContainer.append(message);
             }
 
-            if (typeof msg == 'string')
+            if (typeof msg === 'string')
             {
                 msg = [msg];
             }
@@ -176,8 +176,8 @@ var Phoenix;
             var hideClass = button.attr('data-class-hide') || 'btn-default';
 
             var icon = button.find('span.filter-button-icon');
-            var iconShowClass = icon.attr('data-class-show') || 'glyphicon-menu-up fa fa-angle-up';
-            var iconHideClass = icon.attr('data-class-hide') || 'glyphicon-menu-down fa fa-angle-down';
+            var iconShowClass = icon.attr('data-class-show') || 'fa fa-angle-up';
+            var iconHideClass = icon.attr('data-class-hide') || 'fa fa-angle-down';
 
             if (container.hasClass('shown'))
             {

@@ -25,7 +25,7 @@
     <h1>{$controller.item.name.cap$} Item</h1>
     <p>
         <a class="btn btn-default" href="{{ $router->route('{$controller.list.name.lower$}') }}">
-            <span class="glyphicon glyphicon-chevron-left fa fa-chervon-left"></span>
+            <span class="fa fa-chervon-left"></span>
             Back to List
         </a>
     </p>

@@ -40,7 +40,7 @@
         {{-- FILTER BAR --}}
         <div class="filter-bar">
             <button class="btn btn-default pull-right" onclick="parent.{{ $function }}('{{ $selector }}', '', '');">
-                <span class="glyphicon glyphicon-remove fa fa-remove text-danger"></span>
+                <span class="fa fa-remove text-danger"></span>
                 @translate('phoenix.grid.modal.button.cancel')
             </button>
             {!! $filterBar->render(['form' => $form, 'show' => $showFilterBar]) !!}
@@ -91,7 +91,7 @@
                         {{-- CHECKBOX --}}
                         <td>
                             <a href="#" onclick="parent.{{ $function }}('{{ $selector }}', '{{ $item->id }}', '{{ $item->title }}');">
-                                <span class="glyphicon glyphicon-menu-left fa fa-angle-right text-muted"></span> {{ $item->title }}
+                                <span class="fa fa-angle-right text-muted"></span> {{ $item->title }}
                             </a>
                         </td>
 
@@ -136,8 +136,6 @@
             {{-- TOKEN --}}
             {!! \Windwalker\Core\Security\CsrfProtection::input() !!}
         </div>
-
-        @include('_global.{$package.name.lower$}.widget.batch')
     </form>
 </div>
 @stop

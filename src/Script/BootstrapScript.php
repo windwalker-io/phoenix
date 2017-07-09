@@ -305,4 +305,17 @@ JS;
 			static::internalJS($js);
 		}
 	}
+
+	/**
+	 * fontAwesome
+	 *
+	 * @return  void
+	 */
+	public static function fontAwesome()
+	{
+		if (!static::inited(__METHOD__))
+		{
+			static::addCSS(static::phoenixName() . '/css/font-awesome.min.css');
+		}
+	}
 }
