@@ -62,7 +62,7 @@
          */
         activateTab: function(href)
         {
-            var $el = this.$element.find('a[data-toggle="tab"]a[href*=' + href + ']');
+            var $el = this.$element.find('a[data-toggle="tab"][href*="' + href + '"]');
             $el.tab('show');
         },
 
@@ -75,7 +75,7 @@
          */
         hasTab: function(href)
         {
-            return this.$element.find('a[data-toggle="tab"]a[href*=' + href + ']').length;
+            return this.$element.find('a[data-toggle="tab"][href*="' + href + '"]').length;
         },
 
         /**
@@ -125,7 +125,7 @@
             var hash = 0;
             var word;
 
-            if (text.length == 0) {
+            if (text.length === 0) {
                 return hash;
             }
 
