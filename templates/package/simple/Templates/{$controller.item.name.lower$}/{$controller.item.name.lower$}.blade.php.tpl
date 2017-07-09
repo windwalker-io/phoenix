@@ -10,10 +10,11 @@
  * @var $datetime \DateTime                                   PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
  * @var $router   \Windwalker\Core\Router\PackageRouter       Router object.
+ * @var $asset    \Windwalker\Core\Asset\AssetManager         The Asset manager.
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \{$package.namespace$}Flower\Record\{$controller.item.name.cap$}Record
+ * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
  * @var $state \Windwalker\Structure\Structure
  */
 ?>
