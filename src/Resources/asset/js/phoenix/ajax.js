@@ -182,6 +182,7 @@ var Phoenix;
             options = options || {};
             headers = headers || {};
             data = data || {};
+            url = url || '';
 
             if (typeof url === 'object')
             {
@@ -189,7 +190,7 @@ var Phoenix;
                 url = options.url;
             }
 
-            if (url === undefined)
+            if (url === '')
             {
                 throw new Error('No URL provided');
             }
