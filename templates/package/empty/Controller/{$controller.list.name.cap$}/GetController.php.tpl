@@ -46,9 +46,6 @@ class GetController extends DisplayController
 	 */
 	protected function prepareExecute()
 	{
-		$this->layout = $this->input->get('layout');
-		$this->format = $this->input->get('format', 'html');
-
 		parent::prepareExecute();
 	}
 
