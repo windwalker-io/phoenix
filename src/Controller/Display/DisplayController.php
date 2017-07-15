@@ -72,6 +72,8 @@ class DisplayController extends AbstractPhoenixController
 			$response->getHeaders()
 		);
 
+		$this->response = $this->response->withStatus($response->getStatusCode(), $response->getReasonPhrase());
+
 		// Prepare Json Middleware
 		if ($this->format === 'json')
 		{
