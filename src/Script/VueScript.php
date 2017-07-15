@@ -92,7 +92,7 @@ JS
 
 			$defaultHealders = [
 				'common' => [
-					'X-Csrf-Token' => CsrfProtection::getFormToken()
+					'X-CSRF-Token' => CsrfProtection::getFormToken()
 				]
 			];
 

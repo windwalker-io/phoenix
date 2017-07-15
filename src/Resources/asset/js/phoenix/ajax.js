@@ -190,11 +190,6 @@ var Phoenix;
                 url = options.url;
             }
 
-            if (url === '')
-            {
-                throw new Error('No URL provided');
-            }
-
             options.data = $.extend(true, {}, this.data, options.data, data);
             options.type = method.toUpperCase() || 'GET';
             var type = options.type;

@@ -390,7 +390,7 @@ JS;
 		if (!static::inited(__METHOD__, (bool) $token) && $token)
 		{
 			$token = CsrfProtection::getFormToken();
-			static::internalJS("Phoenix.Ajax.headers._global['X-Csrf-Token'] = '{$token}'");
+			static::internalJS("Phoenix.Ajax.headers._global['X-CSRF-Token'] = '{$token}'");
 		}
 	}
 

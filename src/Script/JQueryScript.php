@@ -180,7 +180,7 @@ JS;
 			$js = <<<JS
 jQuery.ajaxSetup({
     headers: {
-        'X-Csrf-Token': jQuery('meta[name="csrf-token"]').attr('content')
+        'X-CSRF-Token': jQuery('meta[name="csrf-token"]').attr('content')
     }
 });
 JS;
