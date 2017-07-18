@@ -224,7 +224,7 @@ JS;
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
 			$defaultOptions = [
-				'debug' => WINDWALKER_DEBUG,
+				'debug' => (bool) WINDWALKER_DEBUG,
 				'format' => $format,
 				'sideBySide' => true,
 				'calendarWeeks' => true,
