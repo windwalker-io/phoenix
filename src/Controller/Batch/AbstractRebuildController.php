@@ -62,10 +62,14 @@ class AbstractRebuildController extends AbstractBatchController
 				throw $e;
 			}
 
-			$this->setRedirect($this->getFailRedirect(), $e->getMessage(), Bootstrap::MSG_DANGER);
+			$this->addMessage($e->getMessage(), Bootstrap::MSG_DANGER);
+			$this->setRedirect($this->getFailRedirect());
+
+			return false;
 		}
 
-		$this->setRedirect($this->getSuccessRedirect(), $this->getSuccessMessage(), Bootstrap::MSG_SUCCESS);
+		$this->addMessage($this->getSuccessMessage(), Bootstrap::MSG_SUCCESS);
+		$this->setRedirect($this->getSuccessRedirect());
 
 		return true;
 	}
