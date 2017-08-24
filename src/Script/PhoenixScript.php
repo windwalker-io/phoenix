@@ -450,7 +450,14 @@ JS;
 			$js = <<<JS
 // Init Phoenix Storage
 window.Phoenix = window.Phoenix || {};
-window.Phoenix.Store = window.Phoenix.Store || {};
+window.Phoenix.Store = window.Phoenix.Store || {
+    get: function (name, def) {
+        return this[name] !== undefined ? this[name] : def; 
+    },
+    set: function (name, value) {
+        this[name] = value;
+    }
+};
 JS;
 
 			static::internalJS($js);
@@ -459,7 +466,7 @@ JS;
 		$store = static::getJSObject($store);
 
 		$js = <<<JS
-Phoenix.Store.$name = $store;
+Phoenix.Store.set('$name', $store);
 JS;
 
 		static::internalJS($js);
