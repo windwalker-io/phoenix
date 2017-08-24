@@ -110,11 +110,6 @@ abstract class AbstractPostController extends AbstractPhoenixController
 		{
 			$this->keyName = $this->model->getKeyName(false) ? : 'id';
 		}
-
-		if (!$this->checkAccess($this->dataObject))
-		{
-			throw new UnauthorizedException('You have no access to modify this resource.');
-		}
 	}
 
 	/**

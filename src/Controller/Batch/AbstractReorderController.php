@@ -11,6 +11,7 @@ namespace Phoenix\Controller\Batch;
 use Phoenix\Model\AdminModel;
 use Phoenix\Model\AdminRepositoryInterface;
 use Windwalker\Core\Language\Translator;
+use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 
 /**
@@ -66,6 +67,11 @@ abstract class AbstractReorderController extends AbstractBatchController
 	 */
 	protected function doExecute()
 	{
+		if (!$this->checkAccess($this->data))
+		{
+			throw new UnauthorizedException('You have no access to modify these items.');
+		}
+
 		$this->model['order.column'] = $this->orderField;
 
 		$this->model->reorder((array) $this->data);

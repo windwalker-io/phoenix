@@ -12,6 +12,7 @@ use Phoenix\Controller\AbstractPostController;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\Record\Exception\NoResultException;
@@ -106,7 +107,10 @@ abstract class AbstractBatchController extends AbstractPostController
 
 		$data = $this->cleanData($data);
 
-		$this->checkAccess($data);
+		if (!$this->checkAccess($this->dataObject))
+		{
+			throw new UnauthorizedException('You have no access to modify these items.');
+		}
 
 		if ($data->isNull() && !$this->allowNullData)
 		{

@@ -10,7 +10,9 @@ namespace Phoenix\Controller\Batch;
 
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
+use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
+use Windwalker\Record\NestedRecord;
 
 /**
  * The AbstractRebuildController class.
@@ -34,15 +36,23 @@ class AbstractRebuildController extends AbstractBatchController
 	 */
 	protected function doExecute()
 	{
+		if (!$this->checkAccess([]))
+		{
+			throw new UnauthorizedException('You have no access to modify this resource.');
+		}
+
 		try
 		{
-			$this->record->rebuild();
+			/** @var NestedRecord $record */
+			$record = $this->model->getRecord();
+
+			$record->rebuild();
 
 			$ids = $this->model->getDataMapper()->findColumn('id', ['parent_id != 0']);
 
 			foreach ($ids as $id)
 			{
-				$this->record->rebuildPath($id);
+				$record->rebuildPath($id);
 			}
 		}
 		catch (\Exception $e)

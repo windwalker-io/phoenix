@@ -11,6 +11,7 @@ namespace Phoenix\Controller;
 use Phoenix\Model\FormAwareRepositoryInterface;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Model\Exception\ValidateFailException;
+use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
@@ -106,6 +107,11 @@ abstract class AbstractSaveController extends AbstractPostController
 		$data = $this->getDataObject();
 
 		$data->bind($this->data);
+
+		if (!$this->checkAccess($data))
+		{
+			throw new UnauthorizedException('You have no access to modify this resource.');
+		}
 
 		// Process pre save hook, you may add your own logic in this method
 		$this->preSave($data);
