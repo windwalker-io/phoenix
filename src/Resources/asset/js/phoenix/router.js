@@ -41,12 +41,12 @@ var Phoenix;
          */
         route: function(route)
         {
-            if (this.routes[route])
+            if (this.routes[route] === undefined)
             {
-                return this.routes[route];
+                throw new Error('Route: "' + route + '" not found');
             }
 
-            return null;
+            return this.routes[route];
         }
     };
 
