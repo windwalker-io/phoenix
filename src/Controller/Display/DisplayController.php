@@ -69,13 +69,12 @@ class DisplayController extends AbstractPhoenixController
 			$this->format,
 			$response->getBody()->__toString(),
 			$response->getStatusCode(),
-			$response->getHeaders()
+			$response->getHeaders(),
+			$response->getReasonPhrase()
 		);
 
-		$this->response = $this->response->withStatus($response->getStatusCode(), $response->getReasonPhrase());
-
 		// Prepare Json Middleware
-		if ($this->format === 'json')
+		if ($this->format === 'json' && array_search(JsonApiMiddleware::class, iterator_to_array($this->middlewares)) !== false)
 		{
 			$this->addMiddleware(JsonApiMiddleware::class);
 		}
@@ -256,22 +255,38 @@ class DisplayController extends AbstractPhoenixController
 	 * createResponse
 	 *
 	 * @param string $format
-	 * @param array  ...$args
+	 * @param string $body
+	 * @param int    $code
+	 * @param array  $headers
+	 * @param string $reason
 	 *
-	 * @return  Response\AbstractContentTypeResponse
+	 * @return Response\AbstractContentTypeResponse
 	 */
-	public static function createResponse($format, ...$args)
+	public static function createResponse($format, $body, $code, $headers, $reason = null)
 	{
 		switch (strtolower($format))
 		{
 			case 'html':
-				return new HtmlViewResponse(...$args);
+				$response = new HtmlViewResponse($body, $code, $headers);
+				break;
+
 			case 'json':
-				return new Response\JsonResponse(...$args);
+				$response = new Response\JsonResponse($body, $code, $headers);
+				break;
+
 			case 'xml':
-				return new Response\XmlResponse(...$args);
+				$response = new Response\XmlResponse($body, $code, $headers);
+				break;
+
+			default:
+				$response = new Response\TextResponse($body, $code, $headers);
 		}
 
-		return new Response\TextResponse(...$args);
+		if ($reason !== null)
+		{
+			$response = $response->withStatus($code, $reason);
+		}
+
+		return $response;
 	}
 }
