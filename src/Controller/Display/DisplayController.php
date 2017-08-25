@@ -74,7 +74,7 @@ class DisplayController extends AbstractPhoenixController
 		);
 
 		// Prepare Json Middleware
-		if ($this->format === 'json' && array_search(JsonApiMiddleware::class, iterator_to_array($this->middlewares)) !== false)
+		if ($this->format === 'json' && array_search(JsonApiMiddleware::class, iterator_to_array($this->middlewares)) === false)
 		{
 			$this->addMiddleware(JsonApiMiddleware::class);
 		}
