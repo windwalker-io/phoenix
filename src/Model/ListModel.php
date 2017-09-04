@@ -810,7 +810,12 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	public function select($fields)
 	{
-		$this->state->push('query.select', (array) $fields);
+		$fields = (array) $fields;
+
+		foreach ($fields as $field)
+		{
+			$this->state->push('query.select', (array) $field);
+		}
 
 		return $this;
 	}
