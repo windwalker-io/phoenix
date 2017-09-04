@@ -69,7 +69,7 @@ class ItemListField extends SqlListField
 		$select = $this->get('select', '*');
 
 		$query->select($select)
-			->from($table);
+			->from($query->quoteName($table));
 
 		$this->postQuery($query);
 

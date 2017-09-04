@@ -332,7 +332,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 			{
 				$query = $this->db->getQuery(true)
 					->select(sprintf('MAX(%s)', $orderField))
-					->from($record->getTableName());
+					->from($this->db->quoteName($record->getTableName()));
 
 				$condition = $this->getReorderConditions($record);
 
