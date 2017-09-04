@@ -16,6 +16,7 @@ use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Structure\Structure;
+use Windwalker\Utilities\Arr;
 
 /**
  * The GridHelper class.
@@ -133,7 +134,8 @@ class GridHelper
 			'field'     => $field,
 			'ordering'  => $listOrder,
 			'direction' => strtoupper($listDirn),
-			'selector'  => $selector
+			'selector'  => $selector,
+			'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix')
 		], WidgetHelper::EDGE);
 	}
 
@@ -185,7 +187,8 @@ class GridHelper
 			'row'    => $this->row,
 			'keyName' => $keyName,
 			'orderField'  => $orderField,
-			'saveOrder' => $saveOrder
+			'saveOrder' => $saveOrder,
+			'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix')
 		], WidgetHelper::EDGE);
 	}
 
@@ -198,7 +201,9 @@ class GridHelper
 	{
 		if ($this->config->get('list.saveorder'))
 		{
-			return WidgetHelper::render('phoenix.grid.table.saveorder-button', [], WidgetHelper::EDGE);
+			return WidgetHelper::render('phoenix.grid.table.saveorder-button', [
+				'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix')
+			], WidgetHelper::EDGE);
 		}
 
 		return '';
@@ -215,7 +220,10 @@ class GridHelper
 	{
 		$options['duration'] = isset($options['duration']) ? $options['duration'] : 0;
 
-		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', ['options' => $options], WidgetHelper::EDGE);
+		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', [
+			'options' => $options,
+			'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix')
+		], WidgetHelper::EDGE);
 	}
 
 	/**
@@ -287,6 +295,8 @@ class GridHelper
 	 */
 	public function createIconButton(array $options = [])
 	{
+		Arr::def($options, 'phoenix_js_object', 'Phoenix');
+
 		return IconButton::create($options);
 	}
 

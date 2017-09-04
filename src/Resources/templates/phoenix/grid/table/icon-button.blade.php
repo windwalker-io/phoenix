@@ -8,7 +8,7 @@
         {{ !empty($disabled) ? 'disabled' : null }}
 
         @if (!empty($task))
-        onclick="Phoenix.Grid.doTask('{{ $task or null }}', {{ $row or null }})"
+        onclick="{{ $phoenix_js_object }}.Grid.doTask('{{ $task or null }}', {{ $row or null }})"
         @endif
     >
         <span class="{{ $icon or null }}"></span>

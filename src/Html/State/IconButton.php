@@ -9,6 +9,7 @@
 namespace Phoenix\Html\State;
 
 use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The StateButton class.
@@ -77,11 +78,15 @@ class IconButton
 	/**
 	 * StateButton constructor.
 	 *
-	 * @param array   $options
+	 * @param array $options
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function __construct(array $options = [])
 	{
 		$this->options = $options;
+
+		Arr::def($this->options, 'phoenix_js_object', 'Phoenix');
 
 		$this->init();
 	}
