@@ -86,7 +86,7 @@ class IconButton
 	{
 		$this->options = $options;
 
-		Arr::def($this->options, 'phoenix_js_object', 'Phoenix');
+		$this->options = Arr::def($this->options, 'phoenix_js_object', 'Phoenix');
 
 		$this->init();
 	}

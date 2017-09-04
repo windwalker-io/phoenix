@@ -132,6 +132,8 @@ JS
 
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
+			static::core($selector, $variable);
+
 			$options = static::getJSObject($options);
 
 			$js = <<<JS

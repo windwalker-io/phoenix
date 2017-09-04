@@ -445,12 +445,12 @@
      */
     $.fn[plugin] = function(core, options)
     {
-        if (!$.data(this, "phoenix." + plugin))
+        if (!this.data("phoenix." + plugin))
         {
-            $.data(this, "phoenix." + plugin, new PhoenixGrid(this, core, options));
+            this.data("phoenix." + plugin, new PhoenixGrid(this, core, options));
         }
 
-        return $.data(this, "phoenix." + plugin);
+        return this.data("phoenix." + plugin);
     };
 
 })(jQuery);

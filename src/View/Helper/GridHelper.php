@@ -295,7 +295,7 @@ class GridHelper
 	 */
 	public function createIconButton(array $options = [])
 	{
-		Arr::def($options, 'phoenix_js_object', 'Phoenix');
+		$options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
 
 		return IconButton::create($options);
 	}
@@ -310,6 +310,8 @@ class GridHelper
 	 */
 	public function published($value, array $options = [])
 	{
+		$options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
+
 		return StateButton::create($options)->render($value, $this->row);
 	}
 
@@ -323,6 +325,8 @@ class GridHelper
 	 */
 	public function state($value, array $options = [])
 	{
+		$options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
+
 		return StateButton::create($options)->render($value, $this->row);
 	}
 
