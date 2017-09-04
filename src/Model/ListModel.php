@@ -448,7 +448,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 		{
 			$start = $this->state['list.start'];
 
-			if ($this->config->get('list.fix_page', true))
+			if ($this->config->get('list.fix_page', false))
 			{
 				$limit = $this->getLimit();
 				$total = $this->getTotal();

@@ -35,6 +35,13 @@ class ListView extends AbstractPhoenixHtmView
 	protected $pagination;
 
 	/**
+	 * Property fixPage.
+	 *
+	 * @var  bool
+	 */
+	protected $fixPage = true;
+
+	/**
 	 * setTitle
 	 *
 	 * @param string $title
@@ -87,6 +94,7 @@ class ListView extends AbstractPhoenixHtmView
 		}
 		else
 		{
+			$this->model->getConfig()->set('list.fix_page', $this->fixPage);
 			$data->total = $data->total ? : $this->model->getTotal();
 			$data->pagination = $this->model->getPagination()
 				->template('phoenix.pagination.default')
