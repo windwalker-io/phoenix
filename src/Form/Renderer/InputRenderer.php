@@ -13,6 +13,7 @@ use Windwalker\Dom\HtmlElement;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Renderer\FormRendererInterface;
+use Windwalker\Utilities\Arr;
 
 /**
  * The BootstrapRenderer class.
@@ -117,6 +118,7 @@ class InputRenderer implements FormRendererInterface
 			return $this->$method($field, $attribs);
 		}
 
+		$attribs = Arr::def($attribs, 'class', '');
 		$attribs['class'] .= ' form-control';
 
 		return $field->buildInput($attribs);
@@ -131,6 +133,7 @@ class InputRenderer implements FormRendererInterface
 	 */
 	public static function renderRadio(AbstractField $field, array $attribs = [])
 	{
+		$attribs = Arr::def($attribs, 'class', '');
 		$attribs['class'] .= ' radio-container input-list-container';
 
 		return WidgetHelper::render(static::getTemplatePrefix() . 'field.radio', [
@@ -149,6 +152,7 @@ class InputRenderer implements FormRendererInterface
 	 */
 	public static function renderCheckboxes(AbstractField $field, array $attribs = [])
 	{
+		$attribs = Arr::def($attribs, 'class', '');
 		$attribs['class'] .= ' checkbox-container input-list-container';
 
 		return WidgetHelper::render(static::getTemplatePrefix() . 'field.checkboxes', [
