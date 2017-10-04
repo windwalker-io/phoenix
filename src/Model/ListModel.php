@@ -517,7 +517,7 @@ class ListModel extends DatabaseModelRepository implements ListRepositoryInterfa
 	 */
 	public function getPage()
 	{
-		return (int) $this->get('list.page');
+		return (int) $this->get('list.page') ? : 1;
 	}
 
 	/**
