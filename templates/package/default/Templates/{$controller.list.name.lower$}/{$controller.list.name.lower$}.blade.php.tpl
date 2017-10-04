@@ -43,12 +43,12 @@
         </div>
 
         {{-- RESPONSIVE TABLE DESC --}}
-        <p class="visible-xs-block">
+        <p class="visible-xs-block d-sm-block d-md-none">
             @translate('phoenix.grid.responsive.table.desc')
         </p>
 
-        <div class="grid-table table-responsive">
-            <table class="table table-bordered">
+        <div class="grid-table">
+            <table class="table table-striped table-bordered table-responsive">
                 <thead>
                 <tr>
                     {{-- CHECKBOX --}}
@@ -114,7 +114,7 @@
                         <td>
                             <span class="btn-group">
                                 {!! $grid->published($item->state) !!}
-                                <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
+                                <button type="button" class="btn btn-light btn-sm hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
                                     title="@translate('phoenix.toolbar.duplicate')">
                                     <span class="fa fa-fw fa-copy text-info"></span>
                                 </button>
@@ -152,7 +152,7 @@
 
                         {{-- DELETE --}}
                         <td class="text-center">
-                            <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
+                            <button type="button" class="btn btn-outline-secondary btn-sm hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
                                 title="@translate('phoenix.toolbar.delete')">
                                 <span class="fa fa-fw fa-trash"></span>
                             </button>

@@ -16,9 +16,9 @@ use Windwalker\Core\Pagination\PaginationResult;
 ?>
 <ul class="pagination windwalker-pagination">
 	<?php if ($pagination->getFirst()): ?>
-		<li>
+		<li class="page-item">
 			<a href="<?php echo $this->escape($route(['page'=> $pagination->getFirst()])); ?>"
-				class="hasTooltip" title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
+				class="hasTooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
 				<span class="fa fa-fast-backward"></span>
 				<span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.first'); ?>
@@ -28,9 +28,9 @@ use Windwalker\Core\Pagination\PaginationResult;
 	<?php endif; ?>
 
 	<?php if ($pagination->getPrevious()): ?>
-		<li>
+		<li class="page-item">
 			<a href="<?php echo $this->escape($route(['page'=> $pagination->getPrevious()])); ?>"
-				class="hasTooltip" title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
+				class="hasTooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
 				<span class="fa fa-backward"></span>
 				<span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.previous'); ?>
@@ -40,8 +40,8 @@ use Windwalker\Core\Pagination\PaginationResult;
 	<?php endif; ?>
 
 	<?php if ($pagination->getLess()): ?>
-		<li>
-			<a href="<?php echo $this->escape($route(['page'=> $pagination->getLess()])); ?>">
+		<li class="page-item">
+			<a class="page-link" href="<?php echo $this->escape($route(['page'=> $pagination->getLess()])); ?>">
 				<span class="fa fa-chevron-left"></span>
 				<?php echo Translator::translate('phoenix.pagination.less'); ?>
 			</a>
@@ -50,13 +50,13 @@ use Windwalker\Core\Pagination\PaginationResult;
 
 	<?php foreach ($pagination->getPages() as $k => $page): ?>
 		<?php $active = ($page == 'current') ? 'active' : ''; ?>
-		<li class="<?php echo $active; ?>">
+		<li class="page-item <?php echo $active; ?>">
 			<?php if (!$active): ?>
-				<a href="<?php echo $this->escape($route(['page'=> $k])); ?>">
+				<a class="page-link" href="<?php echo $this->escape($route(['page'=> $k])); ?>">
 					<?php echo $k; ?>
 				</a>
 			<?php else: ?>
-				<a href="javascript:void(0);">
+				<a class="page-link" href="javascript:void(0);">
 					<?php echo $k; ?>
 				</a>
 			<?php endif; ?>
@@ -64,8 +64,8 @@ use Windwalker\Core\Pagination\PaginationResult;
 	<?php endforeach; ?>
 
 	<?php if ($pagination->getMore()): ?>
-		<li>
-			<a href="<?php echo $this->escape($route(['page'=> $pagination->getMore()])); ?>">
+		<li class="page-item">
+			<a class="page-link" href="<?php echo $this->escape($route(['page'=> $pagination->getMore()])); ?>">
 				<?php echo Translator::translate('phoenix.pagination.more'); ?>
 				<span class="fa fa-chevron-right"></span>
 			</a>
@@ -73,9 +73,9 @@ use Windwalker\Core\Pagination\PaginationResult;
 	<?php endif; ?>
 
 	<?php if ($pagination->getNext()): ?>
-		<li>
+		<li class="page-item">
 			<a href="<?php echo $this->escape($route(['page'=> $pagination->getNext()])); ?>"
-				class="hasTooltip" title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
+				class="hasTooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
 				<span class="fa fa-forward"></span>
 				<span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.next'); ?>
@@ -85,9 +85,9 @@ use Windwalker\Core\Pagination\PaginationResult;
 	<?php endif; ?>
 
 	<?php if ($pagination->getLast()): ?>
-		<li>
+		<li class="page-item">
 			<a href="<?php echo $this->escape($route(['page'=> $pagination->getLast()])); ?>"
-				class="hasTooltip" title="<?php echo Translator::translate('phoenix.pagination.last'); ?>">
+				class="hasTooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.last'); ?>">
 				<span class="fa fa-fast-forward"></span>
 				<span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.last'); ?>

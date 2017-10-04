@@ -13,19 +13,19 @@
  */
 ?>
 
-<h3 class="visible-xs-block">
+<h3 class="visible-xs-block d-sm-block d-md-none">
     @translate('phoenix.title.submenu')
 </h3>
 
-<ul id="submenu" class="nav nav-pills nav-stacked">
+<ul id="submenu" class="nav nav-pills nav-fill flex-column">
     <li class="{{ $helper->menu->active('categories') }}">
-        <a href="#">
+        <a href="#" class="nav-link {{ $helper->menu->active('categories') }}">
             @translate('{$package.name.lower$}.categories.title')
         </a>
     </li>
 
     <li class="{{ $helper->menu->active('{$controller.list.name.lower$}') }}">
-        <a href="{{ $router->route('{$controller.list.name.lower$}') }}">
+        <a href="{{ $router->route('{$controller.list.name.lower$}') }}" class="nav-link {{ $helper->menu->active('{$controller.list.name.lower$}') }}">
             @translate('{$package.name.lower$}.{$controller.list.name.lower$}.title')
         </a>
     </li>

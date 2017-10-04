@@ -18,6 +18,13 @@ abstract class BootstrapScript extends AbstractPhoenixScript
 	const FONTAWESOME = 'fontawesome';
 
 	/**
+	 * Property currentVersion.
+	 *
+	 * @var  int
+	 */
+	public static $currentVersion = 3;
+
+	/**
 	 * css
 	 *
 	 * @param int $version
@@ -28,6 +35,8 @@ abstract class BootstrapScript extends AbstractPhoenixScript
 	{
 		if (!static::inited(__METHOD__))
 		{
+			static::$currentVersion = (int) $version;
+
 			if ($version == 3)
 			{
 				static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap.min.css');
@@ -144,6 +153,7 @@ JS;
 .checkbox.single-checkbox input[type=checkbox] {
   width: 17px;
   height: 17px;
+  display: none;
 }
 CSS;
 

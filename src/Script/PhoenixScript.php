@@ -167,7 +167,15 @@ JS;
 			JQueryScript::core();
 
 			static::addJS(static::phoenixName() . '/js/chosen/chosen.min.js');
-			static::addCSS(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
+
+			if (BootstrapScript::$currentVersion === 3)
+			{
+				static::addCSS(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
+			}
+			else
+			{
+				static::addCSS(static::phoenixName() . '/css/chosen/bootstrap4-chosen.css');
+			}
 		}
 
 		if (!static::inited(__METHOD__, get_defined_vars()))

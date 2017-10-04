@@ -117,7 +117,7 @@ body.sidebar-hide .main-body {
   margin-bottom: 15px;
 }
 .ordering-control {
-  max-width: 90px;
+  max-width: 120px;
 }
 .ordering-control input {
   min-width: 40px;

@@ -52,8 +52,8 @@ class {$package.name.cap$}Package extends AbstractPackage
 		$this->checkAccess();
 
 		// Assets
-		BootstrapScript::css();
-		BootstrapScript::script();
+		BootstrapScript::css(4);
+		BootstrapScript::script(4);
 		BootstrapScript::fontAwesome();
 		Asset::addCSS($this->name . '/css/{$package.name.lower$}.css');
 

@@ -174,7 +174,7 @@
         min-width : 40px;
     }
 
-    max-width : 90px;
+    max-width : 120px;
 }
 
 // Input
