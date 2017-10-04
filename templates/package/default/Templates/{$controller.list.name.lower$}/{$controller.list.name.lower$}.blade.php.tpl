@@ -57,7 +57,7 @@
                     </th>
 
                     {{-- STATE --}}
-                    <th style="min-width: 90px;"  width="10%" class="text-nowrap">
+                    <th style="min-width: 70px;"  width="8%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
                     </th>
 
@@ -87,6 +87,11 @@
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') !!}
                     </th>
 
+                    {{-- DELETE --}}
+                    <th width="1%" class="text-nowrap">
+                        @translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.delete')
+                    </th>
+
                     {{-- ID --}}
                     <th width="3%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
@@ -113,10 +118,6 @@
                                     title="@translate('phoenix.toolbar.duplicate')">
                                     <span class="fa fa-fw fa-copy text-info"></span>
                                 </button>
-                                <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
-                                    title="@translate('phoenix.toolbar.delete')">
-                                    <span class="fa fa-fw fa-trash"></span>
-                                </button>
                             </span>
                         </td>
 
@@ -128,7 +129,7 @@
                         </td>
 
                         {{-- ORDERING --}}
-                        <td>
+                        <td class="text-right">
                             {!! $grid->orderButton() !!}
                         </td>
 
@@ -147,6 +148,14 @@
                         {{-- LANGUAGE --}}
                         <td>
                             {{ $item->language }}
+                        </td>
+
+                        {{-- DELETE --}}
+                        <td class="text-center">
+                            <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
+                                title="@translate('phoenix.toolbar.delete')">
+                                <span class="fa fa-fw fa-trash"></span>
+                            </button>
                         </td>
 
                         {{-- ID --}}

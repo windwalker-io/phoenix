@@ -18,6 +18,7 @@
 {$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext="Fulltext"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.modified="Modified"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby="Modified By"
+{$package.name.lower$}.{$controller.item.name.lower$}.field.delete="Delete"
 
 [fieldset]
 {$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.basic="Basic"

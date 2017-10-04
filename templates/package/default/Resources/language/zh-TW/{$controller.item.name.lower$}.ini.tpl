@@ -18,6 +18,7 @@
 {$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext="內文"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.modified="修改時間"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby="修改者"
+{$package.name.lower$}.{$controller.item.name.lower$}.field.delete="刪除"
 
 [fieldset]
 {$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.basic="基本資料"
