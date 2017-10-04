@@ -15,6 +15,9 @@
  * ---------------------------------------------------------------
  * @var $form \Windwalker\Form\Form
  */
+
+$update = isset($update) ? $update : true;
+$copy = isset($copy) ? $copy : true;
 ?>
 <div class="modal fade" id="batch-modal" tabindex="-1" role="dialog" aria-labelledby="batch-modal-title">
     <div class="modal-dialog">
@@ -39,14 +42,18 @@
                     <span class="fa fa-remove"></span>
                     @translate('phoenix.core.close')
                 </button>
-                <button type="button" class="btn btn-info" onclick="Phoenix.Grid.hasChecked();Phoenix.patch()">
-                    <span class="fa fa-check"></span>
-                    @translate('phoenix.core.update')
-                </button>
-                <button type="button" class="btn btn-primary" onclick="Phoenix.Grid.hasChecked();Phoenix.post()">
-                    <span class="fa fa-copy"></span>
-                    @translate('phoenix.core.copy')
-                </button>
+                @if ($update)
+                    <button type="button" class="btn btn-info" onclick="Phoenix.Grid.hasChecked();Phoenix.patch()">
+                        <span class="fa fa-check"></span>
+                        @translate('phoenix.core.update')
+                    </button>
+                @endif
+                @if ($copy)
+                    <button type="button" class="btn btn-primary" onclick="Phoenix.Grid.hasChecked();Phoenix.post()">
+                        <span class="fa fa-copy"></span>
+                        @translate('phoenix.core.copy')
+                    </button>
+                @endif
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
