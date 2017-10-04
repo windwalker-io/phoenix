@@ -100,6 +100,14 @@ $assets = [
 		'fonts/fontawesome-webfont.ttf' => 'fonts/fontawesome-webfont.ttf',
 		'fonts/fontawesome-webfont.woff' => 'fonts/fontawesome-webfont.woff',
 		'fonts/fontawesome-webfont.woff2' => 'fonts/fontawesome-webfont.woff2',
+	],
+	'bootstrap' => [
+		'dist/css/bootstrap.css' => 'css/bootstrap/4/bootstrap.css',
+		'dist/css/bootstrap.css.map' => 'css/bootstrap/4/bootstrap.css.map',
+		'dist/css/bootstrap.min.css' => 'css/bootstrap/4/bootstrap.min.css',
+		'dist/css/bootstrap.min.css.map' => 'css/bootstrap/4/bootstrap.min.css.map',
+		'dist/js/bootstrap.js' => 'js/bootstrap/4/bootstrap.js',
+		'dist/js/bootstrap.min.js' => 'js/bootstrap/4/bootstrap.min.js',
 	]
 ];
 

@@ -17,6 +17,7 @@
   "homepage": "https://github.com/ventoviro/phoenix#readme",
   "dependencies": {
     "backbone": "*",
+    "bootstrap": "4.0.0-beta",
     "font-awesome": "4.*",
     "fontawesome": "4.*",
     "ivia": "*",
