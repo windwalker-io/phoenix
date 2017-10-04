@@ -93,7 +93,7 @@
                     </th>
 
                     {{-- ID --}}
-                    <th width="3%" class="text-nowrap">
+                    <th width="3%" class="text-nowrap text-right">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
                     </th>
                 </tr>
@@ -159,7 +159,7 @@
                         </td>
 
                         {{-- ID --}}
-                        <td>
+                        <td class="text-right">
                             {{ $item->id }}
                         </td>
                     </tr>

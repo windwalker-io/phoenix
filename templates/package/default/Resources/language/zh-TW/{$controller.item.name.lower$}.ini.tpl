@@ -5,6 +5,7 @@
 
 [field]
 {$package.name.lower$}.{$controller.item.name.lower$}.field.state="狀態"
+{$package.name.lower$}.{$controller.item.name.lower$}.field.published="啟用"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.title="標題"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.ordering="排序"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.author="作者"

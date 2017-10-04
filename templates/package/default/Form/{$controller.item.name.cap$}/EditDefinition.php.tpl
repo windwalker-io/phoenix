@@ -94,12 +94,12 @@ class EditDefinition extends AbstractFieldDefinition
 		$this->fieldset('created', function(Form $form)
 		{
 			// State
-			$this->radio('state')
-				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.state'))
-				->addClass('btn-group hasChosen')
-				->defaultValue(1)
-				->option(Translator::translate('phoenix.grid.state.published'), '1')
-				->option(Translator::translate('phoenix.grid.state.unpublished'), '0');
+			$this->switch('state')
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.published'))
+				->class('')
+				->color('success')
+				->round(true)
+				->defaultValue(1);
 
 			// Created
 			$this->calendar('created')

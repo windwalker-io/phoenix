@@ -167,6 +167,25 @@ class InputRenderer implements FormRendererInterface
 	}
 
 	/**
+	 * renderRadio
+	 *
+	 * @param AbstractField $field
+	 * @param array         $attribs
+	 *
+	 * @return string
+	 */
+	public static function renderSwitch(AbstractField $field, array $attribs = [])
+	{
+//		$attribs = Arr::def($attribs, 'class', '');
+//		$attribs['class'] .= ' checkbox-container input-list-container';
+
+		return WidgetHelper::render(static::getTemplatePrefix() . 'field.switch', [
+			'attribs' => $attribs,
+			'field' => $field
+		], WidgetHelper::EDGE);
+	}
+
+	/**
 	 * renderSpacer
 	 *
 	 * @param AbstractField $field

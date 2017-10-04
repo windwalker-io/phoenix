@@ -5,6 +5,7 @@
 
 [field]
 {$package.name.lower$}.{$controller.item.name.lower$}.field.state="State"
+{$package.name.lower$}.{$controller.item.name.lower$}.field.published="Published"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.title="Title"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.ordering="Order"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.author="Author"
