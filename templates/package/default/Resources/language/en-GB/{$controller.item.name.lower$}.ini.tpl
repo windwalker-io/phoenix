@@ -12,6 +12,7 @@
 {$package.name.lower$}.{$controller.item.name.lower$}.field.language="Language"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.id="ID"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.alias="Alias"
+{$package.name.lower$}.{$controller.item.name.lower$}.field.alias.desc="Alias is used as URL path of this resource, please enter alphabetic and numeric characters."
 {$package.name.lower$}.{$controller.item.name.lower$}.field.image="Image"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.url="URL"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.introtext="Introtext"

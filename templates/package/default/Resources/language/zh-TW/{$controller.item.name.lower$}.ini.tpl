@@ -12,6 +12,7 @@
 {$package.name.lower$}.{$controller.item.name.lower$}.field.language="語言"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.id="ID"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.alias="網址別名"
+{$package.name.lower$}.{$controller.item.name.lower$}.field.alias.desc="這個欄位可以作為網址辨認用途，請填寫合適的英文與數字"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.image="圖片"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.url="URL"
 {$package.name.lower$}.{$controller.item.name.lower$}.field.introtext="摘要"

@@ -51,7 +51,8 @@ class EditDefinition extends AbstractFieldDefinition
 
 			// Alias
 			$this->text('alias')
-				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'));
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'))
+				->description(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias.desc'));
 
 			// Image
 			$this->text('image')
@@ -64,11 +65,13 @@ class EditDefinition extends AbstractFieldDefinition
 				->set('class', 'validate-url');
 
 			// Example: {$controller.item.name.cap$} List
+			// TODO: Please remove this field in production
 			$this->add('{$controller.item.name.lower$}_list', {$controller.item.name.cap$}ListField::class)
 				->label('List Example')
 				->addClass('hasChosen');
 
 			// Example: {$controller.item.name.cap$} Modal
+			// TODO: Please remove this field in production
 			$this->add('{$controller.item.name.lower$}_modal', {$controller.item.name.cap$}ModalField::class)
 				->label('Modal Example');
 		});

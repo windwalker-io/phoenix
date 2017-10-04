@@ -84,7 +84,12 @@ class InputRenderer implements FormRendererInterface
 
 		if ($field->get('required'))
 		{
-			$label = '<span class="windwalker-input-required-hint">*</span> ' . $label;
+			$label .= '<span class="windwalker-input-required-hint"> *</span>';
+		}
+
+		if ($desc = $field->get('description'))
+		{
+			$label .= ' <span class="fa fa-question-circle">';
 		}
 
 		return (string) new HtmlElement('label', $label, $attribs);
