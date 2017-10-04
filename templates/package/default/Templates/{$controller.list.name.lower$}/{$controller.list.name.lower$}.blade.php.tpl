@@ -52,17 +52,17 @@
                 <thead>
                 <tr>
                     {{-- CHECKBOX --}}
-                    <th width="1%">
+                    <th width="1%" class="text-nowrap">
                         {!! $grid->checkboxesToggle(['duration' => 150]) !!}
                     </th>
 
                     {{-- STATE --}}
-                    <th style="min-width: 90px;"  width="10%">
+                    <th style="min-width: 90px;"  width="10%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
                     </th>
 
                     {{-- TITLE --}}
-                    <th>
+                    <th class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
                     </th>
 

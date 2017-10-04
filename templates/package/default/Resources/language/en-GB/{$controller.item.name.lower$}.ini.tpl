@@ -25,4 +25,4 @@
 {$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.created="Created"
 
 [filter]
-{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select="-- Select State --"
+{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select="- Select State -"
