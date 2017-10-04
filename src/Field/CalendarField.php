@@ -54,10 +54,15 @@ class CalendarField extends TextField
 		// Convert timezone
 		$from = $this->get('from', 'UTC');
 		$to   = $this->get('to', Ioc::getConfig()->get('system.timezone', 'UTC'));
+		$nullDate = Chronos::getNullDate();
 
-		if ($attrs['value'] && $attrs['value'] !== static::EMPTY_DATETIME)
+		if ($attrs['value'] && !in_array($attrs['value'], [static::EMPTY_DATETIME, $nullDate], true))
 		{
 			$attrs['value'] = Chronos::convert($attrs['value'], $from, $to);
+		}
+		else
+		{
+			$attrs['value'] = null;
 		}
 
 		$input  = parent::buildInput($attrs);

@@ -95,11 +95,7 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		// Created date
 		if ($record->hasField('created'))
 		{
-			if ($record->created)
-			{
-				$record->created = Chronos::toServerTime($record->created);
-			}
-			else
+			if (!$record->created)
 			{
 				$record->created = $date->toSql();
 			}

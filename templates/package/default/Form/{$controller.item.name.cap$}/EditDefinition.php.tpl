@@ -10,6 +10,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Form\{$controller.item.name.
 
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ListField;
 use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}\{$controller.item.name.cap$}ModalField;
+use Phoenix\Form\Filter\UtcFilter;
 use Phoenix\Form\PhoenixFieldTrait;
 use Windwalker\Core\Form\AbstractFieldDefinition;
 use Windwalker\Core\Language\Translator;
@@ -99,11 +100,13 @@ class EditDefinition extends AbstractFieldDefinition
 
 			// Created
 			$this->calendar('created')
-				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.created'));
+				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.created'))
+				->addFilter(UtcFilter::class);
 
 			// Modified
 			$this->calendar('modified')
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'))
+				->addFilter(UtcFilter::class)
 				->disabled();
 
 			// Author
