@@ -46,15 +46,19 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 		if (!static::inited(__METHOD__, get_defined_vars()))
 		{
 			$defaultOptions = [
-				'theme' => 'bootstrap',
+				'theme' => BootstrapScript::$currentVersion === 3 ? 'bootstrap' : 'bootstrap4',
 				'uri' => get_object_vars(Ioc::getUriData())
 			];
 
 			$options = static::mergeOptions($defaultOptions, $options);
 
-			if ($options['theme'] == 'bootstrap')
+			if ($options['theme'] === 'bootstrap')
 			{
 				static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
+			}
+			elseif ($options['theme'] === 'bootstrap4')
+			{
+				static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap4.js');
 			}
 
 			$options = static::getJSObject($defaultOptions, $options);

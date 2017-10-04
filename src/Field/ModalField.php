@@ -178,13 +178,10 @@ class ModalField extends TextField
 		$js = <<<JS
 // Phoenix.Field.Modal
 var Phoenix;
-(function(Phoenix, $)
-{
-    (function()
-    {
+(function(Phoenix, $) {
+    (function() {
         Phoenix.Field.Modal = {
-            select: function(selector, id, title)
-            {
+            select: function(selector, id, title) {
                 var ele = $(selector);
 
                 ele.find('.input-group input').attr('value', title).trigger('change').delay(250).effect('highlight');

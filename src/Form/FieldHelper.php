@@ -8,6 +8,7 @@
 
 namespace Phoenix\Form;
 
+use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\JQueryScript;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Field\HiddenField;
@@ -38,6 +39,12 @@ class FieldHelper
 		{
 			$attribs['style'] = isset($attribs['style']) ? $attribs['style'] : '';
 			$attribs['style'] .= 'display: none;';
+		}
+
+		if (BootstrapScript::$currentVersion === 4)
+		{
+			Arr::def($attribs, 'class', '');
+			$attribs['class'] .= ' row';
 		}
 	}
 

@@ -3,7 +3,7 @@
 @if (!empty($only_icon))
     <span class="{{ $icon or '' }} hasTooltip" title="@translate($title)"></span>
 @else
-    <button type="button" class="grid-boolean-icon data-state-{{ $value or '' }} btn btn-light btn-sm hasTooltip"
+    <button type="button" class="grid-boolean-icon data-state-{{ $value or '' }} btn btn-default btn-light btn-sm hasTooltip"
         title="@translate($title)"
         {{ !empty($disabled) ? 'disabled' : null }}
 

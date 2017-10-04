@@ -34,7 +34,7 @@ $filterFields = $form->getFields(null, 'filter');
 
                 {{-- Submit Button --}}
                 <span class="input-group-btn">
-            <button class="btn btn-outline-secondary hasTooltip" type="submit"
+            <button class="btn btn-default btn-outline-secondary hasTooltip" type="submit"
                 title="@translate('phoenix.grid.search.button.desc')">
                 <span class="fa fa-search"></span>
             </button>
@@ -47,9 +47,9 @@ $filterFields = $form->getFields(null, 'filter');
 
             @if ($filter && count($filterFields))
             {{-- Filter Toggle Button --}}
-            <button type="button" class="btn {{ $show ? 'btn-dark' : 'btn-outline-secondary' }} filter-toggle-button hasTooltip"
+            <button type="button" class="btn {{ $show ? 'btn-dark' : 'btn-default btn-outline-secondary' }} filter-toggle-button hasTooltip"
                 data-class-show="btn-dark"
-                data-class-hide="btn-outline-secondary"
+                data-class-hide="btn-default btn-outline-secondary"
                 title="@translate('phoenix.grid.filter.button.desc')">
                 @translate('phoenix.grid.filter.button.text')
 
@@ -63,7 +63,7 @@ $filterFields = $form->getFields(null, 'filter');
             @endif
 
             {{-- Clear Button --}}
-            <button type="button" class="btn btn-outline-secondary search-clear-button hasTooltip"
+            <button type="button" class="btn btn-default btn-outline-secondary search-clear-button hasTooltip"
                 title="@translate('phoenix.grid.clear.button.desc')">
                 <span class="fa fa-remove"></span>
             </button>
