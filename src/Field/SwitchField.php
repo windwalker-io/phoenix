@@ -40,6 +40,22 @@ class SwitchField extends CheckboxField
 	protected static $inited = false;
 
 	/**
+	 * prepareRenderInput
+	 *
+	 * @param array $attrs
+	 *
+	 * @return  array
+	 */
+	public function prepare(&$attrs)
+	{
+		parent::prepare($attrs);
+
+		$value = $this->getValue();
+
+		$attrs['checked'] = $value == $this->get('checked_value') ? 'true' : null;
+	}
+
+	/**
 	 * buildInput
 	 *
 	 * @param array $attrs
