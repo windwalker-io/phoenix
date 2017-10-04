@@ -52,7 +52,10 @@ class SwitchField extends CheckboxField
 
 		$value = $this->getValue();
 
-		$attrs['checked'] = $value == $this->get('checked_value') ? 'true' : null;
+		if ($this->get('checked_value') !== null)
+		{
+			$attrs['checked'] = $value == $this->get('checked_value') ? 'true' : null;
+		}
 	}
 
 	/**
