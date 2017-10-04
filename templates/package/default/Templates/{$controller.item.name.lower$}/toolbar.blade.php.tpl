@@ -38,7 +38,7 @@
     @translate('phoenix.toolbar.save2new')
 </button>
 
-<a type="button" class="btn btn-default btn-sm phoenix-btn-cancel"
+<a role="button" class="btn btn-default btn-sm phoenix-btn-cancel"
     href="{{ $router->route('{$controller.list.name.lower$}') }}">
     <span class="fa fa-remove text-danger"></span>
     @translate('phoenix.toolbar.cancel')

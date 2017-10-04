@@ -14,7 +14,7 @@
  */
 ?>
 
-<a type="button" class="btn btn-success btn-sm phoenix-btn-new" href="{{ $router->route('{$controller.item.name.lower$}', ['new' => true]) }}">
+<a role="button" class="btn btn-success btn-sm phoenix-btn-new" href="{{ $router->route('{$controller.item.name.lower$}', ['new' => true]) }}">
     <span class="fa fa-plus"></span>
     @translate('phoenix.toolbar.new')
 </a>

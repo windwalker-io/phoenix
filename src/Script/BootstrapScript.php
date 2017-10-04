@@ -20,32 +20,47 @@ abstract class BootstrapScript extends AbstractPhoenixScript
 	/**
 	 * css
 	 *
-	 * @return  void
+	 * @param int $version
+	 *
+	 * @return void
 	 */
-	public static function css()
+	public static function css($version = 3)
 	{
 		if (!static::inited(__METHOD__))
 		{
-			$asset = static::getAsset();
-
-			$asset->addStyle(static::phoenixName() . '/css/bootstrap/bootstrap.min.css');
+			if ($version == 3)
+			{
+				static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap.min.css');
+			}
+			else
+			{
+				static::addCSS(static::phoenixName() . '/bootstrap4/css/bootstrap.min.css');
+			}
 		}
 	}
 
 	/**
 	 * script
 	 *
-	 * @return  void
+	 * @param int $version
+	 *
+	 * @return void
 	 */
-	public static function script()
+	public static function script($version = 3)
 	{
 		if (!static::inited(__METHOD__))
 		{
 			JQueryScript::core();
 
-			$asset = static::getAsset();
-
-			$asset->addScript(static::phoenixName() . '/js/bootstrap/bootstrap.min.js');
+			if ($version == 3)
+			{
+				static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap.min.js');
+			}
+			else
+			{
+				static::addJS('//cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js');
+				static::addJS(static::phoenixName() . '/bootstrap4/js/bootstrap.min.js');
+			}
 		}
 	}
 
