@@ -13,18 +13,19 @@
  */
 ?>
 
-<div class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
+<div class="navbar navbar-default navbar-dark bg-dark navbar-fixed-top navbar-expand-lg navbar-light bg-light">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
             <a class="navbar-brand" href="{{ $uri->path }}">Windwalker Phoenix</a>
+            <button type="button" class="navbar-toggle navbar-toggler"  data-toggle="collapse"
+                data-target="#top-navbar-content" aria-controls="#top-navbar-content" aria-expanded="false">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
         </div>
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
+        <div id="top-navbar-content" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav mr-auto">
                 @section('nav')
                     @include('_global.{$package.name.lower$}.widget.mainmenu')
                 @show
@@ -34,5 +35,4 @@
             </ul>
         </div>
         <!--/.nav-collapse -->
-    </div>
 </div>

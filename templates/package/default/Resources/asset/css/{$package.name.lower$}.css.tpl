@@ -78,6 +78,8 @@ body.sidebar-hide .main-sidebar {
 }
 body.sidebar-hide .main-body {
   width: 100%;
+  flex: 0 0 100%;
+  max-width: 100%;
 }
 #copyright {
   padding-bottom: 20px;
@@ -94,6 +96,9 @@ body.sidebar-hide .main-body {
     overflow: hidden;
   }
   #admin-toolbar .admin-toolbar-buttons.collapse.in {
+    height: auto;
+  }
+  #admin-toolbar .admin-toolbar-buttons.collapse.show {
     height: auto;
   }
   #admin-toolbar .toolbar-toggle-button,
@@ -131,6 +136,9 @@ body.sidebar-hide .main-body {
 }
 #phoenix-iframe-modal .modal-body iframe {
   height: 500px;
+}
+.modal-xs {
+  max-width: 900px;
 }
 @media (max-width: 767px) {
   .filter-buttons-group {

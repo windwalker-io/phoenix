@@ -109,6 +109,8 @@
 
         .main-body {
             width: 100%;
+            flex: 0 0 100%;
+            max-width: 100%;
         }
     }
 
@@ -134,6 +136,10 @@
                 overflow : hidden;
 
                 &.collapse.in {
+                    height : auto;
+                }
+
+                &.collapse.show {
                     height : auto;
                 }
             }
@@ -193,6 +199,10 @@
     .modal-body iframe {
         height : 500px;
     }
+}
+
+.modal-xs {
+    max-width: 900px;
 }
 
 @media (max-width : 767px) {

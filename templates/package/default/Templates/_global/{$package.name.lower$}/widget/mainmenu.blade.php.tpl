@@ -13,8 +13,8 @@
  */
 ?>
 @section('nav')
-    <li class="{{ $helper->menu->active('dashboard') }}">
-        <a href="#">
+    <li v-cloak="nav-item" class="{{ $helper->menu->active('dashboard') }}">
+        <a class="nav-link" href="#">
             @translate('phoenix.title.dashboard')
         </a>
     </li>

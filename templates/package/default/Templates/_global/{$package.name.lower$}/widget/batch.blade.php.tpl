@@ -20,7 +20,7 @@ $update = isset($update) ? $update : true;
 $copy = isset($copy) ? $copy : true;
 ?>
 <div class="modal fade" id="batch-modal" tabindex="-1" role="dialog" aria-labelledby="batch-modal-title">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -38,7 +38,7 @@ $copy = isset($copy) ? $copy : true;
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">
+                <button type="button" role="button" class="btn btn-default btn-outline-secondary" data-dismiss="modal">
                     <span class="fa fa-remove"></span>
                     @translate('phoenix.core.close')
                 </button>

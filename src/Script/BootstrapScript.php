@@ -43,7 +43,7 @@ abstract class BootstrapScript extends AbstractPhoenixScript
 			}
 			else
 			{
-				static::addCSS(static::phoenixName() . '/bootstrap4/css/bootstrap.min.css');
+				static::addCSS(static::phoenixName() . '/css/bootstrap/4/bootstrap.min.css');
 			}
 		}
 	}
@@ -67,8 +67,8 @@ abstract class BootstrapScript extends AbstractPhoenixScript
 			}
 			else
 			{
-				static::addJS('//cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js');
-				static::addJS(static::phoenixName() . '/bootstrap4/js/bootstrap.min.js');
+				static::addJS(static::phoenixName() . '/js/bootstrap/4/popper.min.js');
+				static::addJS(static::phoenixName() . '/js/bootstrap/4/bootstrap.min.js');
 			}
 		}
 	}

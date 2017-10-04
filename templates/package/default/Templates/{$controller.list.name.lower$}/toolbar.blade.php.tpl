@@ -34,12 +34,12 @@
     @translate('phoenix.toolbar.unpublish')
 </button>
 
-<button type="button" class="btn btn-dark btn-sm phoenix-btn-batch" data-toggle="modal" data-target="#batch-modal" onclick="Phoenix.Grid.hasChecked(null, event);">
+<button type="button" class="btn btn-default btn-dark btn-sm phoenix-btn-batch" data-toggle="modal" data-target="#batch-modal" onclick="Phoenix.Grid.hasChecked(null, event);">
     <span class="fa fa-sliders"></span>
     @translate('phoenix.toolbar.batch')
 </button>
 
-<button type="button" class="btn btn-outline-danger btn-sm phoenix-btn-delete" onclick="Phoenix.Grid.hasChecked().deleteList();">
+<button type="button" class="btn btn-default btn-outline-danger btn-sm phoenix-btn-delete" onclick="Phoenix.Grid.hasChecked().deleteList();">
     <span class="fa fa-trash"></span>
     @translate('phoenix.toolbar.delete')
 </button>

@@ -17,10 +17,10 @@
     @translate('phoenix.title.submenu')
 </h3>
 
-<ul id="submenu" class="nav nav-pills nav-fill flex-column">
+<ul id="submenu" class="nav nav-stacked nav-pills flex-column">
     <li class="{{ $helper->menu->active('categories') }}">
         <a href="#" class="nav-link {{ $helper->menu->active('categories') }}">
-            @translate('{$package.name.lower$}.categories.title')
+            Example Item
         </a>
     </li>
 

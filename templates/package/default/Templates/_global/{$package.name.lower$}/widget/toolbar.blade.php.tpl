@@ -14,11 +14,12 @@
 ?>
 
 <aside id="admin-toolbar" class="">
-    <button data-toggle="collapse" class="btn btn-default toolbar-toggle-button" data-target=".admin-toolbar-buttons">
+    <button data-toggle="collapse" class="btn btn-default toolbar-toggle-button"
+        data-target="#admin-toolbar-buttons">
         <span class="fa fa-wrench"></span>
         @translate('phoenix.toolbar.toggle')
     </button>
-    <div class="admin-toolbar-buttons">
+    <div id="admin-toolbar-buttons" class="admin-toolbar-buttons">
         <hr />
         @yield('toolbar-buttons')
     </div>
@@ -49,7 +50,10 @@
                     if (document.body.clientWidth > 480)
                     {
                         $('.subhead-collapse').height(toolbar.height());
-                        toolbar.scrollspy({offset: {top: toolbar.offset().top - $('nav.navbar').height()}});
+                        toolbar.scrollspy({
+                            offset: toolbar.offset().top - $('nav.navbar').height(),
+                            target: '#admin-toolbar'
+                        });
                     }
                 }
             }

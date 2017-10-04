@@ -39,44 +39,40 @@
 
         {{-- FILTER BAR --}}
         <div class="filter-bar">
-            <button class="btn btn-default pull-right" onclick="parent.{{ $function }}('{{ $selector }}', '', '');">
-                <span class="fa fa-remove text-danger"></span>
-                @translate('phoenix.grid.modal.button.cancel')
-            </button>
             {!! $filterBar->render(['form' => $form, 'show' => $showFilterBar]) !!}
         </div>
 
         {{-- RESPONSIVE TABLE DESC --}}
-        <p class="visible-xs-block">
+        <p class="visible-xs-block d-sm-block d-md-none">
             @translate('phoenix.grid.responsive.table.desc')
         </p>
 
-        <div class="grid-table table-responsive">
-            <table class="table table-bordered">
+        <div class="grid-table">
+            <table class="table table-bordered table-responsive">
                 <thead>
                 <tr>
                     {{-- TITLE --}}
-                    <th>
+                    <th class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
                     </th>
 
                     {{-- STATE --}}
-                    <th width="5%">
+                    <th width="5%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
                     </th>
 
                     {{-- AUTHOR --}}
-                    <th width="15%">
+                    <th width="15%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
                     </th>
 
                     {{-- CREATED --}}
-                    <th width="15%">
+                    <th width="15%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
                     </th>
 
                     {{-- ID --}}
-                    <th width="5%">
+                    <th width="5%" class="text-nowrap">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
                     </th>
                 </tr>
@@ -111,7 +107,7 @@
                         </td>
 
                         {{-- ID --}}
-                        <td>
+                        <td class="text-right">
                             {{ $item->id }}
                         </td>
                     </tr>
