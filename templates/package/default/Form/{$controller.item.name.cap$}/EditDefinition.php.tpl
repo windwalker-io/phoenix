@@ -98,7 +98,7 @@ class EditDefinition extends AbstractFieldDefinition
 				->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.published'))
 				->class('')
 				->color('success')
-				->round(true)
+				->circle(true)
 				->defaultValue(1);
 
 			// Created

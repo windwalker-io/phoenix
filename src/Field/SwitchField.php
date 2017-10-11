@@ -17,6 +17,8 @@ use Windwalker\Form\Field\CheckboxField;
  * The SwitchField class.
  *
  * @method $this|mixed round(bool $value = null)
+ * @method $this|mixed circle(bool $value = null)
+ * @method $this|mixed shape(string $value = null)
  * @method $this|mixed color(string $value = null)
  * @method $this|mixed checkedValue(string $value = null)
  * @method $this|mixed uncheckedValue(string $value = null)
@@ -56,6 +58,18 @@ class SwitchField extends CheckboxField
 		{
 			$attrs['checked'] = $value == $this->get('checked_value') ? 'true' : null;
 		}
+
+		if ($this->get('round'))
+		{
+			$this->set('shape', 'slider-round');
+		}
+
+		if ($this->get('circle'))
+		{
+			$this->set('shape', 'slider-circle');
+		}
+
+		return $attrs;
 	}
 
 	/**
@@ -114,6 +128,8 @@ class SwitchField extends CheckboxField
 	{
 		return array_merge(parent::getAccessors(), [
 			'round',
+			'circle',
+			'shape',
 			'color',
 			'checkedValue' => 'checked_value',
 			'uncheckedValue' => 'unchecked_value',
