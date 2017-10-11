@@ -7,6 +7,7 @@
   /* Hide default HTML checkbox */
   /* The slider */
   /* Rounded sliders */
+  /* Circle sliders */
 }
 .phoenix-switch input {
   display: none;
@@ -47,8 +48,14 @@
   background-color: #aaa !important;
 }
 .phoenix-switch .slider.round {
-  border-radius: 34px;
+  border-radius: 10px;
 }
 .phoenix-switch .slider.round:before {
+  border-radius: 7px;
+}
+.phoenix-switch .slider.cirlce {
+  border-radius: 50px;
+}
+.phoenix-switch .slider.cirlce:before {
   border-radius: 50%;
 }
