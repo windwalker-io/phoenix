@@ -12,5 +12,5 @@ $color = $field->get('color', 'primary');
 <label class="phoenix-switch" for="{{ $field->getId() }}">
     <input name="{{ $field->getFieldName() }}" type="hidden" value="{{ $field->get('unchecked_value', 0) }}" />
     {!! $field->buildInput($attribs) !!}
-    <span class="slider {{ $field->get('shape', 'slider-square') }} {{ $color ? 'btn-' . $color : 'btn-default' }}"></span>
+    <span class="switch-slider {{ $field->get('shape', 'slider-square') }} {{ $color ? 'btn-' . $color : 'btn-default' }}"></span>
 </label>
