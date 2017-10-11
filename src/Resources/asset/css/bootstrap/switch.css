@@ -41,10 +41,10 @@
   transform: translateX(26px);
 }
 .phoenix-switch input:not(:checked) + .slider {
-  background-color: #ccc;
+  background-color: #ccc !important;
 }
 .phoenix-switch input:not(:checked) + .slider:hover {
-  background-color: #aaa;
+  background-color: #aaa !important;
 }
 .phoenix-switch .slider.round {
   border-radius: 34px;
