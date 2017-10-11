@@ -45,7 +45,9 @@ class IconButton
 			'title'     => 'Unknown state',
 			'only_icon' => false,
 			'disabled'  => null,
-			'options'   => []
+			'options'   => [
+				'button_color' => 'btn-default btn-light'
+			]
 		]
 	];
 
@@ -164,6 +166,7 @@ class IconButton
 	 * @param  integer $row
 	 *
 	 * @return string
+	 * @throws \InvalidArgumentException
 	 */
 	public function render($value = null, $row = null)
 	{
@@ -171,7 +174,7 @@ class IconButton
 
 		$default = $default ? : $this->getState('_default');
 
-		$default = array_merge($default, $this->options);
+		$default = Arr::mergeRecursive($this->getState('_default'), $default, $this->options);
 		$default['row'] = (int) $row;
 
 		return WidgetHelper::render($this->template, $default, WidgetHelper::EDGE);
