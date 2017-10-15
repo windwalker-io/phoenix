@@ -52,6 +52,13 @@
         }
     }
 
+    input[disabled] + .switch-slider,
+    input[readonly] + .switch-slider {
+        opacity: .65;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
     /* Rounded sliders */
     .switch-slider.slider-round {
         border-radius: 10px;

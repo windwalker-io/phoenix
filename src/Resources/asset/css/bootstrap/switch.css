@@ -48,6 +48,12 @@
 .phoenix-switch input:not(:checked) + .switch-slider:hover {
   background-color: #aaa !important;
 }
+.phoenix-switch input[disabled] + .switch-slider,
+.phoenix-switch input[readonly] + .switch-slider {
+  opacity: .65;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 .phoenix-switch .switch-slider.slider-round {
   border-radius: 10px;
 }
