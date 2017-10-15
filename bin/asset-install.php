@@ -72,7 +72,11 @@ $assets = [
 	],
 	'moment' => [
 		'moment.js' => 'js/datetime/moment.js',
-		'min/moment.min.js' => 'js/datetime/moment.min.js',
+		'locale/en-gb.js' => 'js/datetime/locale/en-gb.js',
+		'locale/zh-tw.js' => 'js/datetime/locale/zh-tw.js',
+		'locale/zh-cn.js' => 'js/datetime/locale/zh-cn.js',
+		'locale/ja.js' => 'js/datetime/locale/ja-jp.js',
+		'locale/ko.js' => 'js/datetime/locale/ko-kr.js',
 	],
 	'moment-timezone' => [
 		'moment-timezone.js' => 'js/datetime/moment-timezone.js',

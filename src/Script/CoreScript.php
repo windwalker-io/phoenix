@@ -9,6 +9,7 @@
 namespace Phoenix\Script;
 
 use Phoenix\Html\HtmlHeader;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Utilities\Arr;
 
@@ -147,15 +148,23 @@ JS;
 	/**
 	 * moment
 	 *
-	 * @param bool $timezone
+	 * @param bool   $timezone
+	 * @param string $locale
 	 *
-	 * @return  void
+	 * @return void
 	 */
-	public static function moment($timezone = false)
+	public static function moment($timezone = false, $locale = 'en-gb')
 	{
 		if (!static::inited(__METHOD__))
 		{
 			static::addJS(static::phoenixName() . '/js/datetime/moment.min.js');
+
+			$locale = $locale ? strtolower($locale) : strtolower(Translator::getLocale());
+
+			if (in_array($locale, ['en-gb', 'zh-tw', 'zh-cn', 'ja-jp', 'ko-kr'], true))
+			{
+				self::addJS(static::phoenixName() . '/js/datetime/locale/' . $locale . '.js');
+			}
 		}
 
 		if (!static::inited(__METHOD__) && $timezone)

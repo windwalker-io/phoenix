@@ -8,6 +8,8 @@
 
 namespace Phoenix\Script;
 
+use Windwalker\Core\Language\Translator;
+
 /**
  * The BootstrapScript class.
  * @since  1.0
@@ -241,7 +243,7 @@ JS;
 		{
 			JQueryScript::core();
 
-			CoreScript::moment();
+			CoreScript::moment(false, Translator::getLocale());
 			static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
 			static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
 		}
