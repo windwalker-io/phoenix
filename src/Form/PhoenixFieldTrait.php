@@ -9,6 +9,7 @@
 namespace Phoenix\Form;
 
 use Phoenix\Field\CalendarField;
+use Phoenix\Field\InlineField;
 use Phoenix\Field\ItemListField;
 use Phoenix\Field\ModalField;
 use Phoenix\Field\SqlListField;
@@ -22,6 +23,7 @@ use Phoenix\Field\SwitchField;
  * @method  ModalField    modal($name = null, $label = null)
  * @method  SqlListField  sqlList($name = null, $label = null)
  * @method  SwitchField   switch($name = null, $label = null)
+ * @method  InlineField   inline($name = null, $label = null)
  *
  * @since  1.1
  */
