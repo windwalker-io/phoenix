@@ -63,7 +63,7 @@ var Phoenix;
          * @return {string}
          */
         normalize: function (text) {
-            return text.replace(/[^A-Z0-9]+/i, '.');
+            return text.replace(/[^A-Z0-9]+/ig, '.');
         }
     };
 })(Phoenix || (Phoenix = {}));
