@@ -10,37 +10,31 @@ var Phoenix;
 /**
  * Phoenix.Translator
  */
-(function(Phoenix)
-{
+(function (Phoenix) {
     "use strict";
 
-   Phoenix.Translator = {
+    Phoenix.Translator = {
         keys: {},
 
         /**
          * Translate a string.
          *
          * @param {string} text
+         *
          * @returns {string}
          */
-        translate: function(text)
-        {
-            if (this.keys[text])
-            {
-                return this.keys[text];
+        translate: function (text) {
+            var key = this.normalize(text);
+
+            if (this.keys[key]) {
+                return this.keys[key];
             }
 
             return text;
         },
 
-        sprintf: function(text)
-        {
-            var args = [], i;
-
-            for (i in arguments)
-            {
-                args.push(arguments[i]);
-            }
+        sprintf: function (text) {
+            var args = Array.prototype.slice.call(arguments);
 
             args[0] = this.translate(text);
 
@@ -55,11 +49,21 @@ var Phoenix;
          *
          * @return {Phoenix.Translator}
          */
-        addKey: function(key, value)
-        {
-            this.keys[key] = value;
+        addKey: function (key, value) {
+            this.keys[this.normalize(key)] = value;
 
             return this;
+        },
+
+        /**
+         * Replace all symbols to dot(.).
+         *
+         * @param {string} text
+         *
+         * @return {string}
+         */
+        normalize: function (text) {
+            return text.replace(/[^A-Z0-9]+/i, '.');
         }
     };
 })(Phoenix || (Phoenix = {}));
