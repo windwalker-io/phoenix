@@ -102,9 +102,9 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 		}
 
 		// Modified date
-		if ($record->hasField('modified') && $record->$key)
+		if ($record->hasField('modified'))
 		{
-			$record->modified = $date->toSql();
+			$record->modified = $record->$key ? $date->toSql() : Chronos::getNullDate();
 		}
 
 		// Created user
