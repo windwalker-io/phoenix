@@ -112,6 +112,12 @@ $assets = [
 		'dist/css/bootstrap.min.css.map' => 'css/bootstrap/4/bootstrap.min.css.map',
 		'dist/js/bootstrap.js' => 'js/bootstrap/4/bootstrap.js',
 		'dist/js/bootstrap.min.js' => 'js/bootstrap/4/bootstrap.min.js',
+	],
+	'eonasdan-bootstrap-datetimepicker' => [
+		'build/css/bootstrap-datetimepicker.css' => 'css/bootstrap/bootstrap-datetimepicker.css',
+		'build/css/bootstrap-datetimepicker.min.css' => 'css/bootstrap/bootstrap-datetimepicker.min.css',
+		'build/js/bootstrap-datetimepicker.js' => 'css/bootstrap/bootstrap-datetimepicker.js',
+		'build/js/bootstrap-datetimepicker.min.js' => 'css/bootstrap/bootstrap-datetimepicker.min.js',
 	]
 ];
 
