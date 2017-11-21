@@ -24,7 +24,7 @@
     "ivia": "*",
     "jquery": "1.*",
     "jquery-depends-on": "1.*",
-    "moment": "2.*",
+    "moment": "~>2.19",
     "moment-timezone": "*",
     "punycode": "1.*",
     "requirejs": "*",
