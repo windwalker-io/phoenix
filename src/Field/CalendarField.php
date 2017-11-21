@@ -16,10 +16,11 @@ use Windwalker\Form\Field\TextField;
 /**
  * The CalendarField class.
  *
- * @method $this from($value)
- * @method $this to($value)
- * @method $this format($value)
+ * @method $this from(string $value)
+ * @method $this to(string $value)
+ * @method $this format(string $value)
  * @method $this calendarOptions(array $options)
+ * @method $this layout(string $value)
  *
  * @since  1.0
  */
@@ -69,7 +70,7 @@ class CalendarField extends TextField
 		$format = $this->get('format', 'YYYY-MM-DD HH:mm:ss');
 		$id     = $this->getId();
 
-		return WidgetHelper::render('phoenix.form.field.calendar', [
+		return WidgetHelper::render($this->get('layout', 'phoenix.form.field.calendar'), [
 			'id'     => $id,
 			'input'  => $input,
 			'attrs'  => $attrs,
@@ -92,7 +93,8 @@ class CalendarField extends TextField
 			'from',
 			'to',
 			'format',
-			'calendarOptions' => 'options'
+			'calendarOptions' => 'options',
+			'layout',
 		]);
 	}
 }

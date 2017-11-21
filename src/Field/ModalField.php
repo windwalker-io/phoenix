@@ -30,6 +30,7 @@ use Windwalker\Form\Field\TextField;
  * @method  mixed|$this  titleField(string $value = null)
  * @method  mixed|$this  titleClass(string $value = null)
  * @method  mixed|$this  buttonText(string $value = null)
+ * @method  mixed|$this  layout(string $value = null)
  *
  * @since  1.0
  */
@@ -108,7 +109,7 @@ class ModalField extends TextField
 		$url   = $this->get('url') ? : $this->getUrl();
 		$id    = $this->getId();
 
-		return WidgetHelper::render('phoenix.form.field.modal', [
+		return WidgetHelper::render($this->get('layout', 'phoenix.form.field.modal'), [
 			'id'    => $id,
 			'title' => $this->getTitle(),
 			'input' => $input,
@@ -216,7 +217,8 @@ JS;
 			'keyField' => 'key_field',
 			'titleField' => 'title_field',
 			'titleClass',
-			'buttonText'
+			'buttonText',
+			'layout'
 		]);
 	}
 }

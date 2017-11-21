@@ -17,6 +17,7 @@ use Windwalker\Form\Form;
  * The InlineField class.
  *
  * @method  mixed|$this  asGroup(bool $value = null)
+ * @method  mixed|$this  layout(string $value = null)
  *
  * @since  1.4.2
  */
@@ -59,7 +60,7 @@ class InlineField extends TextField
 	{
 		$this->form = $this->form ? : new Form;
 
-		return WidgetHelper::render('phoenix.form.field.inline', [
+		return WidgetHelper::render($this->get('layout', 'phoenix.form.field.inline'), [
 			'form'  => $this->form,
 			'attrs' => $attrs,
 			'field' => $this
@@ -90,7 +91,8 @@ class InlineField extends TextField
 	protected function getAccessors()
 	{
 		return array_merge(parent::getAccessors(), [
-			'asGroup' => 'as_group'
+			'asGroup' => 'as_group',
+			'layout',
 		]);
 	}
 }

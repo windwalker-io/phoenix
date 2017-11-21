@@ -89,16 +89,6 @@ class SwitchField extends CheckboxField
 	}
 
 	/**
-	 * filter
-	 *
-	 * @return  static
-	 */
-	public function filter()
-	{
-		return parent::filter();
-	}
-
-	/**
 	 * initAssets
 	 *
 	 * @return  void
