@@ -50,16 +50,28 @@ class InputRenderer implements FormRendererInterface
 	 *
 	 * @param AbstractField $field
 	 * @param array         $attribs
+	 * @param array         $options
 	 *
 	 * @return string
 	 */
-	public function renderField(AbstractField $field, array $attribs = [])
+	public function renderField(AbstractField $field, array $attribs = [], array $options = [])
 	{
+		$noLabel = Arr::get($options, 'no_label', false);
+		$hideLabel = Arr::get($options, 'hide_label', false);
+
+		if ($hideLabel)
+		{
+			$field->appendAttribute('labelClass', 'sr-only');
+		}
+
 		return WidgetHelper::render('phoenix.bootstrap.field.control', [
 			'field'     => $field,
-			'labelHtml' => $field->renderLabel(),
+			'labelHtml' => $noLabel ? '' : $field->renderLabel(),
 			'inputHtml' => $field->renderInput(),
-			'attribs'   => $attribs
+			'attribs'   => $attribs,
+			'noLabel'   => $noLabel,
+			'hideLabel'   => $hideLabel,
+			'options'   => $options
 		], WidgetHelper::EDGE);
 	}
 

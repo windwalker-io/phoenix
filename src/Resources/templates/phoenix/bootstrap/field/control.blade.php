@@ -1,8 +1,10 @@
 {{-- Part of phoenix project. --}}
 <?php
 /**
- * @var $field   \Windwalker\Form\Field\AbstractField|\Windwalker\Form\Field\ListField
- * @var $attribs array
+ * @var $field     \Windwalker\Form\Field\AbstractField|\Windwalker\Form\Field\ListField
+ * @var $attribs   array
+ * @var $noLabel   bool
+ * @var $hideLabel bool
  */
 \Phoenix\Form\FieldHelper::handle($field, $attribs);
 
@@ -17,7 +19,7 @@
 
     <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attribs) !!}>
         {!! $labelHtml !!}
-        <div class="{{ $field->get('fieldWidth', 'col-md-9') }} input-container">
+        <div class="{{ $noLabel || $hideLabel ? 'col-md-12' : $field->get('fieldWidth', 'col-md-9') }} input-container">
             {!! $inputHtml !!}
         </div>
     </div>
