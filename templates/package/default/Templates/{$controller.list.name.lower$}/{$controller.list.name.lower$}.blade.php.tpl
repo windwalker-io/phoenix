@@ -111,7 +111,7 @@
                         </td>
 
                         {{-- STATE --}}
-                        <td>
+                        <td class="text-nowrap">
                             <span class="btn-group">
                                 {!! $grid->published($item->state) !!}
                                 <button type="button" class="btn btn-default btn-light btn-sm hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
@@ -134,19 +134,19 @@
                         </td>
 
                         {{-- AUTHOR --}}
-                        <td>
+                        <td class="text-nowrap">
                             {{ property_exists($item, 'user_name') ? $item->user_name : $item->created_by }}
                         </td>
 
                         {{-- CREATED --}}
-                        <td>
+                        <td class="text-nowrap">
                             <span class="hasTooltip" title="{{ $datetime::toLocalTime($item->created, 'Y-m-d H:i:s') }}">
                                 {{ $datetime::toLocalTime($item->created, 'Y-m-d') }}
                             </span>
                         </td>
 
                         {{-- LANGUAGE --}}
-                        <td>
+                        <td class="text-nowrap">
                             {{ $item->language }}
                         </td>
 
