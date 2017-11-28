@@ -8,8 +8,7 @@
 /**
  * PhoenixGrid
  */
-;(function($)
-{
+;(function ($) {
     "use strict";
 
     /**
@@ -50,8 +49,7 @@
      *
      * @constructor
      */
-    function PhoenixGrid(element, core, options)
-    {
+    function PhoenixGrid (element, core, options) {
         this.form = element;
         this.core = core;
         this.options = $.extend(true, {}, defaultOptions, options);
@@ -70,60 +68,53 @@
 
     PhoenixGrid.prototype = {
 
-	    /**
+        /**
          * Start this object and events.
          */
-        registerEvents: function()
-        {
+        registerEvents: function () {
             var self = this;
 
-            this.searchClearButton.click(function(event)
-            {
+            this.searchClearButton.click(function (event) {
                 self.searchContainer.find('input, textarea, select').val('');
                 self.filterContainer.find('input, textarea, select').val('');
 
                 self.form.submit();
             });
 
-            this.filterButton.click(function(event)
-            {
+            this.filterButton.click(function (event) {
                 self.toggleFilter();
                 event.stopPropagation();
                 event.preventDefault();
             });
 
-            this.sortButtons.click(function(event)
-            {
+            this.sortButtons.click(function (event) {
                 self.sort(this, event);
             });
         },
 
-	    /**
+        /**
          * Toggle filter bar.
          *
          * @returns {PhoenixGrid}
          */
-        toggleFilter: function()
-        {
+        toggleFilter: function () {
             Phoenix.Theme.toggleFilter(this.filterContainer, this.filterButton);
 
             return this;
         },
 
-	    /**
+        /**
          * Sort two items.
          *
          * @param {string} ordering
          * @param {string} direction
          *
          * @returns {boolean}
-	     */
-        sort: function(ordering, direction)
-        {
+         */
+        sort: function (ordering, direction) {
             var orderingInput = this.form.find('input[name=list_ordering]');
 
-            if (!orderingInput.length)
-            {
+            if (!orderingInput.length) {
                 orderingInput = $('<input name="list_ordering" type="hidden" value="" />');
 
                 this.form.append(orderingInput);
@@ -131,8 +122,7 @@
 
             var directionInput = this.form.find('input[name=list_direction]');
 
-            if (!directionInput.length)
-            {
+            if (!directionInput.length) {
                 directionInput = $('<input name="list_direction" type="hidden" value="" />');
 
                 this.form.append(directionInput);
@@ -150,14 +140,12 @@
          * @param {number}  row
          * @param {boolean} value
          */
-        checkRow: function(row, value)
-        {
+        checkRow: function (row, value) {
             value = value || true;
 
             var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
 
-            if (!ch.length)
-            {
+            if (!ch.length) {
                 throw new Error('Checkbox of row: ' + row + ' not found.');
             }
 
@@ -173,8 +161,7 @@
          *
          * @returns {boolean}
          */
-        updateRow: function(row, url, queries)
-        {
+        updateRow: function (row, url, queries) {
             this.toggleAll(false);
 
             this.checkRow(row);
@@ -182,7 +169,7 @@
             return this.core.patch(url, queries);
         },
 
-	    /**
+        /**
          * Update a row with batch task.
          *
          * @param  {string} task
@@ -191,9 +178,8 @@
          * @param  {Object} queries
          *
          * @returns {boolean}
-	     */
-        doTask: function(task, row, url, queries)
-        {
+         */
+        doTask: function (task, row, url, queries) {
             queries = queries || {};
 
             queries.task = task;
@@ -201,7 +187,7 @@
             return this.updateRow(row, url, queries);
         },
 
-	    /**
+        /**
          * Batch update items.
          *
          * @param  {string} task
@@ -209,9 +195,8 @@
          * @param  {Object} queries
          *
          * @returns {boolean}
-	     */
-        batch: function(task, url, queries)
-        {
+         */
+        batch: function (task, url, queries) {
             queries = queries || {};
 
             queries.task = task;
@@ -228,8 +213,7 @@
          *
          * @returns {boolean}
          */
-        copyRow: function(row, url, queries)
-        {
+        copyRow: function (row, url, queries) {
             this.toggleAll(false);
 
             this.checkRow(row);
@@ -237,7 +221,7 @@
             return this.core.post(url, queries);
         },
 
-	    /**
+        /**
          * Delete checked items.
          *
          * @param  {string} message
@@ -245,17 +229,14 @@
          * @param  {Object} queries
          *
          * @returns {boolean}
-	     */
-        deleteList: function(message, url, queries)
-        {
+         */
+        deleteList: function (message, url, queries) {
             var self = this;
 
             message = message || Phoenix.Translator.translate('phoenix.message.delete.confirm');
 
-            this.core.confirm(message, function(isConfirm)
-            {
-                if (isConfirm)
-                {
+            this.core.confirm(message, function (isConfirm) {
+                if (isConfirm) {
                     self.core['delete'](url, queries);
                 }
             });
@@ -263,7 +244,7 @@
             return true;
         },
 
-	    /**
+        /**
          * Delete an itme.
          *
          * @param  {number} row
@@ -272,9 +253,8 @@
          * @param  {Object} queries
          *
          * @returns {boolean}
-	     */
-        deleteRow: function(row, msg, url, queries)
-        {
+         */
+        deleteRow: function (row, msg, url, queries) {
             this.toggleAll(false);
 
             this.checkRow(row);
@@ -288,22 +268,17 @@
          * @param  {boolean}          value     Checked or unchecked.
          * @param  {number|boolean}   duration  Duration to check all.
          */
-        toggleAll: function(value, duration)
-        {
+        toggleAll: function (value, duration) {
             var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
 
-            $.each(checkboxes, function(i, e)
-            {
-                if (duration)
-                {
+            $.each(checkboxes, function (i, e) {
+                if (duration) {
                     // A little pretty effect
-                    setTimeout(function()
-                    {
+                    setTimeout(function () {
                         e.checked = value;
                     }, (duration / checkboxes.length) * i);
                 }
-                else
-                {
+                else {
                     e.checked = value;
                 }
             });
@@ -316,8 +291,7 @@
          *
          * @returns {int}
          */
-        countChecked: function()
-        {
+        countChecked: function () {
             return this.getChecked().length;
         },
 
@@ -326,15 +300,12 @@
          *
          * @returns {Element[]}
          */
-        getChecked: function()
-        {
+        getChecked: function () {
             var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]'),
                 result = [];
 
-            $.each(checkboxes, function(i, e)
-            {
-                if (e.checked)
-                {
+            $.each(checkboxes, function (i, e) {
+                if (e.checked) {
                     result.push(e);
                 }
             });
@@ -350,17 +321,14 @@
          *
          * @returns {PhoenixGrid}
          */
-        hasChecked: function(msg, event)
-        {
+        hasChecked: function (msg, event) {
             msg = msg || Phoenix.Translator.translate('phoenix.message.grid.checked');
 
-            if (!this.countChecked())
-            {
+            if (!this.countChecked()) {
                 alert(msg);
 
                 // If you send event object as second argument, we will stop all actions.
-                if (event)
-                {
+                if (event) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
@@ -379,8 +347,7 @@
          *
          * @returns {boolean}
          */
-        reorderAll: function(url, queries)
-        {
+        reorderAll: function (url, queries) {
             var self = this;
             var origin = this.form.find('input[name=origin_ordering]');
 
@@ -395,11 +362,13 @@
                     var $this = $(this);
 
                     if ($this.val() !== originOrdering[i]) {
+                        // Check self
                         self.checkRow($this.data('order-row'));
 
                         var tr = $this.parents('tr');
                         var group = tr.data('order-group');
 
+                        // Check same group boxes
                         if (group !== '') {
                             tr.siblings('[data-order-group=' + group + ']')
                                 .find('input.grid-checkbox')
@@ -422,8 +391,7 @@
          *
          * @returns {boolean}
          */
-        reorder: function(row, delta, url, queries)
-        {
+        reorder: function (row, delta, url, queries) {
             queries = queries || {};
             queries.delta = delta;
 
@@ -431,7 +399,7 @@
         }
     };
 
-	/**
+    /**
      * Push plugins.
      *
      * @param core
@@ -439,10 +407,8 @@
      *
      * @returns {*}
      */
-    $.fn[plugin] = function(core, options)
-    {
-        if (!this.data("phoenix." + plugin))
-        {
+    $.fn[plugin] = function (core, options) {
+        if (!this.data("phoenix." + plugin)) {
             this.data("phoenix." + plugin, new PhoenixGrid(this, core, options));
         }
 
