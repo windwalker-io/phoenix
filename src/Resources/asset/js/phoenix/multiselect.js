@@ -37,7 +37,9 @@
         this.last = false;
         this.options = $.extend({}, defaultOptions, options);
 
-        this.boxes.click(function(event)
+        this.boxes.parents('td').css('user-select', 'none');
+
+        this.boxes.on('click', function(event)
         {
             self.select(this, event);
         })
