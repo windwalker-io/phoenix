@@ -20,24 +20,6 @@ use Windwalker\Test\TestHelper;
 class NestedAdminModel extends AdminModel
 {
 	/**
-	 * reorder
-	 *
-	 * @param array  $conditions
-	 * @param string $orderField
-	 *
-	 * @return bool
-	 */
-	public function reorderAll($conditions = [], $orderField = null)
-	{
-		/** @var NestedRecord $record */
-		$record = $this->getRecord();
-
-		$record->rebuild();
-
-		return true;
-	}
-
-	/**
 	 * prepareRecord
 	 *
 	 * @param Record $record
@@ -69,6 +51,52 @@ class NestedAdminModel extends AdminModel
 	{
 		/** @var NestedRecord $record */
 		$record->rebuild();
-		$record->rebuildPath();
+	}
+
+	/**
+	 * reorder
+	 *
+	 * @param array  $conditions
+	 * @param string $orderField
+	 *
+	 * @return bool
+	 */
+	public function reorderAll($conditions = [], $orderField = null)
+	{
+		/** @var NestedRecord $record */
+		$record = $this->getRecord();
+
+		$record->rebuild();
+
+		return true;
+	}
+
+	/**
+	 * move
+	 *
+	 * @param int|array $ids
+	 * @param int       $delta
+	 * @param string    $orderField
+	 *
+	 * @return  bool
+	 */
+	public function move($ids, $delta, $orderField = null)
+	{
+		if (!$ids || !$delta)
+		{
+			return true;
+		}
+
+		/** @var NestedRecord $record */
+		$record     = $this->getRecord();
+		$orderField = $orderField ? : $this->state->get('order.column', 'ordering');
+
+		foreach ((array) $ids as $id)
+		{
+			$record->load($id);
+			$record->move($delta, $orderField);
+		}
+
+		return true;
 	}
 }

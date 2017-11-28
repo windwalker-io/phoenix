@@ -381,57 +381,53 @@
          */
         reorderAll: function(url, queries)
         {
-            queries = queries || {};
-            queries['task'] = queries['task'] || 'reorder';
+            var self = this;
+            var origin = this.form.find('input[name=origin_ordering]');
 
-            return this.core.patch(url, queries);
+            // If origin exists, we diff them and only send changed group.
+            if (origin.length) {
+                var originOrdering = origin.val().split(',');
+                var inputs = this.form.find('.ordering-control input');
+
+                this.toggleAll(false);
+
+                inputs.each(function (i) {
+                    var $this = $(this);
+
+                    if ($this.val() !== originOrdering[i]) {
+                        self.checkRow($this.data('order-row'));
+
+                        var tr = $this.parents('tr');
+                        var group = tr.data('order-group');
+
+                        if (group !== '') {
+                            tr.siblings('[data-order-group=' + group + ']')
+                                .find('input.grid-checkbox')
+                                .prop('checked', true);
+                        }
+                    }
+                });
+            }
+
+            return this.batch('reorder', url, queries);
         },
 
         /**
          * Reorder items.
          *
          * @param  {int}     row
-         * @param  {int}     offset
+         * @param  {int}     delta
          * @param  {string}  url
          * @param  {Object}  queries
          *
          * @returns {boolean}
          */
-        reorder: function(row, offset, url, queries)
+        reorder: function(row, delta, url, queries)
         {
-            var input = this.form.find('input[data-order-row=' + row + ']');
-            var tr    = input.parents('tr');
-            var group = tr.attr('data-order-group');
-            var input2;
+            queries = queries || {};
+            queries.delta = delta;
 
-            input.val(parseInt(input.val()) + parseFloat(offset));
-
-            if (offset > 0)
-            {
-                if (group)
-                {
-                    input2 = tr.nextAll('tr[data-order-group=' + group + ']').first().find('input[data-order-row]');
-                }
-                else
-                {
-                    input2 = tr.next().find('input[data-order-row]');
-                }
-            }
-            else if (offset < 0)
-            {
-                if (group)
-                {
-                    input2 = tr.prevAll('tr[data-order-group=' + group + ']').first().find('input[data-order-row]');
-                }
-                else
-                {
-                    input2 = tr.prev().find('input[data-order-row]');
-                }
-            }
-
-            input2.val(parseInt(input2.val()) - parseFloat(offset));
-
-            return this.reorderAll(url, queries);
+            return this.doTask('reorder', row, url, queries);
         }
     };
 

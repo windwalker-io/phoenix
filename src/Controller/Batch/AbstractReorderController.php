@@ -43,14 +43,31 @@ abstract class AbstractReorderController extends AbstractBatchController
 	protected $orderField = 'ordering';
 
 	/**
+	 * Property delta.
+	 *
+	 * @var int
+	 */
+	protected $delta;
+
+	/**
+	 * Property origin.
+	 *
+	 * @var  array
+	 */
+	protected $origin = [];
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
 	 */
 	protected function prepareExecute()
 	{
-		$this->model = $this->getModel($this->config['item_name']);
-		$this->data  = $this->input->getVar('ordering', []);
+		parent::prepareExecute();
+
+		$this->data  = $this->input->getArray('ordering', []);
+		$this->origin = explode(',', $this->input->post->getString('origin_ordering'));
+		$this->delta = $this->input->post->get('delta');
 
 		// Determine model
 		if (!$this->model instanceof AdminRepositoryInterface)
@@ -74,7 +91,35 @@ abstract class AbstractReorderController extends AbstractBatchController
 
 		$this->model['order.column'] = $this->orderField;
 
-		$this->model->reorder((array) $this->data);
+		// Move item
+		if ($this->delta)
+		{
+			$this->model->move($this->pks, $this->delta);
+		}
+		// Save order list
+		else
+		{
+			// Do not order if no change.
+			if (array_values($this->data) === array_values($this->origin))
+			{
+				return true;
+			}
+
+			// Order subset list.
+			if ($this->pks)
+			{
+				$pks = array_flip($this->pks);
+				
+				$order = array_intersect_key($this->data, $pks);
+			}
+			// Order whole page
+			else
+			{
+				$order = $this->data;
+			}
+
+			$this->model->reorder((array) $order);
+		}
 
 		return true;
 	}

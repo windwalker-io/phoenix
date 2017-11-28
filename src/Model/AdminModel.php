@@ -11,7 +11,9 @@ namespace Phoenix\Model;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\User\User;
 use Windwalker\Data\DataInterface;
+use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Filter\OutputFilter;
+use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
 
 /**
@@ -164,6 +166,64 @@ abstract class AdminModel extends CrudModel implements AdminRepositoryInterface
 	public function getUserData($conditions = [])
 	{
 		return User::getUser($conditions);
+	}
+
+	/**
+	 * move
+	 *
+	 * @param int|array $ids
+	 * @param int       $delta
+	 * @param string    $orderField
+	 *
+	 * @return  bool
+	 */
+	public function move($ids, $delta, $orderField = null)
+	{
+		if (!$ids || !$delta)
+		{
+			return true;
+		}
+		
+		$record     = $this->getRecord();
+		$key        = $record->getKeyName();
+		$orderField = $orderField ? : $this->state->get('order.column', 'ordering');
+
+		foreach ((array) $ids as $id)
+		{
+			$record->load($id);
+
+			$neighbor = $this->getRecord();
+			$condition = $this->getReorderConditions($record);
+
+			// Move down
+			if ($delta > 0)
+			{
+				$condition[] = $this->db->quoteName($orderField) . ' > ' . (int) $record->$orderField;
+			}
+			// Move up
+			else
+			{
+				$condition[] = $this->db->quoteName($orderField) . ' < ' . (int) $record->$orderField;
+			}
+
+			try
+			{
+				$neighbor->load($condition);
+			}
+			catch (NoResultException $e)
+			{
+				continue;
+			}
+
+			$ordering = [
+				$record->$key => (int) $neighbor->$orderField,
+				$neighbor->$key => (int) $record->$orderField
+			];
+
+			$this->reorder($ordering, $orderField);
+		}
+
+		return true;
 	}
 
 	/**
