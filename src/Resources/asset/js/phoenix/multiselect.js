@@ -8,8 +8,7 @@
 /**
  * PhoenixMultiSelect
  */
-;(function($)
-{
+;(function ($) {
     /**
      * Plugin name.
      *
@@ -29,20 +28,18 @@
      *
      * @constructor
      */
-    var PhoenixMultiSelect = function($element, options)
-    {
+    var PhoenixMultiSelect = function ($element, options) {
         var self = this;
         this.form = $element;
         this.boxes = $element.find('input.grid-checkbox[type=checkbox]');
         this.last = false;
         this.options = $.extend({}, defaultOptions, options);
 
-        this.boxes.parents('td').css('user-select', 'none');
+        this.boxes.parent().css('user-select', 'none');
 
-        this.boxes.on('click', function(event)
-        {
+        this.boxes.on('click', function (event) {
             self.select(this, event);
-        })
+        });
     };
 
     PhoenixMultiSelect.prototype = {
@@ -52,34 +49,27 @@
          * @param {Element} element
          * @param {Event}   event
          */
-        select: function(element, event)
-        {
-            if (!this.last)
-            {
+        select: function (element, event) {
+            if (!this.last) {
                 this.last = element;
 
                 return;
             }
 
-            if (event.shiftKey)
-            {
+            if (event.shiftKey) {
                 var self = this;
                 var start = this.boxes.index(element);
                 var end = this.boxes.index(this.last);
 
                 var chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
 
-                $.each(chs, function(i, e)
-                {
-                    if (self.options.duration)
-                    {
-                        setTimeout(function()
-                        {
+                $.each(chs, function (i, e) {
+                    if (self.options.duration) {
+                        setTimeout(function () {
                             e.checked = self.last.checked;
                         }, (self.options.duration / chs.length) * i);
                     }
-                    else
-                    {
+                    else {
                         e.checked = self.last.checked;
                     }
                 })
@@ -89,10 +79,8 @@
         }
     };
 
-    $.fn[plugin] = function(options)
-    {
-        if (!this.data('phoenix.' + plugin))
-        {
+    $.fn[plugin] = function (options) {
+        if (!this.data('phoenix.' + plugin)) {
             this.data('phoenix.' + plugin, new PhoenixMultiSelect(this, options));
         }
 
