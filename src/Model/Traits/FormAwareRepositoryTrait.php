@@ -82,14 +82,18 @@ trait FormAwareRepositoryTrait
 
 		$form->defineFormFields($definition);
 
+		$data = [];
+
 		if ($loadData === true)
 		{
-			$form->bind($this->getFormDefaultData());
+			$data = $this->getFormDefaultData();
 		}
 		elseif ($loadData)
 		{
-			$form->bind($loadData);
+			$data = $loadData;
 		}
+
+		$form->bind($data);
 
 		$renderer = $this->get('field.renderer', $this->formRenderer);
 
@@ -99,6 +103,7 @@ trait FormAwareRepositoryTrait
 		}
 
 		Ioc::getDispatcher()->triggerEvent('onModelAfterGetForm', [
+			'data'       => $data,
 			'form'       => $form,
 			'model'      => $this,
 			'control'    => $control,
