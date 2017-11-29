@@ -141,10 +141,6 @@ body.sidebar-hide .main-body {
   max-width: 900px;
 }
 @media (max-width: 767px) {
-  .filter-buttons-group {
-    display: block;
-    width: 100%;
-  }
   .filter-buttons-group .filter-toggle-button {
     width: 70%;
   }

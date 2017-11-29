@@ -47,8 +47,8 @@ $filterFields = $form->getFields(null, 'filter');
 
             @if ($filter && count($filterFields))
             {{-- Filter Toggle Button --}}
-            <button type="button" class="btn {{ $show ? 'btn-dark' : 'btn-default btn-outline-secondary' }} filter-toggle-button hasTooltip"
-                data-class-show="btn-dark"
+            <button type="button" class="btn {{ $show ? 'btn-primary btn-dark' : 'btn-default btn-outline-secondary' }} filter-toggle-button hasTooltip"
+                data-class-show="btn-primary btn-dark"
                 data-class-hide="btn-default btn-outline-secondary"
                 title="@translate('phoenix.grid.filter.button.desc')">
                 @translate('phoenix.grid.filter.button.text')
@@ -90,7 +90,7 @@ $filterFields = $form->getFields(null, 'filter');
             @else
 
                 {{-- Filter Input --}}
-                <div class="form-group col-sm-4 col-md-3">
+                <div class="form-group col-sm-6 col-md-4 col-lg-3">
                     {!! $field->appendAttribute('labelClass', ' sr-only')->renderLabel() !!}
                     {!! $field->appendAttribute('class', ' form-control')->renderInput() !!}
                 </div>
