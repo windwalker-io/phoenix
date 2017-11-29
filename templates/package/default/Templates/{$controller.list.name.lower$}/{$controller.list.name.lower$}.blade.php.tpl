@@ -62,7 +62,7 @@
                     </th>
 
                     {{-- TITLE --}}
-                    <th class="text-nowrap">
+                    <th class="text-nowrap" style="min-width: 300px;">
                         {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
                     </th>
 
