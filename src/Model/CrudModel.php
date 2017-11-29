@@ -11,6 +11,7 @@ namespace Phoenix\Model;
 use Phoenix\Model\Traits\FormAwareRepositoryTrait;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
+use Windwalker\Ioc;
 use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
 
@@ -67,12 +68,30 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 
 		$record->bind($dumped);
 
+		$dispatcher = Ioc::getDispatcher();
+
+		$dispatcher->triggerEvent('onModelBeforeSave', [
+			'conditions' => $conditions,
+			'model' => $this,
+			'data' => $data,
+			'record' => $record,
+			'updateNulls' => $this->updateNulls
+		]);
+
 		$this->prepareRecord($record);
 
 		$record->validate()
 			->store($this->updateNulls);
 
 		$this->postSaveHook($record);
+
+		$dispatcher->triggerEvent('onModelAfterSave', [
+			'conditions' => $conditions,
+			'model' => $this,
+			'data' => $data,
+			'record' => $record,
+			'updateNulls' => $this->updateNulls
+		]);
 
 		$data->bind($record->dump(true));
 
@@ -117,10 +136,25 @@ class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudR
 
 		$record = $this->getRecord();
 
+		$dispatcher = Ioc::getDispatcher();
+
+		$dispatcher->triggerEvent('onModelBeforeDelete', [
+			'conditions' => $conditions,
+			'model' => $this,
+			'record' => $record
+		]);
+
 		try
 		{
 			// Find record first to check we can delete it.
 			$record->load($conditions)->delete();
+
+			$dispatcher->triggerEvent('onModelAfterDelete', [
+				'conditions' => $conditions,
+				'model' => $this,
+				'record' => $record,
+				'result' => true
+			]);
 		}
 		catch (NoResultException $e)
 		{
