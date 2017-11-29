@@ -87,7 +87,8 @@ $assets = [
 		'dist/silicone.min.css' => 'css/silicone/silicone.min.css',
 	],
 	'sprintf-js' => [
-		'dist/sprintf.min.js' => 'js/core/sprintf.min.js'
+		'dist/sprintf.min.js' => 'js/core/sprintf.min.js',
+		'dist/sprintf.min.js.map' => 'js/core/sprintf.min.js.map',
 	],
 	'ivia' => [
 		'dist/ivia.js' => 'js/ivia/ivia.js',
