@@ -151,4 +151,16 @@ class ListDisplayController extends DisplayController
 
 		return [$search['field'] => $search['content']];
 	}
+
+	/**
+	 * getContext
+	 *
+	 * @param   string $task
+	 *
+	 * @return  string
+	 */
+	public function getContext($task = null)
+	{
+		return parent::getContext($task) . '.' . $this->layout;
+	}
 }

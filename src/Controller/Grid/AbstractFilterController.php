@@ -70,4 +70,16 @@ abstract class AbstractFilterController extends AbstractPhoenixController
 
 		return parent::getUserStateFromInput($name, $inputName, $default, $filter, $namespace);
 	}
+
+	/**
+	 * getContext
+	 *
+	 * @param   string $task
+	 *
+	 * @return  string
+	 */
+	public function getContext($task = null)
+	{
+		return parent::getContext($task) . '.' . $this->input->get('layout', strtolower($this->getName()));
+	}
 }
