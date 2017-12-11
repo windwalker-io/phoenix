@@ -26,7 +26,7 @@ abstract class AbstractFilterController extends AbstractPhoenixController
 	 */
 	protected $inflection = self::PLURAL;
 
-	/**
+    /**
 	 * doExecute
 	 *
 	 * @return  mixed
@@ -80,6 +80,8 @@ abstract class AbstractFilterController extends AbstractPhoenixController
 	 */
 	public function getContext($task = null)
 	{
-		return parent::getContext($task) . '.' . $this->input->get('layout', strtolower($this->getName()));
+        $layout = $this->input->get('layout') ?: $this->app->get('route.extra.layout', $this->name);
+
+		return parent::getContext($task) . '.' . $layout;
 	}
 }
