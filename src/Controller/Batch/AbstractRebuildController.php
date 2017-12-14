@@ -8,9 +8,8 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Security\Exception\UnauthorizedException;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Data\Data;
 use Windwalker\Record\NestedRecord;
 
@@ -38,7 +37,7 @@ class AbstractRebuildController extends AbstractBatchController
 	{
 		if (!$this->checkAccess([]))
 		{
-			throw new UnauthorizedException('You have no access to modify this resource.');
+			throw new ValidateFailException('You have no access to modify this resource.');
 		}
 
 		try
@@ -62,14 +61,8 @@ class AbstractRebuildController extends AbstractBatchController
 				throw $e;
 			}
 
-			$this->addMessage($e->getMessage(), Bootstrap::MSG_DANGER);
-			$this->setRedirect($this->getFailRedirect());
-
 			return false;
 		}
-
-		$this->addMessage($this->getSuccessMessage(), Bootstrap::MSG_SUCCESS);
-		$this->setRedirect($this->getSuccessRedirect());
 
 		return true;
 	}
