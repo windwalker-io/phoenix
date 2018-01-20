@@ -1,3 +1,46 @@
+# EXPERIMENTAL. 
+
+This is an experiment in "borrowing" the ER file format to enhance Phoenix scaffolding capability. The ER file format is a plain text description of entities, their attributes, and relationships found in this excellent ERD Generation tool: https://github.com/BurntSushi/erd . 
+
+The end goal is to be able to take an ER file, and use it as an input file for Phoenix to use as a starting point when building scaffolding for migrations, forms, fields, etc. 
+
+## self imposed constraints
+- Maintain compatibility with BurntSush/erd :  must be able to use a file for both ERD generation and scaffolding
+
+# BurntSushi/erd file format
+The BurntSushi/erd tool will take a plaintext ER file and generate a diagram such as this:
+ 
+[![ER diagram for nfldb](http://burntsushi.net/stuff/erd/example-nfldb.png)](http://burntsushi.net/stuff/erd/example-nfldb.pdf)
+
+The [corresponding `er` file is in the `examples` 
+directory](https://github.com/BurntSushi/erd/blob/master/examples/nfldb.er).
+
+```
+# Entities
+[player] {bgcolor: "#d0e0d0"}
+*player_id {label: "varchar, not null"}
+full_name {label: "varchar, null"}
+team {label: "varchar, not null"}
+position {label: "player_pos, not null"}
+status {label: "player_status, not null"}
+
+[team] {bgcolor: "#d0e0d0"}
+*team_id {label: "varchar, not null"}
+city {label: "varchar, not null"}
+name {label: "varchar, not null"}
+
+[game]
+etc
+
+# Relationships
+
+player      *--1 team
+game        *--1 team {label: "home"}
+game        *--1 team {label: "away"}
+ ```
+
+if Phoenix is capable of reading Entity Relationship Diagram definition files made for BurntSush/erd
+
 # Phoenix RAD package
 
 Phoenix is a RAD (Rapid Application Development) package for Windwalker, it provides a set of Model, View and Controllers
