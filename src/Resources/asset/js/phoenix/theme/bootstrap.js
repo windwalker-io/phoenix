@@ -42,7 +42,7 @@ var Phoenix;
 
                     case validation.STATE_EMPTY:
                         color = 'error';
-                        icon  = 'fa fa-remove';
+                        icon  = 'fa fa-remove fa-times';
                         break;
 
                     case validation.STATE_FAIL:

@@ -54,7 +54,7 @@ class {$package.name.cap$}Package extends AbstractPackage
 		// Assets
 		BootstrapScript::css(4);
 		BootstrapScript::script(4);
-		BootstrapScript::fontAwesome();
+		BootstrapScript::fontAwesome(5);
 		Asset::addCSS($this->name . '/css/{$package.name.lower$}.css');
 
 		// Language

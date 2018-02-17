@@ -351,15 +351,23 @@ JS;
 	/**
 	 * fontAwesome
 	 *
+	 * @param int $version
+	 *
 	 * @return  void
 	 */
-	public static function fontAwesome()
+	public static function fontAwesome($version = 4)
 	{
 		if (!static::inited(__METHOD__))
 		{
-			static::addJS(static::phoenixName() . '/js/fontawesome/fontawesome-all.min.js');
-			static::addJS(static::phoenixName() . '/js/fontawesome/fa-v4-shims.min.js');
-			static::addCSS(static::phoenixName() . '/css/fontawesome/fa-svg-with-js.css');
+			if ($version === 5)
+			{
+				static::addCSS(static::phoenixName() . '/css/fontawesome-all.min.css');
+				static::addJS(static::phoenixName() . '/js/fontawesome/fa-v4-shims.min.js');
+			}
+			else
+			{
+				static::addCSS(static::phoenixName() . '/css/font-awesome.min.css');
+			}
 		}
 	}
 }

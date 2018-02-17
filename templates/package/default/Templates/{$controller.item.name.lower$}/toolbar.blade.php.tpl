@@ -26,7 +26,7 @@
         <span class="sr-only">Toggle Dropdown</span>
     </button>
 
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-right">
         <li>
             <a class="dropdown-item phoenix-btn-save2copy"
                 href="javascript://"
@@ -55,6 +55,6 @@
 
 <a role="button" class="btn btn-default btn-outline-secondary btn-sm phoenix-btn-cancel"
     href="{{ $router->route('{$controller.list.name.lower$}') }}">
-    <span class="fa fa-remove"></span>
+    <span class="fa fa-remove fa-times"></span>
     @translate('phoenix.toolbar.cancel')
 </a>

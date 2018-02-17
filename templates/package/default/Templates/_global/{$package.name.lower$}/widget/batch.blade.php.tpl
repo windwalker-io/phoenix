@@ -45,7 +45,7 @@ $copy = isset($copy) ? $copy : true;
             </div>
             <div class="modal-footer">
                 <button type="button" role="button" class="btn btn-default btn-outline-secondary" data-dismiss="modal">
-                    <span class="fa fa-remove"></span>
+                    <span class="fa fa-remove fa-times"></span>
                     @translate('phoenix.core.close')
                 </button>
                 @if ($update)

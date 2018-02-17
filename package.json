@@ -19,6 +19,7 @@
     "backbone": "*",
     "bootstrap": "4.*",
     "eonasdan-bootstrap-datetimepicker": "4.*",
+    "font-awesome": "4.*",
     "ivia": "*",
     "jquery": "1.*",
     "jquery-depends-on": "1.*",

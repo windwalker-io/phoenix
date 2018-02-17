@@ -65,7 +65,7 @@ $filterFields = $form->getFields(null, 'filter');
             {{-- Clear Button --}}
             <button type="button" class="btn btn-default btn-outline-secondary search-clear-button hasTooltip"
                 title="@translate('phoenix.grid.clear.button.desc')">
-                <span class="fa fa-remove"></span>
+                <span class="fa fa-remove fa-times"></span>
             </button>
         </div>
     </div>

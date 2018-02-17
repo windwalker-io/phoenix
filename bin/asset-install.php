@@ -95,9 +95,11 @@ $assets = [
 		'dist/ivia.min.js' => 'js/ivia/ivia.min.js',
 		'dist/ivia.js.map' => 'js/ivia/ivia.js.map',
 	],
-	'@fortawesome/fontawesome-free-webfonts' => [
-		'css/fontawesome.css' => 'css/fontawesome.css',
-		'webfonts' => 'webfonts',
+	'font-awesome' => [
+		'css/font-awesome.css' => 'css/font-awesome.css',
+		'css/font-awesome.css.map' => 'css/font-awesome.css.map',
+		'css/font-awesome.min.css' => 'css/font-awesome.min.css',
+		'fonts' => 'fonts'
 	],
 	'bootstrap' => [
 		'dist/css/bootstrap.css' => 'css/bootstrap/4/bootstrap.css',
@@ -106,7 +108,7 @@ $assets = [
 		'dist/css/bootstrap.min.css.map' => 'css/bootstrap/4/bootstrap.min.css.map',
 		'dist/js/bootstrap.js' => 'js/bootstrap/4/bootstrap.js',
 		'dist/js/bootstrap.min.js' => 'js/bootstrap/4/bootstrap.min.js',
-		'scss' => 'js/bootstrap/4/scss',
+		'scss' => 'css/bootstrap/4/scss',
 	],
 	'eonasdan-bootstrap-datetimepicker' => [
 		'build/css/bootstrap-datetimepicker.css' => 'css/bootstrap/bootstrap-datetimepicker.css',
