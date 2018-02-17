@@ -16,8 +16,10 @@
   },
   "homepage": "https://github.com/ventoviro/phoenix#readme",
   "dependencies": {
+    "babel-standalone": "^6.26.0",
     "backbone": "*",
-    "bootstrap": "4.0.0-beta.2",
+    "bootstrap": "4.*",
+    "core-js": "^2.5.3",
     "eonasdan-bootstrap-datetimepicker": "4.*",
     "font-awesome": "4.*",
     "fontawesome": "4.*",
