@@ -33,7 +33,7 @@ $filterFields = $form->getFields(null, 'filter');
                 {!! $form->getField('content', 'search')->appendAttribute('class', ' form-control')->renderInput() !!}
 
                 {{-- Submit Button --}}
-                <span class="input-group-btn">
+                <span class="input-group-btn input-group-append">
             <button class="btn btn-default btn-outline-secondary hasTooltip" type="submit"
                 title="@translate('phoenix.grid.search.button.desc')">
                 <span class="fa fa-search"></span>

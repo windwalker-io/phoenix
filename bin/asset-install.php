@@ -95,16 +95,9 @@ $assets = [
 		'dist/ivia.min.js' => 'js/ivia/ivia.min.js',
 		'dist/ivia.js.map' => 'js/ivia/ivia.js.map',
 	],
-	'font-awesome' => [
-		'css/font-awesome.css' => 'css/font-awesome.css',
-		'css/font-awesome.css.map' => 'css/font-awesome.css.map',
-		'css/font-awesome.min.css' => 'css/font-awesome.min.css',
-		'fonts/FontAwesome.otf' => 'fonts/FontAwesome.otf',
-		'fonts/fontawesome-webfont.eot' => 'fonts/fontawesome-webfont.eot',
-		'fonts/fontawesome-webfont.svg' => 'fonts/fontawesome-webfont.svg',
-		'fonts/fontawesome-webfont.ttf' => 'fonts/fontawesome-webfont.ttf',
-		'fonts/fontawesome-webfont.woff' => 'fonts/fontawesome-webfont.woff',
-		'fonts/fontawesome-webfont.woff2' => 'fonts/fontawesome-webfont.woff2',
+	'@fortawesome/fontawesome-free-webfonts' => [
+		'css/fontawesome.css' => 'css/fontawesome.css',
+		'webfonts' => 'webfonts',
 	],
 	'bootstrap' => [
 		'dist/css/bootstrap.css' => 'css/bootstrap/4/bootstrap.css',

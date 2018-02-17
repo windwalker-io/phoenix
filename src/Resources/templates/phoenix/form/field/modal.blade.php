@@ -15,7 +15,7 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
             value="{{ $title or '' }}"
             placeholder="{{ $attrs['placeholder'] }}"
         />
-        <span class="input-group-btn">
+        <span class="input-group-btn input-group-append">
             <a class="btn btn-info hasModal {{ $disabled ? 'disabled' : null }}" role="button" href="{{ $disabled ? 'javascript:void(0);' : $url }}">
                 @translate($field->getAttribute('buttonText', 'phoenix.form.field.modal.button.text'))
             </a>

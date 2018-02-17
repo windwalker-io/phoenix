@@ -357,7 +357,9 @@ JS;
 	{
 		if (!static::inited(__METHOD__))
 		{
-			static::addCSS(static::phoenixName() . '/css/font-awesome.min.css');
+			static::addJS(static::phoenixName() . '/js/fontawesome/fontawesome-all.min.js');
+			static::addJS(static::phoenixName() . '/js/fontawesome/fa-v4-shims.min.js');
+			static::addCSS(static::phoenixName() . '/css/fontawesome/fa-svg-with-js.css');
 		}
 	}
 }
