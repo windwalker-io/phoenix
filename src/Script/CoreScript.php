@@ -9,6 +9,8 @@
 namespace Phoenix\Script;
 
 use Phoenix\Html\HtmlHeader;
+use WhichBrowser\Parser;
+use Windwalker\Core\Browser\WhichBrowserFactory;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Environment\Browser\Browser;
@@ -231,59 +233,6 @@ JS;
 		if (!static::inited(__METHOD__))
 		{
 			static::addJS(static::phoenixName() . '/js/ivia/ivia.min.js');
-		}
-	}
-
-	/**
-	 * polyfill
-	 *
-	 * @param callable $condition
-	 *
-	 * @return  void
-	 *
-	 * @since  1.4.7
-	 */
-	public static function polyfill(callable $condition = null)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			$condition = $condition ?: function (Browser $browser) {
-				return $browser->getBrowser() === Browser::IE && ((int) $browser->getBrowserVersion()) <= 11;
-			};
-
-			if ($condition(Ioc::getEnvironment()->getBrowser()))
-			{
-				static::addJS(static::phoenixName() . '/js/polyfill/core.min.js');
-			}
-		}
-	}
-
-	/**
-	 * babel
-	 *
-	 * @param callable $condition
-	 *
-	 * @return  void
-	 *
-	 * @since  1.4.7
-	 */
-	public static function babel(callable $condition = null)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			$condition = $condition ?: function (Browser $browser)
-			{
-				var_dump($browser->getEngine(), $browser->getBrowserVersion());
-
-				return $browser->getEngine() === Browser::ENGINE_TRIDENT && ((int) $browser->getBrowserVersion()) <= 11;
-			};
-
-			static::polyfill($condition);
-
-			if ($condition(Ioc::getEnvironment()->getBrowser()))
-			{
-				static::addJS(static::phoenixName() . '/js/polyfill/babel.min.js');
-			}
 		}
 	}
 }

@@ -127,7 +127,11 @@ $assets = [
     'babel-standalone' => [
         'babel.js' => 'js/polyfill/babel.js',
         'babel.min.js' => 'js/polyfill/babel.min.js',
-    ]
+    ],
+    'babel-polyfill' => [
+        'dist/polyfill.js' => 'js/polyfill/babel-polyfill.js',
+        'dist/polyfill.min.js' => 'js/polyfill/babel-polyfill.min.js',
+    ],
 ];
 
 $app = new AssetInstaller(
