@@ -17,12 +17,12 @@ use Phoenix\Controller\Batch\AbstractCopyController;
  */
 class CopyController extends AbstractCopyController
 {
-	/**
-	 * The default model.
-	 *
-	 * Keep model name here to make sure controller get singular model to handle copy.
-	 *
-	 * @var  string
-	 */
-	protected $model = '{$controller.item.name.cap$}';
+    /**
+     * The default model.
+     *
+     * Keep model name here to make sure controller get singular model to handle copy.
+     *
+     * @var  string
+     */
+    protected $model = '{$controller.item.name.cap$}';
 }

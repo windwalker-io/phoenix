@@ -17,5 +17,5 @@ use Phoenix\Controller\Batch\AbstractUpdateController;
  */
 class UpdateController extends AbstractUpdateController
 {
-	//
+    //
 }

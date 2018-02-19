@@ -16,7 +16,7 @@ use Windwalker\Filesystem\Folder;
 
 if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
 {
-	define('PACKAGE_{$package.name.upper$}_ROOT', __DIR__);
+    define('PACKAGE_{$package.name.upper$}_ROOT', __DIR__);
 }
 
 /**
@@ -26,76 +26,77 @@ if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
  */
 class {$package.name.cap$}Package extends AbstractPackage
 {
-	/**
-	 * initialise
-	 *
-	 * @throws  \LogicException
-	 * @return  void
-	 */
-	public function boot()
-	{
-		parent::boot();
-	}
+    /**
+     * initialise
+     *
+     * @throws  \LogicException
+     * @return  void
+     */
+    public function boot()
+    {
+        parent::boot();
+    }
 
-	/**
-	 * prepareExecute
-	 *
-	 * @return  void
-	 */
-	protected function prepareExecute()
-	{
-		$this->checkAccess();
+    /**
+     * prepareExecute
+     *
+     * @return  void
+     */
+    protected function prepareExecute()
+    {
+        $this->checkAccess();
 
-		// Assets
-		BootstrapScript::css();
-		BootstrapScript::script();
-		BootstrapScript::fontAwesome();
+        // Assets
+        BootstrapScript::css();
+        BootstrapScript::script();
+        BootstrapScript::fontAwesome();
 
-		// Language
-		TranslatorHelper::loadAll($this, 'ini');
-	}
+        // Language
+        TranslatorHelper::loadAll($this, 'ini');
+    }
 
-	/**
-	 * checkAccess
-	 *
-	 * @return  void
-	 */
-	protected function checkAccess()
-	{
+    /**
+     * checkAccess
+     *
+     * @return  void
+     */
+    protected function checkAccess()
+    {
 
-	}
+    }
 
-	/**
-	 * postExecute
-	 *
-	 * @param string $result
-	 *
-	 * @return  string
-	 */
-	protected function postExecute($result = null)
-	{
-		return $result;
-	}
+    /**
+     * postExecute
+     *
+     * @param string $result
+     *
+     * @return  string
+     */
+    protected function postExecute($result = null)
+    {
+        return $result;
+    }
 
-	/**
-	 * loadRouting
-	 *
-	 * @param MainRouter $router
-	 * @param string     $group
-	 *
-	 * @return MainRouter
-	 */
-	public function loadRouting(MainRouter $router, $group = null)
-	{
-		$router = parent::loadRouting($router, $group);
+    /**
+     * loadRouting
+     *
+     * @param MainRouter $router
+     * @param string     $group
+     *
+     * @return MainRouter
+     */
+    public function loadRouting(MainRouter $router, $group = null)
+    {
+        $router = parent::loadRouting($router, $group);
 
-		$router->group($group, function (MainRouter $router)
-		{
-			$router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
+        $router->group(
+            $group, function (MainRouter $router) {
+            $router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
 
-			// Merge other routes here...
-		});
+            // Merge other routes here...
+        }
+        );
 
-		return $router;
-	}
+        return $router;
+    }
 }

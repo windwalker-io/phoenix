@@ -14,26 +14,26 @@
  *
  * View variables
  * --------------------------------------------------------------
- * @var $item  \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
- * @var $state \Windwalker\Structure\Structure
+ * @var $item     \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
+ * @var $state    \Windwalker\Structure\Structure
  */
 ?>
 
 @extends('_global.html')
 
 @section('content')
-<div class="container {$controller.item.name.lower$}-item">
-    <h1>{$controller.item.name.cap$} Item</h1>
-    <p>
-        <a class="btn btn-default" href="{{ $router->route('{$controller.list.name.lower$}') }}">
-            <span class="fa fa-chervon-left"></span>
-            Back to List
-        </a>
-    </p>
-    <hr />
-    <img src="{{ $item->image }}" alt="Image">
-    <h2>{{ $item->title }}</h2>
-    <p>{{ $item->introtext }}</p>
-    <p>{{ $item->fulltext }}</p>
-</div>
+    <div class="container {$controller.item.name.lower$}-item">
+        <h1>{$controller.item.name.cap$} Item</h1>
+        <p>
+            <a class="btn btn-default" href="{{ $router->route('{$controller.list.name.lower$}') }}">
+                <span class="fa fa-chervon-left"></span>
+                Back to List
+            </a>
+        </p>
+        <hr />
+        <img src="{{ $item->image }}" alt="Image">
+        <h2>{{ $item->title }}</h2>
+        <p>{{ $item->introtext }}</p>
+        <p>{{ $item->fulltext }}</p>
+    </div>
 @stop

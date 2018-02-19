@@ -13,26 +13,26 @@ use Windwalker\Data\DataInterface;
 
 /**
  * The {$controller.item.name.cap$}Model class.
- * 
+ *
  * @since  1.0
  */
 class {$controller.item.name.cap$}Model extends ItemModel
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.item.name.cap$}';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = '{$controller.item.name.cap$}';
 
-	/**
-	 * postGetItem
-	 *
-	 * @param DataInterface $item
-	 *
-	 * @return  void
-	 */
-	protected function postGetItem(DataInterface $item)
-	{
-	}
+    /**
+     * postGetItem
+     *
+     * @param DataInterface $item
+     *
+     * @return  void
+     */
+    protected function postGetItem(DataInterface $item)
+    {
+    }
 }

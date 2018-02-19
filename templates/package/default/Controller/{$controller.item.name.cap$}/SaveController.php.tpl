@@ -14,94 +14,92 @@ use Windwalker\Data\DataInterface;
 
 /**
  * The SaveController class.
- * 
+ *
  * @since  1.0
  */
 class SaveController extends AbstractSaveController
 {
-	/**
-	 * Keep this property so save & close can find routing.
-	 *
-	 * @var  string
-	 */
-	protected $listName = '{$controller.list.name.cap$}';
+    /**
+     * Keep this property so save & close can find routing.
+     *
+     * @var  string
+     */
+    protected $listName = '{$controller.list.name.cap$}';
+    /**
+     * Property formControl.
+     *
+     * @var  string
+     */
+    protected $formControl = 'item';
+    /**
+     * The default Model.
+     *
+     * If set model name here, controller will get model object by this name.
+     *
+     * @var  {$controller.item.name.cap$}Model
+     */
+    protected $model = '{$controller.item.name.cap$}';
 
-	/**
-	 * Property formControl.
-	 *
-	 * @var  string
-	 */
-	protected $formControl = 'item';
+    /**
+     * A hook before main process executing.
+     *
+     * @return  void
+     */
+    protected function prepareExecute()
+    {
+        parent::prepareExecute();
+    }
 
-	/**
-	 * The default Model.
-	 *
-	 * If set model name here, controller will get model object by this name.
-	 *
-	 * @var  {$controller.item.name.cap$}Model
-	 */
-	protected $model = '{$controller.item.name.cap$}';
+    /**
+     * Check user has access to modify this resource or not.
+     *
+     * Throw exception with 4xx code or return false to block unauthorised access.
+     *
+     * @param   array|DataInterface $data
+     *
+     * @return  boolean
+     *
+     * @throws \RuntimeException
+     * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
+     */
+    public function checkAccess($data)
+    {
+        return parent::checkAccess($data);
+    }
 
-	/**
-	 * A hook before main process executing.
-	 *
-	 * @return  void
-	 */
-	protected function prepareExecute()
-	{
-		parent::prepareExecute();
-	}
+    /**
+     * A hook before save.
+     *
+     * @param DataInterface $data Data to save.
+     *
+     * @return void
+     */
+    protected function preSave(DataInterface $data)
+    {
+        parent::preSave($data);
+    }
 
-	/**
-	 * Check user has access to modify this resource or not.
-	 *
-	 * Throw exception with 4xx code or return false to block unauthorised access.
-	 *
-	 * @param   array|DataInterface $data
-	 *
-	 * @return  boolean
-	 *
-	 * @throws \RuntimeException
-	 * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
-	 */
-	public function checkAccess($data)
-	{
-		return parent::checkAccess($data);
-	}
+    /**
+     * A hook after save.
+     *
+     * @param DataInterface $data Data saved.
+     *
+     * @return  void
+     */
+    protected function postSave(DataInterface $data)
+    {
+        parent::postSave($data);
+    }
 
-	/**
-	 * A hook before save.
-	 *
-	 * @param DataInterface $data Data to save.
-	 *
-	 * @return void
-	 */
-	protected function preSave(DataInterface $data)
-	{
-		parent::preSave($data);
-	}
-
-	/**
-	 * A hook after save.
-	 *
-	 * @param DataInterface $data Data saved.
-	 *
-	 * @return  void
-	 */
-	protected function postSave(DataInterface $data)
-	{
-		parent::postSave($data);
-	}
-
-	/**
-	 * A hook after main process executing.
-	 *
-	 * @param mixed $result The result content to return, can be any value or boolean.
-	 *
-	 * @return  mixed
-	 */
-	protected function postExecute($result = null)
-	{
-		return parent::postExecute($result);
-	}
+    /**
+     * A hook after main process executing.
+     *
+     * @param mixed $result The result content to return, can be any value or boolean.
+     *
+     * @return  mixed
+     */
+    protected function postExecute($result = null)
+    {
+        return parent::postExecute($result);
+    }
 }

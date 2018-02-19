@@ -32,7 +32,7 @@
     {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
 <body class="package-{{ $package->name }} view-{{ strtolower($view->getName()) }} layout-{{ $view->getLayout() }}" style="padding-top: 50px">
-    @section('navbar')
+@section('navbar')
     <div class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -45,9 +45,9 @@
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                     @section('nav')
+                    @section('nav')
                         <li class="active"><a href="{{ $uri->path }}">Home</a></li>
-                     @show
+                    @show
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {{-- <li class="pull-right"><a href="{{ $uri->path }}/admin">Admin</a></li> --}}
@@ -56,15 +56,15 @@
             <!--/.nav-collapse -->
         </div>
     </div>
-    @show
+@show
 
-    @section('message')
-        @messages()
-    @show
+@section('message')
+    @messages()
+@show
 
-    @yield('content', 'Content')
+@yield('content', 'Content')
 
-    @section('copyright')
+@section('copyright')
     <div id="copyright">
         <div class="container">
             <div class="row">
@@ -79,7 +79,7 @@
             </div>
         </div>
     </div>
-    @show
+@show
 {!! $asset->getTemplate()->renderTemplates() !!}
 </body>
 </html>

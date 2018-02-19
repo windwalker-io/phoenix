@@ -12,49 +12,49 @@ use Phoenix\View\ListView;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
- * 
+ *
  * @since  1.0
  */
 class {$controller.list.name.cap$}HtmlView extends ListView
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.list.name.cap$}';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = '{$controller.list.name.cap$}';
 
-	/**
-	 * prepareData
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		parent::prepareData($data);
+    /**
+     * prepareData
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        parent::prepareData($data);
 
-		$this->prepareScripts();
-		$this->prepareMetadata();
-	}
+        $this->prepareScripts();
+        $this->prepareMetadata();
+    }
 
-	/**
-	 * prepareDocument
-	 *
-	 * @return  void
-	 */
-	protected function prepareScripts()
-	{
-	}
+    /**
+     * prepareDocument
+     *
+     * @return  void
+     */
+    protected function prepareScripts()
+    {
+    }
 
-	/**
-	 * prepareMetadata
-	 *
-	 * @return  void
-	 */
-	protected function prepareMetadata()
-	{
-		$this->setTitle();
-	}
+    /**
+     * prepareMetadata
+     *
+     * @return  void
+     */
+    protected function prepareMetadata()
+    {
+        $this->setTitle();
+    }
 }

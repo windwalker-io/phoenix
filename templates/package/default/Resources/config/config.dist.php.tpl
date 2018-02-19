@@ -7,31 +7,31 @@
  */
 
 return [
-	'providers' => [
+    'providers' => [
 
-	],
+    ],
 
-	'routing' => [
-		'files' => [
-			'main' => PACKAGE_{$package.name.upper$}_ROOT . '/routing.yml'
-		]
-	],
+    'routing' => [
+        'files' => [
+            'main' => PACKAGE_{$package.name.upper$}_ROOT . '/routing.yml'
+        ]
+    ],
 
-	'middlewares' => [
+    'middlewares' => [
 
-	],
+    ],
 
-	'configs' => [
+    'configs' => [
 
-	],
+    ],
 
-	'listeners' => [
-		'orphans' => \Phoenix\Listener\DumpOrphansListener::class
-	],
+    'listeners' => [
+        'orphans' => \Phoenix\Listener\DumpOrphansListener::class
+    ],
 
-	'console' => [
-		'commands' => [
+    'console' => [
+        'commands' => [
 
-		]
-	]
+        ]
+    ]
 ];

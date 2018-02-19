@@ -12,49 +12,49 @@ use Phoenix\View\ItemView;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
- * 
+ *
  * @since  1.0
  */
 class {$controller.item.name.cap$}HtmlView extends ItemView
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.item.name.cap$}';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = '{$controller.item.name.cap$}';
 
-	/**
-	 * prepareData
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		parent::prepareData($data);
+    /**
+     * prepareData
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        parent::prepareData($data);
 
-		$this->prepareScripts();
-		$this->prepareMetadata();
-	}
+        $this->prepareScripts();
+        $this->prepareMetadata();
+    }
 
-	/**
-	 * prepareDocument
-	 *
-	 * @return  void
-	 */
-	protected function prepareScripts()
-	{
-	}
+    /**
+     * prepareDocument
+     *
+     * @return  void
+     */
+    protected function prepareScripts()
+    {
+    }
 
-	/**
-	 * prepareMetadata
-	 *
-	 * @return  void
-	 */
-	protected function prepareMetadata()
-	{
-		$this->setTitle();
-	}
+    /**
+     * prepareMetadata
+     *
+     * @return  void
+     */
+    protected function prepareMetadata()
+    {
+        $this->setTitle();
+    }
 }

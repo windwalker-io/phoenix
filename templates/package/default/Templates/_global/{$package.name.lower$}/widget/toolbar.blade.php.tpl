@@ -41,14 +41,12 @@
             $(window).on('resize', processScrollInit);
             $(window).on('scroll', processScroll);
 
-            function processScrollInit()
-            {
+            function processScrollInit() {
                 if (toolbar.length) {
                     navTop = toolbar.length && toolbar.offset().top - 30;
 
                     // Only apply the scrollspy when the toolbar is not collapsed
-                    if (document.body.clientWidth > 480)
-                    {
+                    if (document.body.clientWidth > 480) {
                         $('.subhead-collapse').height(toolbar.height());
                         toolbar.scrollspy({
                             offset: toolbar.offset().top - $('nav.navbar').height(),
@@ -58,8 +56,7 @@
                 }
             }
 
-            function processScroll()
-            {
+            function processScroll() {
                 if (toolbar.length) {
                     var scrollTop = $(window).scrollTop();
 

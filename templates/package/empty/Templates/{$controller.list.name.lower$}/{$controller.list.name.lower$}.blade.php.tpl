@@ -17,9 +17,9 @@
 @extends('_global.html')
 
 @section('content')
-<div class="container {$controller.item.name.lower$}-item">
-    <h1>{$controller.list.name.cap$}</h1>
+    <div class="container {$controller.item.name.lower$}-item">
+        <h1>{$controller.list.name.cap$}</h1>
 
-    {{-- Add your content --}}
-</div>
+        {{-- Add your content --}}
+    </div>
 @stop

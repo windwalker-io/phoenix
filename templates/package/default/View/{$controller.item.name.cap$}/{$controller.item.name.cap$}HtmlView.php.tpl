@@ -15,85 +15,82 @@ use Phoenix\View\ItemView;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
- * 
+ *
  * @since  1.0
  */
 class {$controller.item.name.cap$}HtmlView extends EditView
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.item.name.cap$}';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = '{$controller.item.name.cap$}';
+    /**
+     * Property formDefinition.
+     *
+     * @var  string
+     */
+    protected $formDefinition = 'Edit';
+    /**
+     * Property formControl.
+     *
+     * @var  string
+     */
+    protected $formControl = 'item';
+    /**
+     * Property formLoadData.
+     *
+     * @var  boolean
+     */
+    protected $formLoadData = true;
 
-	/**
-	 * Property formDefinition.
-	 *
-	 * @var  string
-	 */
-	protected $formDefinition = 'Edit';
+    /**
+     * prepareData
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @see  ItemView
+     * ------------------------------------------------------
+     * @var                         $data ->state  \Windwalker\Registry\Registry
+     * @var                         $data ->item   \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
+     *
+     * @see  EditView
+     * ------------------------------------------------------
+     * @var                         $data ->form   \Windwalker\Form\Form
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        parent::prepareData($data);
 
-	/**
-	 * Property formControl.
-	 *
-	 * @var  string
-	 */
-	protected $formControl = 'item';
+        $this->prepareScripts();
+        $this->prepareMetadata();
+    }
 
-	/**
-	 * Property formLoadData.
-	 *
-	 * @var  boolean
-	 */
-	protected $formLoadData = true;
+    /**
+     * prepareDocument
+     *
+     * @return  void
+     */
+    protected function prepareScripts()
+    {
+        PhoenixScript::core();
+        PhoenixScript::chosen('select.hasChosen');
+        PhoenixScript::formValidation();
+        BootstrapScript::checkbox(BootstrapScript::FONTAWESOME);
+        BootstrapScript::buttonRadio();
+        BootstrapScript::tooltip();
+    }
 
-	/**
-	 * prepareData
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @see  ItemView
-	 * ------------------------------------------------------
-	 * @var  $data->state  \Windwalker\Registry\Registry
-	 * @var  $data->item   \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
-	 *
-	 * @see  EditView
-	 * ------------------------------------------------------
-	 * @var  $data->form   \Windwalker\Form\Form
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		parent::prepareData($data);
-
-		$this->prepareScripts();
-		$this->prepareMetadata();
-	}
-
-	/**
-	 * prepareDocument
-	 *
-	 * @return  void
-	 */
-	protected function prepareScripts()
-	{
-		PhoenixScript::core();
-		PhoenixScript::chosen('select.hasChosen');
-		PhoenixScript::formValidation();
-		BootstrapScript::checkbox(BootstrapScript::FONTAWESOME);
-		BootstrapScript::buttonRadio();
-		BootstrapScript::tooltip();
-	}
-
-	/**
-	 * prepareMetadata
-	 *
-	 * @return  void
-	 */
-	protected function prepareMetadata()
-	{
-		$this->setTitle();
-	}
+    /**
+     * prepareMetadata
+     *
+     * @return  void
+     */
+    protected function prepareMetadata()
+    {
+        $this->setTitle();
+    }
 }

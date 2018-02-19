@@ -12,15 +12,15 @@ use Windwalker\Core\Model\ModelRepository;
 
 /**
  * The {$controller.item.name.cap$}Model class.
- * 
+ *
  * @since  1.0
  */
 class {$controller.item.name.cap$}Model extends ModelRepository
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '{$controller.item.name.cap$}';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = '{$controller.item.name.cap$}';
 }

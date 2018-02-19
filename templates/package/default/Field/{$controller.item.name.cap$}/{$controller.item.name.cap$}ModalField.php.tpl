@@ -18,38 +18,34 @@ use Phoenix\Field\ModalField;
  */
 class {$controller.item.name.cap$}ModalField extends ModalField
 {
-	/**
-	 * Property table.
-	 *
-	 * @var  string
-	 */
-	protected $table = Table::{$controller.list.name.upper$};
-
-	/**
-	 * Property view.
-	 *
-	 * @var  string
-	 */
-	protected $view = '{$controller.list.name.lower$}';
-
-	/**
-	 * Property package.
-	 *
-	 * @var  string
-	 */
-	protected $package = '{$package.name.lower$}';
-
-	/**
-	 * Property titleField.
-	 *
-	 * @var  string
-	 */
-	protected $titleField = 'title';
-
-	/**
-	 * Property keyField.
-	 *
-	 * @var  string
-	 */
-	protected $keyField = 'id';
+    /**
+     * Property table.
+     *
+     * @var  string
+     */
+    protected $table = Table::{$controller.list.name.upper$};
+    /**
+     * Property view.
+     *
+     * @var  string
+     */
+    protected $view = '{$controller.list.name.lower$}';
+    /**
+     * Property package.
+     *
+     * @var  string
+     */
+    protected $package = '{$package.name.lower$}';
+    /**
+     * Property titleField.
+     *
+     * @var  string
+     */
+    protected $titleField = 'title';
+    /**
+     * Property keyField.
+     *
+     * @var  string
+     */
+    protected $keyField = 'id';
 }

@@ -10,12 +10,12 @@ namespace {$package.namespace$}{$package.name.cap$}\Table;
 
 /**
  * The Table class.
- * 
+ *
  * @since  1.0
  */
 abstract class Table
 {
-	const {$controller.list.name.upper$} = '{$controller.list.name.lower$}';
+    const {$controller.list.name.upper$} = '{$controller.list.name.lower$}';
 
-	// @muse-placeholder  db-table  Do not remove this.
+    // @muse-placeholder  db-table  Do not remove this.
 }

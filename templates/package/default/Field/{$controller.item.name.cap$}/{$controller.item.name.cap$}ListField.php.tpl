@@ -18,17 +18,16 @@ use Phoenix\Field\ItemListField;
  */
 class {$controller.item.name.cap$}ListField extends ItemListField
 {
-	/**
-	 * Property table.
-	 *
-	 * @var  string
-	 */
-	protected $table = Table::{$controller.list.name.upper$};
-
-	/**
-	 * Property ordering.
-	 *
-	 * @var  string
-	 */
-	protected $ordering = null;
+    /**
+     * Property table.
+     *
+     * @var  string
+     */
+    protected $table = Table::{$controller.list.name.upper$};
+    /**
+     * Property ordering.
+     *
+     * @var  string
+     */
+    protected $ordering = null;
 }

@@ -13,7 +13,7 @@
  * @var $asset    \Windwalker\Core\Asset\AssetManager         The Asset manager.
  *
  * ---------------------------------------------------------------
- * @var $form \Windwalker\Form\Form
+ * @var $form     \Windwalker\Form\Form
  */
 
 $update = isset($update) ? $update : true;
@@ -32,7 +32,8 @@ $copy = isset($copy) ? $copy : true;
                 <h4 class="modal-title" id="batch-modal-title">
                     <span class="fa fa-sliders"></span> @translate('phoenix.batch.modal.title')
                 </h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
                 <p>

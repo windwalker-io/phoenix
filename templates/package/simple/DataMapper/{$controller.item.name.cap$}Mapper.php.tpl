@@ -13,36 +13,33 @@ use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 
 /**
  * The {$controller.item.name.cap$}Mapper class.
- * 
+ *
  * @since  1.0
  */
 class {$controller.item.name.cap$}Mapper extends AbstractDatabaseMapperProxy
 {
-	/**
-	 * Property table.
-	 *
-	 * @var  string
-	 */
-	protected static $table = '{$controller.list.name.lower$}';
-
-	/**
-	 * Property keys.
-	 *
-	 * @var  string
-	 */
-	protected static $keys = 'id';
-
-	/**
-	 * Property alias.
-	 *
-	 * @var  string
-	 */
-	protected static $alias = '{$controller.item.name.lower$}';
-
-	/**
-	 * Property dataClass.
-	 *
-	 * @var  string
-	 */
-	protected static $dataClass = {$controller.item.name.cap$}Record::class;
+    /**
+     * Property table.
+     *
+     * @var  string
+     */
+    protected static $table = '{$controller.list.name.lower$}';
+    /**
+     * Property keys.
+     *
+     * @var  string
+     */
+    protected static $keys = 'id';
+    /**
+     * Property alias.
+     *
+     * @var  string
+     */
+    protected static $alias = '{$controller.item.name.lower$}';
+    /**
+     * Property dataClass.
+     *
+     * @var  string
+     */
+    protected static $dataClass = {$controller.item.name.cap$}Record::class;
 }

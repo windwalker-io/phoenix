@@ -17,5 +17,5 @@ use Phoenix\Controller\Batch\AbstractReorderController;
  */
 class ReorderController extends AbstractReorderController
 {
-	//
+    //
 }

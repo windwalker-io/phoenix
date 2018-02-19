@@ -17,12 +17,12 @@ use Phoenix\Controller\Batch\BatchDelegatingController;
  */
 class BatchController extends BatchDelegatingController
 {
-	/**
-	 * The default model.
-	 *
-	 * Keep model name here to make sure controller get singular model to handle update.
-	 *
-	 * @var  string
-	 */
-	protected $model = '{$controller.item.name.cap$}';
+    /**
+     * The default model.
+     *
+     * Keep model name here to make sure controller get singular model to handle update.
+     *
+     * @var  string
+     */
+    protected $model = '{$controller.item.name.cap$}';
 }

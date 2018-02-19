@@ -3,14 +3,14 @@
 /**
  * Global variables
  * --------------------------------------------------------------
- * @var $app      \Windwalker\Web\Application                 Global Application
- * @var $package  \{$package.namespace$}{$package.name.cap$}\{$package.name.cap$}Package                 Package object.
- * @var $view     \{$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView  View object.
- * @var $uri      \Windwalker\Uri\UriData                     Uri information, example: $uri->path
- * @var $datetime \Windwalker\Core\DateTime\DateTime          PHP DateTime object of current time.
- * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
- * @var $router   \Windwalker\Core\Router\MainRouter          Route builder object.
- * @var $asset    \Windwalker\Core\Asset\AssetManager         The Asset manager.
+ * @var $app           \Windwalker\Web\Application                 Global Application
+ * @var $package       \{$package.namespace$}{$package.name.cap$}\{$package.name.cap$}Package                 Package object.
+ * @var $view          \{$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView  View object.
+ * @var $uri           \Windwalker\Uri\UriData                     Uri information, example: $uri->path
+ * @var $datetime      \Windwalker\Core\DateTime\DateTime          PHP DateTime object of current time.
+ * @var $helper        \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
+ * @var $router        \Windwalker\Core\Router\MainRouter          Route builder object.
+ * @var $asset         \Windwalker\Core\Asset\AssetManager         The Asset manager.
  *
  * View variables
  * --------------------------------------------------------------
@@ -34,84 +34,84 @@
 @stop
 
 @section('admin-body')
-<div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
-    <form name="admin-form" id="admin-form" action="{{ $router->route('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
+    <div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
+        <form name="admin-form" id="admin-form" action="{{ $router->route('{$controller.list.name.lower$}') }}" method="POST" enctype="multipart/form-data">
 
-        {{-- FILTER BAR --}}
-        <div class="filter-bar">
-            {!! $filterBar->render(['form' => $form, 'show' => $showFilterBar]) !!}
-        </div>
+            {{-- FILTER BAR --}}
+            <div class="filter-bar">
+                {!! $filterBar->render(['form' => $form, 'show' => $showFilterBar]) !!}
+            </div>
 
-        {{-- RESPONSIVE TABLE DESC --}}
-        <p class="visible-xs-block d-sm-block d-md-none">
-            @translate('phoenix.grid.responsive.table.desc')
-        </p>
+            {{-- RESPONSIVE TABLE DESC --}}
+            <p class="visible-xs-block d-sm-block d-md-none">
+                @translate('phoenix.grid.responsive.table.desc')
+            </p>
 
-        <div class="grid-table">
-            <table class="table table-striped table-bordered table-responsive">
-                <thead>
-                <tr>
-                    {{-- CHECKBOX --}}
-                    <th width="1%" class="text-nowrap">
-                        {!! $grid->checkboxesToggle(['duration' => 150]) !!}
-                    </th>
-
-                    {{-- STATE --}}
-                    <th style="min-width: 70px;"  width="8%" class="text-nowrap">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
-                    </th>
-
-                    {{-- TITLE --}}
-                    <th class="text-nowrap" style="min-width: 300px;">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
-                    </th>
-
-                    {{-- ORDERING --}}
-                    <th width="5%" class="text-nowrap">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!}
-                        {!! $grid->saveOrderButton() !!}
-                    </th>
-
-                    {{-- AUTHOR --}}
-                    <th width="10%" class="text-nowrap">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
-                    </th>
-
-                    {{-- CREATED --}}
-                    <th width="10%" class="text-nowrap">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
-                    </th>
-
-                    {{-- LANGUAGE --}}
-                    <th width="7%" class="text-nowrap">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') !!}
-                    </th>
-
-                    {{-- DELETE --}}
-                    <th width="1%" class="text-nowrap">
-                        @translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.delete')
-                    </th>
-
-                    {{-- ID --}}
-                    <th width="3%" class="text-nowrap text-right">
-                        {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
-                    </th>
-                </tr>
-                </thead>
-
-                <tbody>
-                @foreach ($items as $i => $item)
-                    <?php
-                    $grid->setItem($item, $i);
-                    ?>
-                    <tr data-order-group="">
+            <div class="grid-table">
+                <table class="table table-striped table-bordered table-responsive">
+                    <thead>
+                    <tr>
                         {{-- CHECKBOX --}}
-                        <td>
-                            {!! $grid->checkbox() !!}
-                        </td>
+                        <th width="1%" class="text-nowrap">
+                            {!! $grid->checkboxesToggle(['duration' => 150]) !!}
+                        </th>
 
                         {{-- STATE --}}
-                        <td class="text-nowrap">
+                        <th style="min-width: 70px;" width="8%" class="text-nowrap">
+                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
+                        </th>
+
+                        {{-- TITLE --}}
+                        <th class="text-nowrap" style="min-width: 300px;">
+                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
+                        </th>
+
+                        {{-- ORDERING --}}
+                        <th width="5%" class="text-nowrap">
+                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!}
+                            {!! $grid->saveOrderButton() !!}
+                        </th>
+
+                        {{-- AUTHOR --}}
+                        <th width="10%" class="text-nowrap">
+                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
+                        </th>
+
+                        {{-- CREATED --}}
+                        <th width="10%" class="text-nowrap">
+                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
+                        </th>
+
+                        {{-- LANGUAGE --}}
+                        <th width="7%" class="text-nowrap">
+                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') !!}
+                        </th>
+
+                        {{-- DELETE --}}
+                        <th width="1%" class="text-nowrap">
+                            @translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.delete')
+                        </th>
+
+                        {{-- ID --}}
+                        <th width="3%" class="text-nowrap text-right">
+                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
+                        </th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    @foreach ($items as $i => $item)
+                        <?php
+                        $grid->setItem($item, $i);
+                        ?>
+                        <tr data-order-group="">
+                            {{-- CHECKBOX --}}
+                            <td>
+                                {!! $grid->checkbox() !!}
+                            </td>
+
+                            {{-- STATE --}}
+                            <td class="text-nowrap">
                             <span class="btn-group">
                                 {!! $grid->published($item->state) !!}
                                 <button type="button" class="btn btn-default btn-light btn-sm hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
@@ -119,73 +119,73 @@
                                     <span class="fa fa-fw fa-copy text-info"></span>
                                 </button>
                             </span>
-                        </td>
+                            </td>
 
-                        {{-- TITLE --}}
-                        <td>
-                            <a href="{{ $router->route('{$controller.item.name.lower$}', ['id' => $item->id]) }}">
-                                {{ $item->title }}
-                            </a>
-                        </td>
+                            {{-- TITLE --}}
+                            <td>
+                                <a href="{{ $router->route('{$controller.item.name.lower$}', ['id' => $item->id]) }}">
+                                    {{ $item->title }}
+                                </a>
+                            </td>
 
-                        {{-- ORDERING --}}
-                        <td class="text-right">
-                            {!! $grid->orderButton() !!}
-                        </td>
+                            {{-- ORDERING --}}
+                            <td class="text-right">
+                                {!! $grid->orderButton() !!}
+                            </td>
 
-                        {{-- AUTHOR --}}
-                        <td class="text-nowrap">
-                            {{ property_exists($item, 'user_name') ? $item->user_name : $item->created_by }}
-                        </td>
+                            {{-- AUTHOR --}}
+                            <td class="text-nowrap">
+                                {{ property_exists($item, 'user_name') ? $item->user_name : $item->created_by }}
+                            </td>
 
-                        {{-- CREATED --}}
-                        <td class="text-nowrap">
+                            {{-- CREATED --}}
+                            <td class="text-nowrap">
                             <span class="hasTooltip" title="{{ $datetime::toLocalTime($item->created, 'Y-m-d H:i:s') }}">
                                 {{ $datetime::toLocalTime($item->created, 'Y-m-d') }}
                             </span>
-                        </td>
+                            </td>
 
-                        {{-- LANGUAGE --}}
-                        <td class="text-nowrap">
-                            {{ $item->language }}
-                        </td>
+                            {{-- LANGUAGE --}}
+                            <td class="text-nowrap">
+                                {{ $item->language }}
+                            </td>
 
-                        {{-- DELETE --}}
-                        <td class="text-center">
-                            <button type="button" class="btn btn-default btn-outline-secondary btn-sm hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
-                                title="@translate('phoenix.toolbar.delete')">
-                                <span class="fa fa-fw fa-trash"></span>
-                            </button>
-                        </td>
+                            {{-- DELETE --}}
+                            <td class="text-center">
+                                <button type="button" class="btn btn-default btn-outline-secondary btn-sm hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
+                                    title="@translate('phoenix.toolbar.delete')">
+                                    <span class="fa fa-fw fa-trash"></span>
+                                </button>
+                            </td>
 
-                        {{-- ID --}}
-                        <td class="text-right">
-                            {{ $item->id }}
+                            {{-- ID --}}
+                            <td class="text-right">
+                                {{ $item->id }}
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+
+                    <tfoot>
+                    <tr>
+                        {{-- PAGINATION --}}
+                        <td colspan="25">
+                            {!! $pagination->route('{$controller.list.name.lower$}', [])->render() !!}
                         </td>
                     </tr>
-                @endforeach
-                </tbody>
+                    </tfoot>
+                </table>
+            </div>
 
-                <tfoot>
-                <tr>
-                    {{-- PAGINATION --}}
-                    <td colspan="25">
-                        {!! $pagination->route('{$controller.list.name.lower$}', [])->render() !!}
-                    </td>
-                </tr>
-                </tfoot>
-            </table>
-        </div>
+            <div class="hidden-inputs">
+                {{-- METHOD --}}
+                <input type="hidden" name="_method" value="PUT" />
 
-        <div class="hidden-inputs">
-            {{-- METHOD --}}
-            <input type="hidden" name="_method" value="PUT" />
+                {{-- TOKEN --}}
+                @formToken()
+            </div>
 
-            {{-- TOKEN --}}
-            @formToken()
-        </div>
-
-        @include('_global.{$package.name.lower$}.widget.batch')
-    </form>
-</div>
+            @include('_global.{$package.name.lower$}.widget.batch')
+        </form>
+    </div>
 @stop

@@ -19,74 +19,74 @@ use Windwalker\Utilities\ArrayHelper;
  */
 class MenuHelper extends AbstractHelper
 {
-	const PLURAL = 'plural';
-	const SINGULAR = 'singular';
+    const PLURAL = 'plural';
+    const SINGULAR = 'singular';
 
-	/**
-	 * active
-	 *
-	 * @param string $path
-	 * @param array  $query
-	 * @param string $menu
-	 *
-	 * @return string
-	 */
-	public function active($path, $query = [], $menu = 'mainmenu')
-	{
-		$view = $this->getParent()->getView();
+    /**
+     * active
+     *
+     * @param string $path
+     * @param array  $query
+     * @param string $menu
+     *
+     * @return string
+     */
+    public function active($path, $query = [], $menu = 'mainmenu')
+    {
+        $view = $this->getParent()->getView();
 
-		// Match route
-		$route = $path;
+        // Match route
+        $route = $path;
 
-		if (strpos($route, '@') === false)
-		{
-			$route = $view->getPackage()->getName() . '@' . $route;
-		}
+        if (strpos($route, '@') === false)
+        {
+            $route = $view->getPackage()->getName() . '@' . $route;
+        }
 
-		if ($view['app']->get('route.matched') == $route && $this->matchRequest($query))
-		{
-			return 'active';
-		}
+        if ($view['app']->get('route.matched') == $route && $this->matchRequest($query))
+        {
+            return 'active';
+        }
 
-		// If route not matched, we match extra values from routing.
-		$routePath = $view['app']->get('route.extra.menu.' . $menu);
+        // If route not matched, we match extra values from routing.
+        $routePath = $view['app']->get('route.extra.menu.' . $menu);
 
-		$path = array_filter(explode('/', trim($path, '/')), 'strlen');
-		$routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
+        $path      = array_filter(explode('/', trim($path, '/')), 'strlen');
+        $routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
 
-		$success = false;
+        $success = false;
 
-		foreach ($path as $key => $pathSegment)
-		{
-			if (isset($routePath[$key]) && $routePath[$key] == $pathSegment && $this->matchRequest($query))
-			{
-				$success = true;
-			}
-			else
-			{
-				$success = false;
-			}
-		}
+        foreach ($path as $key => $pathSegment)
+        {
+            if (isset($routePath[$key]) && $routePath[$key] == $pathSegment && $this->matchRequest($query))
+            {
+                $success = true;
+            }
+            else
+            {
+                $success = false;
+            }
+        }
 
-		return $success ? 'active' : '';
-	}
+        return $success ? 'active' : '';
+    }
 
-	/**
-	 * matchRequest
-	 *
-	 * @param array $query
-	 *
-	 * @return  boolean
-	 */
-	protected function matchRequest($query = [])
-	{
-		$input = Ioc::getInput();
+    /**
+     * matchRequest
+     *
+     * @param array $query
+     *
+     * @return  boolean
+     */
+    protected function matchRequest($query = [])
+    {
+        $input = Ioc::getInput();
 
-		if (!$query)
-		{
-			return true;
-		}
+        if (!$query)
+        {
+            return true;
+        }
 
-		return !empty(ArrayHelper::query([$input->toArray()], $query));
-	}
+        return !empty(ArrayHelper::query([$input->toArray()], $query));
+    }
 }
