@@ -8,83 +8,83 @@
 /**
  * PhoenixMultiSelect
  */
-;(function ($) {
-    /**
-     * Plugin name.
-     *
-     * @type {string}
-     */
-    var plugin = 'multiselect';
+;(function($) {
+  /**
+   * Plugin name.
+   *
+   * @type {string}
+   */
+  var plugin = 'multiselect';
 
-    var defaultOptions = {
-        duration: 100
-    };
+  var defaultOptions = {
+    duration: 100
+  };
 
+  /**
+   * Multi Select.
+   *
+   * @param {jQuery} $element
+   * @param {Object} options
+   *
+   * @constructor
+   */
+  var PhoenixMultiSelect = function($element, options) {
+    var self = this;
+    this.form = $element;
+    this.boxes = $element.find('input.grid-checkbox[type=checkbox]');
+    this.last = false;
+    this.options = $.extend({}, defaultOptions, options);
+
+    this.boxes.parent().css('user-select', 'none');
+
+    this.boxes.on('click', function(event) {
+      self.select(this, event);
+    });
+  };
+
+  PhoenixMultiSelect.prototype = {
     /**
-     * Multi Select.
+     * Do select.
      *
-     * @param {jQuery} $element
-     * @param {Object} options
-     *
-     * @constructor
+     * @param {Element} element
+     * @param {Event}   event
      */
-    var PhoenixMultiSelect = function ($element, options) {
+    select: function(element, event) {
+      if (!this.last) {
+        this.last = element;
+
+        return;
+      }
+
+      if (event.shiftKey) {
         var self = this;
-        this.form = $element;
-        this.boxes = $element.find('input.grid-checkbox[type=checkbox]');
-        this.last = false;
-        this.options = $.extend({}, defaultOptions, options);
+        var start = this.boxes.index(element);
+        var end = this.boxes.index(this.last);
 
-        this.boxes.parent().css('user-select', 'none');
+        var chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
 
-        this.boxes.on('click', function (event) {
-            self.select(this, event);
-        });
-    };
+        $.each(chs, function(i, e) {
+          if (self.options.duration) {
+            setTimeout(function() {
+              e.checked = self.last.checked;
+            }, (self.options.duration / chs.length) * i);
+          }
+          else {
+            e.checked = self.last.checked;
+          }
+        })
+      }
 
-    PhoenixMultiSelect.prototype = {
-        /**
-         * Do select.
-         *
-         * @param {Element} element
-         * @param {Event}   event
-         */
-        select: function (element, event) {
-            if (!this.last) {
-                this.last = element;
+      this.last = element;
+    }
+  };
 
-                return;
-            }
+  $.fn[plugin] = function(options) {
+    if (!this.data('phoenix.' + plugin)) {
+      this.data('phoenix.' + plugin, new PhoenixMultiSelect(this, options));
+    }
 
-            if (event.shiftKey) {
-                var self = this;
-                var start = this.boxes.index(element);
-                var end = this.boxes.index(this.last);
-
-                var chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
-
-                $.each(chs, function (i, e) {
-                    if (self.options.duration) {
-                        setTimeout(function () {
-                            e.checked = self.last.checked;
-                        }, (self.options.duration / chs.length) * i);
-                    }
-                    else {
-                        e.checked = self.last.checked;
-                    }
-                })
-            }
-
-            this.last = element;
-        }
-    };
-
-    $.fn[plugin] = function (options) {
-        if (!this.data('phoenix.' + plugin)) {
-            this.data('phoenix.' + plugin, new PhoenixMultiSelect(this, options));
-        }
-
-        return this.data('phoenix.' + plugin);
-    };
+    return this.data('phoenix.' + plugin);
+  };
 
 })(jQuery);

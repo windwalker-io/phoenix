@@ -10,45 +10,41 @@ var Phoenix;
 /**
  * Phoenix.Router
  */
-(function(Phoenix)
-{
-    "use strict";
+(function(Phoenix) {
+  "use strict";
 
-    Phoenix.Router = {
-        routes: {},
+  Phoenix.Router = {
+    routes: {},
 
-        /**
-         * Add a route.
-         *
-         * @param route
-         * @param url
-         *
-         * @returns {Phoenix.Router}
-         */
-        add: function(route, url)
-        {
-            this.routes[route] = url;
+    /**
+     * Add a route.
+     *
+     * @param route
+     * @param url
+     *
+     * @returns {Phoenix.Router}
+     */
+    add: function(route, url) {
+      this.routes[route] = url;
 
-            return this;
-        },
+      return this;
+    },
 
-        /**
-         * Get route.
-         *
-         * @param route
-         *
-         * @returns {String}
-         */
-        route: function(route)
-        {
-            if (this.routes[route] === undefined)
-            {
-                throw new Error('Route: "' + route + '" not found');
-            }
+    /**
+     * Get route.
+     *
+     * @param route
+     *
+     * @returns {String}
+     */
+    route: function(route) {
+      if (this.routes[route] === undefined) {
+        throw new Error('Route: "' + route + '" not found');
+      }
 
-            return this.routes[route];
-        }
-    };
+      return this.routes[route];
+    }
+  };
 
-    Phoenix.Uri = {};
+  Phoenix.Uri = {};
 })(Phoenix || (Phoenix = {}));
