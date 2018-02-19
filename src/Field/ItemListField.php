@@ -25,92 +25,88 @@ use Windwalker\Query\Query;
  */
 class ItemListField extends SqlListField
 {
-	/**
-	 * Property table.
-	 *
-	 * @var  string
-	 */
-	protected $table;
+    /**
+     * Property table.
+     *
+     * @var  string
+     */
+    protected $table;
 
-	/**
-	 * Property ordering.
-	 *
-	 * @var  string
-	 */
-	protected $ordering;
+    /**
+     * Property ordering.
+     *
+     * @var  string
+     */
+    protected $ordering;
 
-	/**
-	 * getItems
-	 *
-	 * @return  \stdClass[]
-	 */
-	protected function getItems()
-	{
-		$db = Ioc::getDatabase();
+    /**
+     * getItems
+     *
+     * @return  \stdClass[]
+     */
+    protected function getItems()
+    {
+        $db = Ioc::getDatabase();
 
-		$query = $db->getQuery(true);
-		$table = $this->get('table', $this->table);
+        $query = $db->getQuery(true);
+        $table = $this->get('table', $this->table);
 
-		if (!$table)
-		{
-			return [];
-		}
+        if (!$table) {
+            return [];
+        }
 
-		if ($this->get('published'))
-		{
-			$query->where($query->quoteName($this->get('state_field', 'state')) . ' >= 1');
-		}
+        if ($this->get('published')) {
+            $query->where($query->quoteName($this->get('state_field', 'state')) . ' >= 1');
+        }
 
-		if ($ordering = $this->get('ordering', $this->ordering))
-		{
-			$query->order($ordering);
-		}
+        if ($ordering = $this->get('ordering', $this->ordering)) {
+            $query->order($ordering);
+        }
 
-		$select = $this->get('select', '*');
+        $select = $this->get('select', '*');
 
-		$query->select($select)
-			->from($query->quoteName($table));
+        $query->select($select)
+            ->from($query->quoteName($table));
 
-		$this->postQuery($query);
+        $this->postQuery($query);
 
-		$postQuery = $this->get('post_query', $this->get('postQuery'));
+        $postQuery = $this->get('post_query', $this->get('postQuery'));
 
-		if (is_callable($postQuery))
-		{
-			call_user_func($postQuery, $query, $this);
-		}
+        if (is_callable($postQuery)) {
+            call_user_func($postQuery, $query, $this);
+        }
 
-		return (array) $db->setQuery($query)->loadAll();
-	}
+        return (array) $db->setQuery($query)->loadAll();
+    }
 
-	/**
-	 * postQuery
-	 *
-	 * @param Query $query
-	 *
-	 * @return  void
-	 */
-	protected function postQuery(Query $query)
-	{
-		//
-	}
+    /**
+     * postQuery
+     *
+     * @param Query $query
+     *
+     * @return  void
+     */
+    protected function postQuery(Query $query)
+    {
+        //
+    }
 
-	/**
-	 * getAccessors
-	 *
-	 * @return  array
-	 *
-	 * @since   1.3.2
-	 */
-	protected function getAccessors()
-	{
-		return array_merge(parent::getAccessors(), [
-			'table',
-			'published',
-			'stateField' => 'state_field',
-			'ordering',
-			'select',
-			'postQueryHandler' => 'post_query'
-		]);
-	}
+    /**
+     * getAccessors
+     *
+     * @return  array
+     *
+     * @since   1.3.2
+     */
+    protected function getAccessors()
+    {
+        return array_merge(parent::getAccessors(), [
+            'table',
+            'published',
+            'stateField' => 'state_field',
+            'ordering',
+            'select',
+            'postQueryHandler' => 'post_query',
+        ]);
+    }
 }

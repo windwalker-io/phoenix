@@ -24,215 +24,200 @@ use Windwalker\Structure\StructureHelper;
  */
 class TranslatorHelper
 {
-	/**
-	 * loadAll
-	 *
-	 * @param string $package
-	 * @param string $format
-	 *
-	 * @return  void
-	 */
-	public static function loadAll($package, $format = 'ini')
-	{
-		if (is_string($package))
-		{
-			$package = PackageHelper::getPackage($package);
-		}
+    /**
+     * loadAll
+     *
+     * @param string $package
+     * @param string $format
+     *
+     * @return  void
+     */
+    public static function loadAll($package, $format = 'ini')
+    {
+        if (is_string($package)) {
+            $package = PackageHelper::getPackage($package);
+        }
 
-		if (!$package)
-		{
-			return;
-		}
+        if (!$package) {
+            return;
+        }
 
-		$path = $package->getDir() . '/Resources/language';
+        $path = $package->getDir() . '/Resources/language';
 
-		static::loadAllFromPath($path, $format, $package);
-	}
+        static::loadAllFromPath($path, $format, $package);
+    }
 
-	/**
-	 * loadAllFromPath
-	 *
-	 * @param   string $path
-	 * @param   string $format
-	 * @param   string $package
-	 */
-	public static function loadAllFromPath($path, $format, $package = null)
-	{
-		$config = Ioc::getConfig();
+    /**
+     * loadAllFromPath
+     *
+     * @param   string $path
+     * @param   string $format
+     * @param   string $package
+     */
+    public static function loadAllFromPath($path, $format, $package = null)
+    {
+        $config = Ioc::getConfig();
 
-		$locale = $config['language.locale']  ? : 'en-GB';
-		$default = $config['language.default'] ? : 'en-GB';
-		$locale = LanguageNormalize::toLanguageTag($locale);
-		$default = LanguageNormalize::toLanguageTag($default);
+        $locale  = $config['language.locale'] ?: 'en-GB';
+        $default = $config['language.default'] ?: 'en-GB';
+        $locale  = LanguageNormalize::toLanguageTag($locale);
+        $default = LanguageNormalize::toLanguageTag($default);
 
-		$localePath = $path . '/' . $locale;
+        $localePath = $path . '/' . $locale;
 
-		$files = [];
+        $files = [];
 
-		if (is_dir($localePath))
-		{
-			$files = array_merge($files, (array) Folder::files($localePath, false, Folder::PATH_BASENAME));
-		}
+        if (is_dir($localePath)) {
+            $files = array_merge($files, (array) Folder::files($localePath, false, Folder::PATH_BASENAME));
+        }
 
-		$defaultPath = $path . '/' . $default;
+        $defaultPath = $path . '/' . $default;
 
-		if (is_dir($defaultPath))
-		{
-			$files = array_merge($files, (array) Folder::files($defaultPath, false, Folder::PATH_BASENAME));
-		}
+        if (is_dir($defaultPath)) {
+            $files = array_merge($files, (array) Folder::files($defaultPath, false, Folder::PATH_BASENAME));
+        }
 
-		foreach ($files as $file)
-		{
-			$ext = File::getExtension($file);
+        foreach ($files as $file) {
+            $ext = File::getExtension($file);
 
-			if (strcasecmp($ext, $format) !== 0)
-			{
-				continue;
-			}
+            if (strcasecmp($ext, $format) !== 0) {
+                continue;
+            }
 
-			Translator::loadFile(File::stripExtension($file), strtolower($format), $package);
-		}
-	}
+            Translator::loadFile(File::stripExtension($file), strtolower($format), $package);
+        }
+    }
 
-	/**
-	 * getOrphans
-	 *
-	 * @param boolean $flatten
-	 * @param int     $stripPrefix
-	 *
-	 * @return array
-	 */
-	public static function getOrphans($flatten = true, $stripPrefix = 1)
-	{
-		$orphans = Translator::getInstance()->getOrphans();
+    /**
+     * getOrphans
+     *
+     * @param boolean $flatten
+     * @param int     $stripPrefix
+     *
+     * @return array
+     */
+    public static function getOrphans($flatten = true, $stripPrefix = 1)
+    {
+        $orphans = Translator::getInstance()->getOrphans();
 
-		foreach ($orphans as $key => $value)
-		{
-			$value = explode('.', $key);
+        foreach ($orphans as $key => $value) {
+            $value = explode('.', $key);
 
-			$value = array_map('ucfirst', $value);
+            $value = array_map('ucfirst', $value);
 
-			foreach (range(1, $stripPrefix) as $i)
-			{
-				array_shift($value);
-			}
+            foreach (range(1, $stripPrefix) as $i) {
+                array_shift($value);
+            }
 
-			$value = implode(' ', $value);
+            $value = implode(' ', $value);
 
-			$orphans[$key] = $value;
-		}
+            $orphans[$key] = $value;
+        }
 
-		if (!$flatten)
-		{
-			$reg = new Structure;
+        if (!$flatten) {
+            $reg = new Structure;
 
-			foreach ($orphans as $key => $value)
-			{
-				$reg->set($key, $value);
-			}
+            foreach ($orphans as $key => $value) {
+                $reg->set($key, $value);
+            }
 
-			$orphans = $reg->toArray();
-		}
+            $orphans = $reg->toArray();
+        }
 
-		return $orphans;
-	}
+        return $orphans;
+    }
 
-	/**
-	 * getFormattedOrphans
-	 *
-	 * @param string $format
-	 *
-	 * @return  string
-	 */
-	public static function getFormattedOrphans($format = 'ini')
-	{
-		$formatter = StructureHelper::getFormatClass($format);
+    /**
+     * getFormattedOrphans
+     *
+     * @param string $format
+     *
+     * @return  string
+     */
+    public static function getFormattedOrphans($format = 'ini')
+    {
+        $formatter = StructureHelper::getFormatClass($format);
 
-		$returns = [];
-		$options = [];
+        $returns = [];
+        $options = [];
 
-		switch (strtolower($format))
-		{
-			case 'ini':
+        switch (strtolower($format)) {
+            case 'ini':
 
-				$orphans = static::getOrphans();
+                $orphans = static::getOrphans();
 
-				foreach ($orphans as $key => $value)
-				{
-					$key2 = explode('.', $key);
+                foreach ($orphans as $key => $value) {
+                    $key2 = explode('.', $key);
 
-					if (isset($key2[1]))
-					{
-						$returns[$key2[1]][$key] = $value;
+                    if (isset($key2[1])) {
+                        $returns[$key2[1]][$key] = $value;
 
-						continue;
-					}
+                        continue;
+                    }
 
-					$returns[$key] = $value;
-				}
+                    $returns[$key] = $value;
+                }
 
-				break;
+                break;
 
-			case 'yaml':
-			case 'yml':
-				$options['inline'] = 99;
+            case 'yaml':
+            case 'yml':
+                $options['inline'] = 99;
 
-			default:
-				$orphans = static::getOrphans(false);
-				$returns = $orphans;
-		}
+            default:
+                $orphans = static::getOrphans(false);
+                $returns = $orphans;
+        }
 
-		return $formatter::structToString($returns, $options);
-	}
+        return $formatter::structToString($returns, $options);
+    }
 
-	/**
-	 * dumpOrphans
-	 *
-	 * @param string $format
-	 *
-	 * @return  void
-	 *
-	 * @throws \Windwalker\Filesystem\Exception\FilesystemException
-	 */
-	public static function dumpOrphans($format = 'ini')
-	{
-		$format = strtolower($format);
-		$ext = ($format === 'yaml') ? 'yml' : $format;
+    /**
+     * dumpOrphans
+     *
+     * @param string $format
+     *
+     * @return  void
+     *
+     * @throws \Windwalker\Filesystem\Exception\FilesystemException
+     */
+    public static function dumpOrphans($format = 'ini')
+    {
+        $format = strtolower($format);
+        $ext    = ($format === 'yaml') ? 'yml' : $format;
 
-		$file = WINDWALKER_TEMP . '/language/orphans.' . $ext;
+        $file = WINDWALKER_TEMP . '/language/orphans.' . $ext;
 
-		if (!is_file($file))
-		{
-			Folder::create(dirname($file));
-			file_put_contents($file, '');
-		}
+        if (!is_file($file)) {
+            Folder::create(dirname($file));
+            file_put_contents($file, '');
+        }
 
-		$orphans = new Structure;
-		$orphans->loadFile($file, $format, ['processSections' => true]);
+        $orphans = new Structure;
+        $orphans->loadFile($file, $format, ['processSections' => true]);
 
-		$orphans->loadString(static::getFormattedOrphans($format), $format, ['processSections' => true]);
+        $orphans->loadString(static::getFormattedOrphans($format), $format, ['processSections' => true]);
 
-		file_put_contents($file, $orphans->toString($format, ['inline' => 99]));
-	}
+        file_put_contents($file, $orphans->toString($format, ['inline' => 99]));
+    }
 
-	/**
-	 * getFormatter
-	 *
-	 * @param   string $format
-	 *
-	 * @return  string
-	 *
-	 * @throws \DomainException
-	 */
-	public static function getFormatter($format)
-	{
-		$class = sprintf('Windwalker\Registry\Format\%sFormat', ucfirst($format));
+    /**
+     * getFormatter
+     *
+     * @param   string $format
+     *
+     * @return  string
+     *
+     * @throws \DomainException
+     */
+    public static function getFormatter($format)
+    {
+        $class = sprintf('Windwalker\Registry\Format\%sFormat', ucfirst($format));
 
-		if (class_exists($class))
-		{
-			return $class;
-		}
+        if (class_exists($class)) {
+            return $class;
+        }
 
-		throw new \DomainException(sprintf('Class: %s not exists', $class));
-	}
+        throw new \DomainException(sprintf('Class: %s not exists', $class));
+    }
 }

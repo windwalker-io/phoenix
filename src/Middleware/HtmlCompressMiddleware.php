@@ -21,25 +21,24 @@ use Windwalker\Middleware\MiddlewareInterface;
  */
 class HtmlCompressMiddleware extends AbstractWebMiddleware
 {
-	/**
-	 * Middleware logic to be invoked.
-	 *
-	 * @param   Request                      $request  The request.
-	 * @param   Response                     $response The response.
-	 * @param   callable|MiddlewareInterface $next     The next middleware.
-	 *
-	 * @return  Response
-	 */
-	public function __invoke(Request $request, Response $response, $next = null)
-	{
-		/** @var Response $response */
-		$response = $next($request, $response);
+    /**
+     * Middleware logic to be invoked.
+     *
+     * @param   Request                      $request  The request.
+     * @param   Response                     $response The response.
+     * @param   callable|MiddlewareInterface $next     The next middleware.
+     *
+     * @return  Response
+     */
+    public function __invoke(Request $request, Response $response, $next = null)
+    {
+        /** @var Response $response */
+        $response = $next($request, $response);
 
-		if ($response instanceof HtmlResponse)
-		{
-			$response = $this->app->server->compressor->compress($response);
-		}
+        if ($response instanceof HtmlResponse) {
+            $response = $this->app->server->compressor->compress($response);
+        }
 
-		return $response;
-	}
+        return $response;
+    }
 }

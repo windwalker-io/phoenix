@@ -17,31 +17,31 @@ use Windwalker\Query\Query;
  */
 interface FilterHelperInterface
 {
-	/**
-	 * Set filter handler. Can be a callback or closure.
-	 *
-	 * Example:
-	 * ``` php
-	 * function(Query $query, $field, $value)
-	 * {
-	 *     return $query->where($field . ' <= ' . $value);
-	 * }
-	 * ```
-	 *
-	 * @param string        $name    The handler name.
-	 * @param callable|bool $handler Handler callback.
-	 *
-	 * @return  FilterHelperInterface Return self to support chaining.
-	 */
-	public function setHandler($name, $handler);
+    /**
+     * Set filter handler. Can be a callback or closure.
+     *
+     * Example:
+     * ``` php
+     * function(Query $query, $field, $value)
+     * {
+     *     return $query->where($field . ' <= ' . $value);
+     * }
+     * ```
+     *
+     * @param string        $name    The handler name.
+     * @param callable|bool $handler Handler callback.
+     *
+     * @return  FilterHelperInterface Return self to support chaining.
+     */
+    public function setHandler($name, $handler);
 
-	/**
-	 * Execute the filter and add in query object.
-	 *
-	 * @param Query $query Db query object.
-	 * @param array $data  The data from request.
-	 *
-	 * @return  Query Return the query object.
-	 */
-	public function execute(Query $query, $data = []);
+    /**
+     * Execute the filter and add in query object.
+     *
+     * @param Query $query Db query object.
+     * @param array $data  The data from request.
+     *
+     * @return  Query Return the query object.
+     */
+    public function execute(Query $query, $data = []);
 }

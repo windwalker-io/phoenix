@@ -18,167 +18,161 @@ use Windwalker\Dom\HtmlElement;
  */
 class Metadata extends Data
 {
-	/**
-	 * Property metadata.
-	 *
-	 * @var  array
-	 */
-	protected $metadata = [];
+    /**
+     * Property metadata.
+     *
+     * @var  array
+     */
+    protected $metadata = [];
 
-	/**
-	 * Property openGraphs.
-	 *
-	 * @var  array
-	 */
-	protected $openGraphs = [];
+    /**
+     * Property openGraphs.
+     *
+     * @var  array
+     */
+    protected $openGraphs = [];
 
-	/**
-	 * addMetadata
-	 *
-	 * @param   string $name
-	 * @param   string $content
-	 * @param   bool   $replace
-	 *
-	 * @return static
-	 */
-	public function addMetadata($name, $content, $replace = false)
-	{
-		if (!isset($this->metadata[$name]) || $replace)
-		{
-			$this->metadata[$name] = [];
-		}
+    /**
+     * addMetadata
+     *
+     * @param   string $name
+     * @param   string $content
+     * @param   bool   $replace
+     *
+     * @return static
+     */
+    public function addMetadata($name, $content, $replace = false)
+    {
+        if (!isset($this->metadata[$name]) || $replace) {
+            $this->metadata[$name] = [];
+        }
 
-		foreach ((array) $content as $item)
-		{
-			$this->metadata[$name][] = new HtmlElement('meta', null, [
-				'name'    => $this->escape($name),
-				'content' => $this->escape($item)
-			]
-			);
-		}
+        foreach ((array) $content as $item) {
+            $this->metadata[$name][] = new HtmlElement('meta', null, [
+                    'name' => $this->escape($name),
+                    'content' => $this->escape($item),
+                ]
+            );
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * removeMetadata
-	 *
-	 * @param  string  $name
-	 *
-	 * @return  static
-	 */
-	public function removeMetadata($name)
-	{
-		if (isset($this->metadata[$name]))
-		{
-			unset($this->metadata[$name]);
-		}
+    /**
+     * removeMetadata
+     *
+     * @param  string $name
+     *
+     * @return  static
+     */
+    public function removeMetadata($name)
+    {
+        if (isset($this->metadata[$name])) {
+            unset($this->metadata[$name]);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * addOpenGraph
-	 *
-	 * @param   string $type
-	 * @param   string $content
-	 * @param   bool   $replace
-	 *
-	 * @return static
-	 */
-	public function addOpenGraph($type, $content, $replace = false)
-	{
-		if (!isset($this->openGraphs[$type]) || $replace)
-		{
-			$this->openGraphs[$type] = [];
-		}
+    /**
+     * addOpenGraph
+     *
+     * @param   string $type
+     * @param   string $content
+     * @param   bool   $replace
+     *
+     * @return static
+     */
+    public function addOpenGraph($type, $content, $replace = false)
+    {
+        if (!isset($this->openGraphs[$type]) || $replace) {
+            $this->openGraphs[$type] = [];
+        }
 
-		foreach ((array) $content as $item)
-		{
-			$this->openGraphs[$type][] = new HtmlElement('meta', null, [
-				'property' => $this->escape($type),
-				'content'  => $this->escape($item)
-			]
-			);
-		}
+        foreach ((array) $content as $item) {
+            $this->openGraphs[$type][] = new HtmlElement('meta', null, [
+                    'property' => $this->escape($type),
+                    'content' => $this->escape($item),
+                ]
+            );
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * removeOpenGraph
-	 *
-	 * @param  string  $type
-	 *
-	 * @return  static
-	 */
-	public function removeOpenGraph($type)
-	{
-		if (isset($this->openGraphs[$type]))
-		{
-			unset($this->openGraphs[$type]);
-		}
+    /**
+     * removeOpenGraph
+     *
+     * @param  string $type
+     *
+     * @return  static
+     */
+    public function removeOpenGraph($type)
+    {
+        if (isset($this->openGraphs[$type])) {
+            unset($this->openGraphs[$type]);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Metadata
-	 *
-	 * @return  array
-	 */
-	public function getMetadata()
-	{
-		return $this->metadata;
-	}
+    /**
+     * Method to get property Metadata
+     *
+     * @return  array
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
 
-	/**
-	 * Method to set property metadata
-	 *
-	 * @param   array $metadata
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setMetadata($metadata)
-	{
-		$this->metadata = $metadata;
+    /**
+     * Method to set property metadata
+     *
+     * @param   array $metadata
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property OpenGraphs
-	 *
-	 * @return  array
-	 */
-	public function getOpenGraphs()
-	{
-		return $this->openGraphs;
-	}
+    /**
+     * Method to get property OpenGraphs
+     *
+     * @return  array
+     */
+    public function getOpenGraphs()
+    {
+        return $this->openGraphs;
+    }
 
-	/**
-	 * Method to set property openGraphs
-	 *
-	 * @param   array $openGraphs
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setOpenGraphs(array $openGraphs)
-	{
-		$this->openGraphs = $openGraphs;
+    /**
+     * Method to set property openGraphs
+     *
+     * @param   array $openGraphs
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setOpenGraphs(array $openGraphs)
+    {
+        $this->openGraphs = $openGraphs;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * escape
-	 *
-	 * @param   string  $string
-	 *
-	 * @return  string
-	 */
-	public function escape($string)
-	{
-		return htmlspecialchars($string, ENT_COMPAT, 'UTF-8');
-	}
+    /**
+     * escape
+     *
+     * @param   string $string
+     *
+     * @return  string
+     */
+    public function escape($string)
+    {
+        return htmlspecialchars($string, ENT_COMPAT, 'UTF-8');
+    }
 }

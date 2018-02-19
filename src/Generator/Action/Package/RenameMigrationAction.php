@@ -19,60 +19,53 @@ use Windwalker\Filesystem\Folder;
  */
 class RenameMigrationAction extends AbstractAction
 {
-	/**
-	 * Do this execute.
-	 *
-	 * @return  mixed
-	 */
-	protected function doExecute()
-	{
-		$dest = $this->config['dir.dest'];
-		$migName = $this->config['replace.controller.item.name.cap'] . 'Init';
+    /**
+     * Do this execute.
+     *
+     * @return  mixed
+     */
+    protected function doExecute()
+    {
+        $dest    = $this->config['dir.dest'];
+        $migName = $this->config['replace.controller.item.name.cap'] . 'Init';
 
-		if (!is_dir($dest . '/Migration'))
-		{
-			return;
-		}
+        if (!is_dir($dest . '/Migration')) {
+            return;
+        }
 
-		// Copy migration
-		$files = Folder::files($dest . '/Migration');
+        // Copy migration
+        $files = Folder::files($dest . '/Migration');
 
-		$file = false;
+        $file = false;
 
-		// If last migration with same name exists, delete duplicated migration.
-		foreach ($files as $file)
-		{
-			$fileName = pathinfo($file, PATHINFO_BASENAME);
+        // If last migration with same name exists, delete duplicated migration.
+        foreach ($files as $file) {
+            $fileName = pathinfo($file, PATHINFO_BASENAME);
 
-			if (strpos($file, $migName . '.php') !== false && $fileName != '19700101000000_' . $migName . '.php')
-			{
-				if (is_file($dest . '/Migration/' . '19700101000000_' . $migName . '.php'))
-				{
-					File::delete($dest . '/Migration/' . '19700101000000_' . $migName . '.php');
-				}
+            if (strpos($file, $migName . '.php') !== false && $fileName != '19700101000000_' . $migName . '.php') {
+                if (is_file($dest . '/Migration/' . '19700101000000_' . $migName . '.php')) {
+                    File::delete($dest . '/Migration/' . '19700101000000_' . $migName . '.php');
+                }
 
-				return;
-			}
-		}
+                return;
+            }
+        }
 
-		foreach ($files as $file)
-		{
-			if (strpos($file, $migName . '.php') !== false)
-			{
-				break;
-			}
-		}
+        foreach ($files as $file) {
+            if (strpos($file, $migName . '.php') !== false) {
+                break;
+            }
+        }
 
-		// Migration not exists, return.
-		if (!$file)
-		{
-			return;
-		}
+        // Migration not exists, return.
+        if (!$file) {
+            return;
+        }
 
-		$newName = gmdate('YmdHis') . '_' . $migName . '.php';
+        $newName = gmdate('YmdHis') . '_' . $migName . '.php';
 
-		File::move($file, $dest . '/Migration/' . $newName);
+        File::move($file, $dest . '/Migration/' . $newName);
 
-		$this->io->out('[<info>Action</info>] Rename migration file to: ' . $newName);
-	}
+        $this->io->out('[<info>Action</info>] Rename migration file to: ' . $newName);
+    }
 }

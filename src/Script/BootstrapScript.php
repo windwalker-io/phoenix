@@ -16,84 +16,74 @@ use Windwalker\Core\Language\Translator;
  */
 abstract class BootstrapScript extends AbstractPhoenixScript
 {
-	const GLYPHICONS = 'glyphicons';
-	const FONTAWESOME = 'fontawesome';
+    const GLYPHICONS = 'glyphicons';
+    const FONTAWESOME = 'fontawesome';
 
-	/**
-	 * Property currentVersion.
-	 *
-	 * @var  int
-	 */
-	public static $currentVersion = 3;
+    /**
+     * Property currentVersion.
+     *
+     * @var  int
+     */
+    public static $currentVersion = 3;
 
-	/**
-	 * css
-	 *
-	 * @param int $version
-	 *
-	 * @return void
-	 */
-	public static function css($version = 3)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			static::$currentVersion = (int) $version;
+    /**
+     * css
+     *
+     * @param int $version
+     *
+     * @return void
+     */
+    public static function css($version = 3)
+    {
+        if (!static::inited(__METHOD__)) {
+            static::$currentVersion = (int) $version;
 
-			if ($version == 3)
-			{
-				static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap.min.css');
-			}
-			else
-			{
-				static::addCSS(static::phoenixName() . '/css/bootstrap/4/bootstrap.min.css');
-			}
-		}
-	}
+            if ($version == 3) {
+                static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap.min.css');
+            } else {
+                static::addCSS(static::phoenixName() . '/css/bootstrap/4/bootstrap.min.css');
+            }
+        }
+    }
 
-	/**
-	 * script
-	 *
-	 * @param int $version
-	 *
-	 * @return void
-	 */
-	public static function script($version = 3)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			JQueryScript::core();
+    /**
+     * script
+     *
+     * @param int $version
+     *
+     * @return void
+     */
+    public static function script($version = 3)
+    {
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
 
-			if ($version == 3)
-			{
-				static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap.min.js');
-			}
-			else
-			{
-				static::addJS(static::phoenixName() . '/js/bootstrap/4/popper.min.js');
-				static::addJS(static::phoenixName() . '/js/bootstrap/4/bootstrap.min.js');
-			}
-		}
-	}
+            if ($version == 3) {
+                static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap.min.js');
+            } else {
+                static::addJS(static::phoenixName() . '/js/bootstrap/4/popper.min.js');
+                static::addJS(static::phoenixName() . '/js/bootstrap/4/bootstrap.min.js');
+            }
+        }
+    }
 
-	/**
-	 * tooltip
-	 *
-	 * @param string $selector
-	 *
-	 * @return  void
-	 */
-	public static function tooltip($selector = '.hasTooltip')
-	{
-		$asset = static::getAsset();
+    /**
+     * tooltip
+     *
+     * @param string $selector
+     *
+     * @return  void
+     */
+    public static function tooltip($selector = '.hasTooltip')
+    {
+        $asset = static::getAsset();
 
-		if (!static::inited(__METHOD__))
-		{
-			static::script();
-		}
+        if (!static::inited(__METHOD__)) {
+            static::script();
+        }
 
-		if (!static::inited(__METHOD__, func_get_args()))
-		{
-			$js = <<<JS
+        if (!static::inited(__METHOD__, func_get_args())) {
+            $js = <<<JS
 // Modal task
 jQuery(document).ready(function($)
 {
@@ -101,27 +91,26 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
-		}
-	}
+            $asset->internalScript($js);
+        }
+    }
 
-	/**
-	 * checkbox
-	 *
-	 * @param string $iconSet
-	 */
-	public static function checkbox($iconSet = self::GLYPHICONS)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			$asset = static::getAsset();
+    /**
+     * checkbox
+     *
+     * @param string $iconSet
+     */
+    public static function checkbox($iconSet = self::GLYPHICONS)
+    {
+        if (!static::inited(__METHOD__)) {
+            $asset = static::getAsset();
 
-			$asset->addStyle(static::phoenixName() . '/css/bootstrap/awesome-checkbox.min.css');
+            $asset->addStyle(static::phoenixName() . '/css/bootstrap/awesome-checkbox.min.css');
 
-			$font = $iconSet == static::GLYPHICONS ? 'Glyphicons Halflings' : 'FontAwesome';
-			$content = $iconSet == static::GLYPHICONS ? '\\e013' : '\\f00c';
+            $font    = $iconSet == static::GLYPHICONS ? 'Glyphicons Halflings' : 'FontAwesome';
+            $content = $iconSet == static::GLYPHICONS ? '\\e013' : '\\f00c';
 
-			$css = <<<CSS
+            $css = <<<CSS
 /* Bootstrap Awesome Checkbox */
 .checkbox input[type=checkbox]:checked + label:after {
   font-family: '$font';
@@ -159,26 +148,25 @@ JS;
 }
 CSS;
 
-			$asset->internalStyle($css);
-		}
-	}
+            $asset->internalStyle($css);
+        }
+    }
 
-	/**
-	 * modal
-	 *
-	 * @param string $selector
-	 *
-	 * @return  void
-	 */
-	public static function modal($selector = '.hasModal')
-	{
-		$asset = static::getAsset();
+    /**
+     * modal
+     *
+     * @param string $selector
+     *
+     * @return  void
+     */
+    public static function modal($selector = '.hasModal')
+    {
+        $asset = static::getAsset();
 
-		if (!static::inited(__METHOD__))
-		{
-			static::script();
+        if (!static::inited(__METHOD__)) {
+            static::script();
 
-			$js = <<<JS
+            $js = <<<JS
 // Init modal
 jQuery(document).ready(function($)
 {
@@ -196,12 +184,11 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
-		}
+            $asset->internalScript($js);
+        }
 
-		if (!static::inited(__METHOD__, func_get_args()))
-		{
-			$js = <<<JS
+        if (!static::inited(__METHOD__, func_get_args())) {
+            $js = <<<JS
 // Modal task
 jQuery(document).ready(function($)
 {
@@ -224,56 +211,54 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			$asset->internalScript($js);
-		}
-	}
+            $asset->internalScript($js);
+        }
+    }
 
-	/**
-	 * calendar
-	 *
-	 * @param string $selector
-	 * @param string $format
-	 * @param array  $options
-	 *
-	 * @return  void
-	 */
-	public static function calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = [])
-	{
-		if (!static::inited(__METHOD__))
-		{
-			JQueryScript::core();
+    /**
+     * calendar
+     *
+     * @param string $selector
+     * @param string $format
+     * @param array  $options
+     *
+     * @return  void
+     */
+    public static function calendar($selector = '.hasCalendar', $format = 'YYYY-MM-DD HH:mm:ss', $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
 
-			CoreScript::moment(false, Translator::getLocale());
-			static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
-			static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
-		}
+            CoreScript::moment(false, Translator::getLocale());
+            static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
+            static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
+        }
 
-		if (!static::inited(__METHOD__, get_defined_vars()))
-		{
-			$defaultOptions = [
-				'debug' => (bool) WINDWALKER_DEBUG,
-				'format' => $format,
-				'sideBySide' => true,
-				'calendarWeeks' => true,
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            $defaultOptions = [
+                'debug' => (bool) WINDWALKER_DEBUG,
+                'format' => $format,
+                'sideBySide' => true,
+                'calendarWeeks' => true,
 
-				// Totally support font-awesome now
-				// @see https://github.com/smalot/bootstrap-datetimepicker/issues/160
-				'icons' => [
-					'time'     => 'fa fa-clock-o',
-					'date'     => 'fa fa-calendar',
-					'up'       => 'fa fa-chevron-up',
-					'down'     => 'fa fa-chevron-down',
-					'previous' => 'fa fa-chevron-left',
-					'next'     => 'fa fa-chevron-right',
-					'today'    => 'fa fa-calendar-check-o',
-					'clear'    => 'fa fa-trash-o',
-					'close'    => 'fa fa-close'
-				]
-			];
+                // Totally support font-awesome now
+                // @see https://github.com/smalot/bootstrap-datetimepicker/issues/160
+                'icons' => [
+                    'time' => 'fa fa-clock-o',
+                    'date' => 'fa fa-calendar',
+                    'up' => 'fa fa-chevron-up',
+                    'down' => 'fa fa-chevron-down',
+                    'previous' => 'fa fa-chevron-left',
+                    'next' => 'fa fa-chevron-right',
+                    'today' => 'fa fa-calendar-check-o',
+                    'clear' => 'fa fa-trash-o',
+                    'close' => 'fa fa-close',
+                ],
+            ];
 
-			$options = static::getJSObject($defaultOptions, $options);
+            $options = static::getJSObject($defaultOptions, $options);
 
-			$js = <<<JS
+            $js = <<<JS
 jQuery(document).ready(function($)
 {
 	$('$selector').datetimepicker($options).on('dp.change', function (event) {
@@ -282,92 +267,84 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			static::internalJS($js);
-		}
-	}
+            static::internalJS($js);
+        }
+    }
 
-	/**
-	 * tabState
-	 *
-	 * @param string $selector
-	 * @param int    $time
-	 */
-	public static function tabState($selector = '#admin-form', $time = 100)
-	{
-		$args = get_defined_vars();
+    /**
+     * tabState
+     *
+     * @param string $selector
+     * @param int    $time
+     */
+    public static function tabState($selector = '#admin-form', $time = 100)
+    {
+        $args = get_defined_vars();
 
-		$asset = static::getAsset();
+        $asset = static::getAsset();
 
-		if (!static::inited(__METHOD__))
-		{
-			JQueryScript::core();
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
 
-			$asset->addScript(static::phoenixName() . '/js/bootstrap/tab-state.min.js');
-		}
+            $asset->addScript(static::phoenixName() . '/js/bootstrap/tab-state.min.js');
+        }
 
-		if (!static::inited(__METHOD__, $args))
-		{
-			$time = (int) $time;
+        if (!static::inited(__METHOD__, $args)) {
+            $time = (int) $time;
 
-			$asset->internalScript(<<<JS
+            $asset->internalScript(<<<JS
 jQuery(document).ready(function($) {
     new LoadTab($('$selector'), $time);
 });
 JS
-);
-		}
-	}
+            );
+        }
+    }
 
-	/**
-	 * buttonRadio
-	 *
-	 * @param string $selector
-	 * @param array  $options
-	 */
-	public static function buttonRadio($selector = '#admin-form', array $options = [])
-	{
-		if (!static::inited(__METHOD__))
-		{
-			JQueryScript::core();
+    /**
+     * buttonRadio
+     *
+     * @param string $selector
+     * @param array  $options
+     */
+    public static function buttonRadio($selector = '#admin-form', array $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
 
-			static::addJS(static::phoenixName() . '/js/bootstrap/button-radio.min.js');
-		}
+            static::addJS(static::phoenixName() . '/js/bootstrap/button-radio.min.js');
+        }
 
-		if (!static::inited(__METHOD__, get_defined_vars()))
-		{
-			$options = static::getJSObject($options);
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            $options = static::getJSObject($options);
 
-			$js = <<<JS
+            $js = <<<JS
 jQuery(function($) {
     $('$selector').buttonRadio($options);
 })
 JS;
 
 
-			static::internalJS($js);
-		}
-	}
+            static::internalJS($js);
+        }
+    }
 
-	/**
-	 * fontAwesome
-	 *
-	 * @param int $version
-	 *
-	 * @return  void
-	 */
-	public static function fontAwesome($version = 4)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			if ($version === 5)
-			{
-				static::addCSS(static::phoenixName() . '/css/fontawesome-all.min.css');
-				static::addJS(static::phoenixName() . '/js/fontawesome/fa-v4-shims.min.js');
-			}
-			else
-			{
-				static::addCSS(static::phoenixName() . '/css/font-awesome.min.css');
-			}
-		}
-	}
+    /**
+     * fontAwesome
+     *
+     * @param int $version
+     *
+     * @return  void
+     */
+    public static function fontAwesome($version = 4)
+    {
+        if (!static::inited(__METHOD__)) {
+            if ($version === 5) {
+                static::addCSS(static::phoenixName() . '/css/fontawesome-all.min.css');
+                static::addJS(static::phoenixName() . '/js/fontawesome/fa-v4-shims.min.js');
+            } else {
+                static::addCSS(static::phoenixName() . '/css/font-awesome.min.css');
+            }
+        }
+    }
 }

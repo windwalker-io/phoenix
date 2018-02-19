@@ -19,58 +19,53 @@ use Windwalker\Filesystem\Folder;
  */
 class CopyMigrationAction extends AbstractAction
 {
-	/**
-	 * Do this execute.
-	 *
-	 * @return  mixed
-	 * @throws \Windwalker\Filesystem\Exception\FilesystemException
-	 */
-	protected function doExecute()
-	{
-		/** @var CopyOperator $copyOperator */
-		$copyOperator = $this->container->get('operator.factory')->getOperator('copy');
+    /**
+     * Do this execute.
+     *
+     * @return  mixed
+     * @throws \Windwalker\Filesystem\Exception\FilesystemException
+     */
+    protected function doExecute()
+    {
+        /** @var CopyOperator $copyOperator */
+        $copyOperator = $this->container->get('operator.factory')->getOperator('copy');
 
-		$src = $this->config['dir.src'];
-		$dest = $this->config['dir.dest'];
-		$migName = $this->config['replace.controller.item.name.cap'] . 'Init';
+        $src     = $this->config['dir.src'];
+        $dest    = $this->config['dir.dest'];
+        $migName = $this->config['replace.controller.item.name.cap'] . 'Init';
 
-		if (!is_dir($src . '/Migration'))
-		{
-			return;
-		}
+        if (!is_dir($src . '/Migration')) {
+            return;
+        }
 
-		if (!is_dir($dest . '/Migration'))
-		{
-			Folder::create($dest . '/Migration');
-		}
+        if (!is_dir($dest . '/Migration')) {
+            Folder::create($dest . '/Migration');
+        }
 
-		// Copy migration
-		$files = Folder::files($dest . '/Migration');
+        // Copy migration
+        $files = Folder::files($dest . '/Migration');
 
-		$hasSameName = false;
+        $hasSameName = false;
 
-		foreach ($files as $file)
-		{
-			if (strpos($file, $migName . '.php') !== false)
-			{
-				$hasSameName = true;
+        foreach ($files as $file) {
+            if (strpos($file, $migName . '.php') !== false) {
+                $hasSameName = true;
 
-				break;
-			}
-		}
+                break;
+            }
+        }
 
-		// Migration already exists, return.
-		if ($hasSameName)
-		{
-			return;
-		}
+        // Migration already exists, return.
+        if ($hasSameName) {
+            return;
+        }
 
-		$migFile = Folder::files($src . '/Migration')[0];
+        $migFile = Folder::files($src . '/Migration')[0];
 
-		$newName = gmdate('YmdHis') . '_' . $migName . '.php';
+        $newName = gmdate('YmdHis') . '_' . $migName . '.php';
 
-		$copyOperator->copy($migFile, $dest . '/Migration/' . $newName, $this->replace);
+        $copyOperator->copy($migFile, $dest . '/Migration/' . $newName, $this->replace);
 
-		$this->io->out('[<info>Action</info>] Create migration file: ' . $newName);
-	}
+        $this->io->out('[<info>Action</info>] Create migration file: ' . $newName);
+    }
 }

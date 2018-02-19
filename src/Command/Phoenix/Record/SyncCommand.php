@@ -27,142 +27,132 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class SyncCommand extends CoreCommand
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'sync';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'sync';
 
-	/**
-	 * Property usage.
-	 *
-	 * @var  string
-	 */
-	protected $usage = '%s <package> <record_name> [<table>] [options]';
+    /**
+     * Property usage.
+     *
+     * @var  string
+     */
+    protected $usage = '%s <package> <record_name> [<table>] [options]';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Sync tables columns to RecordTrait to support auto-complete.';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Sync tables columns to RecordTrait to support auto-complete.';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-	}
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int
-	 *
-	 * @since  2.0
-	 */
-	protected function doExecute()
-	{
-		$package = $this->getArgument(0);
-		
-		if (!$package)
-		{
-			throw new WrongArgumentException('Please enter package name.');
-		}
+    /**
+     * Execute this command.
+     *
+     * @return int
+     *
+     * @since  2.0
+     */
+    protected function doExecute()
+    {
+        $package = $this->getArgument(0);
 
-		$package = ConsoleHelper::getAllPackagesResolver()->getPackage($package);
+        if (!$package) {
+            throw new WrongArgumentException('Please enter package name.');
+        }
 
-		if (!$package)
-		{
-			throw new \InvalidArgumentException(sprintf('Package: %s not found', $this->getArgument(0)));
-		}
+        $package = ConsoleHelper::getAllPackagesResolver()->getPackage($package);
 
-		$recordClass = $this->getArgument(1);
+        if (!$package) {
+            throw new \InvalidArgumentException(sprintf('Package: %s not found', $this->getArgument(0)));
+        }
 
-		if (!$recordClass)
-		{
-			throw new WrongArgumentException('Please enter record name or class.');
-		}
+        $recordClass = $this->getArgument(1);
 
-		$recordClass = StringNormalise::toClassNamespace($recordClass);
-		$pkgNamespace = ReflectionHelper::getNamespaceName($package);
+        if (!$recordClass) {
+            throw new WrongArgumentException('Please enter record name or class.');
+        }
 
-		if (!class_exists($recordClass))
-		{
-			$recordClass = $pkgNamespace. '\\Record\\' . ucfirst($recordClass) . 'Record';
-		}
+        $recordClass  = StringNormalise::toClassNamespace($recordClass);
+        $pkgNamespace = ReflectionHelper::getNamespaceName($package);
 
-		$table = null;
+        if (!class_exists($recordClass)) {
+            $recordClass = $pkgNamespace . '\\Record\\' . ucfirst($recordClass) . 'Record';
+        }
 
-		if (class_exists($recordClass))
-		{
-			try
-			{
-				/** @var Record $record */
-				$record = new $recordClass;
-				$table  = $record->getTableName();
-			}
-			catch (\Exception $e)
-			{
-				// Nothing
-			}
-		}
+        $table = null;
 
-		if ($this->getArgument(2))
-		{
-			$table = $this->getArgument(2);
-		}
+        if (class_exists($recordClass)) {
+            try {
+                /** @var Record $record */
+                $record = new $recordClass;
+                $table  = $record->getTableName();
+            } catch (\Exception $e) {
+                // Nothing
+            }
+        }
 
-		$columns = Ioc::getDatabase()->getTable($table, true)->getColumnDetails(true);
-		$fields = [];
-		$dataType = Ioc::getDatabase()->getTable($table)->getDataType();
+        if ($this->getArgument(2)) {
+            $table = $this->getArgument(2);
+        }
 
-		foreach ($columns as $column)
-		{
-			$fields[] = [
-				'name' => $column->Field,
-				'type' => $dataType::getPhpType(explode('(', $column->Type)[0])
-			];
-		}
+        $columns  = Ioc::getDatabase()->getTable($table, true)->getColumnDetails(true);
+        $fields   = [];
+        $dataType = Ioc::getDatabase()->getTable($table)->getDataType();
 
-		// Prepare Trait name
-		$name = end(explode('\\', $recordClass));
-		$name = str_replace('Record', '', $name);
-		$shortName = ucfirst($name) . 'DataTrait';
+        foreach ($columns as $column) {
+            $fields[] = [
+                'name' => $column->Field,
+                'type' => $dataType::getPhpType(explode('(', $column->Type)[0]),
+            ];
+        }
 
-		$data = [
-			'package_namespace' => $pkgNamespace . '\\Record\\Traits',
-			'short_name' => $shortName,
-			'columns' => $fields
-		];
+        // Prepare Trait name
+        $name      = end(explode('\\', $recordClass));
+        $name      = str_replace('Record', '', $name);
+        $shortName = ucfirst($name) . 'DataTrait';
 
-		$content = (new Edge(new EdgeStringLoader))->render($this->getTemplate(), $data);
+        $data = [
+            'package_namespace' => $pkgNamespace . '\\Record\\Traits',
+            'short_name' => $shortName,
+            'columns' => $fields,
+        ];
 
-		$file = $package->getDir() . '/Record/Traits/' . $shortName . '.php';
+        $content = (new Edge(new EdgeStringLoader))->render($this->getTemplate(), $data);
 
-		if (is_file($file) && !(new BooleanPrompter)->ask('File: <comment>' . $file . '</comment> exists, do you want to override it? [N/y]: ', false))
-		{
-			throw new \RuntimeException('  Canceled...');
-		}
+        $file = $package->getDir() . '/Record/Traits/' . $shortName . '.php';
 
-		File::write($file, $content);
+        if (is_file($file) && !(new BooleanPrompter)->ask('File: <comment>' . $file . '</comment> exists, do you want to override it? [N/y]: ',
+                false)) {
+            throw new \RuntimeException('  Canceled...');
+        }
 
-		$this->out()->out('Writing file: <info>' . $file . '</info> success.');
+        File::write($file, $content);
 
-		return true;
-	}
+        $this->out()->out('Writing file: <info>' . $file . '</info> success.');
 
-	/**
-	 * getTemplate
-	 *
-	 * @return  string
-	 */
-	protected function getTemplate()
-	{
-		return <<<TMPL
+        return true;
+    }
+
+    /**
+     * getTemplate
+     *
+     * @return  string
+     */
+    protected function getTemplate()
+    {
+        return <<<TMPL
 {!! '<' . '?php' !!}
 /**
  * Part of phoenix project.
@@ -189,5 +179,5 @@ trait {{ \$short_name }}
 
 TMPL;
 
-	}
+    }
 }

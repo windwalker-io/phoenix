@@ -21,43 +21,42 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class SendgridProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->share(\SendGrid::class, [$this, 'sendgrid'])
-			->alias('sendgrid', \SendGrid::class);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->share(\SendGrid::class, [$this, 'sendgrid'])
+            ->alias('sendgrid', \SendGrid::class);
 
-		$container->prepareSharedObject(SendGridAdapter::class)
-			->alias('mailer.adapter.sendgrid', SendGridAdapter::class)
-			->bindShared(MailerAdapterInterface::class, SendGridAdapter::class);
-	}
+        $container->prepareSharedObject(SendGridAdapter::class)
+            ->alias('mailer.adapter.sendgrid', SendGridAdapter::class)
+            ->bindShared(MailerAdapterInterface::class, SendGridAdapter::class);
+    }
 
-	/**
-	 * swiftmailer
-	 *
-	 * @param Container $container
-	 *
-	 * @return  \SendGrid
-	 *
-	 * @throws \UnexpectedValueException
-	 * @throws \LogicException
-	 */
-	public function sendgrid(Container $container)
-	{
-		if (!class_exists(\SendGrid::class))
-		{
-			throw new \LogicException('Please install sendgrid/sendgrid 5.* first.');
-		}
+    /**
+     * swiftmailer
+     *
+     * @param Container $container
+     *
+     * @return  \SendGrid
+     *
+     * @throws \UnexpectedValueException
+     * @throws \LogicException
+     */
+    public function sendgrid(Container $container)
+    {
+        if (!class_exists(\SendGrid::class)) {
+            throw new \LogicException('Please install sendgrid/sendgrid 5.* first.');
+        }
 
-		/** @var Config $config */
-		$config = $container->get('config');
+        /** @var Config $config */
+        $config = $container->get('config');
 
-		return new \SendGrid($config->get('mail.sendgrid.key'));
-	}
+        return new \SendGrid($config->get('mail.sendgrid.key'));
+    }
 }

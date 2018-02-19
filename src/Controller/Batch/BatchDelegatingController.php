@@ -16,63 +16,61 @@ use Windwalker\String\StringNormalise;
 
 /**
  * The BatchDelegatingController class.
- * 
- * @see  AbstractBatchController
+ *
+ * @see    AbstractBatchController
  *
  * @since  1.0
  */
 class BatchDelegatingController extends AbstractPhoenixController
 {
-	use CsrfProtectionTrait;
+    use CsrfProtectionTrait;
 
-	/**
-	 * Property inflection.
-	 *
-	 * @var  string
-	 */
-	protected $inflection = self::PLURAL;
+    /**
+     * Property inflection.
+     *
+     * @var  string
+     */
+    protected $inflection = self::PLURAL;
 
-	/**
-	 * doExecute
-	 *
-	 * @return  mixed
-	 *
-	 * @throws \DomainException
-	 * @throws \InvalidArgumentException
-	 */
-	protected function doExecute()
-	{
-		$task = $this->input->get('task', 'Update');
+    /**
+     * doExecute
+     *
+     * @return  mixed
+     *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     */
+    protected function doExecute()
+    {
+        $task = $this->input->get('task', 'Update');
 
-		if (!$task)
-		{
-			throw new \InvalidArgumentException('Task of: ' . __CLASS__ . ' should not be empty.');
-		}
+        if (!$task) {
+            throw new \InvalidArgumentException('Task of: ' . __CLASS__ . ' should not be empty.');
+        }
 
-		$resolver = $this->getPackage()->getMvcResolver();
+        $resolver = $this->getPackage()->getMvcResolver();
 
-		$class = $resolver->resolveController($this->package, $this->getName() . '\Batch\\' . $task . 'Controller');
+        $class = $resolver->resolveController($this->package, $this->getName() . '\Batch\\' . $task . 'Controller');
 
-		if (!$class)
-		{
-			throw new \DomainException(StringNormalise::toClassNamespace($this->getName() . '\Batch\\' . $task) . 'Controller not found');
-		}
+        if (!$class) {
+            throw new \DomainException(StringNormalise::toClassNamespace($this->getName() . '\Batch\\' . $task) . 'Controller not found');
+        }
 
-		// Keep model is string or null.
-		$model = $this->model instanceof ModelRepository ? null : $this->model;
+        // Keep model is string or null.
+        $model = $this->model instanceof ModelRepository ? null : $this->model;
 
-		/** @var AbstractController $controller */
-		$controller = new $class;
-		$controller->setName($this->getName());
-		$controller->config->set('item_name', $model ? : $this->config['item_name']);
-		$controller->config->set('list_name', $this->config['list_name']);
-		
-		$this->hmvc($controller, $this->input->compact([
-			'id'       => 'array',
-			'batch'    => 'var',
-			'ordering' => 'var',
-		]));
+        /** @var AbstractController $controller */
+        $controller = new $class;
+        $controller->setName($this->getName());
+        $controller->config->set('item_name', $model ?: $this->config['item_name']);
+        $controller->config->set('list_name', $this->config['list_name']);
 
-		return true;
-	}
+        $this->hmvc($controller, $this->input->compact([
+            'id' => 'array',
+            'batch' => 'var',
+            'ordering' => 'var',
+        ]));
+
+        return true;
+    }
 }

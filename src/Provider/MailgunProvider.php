@@ -22,43 +22,42 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class MailgunProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->share(Mailgun::class, [$this, 'mailgun'])
-			->alias('mailgun', Mailgun::class);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->share(Mailgun::class, [$this, 'mailgun'])
+            ->alias('mailgun', Mailgun::class);
 
-		$container->prepareSharedObject(MailgunAdapter::class)
-			->alias('mailer.adapter.mailgun', MailgunAdapter::class)
-			->bindShared(MailerAdapterInterface::class, MailgunAdapter::class);
-	}
+        $container->prepareSharedObject(MailgunAdapter::class)
+            ->alias('mailer.adapter.mailgun', MailgunAdapter::class)
+            ->bindShared(MailerAdapterInterface::class, MailgunAdapter::class);
+    }
 
-	/**
-	 * swiftmailer
-	 *
-	 * @param Container $container
-	 *
-	 * @return  Mailgun
-	 *
-	 * @throws \UnexpectedValueException
-	 * @throws \LogicException
-	 */
-	public function mailgun(Container $container)
-	{
-		if (!class_exists(Mailgun::class))
-		{
-			throw new \LogicException('Please install mailgun/mailgun-php first.');
-		}
+    /**
+     * swiftmailer
+     *
+     * @param Container $container
+     *
+     * @return  Mailgun
+     *
+     * @throws \UnexpectedValueException
+     * @throws \LogicException
+     */
+    public function mailgun(Container $container)
+    {
+        if (!class_exists(Mailgun::class)) {
+            throw new \LogicException('Please install mailgun/mailgun-php first.');
+        }
 
-		/** @var Config $config */
-		$config = $container->get('config');
+        /** @var Config $config */
+        $config = $container->get('config');
 
-		return Mailgun::create($config->get('mail.mailgun.key'));
-	}
+        return Mailgun::create($config->get('mail.mailgun.key'));
+    }
 }

@@ -19,34 +19,34 @@ use Windwalker\DataMapper\Entity\Entity;
  */
 interface CrudRepositoryInterface extends DatabaseRepositoryInterface
 {
-	/**
-	 * getItem
-	 *
-	 * @param   mixed  $pk
-	 *
-	 * @return  DataInterface|Entity
-	 */
-	public function getItem($pk = null);
+    /**
+     * getItem
+     *
+     * @param   mixed $pk
+     *
+     * @return  DataInterface|Entity
+     */
+    public function getItem($pk = null);
 
-	/**
-	 * save
-	 *
-	 * @param DataInterface|Entity $data
-	 *
-	 * @return  boolean
-	 *
-	 * @throws  \RuntimeException
-	 */
-	public function save(DataInterface $data);
+    /**
+     * save
+     *
+     * @param DataInterface|Entity $data
+     *
+     * @return  boolean
+     *
+     * @throws  \RuntimeException
+     */
+    public function save(DataInterface $data);
 
-	/**
-	 * delete
-	 *
-	 * @param array $conditions
-	 *
-	 * @return  boolean
-	 *
-	 * @throws \UnexpectedValueException
-	 */
-	public function delete($conditions = null);
+    /**
+     * delete
+     *
+     * @param array $conditions
+     *
+     * @return  boolean
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function delete($conditions = null);
 }

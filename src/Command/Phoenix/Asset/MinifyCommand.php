@@ -22,129 +22,115 @@ use Windwalker\String\StringHelper;
  */
 class MinifyCommand extends CoreCommand
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'minify';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'minify';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Minify resources';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Minify resources';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	public function init()
-	{
-		$this->addGlobalOption('p')
-			->alias('package')
-			->description('Package name to minify assets of this package');
+    /**
+     * init
+     *
+     * @return  void
+     */
+    public function init()
+    {
+        $this->addGlobalOption('p')
+            ->alias('package')
+            ->description('Package name to minify assets of this package');
 
-		$this->addGlobalOption('d')
-			->alias('dir')
-			->description('Directory to minify.');
-	}
+        $this->addGlobalOption('d')
+            ->alias('dir')
+            ->description('Directory to minify.');
+    }
 
-	/**
-	 * doExecute
-	 *
-	 * @return  int
-	 */
-	protected function doExecute()
-	{
-		$path = $this->getArgument(0);
+    /**
+     * doExecute
+     *
+     * @return  int
+     */
+    protected function doExecute()
+    {
+        $path = $this->getArgument(0);
 
-		$package = $this->getOption('p');
+        $package = $this->getOption('p');
 
-		$folder = $this->console->get('asset.folder', 'asset');
+        $folder = $this->console->get('asset.folder', 'asset');
 
-		if ($package = PackageHelper::getPackage($package))
-		{
-			$path = $package->getDir() . '/Resources/asset/' . $path;
-		}
-		else
-		{
-			$path = WINDWALKER_PUBLIC . '/' . trim($folder, '/') . '/' . $path;
-		}
+        if ($package = PackageHelper::getPackage($package)) {
+            $path = $package->getDir() . '/Resources/asset/' . $path;
+        } else {
+            $path = WINDWALKER_PUBLIC . '/' . trim($folder, '/') . '/' . $path;
+        }
 
-		if (is_file($path))
-		{
-			$files = [new \SplFileInfo($path)];
-		}
-		elseif (is_dir($path))
-		{
-			$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS));
-		}
-		else
-		{
-			throw new \InvalidArgumentException('No path');
-		}
+        if (is_file($path)) {
+            $files = [new \SplFileInfo($path)];
+        } elseif (is_dir($path)) {
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path,
+                \FilesystemIterator::FOLLOW_SYMLINKS));
+        } else {
+            throw new \InvalidArgumentException('No path');
+        }
 
-		/** @var \SplFileInfo $file */
-		foreach ($files as $file)
-		{
-			$ext = File::getExtension($file->getPathname());
+        /** @var \SplFileInfo $file */
+        foreach ($files as $file) {
+            $ext = File::getExtension($file->getPathname());
 
-			if (StringHelper::endsWith($file->getBasename(), '.min.' . $ext))
-			{
-				continue;
-			}
+            if (StringHelper::endsWith($file->getBasename(), '.min.' . $ext)) {
+                continue;
+            }
 
-			if ($ext === 'css')
-			{
-				$this->out('[<comment>Compressing</comment>] ' . $file);
+            if ($ext === 'css') {
+                $this->out('[<comment>Compressing</comment>] ' . $file);
 
-				$data = $this->minifyCSS($file);
-			}
-			elseif ($ext === 'js')
-			{
-				$this->out('[<comment>Compressing</comment>] ' . $file);
+                $data = $this->minifyCSS($file);
+            } elseif ($ext === 'js') {
+                $this->out('[<comment>Compressing</comment>] ' . $file);
 
-				$data = $this->minifyJS($file);
-			}
-			else
-			{
-				continue;
-			}
+                $data = $this->minifyJS($file);
+            } else {
+                continue;
+            }
 
-			$newName = $file->getPath() . '/' . File::stripExtension($file->getBasename()) . '.min.' . $ext;
+            $newName = $file->getPath() . '/' . File::stripExtension($file->getBasename()) . '.min.' . $ext;
 
-			file_put_contents($newName, $data);
+            file_put_contents($newName, $data);
 
-			$this->out('[<info>Compressed</info>] ' . $newName);
-		}
+            $this->out('[<info>Compressed</info>] ' . $newName);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * minifyCSS
-	 *
-	 * @param string $file
-	 *
-	 * @return  string
-	 */
-	protected function minifyCSS($file)
-	{
-		return str_replace("\n", ' ', CssMinifier::process($file));
-	}
+    /**
+     * minifyCSS
+     *
+     * @param string $file
+     *
+     * @return  string
+     */
+    protected function minifyCSS($file)
+    {
+        return str_replace("\n", ' ', CssMinifier::process($file));
+    }
 
-	/**
-	 * minifyJS
-	 *
-	 * @param string $file
-	 *
-	 * @return  string
-	 */
-	protected function minifyJS($file)
-	{
-		return str_replace("\n", ' ', JsMinifier::process($file));
-	}
+    /**
+     * minifyJS
+     *
+     * @param string $file
+     *
+     * @return  string
+     */
+    protected function minifyJS($file)
+    {
+        return str_replace("\n", ' ', JsMinifier::process($file));
+    }
 }

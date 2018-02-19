@@ -20,62 +20,56 @@ use Windwalker\Record\NestedRecord;
  */
 class AbstractRebuildController extends AbstractBatchController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'rebuild';
+    /**
+     * Property action.
+     *
+     * @var  string
+     */
+    protected $action = 'rebuild';
 
-	/**
-	 * doExecute
-	 *
-	 * @return mixed
-	 * @throws \Exception
-	 */
-	protected function doExecute()
-	{
-		if (!$this->checkAccess([]))
-		{
-			throw new ValidateFailException('You have no access to modify this resource.');
-		}
+    /**
+     * doExecute
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function doExecute()
+    {
+        if (!$this->checkAccess([])) {
+            throw new ValidateFailException('You have no access to modify this resource.');
+        }
 
-		try
-		{
-			/** @var NestedRecord $record */
-			$record = $this->model->getRecord();
+        try {
+            /** @var NestedRecord $record */
+            $record = $this->model->getRecord();
 
-			$record->rebuild();
+            $record->rebuild();
 
-			$ids = $this->model->getDataMapper()->findColumn('id', ['parent_id != 0']);
+            $ids = $this->model->getDataMapper()->findColumn('id', ['parent_id != 0']);
 
-			foreach ($ids as $id)
-			{
-				$record->rebuildPath($id);
-			}
-		}
-		catch (\Exception $e)
-		{
-			if (WINDWALKER_DEBUG)
-			{
-				throw $e;
-			}
+            foreach ($ids as $id) {
+                $record->rebuildPath($id);
+            }
+        } catch (\Exception $e) {
+            if (WINDWALKER_DEBUG) {
+                throw $e;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * getSuccessMessage
-	 *
-	 * @param Data $data
-	 *
-	 * @return  string
-	 */
-	public function getSuccessMessage($data = null)
-	{
-		return Translator::translate($this->langPrefix . 'message.batch.' . $this->action . '.success');
-	}
+    /**
+     * getSuccessMessage
+     *
+     * @param Data $data
+     *
+     * @return  string
+     */
+    public function getSuccessMessage($data = null)
+    {
+        return Translator::translate($this->langPrefix . 'message.batch.' . $this->action . '.success');
+    }
 }

@@ -15,34 +15,34 @@ use Windwalker\Console\Command\Command;
 
 /**
  * The PhoenixCommand class.
- * 
+ *
  * @since  1.0
  */
 class PhoenixCommand extends Command
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'phoenix';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'phoenix';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'The Phoenix RAD package.';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'The Phoenix RAD package.';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addCommand(new AssetCommand);
-		$this->addCommand(new FormCommand);
-		$this->addCommand(new RecordCommand);
-	}
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addCommand(new AssetCommand);
+        $this->addCommand(new FormCommand);
+        $this->addCommand(new RecordCommand);
+    }
 }

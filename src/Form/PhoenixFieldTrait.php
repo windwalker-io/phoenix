@@ -22,20 +22,20 @@ use Phoenix\Field\SwitchField;
  * @method  ItemListField itemList($name = null, $label = null)
  * @method  ModalField    modal($name = null, $label = null)
  * @method  SqlListField  sqlList($name = null, $label = null)
- * @method  SwitchField   switch($name = null, $label = null)
+ * @method  SwitchField   switch ($name = null, $label = null)
  * @method  InlineField   inline($name = null, $label = null)
  *
  * @since  1.1
  */
 trait PhoenixFieldTrait
 {
-	/**
-	 * bootPhoenixFieldTrait
-	 *
-	 * @return  void
-	 */
-	public function bootPhoenixFieldTrait()
-	{
-		$this->addNamespace('Phoenix\Field');
-	}
+    /**
+     * bootPhoenixFieldTrait
+     *
+     * @return  void
+     */
+    public function bootPhoenixFieldTrait()
+    {
+        $this->addNamespace('Phoenix\Field');
+    }
 }

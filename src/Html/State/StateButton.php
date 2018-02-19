@@ -15,15 +15,15 @@ namespace Phoenix\Html\State;
  */
 class StateButton extends PublishedButton
 {
-	/**
-	 * configure
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		parent::init();
+    /**
+     * configure
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        parent::init();
 
-		$this->addState(-1, 'publish', 'fa fa-fw fa-trash', 'phoenix.grid.state.trashed');
-	}
+        $this->addState(-1, 'publish', 'fa fa-fw fa-trash', 'phoenix.grid.state.trashed');
+    }
 }

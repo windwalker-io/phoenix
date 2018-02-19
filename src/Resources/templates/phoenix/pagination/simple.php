@@ -17,8 +17,9 @@ use Windwalker\Core\Pagination\PaginationResult;
 <div class="windwalker-pagination">
     <div class="btn-group pull-left">
         <?php if ($pagination->getFirst()): ?>
-            <a href="<?php echo $this->escape($route(['page'=> $pagination->getFirst()])); ?>"
-                class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
+            <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
+               class="hasTooltip btn btn-default"
+               title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
                 <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
                     <?php echo Translator::translate('phoenix.pagination.first'); ?>
@@ -27,8 +28,9 @@ use Windwalker\Core\Pagination\PaginationResult;
         <?php endif; ?>
 
         <?php if ($pagination->getPrevious()): ?>
-            <a href="<?php echo $this->escape($route(['page'=> $pagination->getPrevious()])); ?>"
-                class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
+            <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
+               class="hasTooltip btn btn-default"
+               title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
                 <span class="fa fa-backward"></span>
                 <span class="sr-only">
                     <?php echo Translator::translate('phoenix.pagination.previous'); ?>
@@ -38,14 +40,15 @@ use Windwalker\Core\Pagination\PaginationResult;
     </div>
 
     <div class="pull-right">
-	    <?php if ($pagination->getNext()): ?>
-			<a href="<?php echo $this->escape($route(['page'=> $pagination->getNext()])); ?>"
-				class="hasTooltip btn btn-default" title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
-				<span class="fa fa-forward"></span>
-				<span class="sr-only">
+        <?php if ($pagination->getNext()): ?>
+            <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
+               class="hasTooltip btn btn-default"
+               title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
+                <span class="fa fa-forward"></span>
+                <span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.next'); ?>
 				</span>
-			</a>
-	    <?php endif; ?>
+            </a>
+        <?php endif; ?>
     </div>
 </div>

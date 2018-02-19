@@ -18,40 +18,38 @@ use Phoenix\Generator\FileOperator\CopyOperator;
  */
 class PrepareAction extends AbstractAction
 {
-	/**
-	 * Do this execute.
-	 *
-	 * @return  mixed
-	 */
-	protected function doExecute()
-	{
-		/** @var CopyOperator $copyOperator */
-		$copyOperator = $this->container->get('operator.factory')->getOperator('copy');
+    /**
+     * Do this execute.
+     *
+     * @return  mixed
+     */
+    protected function doExecute()
+    {
+        /** @var CopyOperator $copyOperator */
+        $copyOperator = $this->container->get('operator.factory')->getOperator('copy');
 
-		$src  = $this->config['dir.src'];
-		$dest = $this->config['dir.dest'];
+        $src  = $this->config['dir.src'];
+        $dest = $this->config['dir.dest'];
 
-		$files = [
-			'DataMapper',
-			'Field',
-			'Resources/language',
-			'Resources/routing',
-			'Record',
-			'Seed'
-		];
+        $files = [
+            'DataMapper',
+            'Field',
+            'Resources/language',
+            'Resources/routing',
+            'Record',
+            'Seed',
+        ];
 
-		foreach ($files as $file)
-		{
-			if (!file_exists($src . '/' . $file))
-			{
-				continue;
-			}
+        foreach ($files as $file) {
+            if (!file_exists($src . '/' . $file)) {
+                continue;
+            }
 
-			$copyOperator->copy(
-				$src . '/' . $file,
-				$dest . '/' . $file,
-				$this->config['replace']
-			);
-		}
-	}
+            $copyOperator->copy(
+                $src . '/' . $file,
+                $dest . '/' . $file,
+                $this->config['replace']
+            );
+        }
+    }
 }

@@ -18,17 +18,17 @@ use Windwalker\Event\Event;
  */
 class CssMinifyListener
 {
-	/**
-	 * onPhoenixRenderScripts
-	 *
-	 * @param Event $event
-	 *
-	 * @return  void
-	 */
-	public function onAssetRenderStyles(Event $event)
-	{
-		$minify = new CssMinify($event['asset']);
+    /**
+     * onPhoenixRenderScripts
+     *
+     * @param Event $event
+     *
+     * @return  void
+     */
+    public function onAssetRenderStyles(Event $event)
+    {
+        $minify = new CssMinify($event['asset']);
 
-		$minify->compress();
-	}
+        $minify->compress();
+    }
 }

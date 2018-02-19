@@ -22,164 +22,156 @@ use Windwalker\Record\Record;
  */
 class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudRepositoryInterface
 {
-	use FormAwareRepositoryTrait;
-	
-	/**
-	 * Property updateNulls.
-	 *
-	 * @var  boolean
-	 */
-	protected $updateNulls = true;
+    use FormAwareRepositoryTrait;
 
-	/**
-	 * save
-	 *
-	 * @param DataInterface|Entity $data
-	 *
-	 * @return  DataInterface|Entity
-	 *
-	 * @throws  \LogicException
-	 * @throws  \UnexpectedValueException
-	 * @throws  \Windwalker\Record\Exception\NoResultException
-	 * @throws  \InvalidArgumentException
-	 * @throws  \RuntimeException
-	 */
-	public function save(DataInterface $data)
-	{
-		// Prepare Record object, primary keys and dump input data
-		$record = $this->getRecord();
-		$keys   = array_filter((array) $this->getKeyName(true)); // Fix because Record return empty string
-		$dumped = $data->dump(true);
+    /**
+     * Property updateNulls.
+     *
+     * @var  boolean
+     */
+    protected $updateNulls = true;
 
-		// Let's check if primary exists, do action for update.
-		$conditions = array_intersect_key($dumped, array_flip($keys));
+    /**
+     * save
+     *
+     * @param DataInterface|Entity $data
+     *
+     * @return  DataInterface|Entity
+     *
+     * @throws  \LogicException
+     * @throws  \UnexpectedValueException
+     * @throws  \Windwalker\Record\Exception\NoResultException
+     * @throws  \InvalidArgumentException
+     * @throws  \RuntimeException
+     */
+    public function save(DataInterface $data)
+    {
+        // Prepare Record object, primary keys and dump input data
+        $record = $this->getRecord();
+        $keys   = array_filter((array) $this->getKeyName(true)); // Fix because Record return empty string
+        $dumped = $data->dump(true);
 
-		if (array_filter($conditions))
-		{
-			try
-			{
-				$record->load($conditions);
-			}
-			catch (NoResultException $e)
-			{
-				throw new NoResultException('Try to update a non-exists record to database.', $e->getCode(), $e);
-			}
-		}
+        // Let's check if primary exists, do action for update.
+        $conditions = array_intersect_key($dumped, array_flip($keys));
 
-		$record->bind($dumped);
+        if (array_filter($conditions)) {
+            try {
+                $record->load($conditions);
+            } catch (NoResultException $e) {
+                throw new NoResultException('Try to update a non-exists record to database.', $e->getCode(), $e);
+            }
+        }
 
-		$dispatcher = Ioc::getDispatcher();
+        $record->bind($dumped);
 
-		$dispatcher->triggerEvent('onModelBeforeSave', [
-			'conditions' => $conditions,
-			'model' => $this,
-			'data' => $data,
-			'record' => $record,
-			'updateNulls' => $this->updateNulls
-		]);
+        $dispatcher = Ioc::getDispatcher();
 
-		$this->prepareRecord($record);
+        $dispatcher->triggerEvent('onModelBeforeSave', [
+            'conditions' => $conditions,
+            'model' => $this,
+            'data' => $data,
+            'record' => $record,
+            'updateNulls' => $this->updateNulls,
+        ]);
 
-		$record->validate()
-			->store($this->updateNulls);
+        $this->prepareRecord($record);
 
-		$this->postSaveHook($record);
+        $record->validate()
+            ->store($this->updateNulls);
 
-		$dispatcher->triggerEvent('onModelAfterSave', [
-			'conditions' => $conditions,
-			'model' => $this,
-			'data' => $data,
-			'record' => $record,
-			'updateNulls' => $this->updateNulls
-		]);
+        $this->postSaveHook($record);
 
-		$data->bind($record->dump(true));
+        $dispatcher->triggerEvent('onModelAfterSave', [
+            'conditions' => $conditions,
+            'model' => $this,
+            'data' => $data,
+            'record' => $record,
+            'updateNulls' => $this->updateNulls,
+        ]);
 
-		return $data;
-	}
+        $data->bind($record->dump(true));
 
-	/**
-	 * postSaveHook
-	 *
-	 * @param Record $record
-	 *
-	 * @return  void
-	 */
-	protected function postSaveHook(Record $record)
-	{
-	}
+        return $data;
+    }
 
-	/**
-	 * prepareRecord
-	 *
-	 * @param Record $record
-	 *
-	 * @return  void
-	 */
-	protected function prepareRecord(Record $record)
-	{
-	}
+    /**
+     * postSaveHook
+     *
+     * @param Record $record
+     *
+     * @return  void
+     */
+    protected function postSaveHook(Record $record)
+    {
+    }
 
-	/**
-	 * delete
-	 *
-	 * @param array $conditions
-	 *
-	 * @return  boolean
-	 *
-	 * @throws \UnexpectedValueException
-	 * @throws \Windwalker\Record\Exception\NoResultException
-	 */
-	public function delete($conditions = null)
-	{
-		$conditions = $conditions ? : $this['load.conditions'];
+    /**
+     * prepareRecord
+     *
+     * @param Record $record
+     *
+     * @return  void
+     */
+    protected function prepareRecord(Record $record)
+    {
+    }
 
-		$record = $this->getRecord();
+    /**
+     * delete
+     *
+     * @param array $conditions
+     *
+     * @return  boolean
+     *
+     * @throws \UnexpectedValueException
+     * @throws \Windwalker\Record\Exception\NoResultException
+     */
+    public function delete($conditions = null)
+    {
+        $conditions = $conditions ?: $this['load.conditions'];
 
-		$dispatcher = Ioc::getDispatcher();
+        $record = $this->getRecord();
 
-		$dispatcher->triggerEvent('onModelBeforeDelete', [
-			'conditions' => $conditions,
-			'model' => $this,
-			'record' => $record
-		]);
+        $dispatcher = Ioc::getDispatcher();
 
-		try
-		{
-			// Find record first to check we can delete it.
-			$record->load($conditions)->delete();
+        $dispatcher->triggerEvent('onModelBeforeDelete', [
+            'conditions' => $conditions,
+            'model' => $this,
+            'record' => $record,
+        ]);
 
-			$dispatcher->triggerEvent('onModelAfterDelete', [
-				'conditions' => $conditions,
-				'model' => $this,
-				'record' => $record,
-				'result' => true
-			]);
-		}
-		catch (NoResultException $e)
-		{
-			return false;
-		}
+        try {
+            // Find record first to check we can delete it.
+            $record->load($conditions)->delete();
 
-		return true;
-	}
+            $dispatcher->triggerEvent('onModelAfterDelete', [
+                'conditions' => $conditions,
+                'model' => $this,
+                'record' => $record,
+                'result' => true,
+            ]);
+        } catch (NoResultException $e) {
+            return false;
+        }
 
-	/**
-	 * updateNulls
-	 *
-	 * @param   boolean $boolean
-	 *
-	 * @return  static|boolean
-	 */
-	public function updateNulls($boolean = null)
-	{
-		if ($boolean !== null)
-		{
-			$this->updateNulls = (bool) $boolean;
+        return true;
+    }
 
-			return $this;
-		}
+    /**
+     * updateNulls
+     *
+     * @param   boolean $boolean
+     *
+     * @return  static|boolean
+     */
+    public function updateNulls($boolean = null)
+    {
+        if ($boolean !== null) {
+            $this->updateNulls = (bool) $boolean;
 
-		return $this->updateNulls;
-	}
+            return $this;
+        }
+
+        return $this->updateNulls;
+    }
 }

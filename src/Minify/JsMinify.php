@@ -18,69 +18,69 @@ use Asika\Minifier\MinifierInterface;
  */
 class JsMinify extends AbstractAssetMinify
 {
-	/**
-	 * Property type.
-	 *
-	 * @var  string
-	 */
-	protected $type = 'js';
+    /**
+     * Property type.
+     *
+     * @var  string
+     */
+    protected $type = 'js';
 
-	/**
-	 * getStorage
-	 *
-	 * @return  array
-	 */
-	protected function getStorage()
-	{
-		return $this->asset->getScripts();
-	}
+    /**
+     * getStorage
+     *
+     * @return  array
+     */
+    protected function getStorage()
+    {
+        return $this->asset->getScripts();
+    }
 
-	/**
-	 * getMinifier
-	 *
-	 * @return  MinifierInterface
-	 */
-	protected function createMinifier()
-	{
-		return new JsMinifier;
-	}
+    /**
+     * getMinifier
+     *
+     * @return  MinifierInterface
+     */
+    protected function createMinifier()
+    {
+        return new JsMinifier;
+    }
 
-	/**
-	 * getInternalStorage
-	 *
-	 * @return  array
-	 */
-	protected function getInternalStorage()
-	{
-		return implode("\n", $this->asset->getInternalScripts());
-	}
+    /**
+     * getInternalStorage
+     *
+     * @return  array
+     */
+    protected function getInternalStorage()
+    {
+        return implode("\n", $this->asset->getInternalScripts());
+    }
 
-	/**
-	 * addAsset
-	 *
-	 * @param string $path
-	 * @param string $md5sum
-	 *
-	 * @return  void
-	 */
-	protected function addAsset($path, $md5sum = null)
-	{
-		// Clean assets list
-		$this->asset->setScripts([]);
-		$this->asset->setInternalScripts(null);
+    /**
+     * addAsset
+     *
+     * @param string $path
+     * @param string $md5sum
+     *
+     * @return  void
+     */
+    protected function addAsset($path, $md5sum = null)
+    {
+        // Clean assets list
+        $this->asset->setScripts([]);
+        $this->asset->setInternalScripts(null);
 
-		$this->asset->addScript($path, $md5sum);
-	}
+        $this->asset->addScript($path, $md5sum);
+    }
 
-	/**
-	 * implodeData
-	 *
-	 * @param array $data
-	 *
-	 * @return  string
-	 */
-	protected function implodeData($data)
-	{
-		return implode("\n;\n", $data);
-	}
+    /**
+     * implodeData
+     *
+     * @param array $data
+     *
+     * @return  string
+     */
+    protected function implodeData($data)
+    {
+        return implode("\n;\n", $data);
+    }
 }

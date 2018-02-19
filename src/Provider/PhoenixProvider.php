@@ -17,61 +17,57 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AssetProvider class.
- * 
+ *
  * @since  1.0
  */
 class PhoenixProvider implements ServiceProviderInterface
 {
-	/**
-	 * Property package.
-	 *
-	 * @var  AbstractPackage
-	 */
-	protected $package;
+    /**
+     * Property package.
+     *
+     * @var  AbstractPackage
+     */
+    protected $package;
 
-	/**
-	 * PhoenixProvider constructor.
-	 *
-	 * @param AbstractPackage $package
-	 */
-	public function __construct(AbstractPackage $package)
-	{
-		$this->package = $package;
-	}
+    /**
+     * PhoenixProvider constructor.
+     *
+     * @param AbstractPackage $package
+     */
+    public function __construct(AbstractPackage $package)
+    {
+        $this->package = $package;
+    }
 
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		if ($container->getParent())
-		{
-			$container = $container->getParent();
-		}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        if ($container->getParent()) {
+            $container = $container->getParent();
+        }
 
-		if ($this->package->app->isConsole())
-		{
-			return;
-		}
+        if ($this->package->app->isConsole()) {
+            return;
+        }
 
-		// Html document
-		$closure = function(Container $container)
-		{
-			return $container->newInstance(HtmlHeaderManager::class);
-		};
+        // Html document
+        $closure = function (Container $container) {
+            return $container->newInstance(HtmlHeaderManager::class);
+        };
 
-		$container->share(HtmlHeaderManager::class, $closure)
-			->alias('html.header', HtmlHeaderManager::class);
+        $container->share(HtmlHeaderManager::class, $closure)
+            ->alias('html.header', HtmlHeaderManager::class);
 
-		$container->extend(RendererManager::class, function (RendererManager $manager, Container $container)
-		{
-		    $manager->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', PriorityQueue::LOW - 25);
+        $container->extend(RendererManager::class, function (RendererManager $manager, Container $container) {
+            $manager->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', PriorityQueue::LOW - 25);
 
-			return $manager;
-		});
-	}
+            return $manager;
+        });
+    }
 }

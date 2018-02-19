@@ -22,41 +22,40 @@ use Windwalker\Middleware\MiddlewareInterface;
  */
 class HtmlMinifyMiddleware extends AbstractWebMiddleware
 {
-	/**
-	 * Middleware logic to be invoked.
-	 *
-	 * @param   Request                      $request  The request.
-	 * @param   Response                     $response The response.
-	 * @param   callable|MiddlewareInterface $next     The next middleware.
-	 *
-	 * @return  Response
-	 */
-	public function __invoke(Request $request, Response $response, $next = null)
-	{
-		/** @var Response $response */
-		$response = $next($request, $response);
+    /**
+     * Middleware logic to be invoked.
+     *
+     * @param   Request                      $request  The request.
+     * @param   Response                     $response The response.
+     * @param   callable|MiddlewareInterface $next     The next middleware.
+     *
+     * @return  Response
+     */
+    public function __invoke(Request $request, Response $response, $next = null)
+    {
+        /** @var Response $response */
+        $response = $next($request, $response);
 
-		if ($response instanceof HtmlResponse)
-		{
-			// @link  http://stackoverflow.com/a/6225706
-			$search = [
-				'/\>[^\S ]+/s', // strip whitespaces after tags, except space
-				'/[^\S ]+\</s', // strip whitespaces before tags, except space
-				'/(\s)+/s'      // shorten multiple whitespace sequences
-			];
+        if ($response instanceof HtmlResponse) {
+            // @link  http://stackoverflow.com/a/6225706
+            $search = [
+                '/\>[^\S ]+/s', // strip whitespaces after tags, except space
+                '/[^\S ]+\</s', // strip whitespaces before tags, except space
+                '/(\s)+/s'      // shorten multiple whitespace sequences
+            ];
 
-			$replace = [
-				'>',
-				'<',
-				'\\1'
-			];
+            $replace = [
+                '>',
+                '<',
+                '\\1',
+            ];
 
-			$html = preg_replace($search, $replace, $response->getBody()->__toString());
+            $html = preg_replace($search, $replace, $response->getBody()->__toString());
 
-			$response = $response->withBody(new Stream('php://memory', Stream::MODE_READ_WRITE_FROM_BEGIN));
-			$response->getBody()->write($html);
-		}
+            $response = $response->withBody(new Stream('php://memory', Stream::MODE_READ_WRITE_FROM_BEGIN));
+            $response->getBody()->write($html);
+        }
 
-		return $response;
-	}
+        return $response;
+    }
 }

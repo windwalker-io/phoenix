@@ -24,7 +24,8 @@ $filterFields = $form->getFields(null, 'filter');
             @if ($field->get('display'))
                 {!! $field->appendAttribute('class', ' form-control')->renderInput() !!}
             @else
-                <input id="{{ $field->getId() }}" name="{{ $field->getFieldName() }}" value="{{ $field->getValue() }}" type="hidden" />
+                <input id="{{ $field->getId() }}" name="{{ $field->getFieldName() }}" value="{{ $field->getValue() }}"
+                       type="hidden"/>
             @endif
 
             {{-- Search Input --}}
@@ -35,7 +36,7 @@ $filterFields = $form->getFields(null, 'filter');
                 {{-- Submit Button --}}
                 <span class="input-group-btn input-group-append">
             <button class="btn btn-default btn-outline-secondary hasTooltip" type="submit"
-                title="@translate('phoenix.grid.search.button.desc')">
+                    title="@translate('phoenix.grid.search.button.desc')">
                 <span class="fa fa-search"></span>
             </button>
         </span>
@@ -46,25 +47,26 @@ $filterFields = $form->getFields(null, 'filter');
         <div class="btn-group filter-buttons-group ml-sm-3">
 
             @if ($filter && count($filterFields))
-            {{-- Filter Toggle Button --}}
-            <button type="button" class="btn {{ $show ? 'btn-primary btn-dark' : 'btn-default btn-outline-secondary' }} filter-toggle-button hasTooltip"
-                data-class-show="btn-primary btn-dark"
-                data-class-hide="btn-default btn-outline-secondary"
-                title="@translate('phoenix.grid.filter.button.desc')">
-                @translate('phoenix.grid.filter.button.text')
+                {{-- Filter Toggle Button --}}
+                <button type="button"
+                        class="btn {{ $show ? 'btn-primary btn-dark' : 'btn-default btn-outline-secondary' }} filter-toggle-button hasTooltip"
+                        data-class-show="btn-primary btn-dark"
+                        data-class-hide="btn-default btn-outline-secondary"
+                        title="@translate('phoenix.grid.filter.button.desc')">
+                    @translate('phoenix.grid.filter.button.text')
 
-                {{-- Button Icon --}}
-                <span
-                    class="filter-button-icon fa fa-angle-{{ $show ? 'up' : 'down' }}"
-                    data-class-show="fa fa-angle-up"
-                    data-class-hide="fa fa-angle-down"
-                ></span>
-            </button>
+                    {{-- Button Icon --}}
+                    <span
+                        class="filter-button-icon fa fa-angle-{{ $show ? 'up' : 'down' }}"
+                        data-class-show="fa fa-angle-up"
+                        data-class-hide="fa fa-angle-down"
+                    ></span>
+                </button>
             @endif
 
             {{-- Clear Button --}}
             <button type="button" class="btn btn-default btn-outline-secondary search-clear-button hasTooltip"
-                title="@translate('phoenix.grid.clear.button.desc')">
+                    title="@translate('phoenix.grid.clear.button.desc')">
                 <span class="fa fa-remove fa-times"></span>
             </button>
         </div>

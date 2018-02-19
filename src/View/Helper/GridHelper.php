@@ -32,442 +32,437 @@ use Windwalker\Utilities\Arr;
  */
 class GridHelper
 {
-	/**
-	 * View instance.
-	 *
-	 * @var HtmlView
-	 */
-	protected $view;
+    /**
+     * View instance.
+     *
+     * @var HtmlView
+     */
+    protected $view;
 
-	/**
-	 * Config object.
-	 *
-	 * @var Structure
-	 */
-	protected $config = [];
+    /**
+     * Config object.
+     *
+     * @var Structure
+     */
+    protected $config = [];
 
-	/**
-	 * The fields mapper.
-	 *
-	 * @var array
-	 */
-	protected $fields = [
-		'pk'          => 'id',
-		'title'       => 'title',
-		'alias'       => 'alias',
-		'state'       => 'state',
-		'ordering'    => 'ordering',
-		'author'      => 'created_by',
-		'author_name' => 'user_name',
-		'created'     => 'created',
-		'language'    => 'language',
-		'lang_title'  => 'lang_title'
-	];
+    /**
+     * The fields mapper.
+     *
+     * @var array
+     */
+    protected $fields = [
+        'pk' => 'id',
+        'title' => 'title',
+        'alias' => 'alias',
+        'state' => 'state',
+        'ordering' => 'ordering',
+        'author' => 'created_by',
+        'author_name' => 'user_name',
+        'created' => 'created',
+        'language' => 'language',
+        'lang_title' => 'lang_title',
+    ];
 
-	/**
-	 * State object.
-	 *
-	 * @var Structure
-	 */
-	protected $state;
+    /**
+     * State object.
+     *
+     * @var Structure
+     */
+    protected $state;
 
-	/**
-	 * The current item object.
-	 *
-	 * @var object
-	 */
-	protected $current;
+    /**
+     * The current item object.
+     *
+     * @var object
+     */
+    protected $current;
 
-	/**
-	 * The row count.
-	 *
-	 * @var integer
-	 */
-	protected $row;
+    /**
+     * The row count.
+     *
+     * @var integer
+     */
+    protected $row;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param HtmlView $view   The view object.
-	 * @param array    $config The config object.
-	 */
-	public function __construct(HtmlView $view, $config = [])
-	{
-		$this->view   = $view;
-		$this->config = $config = ($config instanceof Structure) ? $config : new Structure($config);
-		$this->state  = $state = $view['state'] ? : new Structure;
+    /**
+     * Constructor.
+     *
+     * @param HtmlView $view   The view object.
+     * @param array    $config The config object.
+     */
+    public function __construct(HtmlView $view, $config = [])
+    {
+        $this->view   = $view;
+        $this->config = $config = ($config instanceof Structure) ? $config : new Structure($config);
+        $this->state  = $state = $view['state'] ?: new Structure;
 
-		// Merge fields
-		$fields = $config->get('field');
+        // Merge fields
+        $fields = $config->get('field');
 
-		$fields = array_merge($this->fields, (array) $fields);
+        $fields = array_merge($this->fields, (array) $fields);
 
-		$this->config->set('field', $fields);
+        $this->config->set('field', $fields);
 
-		// Access context
-		$this->context = $this->config->get('option') . '.' . $this->config->get('view_item');
+        // Access context
+        $this->context = $this->config->get('option') . '.' . $this->config->get('view_item');
 
-		// Ordering
-		$listOrder   = $state->get('list.ordering');
-		$orderColumn = $state->get('list.orderColumn', $config->get('order_column'));
-		$listDirn    = $this->state->get('list.direction');
+        // Ordering
+        $listOrder   = $state->get('list.ordering');
+        $orderColumn = $state->get('list.orderColumn', $config->get('order_column'));
+        $listDirn    = $this->state->get('list.direction');
 
-		$this->config->set('list.saveorder', ($listOrder == $orderColumn) && strtoupper($listDirn) === 'ASC');
-	}
+        $this->config->set('list.saveorder', ($listOrder == $orderColumn) && strtoupper($listDirn) === 'ASC');
+    }
 
-	/**
-	 * Method to sort a column in a grid
-	 *
-	 * @param   string  $label  The link title
-	 * @param   string  $field  The order field for the column
-	 *
-	 * @return  string
-	 */
-	public function sortTitle($label, $field)
-	{
-		$listOrder = $this->state->get('list.ordering');
-		$listDirn  = $this->state->get('list.direction');
-		$selector  = $this->config->get('form_selector', '#admin-form');
+    /**
+     * Method to sort a column in a grid
+     *
+     * @param   string $label The link title
+     * @param   string $field The order field for the column
+     *
+     * @return  string
+     */
+    public function sortTitle($label, $field)
+    {
+        $listOrder = $this->state->get('list.ordering');
+        $listDirn  = $this->state->get('list.direction');
+        $selector  = $this->config->get('form_selector', '#admin-form');
 
-		return WidgetHelper::render('phoenix.grid.table.sort', [
-			'label'     => $label,
-			'field'     => $field,
-			'ordering'  => $listOrder,
-			'direction' => strtoupper($listDirn),
-			'selector'  => $selector,
-			'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix')
-		], WidgetHelper::EDGE);
-	}
+        return WidgetHelper::render('phoenix.grid.table.sort', [
+            'label' => $label,
+            'field' => $field,
+            'ordering' => $listOrder,
+            'direction' => strtoupper($listDirn),
+            'selector' => $selector,
+            'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix'),
+        ], WidgetHelper::EDGE);
+    }
 
-	/**
-	 * Set current item for this loop.
-	 *
-	 * @param object  $item The item object.
-	 * @param integer $i    The row number.
-	 *
-	 * @return GridHelper Return self to support chaining.
-	 */
-	public function setItem($item, $i)
-	{
-		if (!($item instanceof Data))
-		{
-			$item = new Data($item);
-		}
+    /**
+     * Set current item for this loop.
+     *
+     * @param object  $item The item object.
+     * @param integer $i    The row number.
+     *
+     * @return GridHelper Return self to support chaining.
+     */
+    public function setItem($item, $i)
+    {
+        if (!($item instanceof Data)) {
+            $item = new Data($item);
+        }
 
-		$this->row = (int) $i;
+        $this->row = (int) $i;
 
-		$this->current = $item;
+        $this->current = $item;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Current
-	 *
-	 * @return  object
-	 */
-	public function getItem()
-	{
-		return $this->current;
-	}
+    /**
+     * Method to get property Current
+     *
+     * @return  object
+     */
+    public function getItem()
+    {
+        return $this->current;
+    }
 
-	/**
-	 * orderButton
-	 *
-	 * @return  string
-	 */
-	public function orderButton()
-	{
-		$keyName = $this->config->get('field.pk');
-		$orderField = $this->config['field.ordering'];
-		$saveOrder = $this->config->get('list.saveorder');
+    /**
+     * orderButton
+     *
+     * @return  string
+     */
+    public function orderButton()
+    {
+        $keyName    = $this->config->get('field.pk');
+        $orderField = $this->config['field.ordering'];
+        $saveOrder  = $this->config->get('list.saveorder');
 
-		return WidgetHelper::render('phoenix.grid.table.order-button', [
-			'item'   => $this->current,
-			'row'    => $this->row,
-			'keyName' => $keyName,
-			'orderField'  => $orderField,
-			'saveOrder' => $saveOrder,
-			'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix')
-		], WidgetHelper::EDGE);
-	}
+        return WidgetHelper::render('phoenix.grid.table.order-button', [
+            'item' => $this->current,
+            'row' => $this->row,
+            'keyName' => $keyName,
+            'orderField' => $orderField,
+            'saveOrder' => $saveOrder,
+            'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix'),
+        ], WidgetHelper::EDGE);
+    }
 
-	/**
-	 * saveOrderButton
-	 *
-	 * @return  string
-	 */
-	public function saveOrderButton()
-	{
-		if ($this->config->get('list.saveorder'))
-		{
-			return WidgetHelper::render('phoenix.grid.table.saveorder-button', [
-				'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix')
-			], WidgetHelper::EDGE);
-		}
+    /**
+     * saveOrderButton
+     *
+     * @return  string
+     */
+    public function saveOrderButton()
+    {
+        if ($this->config->get('list.saveorder')) {
+            return WidgetHelper::render('phoenix.grid.table.saveorder-button', [
+                'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix'),
+            ], WidgetHelper::EDGE);
+        }
 
-		return '';
-	}
+        return '';
+    }
 
-	/**
-	 * checkboxesToggle
-	 *
-	 * @param array $options
-	 *
-	 * @return string
-	 */
-	public function checkboxesToggle($options = [])
-	{
-		$options['duration'] = isset($options['duration']) ? $options['duration'] : 0;
+    /**
+     * checkboxesToggle
+     *
+     * @param array $options
+     *
+     * @return string
+     */
+    public function checkboxesToggle($options = [])
+    {
+        $options['duration'] = isset($options['duration']) ? $options['duration'] : 0;
 
-		return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', [
-			'options' => $options,
-			'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix')
-		], WidgetHelper::EDGE);
-	}
+        return WidgetHelper::render('phoenix.grid.table.checkboxes-toggle', [
+            'options' => $options,
+            'phoenixJsObject' => $this->config->get('phoenix_js_object', 'Phoenix'),
+        ], WidgetHelper::EDGE);
+    }
 
-	/**
-	 * Checkbox input.
-	 *
-	 * @return  string Checkbox html code.
-	 */
-	public function checkbox()
-	{
-		$keyName = $this->config->get('field.pk');
+    /**
+     * Checkbox input.
+     *
+     * @return  string Checkbox html code.
+     */
+    public function checkbox()
+    {
+        $keyName = $this->config->get('field.pk');
 
-		return WidgetHelper::render('phoenix.grid.table.checkbox', [
-			'keyName' => $keyName,
-			'item'   => $this->current,
-			'row'    => $this->row
-		], WidgetHelper::EDGE);
-	}
+        return WidgetHelper::render('phoenix.grid.table.checkbox', [
+            'keyName' => $keyName,
+            'item' => $this->current,
+            'row' => $this->row,
+        ], WidgetHelper::EDGE);
+    }
 
-	/**
-	 * Make a link to direct to foreign table item.
-	 *
-	 * @param   string $title   Title of link, default is an icon.
-	 * @param   string $url     URL to link.
-	 * @param   array  $attribs Link element attributes.
-	 * @param   array  $options
-	 *
-	 * @return string Link element.
-	 */
-	public function foreignLink($title = null, $url = null, array $attribs = [], array $options = [])
-	{
-		$defaultAttribs['href']   = $url;
-		$defaultAttribs['class']  = 'text-muted muted';
-		$defaultAttribs['target'] = '_blank';
+    /**
+     * Make a link to direct to foreign table item.
+     *
+     * @param   string $title   Title of link, default is an icon.
+     * @param   string $url     URL to link.
+     * @param   array  $attribs Link element attributes.
+     * @param   array  $options
+     *
+     * @return string Link element.
+     */
+    public function foreignLink($title = null, $url = null, array $attribs = [], array $options = [])
+    {
+        $defaultAttribs['href']   = $url;
+        $defaultAttribs['class']  = 'text-muted muted';
+        $defaultAttribs['target'] = '_blank';
 
-		$options['icon'] = isset($options['icon']) ? $options['icon'] : 'fa fa-external-link';
+        $options['icon'] = isset($options['icon']) ? $options['icon'] : 'fa fa-external-link';
 
-		$title = $title . ' <small class="' . $options['icon'] . '"></small>';
+        $title = $title . ' <small class="' . $options['icon'] . '"></small>';
 
-		return new HtmlElement('a', $title, array_merge($defaultAttribs, $attribs));
-	}
+        return new HtmlElement('a', $title, array_merge($defaultAttribs, $attribs));
+    }
 
-	/**
-	 * Created date.
-	 *
-	 * @param string $format The date format.
-	 * @param bool   $local  Use local timezone.
-	 *
-	 * @return string Date string.
-	 */
-	public function createdDate($format = '', $local = false)
-	{
-		$field = $this->config->get('field.created', 'created');
-		$format = $format ? : Chronos::$format;
+    /**
+     * Created date.
+     *
+     * @param string $format The date format.
+     * @param bool   $local  Use local timezone.
+     *
+     * @return string Date string.
+     */
+    public function createdDate($format = '', $local = false)
+    {
+        $field  = $this->config->get('field.created', 'created');
+        $format = $format ?: Chronos::$format;
 
-		if ($local)
-		{
-			return Chronos::toLocalTime($this->current->$field, $format);
-		}
+        if ($local) {
+            return Chronos::toLocalTime($this->current->$field, $format);
+        }
 
-		return Chronos::create($this->current->$field)->format($format);
-	}
+        return Chronos::create($this->current->$field)->format($format);
+    }
 
-	/**
-	 * createIconButton
-	 *
-	 * @param array $options
-	 *
-	 * @return  IconButton
-	 */
-	public function createIconButton(array $options = [])
-	{
-		$options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
+    /**
+     * createIconButton
+     *
+     * @param array $options
+     *
+     * @return  IconButton
+     */
+    public function createIconButton(array $options = [])
+    {
+        $options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
 
-		return IconButton::create($options);
-	}
+        return IconButton::create($options);
+    }
 
-	/**
-	 * published
-	 *
-	 * @param string $value
-	 * @param array  $options
-	 *
-	 * @return  static
-	 */
-	public function published($value, array $options = [])
-	{
-		$options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
+    /**
+     * published
+     *
+     * @param string $value
+     * @param array  $options
+     *
+     * @return  static
+     */
+    public function published($value, array $options = [])
+    {
+        $options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
 
-		return StateButton::create($options)->render($value, $this->row);
-	}
+        return StateButton::create($options)->render($value, $this->row);
+    }
 
-	/**
-	 * publishButton
-	 *
-	 * @param mixed $value
-	 * @param array $options
-	 *
-	 * @return  string
-	 */
-	public function state($value, array $options = [])
-	{
-		$options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
+    /**
+     * publishButton
+     *
+     * @param mixed $value
+     * @param array $options
+     *
+     * @return  string
+     */
+    public function state($value, array $options = [])
+    {
+        $options = Arr::def($options, 'phoenix_js_object', $this->config->get('phoenix_js_object', 'Phoenix'));
 
-		return StateButton::create($options)->render($value, $this->row);
-	}
+        return StateButton::create($options)->render($value, $this->row);
+    }
 
-	/**
-	 * Method to escape output.
-	 *
-	 * @param   string $output The output to escape.
-	 *
-	 * @return  string  The escaped output.
-	 */
-	public function escape($output)
-	{
-		// Escape the output.
-		return htmlentities($output, ENT_COMPAT, 'UTF-8');
-	}
+    /**
+     * Method to escape output.
+     *
+     * @param   string $output The output to escape.
+     *
+     * @return  string  The escaped output.
+     */
+    public function escape($output)
+    {
+        // Escape the output.
+        return htmlentities($output, ENT_COMPAT, 'UTF-8');
+    }
 
-	/**
-	 * Method to get property Row
-	 *
-	 * @return  int
-	 */
-	public function getRow()
-	{
-		return $this->row;
-	}
+    /**
+     * Method to get property Row
+     *
+     * @return  int
+     */
+    public function getRow()
+    {
+        return $this->row;
+    }
 
-	/**
-	 * Method to set property row
-	 *
-	 * @param   int $row
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRow($row)
-	{
-		$this->row = $row;
+    /**
+     * Method to set property row
+     *
+     * @param   int $row
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setRow($row)
+    {
+        $this->row = $row;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property State
-	 *
-	 * @return  Structure
-	 */
-	public function getState()
-	{
-		return $this->state;
-	}
+    /**
+     * Method to get property State
+     *
+     * @return  Structure
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
 
-	/**
-	 * Method to set property state
-	 *
-	 * @param   Structure $state
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setState(Structure $state)
-	{
-		$this->state = $state;
+    /**
+     * Method to set property state
+     *
+     * @param   Structure $state
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setState(Structure $state)
+    {
+        $this->state = $state;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Config
-	 *
-	 * @return  Structure
-	 */
-	public function getConfig()
-	{
-		return $this->config;
-	}
+    /**
+     * Method to get property Config
+     *
+     * @return  Structure
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
 
-	/**
-	 * Method to set property config
-	 *
-	 * @param   Structure $config
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setConfig(Structure $config)
-	{
-		$this->config = $config;
+    /**
+     * Method to set property config
+     *
+     * @param   Structure $config
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setConfig(Structure $config)
+    {
+        $this->config = $config;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property View
-	 *
-	 * @return  HtmlView
-	 */
-	public function getView()
-	{
-		return $this->view;
-	}
+    /**
+     * Method to get property View
+     *
+     * @return  HtmlView
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
 
-	/**
-	 * Method to set property view
-	 *
-	 * @param   HtmlView $view
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setView($view)
-	{
-		$this->view = $view;
+    /**
+     * Method to set property view
+     *
+     * @param   HtmlView $view
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setView($view)
+    {
+        $this->view = $view;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * __get
-	 *
-	 * @param   string $name
-	 *
-	 * @return  mixed
-	 *
-	 * @throws \OutOfRangeException
-	 */
-	public function __get($name)
-	{
-		$allowFields = [
-			'view',
-			'config',
-			'state',
-			'current',
-			'row'
-		];
+    /**
+     * __get
+     *
+     * @param   string $name
+     *
+     * @return  mixed
+     *
+     * @throws \OutOfRangeException
+     */
+    public function __get($name)
+    {
+        $allowFields = [
+            'view',
+            'config',
+            'state',
+            'current',
+            'row',
+        ];
 
-		if (in_array($name, $allowFields))
-		{
-			return $this->$name;
-		}
+        if (in_array($name, $allowFields)) {
+            return $this->$name;
+        }
 
-		if ($name === 'item')
-		{
-			return $this->current;
-		}
+        if ($name === 'item') {
+            return $this->current;
+        }
 
-		throw new \OutOfRangeException('Property ' . $name . ' not exists.');
-	}
+        throw new \OutOfRangeException('Property ' . $name . ' not exists.');
+    }
 }

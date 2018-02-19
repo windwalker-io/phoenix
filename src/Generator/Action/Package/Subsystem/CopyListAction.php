@@ -19,43 +19,41 @@ use Windwalker\String\StringHelper;
  */
 class CopyListAction extends AbstractAction
 {
-	/**
-	 * Do this execute.
-	 *
-	 * @return  mixed
-	 */
-	protected function doExecute()
-	{
-		/** @var CopyOperator $copyOperator */
-		$copyOperator = $this->container->get('operator.factory')->getOperator('copy');
+    /**
+     * Do this execute.
+     *
+     * @return  mixed
+     */
+    protected function doExecute()
+    {
+        /** @var CopyOperator $copyOperator */
+        $copyOperator = $this->container->get('operator.factory')->getOperator('copy');
 
-		$src  = $this->config['dir.src'];
-		$dest = $this->config['dir.dest'];
-		$list = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
+        $src  = $this->config['dir.src'];
+        $dest = $this->config['dir.dest'];
+        $list = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
 
-		$files = [
-			'Controller/%s',
-			'Field',
-			'Form/%s',
-			'Model/%sModel.php.tpl',
-			'Templates/' . StringHelper::quote('controller.list.name.lower', $this->config['tagVariables']),
-			'View/%s'
-		];
+        $files = [
+            'Controller/%s',
+            'Field',
+            'Form/%s',
+            'Model/%sModel.php.tpl',
+            'Templates/' . StringHelper::quote('controller.list.name.lower', $this->config['tagVariables']),
+            'View/%s',
+        ];
 
-		foreach ($files as $file)
-		{
-			$file = sprintf($file, $list);
+        foreach ($files as $file) {
+            $file = sprintf($file, $list);
 
-			if (!file_exists($src . '/' . $file))
-			{
-				continue;
-			}
+            if (!file_exists($src . '/' . $file)) {
+                continue;
+            }
 
-			$copyOperator->copy(
-				$src . '/' . $file,
-				$dest . '/' . $file,
-				$this->config['replace']
-			);
-		}
-	}
+            $copyOperator->copy(
+                $src . '/' . $file,
+                $dest . '/' . $file,
+                $this->config['replace']
+            );
+        }
+    }
 }

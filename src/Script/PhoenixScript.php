@@ -18,52 +18,47 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The PhoenixScript class.
  *
- * @see  AbstractScript
+ * @see    AbstractScript
  *
  * @since  1.0
  */
 abstract class PhoenixScript extends AbstractPhoenixScript
 {
-	/**
-	 * core
-	 *
-	 * @param string $formSelector
-	 * @param string $variable
-	 * @param array  $options
-	 *
-	 * @return void
-	 */
-	public static function core($formSelector = '#admin-form', $variable = 'Phoenix', $options = [])
-	{
-		if (!static::inited(__METHOD__))
-		{
-			JQueryScript::core();
-			CoreScript::csrfToken();
+    /**
+     * core
+     *
+     * @param string $formSelector
+     * @param string $variable
+     * @param array  $options
+     *
+     * @return void
+     */
+    public static function core($formSelector = '#admin-form', $variable = 'Phoenix', $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
+            CoreScript::csrfToken();
 
-			static::addJS(static::phoenixName() . '/js/phoenix/phoenix.js');
-		}
+            static::addJS(static::phoenixName() . '/js/phoenix/phoenix.js');
+        }
 
-		if (!static::inited(__METHOD__, get_defined_vars()))
-		{
-			$defaultOptions = [
-				'theme' => BootstrapScript::$currentVersion === 3 ? 'bootstrap' : 'bootstrap4',
-				'uri' => get_object_vars(Ioc::getUriData())
-			];
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            $defaultOptions = [
+                'theme' => BootstrapScript::$currentVersion === 3 ? 'bootstrap' : 'bootstrap4',
+                'uri' => get_object_vars(Ioc::getUriData()),
+            ];
 
-			$options = static::mergeOptions($defaultOptions, $options);
+            $options = static::mergeOptions($defaultOptions, $options);
 
-			if ($options['theme'] === 'bootstrap')
-			{
-				static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
-			}
-			elseif ($options['theme'] === 'bootstrap4')
-			{
-				static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap4.js');
-			}
+            if ($options['theme'] === 'bootstrap') {
+                static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
+            } elseif ($options['theme'] === 'bootstrap4') {
+                static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap4.js');
+            }
 
-			$options = static::getJSObject($defaultOptions, $options);
+            $options = static::getJSObject($defaultOptions, $options);
 
-			$js = <<<JS
+            $js = <<<JS
 // Phoenix Core
 jQuery(document).ready(function($)
 {
@@ -74,73 +69,70 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			static::internalJS($js);
-		}
-	}
+            static::internalJS($js);
+        }
+    }
 
-	/**
-	 * route
-	 *
-	 * @param   string  $route
-	 * @param   string  $url
-	 *
-	 * @return  void
-	 */
-	public static function addRoute($route, $url)
-	{
-		static::router();
+    /**
+     * route
+     *
+     * @param   string $route
+     * @param   string $url
+     *
+     * @return  void
+     */
+    public static function addRoute($route, $url)
+    {
+        static::router();
 
-		static::internalJS("Phoenix.Router.add('$route', '$url')");
-	}
+        static::internalJS("Phoenix.Router.add('$route', '$url')");
+    }
 
-	/**
-	 * router
-	 *
-	 * @return  void
-	 */
-	public static function router()
-	{
-		if (!static::inited(__METHOD__))
-		{
-			static::addJS(static::phoenixName() . '/js/phoenix/router.min.js');
+    /**
+     * router
+     *
+     * @return  void
+     */
+    public static function router()
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addJS(static::phoenixName() . '/js/phoenix/router.min.js');
 
-			$uri = static::getJSObject((array) Ioc::get('uri'));
+            $uri = static::getJSObject((array) Ioc::get('uri'));
 
-			static::internalJS(<<<JS
+            static::internalJS(<<<JS
 Phoenix.Uri = $uri;
 JS
-);
-		}
-	}
+            );
+        }
+    }
 
-	/**
-	 * filterbar
-	 *
-	 * @param string $selector
-	 * @param string $variable
-	 * @param array  $options
-	 *
-	 * @return void
-	 */
-	public static function grid($selector = '#admin-form', $variable = 'Phoenix' ,$options = [])
-	{
-		if (!static::inited(__METHOD__))
-		{
-			static::core($selector);
+    /**
+     * filterbar
+     *
+     * @param string $selector
+     * @param string $variable
+     * @param array  $options
+     *
+     * @return void
+     */
+    public static function grid($selector = '#admin-form', $variable = 'Phoenix', $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            static::core($selector);
 
-			static::addJS(static::phoenixName() . '/js/phoenix/grid.js');
+            static::addJS(static::phoenixName() . '/js/phoenix/grid.js');
 
-			static::translate('phoenix.message.delete.confirm');
-			static::translate('phoenix.message.grid.checked');
-		}
+            static::translate('phoenix.message.delete.confirm');
+            static::translate('phoenix.message.grid.checked');
+        }
 
-		if (!static::inited(__METHOD__, get_defined_vars()))
-		{
-			static::core($selector, $variable);
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            static::core($selector, $variable);
 
-			$options = static::getJSObject($options);
+            $options = static::getJSObject($options);
 
-			$js = <<<JS
+            $js = <<<JS
 // Gird and filter bar
 jQuery(document).ready(function($)
 {
@@ -152,49 +144,44 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			static::internalJS($js);
-		}
-	}
+            static::internalJS($js);
+        }
+    }
 
-	/**
-	 * chosen
-	 *
-	 * @param string $selector
-	 * @param array  $options
-	 *
-	 * @return  void
-	 */
-	public static function chosen($selector = 'select', $options = [])
-	{
-		if (!static::inited(__METHOD__))
-		{
-			JQueryScript::core();
+    /**
+     * chosen
+     *
+     * @param string $selector
+     * @param array  $options
+     *
+     * @return  void
+     */
+    public static function chosen($selector = 'select', $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
 
-			static::addJS(static::phoenixName() . '/js/chosen/chosen.min.js');
+            static::addJS(static::phoenixName() . '/js/chosen/chosen.min.js');
 
-			if (BootstrapScript::$currentVersion === 3)
-			{
-				static::addCSS(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
-			}
-			else
-			{
-				static::addCSS(static::phoenixName() . '/css/chosen/bootstrap4-chosen.css');
-			}
-		}
+            if (BootstrapScript::$currentVersion === 3) {
+                static::addCSS(static::phoenixName() . '/css/chosen/bootstrap-chosen.css');
+            } else {
+                static::addCSS(static::phoenixName() . '/css/chosen/bootstrap4-chosen.css');
+            }
+        }
 
-		if (!static::inited(__METHOD__, get_defined_vars()))
-		{
-			$defaultOptions = [
-				'allow_single_deselect'     => true,
-				'disable_search_threshold'  => 10,
-				'placeholder_text_multiple' => Translator::translate('phoenix.chosen.text,multiple'),
-				'placeholder_text_single'   => Translator::translate('phoenix.chosen.text.single'),
-				'no_results_text'           => Translator::translate('phoenix.chosen.text.noresult')
-			];
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            $defaultOptions = [
+                'allow_single_deselect' => true,
+                'disable_search_threshold' => 10,
+                'placeholder_text_multiple' => Translator::translate('phoenix.chosen.text,multiple'),
+                'placeholder_text_single' => Translator::translate('phoenix.chosen.text.single'),
+                'no_results_text' => Translator::translate('phoenix.chosen.text.noresult'),
+            ];
 
-			$options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
+            $options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
-			$js = <<<JS
+            $js = <<<JS
 // Chosen select
 jQuery(document).ready(function($)
 {
@@ -220,70 +207,67 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			static::internalJS($js);
-		}
-	}
+            static::internalJS($js);
+        }
+    }
 
-	/**
-	 * translator
-	 *
-	 * @return  void
-	 */
-	public static function translator()
-	{
-		if (!static::inited(__METHOD__))
-		{
-			CoreScript::sprintf();
+    /**
+     * translator
+     *
+     * @return  void
+     */
+    public static function translator()
+    {
+        if (!static::inited(__METHOD__)) {
+            CoreScript::sprintf();
 
-			$asset = static::getAsset();
-			$asset->addScript(static::phoenixName() . '/js/phoenix/translator.min.js');
-		}
-	}
+            $asset = static::getAsset();
+            $asset->addScript(static::phoenixName() . '/js/phoenix/translator.min.js');
+        }
+    }
 
-	/**
-	 * langKey
-	 *
-	 * @param   string  $key
-	 *
-	 * @return  void
-	 */
-	public static function translate($key)
-	{
-		static::translator();
+    /**
+     * langKey
+     *
+     * @param   string $key
+     *
+     * @return  void
+     */
+    public static function translate($key)
+    {
+        static::translator();
 
-		$asset = static::getAsset();
+        $asset = static::getAsset();
 
-		$text = Translator::translate($key);
+        $text = Translator::translate($key);
 
-		/** @var Language $language */
-		$language = Translator::getInstance();
-		$handler = $language->getNormalizeHandler();
+        /** @var Language $language */
+        $language = Translator::getInstance();
+        $handler  = $language->getNormalizeHandler();
 
-		$key = call_user_func($handler, $key);
+        $key = call_user_func($handler, $key);
 
-		$asset->internalScript("Phoenix.Translator.addKey('{$key}', '$text')");
-	}
+        $asset->internalScript("Phoenix.Translator.addKey('{$key}', '$text')");
+    }
 
-	/**
-	 * multiSelect
-	 *
-	 * @param string $selector
-	 * @param array  $options
-	 */
-	public static function multiSelect($selector = '#admin-form table', $options = [])
-	{
-		if (!static::inited(__METHOD__))
-		{
-			JQueryScript::core();
+    /**
+     * multiSelect
+     *
+     * @param string $selector
+     * @param array  $options
+     */
+    public static function multiSelect($selector = '#admin-form table', $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
 
-			static::addJS(static::phoenixName() . '/js/phoenix/multiselect.min.js');
-		}
+            static::addJS(static::phoenixName() . '/js/phoenix/multiselect.min.js');
+        }
 
-		if (!static::inited(__METHOD__, get_defined_vars()))
-		{
-			$options = static::getJSObject($options);
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            $options = static::getJSObject($options);
 
-			$js = <<<JS
+            $js = <<<JS
 // Chosen select
 jQuery(document).ready(function($)
 {
@@ -291,44 +275,42 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			static::internalJS($js);
-		}
-	}
+            static::internalJS($js);
+        }
+    }
 
-	/**
-	 * formValidation
-	 *
-	 * @param string $selector
-	 * @param array  $options
-	 *
-	 * @return  void
-	 */
-	public static function formValidation($selector = '#admin-form', $options = [])
-	{
-		if (!static::inited(__METHOD__))
-		{
-			static::core();
+    /**
+     * formValidation
+     *
+     * @param string $selector
+     * @param array  $options
+     *
+     * @return  void
+     */
+    public static function formValidation($selector = '#admin-form', $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            static::core();
 
-			static::addJS(static::phoenixName() . '/js/string/punycode.min.js');
-			static::addJS(static::phoenixName() . '/js/phoenix/validation.min.js');
-		}
+            static::addJS(static::phoenixName() . '/js/string/punycode.min.js');
+            static::addJS(static::phoenixName() . '/js/phoenix/validation.min.js');
+        }
 
-		if (!static::inited(__METHOD__, get_defined_vars()))
-		{
-			$defaultOptions = [
-				'scroll' => [
-					'enabled'  => true,
-					'offset'   => -100,
-					'duration' => 1000
-				]
-			];
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            $defaultOptions = [
+                'scroll' => [
+                    'enabled' => true,
+                    'offset' => -100,
+                    'duration' => 1000,
+                ],
+            ];
 
-			$options = static::getJSObject($defaultOptions, $options);
+            $options = static::getJSObject($defaultOptions, $options);
 
-			static::translate('phoenix.message.validation.required');
-			static::translate('phoenix.message.validation.failure');
+            static::translate('phoenix.message.validation.required');
+            static::translate('phoenix.message.validation.failure');
 
-			$js = <<<JS
+            $js = <<<JS
 // Chosen select
 jQuery(document).ready(function($)
 {
@@ -336,132 +318,121 @@ jQuery(document).ready(function($)
 });
 JS;
 
-			static::internalJS($js);
-		}
-	}
+            static::internalJS($js);
+        }
+    }
 
-	/**
-	 * keepAlive
-	 *
-	 * @param string  $url
-	 * @param integer $time
-	 *
-	 * @return  void
-	 */
-	public static function keepAlive($url = './', $time = null)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			static::core();
+    /**
+     * keepAlive
+     *
+     * @param string  $url
+     * @param integer $time
+     *
+     * @return  void
+     */
+    public static function keepAlive($url = './', $time = null)
+    {
+        if (!static::inited(__METHOD__)) {
+            static::core();
 
-			if ($time === null)
-			{
-				$config = Ioc::getConfig();
-				$time = $config->get('session.life_time', 3);
+            if ($time === null) {
+                $config = Ioc::getConfig();
+                $time   = $config->get('session.life_time', 3);
 
-				$time = $time * 60000;
-			}
+                $time = $time * 60000;
+            }
 
-			$js = <<<JS
+            $js = <<<JS
 jQuery(document).ready(function($) {
     Phoenix.keepAlive('$url', $time);
 });
 JS;
 
-			static::getAsset()->internalScript($js);
-		}
-	}
+            static::getAsset()->internalScript($js);
+        }
+    }
 
-	/**
-	 * crypto
-	 *
-	 * @return  void
-	 */
-	public static function crypto()
-	{
-		if (!static::inited(__METHOD__))
-		{
-			$asset = static::getAsset();
+    /**
+     * crypto
+     *
+     * @return  void
+     */
+    public static function crypto()
+    {
+        if (!static::inited(__METHOD__)) {
+            $asset = static::getAsset();
 
-			$asset->addScript(static::phoenixName() . '/js/phoenix/crypto.min.js');
-		}
-	}
+            $asset->addScript(static::phoenixName() . '/js/phoenix/crypto.min.js');
+        }
+    }
 
-	/**
-	 * ajax
-	 *
-	 * @param bool $token
-	 *
-	 * @return  void
-	 */
-	public static function ajax($token = true)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			static::addJS(static::phoenixName() . '/js/phoenix/ajax.min.js');
-		}
+    /**
+     * ajax
+     *
+     * @param bool $token
+     *
+     * @return  void
+     */
+    public static function ajax($token = true)
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addJS(static::phoenixName() . '/js/phoenix/ajax.min.js');
+        }
 
-		if (!static::inited(__METHOD__, (bool) $token) && $token)
-		{
-			$token = CsrfProtection::getFormToken();
-			static::internalJS("Phoenix.Ajax.headers._global['X-CSRF-Token'] = '{$token}'");
-		}
-	}
+        if (!static::inited(__METHOD__, (bool) $token) && $token) {
+            $token = CsrfProtection::getFormToken();
+            static::internalJS("Phoenix.Ajax.headers._global['X-CSRF-Token'] = '{$token}'");
+        }
+    }
 
-	/**
-	 * listDependent
-	 *
-	 * @param string $selector
-	 * @param string $dependentSelector
-	 * @param mixed  $source
-	 * @param array  $options
-	 *
-	 * @return void
-	 */
-	public static function listDependent($selector, $dependentSelector, $source, array $options = [])
-	{
-		if (!static::inited(__METHOD__))
-		{
-			CoreScript::simpleUri();
-			static::addJS(static::phoenixName() . '/js/phoenix/list-dependent.min.js');
-		}
+    /**
+     * listDependent
+     *
+     * @param string $selector
+     * @param string $dependentSelector
+     * @param mixed  $source
+     * @param array  $options
+     *
+     * @return void
+     */
+    public static function listDependent($selector, $dependentSelector, $source, array $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            CoreScript::simpleUri();
+            static::addJS(static::phoenixName() . '/js/phoenix/list-dependent.min.js');
+        }
 
-		if (!static::inited(__METHOD__, get_defined_vars()))
-		{
-			if (is_string($source))
-			{
-				$options['ajax']['url'] = $source;
-			}
-			else
-			{
-				$options['source'] = $source;
-			}
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            if (is_string($source)) {
+                $options['ajax']['url'] = $source;
+            } else {
+                $options['source'] = $source;
+            }
 
-			$options = static::getJSObject($options);
+            $options = static::getJSObject($options);
 
-			$js = <<<JS
+            $js = <<<JS
 jQuery(function ($) {
     $('$selector').listDependent('$dependentSelector', $options);
 });
 JS;
 
-			static::internalJS($js);
-		}
-	}
+            static::internalJS($js);
+        }
+    }
 
-	/**
-	 * store
-	 *
-	 * @param string $name
-	 * @param mixed  $store
-	 *
-	 * @return  void
-	 */
-	public static function store($name, $store)
-	{
-		if (!static::inited(__METHOD__))
-		{
-			$js = <<<JS
+    /**
+     * store
+     *
+     * @param string $name
+     * @param mixed  $store
+     *
+     * @return  void
+     */
+    public static function store($name, $store)
+    {
+        if (!static::inited(__METHOD__)) {
+            $js = <<<JS
 // Init Phoenix Storage
 window.Phoenix = window.Phoenix || {};
 window.Phoenix.Store = window.Phoenix.Store || {
@@ -474,15 +445,15 @@ window.Phoenix.Store = window.Phoenix.Store || {
 };
 JS;
 
-			static::internalJS($js);
-		}
+            static::internalJS($js);
+        }
 
-		$store = static::getJSObject($store);
+        $store = static::getJSObject($store);
 
-		$js = <<<JS
+        $js = <<<JS
 Phoenix.Store.set('$name', $store);
 JS;
 
-		static::internalJS($js);
-	}
+        static::internalJS($js);
+    }
 }

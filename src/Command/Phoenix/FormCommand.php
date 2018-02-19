@@ -13,40 +13,40 @@ use Windwalker\Console\Command\Command;
 
 /**
  * The FormCommand class.
- * 
+ *
  * @since  1.0
  */
-class FormCommand extends  Command
+class FormCommand extends Command
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'form';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'form';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Form management';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Form management';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addCommand(new GenFieldCommand);
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addCommand(new GenFieldCommand);
 
-		$this->addGlobalOption('d')
-			->alias('dir')
-			->description('Set migration file directory.');
+        $this->addGlobalOption('d')
+            ->alias('dir')
+            ->description('Set migration file directory.');
 
-		$this->addGlobalOption('p')
-			->alias('package')
-			->description('Package to run migration.');
-	}
+        $this->addGlobalOption('p')
+            ->alias('package')
+            ->description('Package to run migration.');
+    }
 }

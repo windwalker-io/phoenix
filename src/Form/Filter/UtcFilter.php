@@ -15,13 +15,13 @@ namespace Phoenix\Form\Filter;
  */
 class UtcFilter extends TimezoneFilter
 {
-	/**
-	 * TimezoneFilter constructor.
-	 *
-	 * @param string $from
-	 */
-	public function __construct($from = null)
-	{
-		parent::__construct($from, 'UTC');
-	}
+    /**
+     * TimezoneFilter constructor.
+     *
+     * @param string $from
+     */
+    public function __construct($from = null)
+    {
+        parent::__construct($from, 'UTC');
+    }
 }

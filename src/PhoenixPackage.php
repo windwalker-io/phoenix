@@ -17,20 +17,20 @@ define('PHOENIX_TEMPLATES', PHOENIX_ROOT . '/templates');
 
 /**
  * The SimpleRADPackage class.
- * 
+ *
  * @since  1.0
  */
 class PhoenixPackage extends AbstractPackage
 {
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	public function boot()
-	{
-		parent::boot();
+    /**
+     * init
+     *
+     * @return  void
+     */
+    public function boot()
+    {
+        parent::boot();
 
-		Translator::loadFile('phoenix', 'ini', $this);
-	}
+        Translator::loadFile('phoenix', 'ini', $this);
+    }
 }

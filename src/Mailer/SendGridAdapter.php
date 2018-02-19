@@ -25,92 +25,84 @@ use Windwalker\Structure\Structure;
  */
 class SendGridAdapter implements MailerAdapterInterface
 {
-	/**
-	 * Property sendgrid.
-	 *
-	 * @var  \SendGrid
-	 */
-	protected $sendgrid;
+    /**
+     * Property sendgrid.
+     *
+     * @var  \SendGrid
+     */
+    protected $sendgrid;
 
-	/**
-	 * SendGridAdapter constructor.
-	 *
-	 * @param \SendGrid $sendgrid
-	 */
-	public function __construct(\SendGrid $sendgrid)
-	{
-		$this->sendgrid = $sendgrid;
-	}
+    /**
+     * SendGridAdapter constructor.
+     *
+     * @param \SendGrid $sendgrid
+     */
+    public function __construct(\SendGrid $sendgrid)
+    {
+        $this->sendgrid = $sendgrid;
+    }
 
-	/**
-	 * send
-	 *
-	 * @param MailMessage $message
-	 *
-	 * @return  boolean
-	 * @throws \RuntimeException
-	 */
-	public function send(MailMessage $message)
-	{
-		$mail = new Mail;
-		$personalization = new Personalization;
-		$mail->setSubject($message->getSubject());
+    /**
+     * send
+     *
+     * @param MailMessage $message
+     *
+     * @return  boolean
+     * @throws \RuntimeException
+     */
+    public function send(MailMessage $message)
+    {
+        $mail            = new Mail;
+        $personalization = new Personalization;
+        $mail->setSubject($message->getSubject());
 
-		foreach ($message->getFrom() as $email => $name)
-		{
-			$mail->setFrom(new Email($name, $email));
-		}
+        foreach ($message->getFrom() as $email => $name) {
+            $mail->setFrom(new Email($name, $email));
+        }
 
-		foreach ($message->getTo() as $email => $name)
-		{
-			$personalization->addTo(new Email($name, $email));
-		}
+        foreach ($message->getTo() as $email => $name) {
+            $personalization->addTo(new Email($name, $email));
+        }
 
-		foreach ($message->getCc() as $email => $name)
-		{
-			$personalization->addCc(new Email($name, $email));
-		}
+        foreach ($message->getCc() as $email => $name) {
+            $personalization->addCc(new Email($name, $email));
+        }
 
-		foreach ($message->getBcc() as $email => $name)
-		{
-			$personalization->addBcc(new Email($name, $email));
-		}
+        foreach ($message->getBcc() as $email => $name) {
+            $personalization->addBcc(new Email($name, $email));
+        }
 
-		foreach ($message->getFiles() as $file)
-		{
-			$attach = new Attachment;
+        foreach ($message->getFiles() as $file) {
+            $attach = new Attachment;
 
-			if ($file->getFilename())
-			{
-				$attach->setFilename($file->getFilename());
-			}
+            if ($file->getFilename()) {
+                $attach->setFilename($file->getFilename());
+            }
 
-			if ($file->getContentType())
-			{
-				$attach->setType($file->getContentType());
-			}
+            if ($file->getContentType()) {
+                $attach->setType($file->getContentType());
+            }
 
-			$attach->setContent($file->getBody());
+            $attach->setContent($file->getBody());
 
-			$mail->addAttachment($attach);
-		}
+            $mail->addAttachment($attach);
+        }
 
-		$mail->addContent(new Content($message->getHtml() ? 'text/html' : 'text/plain', $message->getBody()));
+        $mail->addContent(new Content($message->getHtml() ? 'text/html' : 'text/plain', $message->getBody()));
 
-		$mail->addPersonalization($personalization);
+        $mail->addPersonalization($personalization);
 
-		/** @var Response $response */
-		$response = $this->sendgrid->client->mail()->send()->post($mail);
+        /** @var Response $response */
+        $response = $this->sendgrid->client->mail()->send()->post($mail);
 
-		$body = new Structure($response->body());
+        $body = new Structure($response->body());
 
-		if ($response->statusCode() !== 202)
-		{
-			throw new \RuntimeException(
-				sprintf('Error: %s - See: %s', $body['errors.0.message'], $body['errors.0.help'])
-			);
-		}
+        if ($response->statusCode() !== 202) {
+            throw new \RuntimeException(
+                sprintf('Error: %s - See: %s', $body['errors.0.message'], $body['errors.0.help'])
+            );
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

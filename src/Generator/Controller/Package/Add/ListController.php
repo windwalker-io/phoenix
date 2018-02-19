@@ -25,38 +25,36 @@ use Windwalker\String\StringHelper;
  */
 class ListController extends AbstractPackageController
 {
-	/**
-	 * Execute the controller.
-	 *
-	 * @return  boolean  True if controller finished execution, false if the controller did not
-	 *                   finish execution. A controller might return false if some precondition for
-	 *                   the controller to run has not been satisfied.
-	 *
-	 * @throws  \LogicException
-	 * @throws  \RuntimeException
-	 */
-	public function execute()
-	{
-		$this->config['item_name'] = StringHelper::quote('controller.item.name.cap', $this->config['tagVariables']);
-		$this->config['list_name'] = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
+    /**
+     * Execute the controller.
+     *
+     * @return  boolean  True if controller finished execution, false if the controller did not
+     *                   finish execution. A controller might return false if some precondition for
+     *                   the controller to run has not been satisfied.
+     *
+     * @throws  \LogicException
+     * @throws  \RuntimeException
+     */
+    public function execute()
+    {
+        $this->config['item_name'] = StringHelper::quote('controller.item.name.cap', $this->config['tagVariables']);
+        $this->config['list_name'] = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
 
-		$this->doAction(new Subsystem\PrepareAction);
-		$this->doAction(new Subsystem\CopyListAction);
+        $this->doAction(new Subsystem\PrepareAction);
+        $this->doAction(new Subsystem\CopyListAction);
 
-		// Some dirty things handling
-		$this->doAction(new AddSubmenuAction);
-		$this->doAction(new AddTableNameAction);
-		$this->doAction(new CopyMigrationAction);
-		$this->doAction(new AddSeederAction);
+        // Some dirty things handling
+        $this->doAction(new AddSubmenuAction);
+        $this->doAction(new AddTableNameAction);
+        $this->doAction(new CopyMigrationAction);
+        $this->doAction(new AddSeederAction);
 
-		if ($this->config['migrate'])
-		{
-			$this->doAction(new MigrateAction);
+        if ($this->config['migrate']) {
+            $this->doAction(new MigrateAction);
 
-			if ($this->config['seed'])
-			{
-				$this->doAction(new SeedAction);
-			}
-		}
-	}
+            if ($this->config['seed']) {
+                $this->doAction(new SeedAction);
+            }
+        }
+    }
 }

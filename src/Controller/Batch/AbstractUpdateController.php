@@ -17,59 +17,59 @@ use Phoenix\Model\FormAwareRepositoryInterface;
  */
 abstract class AbstractUpdateController extends AbstractBatchController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'move';
+    /**
+     * Property action.
+     *
+     * @var  string
+     */
+    protected $action = 'move';
 
-	/**
-	 * A hook before main process executing.
-	 *
-	 * @return  void
-	 */
-	protected function prepareExecute()
-	{
-		parent::prepareExecute();
+    /**
+     * A hook before main process executing.
+     *
+     * @return  void
+     */
+    protected function prepareExecute()
+    {
+        parent::prepareExecute();
 
-		$this->data = $this->getUpdateData();
-	}
+        $this->data = $this->getUpdateData();
+    }
 
-	/**
-	 * getUpdateData
-	 *
-	 * @return  array
-	 */
-	protected function getUpdateData()
-	{
-		$data = array_merge($this->input->getArray('batch'), (array) $this->data);
+    /**
+     * getUpdateData
+     *
+     * @return  array
+     */
+    protected function getUpdateData()
+    {
+        $data = array_merge($this->input->getArray('batch'), (array) $this->data);
 
-		return $this->filter($data);
-	}
+        return $this->filter($data);
+    }
 
-	/**
-	 * filter
-	 *
-	 * @param array $data
-	 *
-	 * @return  array
-	 *
-	 * @throws \DomainException
-	 */
-	protected function filter($data)
-	{
-		/** @var FormAwareRepositoryInterface $model */
-		$model = $this->getModel($this->getName());
+    /**
+     * filter
+     *
+     * @param array $data
+     *
+     * @return  array
+     *
+     * @throws \DomainException
+     */
+    protected function filter($data)
+    {
+        /** @var FormAwareRepositoryInterface $model */
+        $model = $this->getModel($this->getName());
 
-		$form = $model->getForm('grid');
+        $form = $model->getForm('grid');
 
-		$form->bind(['batch' => $data]);
+        $form->bind(['batch' => $data]);
 
-		$form->filter();
+        $form->filter();
 
-		$data = $form->getValues(null, 'batch');
+        $data = $form->getValues(null, 'batch');
 
-		return $data['batch'];
-	}
+        return $data['batch'];
+    }
 }

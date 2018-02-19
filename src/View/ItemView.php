@@ -17,31 +17,32 @@ use Windwalker\Core\Language\Translator;
  */
 class ItemView extends AbstractPhoenixHtmView
 {
-	/**
-	 * setTitle
-	 *
-	 * @param string $title
-	 *
-	 * @return  static
-	 */
-	public function setTitle($title = null)
-	{
-		$title = $title ? : Translator::sprintf('phoenix.title.item', Translator::translate($this->langPrefix . $this->getName() . '.title'));
+    /**
+     * setTitle
+     *
+     * @param string $title
+     *
+     * @return  static
+     */
+    public function setTitle($title = null)
+    {
+        $title = $title ?: Translator::sprintf('phoenix.title.item',
+            Translator::translate($this->langPrefix . $this->getName() . '.title'));
 
-		return parent::setTitle($title);
-	}
+        return parent::setTitle($title);
+    }
 
-	/**
-	 * prepareRender
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		parent::prepareData($data);
+    /**
+     * prepareRender
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        parent::prepareData($data);
 
-		$data->item = $data->item ? : $this->model->getItem();
-	}
+        $data->item = $data->item ?: $this->model->getItem();
+    }
 }

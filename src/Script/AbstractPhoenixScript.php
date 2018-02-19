@@ -19,20 +19,19 @@ use Windwalker\Core\Package\PackageHelper;
  */
 abstract class AbstractPhoenixScript extends AbstractScript
 {
-	/**
-	 * phoenixName
-	 *
-	 * @return  string
-	 */
-	protected static function phoenixName()
-	{
-		static $name;
+    /**
+     * phoenixName
+     *
+     * @return  string
+     */
+    protected static function phoenixName()
+    {
+        static $name;
 
-		if ($name)
-		{
-			return $name;
-		}
+        if ($name) {
+            return $name;
+        }
 
-		return $name = PackageHelper::getAlias(PhoenixPackage::class);
-	}
+        return $name = PackageHelper::getAlias(PhoenixPackage::class);
+    }
 }

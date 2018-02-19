@@ -18,17 +18,17 @@ use Windwalker\Form\Form;
  */
 class InlineDefinition extends AbstractFieldDefinition
 {
-	use PhoenixFieldTrait;
+    use PhoenixFieldTrait;
 
-	/**
-	 * Define the form fields.
-	 *
-	 * @param Form $form The Windwalker form object.
-	 *
-	 * @return  void
-	 */
-	protected function doDefine(Form $form)
-	{
-		//
-	}
+    /**
+     * Define the form fields.
+     *
+     * @param Form $form The Windwalker form object.
+     *
+     * @return  void
+     */
+    protected function doDefine(Form $form)
+    {
+        //
+    }
 }

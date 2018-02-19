@@ -15,76 +15,76 @@ namespace Phoenix\Model\Filter;
  */
 abstract class AbstractFilterHelper implements FilterHelperInterface
 {
-	/**
-	 * Skip this filter.
-	 *
-	 * @const boolean
-	 */
-	const SKIP = false;
+    /**
+     * Skip this filter.
+     *
+     * @const boolean
+     */
+    const SKIP = false;
 
-	/**
-	 * Handler callbacks.
-	 *
-	 * @var  array
-	 */
-	protected $handler = [];
+    /**
+     * Handler callbacks.
+     *
+     * @var  array
+     */
+    protected $handler = [];
 
-	/**
-	 * The default handler.
-	 *
-	 * @var  \Closure
-	 */
-	protected $defaultHandler = null;
+    /**
+     * The default handler.
+     *
+     * @var  \Closure
+     */
+    protected $defaultHandler = null;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		$this->defaultHandler = $this->getDefaultHandler();
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->defaultHandler = $this->getDefaultHandler();
+    }
 
-	/**
-	 * Set filter handler. Can be a callback or closure.
-	 *
-	 * Example:
-	 * ``` php
-	 * function(\JDatabaseQuery $query, $field, $value)
-	 * {
-	 *     return $query->where($field . ' <= ' . $value);
-	 * }
-	 * ```
-	 *
-	 * @param string        $name    The handler name.
-	 * @param callable|bool $handler Handler callback.
-	 *
-	 * @return  AbstractFilterHelper Return self to support chaining.
-	 */
-	public function setHandler($name, $handler)
-	{
-		$this->handler[$name] = $handler;
+    /**
+     * Set filter handler. Can be a callback or closure.
+     *
+     * Example:
+     * ``` php
+     * function(\JDatabaseQuery $query, $field, $value)
+     * {
+     *     return $query->where($field . ' <= ' . $value);
+     * }
+     * ```
+     *
+     * @param string        $name    The handler name.
+     * @param callable|bool $handler Handler callback.
+     *
+     * @return  AbstractFilterHelper Return self to support chaining.
+     */
+    public function setHandler($name, $handler)
+    {
+        $this->handler[$name] = $handler;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Register the default handler.
-	 *
-	 * @return  callable The handler callback.
-	 */
-	abstract protected function getDefaultHandler();
+    /**
+     * Register the default handler.
+     *
+     * @return  callable The handler callback.
+     */
+    abstract protected function getDefaultHandler();
 
-	/**
-	 * Set default handler.
-	 *
-	 * @param   callable $defaultHandler The default handler.
-	 *
-	 * @return  AbstractFilterHelper  Return self to support chaining.
-	 */
-	public function setDefaultHandler(callable $defaultHandler)
-	{
-		$this->defaultHandler = $defaultHandler;
+    /**
+     * Set default handler.
+     *
+     * @param   callable $defaultHandler The default handler.
+     *
+     * @return  AbstractFilterHelper  Return self to support chaining.
+     */
+    public function setDefaultHandler(callable $defaultHandler)
+    {
+        $this->defaultHandler = $defaultHandler;
 
-		return $this;
-	}
+        return $this;
+    }
 }

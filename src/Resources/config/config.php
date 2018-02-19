@@ -7,14 +7,14 @@
  */
 
 return [
-	'providers' => [
-		\Phoenix\Provider\PhoenixProvider::class
-	],
+    'providers' => [
+        \Phoenix\Provider\PhoenixProvider::class,
+    ],
 
-	'console' => [
-		'commands' => [
-			\Phoenix\Command\MuseCommand::class,
-			\Phoenix\Command\PhoenixCommand::class
-		]
-	]
+    'console' => [
+        'commands' => [
+            \Phoenix\Command\MuseCommand::class,
+            \Phoenix\Command\PhoenixCommand::class,
+        ],
+    ],
 ];

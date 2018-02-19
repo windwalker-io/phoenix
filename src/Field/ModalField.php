@@ -36,147 +36,146 @@ use Windwalker\Form\Field\TextField;
  */
 class ModalField extends TextField
 {
-	/**
-	 * Property table.
-	 *
-	 * @var  string
-	 */
-	protected $table;
+    /**
+     * Property table.
+     *
+     * @var  string
+     */
+    protected $table;
 
-	/**
-	 * Property titleField.
-	 *
-	 * @var  string
-	 */
-	protected $titleField = 'title';
+    /**
+     * Property titleField.
+     *
+     * @var  string
+     */
+    protected $titleField = 'title';
 
-	/**
-	 * Property keyName.
-	 *
-	 * @var  string
-	 */
-	protected $keyField = 'id';
+    /**
+     * Property keyName.
+     *
+     * @var  string
+     */
+    protected $keyField = 'id';
 
-	/**
-	 * Property package.
-	 *
-	 * @var  string
-	 */
-	protected $package;
+    /**
+     * Property package.
+     *
+     * @var  string
+     */
+    protected $package;
 
-	/**
-	 * Property view.
-	 *
-	 * @var  string
-	 */
-	protected $view;
+    /**
+     * Property view.
+     *
+     * @var  string
+     */
+    protected $view;
 
-	/**
-	 * Property route.
-	 *
-	 * @var  string
-	 */
-	protected $route;
+    /**
+     * Property route.
+     *
+     * @var  string
+     */
+    protected $route;
 
-	/**
-	 * Property query.
-	 *
-	 * @var  array
-	 */
-	protected $query = [];
+    /**
+     * Property query.
+     *
+     * @var  array
+     */
+    protected $query = [];
 
-	/**
-	 * buildInput
-	 *
-	 * @param array $attrs
-	 *
-	 * @return  string
-	 */
-	public function buildInput($attrs)
-	{
-		$this->prepareScript();
+    /**
+     * buildInput
+     *
+     * @param array $attrs
+     *
+     * @return  string
+     */
+    public function buildInput($attrs)
+    {
+        $this->prepareScript();
 
-		$this->package = $this->get('package', $this->package);
-		$this->view = $this->get('view', $this->view);
+        $this->package = $this->get('package', $this->package);
+        $this->view    = $this->get('view', $this->view);
 
-		$attribs = $attrs;
+        $attribs = $attrs;
 
-		/** @var HtmlElement $input */
-		$input = parent::buildInput($attribs);
-		$input['type'] = 'hidden';
-		$input['data-value-store'] = true;
+        /** @var HtmlElement $input */
+        $input                     = parent::buildInput($attribs);
+        $input['type']             = 'hidden';
+        $input['data-value-store'] = true;
 
-		$url   = $this->get('url') ? : $this->getUrl();
-		$id    = $this->getId();
+        $url = $this->get('url') ?: $this->getUrl();
+        $id  = $this->getId();
 
-		return WidgetHelper::render($this->get('layout', 'phoenix.form.field.modal'), [
-			'id'    => $id,
-			'title' => $this->getTitle(),
-			'input' => $input,
-			'url'   => $url,
-			'attrs' => $attrs,
-			'field' => $this
-		], WidgetHelper::EDGE);
-	}
+        return WidgetHelper::render($this->get('layout', 'phoenix.form.field.modal'), [
+            'id' => $id,
+            'title' => $this->getTitle(),
+            'input' => $input,
+            'url' => $url,
+            'attrs' => $attrs,
+            'field' => $this,
+        ], WidgetHelper::EDGE);
+    }
 
-	/**
-	 * getTitle
-	 *
-	 * @return  Data
-	 */
-	protected function getTitle()
-	{
-		$table = $this->table ? : $this->get('table', $this->view);
-		$value = $this->getValue();
-		$keyField   = $this->get('key_field', $this->keyField);
-		$titleField = $this->get('title_field', $this->titleField);
+    /**
+     * getTitle
+     *
+     * @return  Data
+     */
+    protected function getTitle()
+    {
+        $table      = $this->table ?: $this->get('table', $this->view);
+        $value      = $this->getValue();
+        $keyField   = $this->get('key_field', $this->keyField);
+        $titleField = $this->get('title_field', $this->titleField);
 
-		$dataMapper = new DataMapper($table);
+        $dataMapper = new DataMapper($table);
 
-		$data = $dataMapper->findOne([$keyField => $value]);
+        $data = $dataMapper->findOne([$keyField => $value]);
 
-		return $data->$titleField;
-	}
+        return $data->$titleField;
+    }
 
-	/**
-	 * getUrl
-	 *
-	 * @return  string
-	 * @throws \OutOfRangeException
-	 */
-	protected function getUrl()
-	{
-		$package = PackageHelper::getPackage($this->package);
+    /**
+     * getUrl
+     *
+     * @return  string
+     * @throws \OutOfRangeException
+     */
+    protected function getUrl()
+    {
+        $package = PackageHelper::getPackage($this->package);
 
-		$package = $package ? : PackageHelper::getPackage();
+        $package = $package ?: PackageHelper::getPackage();
 
-		$route = $this->get('route', $this->route) ? : $this->view;
-		$query = $this->get('query', $this->query);
+        $route = $this->get('route', $this->route) ?: $this->view;
+        $query = $this->get('query', $this->query);
 
-		return $package->router->route($route, array_merge([
-			'layout'   => 'modal',
-			'selector' => '#' . $this->getId() . '-wrap',
-			'function' => $this->get('function', 'Phoenix.Field.Modal.select')
-		], $query));
-	}
+        return $package->router->route($route, array_merge([
+            'layout' => 'modal',
+            'selector' => '#' . $this->getId() . '-wrap',
+            'function' => $this->get('function', 'Phoenix.Field.Modal.select'),
+        ], $query));
+    }
 
-	/**
-	 * prepareScript
-	 *
-	 * @return  void
-	 */
-	protected function prepareScript()
-	{
-		static $inited = false;
+    /**
+     * prepareScript
+     *
+     * @return  void
+     */
+    protected function prepareScript()
+    {
+        static $inited = false;
 
-		if ($inited)
-		{
-			return;
-		}
+        if ($inited) {
+            return;
+        }
 
-		JQueryScript::ui(['effect']);
+        JQueryScript::ui(['effect']);
 
-		$js = <<<JS
+        $js = <<<JS
 // Phoenix.Field.Modal
 var Phoenix;
 (function(Phoenix, $) {
@@ -195,30 +194,30 @@ var Phoenix;
 })(Phoenix || (Phoenix = {}), jQuery);
 JS;
 
-		Asset::internalScript($js);
+        Asset::internalScript($js);
 
-		$inited = true;
-	}
+        $inited = true;
+    }
 
-	/**
-	 * getAccessors
-	 *
-	 * @return  array
-	 */
-	protected function getAccessors()
-	{
-		return array_merge(parent::getAccessors(), [
-			'package',
-			'view',
-			'url',
-			'table',
-			'route',
-			'query',
-			'keyField' => 'key_field',
-			'titleField' => 'title_field',
-			'titleClass',
-			'buttonText',
-			'layout'
-		]);
-	}
+    /**
+     * getAccessors
+     *
+     * @return  array
+     */
+    protected function getAccessors()
+    {
+        return array_merge(parent::getAccessors(), [
+            'package',
+            'view',
+            'url',
+            'table',
+            'route',
+            'query',
+            'keyField' => 'key_field',
+            'titleField' => 'title_field',
+            'titleClass',
+            'buttonText',
+            'layout',
+        ]);
+    }
 }

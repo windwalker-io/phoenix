@@ -15,32 +15,32 @@ use Windwalker\Console\Command\Command;
 
 /**
  * The AssetCommand class.
- * 
+ *
  * @since  1.0
  */
 class AssetCommand extends Command
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'asset';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'asset';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Asset management';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Asset management';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addCommand(new MinifyCommand);
-	}
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addCommand(new MinifyCommand);
+    }
 }

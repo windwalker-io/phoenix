@@ -13,64 +13,64 @@ use Windwalker\Console\Command\Command;
 
 /**
  * The InitCommand class.
- * 
+ *
  * @since  1.0
  */
 class InitCommand extends Command
 {
-	/**
-	 * An enabled flag.
-	 *
-	 * @var bool
-	 */
-	public static $isEnabled = true;
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'init';
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Init a new package.';
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = 'init <cmd><package_name></cmd> <option>[option]</option>';
+    /**
+     * An enabled flag.
+     *
+     * @var bool
+     */
+    public static $isEnabled = true;
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'init';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Init a new package.';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = 'init <cmd><package_name></cmd> <option>[option]</option>';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addGlobalOption('table')
-			->description('The database table name.');
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addGlobalOption('table')
+            ->description('The database table name.');
 
-		$this->addGlobalOption('m')
-			->alias('migrate')
-			->description('Run migration.');
+        $this->addGlobalOption('m')
+            ->alias('migrate')
+            ->description('Run migration.');
 
-		$this->addGlobalOption('s')
-			->alias('seed')
-			->description('Run seeder.');
-	}
+        $this->addGlobalOption('s')
+            ->alias('seed')
+            ->description('Run seeder.');
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int|void
-	 */
-	protected function doExecute()
-	{
-		$generator = new GeneratorController($this);
+    /**
+     * Execute this command.
+     *
+     * @return int|void
+     */
+    protected function doExecute()
+    {
+        $generator = new GeneratorController($this);
 
-		$generator->setTask('package.init')->execute();
-	}
+        $generator->setTask('package.init')->execute();
+    }
 }

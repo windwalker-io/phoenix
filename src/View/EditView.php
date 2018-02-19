@@ -18,60 +18,61 @@ use Windwalker\Core\Language\Translator;
  */
 class EditView extends ItemView
 {
-	/**
-	 * Property formDefinition.
-	 *
-	 * @var  string
-	 */
-	protected $formDefinition = 'edit';
+    /**
+     * Property formDefinition.
+     *
+     * @var  string
+     */
+    protected $formDefinition = 'edit';
 
-	/**
-	 * Property formControl.
-	 *
-	 * @var  string
-	 */
-	protected $formControl = 'item';
+    /**
+     * Property formControl.
+     *
+     * @var  string
+     */
+    protected $formControl = 'item';
 
-	/**
-	 * Property formLoadData.
-	 *
-	 * @var  boolean
-	 */
-	protected $formLoadData = true;
+    /**
+     * Property formLoadData.
+     *
+     * @var  boolean
+     */
+    protected $formLoadData = true;
 
-	/**
-	 * setTitle
-	 *
-	 * @param string $title
-	 *
-	 * @return  static
-	 */
-	public function setTitle($title = null)
-	{
-		$title = $title ? : Translator::sprintf('phoenix.title.edit', Translator::translate($this->langPrefix . $this->getName() . '.title'));
+    /**
+     * setTitle
+     *
+     * @param string $title
+     *
+     * @return  static
+     */
+    public function setTitle($title = null)
+    {
+        $title = $title ?: Translator::sprintf('phoenix.title.edit',
+            Translator::translate($this->langPrefix . $this->getName() . '.title'));
 
-		return parent::setTitle($title);
-	}
+        return parent::setTitle($title);
+    }
 
-	/**
-	 * prepareRender
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 * @throws \UnexpectedValueException
-	 */
-	protected function prepareData($data)
-	{
-		parent::prepareData($data);
+    /**
+     * prepareRender
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     * @throws \UnexpectedValueException
+     */
+    protected function prepareData($data)
+    {
+        parent::prepareData($data);
 
-		$model = $this->model->getModel();
+        $model = $this->model->getModel();
 
-		if (!$model instanceof FormAwareRepositoryInterface)
-		{
-			throw new \UnexpectedValueException('You must use a Model implemented ' . FormAwareRepositoryInterface::class . ' in EditView');
-		}
+        if (!$model instanceof FormAwareRepositoryInterface) {
+            throw new \UnexpectedValueException('You must use a Model implemented ' . FormAwareRepositoryInterface::class . ' in EditView');
+        }
 
-		$data->form = $data->form ? : $this->model->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
-	}
+        $data->form = $data->form ?: $this->model->getForm($this->formDefinition, $this->formControl,
+            $this->formLoadData);
+    }
 }

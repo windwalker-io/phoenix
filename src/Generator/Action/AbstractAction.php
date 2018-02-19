@@ -13,25 +13,25 @@ use Windwalker\Ioc;
 
 /**
  * The AbstractAction class.
- * 
+ *
  * @since  1.0
  */
 abstract class AbstractAction extends \Muse\Action\AbstractAction
 {
-	/**
-	 * Property container.
-	 *
-	 * @var  Container
-	 */
-	protected $container;
+    /**
+     * Property container.
+     *
+     * @var  Container
+     */
+    protected $container;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param Container $container
-	 */
-	public function __construct(Container $container = null)
-	{
-		$this->container = $container ? : Ioc::factory();
-	}
+    /**
+     * Constructor.
+     *
+     * @param Container $container
+     */
+    public function __construct(Container $container = null)
+    {
+        $this->container = $container ?: Ioc::factory();
+    }
 }

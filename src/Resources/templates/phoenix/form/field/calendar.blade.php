@@ -1,7 +1,7 @@
 {{-- Part of phoenix project. --}}
 <?php
 /**
- * @var  \Windwalker\Form\Field\AbstractField  $field
+ * @var  \Windwalker\Form\Field\AbstractField $field
  */
 ?>
 

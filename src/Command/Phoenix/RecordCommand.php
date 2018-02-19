@@ -18,27 +18,27 @@ use Windwalker\Core\Console\CoreCommand;
  */
 class RecordCommand extends CoreCommand
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'record';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'record';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Record management';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Record management';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addCommand(new SyncCommand);
-	}
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addCommand(new SyncCommand);
+    }
 }

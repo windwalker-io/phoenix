@@ -14,45 +14,44 @@ use Windwalker\Filesystem\Folder;
 
 /**
  * The ConvertController class.
- * 
+ *
  * @since  1.0
  */
 class ConvertController extends AbstractPackageController
 {
 
-	/**
-	 * Execute the controller.
-	 *
-	 * @return  boolean  True if controller finished execution, false if the controller did not
-	 *                   finish execution. A controller might return false if some precondition for
-	 *                   the controller to run has not been satisfied.
-	 *
-	 * @throws  \LogicException
-	 * @throws  \RuntimeException
-	 */
-	public function execute()
-	{
-		// Flip src and dest because we want to convert template.
-		$dest = $this->config->get('dir.dest');
-		$src  = $this->config->get('dir.src');
+    /**
+     * Execute the controller.
+     *
+     * @return  boolean  True if controller finished execution, false if the controller did not
+     *                   finish execution. A controller might return false if some precondition for
+     *                   the controller to run has not been satisfied.
+     *
+     * @throws  \LogicException
+     * @throws  \RuntimeException
+     */
+    public function execute()
+    {
+        // Flip src and dest because we want to convert template.
+        $dest = $this->config->get('dir.dest');
+        $src  = $this->config->get('dir.src');
 
-		$this->config->set('dir.dest', $src);
-		$this->config->set('dir.src',  $dest);
+        $this->config->set('dir.dest', $src);
+        $this->config->set('dir.src', $dest);
 
-		$this->doAction(new Action\ConvertTemplateAction);
+        $this->doAction(new Action\ConvertTemplateAction);
 
-		// Rename migration
-		if (is_dir($src . '/Migration'))
-		{
-			$file = Folder::files($src . '/Migration')[0];
+        // Rename migration
+        if (is_dir($src . '/Migration')) {
+            $file = Folder::files($src . '/Migration')[0];
 
-			$time = '19700101000000';
+            $time = '19700101000000';
 
-			$newFilename = preg_replace('/\d+(_.+Init\.php\.tpl)/', $time . '$1', $file);
+            $newFilename = preg_replace('/\d+(_.+Init\.php\.tpl)/', $time . '$1', $file);
 
-			File::move($file, $newFilename);
-		}
+            File::move($file, $newFilename);
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

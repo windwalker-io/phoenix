@@ -15,19 +15,19 @@ namespace Phoenix\Controller\Batch;
  */
 abstract class AbstractPublishController extends AbstractBatchController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'publish';
+    /**
+     * Property action.
+     *
+     * @var  string
+     */
+    protected $action = 'publish';
 
-	/**
-	 * Property data.
-	 *
-	 * @var  array
-	 */
-	protected $data = [
-		'state' => 1
-	];
+    /**
+     * Property data.
+     *
+     * @var  array
+     */
+    protected $data = [
+        'state' => 1,
+    ];
 }

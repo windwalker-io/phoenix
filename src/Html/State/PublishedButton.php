@@ -15,14 +15,14 @@ namespace Phoenix\Html\State;
  */
 class PublishedButton extends IconButton
 {
-	/**
-	 * configure
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addState(0, 'publish',   'fa fa-fw fa-remove fa-times text-danger', 'phoenix.grid.state.unpublished')
-			->addState(1,  'unpublish', 'fa fa-fw fa-check text-success', 'phoenix.grid.state.published');
-	}
+    /**
+     * configure
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addState(0, 'publish', 'fa fa-fw fa-remove fa-times text-danger', 'phoenix.grid.state.unpublished')
+            ->addState(1, 'unpublish', 'fa fa-fw fa-check text-success', 'phoenix.grid.state.published');
+    }
 }

@@ -15,19 +15,19 @@ namespace Phoenix\Controller\Batch;
  */
 abstract class AbstractTrashController extends AbstractBatchController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'trash';
+    /**
+     * Property action.
+     *
+     * @var  string
+     */
+    protected $action = 'trash';
 
-	/**
-	 * Property data.
-	 *
-	 * @var  array
-	 */
-	protected $data = [
-		'state' => -1
-	];
+    /**
+     * Property data.
+     *
+     * @var  array
+     */
+    protected $data = [
+        'state' => -1,
+    ];
 }

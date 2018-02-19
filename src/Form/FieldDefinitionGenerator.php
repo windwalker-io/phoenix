@@ -10,59 +10,56 @@ namespace Phoenix\Form;
 
 /**
  * The FieldDefinitionGenerator class.
- * 
+ *
  * @since  1.0
  */
 class FieldDefinitionGenerator
 {
-	/**
-	 * generate
-	 *
-	 * @param string     $type
-	 * @param string     $name
-	 * @param \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function generate($type, $name, $column)
-	{
-		$className = get_called_class();
+    /**
+     * generate
+     *
+     * @param string    $type
+     * @param string    $name
+     * @param \stdClass $column
+     *
+     * @return  string
+     */
+    public static function generate($type, $name, $column)
+    {
+        $className = get_called_class();
 
-		$args = [$type, $name, str_replace('_', ' ', ucfirst($name)), $column];
+        $args = [$type, $name, str_replace('_', ' ', ucfirst($name)), $column];
 
-		$method = 'gen' . ucfirst($type) . ucfirst($name);
+        $method = 'gen' . ucfirst($type) . ucfirst($name);
 
-		if (!is_callable([__CLASS__, $method]))
-		{
-			$method = 'gen' . ucfirst($name);
-		}
+        if (!is_callable([__CLASS__, $method])) {
+            $method = 'gen' . ucfirst($name);
+        }
 
-		if (!is_callable([__CLASS__, $method]))
-		{
-			$method = 'gen' . ucfirst($type);
-		}
+        if (!is_callable([__CLASS__, $method])) {
+            $method = 'gen' . ucfirst($type);
+        }
 
-		if (!is_callable([__CLASS__, $method]))
-		{
-			$method = 'genVarchar';
-		}
+        if (!is_callable([__CLASS__, $method])) {
+            $method = 'genVarchar';
+        }
 
-		return $className::$method($type, $name, str_replace('_', ' ', ucfirst($name)), $column) . "\n";
-	}
+        return $className::$method($type, $name, str_replace('_', ' ', ucfirst($name)), $column) . "\n";
+    }
 
-	/**
-	 * genVarchar
-	 *
-	 * @param string     $type
-	 * @param string     $name
-	 * @param string     $label
-	 * @param \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genVarchar($type, $name, $label, $column)
-	{
-		return <<<HTML
+    /**
+     * genVarchar
+     *
+     * @param string    $type
+     * @param string    $name
+     * @param string    $label
+     * @param \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genVarchar($type, $name, $label, $column)
+    {
+        return <<<HTML
 // $label
 \$this->text('$name')
 	->label('$label')
@@ -71,21 +68,21 @@ class FieldDefinitionGenerator
 	->labelClass('')
 	->defaultValue(null);
 HTML;
-	}
+    }
 
-	/**
-	 * genTinyint
-	 *
-	 * @param string     $type
-	 * @param string     $name
-	 * @param string     $label
-	 * @param \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genTinyint($type, $name, $label, $column)
-	{
-		return <<<HTML
+    /**
+     * genTinyint
+     *
+     * @param string    $type
+     * @param string    $name
+     * @param string    $label
+     * @param \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genTinyint($type, $name, $label, $column)
+    {
+        return <<<HTML
 // $label
 \$this->radio('$name')
 	->label('$label')
@@ -96,33 +93,32 @@ HTML;
 	->labelClass('')
 	->defaultValue(1);
 HTML;
-	}
+    }
 
-	/**
-	 * genTinyint
-	 *
-	 * @param string     $type
-	 * @param string     $name
-	 * @param string     $label
-	 * @param \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genChar($type, $name, $label, $column)
-	{
-		$comment = $column->Comment;
+    /**
+     * genTinyint
+     *
+     * @param string    $type
+     * @param string    $name
+     * @param string    $label
+     * @param \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genChar($type, $name, $label, $column)
+    {
+        $comment = $column->Comment;
 
-		$options = array_map(function($value)
-		{
-			$value = trim($value);
-			$text = ucfirst($value);
+        $options = array_map(function ($value) {
+            $value = trim($value);
+            $text  = ucfirst($value);
 
-			return "->option('$text', '$value')";
-		}, explode(',', $comment));
+            return "->option('$text', '$value')";
+        }, explode(',', $comment));
 
-		$options = implode("\n\t", $options);
+        $options = implode("\n\t", $options);
 
-		return <<<HTML
+        return <<<HTML
 // $label
 \$this->list('$name')
 	->label('$label')
@@ -132,21 +128,21 @@ HTML;
 	->labelClass('')
 	->defaultValue(1);
 HTML;
-	}
+    }
 
-	/**
-	 * genText
-	 *
-	 * @param  string     $type
-	 * @param  string     $name
-	 * @param  string     $label
-	 * @param  \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genText($type, $name, $label, $column)
-	{
-		return <<<HTML
+    /**
+     * genText
+     *
+     * @param  string    $type
+     * @param  string    $name
+     * @param  string    $label
+     * @param  \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genText($type, $name, $label, $column)
+    {
+        return <<<HTML
 // $label
 \$this->textarea('$name')
 	->label('$label')
@@ -156,69 +152,69 @@ HTML;
 	->rows(7)
 	->defaultValue(null);
 HTML;
-	}
+    }
 
-	/**
-	 * genLongtext
-	 *
-	 * @param  string     $type
-	 * @param  string     $name
-	 * @param  string     $label
-	 * @param  \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genLongtext($type, $name, $label, $column)
-	{
-		return static::genText($type, $name, $label, $column);
-	}
+    /**
+     * genLongtext
+     *
+     * @param  string    $type
+     * @param  string    $name
+     * @param  string    $label
+     * @param  \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genLongtext($type, $name, $label, $column)
+    {
+        return static::genText($type, $name, $label, $column);
+    }
 
-	/**
-	 * genMediumtext
-	 *
-	 * @param  string     $type
-	 * @param  string     $name
-	 * @param  string     $label
-	 * @param  \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genMediumtext($type, $name, $label, $column)
-	{
-		return static::genText($type, $name, $label, $column);
-	}
+    /**
+     * genMediumtext
+     *
+     * @param  string    $type
+     * @param  string    $name
+     * @param  string    $label
+     * @param  \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genMediumtext($type, $name, $label, $column)
+    {
+        return static::genText($type, $name, $label, $column);
+    }
 
-	/**
-	 * genID
-	 *
-	 * @param  string     $type
-	 * @param  string     $name
-	 * @param  string     $label
-	 * @param  \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genID($type, $name, $label, $column)
-	{
-		return <<<HTML
+    /**
+     * genID
+     *
+     * @param  string    $type
+     * @param  string    $name
+     * @param  string    $label
+     * @param  \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genID($type, $name, $label, $column)
+    {
+        return <<<HTML
 // $label
 \$this->hidden('$name');
 HTML;
-	}
+    }
 
-	/**
-	 * genPassword
-	 *
-	 * @param  string     $type
-	 * @param  string     $name
-	 * @param  string     $label
-	 * @param  \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genPassword($type, $name, $label, $column)
-	{
-		return <<<HTML
+    /**
+     * genPassword
+     *
+     * @param  string    $type
+     * @param  string    $name
+     * @param  string    $label
+     * @param  \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genPassword($type, $name, $label, $column)
+    {
+        return <<<HTML
 // $label
 \$this->password('$name')
 	->description('Password')
@@ -235,21 +231,21 @@ HTML;
 	->labelClass('')
 	->autocomplete('off');
 HTML;
-	}
+    }
 
-	/**
-	 * genDatetime
-	 *
-	 * @param  string     $type
-	 * @param  string     $name
-	 * @param  string     $label
-	 * @param  \stdClass  $column
-	 *
-	 * @return  string
-	 */
-	public static function genDatetime($type, $name, $label, $column)
-	{
-		return <<<HTML
+    /**
+     * genDatetime
+     *
+     * @param  string    $type
+     * @param  string    $name
+     * @param  string    $label
+     * @param  \stdClass $column
+     *
+     * @return  string
+     */
+    public static function genDatetime($type, $name, $label, $column)
+    {
+        return <<<HTML
 // $label
 \$this->calendar('$name')
 	->label('$label')
@@ -258,5 +254,5 @@ HTML;
 	->labelClass('')
 	->defaultValue(null);
 HTML;
-	}
+    }
 }

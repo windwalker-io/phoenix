@@ -20,24 +20,23 @@ use Windwalker\Event\Event;
  */
 class DumpOrphansListener
 {
-	/**
-	 * onAfterExecute
-	 *
-	 * @param Event $event
-	 *
-	 * @return  void
-	 * 
-	 * @throws \Windwalker\Filesystem\Exception\FilesystemException
-	 */
-	public function onAfterExecute(Event $event)
-	{
-		/** @var WebApplication $app */
-		$app = Ioc::getApplication();
+    /**
+     * onAfterExecute
+     *
+     * @param Event $event
+     *
+     * @return  void
+     *
+     * @throws \Windwalker\Filesystem\Exception\FilesystemException
+     */
+    public function onAfterExecute(Event $event)
+    {
+        /** @var WebApplication $app */
+        $app = Ioc::getApplication();
 
-		// Un comment this line, Translator will export all orphans to /cache/language
-		if ($app->get('language.debug'))
-		{
-			TranslatorHelper::dumpOrphans('ini');
-		}
-	}
+        // Un comment this line, Translator will export all orphans to /cache/language
+        if ($app->get('language.debug')) {
+            TranslatorHelper::dumpOrphans('ini');
+        }
+    }
 }

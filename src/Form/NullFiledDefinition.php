@@ -18,15 +18,15 @@ use Windwalker\Form\Form;
  */
 class NullFiledDefinition implements FieldDefinitionInterface
 {
-	/**
-	 * Define the form fields.
-	 *
-	 * @param Form $form The Windwalker form object.
-	 *
-	 * @return  void
-	 */
-	public function define(Form $form)
-	{
+    /**
+     * Define the form fields.
+     *
+     * @param Form $form The Windwalker form object.
+     *
+     * @return  void
+     */
+    public function define(Form $form)
+    {
 
-	}
+    }
 }

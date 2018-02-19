@@ -20,47 +20,47 @@ use Windwalker\Data\Data;
  */
 abstract class AbstractPhoenixHtmView extends HtmlView
 {
-	/**
-	 * Property renderer.
-	 *
-	 * @var  string
-	 */
-	protected $renderer = RendererHelper::EDGE;
+    /**
+     * Property renderer.
+     *
+     * @var  string
+     */
+    protected $renderer = RendererHelper::EDGE;
 
-	/**
-	 * Property langPrefix.
-	 *
-	 * @var  string
-	 */
-	protected $langPrefix;
+    /**
+     * Property langPrefix.
+     *
+     * @var  string
+     */
+    protected $langPrefix;
 
-	/**
-	 * prepareRender
-	 *
-	 * @param   Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareRender($data)
-	{
-		$data->state = $data->state ? : $this->model->getState();
+    /**
+     * prepareRender
+     *
+     * @param   Data $data
+     *
+     * @return  void
+     */
+    protected function prepareRender($data)
+    {
+        $data->state = $data->state ?: $this->model->getState();
 
-		$this->langPrefix = $this->langPrefix ? : $this->getPackage()->getName() . '.';
+        $this->langPrefix = $this->langPrefix ?: $this->getPackage()->getName() . '.';
 
-		$this->setTitle();
-	}
+        $this->setTitle();
+    }
 
-	/**
-	 * setTitle
-	 *
-	 * @param string $title
-	 *
-	 * @return  static
-	 */
-	public function setTitle($title = null)
-	{
-		HtmlHeader::setTitle($title);
+    /**
+     * setTitle
+     *
+     * @param string $title
+     *
+     * @return  static
+     */
+    public function setTitle($title = null)
+    {
+        HtmlHeader::setTitle($title);
 
-		return $this;
-	}
+        return $this;
+    }
 }

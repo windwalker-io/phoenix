@@ -15,57 +15,52 @@ use Windwalker\Record\Record;
 
 /**
  * The AbstractFormModel class.
- * 
+ *
  * @since  1.0
  */
 class ItemModel extends DatabaseModelRepository
 {
-	/**
-	 * getItem
-	 *
-	 * @param   mixed $conditions
-	 *
-	 * @return  Record
-	 * @throws \InvalidArgumentException
-	 */
-	public function getItem($conditions = null)
-	{
-		$state = $this->state;
+    /**
+     * getItem
+     *
+     * @param   mixed $conditions
+     *
+     * @return  Record
+     * @throws \InvalidArgumentException
+     */
+    public function getItem($conditions = null)
+    {
+        $state = $this->state;
 
-		$conditions = $conditions ? : $state['load.conditions'];
+        $conditions = $conditions ?: $state['load.conditions'];
 
-		return $this->fetch('item.' . json_encode($conditions), function() use ($conditions, $state)
-		{
-			if (!$conditions)
-			{
-				return $this->getRecord()->reset(false);
-			}
+        return $this->fetch('item.' . json_encode($conditions), function () use ($conditions, $state) {
+            if (!$conditions) {
+                return $this->getRecord()->reset(false);
+            }
 
-			$item = $this->getRecord();
+            $item = $this->getRecord();
 
-			try
-			{
-				$item->load($conditions);
-			}
-			catch (NoResultException $e)
-			{
-				return $item->reset(false);
-			}
+            try {
+                $item->load($conditions);
+            } catch (NoResultException $e) {
+                return $item->reset(false);
+            }
 
-			$this->postGetItem($item);
+            $this->postGetItem($item);
 
-			return $item;
-		});
-	}
+            return $item;
+        });
+    }
 
-	/**
-	 * postGetItem
-	 *
-	 * @param DataInterface $item
-	 *
-	 * @return  void
-	 */
-	protected function postGetItem(DataInterface $item)
-	{
-	}
+    /**
+     * postGetItem
+     *
+     * @param DataInterface $item
+     *
+     * @return  void
+     */
+    protected function postGetItem(DataInterface $item)
+    {
+    }
 }

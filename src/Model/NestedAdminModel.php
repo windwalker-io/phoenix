@@ -19,84 +19,81 @@ use Windwalker\Test\TestHelper;
  */
 class NestedAdminModel extends AdminModel
 {
-	/**
-	 * prepareRecord
-	 *
-	 * @param Record $record
-	 *
-	 * @return  void
-	 */
-	protected function prepareRecord(Record $record)
-	{
-		/** @var NestedRecord $record */
-		parent::prepareRecord($record);
+    /**
+     * prepareRecord
+     *
+     * @param Record $record
+     *
+     * @return  void
+     */
+    protected function prepareRecord(Record $record)
+    {
+        /** @var NestedRecord $record */
+        parent::prepareRecord($record);
 
-		// Auto set location for batch copy
-		$key = $record->getKeyName();
+        // Auto set location for batch copy
+        $key = $record->getKeyName();
 
-		if (!$record->$key && !TestHelper::getValue($record, 'locationId'))
-		{
-			$record->setLocation($record->parent_id, $record::LOCATION_LAST_CHILD);
-		}
-	}
+        if (!$record->$key && !TestHelper::getValue($record, 'locationId')) {
+            $record->setLocation($record->parent_id, $record::LOCATION_LAST_CHILD);
+        }
+    }
 
-	/**
-	 * postSaveHook
-	 *
-	 * @param Record $record
-	 *
-	 * @return  void
-	 */
-	protected function postSaveHook(Record $record)
-	{
-		/** @var NestedRecord $record */
-		$record->rebuild();
-	}
+    /**
+     * postSaveHook
+     *
+     * @param Record $record
+     *
+     * @return  void
+     */
+    protected function postSaveHook(Record $record)
+    {
+        /** @var NestedRecord $record */
+        $record->rebuild();
+    }
 
-	/**
-	 * reorder
-	 *
-	 * @param array  $conditions
-	 * @param string $orderField
-	 *
-	 * @return bool
-	 */
-	public function reorderAll($conditions = [], $orderField = null)
-	{
-		/** @var NestedRecord $record */
-		$record = $this->getRecord();
+    /**
+     * reorder
+     *
+     * @param array  $conditions
+     * @param string $orderField
+     *
+     * @return bool
+     */
+    public function reorderAll($conditions = [], $orderField = null)
+    {
+        /** @var NestedRecord $record */
+        $record = $this->getRecord();
 
-		$record->rebuild();
+        $record->rebuild();
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * move
-	 *
-	 * @param int|array $ids
-	 * @param int       $delta
-	 * @param string    $orderField
-	 *
-	 * @return  bool
-	 */
-	public function move($ids, $delta, $orderField = null)
-	{
-		if (!$ids || !$delta)
-		{
-			return true;
-		}
+    /**
+     * move
+     *
+     * @param int|array $ids
+     * @param int       $delta
+     * @param string    $orderField
+     *
+     * @return  bool
+     */
+    public function move($ids, $delta, $orderField = null)
+    {
+        if (!$ids || !$delta) {
+            return true;
+        }
 
-		/** @var NestedRecord $record */
-		$record     = $this->getRecord();
-		$orderField = $orderField ? : $this->state->get('order.column', 'ordering');
+        /** @var NestedRecord $record */
+        $record     = $this->getRecord();
+        $orderField = $orderField ?: $this->state->get('order.column', 'ordering');
 
-		foreach ((array) $ids as $id)
-		{
-			$record->load($id);
-			$record->move($delta, $orderField);
-		}
+        foreach ((array) $ids as $id) {
+            $record->load($id);
+            $record->move($delta, $orderField);
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

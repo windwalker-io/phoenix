@@ -20,95 +20,87 @@ use Windwalker\Core\Mailer\MailMessage;
  */
 class MailgunAdapter implements MailerAdapterInterface
 {
-	/**
-	 * Property Mailgun.
-	 *
-	 * @var  Mailgun
-	 */
-	protected $mailgun;
+    /**
+     * Property Mailgun.
+     *
+     * @var  Mailgun
+     */
+    protected $mailgun;
 
-	/**
-	 * Property config.
-	 *
-	 * @var  Config
-	 */
-	protected $config;
+    /**
+     * Property config.
+     *
+     * @var  Config
+     */
+    protected $config;
 
-	/**
-	 * SendGridAdapter constructor.
-	 *
-	 * @param Mailgun $mailgun
-	 */
-	public function __construct(Mailgun $mailgun, Config $config)
-	{
-		$this->mailgun = $mailgun;
-		$this->config = $config;
-	}
+    /**
+     * SendGridAdapter constructor.
+     *
+     * @param Mailgun $mailgun
+     */
+    public function __construct(Mailgun $mailgun, Config $config)
+    {
+        $this->mailgun = $mailgun;
+        $this->config  = $config;
+    }
 
-	/**
-	 * send
-	 *
-	 * @param MailMessage $message
-	 *
-	 * @return  boolean
-	 * @throws \InvalidArgumentException
-	 * @throws \RuntimeException
-	 */
-	public function send(MailMessage $message)
-	{
-		$params = [];
-		$params['subject'] = $message->getSubject();
+    /**
+     * send
+     *
+     * @param MailMessage $message
+     *
+     * @return  boolean
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public function send(MailMessage $message)
+    {
+        $params            = [];
+        $params['subject'] = $message->getSubject();
 
-		$message->getHtml() ? $params['html'] = $message->getBody() : $params['text'] = $message->getBody();
+        $message->getHtml() ? $params['html'] = $message->getBody() : $params['text'] = $message->getBody();
 
-		foreach ($message->getFrom() as $email => $name)
-		{
-			$params['from'][] = sprintf('%s <%s>', $name, $email);
-		}
+        foreach ($message->getFrom() as $email => $name) {
+            $params['from'][] = sprintf('%s <%s>', $name, $email);
+        }
 
-		foreach ($message->getTo() as $email => $name)
-		{
-			$params['to'][] = sprintf('%s <%s>', $name, $email);
-		}
+        foreach ($message->getTo() as $email => $name) {
+            $params['to'][] = sprintf('%s <%s>', $name, $email);
+        }
 
-		foreach ($message->getCc() as $email => $name)
-		{
-			$params['cc'][] = sprintf('%s <%s>', $name, $email);
-		}
+        foreach ($message->getCc() as $email => $name) {
+            $params['cc'][] = sprintf('%s <%s>', $name, $email);
+        }
 
-		foreach ($message->getBcc() as $email => $name)
-		{
-			$params['bcc'][] = sprintf('%s <%s>', $name, $email);
-		}
+        foreach ($message->getBcc() as $email => $name) {
+            $params['bcc'][] = sprintf('%s <%s>', $name, $email);
+        }
 
-		foreach ($message->getFiles() as $file)
-		{
-			$attach = [];
+        foreach ($message->getFiles() as $file) {
+            $attach = [];
 
-			if ($file->getFilename())
-			{
-				$attach['filename'] = $file->getFilename();
-			}
+            if ($file->getFilename()) {
+                $attach['filename'] = $file->getFilename();
+            }
 
-			if ($file->getContentType())
-			{
-				$attach['contentType'] = $file->getContentType();
-			}
+            if ($file->getContentType()) {
+                $attach['contentType'] = $file->getContentType();
+            }
 
-			$attach['fileContent'] = $file->getBody();
+            $attach['fileContent'] = $file->getBody();
 
-			$params['attachment'][] = $attach;
-		}
+            $params['attachment'][] = $attach;
+        }
 
-		$domain = $this->config->get('mail.mailgun.domain');
+        $domain = $this->config->get('mail.mailgun.domain');
 
-		if (!$domain)
-		{
-			throw new \InvalidArgumentException('Config mail.mailgun.domain should not be empty.');
-		}
+        if (!$domain) {
+            throw new \InvalidArgumentException('Config mail.mailgun.domain should not be empty.');
+        }
 
-		$this->mailgun->messages()->send($domain, $params);
+        $this->mailgun->messages()->send($domain, $params);
 
-		return true;
-	}
+        return true;
+    }
 }

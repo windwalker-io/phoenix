@@ -18,30 +18,28 @@ use Phoenix\Generator\GeneratorHelper;
  */
 class AddSubmenuAction extends AbstractAction
 {
-	/**
-	 * Do this execute.
-	 *
-	 * @return  mixed
-	 */
-	protected function doExecute()
-	{
-		$name = $this->config['replace.controller.list.name.lower'];
-		$package = $this->config['replace.package.name.lower'];
-		$file = $this->config['dir.dest'] . '/Templates/_global/' . $this->config['replace.package.name.lower'] . '/widget/submenu.blade.php';
+    /**
+     * Do this execute.
+     *
+     * @return  mixed
+     */
+    protected function doExecute()
+    {
+        $name    = $this->config['replace.controller.list.name.lower'];
+        $package = $this->config['replace.package.name.lower'];
+        $file    = $this->config['dir.dest'] . '/Templates/_global/' . $this->config['replace.package.name.lower'] . '/widget/submenu.blade.php';
 
-		if (!is_file($file))
-		{
-			return;
-		}
+        if (!is_file($file)) {
+            return;
+        }
 
-		$code = file_get_contents($file);
+        $code = file_get_contents($file);
 
-		if (strpos($code, "\$helper->menu->active('$name')") !== false)
-		{
-			return;
-		}
+        if (strpos($code, "\$helper->menu->active('$name')") !== false) {
+            return;
+        }
 
-		$replace = <<<HTML
+        $replace = <<<HTML
 	<li class="{{ \$helper->menu->active('$name') }}">
 		<a href="{{ \$router->route('$name') }}" class="nav-link {{ \$helper->menu->active('$name') }}">
 	        @translate('$package.$name.title')
@@ -51,11 +49,11 @@ class AddSubmenuAction extends AbstractAction
 
 HTML;
 
-		$code = GeneratorHelper::addBeforePlaceholder('submenu', $code, $replace, '{{--');
+        $code = GeneratorHelper::addBeforePlaceholder('submenu', $code, $replace, '{{--');
 
-		file_put_contents($file, $code);
+        file_put_contents($file, $code);
 
-		$this->io->out('[<info>Action</info>] Add menu item: ' . $name . ' submenu.');
+        $this->io->out('[<info>Action</info>] Add menu item: ' . $name . ' submenu.');
 
-	}
+    }
 }

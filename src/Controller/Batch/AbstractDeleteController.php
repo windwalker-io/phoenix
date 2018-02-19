@@ -17,34 +17,34 @@ use Windwalker\Data\DataInterface;
  */
 abstract class AbstractDeleteController extends AbstractBatchController
 {
-	/**
-	 * Property action.
-	 *
-	 * @var  string
-	 */
-	protected $action = 'delete';
+    /**
+     * Property action.
+     *
+     * @var  string
+     */
+    protected $action = 'delete';
 
-	/**
-	 * Property data.
-	 *
-	 * @var  array
-	 */
-	protected $data = [
-		'state' => -9
-	];
+    /**
+     * Property data.
+     *
+     * @var  array
+     */
+    protected $data = [
+        'state' => -9,
+    ];
 
-	/**
-	 * save
-	 *
-	 * @param   string|int     $pk
-	 * @param   DataInterface  $data
-	 *
-	 * @return  boolean
-	 */
-	protected function save($pk, DataInterface $data)
-	{
-		$data->{$this->keyName} = $pk;
+    /**
+     * save
+     *
+     * @param   string|int    $pk
+     * @param   DataInterface $data
+     *
+     * @return  boolean
+     */
+    protected function save($pk, DataInterface $data)
+    {
+        $data->{$this->keyName} = $pk;
 
-		return $this->model->delete($pk);
-	}
+        return $this->model->delete($pk);
+    }
 }
