@@ -11,7 +11,7 @@ namespace Phoenix\Form\Filter;
 /**
  * The UtcFilter class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.4
  */
 class UtcFilter extends TimezoneFilter
 {

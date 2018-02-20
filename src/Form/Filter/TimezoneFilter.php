@@ -15,7 +15,7 @@ use Windwalker\Ioc;
 /**
  * The TimezoneFilter class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.4
  */
 class TimezoneFilter implements FilterInterface
 {

@@ -23,7 +23,7 @@ use Windwalker\Form\Field\CheckboxField;
  * @method $this|mixed checkedValue(string $value = null)
  * @method $this|mixed uncheckedValue(string $value = null)
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.4
  */
 class SwitchField extends CheckboxField
 {
