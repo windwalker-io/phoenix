@@ -178,7 +178,7 @@ var Phoenix;
         url = options.url;
       }
 
-      options.data = $.extend(true, {}, this.data, options.data, data);
+      options.data = typeof data === 'string' ? data : $.extend(true, {}, this.data, options.data, data);
       options.type = method.toUpperCase() || 'GET';
       var type = options.type;
 

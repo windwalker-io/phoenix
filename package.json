@@ -1,41 +1,55 @@
 {
-  "name": "phoenix",
-  "version": "1.0.0",
-  "description": "Phoenix is a RAD (Rapid Application Development) package for Windwalker, it provides a set of Model, View and Controllers\r with different functions to quickly build web admin system, and a code generator to help us create application scaffold.",
-  "main": "index.js",
-  "scripts": {
-    "postinstall": "php bin/asset-install.php %"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ventoviro/phoenix.git"
-  },
-  "author": "",
-  "bugs": {
-    "url": "https://github.com/ventoviro/phoenix/issues"
-  },
-  "homepage": "https://github.com/ventoviro/phoenix#readme",
-  "dependencies": {
-    "backbone": "*",
-    "bootstrap": "4.*",
-    "eonasdan-bootstrap-datetimepicker": "4.*",
-    "font-awesome": "4.*",
-    "ivia": "*",
-    "jquery": "1.*",
-    "jquery-depends-on": "1.*",
-    "moment": "~>2.19",
-    "moment-timezone": "*",
-    "punycode": "1.*",
-    "requirejs": "*",
-    "silicone": "*",
-    "sprintf-js": "1.*",
-    "underscore": "*",
-    "underscore.string": "*",
-    "vue": "2.*",
-    "vue-resource": "1.*",
-    "vue-router": "2.*",
-    "vue-strap": "1.*",
-    "vue2-animate": "1.*",
-    "vuex": "2.*"
-  }
+    "name": "phoenix",
+    "version": "1.0.0",
+    "description": "Phoenix is a RAD (Rapid Application Development) package for Windwalker, it provides a set of Model, View and Controllers\r with different functions to quickly build web admin system, and a code generator to help us create application scaffold.",
+    "main": "index.js",
+    "scripts": {
+        "postinstall": "php bin/asset-install.php %"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ventoviro/phoenix.git"
+    },
+    "author": "",
+    "bugs": {
+        "url": "https://github.com/ventoviro/phoenix/issues"
+    },
+    "homepage": "https://github.com/ventoviro/phoenix#readme",
+    "dependencies": {
+        "backbone": "*",
+        "bootstrap": "4.*",
+        "eonasdan-bootstrap-datetimepicker": "4.*",
+        "font-awesome": "4.*",
+        "gulp": "^3.9.1",
+        "gulp-autoprefixer": "^4.1.0",
+        "gulp-concat": "^2.6.1",
+        "gulp-filter": "^5.1.0",
+        "gulp-ignore": "^2.0.2",
+        "gulp-jshint": "^2.1.0",
+        "gulp-less": "^3.5.0",
+        "gulp-minify-css": "^1.2.4",
+        "gulp-rename": "^1.2.2",
+        "gulp-sass": "^3.1.0",
+        "gulp-sourcemaps": "^2.6.4",
+        "gulp-uglify": "^3.0.0",
+        "gulp-util": "^3.0.8",
+        "gulp-wrapper": "^1.0.0",
+        "ivia": "*",
+        "jquery": "1.*",
+        "jquery-depends-on": "1.*",
+        "moment": "~>2.19",
+        "moment-timezone": "*",
+        "punycode": "1.*",
+        "requirejs": "*",
+        "silicone": "*",
+        "sprintf-js": "1.*",
+        "underscore": "*",
+        "underscore.string": "*",
+        "vue": "2.*",
+        "vue-resource": "1.*",
+        "vue-router": "2.*",
+        "vue-strap": "1.*",
+        "vue2-animate": "1.*",
+        "vuex": "2.*"
+    }
 }
