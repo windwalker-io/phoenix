@@ -61,8 +61,7 @@ abstract class BootstrapScript extends AbstractPhoenixScript
             if ($version == 3) {
                 static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap.min.js');
             } else {
-                static::addJS(static::phoenixName() . '/js/bootstrap/4/popper.min.js');
-                static::addJS(static::phoenixName() . '/js/bootstrap/4/bootstrap.min.js');
+                static::addJS(static::phoenixName() . '/js/bootstrap/4/bootstrap.bundle.min.js');
             }
         }
     }

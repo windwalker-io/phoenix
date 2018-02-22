@@ -1,5 +1,5 @@
 /*!
- * vue-resource v1.3.4
+ * vue-resource v1.3.6
  * https://github.com/pagekit/vue-resource
  * Released under the MIT License.
  */
@@ -16,7 +16,7 @@
 
 var RESOLVED = 0;
 var REJECTED = 1;
-var PENDING  = 2;
+var PENDING = 2;
 
 function Promise$1(executor) {
 
@@ -82,9 +82,9 @@ Promise$1.race = function race(iterable) {
     });
 };
 
-var p$1 = Promise$1.prototype;
+var p = Promise$1.prototype;
 
-p$1.resolve = function resolve(x) {
+p.resolve = function resolve(x) {
     var promise = this;
 
     if (promise.state === PENDING) {
@@ -125,7 +125,7 @@ p$1.resolve = function resolve(x) {
     }
 };
 
-p$1.reject = function reject(reason) {
+p.reject = function reject(reason) {
     var promise = this;
 
     if (promise.state === PENDING) {
@@ -139,7 +139,7 @@ p$1.reject = function reject(reason) {
     }
 };
 
-p$1.notify = function notify() {
+p.notify = function notify() {
     var promise = this;
 
     nextTick(function () {
@@ -173,7 +173,7 @@ p$1.notify = function notify() {
     });
 };
 
-p$1.then = function then(onResolved, onRejected) {
+p.then = function then(onResolved, onRejected) {
     var promise = this;
 
     return new Promise$1(function (resolve, reject) {
@@ -182,7 +182,7 @@ p$1.then = function then(onResolved, onRejected) {
     });
 };
 
-p$1.catch = function (onRejected) {
+p.catch = function (onRejected) {
     return this.then(undefined, onRejected);
 };
 
@@ -221,14 +221,14 @@ PromiseObj.race = function (iterable, context) {
     return new PromiseObj(Promise.race(iterable), context);
 };
 
-var p = PromiseObj.prototype;
+var p$1 = PromiseObj.prototype;
 
-p.bind = function (context) {
+p$1.bind = function (context) {
     this.context = context;
     return this;
 };
 
-p.then = function (fulfilled, rejected) {
+p$1.then = function (fulfilled, rejected) {
 
     if (fulfilled && fulfilled.bind && this.context) {
         fulfilled = fulfilled.bind(this.context);
@@ -241,7 +241,7 @@ p.then = function (fulfilled, rejected) {
     return new PromiseObj(this.promise.then(fulfilled, rejected), this.context);
 };
 
-p.catch = function (rejected) {
+p$1.catch = function (rejected) {
 
     if (rejected && rejected.bind && this.context) {
         rejected = rejected.bind(this.context);
@@ -250,15 +250,15 @@ p.catch = function (rejected) {
     return new PromiseObj(this.promise.catch(rejected), this.context);
 };
 
-p.finally = function (callback) {
+p$1.finally = function (callback) {
 
     return this.then(function (value) {
-            callback.call(this);
-            return value;
-        }, function (reason) {
-            callback.call(this);
-            return Promise.reject(reason);
-        }
+        callback.call(this);
+        return value;
+    }, function (reason) {
+        callback.call(this);
+        return Promise.reject(reason);
+    }
     );
 };
 
@@ -276,13 +276,13 @@ var ntick;
 
 var inBrowser = typeof window !== 'undefined';
 
-var Util = function (ref) {
+function Util (ref) {
     var config = ref.config;
     var nextTick = ref.nextTick;
 
     ntick = nextTick;
     debug = config.debug || !config.silent;
-};
+}
 
 function warn(msg) {
     if (typeof console !== 'undefined' && debug) {
@@ -455,7 +455,7 @@ function _merge(target, source, deep) {
  * Root Prefix Transform.
  */
 
-var root = function (options$$1, next) {
+function root (options$$1, next) {
 
     var url = next(options$$1);
 
@@ -464,13 +464,13 @@ var root = function (options$$1, next) {
     }
 
     return url;
-};
+}
 
 /**
  * Query Parameter Transform.
  */
 
-var query = function (options$$1, next) {
+function query (options$$1, next) {
 
     var urlParams = Object.keys(Url.options.params), query = {}, url = next(options$$1);
 
@@ -487,7 +487,7 @@ var query = function (options$$1, next) {
     }
 
     return url;
-};
+}
 
 /**
  * URL Template v2.0.6 (https://github.com/bramstein/url-template)
@@ -511,7 +511,7 @@ function parse(template) {
     return {
         vars: variables,
         expand: function expand(context) {
-            return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function (_, expression, literal) {
+            return template.replace(/\{([^{}]+)\}|([^{}]+)/g, function (_, expression, literal) {
                 if (expression) {
 
                     var operator = null, values = [];
@@ -522,7 +522,7 @@ function parse(template) {
                     }
 
                     expression.split(/,/g).forEach(function (variable) {
-                        var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
+                        var tmp = /([^:*]*)(?::(\d+)|(\*))?/.exec(variable);
                         values.push.apply(values, getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
                         variables.push(tmp[1]);
                     });
@@ -644,7 +644,7 @@ function encodeReserved(str) {
  * URL Template (RFC 6570) Transform.
  */
 
-var template = function (options) {
+function template (options) {
 
     var variables = [], url = expand(options.url, options.params, variables);
 
@@ -653,7 +653,7 @@ var template = function (options) {
     });
 
     return url;
-};
+}
 
 /**
  * Service for URL templating.
@@ -790,23 +790,23 @@ function serialize(params, obj, scope) {
  * XDomain client (Internet Explorer).
  */
 
-var xdrClient = function (request) {
+function xdrClient (request) {
     return new PromiseObj(function (resolve) {
 
         var xdr = new XDomainRequest(), handler = function (ref) {
-            var type = ref.type;
+                var type = ref.type;
 
 
-            var status = 0;
+                var status = 0;
 
-            if (type === 'load') {
-                status = 200;
-            } else if (type === 'error') {
-                status = 500;
-            }
+                if (type === 'load') {
+                    status = 200;
+                } else if (type === 'error') {
+                    status = 500;
+                }
 
-            resolve(request.respondWith(xdr.responseText, {status: status}));
-        };
+                resolve(request.respondWith(xdr.responseText, {status: status}));
+            };
 
         request.abort = function () { return xdr.abort(); };
 
@@ -823,7 +823,7 @@ var xdrClient = function (request) {
         xdr.onprogress = function () {};
         xdr.send(request.getBody());
     });
-};
+}
 
 /**
  * CORS Interceptor.
@@ -831,7 +831,7 @@ var xdrClient = function (request) {
 
 var SUPPORTS_CORS = inBrowser && 'withCredentials' in new XMLHttpRequest();
 
-var cors = function (request, next) {
+function cors (request, next) {
 
     if (inBrowser) {
 
@@ -850,13 +850,13 @@ var cors = function (request, next) {
     }
 
     next();
-};
+}
 
 /**
  * Form data Interceptor.
  */
 
-var form = function (request, next) {
+function form (request, next) {
 
     if (isFormData(request.body)) {
 
@@ -869,13 +869,13 @@ var form = function (request, next) {
     }
 
     next();
-};
+}
 
 /**
  * JSON Interceptor.
  */
 
-var json = function (request, next) {
+function json (request, next) {
 
     var type = request.headers.get('Content-Type') || '';
 
@@ -906,20 +906,21 @@ var json = function (request, next) {
         }) : response;
 
     });
-};
+}
 
 function isJson(str) {
 
-    var start = str.match(/^\[|^\{(?!\{)/), end = {'[': /]$/, '{': /}$/};
+    var start = str.match(/^\s*(\[|\{)/);
+    var end = {'[': /]\s*$/, '{': /}\s*$/};
 
-    return start && end[start[0]].test(str);
+    return start && end[start[1]].test(str);
 }
 
 /**
  * JSONP client (Browser).
  */
 
-var jsonpClient = function (request) {
+function jsonpClient (request) {
     return new PromiseObj(function (resolve) {
 
         var name = request.jsonp || 'callback', callback = request.jsonpCallback || '_jsonp' + Math.random().toString(36).substr(2), body = null, handler, script;
@@ -967,39 +968,39 @@ var jsonpClient = function (request) {
 
         document.body.appendChild(script);
     });
-};
+}
 
 /**
  * JSONP Interceptor.
  */
 
-var jsonp = function (request, next) {
+function jsonp (request, next) {
 
     if (request.method == 'JSONP') {
         request.client = jsonpClient;
     }
 
     next();
-};
+}
 
 /**
  * Before Interceptor.
  */
 
-var before = function (request, next) {
+function before (request, next) {
 
     if (isFunction(request.before)) {
         request.before.call(this, request);
     }
 
     next();
-};
+}
 
 /**
  * HTTP method override Interceptor.
  */
 
-var method = function (request, next) {
+function method (request, next) {
 
     if (request.emulateHTTP && /^(PUT|PATCH|DELETE)$/i.test(request.method)) {
         request.headers.set('X-HTTP-Method-Override', request.method);
@@ -1007,13 +1008,13 @@ var method = function (request, next) {
     }
 
     next();
-};
+}
 
 /**
  * Header Interceptor.
  */
 
-var header = function (request, next) {
+function header (request, next) {
 
     var headers = assign({}, Http.headers.common,
         !request.crossOrigin ? Http.headers.custom : {},
@@ -1027,30 +1028,29 @@ var header = function (request, next) {
     });
 
     next();
-};
+}
 
 /**
  * XMLHttp client (Browser).
  */
 
-var xhrClient = function (request) {
+function xhrClient (request) {
     return new PromiseObj(function (resolve) {
 
         var xhr = new XMLHttpRequest(), handler = function (event) {
 
-            var response = request.respondWith(
+                var response = request.respondWith(
                 'response' in xhr ? xhr.response : xhr.responseText, {
                     status: xhr.status === 1223 ? 204 : xhr.status, // IE9 status bug
                     statusText: xhr.status === 1223 ? 'No Content' : trim(xhr.statusText)
-                }
-            );
+                });
 
-            each(trim(xhr.getAllResponseHeaders()).split('\n'), function (row) {
-                response.headers.append(row.slice(0, row.indexOf(':')), row.slice(row.indexOf(':') + 1));
-            });
+                each(trim(xhr.getAllResponseHeaders()).split('\n'), function (row) {
+                    response.headers.append(row.slice(0, row.indexOf(':')), row.slice(row.indexOf(':') + 1));
+                });
 
-            resolve(response);
-        };
+                resolve(response);
+            };
 
         request.abort = function () { return xhr.abort(); };
 
@@ -1090,13 +1090,13 @@ var xhrClient = function (request) {
         xhr.ontimeout = handler;
         xhr.send(request.getBody());
     });
-};
+}
 
 /**
  * Http client (Node).
  */
 
-var nodeClient = function (request) {
+function nodeClient (request) {
 
     var client = require('got');
 
@@ -1114,10 +1114,9 @@ var nodeClient = function (request) {
         client(url, {body: body, method: method, headers: headers}).then(handler = function (resp) {
 
             var response = request.respondWith(resp.body, {
-                    status: resp.statusCode,
-                    statusText: trim(resp.statusMessage)
-                }
-            );
+                status: resp.statusCode,
+                statusText: trim(resp.statusMessage)
+            });
 
             each(resp.headers, function (value, name) {
                 response.headers.set(name, value);
@@ -1127,13 +1126,13 @@ var nodeClient = function (request) {
 
         }, function (error$$1) { return handler(error$$1.response); });
     });
-};
+}
 
 /**
  * Base client.
  */
 
-var Client = function (context) {
+function Client (context) {
 
     var reqHandlers = [sendRequest], resHandlers = [], handler;
 
@@ -1188,7 +1187,7 @@ var Client = function (context) {
     };
 
     return Client;
-};
+}
 
 function sendRequest(request, resolve) {
 
@@ -1229,7 +1228,7 @@ Headers.prototype.set = function set (name, value) {
     this.map[normalizeName(getName(this.map, name) || name)] = [trim(value)];
 };
 
-Headers.prototype.append = function append (name, value){
+Headers.prototype.append = function append (name, value) {
 
     var list = this.map[getName(this.map, name)];
 
@@ -1240,11 +1239,11 @@ Headers.prototype.append = function append (name, value){
     }
 };
 
-Headers.prototype.delete = function delete$1 (name){
+Headers.prototype.delete = function delete$1 (name) {
     delete this.map[getName(this.map, name)];
 };
 
-Headers.prototype.deleteAll = function deleteAll (){
+Headers.prototype.deleteAll = function deleteAll () {
     this.map = {};
 };
 
@@ -1264,7 +1263,7 @@ function getName(map, name) {
 
 function normalizeName(name) {
 
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+    if (/[^a-z0-9\-#$%&'*+.^_`|~]/i.test(name)) {
         throw new TypeError('Invalid character in header field name');
     }
 
@@ -1362,11 +1361,11 @@ var Request = function Request(options$$1) {
     }
 };
 
-Request.prototype.getUrl = function getUrl (){
+Request.prototype.getUrl = function getUrl () {
     return Url(this);
 };
 
-Request.prototype.getBody = function getBody (){
+Request.prototype.getBody = function getBody () {
     return this.body;
 };
 
