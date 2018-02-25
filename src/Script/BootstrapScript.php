@@ -27,6 +27,13 @@ abstract class BootstrapScript extends AbstractPhoenixScript
     public static $currentVersion = 3;
 
     /**
+     * Property faVersion.
+     *
+     * @var  int
+     */
+    public static $faVersion = 4;
+
+    /**
      * css
      *
      * @param int $version
@@ -106,19 +113,31 @@ JS;
 
             $asset->addStyle(static::phoenixName() . '/css/bootstrap/awesome-checkbox.min.css');
 
-            $font    = $iconSet == static::GLYPHICONS ? 'Glyphicons Halflings' : 'FontAwesome';
-            $content = $iconSet == static::GLYPHICONS ? '\\e013' : '\\f00c';
+            $font = 'Glyphicons Halflings';
+            $content = '\\e013';
+            $weight = '"normal"';
+
+            if ($iconSet === static::FONTAWESOME) {
+                $content = '\\f00c';
+                $font = static::$faVersion === 4 ? 'FontAwesome' : 'Font Awesome 5 Free';
+                $weight = static::$faVersion === 4 ? $weight : 900;
+            }
 
             $css = <<<CSS
 /* Bootstrap Awesome Checkbox */
 .checkbox input[type=checkbox]:checked + label:after {
   font-family: '$font';
   content: "$content";
+  font-weight: $weight;
 }
 .checkbox label:after {
-  padding-left: 4px;
-  padding-top: 2px;
+  /*padding-left: 4px;*/
+  /*padding-top: 2px;*/
   font-size: 9px;
+  margin-top: .2em;
+}
+.checkbox label::before {
+  margin-top: .2em;
 }
 .checkbox input {
   cursor: pointer;
@@ -338,9 +357,13 @@ JS;
     public static function fontAwesome($version = 4)
     {
         if (!static::inited(__METHOD__)) {
+            static::$faVersion = (int) $version;
+
             if ($version === 5) {
                 static::addCSS(static::phoenixName() . '/css/fontawesome-all.min.css');
-                static::addJS(static::phoenixName() . '/js/fontawesome/fa-v4-shims.min.js');
+
+                // TODO: Make sure FA fix this then remove.
+                static::internalCSS(".fa.fab { font-family: 'Font Awesome 5 Brands'; }");
             } else {
                 static::addCSS(static::phoenixName() . '/css/font-awesome.min.css');
             }
