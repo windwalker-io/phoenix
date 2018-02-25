@@ -118,10 +118,6 @@ $assets = [
         'build/js/bootstrap-datetimepicker.js' => 'css/bootstrap/bootstrap-datetimepicker.js',
         'build/js/bootstrap-datetimepicker.min.js' => 'css/bootstrap/bootstrap-datetimepicker.min.js',
     ],
-    'core-js' => [
-        'client/core.js' => 'js/polyfill/core.js',
-        'client/core.min.js' => 'js/polyfill/core.min.js',
-    ],
 ];
 
 $app = new AssetInstaller(

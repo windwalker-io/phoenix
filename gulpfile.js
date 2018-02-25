@@ -15,7 +15,7 @@ var gulp = require("gulp"),//http://gulpjs.com/
   rename = require('gulp-rename'),//https://www.npmjs.org/package/gulp-rename
   sourcemaps = require('gulp-sourcemaps'),
   log = util.log,
-  filter = require('gulp-filter');;
+  filter = require('gulp-filter');
 
 const sassFiles = [
   'src/Resources/asset/css/**/*.scss',

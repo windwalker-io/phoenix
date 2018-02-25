@@ -4,7 +4,11 @@
     "description": "Phoenix is a RAD (Rapid Application Development) package for Windwalker, it provides a set of Model, View and Controllers\r with different functions to quickly build web admin system, and a code generator to help us create application scaffold.",
     "main": "index.js",
     "scripts": {
-        "postinstall": "php bin/asset-install.php %"
+        "postinstall": "php bin/asset-install.php %",
+        "build": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile fusionfile.js",
+        "watch": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile fusionfile.js --watch",
+        "watch:reload": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile fusionfile.js --watch --livereload",
+        "prod": "cross-env NODE_ENV=production node_modules/gulp/bin/gulp.js --gulpfile fusionfile.js"
     },
     "repository": {
         "type": "git",
@@ -51,5 +55,8 @@
         "vue-strap": "1.*",
         "vue2-animate": "1.*",
         "vuex": "2.*"
+    },
+    "devDependencies": {
+        "windwalker-fusion": "^0.1.8"
     }
 }
