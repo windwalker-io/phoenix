@@ -31,22 +31,23 @@
     @yield('script')
     {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
-<body class="package-{{ $package->name }} view-{{ strtolower($view->getName()) }} layout-{{ $view->getLayout() }}" style="padding-top: 50px">
+<body class="package-{{ $package->name }} view-{{ strtolower($view->getName()) }} layout-{{ $view->getLayout() }}" style="padding-top: 56px">
 @section('navbar')
-    <div class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar navbar-default navbar-fixed-top fixed-top navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <button type="button" class="navbar-toggle navbar-toggler" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
                 <a class="navbar-brand" href="{{ $uri->path }}">Windwalker</a>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     @section('nav')
-                        <li class="active"><a href="{{ $uri->path }}">Home</a></li>
+                        <li class="nav-item active"><a class="nav-link" href="{{ $uri->path }}">Home</a></li>
                     @show
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
