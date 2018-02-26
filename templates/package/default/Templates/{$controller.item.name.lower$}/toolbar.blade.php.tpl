@@ -14,8 +14,8 @@
  */
 ?>
 
-<div class="btn-group">
-    <button type="button" class="btn btn-success btn-sm phoenix-btn-save"
+<div class="btn-group phoenix-btn-save-dropdown">
+    <button type="button" class="btn btn-success btn-sm btn-wide phoenix-btn-save"
         onclick="Phoenix.post();">
         <span class="fa fa-save"></span>
         @translate('phoenix.toolbar.save')

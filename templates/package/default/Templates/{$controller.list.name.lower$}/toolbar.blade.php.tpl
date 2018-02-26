@@ -14,7 +14,7 @@
  */
 ?>
 
-<a role="button" class="btn btn-primary btn-sm phoenix-btn-new" href="{{ $router->route('{$controller.item.name.lower$}', ['new' => true]) }}">
+<a role="button" class="btn btn-primary btn-sm btn-wide phoenix-btn-new" href="{{ $router->route('{$controller.item.name.lower$}', ['new' => true]) }}">
     <span class="fa fa-plus"></span>
     @translate('phoenix.toolbar.new')
 </a>
@@ -24,15 +24,26 @@
     @translate('phoenix.toolbar.duplicate')
 </button>
 
-<button type="button" class="btn btn-success btn-sm phoenix-btn-publish" onclick="Phoenix.Grid.hasChecked().batch('publish');">
-    <span class="fa fa-check"></span>
-    @translate('phoenix.toolbar.publish')
-</button>
+<div class="dropdown btn-group phoenix-btn-state-dropdown">
+    <button class="btn btn-default btn-secondary btn-sm dropdown-toggle" type="button" id="state-dropdown-toggle"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        @translate('phoenix.toolbar.state.change')
+    </button>
 
-<button type="button" class="btn btn-danger btn-sm phoenix-btn-unpublish" onclick="Phoenix.Grid.hasChecked().batch('unpublish');">
-    <span class="fa fa-remove fa-times"></span>
-    @translate('phoenix.toolbar.unpublish')
-</button>
+    <ul class="dropdown-menu">
+       <li>
+           <a href="javascript://" class="dropdown-item phoenix-btn-publish" onclick="Phoenix.Grid.hasChecked().batch('publish');">
+               <span class="fa fa-check text-success"></span>
+               @translate('phoenix.toolbar.publish')
+           </a>
+
+           <a href="javascript://" class="dropdown-item phoenix-btn-unpublish" onclick="Phoenix.Grid.hasChecked().batch('unpublish');">
+               <span class="fa fa-remove fa-times text-danger"></span>
+               @translate('phoenix.toolbar.unpublish')
+           </a>
+       </li>
+    </ul>
+</div>
 
 <button type="button" class="btn btn-default btn-dark btn-sm phoenix-btn-batch" data-toggle="modal" data-target="#batch-modal" onclick="Phoenix.Grid.hasChecked(null, event);">
     <span class="fa fa-sliders fa-sliders-h"></span>

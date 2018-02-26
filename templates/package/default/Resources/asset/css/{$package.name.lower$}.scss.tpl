@@ -1,3 +1,5 @@
+// {$package.name.cap$} package CSS
+
 // This section is for default template, you can delete it if you use custom templates.
 // ------------------------------------------------------------------------------------
 
@@ -66,6 +68,10 @@ body {
   .toolbar-toggle-button,
   .admin-toolbar-buttons hr {
     display: none;
+  }
+
+  .btn-wide {
+    min-width: 175px;
   }
 }
 
@@ -237,11 +243,6 @@ body.sidebar-hide {
       height: 400px;
     }
   }
-}
-
-// Button
-.btn-group .btn {
-  margin-left: -1px;
 }
 
 // Chosen

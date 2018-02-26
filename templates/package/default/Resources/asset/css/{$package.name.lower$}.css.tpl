@@ -44,13 +44,16 @@ body {
   #admin-toolbar .toolbar-toggle-button,
   #admin-toolbar .admin-toolbar-buttons hr {
     display: none; }
+  #admin-toolbar .btn-wide {
+    min-width: 175px; }
 
 .admin-toolbar-fixed {
   position: fixed;
   width: 100%;
   top: 0;
   z-index: 100;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); }
+  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); }
 
 .main-sidebar ul.nav {
   margin-left: -15px;
@@ -72,7 +75,9 @@ body.sidebar-hide .main-sidebar {
 
 body.sidebar-hide .main-body {
   width: 100%;
-  flex: 0 0 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
   max-width: 100%; }
 
 #copyright {
@@ -95,7 +100,8 @@ body.sidebar-hide .main-body {
     display: block; }
   .admin-toolbar-fixed {
     position: relative;
-    box-shadow: none; }
+    -webkit-box-shadow: none;
+            box-shadow: none; }
   #batch-modal .modal-footer .btn {
     width: 100%;
     margin-bottom: 5px;
@@ -143,9 +149,6 @@ body.sidebar-hide .main-body {
   #phoenix-iframe-modal .modal-body iframe {
     height: 400px; } }
 
-.btn-group .btn {
-  margin-left: -1px; }
-
 .chosen-container {
   cursor: pointer;
   max-width: 100%; }
@@ -167,3 +170,5 @@ body.sidebar-hide .main-body {
   background-color: rgba(0, 0, 0, 0.8);
   font-size: 13px;
   min-width: 100px; }
+
+/*# sourceMappingURL={$package.name.lower$}.css.map */
