@@ -175,6 +175,11 @@ body.sidebar-hide {
   clear: both;
 }
 
+// Alert
+.alert p:last-child {
+  margin-bottom: 0;
+}
+
 // Grid
 .search-container {
   margin-bottom: 15px;

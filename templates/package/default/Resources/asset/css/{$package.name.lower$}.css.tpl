@@ -110,6 +110,9 @@ body.sidebar-hide .main-body {
 .clearfix {
   clear: both; }
 
+.alert p:last-child {
+  margin-bottom: 0; }
+
 .search-container {
   margin-bottom: 15px; }
 
