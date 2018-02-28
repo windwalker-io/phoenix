@@ -79,10 +79,13 @@ body.sidebar-hide .main-body {
   padding-bottom: 20px; }
 
 @media (max-width: 767px) {
-  #admin-toolbar button.btn, #admin-toolbar a.btn {
+  #admin-toolbar .btn,
+  #admin-toolbar .btn-group {
     display: block;
     width: 100%;
     margin-bottom: 5px; }
+  #admin-toolbar .dropdown-menu {
+    width: 100%; }
   #admin-toolbar .admin-toolbar-buttons {
     height: 0;
     overflow: hidden; }

@@ -125,12 +125,15 @@ body.sidebar-hide {
 // Mobile
 @media (max-width: 767px) {
   #admin-toolbar {
-    button, a {
-      &.btn {
-        display: block;
-        width: 100%;
-        margin-bottom: 5px;
-      }
+    .btn,
+    .btn-group {
+      display: block;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+
+    .dropdown-menu {
+      width: 100%;
     }
 
     .admin-toolbar-buttons {
