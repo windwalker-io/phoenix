@@ -62,6 +62,11 @@ body {
 }
 
 #admin-toolbar {
+  position: sticky;
+  width: 100%;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .1);
   background-color: #f6f6f6;
   padding: 7px 15px;
 
@@ -73,14 +78,6 @@ body {
   .btn-wide {
     min-width: 175px;
   }
-}
-
-.admin-toolbar-fixed {
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, .1);
 }
 
 // Sidebar
