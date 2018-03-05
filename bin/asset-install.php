@@ -120,6 +120,14 @@ $assets = [
     ],
 ];
 
+foreach ($assets as $module => $files)
+{
+    foreach ($files as $src => $dest)
+    {
+        echo "fusion.copy(`\${nodePath}/$module/$src`, `\${destPath}/$dest`);\n";
+    }
+}
+die;
 $app = new AssetInstaller(
     'phoenix',
     __DIR__ . '/../node_modules',

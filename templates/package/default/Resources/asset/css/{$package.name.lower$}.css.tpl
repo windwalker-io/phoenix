@@ -39,6 +39,11 @@ body {
   padding-right: 15px; }
 
 #admin-toolbar {
+  position: sticky;
+  width: 100%;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
   background-color: #f6f6f6;
   padding: 7px 15px; }
   #admin-toolbar .toolbar-toggle-button,
@@ -46,14 +51,6 @@ body {
     display: none; }
   #admin-toolbar .btn-wide {
     min-width: 175px; }
-
-.admin-toolbar-fixed {
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 100;
-  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); }
 
 .main-sidebar ul.nav {
   margin-left: -15px;
@@ -75,19 +72,20 @@ body.sidebar-hide .main-sidebar {
 
 body.sidebar-hide .main-body {
   width: 100%;
-  -webkit-box-flex: 0;
-      -ms-flex: 0 0 100%;
-          flex: 0 0 100%;
+  flex: 0 0 100%;
   max-width: 100%; }
 
 #copyright {
   padding-bottom: 20px; }
 
 @media (max-width: 767px) {
-  #admin-toolbar button.btn, #admin-toolbar a.btn {
+  #admin-toolbar .btn,
+  #admin-toolbar .btn-group {
     display: block;
     width: 100%;
     margin-bottom: 5px; }
+  #admin-toolbar .dropdown-menu {
+    width: 100%; }
   #admin-toolbar .admin-toolbar-buttons {
     height: 0;
     overflow: hidden; }
@@ -100,8 +98,7 @@ body.sidebar-hide .main-body {
     display: block; }
   .admin-toolbar-fixed {
     position: relative;
-    -webkit-box-shadow: none;
-            box-shadow: none; }
+    box-shadow: none; }
   #batch-modal .modal-footer .btn {
     width: 100%;
     margin-bottom: 5px;
@@ -173,5 +170,3 @@ body.sidebar-hide .main-body {
   background-color: rgba(0, 0, 0, 0.8);
   font-size: 13px;
   min-width: 100px; }
-
-/*# sourceMappingURL={$package.name.lower$}.css.map */
