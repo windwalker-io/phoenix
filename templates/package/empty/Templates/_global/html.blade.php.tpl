@@ -26,9 +26,7 @@
 
     {!! $asset->renderStyles(true) !!}
     @yield('style')
-
-    {!! $asset->renderScripts(true) !!}
-    @yield('script')
+    @stack('style')
     {!! \Phoenix\Html\HtmlHeader::renderCustomTags() !!}
 </head>
 <body class="package-{{ $package->name }} view-{{ strtolower($view->getName()) }} layout-{{ $view->getLayout() }}" style="padding-top: 56px">
@@ -82,5 +80,8 @@
     </div>
 @show
 {!! $asset->getTemplate()->renderTemplates() !!}
+{!! $asset->renderScripts(true) !!}
+@yield('script')
+@stack('script')
 </body>
 </html>
