@@ -23,7 +23,13 @@ var Phoenix;
      */
     showValidateResponse: function(validation, state, $input, help) {
       var $control = $input.parents('.form-group').first();
+      var $form = $input.parents('form');
       var self = this;
+
+      // Add class to form
+      if (!$form.hasClass('was-validated')) {
+        $form.addClass('was-validated');
+      }
 
       this.removeValidateResponse($control);
 
@@ -86,8 +92,7 @@ var Phoenix;
 
         if (tagName === 'div') {
           $input.append(helpElement);
-        }
-        else {
+        } else {
           $input.parent().append(helpElement);
         }
       }
@@ -165,8 +170,7 @@ var Phoenix;
         container.removeClass('shown');
 
         icon.removeClass(iconShowClass).addClass(iconHideClass);
-      }
-      else {
+      } else {
         button.removeClass(hideClass).addClass(showClass);
         container.show('fast');
         container.addClass('shown');
