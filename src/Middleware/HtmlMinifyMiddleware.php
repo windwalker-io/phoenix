@@ -8,6 +8,7 @@
 
 namespace Phoenix\Middleware;
 
+use Asika\Minifier\JsMinifier;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
@@ -36,21 +37,38 @@ class HtmlMinifyMiddleware extends AbstractWebMiddleware
         /** @var Response $response */
         $response = $next($request, $response);
 
-        if ($response instanceof HtmlResponse) {
+        if (strpos($response->getHeaderLine('content-type'), 'text/html') !== false) {
+            $body = $response->getBody()->__toString();
+            
+            // Minify JS first
+            $body = preg_replace_callback(
+                '/<script(.*?)>(.*?)<\/script>/is',
+                function ($matches) {
+                    if (!trim($matches[2])) {
+                        return $matches[0];
+                    }
+
+                    return sprintf('<script%s>%s</script>', $matches[1], JsMinifier::process($matches[2]));
+                },
+                $body
+            );
+
             // @link  http://stackoverflow.com/a/6225706
             $search = [
                 '/\>[^\S ]+/s', // strip whitespaces after tags, except space
                 '/[^\S ]+\</s', // strip whitespaces before tags, except space
-                '/(\s)+/s'      // shorten multiple whitespace sequences
+                '/(\s)+/s',     // shorten multiple whitespace sequences
+                '/<!--(.|\s)*?-->/' // Remove HTML comments
             ];
 
             $replace = [
                 '>',
                 '<',
                 '\\1',
+                ''
             ];
 
-            $html = preg_replace($search, $replace, $response->getBody()->__toString());
+            $html = preg_replace($search, $replace, $body);
 
             $response = $response->withBody(new Stream('php://memory', Stream::MODE_READ_WRITE_FROM_BEGIN));
             $response->getBody()->write($html);

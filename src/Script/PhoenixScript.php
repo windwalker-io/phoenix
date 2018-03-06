@@ -60,12 +60,11 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 
             $js = <<<JS
 // Phoenix Core
-jQuery(document).ready(function($)
-{
-	var core = $('$formSelector').phoenix($options);
+jQuery(function ($) {
+  var core = $('$formSelector').phoenix($options);
 
-	window.$variable = window.$variable || {};
-	window.$variable = $.extend(window.$variable, core);
+  window.$variable = window.$variable || {};
+  window.$variable = $.extend(window.$variable, core);
 });
 JS;
 
@@ -134,13 +133,12 @@ JS
 
             $js = <<<JS
 // Gird and filter bar
-jQuery(document).ready(function($)
-{
-	var form = $('$selector');
-	var grid = form.grid(form.phoenix(), $options);
+jQuery(function ($) {
+  var form = $('$selector');
+  var grid = form.grid(form.phoenix(), $options);
 
-	window.$variable = window.$variable || {};
-	window.$variable.Grid = window.$variable.Grid || grid;
+  window.$variable = window.$variable || {};
+  window.$variable.Grid = window.$variable.Grid || grid;
 });
 JS;
 
@@ -183,8 +181,7 @@ JS;
 
             $js = <<<JS
 // Chosen select
-jQuery(document).ready(function($)
-{
+jQuery(function($) {
 	var select = $('{$selector}').chosen($options);
 
 	// Readonly hack by http://jsfiddle.net/eirc/v2es7L8o/
@@ -269,8 +266,7 @@ JS;
 
             $js = <<<JS
 // Chosen select
-jQuery(document).ready(function($)
-{
+jQuery(function($) {
 	$('$selector').multiselect('$selector', $options);
 });
 JS;
@@ -312,8 +308,7 @@ JS;
 
             $js = <<<JS
 // Chosen select
-jQuery(document).ready(function($)
-{
+jQuery(function($) {
 	$('$selector').validation($options);
 });
 JS;
@@ -343,7 +338,7 @@ JS;
             }
 
             $js = <<<JS
-jQuery(document).ready(function($) {
+jQuery(function($) {
     Phoenix.keepAlive('$url', $time);
 });
 JS;
@@ -426,10 +421,11 @@ JS;
      *
      * @param string $name
      * @param mixed  $store
+     * @param bool   $merge
      *
      * @return  void
      */
-    public static function store($name, $store)
+    public static function store($name, $store, $merge = false)
     {
         if (!static::inited(__METHOD__)) {
             $js = <<<JS
@@ -441,6 +437,9 @@ window.Phoenix.Store = window.Phoenix.Store || {
     },
     set: function (name, value) {
         this[name] = value;
+    },
+    merge: function (name, value) {
+        this[name] = $.extend(true, {}, this[name] || {}, value);
     }
 };
 JS;
@@ -450,9 +449,15 @@ JS;
 
         $store = static::getJSObject($store);
 
-        $js = <<<JS
+        if (!$merge) {
+            $js = <<<JS
 Phoenix.Store.set('$name', $store);
 JS;
+        } else {
+            $js = <<<JS
+Phoenix.Store.merge('$name', $store);
+JS;
+        }
 
         static::internalJS($js);
     }
