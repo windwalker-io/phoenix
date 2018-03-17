@@ -41,6 +41,26 @@
 
       this.form = $form;
       this.options = options;
+
+      this.bindEvents();
+    }
+
+    bindEvents() {
+      if (this.form.data('toolbar')) {
+        $(this.form.data('toolbar')).find('*[data-action]').on('click', (e) => {
+          this.form.trigger('phoenix.submit', e.currentTarget);
+        });
+      }
+
+      this.form.on('phoenix.submit', (e, button) => {
+        const $button = $(button);
+        const action = $button.data('action');
+        const target = $button.data('target') || null;
+        const query = $button.data('query') || {};
+        query['task'] = $button.data('task') || null;
+
+        this[action](target, query);
+      });
     }
 
     /**

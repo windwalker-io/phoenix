@@ -57,6 +57,7 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 
             static::addJS(static::phoenixName() . '/js/phoenix.min.js');
 
+            static::data('windwalker.debug', WINDWALKER_DEBUG);
             static::data('phoenix.uri', Ioc::getUriData());
             static::data('phoenix.uri', [
                 'asset' => [
@@ -74,11 +75,8 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 
             $js = <<<JS
 // Phoenix Core
-if (!window.$variable) {
-  window.$variable = new PhoenixCore($options);
-}
-window.$variable.use([PhoenixHelper, PhoenixRouter, PhoenixTranslator]);
-
+var $variable = new PhoenixCore($options);
+$variable.use([PhoenixHelper, PhoenixRouter, PhoenixTranslator, PhoenixAjax, PhoenixCrypto]);
 $variable.Uri = window.$variable.data('phoenix.uri');
 JS;
 
@@ -111,10 +109,10 @@ JS;
             $ui = '';
 
             if ($options['theme'] === 'bootstrap') {
-                static::addJS(static::phoenixName() . '/js/phoenix/bootstrap.min.js');
+                static::addJS(static::phoenixName() . '/js/phoenix/ui-bootstrap.min.js');
                 $ui = 'PhoenixUIBootstrap3';
             } elseif ($options['theme'] === 'bootstrap4') {
-                static::addJS(static::phoenixName() . '/js/phoenix/bootstrap4.min.js');
+                static::addJS(static::phoenixName() . '/js/phoenix/ui-bootstrap4.min.js');
                 $ui = 'PhoenixUIBootstrap4';
             }
 
@@ -167,7 +165,7 @@ JS;
     public static function grid($selector = '#admin-form', $variable = 'Phoenix', $options = [])
     {
         if (!static::inited(__METHOD__)) {
-            static::core($selector);
+            static::core($selector, $variable);
 
             static::addJS(static::phoenixName() . '/js/phoenix/grid.js');
 
@@ -313,10 +311,11 @@ JS;
      *
      * @param string $selector
      * @param array  $options
+     * @param string $variable
      *
      * @return  void
      */
-    public static function formValidation($selector = '#admin-form', $options = [])
+    public static function formValidation($selector = '#admin-form', $options = [], $variable = 'Phoenix')
     {
         if (!static::inited(__METHOD__)) {
             static::core();
@@ -339,7 +338,8 @@ JS;
             static::translate('phoenix.message.validation.required');
             static::translate('phoenix.message.validation.failure');
 
-            static::domReady("$('$selector').validation($options);");
+            static::domReady('Phoenix.use(PhoenixValidation);');
+            static::domReady("$variable.validation('$selector', $options);");
         }
     }
 
@@ -370,19 +370,19 @@ JS;
     /**
      * crypto
      *
+     * @deprecated No longer needs this method, just call PhoenixScript::phoenix();
+     *
      * @return  void
      */
     public static function crypto()
     {
-        if (!static::inited(__METHOD__)) {
-            $asset = static::getAsset();
-
-            $asset->addScript(static::phoenixName() . '/js/phoenix/crypto.min.js');
-        }
+        //
     }
 
     /**
      * ajax
+     *
+     * @deprecated No longer needs this method, just call PhoenixScript::phoenix();
      *
      * @param bool $token
      *
@@ -390,14 +390,7 @@ JS;
      */
     public static function ajax($token = true)
     {
-        if (!static::inited(__METHOD__)) {
-            static::addJS(static::phoenixName() . '/js/phoenix/ajax.min.js');
-        }
-
-        if (!static::inited(__METHOD__, (bool) $token) && $token) {
-            $token = CsrfProtection::getFormToken();
-            static::internalJS("Phoenix.Ajax.headers._global['X-CSRF-Token'] = '{$token}'");
-        }
+        //
     }
 
     /**

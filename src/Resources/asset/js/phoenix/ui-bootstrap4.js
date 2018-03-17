@@ -4,6 +4,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * Part of Phoenix project.
  *
@@ -18,12 +22,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * Bootstrap Theme
    */
 
-  var PhoenixUIBootstrap3 = function () {
-    function PhoenixUIBootstrap3() {
-      _classCallCheck(this, PhoenixUIBootstrap3);
+  var PhoenixUIBootstrap4 = function (_PhoenixUI) {
+    _inherits(PhoenixUIBootstrap4, _PhoenixUI);
+
+    function PhoenixUIBootstrap4() {
+      _classCallCheck(this, PhoenixUIBootstrap4);
+
+      return _possibleConstructorReturn(this, (PhoenixUIBootstrap4.__proto__ || Object.getPrototypeOf(PhoenixUIBootstrap4)).apply(this, arguments));
     }
 
-    _createClass(PhoenixUIBootstrap3, [{
+    _createClass(PhoenixUIBootstrap4, [{
       key: 'showValidateResponse',
 
       /**
@@ -36,12 +44,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
       value: function showValidateResponse(validation, state, $input, help) {
         var $control = $input.parents('.form-group').first();
+        var $form = $input.parents('form');
         var self = this;
+
+        // Add class to form
+        if (!$form.hasClass('was-validated')) {
+          $form.addClass('was-validated');
+        }
 
         this.removeValidateResponse($control);
 
         if (state != validation.STATE_NONE) {
-          var icon, color;
+          var icon = void 0,
+              color = void 0;
 
           switch (state) {
             case validation.STATE_SUCCESS:
@@ -73,28 +88,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @param {jQuery} $control
        * @param {jQuery} $input
        * @param {string} icon
-       * @param {string} color
+       * @param {string} type
        * @param {string} help
        */
 
     }, {
       key: 'addValidateResponse',
-      value: function addValidateResponse($control, $input, icon, color, help) {
-        $control.addClass('has-' + color + ' has-feedback');
+      value: function addValidateResponse($control, $input, icon, type, help) {
+        var color = void 0;
 
-        var feedback = $('<span class="' + icon + ' form-control-feedback" aria-hidden="true"></span>');
-        $control.prepend(feedback);
+        color = type === 'success' ? 'valid' : 'invalid';
 
-        if ($control.attr('data-' + color + '-message')) {
-          help = $control.attr('data-' + color + '-message');
+        $input.addClass('is-' + color);
+
+        if ($control.attr('data-' + type + '-message')) {
+          help = $control.attr('data-' + type + '-message');
         }
 
-        if ($input.attr('data-' + color + '-message')) {
-          help = $input.attr('data-' + color + '-message');
+        if ($input.attr('data-' + type + '-message')) {
+          help = $input.attr('data-' + type + '-message');
         }
 
         if (help) {
-          var helpElement = $('<small class="help-block">' + help + '</small>');
+          var feedback = '<span class="' + icon + '" aria-hidden="true"></span>';
+          var helpElement = $('<small class="' + color + '-feedback form-control-feedback">' + feedback + ' ' + help + '</small>');
 
           var tagName = $input.prop('tagName').toLowerCase();
 
@@ -116,30 +133,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'removeValidateResponse',
       value: function removeValidateResponse($element) {
         $element.find('.form-control-feedback').remove();
-        $element.removeClass('has-error').removeClass('has-success').removeClass('has-warning').removeClass('has-feedback');
-
-        $element.find('.help-block').remove();
+        $element.find('input').removeClass('is-invalid').removeClass('is-valid');
       }
 
       /**
        * Render message.
        *
-       * @param {jQuery}       messageContainer
        * @param {string|Array} msg
        * @param {string}       type
        */
 
     }, {
       key: 'renderMessage',
-      value: function renderMessage(messageContainer, msg, type) {
+      value: function renderMessage(msg, type) {
         type = type || 'info';
 
-        var message = messageContainer.find('div.alert.alert-' + type),
-            i;
+        var message = this.messageContainer.find('div.alert.alert-' + type);
+        var i = void 0;
 
         if (!message.length) {
           message = $('<div class="alert alert-' + type + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close"></div>');
-          messageContainer.append(message);
+          this.messageContainer.append(message);
         }
 
         if (typeof msg === 'string') {
@@ -153,24 +167,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       /**
        * Remove all messages.
-       *
-       * @param {jQuery} messageContainer
        */
 
     }, {
       key: 'removeMessages',
-      value: function removeMessages(messageContainer) {
-        var messages = messageContainer.children();
-
-        messages.each(function () {
+      value: function removeMessages() {
+        this.messageContainer.children().each(function () {
           this.remove();
         });
       }
     }]);
 
-    return PhoenixUIBootstrap3;
-  }();
+    return PhoenixUIBootstrap4;
+  }(PhoenixUI);
 
-  window.PhoenixUIBootstrap3 = PhoenixUIBootstrap3;
+  window.PhoenixUIBootstrap4 = PhoenixUIBootstrap4;
 })(jQuery);
-//# sourceMappingURL=bootstrap.js.map
+//# sourceMappingURL=ui-bootstrap4.js.map

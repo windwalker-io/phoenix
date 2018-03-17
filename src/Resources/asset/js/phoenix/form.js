@@ -82,21 +82,44 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
       this.form = $form;
       this.options = options;
+
+      this.bindEvents();
     }
 
-    /**
-     * Make a request.
-     *
-     * @param  {string} url
-     * @param  {Object} queries
-     * @param  {string} method
-     * @param  {string} customMethod
-     *
-     * @returns {boolean}
-     */
-
-
     _createClass(PhoenixFormElement, [{
+      key: 'bindEvents',
+      value: function bindEvents() {
+        var _this2 = this;
+
+        if (this.form.data('toolbar')) {
+          $(this.form.data('toolbar')).find('*[data-action]').on('click', function (e) {
+            _this2.form.trigger('phoenix.submit', e.currentTarget);
+          });
+        }
+
+        this.form.on('phoenix.submit', function (e, button) {
+          var $button = $(button);
+          var action = $button.data('action');
+          var target = $button.data('target') || null;
+          var query = $button.data('query') || {};
+          query['task'] = $button.data('task') || null;
+
+          _this2[action](target, query);
+        });
+      }
+
+      /**
+       * Make a request.
+       *
+       * @param  {string} url
+       * @param  {Object} queries
+       * @param  {string} method
+       * @param  {string} customMethod
+       *
+       * @returns {boolean}
+       */
+
+    }, {
       key: 'submit',
       value: function submit(url, queries, method, customMethod) {
         var form = this.form;

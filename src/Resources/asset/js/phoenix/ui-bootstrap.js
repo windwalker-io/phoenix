@@ -22,16 +22,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
    * Bootstrap Theme
    */
 
-  var PhoenixUIBootstrap4 = function (_PhoenixUI) {
-    _inherits(PhoenixUIBootstrap4, _PhoenixUI);
+  var PhoenixUIBootstrap3 = function (_PhoenixUI) {
+    _inherits(PhoenixUIBootstrap3, _PhoenixUI);
 
-    function PhoenixUIBootstrap4() {
-      _classCallCheck(this, PhoenixUIBootstrap4);
+    function PhoenixUIBootstrap3() {
+      _classCallCheck(this, PhoenixUIBootstrap3);
 
-      return _possibleConstructorReturn(this, (PhoenixUIBootstrap4.__proto__ || Object.getPrototypeOf(PhoenixUIBootstrap4)).apply(this, arguments));
+      return _possibleConstructorReturn(this, (PhoenixUIBootstrap3.__proto__ || Object.getPrototypeOf(PhoenixUIBootstrap3)).apply(this, arguments));
     }
 
-    _createClass(PhoenixUIBootstrap4, [{
+    _createClass(PhoenixUIBootstrap3, [{
       key: 'showValidateResponse',
 
       /**
@@ -44,19 +44,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
       value: function showValidateResponse(validation, state, $input, help) {
         var $control = $input.parents('.form-group').first();
-        var $form = $input.parents('form');
         var self = this;
-
-        // Add class to form
-        if (!$form.hasClass('was-validated')) {
-          $form.addClass('was-validated');
-        }
 
         this.removeValidateResponse($control);
 
         if (state != validation.STATE_NONE) {
-          var icon = void 0,
-              color = void 0;
+          var icon, color;
 
           switch (state) {
             case validation.STATE_SUCCESS:
@@ -88,30 +81,28 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        * @param {jQuery} $control
        * @param {jQuery} $input
        * @param {string} icon
-       * @param {string} type
+       * @param {string} color
        * @param {string} help
        */
 
     }, {
       key: 'addValidateResponse',
-      value: function addValidateResponse($control, $input, icon, type, help) {
-        var color = void 0;
+      value: function addValidateResponse($control, $input, icon, color, help) {
+        $control.addClass('has-' + color + ' has-feedback');
 
-        color = type === 'success' ? 'valid' : 'invalid';
+        var feedback = $('<span class="' + icon + ' form-control-feedback" aria-hidden="true"></span>');
+        $control.prepend(feedback);
 
-        $input.addClass('is-' + color);
-
-        if ($control.attr('data-' + type + '-message')) {
-          help = $control.attr('data-' + type + '-message');
+        if ($control.attr('data-' + color + '-message')) {
+          help = $control.attr('data-' + color + '-message');
         }
 
-        if ($input.attr('data-' + type + '-message')) {
-          help = $input.attr('data-' + type + '-message');
+        if ($input.attr('data-' + color + '-message')) {
+          help = $input.attr('data-' + color + '-message');
         }
 
         if (help) {
-          var feedback = '<span class="' + icon + '" aria-hidden="true"></span>';
-          var helpElement = $('<small class="' + color + '-feedback form-control-feedback">' + feedback + ' ' + help + '</small>');
+          var helpElement = $('<small class="help-block">' + help + '</small>');
 
           var tagName = $input.prop('tagName').toLowerCase();
 
@@ -133,27 +124,30 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       key: 'removeValidateResponse',
       value: function removeValidateResponse($element) {
         $element.find('.form-control-feedback').remove();
-        $element.find('input').removeClass('is-invalid').removeClass('is-valid');
+        $element.removeClass('has-error').removeClass('has-success').removeClass('has-warning').removeClass('has-feedback');
+
+        $element.find('.help-block').remove();
       }
 
       /**
        * Render message.
        *
+       * @param {jQuery}       messageContainer
        * @param {string|Array} msg
        * @param {string}       type
        */
 
     }, {
       key: 'renderMessage',
-      value: function renderMessage(msg, type) {
+      value: function renderMessage(messageContainer, msg, type) {
         type = type || 'info';
 
-        var message = this.messageContainer.find('div.alert.alert-' + type);
-        var i = void 0;
+        var message = messageContainer.find('div.alert.alert-' + type),
+            i;
 
         if (!message.length) {
           message = $('<div class="alert alert-' + type + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close"></div>');
-          this.messageContainer.append(message);
+          messageContainer.append(message);
         }
 
         if (typeof msg === 'string') {
@@ -167,20 +161,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
       /**
        * Remove all messages.
+       *
+       * @param {jQuery} messageContainer
        */
 
     }, {
       key: 'removeMessages',
-      value: function removeMessages() {
-        this.messageContainer.children().each(function () {
+      value: function removeMessages(messageContainer) {
+        var messages = messageContainer.children();
+
+        messages.each(function () {
           this.remove();
         });
       }
     }]);
 
-    return PhoenixUIBootstrap4;
+    return PhoenixUIBootstrap3;
   }(PhoenixUI);
 
-  window.PhoenixUIBootstrap4 = PhoenixUIBootstrap4;
+  window.PhoenixUIBootstrap3 = PhoenixUIBootstrap3;
 })(jQuery);
-//# sourceMappingURL=bootstrap4.js.map
+//# sourceMappingURL=ui-bootstrap.js.map

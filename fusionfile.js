@@ -41,6 +41,8 @@ fusion.task('phoenix', function () {
     'src/Resources/src/helper.js',
     'src/Resources/src/ui.js',
     'src/Resources/src/router.js',
+    'src/Resources/src/ajax.js',
+    'src/Resources/src/crypto.js',
     'src/Resources/src/translator.js',
     'src/Resources/src/legacy.js',
   ], 'src/Resources/asset/js/phoenix.js');

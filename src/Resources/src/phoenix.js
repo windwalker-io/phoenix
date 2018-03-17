@@ -83,6 +83,10 @@
         r.push(listener(args));
       });
 
+      if (this.data('windwalker.debug')) {
+        console.debug(`[Phoenix Event] ${event}`, args);
+      }
+
       return r;
     }
 

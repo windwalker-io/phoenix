@@ -31,6 +31,14 @@
       super.ready();
 
       this.messageContainer = $(this.options.messageSelector);
+
+      this.phoenix.on('validation.response', event => {
+        this.showValidateResponse(event.validation, event.state, event.$input, event.help);
+      });
+
+      this.phoenix.on('validation.remove', event => {
+        this.removeValidateResponse(event.$element);
+      });
     }
 
     /**

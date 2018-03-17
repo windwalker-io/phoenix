@@ -20,11 +20,13 @@
       let gridInited = false;
 
       phoenix.on('jquery.plugin.created', event => {
+        const debug = this.phoenix.data('windwalker.debug');
+
         // Legacy Form polyfill
         if (!formInited && event.name === 'form') {
           ['delete', 'get', 'patch', 'post', 'put', 'sendDelete', 'submit'].forEach((method) => {
             phoenix[method] = (...args) => {
-              this.constructor.warn('Phoenix', method);
+              debug ? this.constructor.warn('Phoenix', method) : null;
               event.instance[method](...args);
             }
           });
@@ -38,7 +40,7 @@
             'toggleAll', 'countChecked', 'getChecked', 'hasChecked', 'reorderAll', 'reorder']
             .forEach((method) => {
               phoenix.Grid[method] = (...args) => {
-                this.constructor.warn('Phoenix.Grid', method);
+                debug ? this.constructor.warn('Phoenix.Grid', method) : null;
                 event.instance[method](...args);
               }
             });

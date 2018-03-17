@@ -11,7 +11,7 @@
   /**
    * Bootstrap Theme
    */
-  class PhoenixUIBootstrap3 {
+  class PhoenixUIBootstrap3 extends PhoenixUI  {
     /**
      * Show Validation response.
      *
