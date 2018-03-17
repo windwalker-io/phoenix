@@ -26,7 +26,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     _createClass(PhoenixUIBootstrap3, [{
       key: 'showValidateResponse',
 
-
       /**
        * Show Validation response.
        *
@@ -166,48 +165,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         messages.each(function () {
           this.remove();
         });
-      }
-
-      /**
-       * Toggle filter bar.
-       *
-       * @param {jQuery} container
-       * @param {jQuery} button
-       */
-
-    }, {
-      key: 'toggleFilter',
-      value: function toggleFilter(container, button) {
-        var showClass = button.attr('data-class-show') || 'btn-primary';
-        var hideClass = button.attr('data-class-hide') || 'btn-default';
-
-        var icon = button.find('span.filter-button-icon');
-        var iconShowClass = icon.attr('data-class-show') || 'fa fa-angle-up';
-        var iconHideClass = icon.attr('data-class-hide') || 'fa fa-angle-down';
-
-        if (container.hasClass('shown')) {
-          button.removeClass(showClass).addClass(hideClass);
-          container.hide('fast');
-          container.removeClass('shown');
-
-          icon.removeClass(iconShowClass).addClass(iconHideClass);
-        } else {
-          button.removeClass(hideClass).addClass(showClass);
-          container.show('fast');
-          container.addClass('shown');
-
-          icon.removeClass(iconHideClass).addClass(iconShowClass);
-        }
-      }
-    }], [{
-      key: 'is',
-      get: function get() {
-        return 'UI';
-      }
-    }, {
-      key: 'proxies',
-      get: function get() {
-        return {};
       }
     }]);
 

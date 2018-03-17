@@ -2,8 +2,6 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -24,8 +22,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
    * Bootstrap Theme
    */
 
-  var PhoenixUIBootstrap4 = function (_PhoenixPlugin) {
-    _inherits(PhoenixUIBootstrap4, _PhoenixPlugin);
+  var PhoenixUIBootstrap4 = function (_PhoenixUI) {
+    _inherits(PhoenixUIBootstrap4, _PhoenixUI);
 
     function PhoenixUIBootstrap4() {
       _classCallCheck(this, PhoenixUIBootstrap4);
@@ -34,12 +32,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }
 
     _createClass(PhoenixUIBootstrap4, [{
-      key: 'ready',
-      value: function ready() {
-        _get(PhoenixUIBootstrap4.prototype.__proto__ || Object.getPrototypeOf(PhoenixUIBootstrap4.prototype), 'ready', this).call(this);
-
-        this.messageContainer = $(this.options.messageSelector);
-      }
+      key: 'showValidateResponse',
 
       /**
        * Show Validation response.
@@ -49,9 +42,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        * @param {jQuery}            $input
        * @param {string}            help
        */
-
-    }, {
-      key: 'showValidateResponse',
       value: function showValidateResponse(validation, state, $input, help) {
         var $control = $input.parents('.form-group').first();
         var $form = $input.parents('form');
@@ -186,61 +176,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           this.remove();
         });
       }
-
-      /**
-       * Toggle filter bar.
-       *
-       * @param {jQuery} container
-       * @param {jQuery} button
-       */
-
-    }, {
-      key: 'toggleFilter',
-      value: function toggleFilter(container, button) {
-        var showClass = button.attr('data-class-show') || 'btn-primary';
-        var hideClass = button.attr('data-class-hide') || 'btn-default';
-
-        var icon = button.find('span.filter-button-icon');
-        var iconShowClass = icon.attr('data-class-show') || 'fa fa-angle-up';
-        var iconHideClass = icon.attr('data-class-hide') || 'fa fa-angle-down';
-
-        if (container.hasClass('shown')) {
-          button.removeClass(showClass).addClass(hideClass);
-          container.hide('fast');
-          container.removeClass('shown');
-
-          icon.removeClass(iconShowClass).addClass(iconHideClass);
-        } else {
-          button.removeClass(hideClass).addClass(showClass);
-          container.show('fast');
-          container.addClass('shown');
-
-          icon.removeClass(iconHideClass).addClass(iconShowClass);
-        }
-      }
-    }], [{
-      key: 'is',
-      get: function get() {
-        return 'UI';
-      }
-    }, {
-      key: 'defaultOptions',
-      get: function get() {
-        return {
-          messageSelector: '.message-wrap'
-        };
-      }
-    }, {
-      key: 'proxies',
-      get: function get() {
-        return {
-          renderMessage: 'renderMessage'
-        };
-      }
     }]);
 
     return PhoenixUIBootstrap4;
-  }(PhoenixPlugin);
+  }(PhoenixUI);
 
   window.PhoenixUIBootstrap4 = PhoenixUIBootstrap4;
 })(jQuery);

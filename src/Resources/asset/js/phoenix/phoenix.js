@@ -52,13 +52,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return this;
         }
 
-        if (!plugin instanceof PhoenixPlugin) {
-          throw new Error('Plugin must instance of : ' + PhoenixPlugin.name);
+        if (plugin.is === undefined) {
+          throw new Error('Plugin: ' + plugin.name + ' must instance of : ' + PhoenixPlugin.name);
         }
 
-        plugin.install(this);
+        var instance = plugin.install(this);
+        instance.boot(this);
 
-        this.trigger('plugin.installed', plugin);
+        this.trigger('plugin.installed', instance);
 
         return this;
       }
@@ -246,9 +247,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }], [{
       key: 'install',
       value: function install(phoenix) {
-        var self = new this(phoenix);
+        var self = new this();
 
         this.createProxies(phoenix, self);
+        return self;
       }
     }, {
       key: 'uninstall',
@@ -260,7 +262,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'is',
       get: function get() {
-        throw new Error('Please add "is" property to Phoenix Plugin: '.this.constructor.name);
+        throw new Error('Please add "is" property to Phoenix Plugin: ' + this.name);
       }
     }, {
       key: 'proxies',
@@ -274,31 +276,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
     }]);
 
-    function PhoenixPlugin(phoenix) {
-      var _this2 = this;
+    function PhoenixPlugin() {
+      //
 
       _classCallCheck(this, PhoenixPlugin);
-
-      this.phoenix = phoenix;
-
-      var name = this.constructor.is.toLowerCase();
-
-      // Merge to global options
-      this.phoenix.options[name] = $.extend(true, this.phoenix.options[name], this.constructor.defaultOptions, this.phoenix.options[name]);
-
-      // Created hook
-      this.created();
-
-      // DOM Ready hook
-      $(function () {
-        return _this2.ready();
-      });
-
-      // Phoenix onload hook
-      // todo: add loaded
     }
 
     _createClass(PhoenixPlugin, [{
+      key: 'boot',
+      value: function boot(phoenix) {
+        var _this2 = this;
+
+        this.phoenix = phoenix;
+
+        var name = this.constructor.is.toLowerCase();
+
+        // Merge to global options
+        this.phoenix.options[name] = $.extend(true, this.phoenix.options[name], this.constructor.defaultOptions, this.phoenix.options[name]);
+
+        // Created hook
+        this.created();
+
+        // DOM Ready hook
+        $(function () {
+          return _this2.ready();
+        });
+
+        // Phoenix onload hook
+        // todo: add loaded
+      }
+    }, {
       key: 'created',
       value: function created() {
         //
@@ -416,9 +423,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }], [{
       key: 'install',
       value: function install(phoenix) {
-        _get(PhoenixJQueryPlugin.__proto__ || Object.getPrototypeOf(PhoenixJQueryPlugin), 'install', this).call(this, phoenix);
+        var instance = _get(PhoenixJQueryPlugin.__proto__ || Object.getPrototypeOf(PhoenixJQueryPlugin), 'install', this).call(this, phoenix);
 
         phoenix.plugin(this.pluginName, this.pluginClass);
+
+        return instance;
       }
     }, {
       key: 'pluginName',
@@ -449,62 +458,59 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   var PhoenixLegacy = function (_PhoenixPlugin2) {
     _inherits(PhoenixLegacy, _PhoenixPlugin2);
 
-    _createClass(PhoenixLegacy, null, [{
-      key: 'install',
-      value: function install(phoenix) {
-        _get(PhoenixLegacy.__proto__ || Object.getPrototypeOf(PhoenixLegacy), 'install', this).call(this, phoenix);
-
-        phoenix.Theme = phoenix.UI;
-      }
-    }, {
-      key: 'is',
-      get: function get() {
-        return 'Legacy';
-      }
-    }]);
-
-    function PhoenixLegacy(phoenix) {
+    function PhoenixLegacy() {
       _classCallCheck(this, PhoenixLegacy);
 
-      var _this4 = _possibleConstructorReturn(this, (PhoenixLegacy.__proto__ || Object.getPrototypeOf(PhoenixLegacy)).call(this, phoenix));
-
-      var formInited = false;
-      var gridInited = false;
-
-      phoenix.on('jquery.plugin.created', function (event) {
-        // Legacy Form polyfill
-        if (!formInited && event.name === 'form') {
-          ['delete', 'get', 'patch', 'post', 'put', 'sendDelete', 'submit'].forEach(function (method) {
-            phoenix[method] = function () {
-              var _event$instance;
-
-              return (_event$instance = event.instance)[method].apply(_event$instance, arguments);
-            };
-          });
-
-          formInited = true;
-        }
-
-        // Legacy Grid polyfill
-        if (!gridInited && event.name === 'grid') {
-          ['toggleFilter', 'sort', 'checkRow', 'updateRow', 'doTask', 'batch', 'copyRow', 'deleteList', 'deleteRow', 'toggleAll', 'countChecked', 'getChecked', 'hasChecked', 'reorderAll', 'reorder'].forEach(function (method) {
-            phoenix.Grid[method] = function () {
-              var _event$instance2;
-
-              return (_event$instance2 = event.instance)[method].apply(_event$instance2, arguments);
-            };
-          });
-
-          gridInited = true;
-        }
-      });
-      return _this4;
+      return _possibleConstructorReturn(this, (PhoenixLegacy.__proto__ || Object.getPrototypeOf(PhoenixLegacy)).apply(this, arguments));
     }
 
     _createClass(PhoenixLegacy, [{
+      key: 'created',
+      value: function created() {
+        var phoenix = this.phoenix;
+
+        phoenix.Theme = phoenix.UI;
+
+        var formInited = false;
+        var gridInited = false;
+
+        phoenix.on('jquery.plugin.created', function (event) {
+          // Legacy Form polyfill
+          if (!formInited && event.name === 'form') {
+            ['delete', 'get', 'patch', 'post', 'put', 'sendDelete', 'submit'].forEach(function (method) {
+              phoenix[method] = function () {
+                var _event$instance;
+
+                return (_event$instance = event.instance)[method].apply(_event$instance, arguments);
+              };
+            });
+
+            formInited = true;
+          }
+
+          // Legacy Grid polyfill
+          if (!gridInited && event.name === 'grid') {
+            ['toggleFilter', 'sort', 'checkRow', 'updateRow', 'doTask', 'batch', 'copyRow', 'deleteList', 'deleteRow', 'toggleAll', 'countChecked', 'getChecked', 'hasChecked', 'reorderAll', 'reorder'].forEach(function (method) {
+              phoenix.Grid[method] = function () {
+                var _event$instance2;
+
+                return (_event$instance2 = event.instance)[method].apply(_event$instance2, arguments);
+              };
+            });
+
+            gridInited = true;
+          }
+        });
+      }
+    }, {
       key: 'ready',
       value: function ready() {
         _get(PhoenixLegacy.prototype.__proto__ || Object.getPrototypeOf(PhoenixLegacy.prototype), 'ready', this).call(this);
+      }
+    }], [{
+      key: 'is',
+      get: function get() {
+        return 'Legacy';
       }
     }]);
 

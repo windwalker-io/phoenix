@@ -39,6 +39,54 @@ abstract class PhoenixScript extends AbstractPhoenixScript
     public static $domReady = [];
 
     /**
+     * phoenix
+     *
+     * @param string $variable
+     * @param array  $options
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function phoenix($variable = 'Phoenix', array $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
+            CoreScript::csrfToken();
+            CoreScript::sprintf();
+
+            static::addJS(static::phoenixName() . '/js/phoenix.min.js');
+
+            static::data('phoenix.uri', Ioc::getUriData());
+            static::data('phoenix.uri', [
+                'asset' => [
+                    'path' => static::getAsset()->path,
+                    'root' => static::getAsset()->root,
+                    'version' => static::getAsset()->getVersion()
+                ]
+            ]);
+        }
+
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            $defaultOptions = [];
+
+            $options = static::getJSObject($defaultOptions, $options);
+
+            $js = <<<JS
+// Phoenix Core
+if (!window.$variable) {
+  window.$variable = new PhoenixCore($options);
+}
+window.$variable.use([PhoenixHelper, PhoenixRouter, PhoenixTranslator]);
+
+$variable.Uri = window.$variable.data('phoenix.uri');
+JS;
+
+            static::internalJS($js);
+        }
+    }
+
+    /**
      * core
      *
      * @param string $formSelector
@@ -50,13 +98,8 @@ abstract class PhoenixScript extends AbstractPhoenixScript
     public static function core($formSelector = '#admin-form', $variable = 'Phoenix', $options = [])
     {
         if (!static::inited(__METHOD__)) {
-            JQueryScript::core();
-            CoreScript::csrfToken();
-
-            static::addJS(static::phoenixName() . '/js/phoenix/phoenix.min.js');
+            static::phoenix($variable, $options);
             static::addJS(static::phoenixName() . '/js/phoenix/form.min.js');
-
-            static::data('phoenix.uri', Ioc::getUriData());
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
@@ -68,24 +111,16 @@ abstract class PhoenixScript extends AbstractPhoenixScript
             $ui = '';
 
             if ($options['theme'] === 'bootstrap') {
-                static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
+                static::addJS(static::phoenixName() . '/js/phoenix/bootstrap.min.js');
                 $ui = 'PhoenixUIBootstrap3';
             } elseif ($options['theme'] === 'bootstrap4') {
-                static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap4.js');
+                static::addJS(static::phoenixName() . '/js/phoenix/bootstrap4.min.js');
                 $ui = 'PhoenixUIBootstrap4';
             }
 
-            $options = static::getJSObject($defaultOptions, $options);
-
             $js = <<<JS
-// Phoenix Core
-if (!$variable) {
-  window.$variable = new PhoenixCore($options);
-}
 window.$variable.use([$ui, PhoenixForm, PhoenixLegacy]);
 window.$variable.form('$formSelector');
-
-$variable.Uri = jQuery.data(document, 'phoenix.uri');
 JS;
 
             static::domReady($js);
@@ -103,7 +138,7 @@ JS;
      */
     public static function addRoute($route, $url)
     {
-        static::router();
+        static::phoenix();
 
         static::data('phoenix.routes', [$route => (string) $url], true);
     }
@@ -111,13 +146,13 @@ JS;
     /**
      * router
      *
+     * @deprecated No longer needs this method, just call PhoenixScript::phoenix();
+     *
      * @return  void
      */
     public static function router()
     {
-        if (!static::inited(__METHOD__)) {
-            static::addJS(static::phoenixName() . '/js/phoenix/router.min.js');
-        }
+        //
     }
 
     /**
@@ -220,16 +255,13 @@ JS;
     /**
      * translator
      *
+     * @deprecated No longer needs this method, just call PhoenixScript::phoenix();
+     *
      * @return  void
      */
     public static function translator()
     {
-        if (!static::inited(__METHOD__)) {
-            CoreScript::sprintf();
-
-            $asset = static::getAsset();
-            $asset->addScript(static::phoenixName() . '/js/phoenix/translator.min.js');
-        }
+        //
     }
 
     /**
@@ -242,7 +274,7 @@ JS;
      */
     public static function translate($key)
     {
-        static::translator();
+        static::phoenix();
 
         $text = Translator::translate($key);
 

@@ -11,27 +11,7 @@
   /**
    * Bootstrap Theme
    */
-  class PhoenixUIBootstrap4 extends PhoenixPlugin {
-    static get is() { return 'UI'; }
-
-    static get defaultOptions() {
-      return {
-        messageSelector: '.message-wrap'
-      };
-    }
-
-    static get proxies() {
-      return {
-        renderMessage: 'renderMessage'
-      };
-    }
-
-    ready() {
-      super.ready();
-
-      this.messageContainer = $(this.options.messageSelector);
-    }
-
+  class PhoenixUIBootstrap4 extends PhoenixUI {
     /**
      * Show Validation response.
      *
@@ -162,35 +142,6 @@
       this.messageContainer.children().each(function() {
         this.remove();
       });
-    }
-
-    /**
-     * Toggle filter bar.
-     *
-     * @param {jQuery} container
-     * @param {jQuery} button
-     */
-    toggleFilter(container, button) {
-      const showClass = button.attr('data-class-show') || 'btn-primary';
-      const hideClass = button.attr('data-class-hide') || 'btn-default';
-
-      const icon = button.find('span.filter-button-icon');
-      const iconShowClass = icon.attr('data-class-show') || 'fa fa-angle-up';
-      const iconHideClass = icon.attr('data-class-hide') || 'fa fa-angle-down';
-
-      if (container.hasClass('shown')) {
-        button.removeClass(showClass).addClass(hideClass);
-        container.hide('fast');
-        container.removeClass('shown');
-
-        icon.removeClass(iconShowClass).addClass(iconHideClass);
-      } else {
-        button.removeClass(hideClass).addClass(showClass);
-        container.show('fast');
-        container.addClass('shown');
-
-        icon.removeClass(iconHideClass).addClass(iconShowClass);
-      }
     }
   }
 
