@@ -8,6 +8,7 @@
 
 namespace Phoenix;
 
+use Phoenix\Listener\JsCommandListener;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
 
@@ -32,5 +33,7 @@ class PhoenixPackage extends AbstractPackage
         parent::boot();
 
         Translator::loadFile('phoenix', 'ini', $this);
+
+        $this->getDispatcher()->addListener(new JsCommandListener());
     }
 }

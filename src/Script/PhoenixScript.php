@@ -13,6 +13,7 @@ use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
+use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -24,6 +25,19 @@ use Windwalker\Utilities\ArrayHelper;
  */
 abstract class PhoenixScript extends AbstractPhoenixScript
 {
+    /**
+     * Property store.
+     *
+     * @var  array
+     */
+    public static $data = [];
+    /**
+     * Property domReady.
+     *
+     * @var  array
+     */
+    public static $domReady = [];
+
     /**
      * core
      *
@@ -40,12 +54,13 @@ abstract class PhoenixScript extends AbstractPhoenixScript
             CoreScript::csrfToken();
 
             static::addJS(static::phoenixName() . '/js/phoenix/phoenix.js');
+
+            static::data('phoenix.uri', Ioc::getUriData());
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
             $defaultOptions = [
-                'theme' => BootstrapScript::$currentVersion === 3 ? 'bootstrap' : 'bootstrap4',
-                'uri' => get_object_vars(Ioc::getUriData()),
+                'theme' => BootstrapScript::$currentVersion === 3 ? 'bootstrap' : 'bootstrap4'
             ];
 
             $options = static::mergeOptions($defaultOptions, $options);
@@ -60,15 +75,15 @@ abstract class PhoenixScript extends AbstractPhoenixScript
 
             $js = <<<JS
 // Phoenix Core
-jQuery(function ($) {
-  var core = $('$formSelector').phoenix($options);
+var core = $('$formSelector').phoenix($options);
 
-  window.$variable = window.$variable || {};
-  window.$variable = $.extend(window.$variable, core);
-});
+window.$variable = window.$variable || {};
+window.$variable = $.extend(window.$variable, core);
+
+$variable.Uri = jQuery.data(document, 'phoenix.uri');
 JS;
 
-            static::internalJS($js);
+            static::domReady($js);
         }
     }
 
@@ -79,12 +94,13 @@ JS;
      * @param   string $url
      *
      * @return  void
+     * @throws \InvalidArgumentException
      */
     public static function addRoute($route, $url)
     {
         static::router();
 
-        static::internalJS("Phoenix.Router.add('$route', '$url')");
+        static::data('phoenix.routes', [$route => (string) $url], true);
     }
 
     /**
@@ -96,13 +112,6 @@ JS;
     {
         if (!static::inited(__METHOD__)) {
             static::addJS(static::phoenixName() . '/js/phoenix/router.min.js');
-
-            $uri = static::getJSObject((array) Ioc::get('uri'));
-
-            static::internalJS(<<<JS
-Phoenix.Uri = $uri;
-JS
-            );
         }
     }
 
@@ -133,16 +142,14 @@ JS
 
             $js = <<<JS
 // Gird and filter bar
-jQuery(function ($) {
-  var form = $('$selector');
-  var grid = form.grid(form.phoenix(), $options);
+var form = $('$selector');
+var grid = form.grid(form.phoenix(), $options);
 
-  window.$variable = window.$variable || {};
-  window.$variable.Grid = window.$variable.Grid || grid;
-});
+window.$variable = window.$variable || {};
+window.$variable.Grid = window.$variable.Grid || grid;
 JS;
 
-            static::internalJS($js);
+            static::domReady($js);
         }
     }
 
@@ -181,7 +188,8 @@ JS;
 
             $js = <<<JS
 // Chosen select
-jQuery(function($) {
+(function($) {
+    // Chosen for $selector
 	var select = $('{$selector}').chosen($options);
 
 	// Readonly hack by http://jsfiddle.net/eirc/v2es7L8o/
@@ -201,10 +209,10 @@ jQuery(function($) {
 	});
 
 	select.trigger('chosen:updated');
-});
+})(jQuery);
 JS;
 
-            static::internalJS($js);
+            static::domReady($js);
         }
     }
 
@@ -229,12 +237,11 @@ JS;
      * @param   string $key
      *
      * @return  void
+     * @throws \InvalidArgumentException
      */
     public static function translate($key)
     {
         static::translator();
-
-        $asset = static::getAsset();
 
         $text = Translator::translate($key);
 
@@ -242,9 +249,9 @@ JS;
         $language = Translator::getInstance();
         $handler  = $language->getNormalizeHandler();
 
-        $key = call_user_func($handler, $key);
+        $key = $handler($key);
 
-        $asset->internalScript("Phoenix.Translator.addKey('{$key}', '$text')");
+        static::data('phoenix.languages', [$key => $text], true);
     }
 
     /**
@@ -264,14 +271,7 @@ JS;
         if (!static::inited(__METHOD__, get_defined_vars())) {
             $options = static::getJSObject($options);
 
-            $js = <<<JS
-// Chosen select
-jQuery(function($) {
-	$('$selector').multiselect('$selector', $options);
-});
-JS;
-
-            static::internalJS($js);
+            static::domReady("$('$selector').multiselect('$selector', $options);");
         }
     }
 
@@ -306,22 +306,15 @@ JS;
             static::translate('phoenix.message.validation.required');
             static::translate('phoenix.message.validation.failure');
 
-            $js = <<<JS
-// Chosen select
-jQuery(function($) {
-	$('$selector').validation($options);
-});
-JS;
-
-            static::internalJS($js);
+            static::domReady("$('$selector').validation($options);");
         }
     }
 
     /**
      * keepAlive
      *
-     * @param string  $url
-     * @param integer $time
+     * @param string        $url
+     * @param integer|float $time
      *
      * @return  void
      */
@@ -334,16 +327,10 @@ JS;
                 $config = Ioc::getConfig();
                 $time   = $config->get('session.life_time', 3);
 
-                $time = $time * 60000;
+                $time *= 60000;
             }
 
-            $js = <<<JS
-jQuery(function($) {
-    Phoenix.keepAlive('$url', $time);
-});
-JS;
-
-            static::getAsset()->internalScript($js);
+            static::domReady("Phoenix.keepAlive('$url', $time);");
         }
     }
 
@@ -406,13 +393,7 @@ JS;
 
             $options = static::getJSObject($options);
 
-            $js = <<<JS
-jQuery(function ($) {
-    $('$selector').listDependent('$dependentSelector', $options);
-});
-JS;
-
-            static::internalJS($js);
+            static::domReady("$('$selector').listDependent('$dependentSelector', $options);");
         }
     }
 
@@ -424,6 +405,8 @@ JS;
      * @param bool   $merge
      *
      * @return  void
+     *
+     * @deprecated Use data() instead.
      */
     public static function store($name, $store, $merge = false)
     {
@@ -460,5 +443,45 @@ JS;
         }
 
         static::internalJS($js);
+    }
+
+    /**
+     * data
+     *
+     * @param string $name
+     * @param mixed  $store
+     * @param bool   $merge
+     *
+     * @return  void
+     * @throws \InvalidArgumentException
+     */
+    public static function data($name, $store, $merge = false)
+    {
+        if ($merge) {
+            static::$data = Arr::mergeRecursive(static::$data, [$name => $store]);
+        } else {
+            static::$data[$name] = $store;
+        }
+    }
+
+    /**
+     * domReady
+     *
+     * @param string $code
+     * @param string $name
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function domReady($code, $name = null)
+    {
+        static $uid = 0;
+
+        if ($name === null) {
+            $name = (string) $uid++;
+        }
+
+        static::$domReady[$name] = $code;
     }
 }

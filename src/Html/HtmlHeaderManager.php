@@ -9,6 +9,7 @@
 namespace Phoenix\Html;
 
 use Windwalker\Dom\HtmlElement;
+use Windwalker\Utilities\Arr;
 
 /**
  * The HtmlHeaderManager class.
@@ -235,11 +236,13 @@ class HtmlHeaderManager
     /**
      * renderTitle
      *
+     * @param string $separator
+     *
      * @return  string
      */
-    public function renderTitle()
+    public function renderTitle($separator = '|')
     {
-        return (string) new HtmlElement('title', $this->getTitle());
+        return (string) new HtmlElement('title', $this->getPageTitle($separator));
     }
 
     /**
