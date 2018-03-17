@@ -53,7 +53,8 @@ abstract class PhoenixScript extends AbstractPhoenixScript
             JQueryScript::core();
             CoreScript::csrfToken();
 
-            static::addJS(static::phoenixName() . '/js/phoenix/phoenix.js');
+            static::addJS(static::phoenixName() . '/js/phoenix/phoenix.min.js');
+            static::addJS(static::phoenixName() . '/js/phoenix/form.min.js');
 
             static::data('phoenix.uri', Ioc::getUriData());
         }
@@ -64,21 +65,25 @@ abstract class PhoenixScript extends AbstractPhoenixScript
             ];
 
             $options = static::mergeOptions($defaultOptions, $options);
+            $ui = '';
 
             if ($options['theme'] === 'bootstrap') {
                 static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap.js');
+                $ui = 'PhoenixUIBootstrap3';
             } elseif ($options['theme'] === 'bootstrap4') {
                 static::addJS(static::phoenixName() . '/js/phoenix/theme/bootstrap4.js');
+                $ui = 'PhoenixUIBootstrap4';
             }
 
             $options = static::getJSObject($defaultOptions, $options);
 
             $js = <<<JS
 // Phoenix Core
-var core = $('$formSelector').phoenix($options);
-
-window.$variable = window.$variable || {};
-window.$variable = $.extend(window.$variable, core);
+if (!$variable) {
+  window.$variable = new PhoenixCore($options);
+}
+window.$variable.use([$ui, PhoenixForm, PhoenixLegacy]);
+window.$variable.form('$formSelector');
 
 $variable.Uri = jQuery.data(document, 'phoenix.uri');
 JS;
@@ -141,12 +146,8 @@ JS;
             $options = static::getJSObject($options);
 
             $js = <<<JS
-// Gird and filter bar
-var form = $('$selector');
-var grid = form.grid(form.phoenix(), $options);
-
-window.$variable = window.$variable || {};
-window.$variable.Grid = window.$variable.Grid || grid;
+$variable.use(PhoenixGrid);
+$variable.grid('$selector', $options);
 JS;
 
             static::domReady($js);

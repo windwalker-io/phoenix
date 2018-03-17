@@ -26,6 +26,19 @@ fusion.task('js', function () {
   // Compile end
 });
 
+// The task `phoenix`
+fusion.task('phoenix', function () {
+  // Watch start
+  fusion.watch([
+    './src/Resources/asset/src/**/*.js'
+  ]);
+  // Watch end
+
+  // Compile Start
+  fusion.babel('src/Resources/asset/src/**/*.js', 'src/Resources/asset/js/phoenix/');
+  // Compile end
+});
+
 // The task `scss`
 fusion.task('scss', function () {
   // Watch start
