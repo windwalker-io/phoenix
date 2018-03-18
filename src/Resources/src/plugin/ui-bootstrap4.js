@@ -12,6 +12,13 @@
    * Bootstrap Theme
    */
   class PhoenixUIBootstrap4 extends PhoenixUI {
+    static get defaultOptions() {
+      return {
+        messageSelector: '.message-wrap',
+        feedbackContainer: 'tooltip'
+      };
+    }
+
     /**
      * Show Validation response.
      *
@@ -48,7 +55,7 @@
 
           case validation.STATE_FAIL:
             color = 'warning';
-            icon = 'fa fa-warning';
+            icon = 'fa fa-warning fa-exclamation-triangle';
             break;
         }
 
@@ -73,19 +80,23 @@
 
       color = type === 'success' ? 'valid' : 'invalid';
 
-      $input.addClass('is-' + color);
+      $control.addClass(`has-${color}`);
+      $control.find('.form-control')
+        .addClass(`is-${color}`);
+      $control.find('.form-check-input')
+        .addClass(`is-${color}`);
 
-      if ($control.attr('data-' + type + '-message')) {
-        help = $control.attr('data-' + type + '-message');
+      if ($control.attr(`data-${type}-message`)) {
+        help = $control.attr(`data-${type}-message`);
       }
 
-      if ($input.attr('data-' + type + '-message')) {
-        help = $input.attr('data-' + type + '-message');
+      if ($input.attr(`data-${type}-message`)) {
+        help = $input.attr(`data-${type}-message`);
       }
 
       if (help) {
-        const feedback = '<span class="' + icon + '" aria-hidden="true"></span>';
-        const helpElement = $('<small class="' + color + '-feedback form-control-feedback">' + feedback + ' ' + help + '</small>');
+        const feedback = `<span class="${icon}" aria-hidden="true"></span>`;
+        const helpElement = $(`<small class="${color}-${this.options.feedbackContainer} form-control-${this.options.feedbackContainer}">${feedback} ${help}</small>`);
 
         const tagName = $input.prop('tagName').toLowerCase();
 
@@ -103,8 +114,11 @@
      * @param {jQuery} $element
      */
     removeValidateResponse($element) {
-      $element.find('.form-control-feedback').remove();
-      $element.find('input')
+      $element.find(`.form-control-${this.options.feedbackContainer}`).remove();
+      $element
+        .removeClass('has-invalid')
+        .removeClass('has-valid');
+      $element.find('.form-control')
         .removeClass('is-invalid')
         .removeClass('is-valid');
     }
@@ -133,15 +147,6 @@
       for (i in msg) {
         message.append('<p>' + msg[i] + '</p>');
       }
-    }
-
-    /**
-     * Remove all messages.
-     */
-    removeMessages() {
-      this.messageContainer.children().each(function() {
-        this.remove();
-      });
     }
   }
 

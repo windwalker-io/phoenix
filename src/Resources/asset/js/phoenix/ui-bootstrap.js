@@ -49,7 +49,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         this.removeValidateResponse($control);
 
         if (state != validation.STATE_NONE) {
-          var icon, color;
+          var icon = void 0,
+              color = void 0;
 
           switch (state) {
             case validation.STATE_SUCCESS:
@@ -64,7 +65,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             case validation.STATE_FAIL:
               color = 'warning';
-              icon = 'fa fa-warning';
+              icon = 'fa fa-warning fa-exclamation-triangle';
               break;
           }
 
@@ -132,22 +133,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       /**
        * Render message.
        *
-       * @param {jQuery}       messageContainer
        * @param {string|Array} msg
        * @param {string}       type
        */
 
     }, {
       key: 'renderMessage',
-      value: function renderMessage(messageContainer, msg, type) {
+      value: function renderMessage(msg, type) {
         type = type || 'info';
 
-        var message = messageContainer.find('div.alert.alert-' + type),
-            i;
+        var message = this.messageContainer.find('div.alert.alert-' + type);
+        var i = void 0;
 
         if (!message.length) {
           message = $('<div class="alert alert-' + type + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close"></div>');
-          messageContainer.append(message);
+          this.messageContainer.append(message);
         }
 
         if (typeof msg === 'string') {
@@ -157,22 +157,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         for (i in msg) {
           message.append('<p>' + msg[i] + '</p>');
         }
-      }
-
-      /**
-       * Remove all messages.
-       *
-       * @param {jQuery} messageContainer
-       */
-
-    }, {
-      key: 'removeMessages',
-      value: function removeMessages(messageContainer) {
-        var messages = messageContainer.children();
-
-        messages.each(function () {
-          this.remove();
-        });
       }
     }]);
 

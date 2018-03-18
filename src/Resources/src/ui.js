@@ -89,7 +89,9 @@
      * Remove all messages.
      */
     removeMessages() {
-      throw new Error('Please implement this method.');
+      this.messageContainer.children().each(function() {
+        this.remove();
+      });
     }
 
     /**

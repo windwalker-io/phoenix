@@ -19,7 +19,6 @@
     right: 0;
     bottom: 0;
     -webkit-transition: .4s;
-    -o-transition: .4s;
     transition: .4s; }
   .phoenix-switch .switch-slider.bg-default {
     background-color: #ccc; }
@@ -32,7 +31,6 @@
     bottom: 4px;
     background-color: white;
     -webkit-transition: .4s;
-    -o-transition: .4s;
     transition: .4s; }
   .phoenix-switch input:checked + .switch-slider:before {
     -webkit-transform: translateX(26px);
@@ -56,4 +54,5 @@
   .phoenix-switch .switch-slider.slider-circle:before {
     border-radius: 50%; }
 
-/*# sourceMappingURL=switch.css.map */
+.has-invalid .phoenix-switch .switch-slider {
+  border: 1px solid #dc3545; }

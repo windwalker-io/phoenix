@@ -908,7 +908,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'removeMessages',
       value: function removeMessages() {
-        throw new Error('Please implement this method.');
+        this.messageContainer.children().each(function () {
+          this.remove();
+        });
       }
 
       /**

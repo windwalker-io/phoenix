@@ -164,7 +164,7 @@ class InputRenderer implements FormRendererInterface
     public static function renderCheckboxes(AbstractField $field, array $attribs = [])
     {
         $attribs          = Arr::def($attribs, 'class', '');
-        $attribs['class'] .= ' checkbox-container input-list-container';
+        $attribs['class'] .= ' checkbox-container input-list-container form-check';
 
         return WidgetHelper::render(static::getTemplatePrefix() . 'field.checkboxes', [
             'attribs' => $attribs,
@@ -184,6 +184,9 @@ class InputRenderer implements FormRendererInterface
     {
 //		$attribs = Arr::def($attribs, 'class', '');
 //		$attribs['class'] .= ' checkbox-container input-list-container';
+
+        $attribs          = Arr::def($attribs, 'class', '');
+        $attribs['class'] .= ' form-control';
 
         return WidgetHelper::render(static::getTemplatePrefix() . 'field.switch', [
             'attribs' => $attribs,
