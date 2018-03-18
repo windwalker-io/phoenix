@@ -205,16 +205,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           return true;
         }
 
-        // Single Radio & Checkbox
-        if (($input.attr('type') === 'radio' || $input.attr('type') === 'checkbox') && !$input.is(':checked')) {
-          this.showResponse(this.STATE_EMPTY, $input);
-          return false;
-        }
-
-        // Input List (Radios & Checkboxes)
         if ($input.attr('required') || $input.hasClass('required')) {
-          // Handle radio & checkboxes
-          if ($input.prop("tagName").toLowerCase() === 'div' && $input.hasClass('input-list-container')) {
+          // Single Radio & Checkbox
+          if (($input.attr('type') === 'radio' || $input.attr('type') === 'checkbox') && !$input.is(':checked')) {
+            this.showResponse(this.STATE_EMPTY, $input);
+            return false;
+          } else if ($input.prop("tagName").toLowerCase() === 'div' && $input.hasClass('input-list-container')) {
+            // Input List (Radios & Checkboxes)
             if (!$input.find('input:checked').length) {
               // Set as :invalid
               $input.find('input').each(function () {
