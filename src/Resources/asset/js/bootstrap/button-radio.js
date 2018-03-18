@@ -15,7 +15,7 @@
     buttonClass: 'btn',
     activeClass: 'active',
     color: {
-      'default': 'btn-default',
+      'default': 'btn-default btn-outline-secondary',
       green: 'btn-success',
       red: 'btn-danger',
       blue: 'btn-primary'
@@ -25,7 +25,7 @@
   /**
    * Button Radio
    *
-   * @param {HtmlElement} element
+   * @param {HTMLElement} element
    * @param {Object}      options
    *
    * @constructor
@@ -39,39 +39,6 @@
 
     options = this.options;
 
-    $radios.addClass(options.buttonClass)
-      .addClass(options.color['default']);
-
-    $radios.click(function () {
-      var btn = $(this);
-      var group = btn.parent().find('.' + options.buttonClass);
-      var input = btn.find('input[type=radio]');
-
-      if (input.prop('disabled') || input.prop('readonly')) {
-        return;
-      }
-
-      if (!input.prop('checked')) {
-        group.removeClass(options.activeClass)
-          .removeClass(options.color.green)
-          .removeClass(options.color.red)
-          .removeClass(options.color.blue);
-
-        if (input.val() == '') {
-          btn.addClass(options.activeClass).addClass(options.color.blue);
-        }
-        else if (input.val() == 0) {
-          btn.addClass(options.activeClass).addClass(options.color.red);
-        }
-        else {
-          btn.addClass(options.activeClass).addClass(options.color.green);
-        }
-
-        input.prop('checked', true);
-        input.trigger('change');
-      }
-    });
-
     $radios.each(function () {
       var $radio = $(this);
       var $input = $radio.find('input');
@@ -83,18 +50,6 @@
       $radio.prepend($text);
       $radio.removeClass('radio');
 
-      if ($input.prop('checked')) {
-        if ($input.val() == '') {
-          $radio.addClass(options.activeClass).addClass(options.color.blue);
-        }
-        else if ($input.val() == 0) {
-          $radio.addClass(options.activeClass).addClass(options.color.red);
-        }
-        else {
-          $radio.addClass(options.activeClass).addClass(options.color.green);
-        }
-      }
-
       if ($input.prop('disabled')) {
         $radio.addClass('disabled');
       }
@@ -103,6 +58,41 @@
         $radio.addClass('readonly');
       }
     });
+
+    $radios.addClass(options.buttonClass)
+      .addClass(options.color['default']);
+
+    $radios.on('click', function () {
+      var btn = $(this);
+      var group = btn.parent().find('.' + options.buttonClass);
+      var input = btn.find('input[type=radio]');
+
+      if (input.prop('disabled') || input.prop('readonly')) {
+        return;
+      }
+
+      if (!input.prop('checked')) {
+        group
+          .addClass(options.color.default)
+          .removeClass(options.activeClass)
+          .removeClass(options.color.green)
+          .removeClass(options.color.red)
+          .removeClass(options.color.blue);
+
+        if (input.val() === '') {
+          btn.addClass(options.activeClass).addClass(options.color.blue).removeClass(options.color.default);
+        } else if (input.val() === '0') {
+          btn.addClass(options.activeClass).addClass(options.color.red).removeClass(options.color.default);
+        } else {
+          btn.addClass(options.activeClass).addClass(options.color.green).removeClass(options.color.default);
+        }
+
+        input.prop('checked', true);
+        input.trigger('change');
+      }
+    }).trigger('click');
+
+    $radios.parent().trigger('button-radio.loaded');
 
     // TODO: Must rewrite to fix for strict mode: Octal literals are not allowed in strict mode.
     // add color classes to chosen field based on value

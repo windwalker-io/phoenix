@@ -10,17 +10,13 @@ const fusion = require('windwalker-fusion');
 // The task `js`
 fusion.task('js', function () {
   // Watch start
-  //fusion.watch([['./src/Resources/asset/js/phoenix/**/*.js'], '!./**/*.min.js']);
   fusion.watch([
-    './src/Resources/asset/js/phoenix/**/*.js',
-    '!./**/*.min.js',
     'src/Resources/asset/js/bootstrap/tab-state.js',
     'src/Resources/asset/js/bootstrap/button-radio.js',
   ]);
   // Watch end
 
   // Compile Start
-  fusion.js('src/Resources/asset/js/phoenix/**/*.js');
   fusion.js('src/Resources/asset/js/bootstrap/tab-state.js');
   fusion.js('src/Resources/asset/js/bootstrap/button-radio.js');
   // Compile end
