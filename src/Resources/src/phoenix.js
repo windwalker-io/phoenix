@@ -62,6 +62,11 @@
     }
 
     on(event, handler) {
+      if (Array.isArray(event)) {
+        event.forEach(e => this.on(e, handler));
+        return this;
+      }
+
       if (this._listeners[event] === undefined) {
         this._listeners[event] = [];
       }
@@ -71,26 +76,53 @@
       return this;
     }
 
-    off(event) {
+    once(event, handler) {
+      if (Array.isArray(event)) {
+        event.forEach(e => this.once(e, handler));
+        return this;
+      }
+
+      handler._once = true;
+
+      this.on(event, handler);
+    }
+
+    off(event, callback = null) {
+      if (callback !== null) {
+        this._listeners[event] = this.listeners(event).filter((listener) => listener !== callback);
+        return this;
+      }
+
       delete this._listeners[event];
 
       return this;
     }
 
-    trigger(event, args) {
-      const r = [];
-      this.listeners(event).forEach(listener => {
-        r.push(listener(args));
-      });
-
-      if (this.data('windwalker.debug')) {
-        console.debug(`[Phoenix Event] ${event}`, args);
+    trigger(event, ...args) {
+      if (Array.isArray(event)) {
+        event.forEach(e => this.trigger(e));
+        return this;
       }
 
-      return r;
+      this.listeners(event).forEach(listener => {
+        listener(...args);
+      });
+
+      // Remove once
+      this._listeners[event] = this.listeners(event).filter((listener) => listener._once !== true);
+
+      if (this.data('windwalker.debug')) {
+        console.debug(`[Phoenix Event] ${event}`, args, this.listeners(event));
+      }
+
+      return this;
     }
 
     listeners(event) {
+      if (typeof event !== 'string') {
+        throw new Error(`get listeners event name should only use string.`);
+      }
+
       return this._listeners[event] === undefined ? [] : this._listeners[event];
     }
 

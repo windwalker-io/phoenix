@@ -124,8 +124,6 @@ abstract class BootstrapScript extends AbstractPhoenixScript
   font-weight: $weight;
 }
 .checkbox label:after {
-  /*padding-left: 4px;*/
-  /*padding-top: 2px;*/
   font-size: 9px;
   margin-top: .2em;
 }
