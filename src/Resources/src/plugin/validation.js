@@ -104,6 +104,12 @@
       return this;
     }
 
+    removeField(input) {
+      this.inputs = this.inputs.filter((i, e) => input !== e);
+
+      return this;
+    }
+
     /**
      * Validate All.
      *

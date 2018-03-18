@@ -146,6 +146,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         return this;
       }
+    }, {
+      key: 'removeField',
+      value: function removeField(input) {
+        this.inputs = this.inputs.filter(function (i, e) {
+          return input !== e;
+        });
+
+        return this;
+      }
 
       /**
        * Validate All.
