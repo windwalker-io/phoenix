@@ -14,12 +14,14 @@
  */
 ?>
 
-<a role="button" class="btn btn-primary btn-sm btn-wide phoenix-btn-new" href="{{ $router->route('{$controller.item.name.lower$}', ['new' => true]) }}">
+<a role="button" class="btn btn-primary btn-sm btn-wide phoenix-btn-new"
+    href="{{ $router->route('{$controller.item.name.lower$}', ['new' => true]) }}">
     <span class="fa fa-plus"></span>
     @translate('phoenix.toolbar.new')
 </a>
 
-<button type="button" class="btn btn-info btn-sm phoenix-btn-duplicate" onclick="Phoenix.Grid.hasChecked();Phoenix.post();">
+<button type="button" class="btn btn-info btn-sm phoenix-btn-duplicate"
+    onclick="Phoenix.Grid.hasChecked();Phoenix.post();">
     <span class="fa fa-copy"></span>
     @translate('phoenix.toolbar.duplicate')
 </button>
@@ -31,26 +33,30 @@
     </button>
 
     <ul class="dropdown-menu">
-       <li>
-           <a href="javascript://" class="dropdown-item phoenix-btn-publish" onclick="Phoenix.Grid.hasChecked().batch('publish');">
-               <span class="fa fa-check text-success"></span>
-               @translate('phoenix.toolbar.publish')
-           </a>
+        <li>
+            <a href="javascript://" class="dropdown-item phoenix-btn-publish"
+                onclick="Phoenix.Grid.hasChecked().batch('publish');">
+                <span class="fa fa-check text-success"></span>
+                @translate('phoenix.toolbar.publish')
+            </a>
 
-           <a href="javascript://" class="dropdown-item phoenix-btn-unpublish" onclick="Phoenix.Grid.hasChecked().batch('unpublish');">
-               <span class="fa fa-remove fa-times text-danger"></span>
-               @translate('phoenix.toolbar.unpublish')
-           </a>
-       </li>
+            <a href="javascript://" class="dropdown-item phoenix-btn-unpublish"
+                onclick="Phoenix.Grid.hasChecked().batch('unpublish');">
+                <span class="fa fa-remove fa-times text-danger"></span>
+                @translate('phoenix.toolbar.unpublish')
+            </a>
+        </li>
     </ul>
 </div>
 
-<button type="button" class="btn btn-default btn-dark btn-sm phoenix-btn-batch" data-toggle="modal" data-target="#batch-modal" onclick="Phoenix.Grid.hasChecked(null, event);">
+<button type="button" class="btn btn-default btn-dark btn-sm phoenix-btn-batch" data-toggle="modal"
+    data-target="#batch-modal" onclick="Phoenix.Grid.hasChecked(null, event);">
     <span class="fa fa-sliders fa-sliders-h"></span>
     @translate('phoenix.toolbar.batch')
 </button>
 
-<button type="button" class="btn btn-default btn-outline-danger btn-sm phoenix-btn-delete" onclick="Phoenix.Grid.hasChecked().deleteList();">
+<button type="button" class="btn btn-default btn-outline-danger btn-sm phoenix-btn-delete"
+    onclick="Phoenix.Grid.hasChecked().deleteList();">
     <span class="fa fa-trash"></span>
     @translate('phoenix.toolbar.delete')
 </button>

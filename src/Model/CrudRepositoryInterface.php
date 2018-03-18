@@ -8,7 +8,6 @@
 
 namespace Phoenix\Model;
 
-use Windwalker\Core\Model\DatabaseRepositoryInterface;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 
@@ -17,7 +16,7 @@ use Windwalker\DataMapper\Entity\Entity;
  *
  * @since  1.1
  */
-interface CrudRepositoryInterface extends DatabaseRepositoryInterface
+interface CrudRepositoryInterface
 {
     /**
      * getItem

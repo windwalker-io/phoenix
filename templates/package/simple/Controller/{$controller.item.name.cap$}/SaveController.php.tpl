@@ -57,6 +57,18 @@ class SaveController extends AbstractSaveController
     }
 
     /**
+     * A hook before save.
+     *
+     * @param DataInterface $data Data to save.
+     *
+     * @return void
+     */
+    protected function preSave(DataInterface $data)
+    {
+        parent::preSave($data);
+    }
+
+    /**
      * Check user has access to modify this resource or not.
      *
      * Throw exception with 4xx code or return false to block unauthorised access.
@@ -71,18 +83,6 @@ class SaveController extends AbstractSaveController
     public function checkAccess($data)
     {
         return parent::checkAccess($data);
-    }
-
-    /**
-     * A hook before save.
-     *
-     * @param DataInterface $data Data to save.
-     *
-     * @return void
-     */
-    protected function preSave(DataInterface $data)
-    {
-        parent::preSave($data);
     }
 
     /**

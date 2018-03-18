@@ -8,6 +8,7 @@
 
 namespace Phoenix\Script;
 
+use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Language\Translator;
 
 /**
@@ -89,15 +90,7 @@ abstract class BootstrapScript extends AbstractPhoenixScript
         }
 
         if (!static::inited(__METHOD__, func_get_args())) {
-            $js = <<<JS
-// Modal task
-jQuery(document).ready(function($)
-{
-	$('{$selector}').tooltip();
-});
-JS;
-
-            $asset->internalScript($js);
+            PhoenixScript::domready("$('{$selector}').tooltip();");
         }
     }
 
@@ -131,8 +124,6 @@ JS;
   font-weight: $weight;
 }
 .checkbox label:after {
-  /*padding-left: 4px;*/
-  /*padding-top: 2px;*/
   font-size: 9px;
   margin-top: .2em;
 }
@@ -166,7 +157,9 @@ JS;
 }
 CSS;
 
-            $asset->internalStyle($css);
+            $asset->internalStyle(
+                WINDWALKER_DEBUG ? $css : str_replace(["\n", "\r"], '', $css)
+            );
         }
     }
 
@@ -179,57 +172,45 @@ CSS;
      */
     public static function modal($selector = '.hasModal')
     {
-        $asset = static::getAsset();
-
         if (!static::inited(__METHOD__)) {
             static::script();
 
-            $js = <<<JS
-// Init modal
-jQuery(document).ready(function($)
-{
-	var modalBox = $('<div class="modal fade" id="phoenix-iframe-modal"> \
-    <div class="modal-dialog modal-lg modal-xs"> \
-        <div class="modal-content"> \
-            <div class="modal-body"> \
-                <iframe width="100%" src="" frameborder="0"></iframe> \
-            </div> \
-        </div> \
-    </div> \
-</div>');
+            $html = <<<HTML
+<div class="modal fade" id="phoenix-iframe-modal">
+    <div class="modal-dialog modal-lg modal-xs">
+        <div class="modal-content">
+            <div class="modal-body">
+                <iframe width="100%" src="" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+HTML;
 
-	$('body').append(modalBox);
-});
-JS;
-
-            $asset->internalScript($js);
+            Asset::getTemplate()->addTemplate('phoenix.iframe.modal', $html);
         }
 
-        if (!static::inited(__METHOD__, func_get_args())) {
+        if (!static::inited(__METHOD__, get_defined_vars())) {
             $js = <<<JS
 // Modal task
-jQuery(document).ready(function($)
-{
-	$('{$selector}').click(function(event)
-	{
-		var link   = $(this);
-		var modal  = $('#phoenix-iframe-modal');
-		var href   = link.attr('href');
-		var iframe = modal.find('iframe');
+$('{$selector}').click(function(event) {
+    var link   = $(this);
+    var modal  = $('#phoenix-iframe-modal');
+    var href   = link.attr('href');
+    var iframe = modal.find('iframe');
 
-		iframe.attr('src', href);
-		modal.modal('show');
-		modal.on('hide.bs.modal', function() {
-		    iframe.attr('src', '');
-		})
+    iframe.attr('src', href);
+    modal.modal('show');
+    modal.on('hide.bs.modal', function() {
+        iframe.attr('src', '');
+    });
 
-		event.stopPropagation();
-		event.preventDefault();
-	});
+    event.stopPropagation();
+    event.preventDefault();
 });
 JS;
 
-            $asset->internalScript($js);
+            PhoenixScript::domready($js);
         }
     }
 
@@ -249,7 +230,12 @@ JS;
 
             CoreScript::moment(false, Translator::getLocale());
             static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
-            static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
+
+            if (static::$currentVersion === 3) {
+                static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
+            } else {
+                static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap4-datetimepicker.min.css');
+            }
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
@@ -277,15 +263,12 @@ JS;
             $options = static::getJSObject($defaultOptions, $options);
 
             $js = <<<JS
-jQuery(document).ready(function($)
-{
-	$('$selector').datetimepicker($options).on('dp.change', function (event) {
-	    $(this).find('input').trigger('change');
-	});
+$('$selector').datetimepicker($options).on('dp.change', function (event) {
+    $(this).find('input').trigger('change');
 });
 JS;
 
-            static::internalJS($js);
+            PhoenixScript::domready($js);
         }
     }
 
@@ -297,25 +280,16 @@ JS;
      */
     public static function tabState($selector = '#admin-form', $time = 100)
     {
-        $args = get_defined_vars();
-
-        $asset = static::getAsset();
-
         if (!static::inited(__METHOD__)) {
             JQueryScript::core();
 
-            $asset->addScript(static::phoenixName() . '/js/bootstrap/tab-state.min.js');
+            static::addJS(static::phoenixName() . '/js/bootstrap/tab-state.min.js');
         }
 
-        if (!static::inited(__METHOD__, $args)) {
+        if (!static::inited(__METHOD__, get_defined_vars())) {
             $time = (int) $time;
 
-            $asset->internalScript(<<<JS
-jQuery(document).ready(function($) {
-    new LoadTab($('$selector'), $time);
-});
-JS
-            );
+            PhoenixScript::domready("new LoadTab($('$selector'), $time);");
         }
     }
 
@@ -336,14 +310,7 @@ JS
         if (!static::inited(__METHOD__, get_defined_vars())) {
             $options = static::getJSObject($options);
 
-            $js = <<<JS
-jQuery(function($) {
-    $('$selector').buttonRadio($options);
-})
-JS;
-
-
-            static::internalJS($js);
+            PhoenixScript::domready("$('$selector').buttonRadio($options);");
         }
     }
 

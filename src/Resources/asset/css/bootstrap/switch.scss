@@ -79,3 +79,7 @@
     border-radius: 50%;
   }
 }
+
+.has-invalid .phoenix-switch .switch-slider {
+  border: 1px solid #dc3545;
+}

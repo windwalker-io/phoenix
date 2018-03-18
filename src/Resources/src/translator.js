@@ -36,25 +36,48 @@
      * @returns {string}
      */
     translate(text, ...args) {
-      var key = this.normalize(text);
+      const key = this.normalize(text);
 
       if (args.length) {
         return this.sprintf(text, ...args);
       }
 
+      return this.find(key);
+    }
+
+    /**
+     * Sptintf language string.
+     * @param {string} text
+     * @param {Array} args
+     */
+    sprintf(text, ...args) {
+      return this.phoenix.vsprintf(this.find(text), args);
+    }
+
+    /**
+     * Find text.
+     * @param {string} key
+     * @returns {*}
+     */
+    find(key) {
       const langs = this.phoenix.data('phoenix.languages');
 
       if (langs[key]) {
         return langs[key];
       }
 
-      return text;
+      return key;
     }
 
-    sprintf(text, ...args) {
-      args[0] = this.translate(text);
+    /**
+     * Has language key.
+     * @param {string} key
+     * @returns {boolean}
+     */
+    has(key) {
+      const langs = this.phoenix.data('phoenix.languages');
 
-      return sprintf.apply(sprintf, args);
+      return langs[key] !== undefined;
     }
 
     /**
@@ -63,7 +86,7 @@
      * @param {string} key
      * @param {string} value
      *
-     * @return {Phoenix.Translator}
+     * @return {PhoenixTranslator}
      */
     addKey(key, value) {
       const data = {};
@@ -81,7 +104,7 @@
      *
      * @return {string}
      */
-    normalize(text) {
+     normalize(text) {
       return text.replace(/[^A-Z0-9]+/ig, '.');
     }
   }

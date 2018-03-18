@@ -34,6 +34,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     _createClass(PhoenixUIBootstrap4, [{
       key: 'showValidateResponse',
 
+
       /**
        * Show Validation response.
        *
@@ -71,7 +72,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             case validation.STATE_FAIL:
               color = 'warning';
-              icon = 'fa fa-warning';
+              icon = 'fa fa-warning fa-exclamation-triangle';
               break;
           }
 
@@ -99,7 +100,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         color = type === 'success' ? 'valid' : 'invalid';
 
-        $input.addClass('is-' + color);
+        $control.addClass('has-' + color);
+        $control.find('.form-control').addClass('is-' + color);
+        $control.find('.form-check-input').addClass('is-' + color);
 
         if ($control.attr('data-' + type + '-message')) {
           help = $control.attr('data-' + type + '-message');
@@ -111,7 +114,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         if (help) {
           var feedback = '<span class="' + icon + '" aria-hidden="true"></span>';
-          var helpElement = $('<small class="' + color + '-feedback form-control-feedback">' + feedback + ' ' + help + '</small>');
+          var helpElement = $('<small class="' + color + '-' + this.options.feedbackContainer + ' form-control-' + this.options.feedbackContainer + '">' + feedback + ' ' + help + '</small>');
 
           var tagName = $input.prop('tagName').toLowerCase();
 
@@ -132,8 +135,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'removeValidateResponse',
       value: function removeValidateResponse($element) {
-        $element.find('.form-control-feedback').remove();
-        $element.find('input').removeClass('is-invalid').removeClass('is-valid');
+        $element.find('.form-control-' + this.options.feedbackContainer).remove();
+        $element.removeClass('has-invalid').removeClass('has-valid');
+        $element.find('.form-control').removeClass('is-invalid').removeClass('is-valid');
       }
 
       /**
@@ -164,17 +168,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           message.append('<p>' + msg[i] + '</p>');
         }
       }
-
-      /**
-       * Remove all messages.
-       */
-
-    }, {
-      key: 'removeMessages',
-      value: function removeMessages() {
-        this.messageContainer.children().each(function () {
-          this.remove();
-        });
+    }], [{
+      key: 'defaultOptions',
+      get: function get() {
+        return {
+          messageSelector: '.message-wrap',
+          feedbackContainer: 'tooltip'
+        };
       }
     }]);
 

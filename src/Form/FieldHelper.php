@@ -8,10 +8,14 @@
 
 namespace Phoenix\Form;
 
+use Phoenix\Field\SwitchField;
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\JQueryScript;
 use Windwalker\Form\Field\AbstractField;
+use Windwalker\Form\Field\CheckboxesField;
+use Windwalker\Form\Field\CheckboxField;
 use Windwalker\Form\Field\HiddenField;
+use Windwalker\Form\Field\RadioField;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Arr;
 
@@ -61,16 +65,29 @@ class FieldHelper
             $form = $field->getForm();
 
             foreach ($showon as $selector => $values) {
-                $values = (array) $values;
+                $values = array_map('strval', (array) $values);
                 list($group, $name) = StringHelper::explode('.', $selector, 2, 'array_unshift');
                 $target = $form->getField($name, $group);
 
-                JQueryScript::dependsOn(
-                    '#' . Arr::get($attribs, 'id'),
-                    [
-                        sprintf('*[name="%s"]', $target->getFieldName()) => ['values' => $values],
-                    ]
-                );
+                $conditions = [];
+
+                if ($target instanceof CheckboxesField) {
+                    foreach ($values as $value) {
+                        $conditions[
+                            sprintf("input[name='%s[]'][value='%s']", $target->getFieldName(), $value)
+                        ] = ['checked' => true];
+                    }
+                } elseif ($target instanceof CheckboxField) {
+                    foreach ($values as $value) {
+                        $conditions[sprintf("input[name='%s'][value='%s']", $target->getFieldName(), $value)] = ['checked' => true];
+                    }
+                } else {
+                    $conditions = [
+                        sprintf('input[name="%s"]', $target->getFieldName()) => ['values' => $values],
+                    ];
+                }
+
+                JQueryScript::dependsOn('#' . Arr::get($attribs, 'id'), $conditions);
             }
         }
     }

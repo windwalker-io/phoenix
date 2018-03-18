@@ -39,6 +39,6 @@
 {!! $asset->getTemplate()->renderTemplates() !!}
 {!! $asset->renderScripts(true) !!}
 @yield('script')
-@stack('style')
+@stack('script')
 </body>
 </html>

@@ -10,7 +10,6 @@ namespace Phoenix\Script;
 
 use Windwalker\Core\Asset\AbstractScript;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
 use Windwalker\Utilities\Arr;
@@ -31,6 +30,7 @@ abstract class PhoenixScript extends AbstractPhoenixScript
      * @var  array
      */
     public static $data = [];
+
     /**
      * Property domReady.
      *
@@ -53,9 +53,8 @@ abstract class PhoenixScript extends AbstractPhoenixScript
         if (!static::inited(__METHOD__)) {
             JQueryScript::core();
             CoreScript::csrfToken();
-            CoreScript::sprintf();
 
-            static::addJS(static::phoenixName() . '/js/phoenix.min.js');
+            static::addJS(static::phoenixName() . '/js/phoenix/phoenix.min.js');
 
             static::data('windwalker.debug', WINDWALKER_DEBUG);
             static::data('phoenix.uri', Ioc::getUriData());
@@ -106,7 +105,7 @@ JS;
             ];
 
             $options = static::mergeOptions($defaultOptions, $options);
-            $ui = '';
+            $ui      = '';
 
             if ($options['theme'] === 'bootstrap') {
                 static::addJS(static::phoenixName() . '/js/phoenix/ui-bootstrap.min.js');
@@ -121,7 +120,7 @@ window.$variable.use([$ui, PhoenixForm, PhoenixLegacy]);
 window.$variable.form('$formSelector');
 JS;
 
-            static::domReady($js);
+            static::domready($js);
         }
     }
 
@@ -183,7 +182,7 @@ $variable.use(PhoenixGrid);
 $variable.grid('$selector', $options);
 JS;
 
-            static::domReady($js);
+            static::domready($js);
         }
     }
 
@@ -221,32 +220,29 @@ JS;
             $options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
             $js = <<<JS
-// Chosen select
-(function($) {
-    // Chosen for $selector
-	var select = $('{$selector}').chosen($options);
+// Chosen for $selector
+var select = $('{$selector}').chosen($options);
 
-	// Readonly hack by http://jsfiddle.net/eirc/v2es7L8o/
-	select.on('chosen:updated', function () {
-		if (select.attr('readonly')) {
-			var wasDisabled = select.is(':disabled');
+// Readonly hack by http://jsfiddle.net/eirc/v2es7L8o/
+select.on('chosen:updated', function () {
+    if (select.attr('readonly')) {
+        var wasDisabled = select.is(':disabled');
 
-			select.attr('disabled', 'disabled');
-			select.data('chosen').search_field_disabled();
+        select.attr('disabled', 'disabled');
+        select.data('chosen').search_field_disabled();
 
-			if (wasDisabled) {
-				select.attr('disabled', 'disabled');
-			} else {
-				select.removeAttr('disabled');
-			}
-		}
-	});
+        if (wasDisabled) {
+            select.attr('disabled', 'disabled');
+        } else {
+            select.removeAttr('disabled');
+        }
+    }
+});
 
-	select.trigger('chosen:updated');
-})(jQuery);
+select.trigger('chosen:updated');
 JS;
 
-            static::domReady($js);
+            static::domready($js);
         }
     }
 
@@ -302,7 +298,7 @@ JS;
         if (!static::inited(__METHOD__, get_defined_vars())) {
             $options = static::getJSObject($options);
 
-            static::domReady("$('$selector').multiselect('$selector', $options);");
+            static::domready("$('$selector').multiselect('$selector', $options);");
         }
     }
 
@@ -338,8 +334,8 @@ JS;
             static::translate('phoenix.message.validation.required');
             static::translate('phoenix.message.validation.failure');
 
-            static::domReady('Phoenix.use(PhoenixValidation);');
-            static::domReady("$variable.validation('$selector', $options);");
+            static::domready('Phoenix.use(PhoenixValidation);');
+            static::domready("$variable.validation('$selector', $options);");
         }
     }
 
@@ -363,7 +359,7 @@ JS;
                 $time *= 60000;
             }
 
-            static::domReady("Phoenix.keepAlive('$url', $time);");
+            static::domready("Phoenix.keepAlive('$url', $time);");
         }
     }
 
@@ -406,7 +402,6 @@ JS;
     public static function listDependent($selector, $dependentSelector, $source, array $options = [])
     {
         if (!static::inited(__METHOD__)) {
-            CoreScript::simpleUri();
             static::addJS(static::phoenixName() . '/js/phoenix/list-dependent.min.js');
         }
 
@@ -419,7 +414,7 @@ JS;
 
             $options = static::getJSObject($options);
 
-            static::domReady("$('$selector').listDependent('$dependentSelector', $options);");
+            static::domready("$('$selector').listDependent('$dependentSelector', $options);");
         }
     }
 
@@ -500,7 +495,7 @@ JS;
      *
      * @since  __DEPLOY_VERSION__
      */
-    public static function domReady($code, $name = null)
+    public static function domready($code, $name = null)
     {
         static $uid = 0;
 

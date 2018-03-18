@@ -17,8 +17,7 @@ use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Router\Exception\RouteNotFoundException;
 
-if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
-{
+if (!defined('PACKAGE_{$package.name.upper$}_ROOT')) {
     define('PACKAGE_{$package.name.upper$}_ROOT', __DIR__);
 }
 
@@ -46,6 +45,7 @@ class {$package.name.cap$}Package extends AbstractPackage
      * prepareExecute
      *
      * @return  void
+     * @throws \Exception
      */
     protected function prepareExecute()
     {
@@ -83,11 +83,10 @@ class {$package.name.cap$}Package extends AbstractPackage
      */
     protected function postExecute($result = null)
     {
-        if (WINDWALKER_DEBUG)
-        {
-            if (class_exists(DebuggerHelper::class))
-            {
-                DebuggerHelper::addCustomData('Language Orphans', '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
+        if (WINDWALKER_DEBUG) {
+            if (class_exists(DebuggerHelper::class)) {
+                DebuggerHelper::addCustomData('Language Orphans',
+                    '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
             }
         }
 
@@ -106,13 +105,11 @@ class {$package.name.cap$}Package extends AbstractPackage
     {
         $router = parent::loadRouting($router, $group);
 
-        $router->group(
-            $group, function (MainRouter $router) {
+        $router->group($group, function (MainRouter $router) {
             $router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
 
             // Merge other routes here...
-        }
-        );
+        });
 
         return $router;
     }

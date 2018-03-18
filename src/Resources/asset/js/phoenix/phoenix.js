@@ -100,6 +100,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'on',
       value: function on(event, handler) {
+        var _this3 = this;
+
+        if (Array.isArray(event)) {
+          event.forEach(function (e) {
+            return _this3.on(e, handler);
+          });
+          return this;
+        }
+
         if (this._listeners[event] === undefined) {
           this._listeners[event] = [];
         }
@@ -109,29 +118,75 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return this;
       }
     }, {
+      key: 'once',
+      value: function once(event, handler) {
+        var _this4 = this;
+
+        if (Array.isArray(event)) {
+          event.forEach(function (e) {
+            return _this4.once(e, handler);
+          });
+          return this;
+        }
+
+        handler._once = true;
+
+        this.on(event, handler);
+      }
+    }, {
       key: 'off',
       value: function off(event) {
+        var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+        if (callback !== null) {
+          this._listeners[event] = this.listeners(event).filter(function (listener) {
+            return listener !== callback;
+          });
+          return this;
+        }
+
         delete this._listeners[event];
 
         return this;
       }
     }, {
       key: 'trigger',
-      value: function trigger(event, args) {
-        var r = [];
+      value: function trigger(event) {
+        var _this5 = this;
+
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        if (Array.isArray(event)) {
+          event.forEach(function (e) {
+            return _this5.trigger(e);
+          });
+          return this;
+        }
+
         this.listeners(event).forEach(function (listener) {
-          r.push(listener(args));
+          listener.apply(undefined, args);
+        });
+
+        // Remove once
+        this._listeners[event] = this.listeners(event).filter(function (listener) {
+          return listener._once !== true;
         });
 
         if (this.data('windwalker.debug')) {
-          console.debug('[Phoenix Event] ' + event, args);
+          console.debug('[Phoenix Event] ' + event, args, this.listeners(event));
         }
 
-        return r;
+        return this;
       }
     }, {
       key: 'listeners',
       value: function listeners(event) {
+        if (typeof event !== 'string') {
+          throw new Error('get listeners event name should only use string.');
+        }
+
         return this._listeners[event] === undefined ? [] : this._listeners[event];
       }
     }, {
@@ -190,8 +245,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var self = this;
         $.fn[name] = function () {
           if (!this.data('phoenix.' + name)) {
-            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-              args[_key] = arguments[_key];
+            for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+              args[_key2] = arguments[_key2];
             }
 
             var _instance = new (Function.prototype.bind.apply(_plugin, [null].concat([this], args)))();
@@ -271,7 +326,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     _createClass(PhoenixPlugin, [{
       key: 'boot',
       value: function boot(phoenix) {
-        var _this3 = this;
+        var _this6 = this;
 
         this.phoenix = phoenix;
 
@@ -285,7 +340,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         // DOM Ready hook
         $(function () {
-          return _this3.ready();
+          return _this6.ready();
         });
 
         // Phoenix onload hook
@@ -400,8 +455,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         options.mainSelector = selector;
 
-        for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-          args[_key2 - 2] = arguments[_key2];
+        for (var _len3 = arguments.length, args = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+          args[_key3 - 2] = arguments[_key3];
         }
 
         return (_$ = $(selector))[this.constructor.pluginName].apply(_$, [options, this.phoenix].concat(args));
@@ -462,7 +517,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           confirm: 'confirm',
           keepAlive: 'keepAlive',
           stopKeepAlive: 'stopKeepAlive',
-          loadScript: 'loadScript'
+          loadScript: 'loadScript',
+          sprintf: 'sprintf',
+          vsprintf: 'vsprintf'
         };
       }
     }, {
@@ -475,10 +532,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     function PhoenixHelper() {
       _classCallCheck(this, PhoenixHelper);
 
-      var _this5 = _possibleConstructorReturn(this, (PhoenixHelper.__proto__ || Object.getPrototypeOf(PhoenixHelper)).call(this));
+      var _this8 = _possibleConstructorReturn(this, (PhoenixHelper.__proto__ || Object.getPrototypeOf(PhoenixHelper)).call(this));
 
-      _this5.aliveHandle = null;
-      return _this5;
+      _this8.aliveHandle = null;
+      return _this8;
     }
 
     /**
@@ -492,7 +549,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     _createClass(PhoenixHelper, [{
       key: 'confirm',
       value: function (_confirm) {
-        function confirm(_x3, _x4) {
+        function confirm(_x4, _x5) {
           return _confirm.apply(this, arguments);
         }
 
@@ -513,7 +570,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'loadScript',
       value: function loadScript(urls) {
-        var _this6 = this;
+        var _this9 = this;
 
         if (typeof urls === 'string') {
           urls = [urls];
@@ -525,7 +582,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         urls.forEach(function (url) {
           promises.push($.getScript({
-            url: _this6.addUriBase(url),
+            url: _this9.addUriBase(url),
             cache: true,
             data: data
           }));
@@ -577,6 +634,211 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   }(PhoenixPlugin);
 
   window.PhoenixHelper = PhoenixHelper;
+
+  // Fork sprintf here to reduce requests
+  (function () {
+    var re = {
+      not_string: /[^s]/,
+      not_bool: /[^t]/,
+      not_type: /[^T]/,
+      not_primitive: /[^v]/,
+      number: /[diefg]/,
+      numeric_arg: /[bcdiefguxX]/,
+      json: /[j]/,
+      not_json: /[^j]/,
+      text: /^[^\x25]+/,
+      modulo: /^\x25{2}/,
+      placeholder: /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-gijostTuvxX])/,
+      key: /^([a-z_][a-z_\d]*)/i,
+      key_access: /^\.([a-z_][a-z_\d]*)/i,
+      index_access: /^\[(\d+)\]/,
+      sign: /^[\+\-]/
+    };
+
+    function sprintf(key) {
+      // `arguments` is not an array, but should be fine for this call
+      return sprintf_format(sprintf_parse(key), arguments);
+    }
+
+    function vsprintf(fmt, argv) {
+      return sprintf.apply(null, [fmt].concat(argv || []));
+    }
+
+    function sprintf_format(parse_tree, argv) {
+      var cursor = 1,
+          tree_length = parse_tree.length,
+          arg,
+          output = '',
+          i,
+          k,
+          match,
+          pad,
+          pad_character,
+          pad_length,
+          is_positive,
+          sign;
+      for (i = 0; i < tree_length; i++) {
+        if (typeof parse_tree[i] === 'string') {
+          output += parse_tree[i];
+        } else if (Array.isArray(parse_tree[i])) {
+          match = parse_tree[i]; // convenience purposes only
+          if (match[2]) {
+            // keyword argument
+            arg = argv[cursor];
+            for (k = 0; k < match[2].length; k++) {
+              if (!arg.hasOwnProperty(match[2][k])) {
+                throw new Error(sprintf('[sprintf] property "%s" does not exist', match[2][k]));
+              }
+              arg = arg[match[2][k]];
+            }
+          } else if (match[1]) {
+            // positional argument (explicit)
+            arg = argv[match[1]];
+          } else {
+            // positional argument (implicit)
+            arg = argv[cursor++];
+          }
+
+          if (re.not_type.test(match[8]) && re.not_primitive.test(match[8]) && arg instanceof Function) {
+            arg = arg();
+          }
+
+          if (re.numeric_arg.test(match[8]) && typeof arg !== 'number' && isNaN(arg)) {
+            throw new TypeError(sprintf('[sprintf] expecting number but found %T', arg));
+          }
+
+          if (re.number.test(match[8])) {
+            is_positive = arg >= 0;
+          }
+
+          switch (match[8]) {
+            case 'b':
+              arg = parseInt(arg, 10).toString(2);
+              break;
+            case 'c':
+              arg = String.fromCharCode(parseInt(arg, 10));
+              break;
+            case 'd':
+            case 'i':
+              arg = parseInt(arg, 10);
+              break;
+            case 'j':
+              arg = JSON.stringify(arg, null, match[6] ? parseInt(match[6]) : 0);
+              break;
+            case 'e':
+              arg = match[7] ? parseFloat(arg).toExponential(match[7]) : parseFloat(arg).toExponential();
+              break;
+            case 'f':
+              arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg);
+              break;
+            case 'g':
+              arg = match[7] ? String(Number(arg.toPrecision(match[7]))) : parseFloat(arg);
+              break;
+            case 'o':
+              arg = (parseInt(arg, 10) >>> 0).toString(8);
+              break;
+            case 's':
+              arg = String(arg);
+              arg = match[7] ? arg.substring(0, match[7]) : arg;
+              break;
+            case 't':
+              arg = String(!!arg);
+              arg = match[7] ? arg.substring(0, match[7]) : arg;
+              break;
+            case 'T':
+              arg = Object.prototype.toString.call(arg).slice(8, -1).toLowerCase();
+              arg = match[7] ? arg.substring(0, match[7]) : arg;
+              break;
+            case 'u':
+              arg = parseInt(arg, 10) >>> 0;
+              break;
+            case 'v':
+              arg = arg.valueOf();
+              arg = match[7] ? arg.substring(0, match[7]) : arg;
+              break;
+            case 'x':
+              arg = (parseInt(arg, 10) >>> 0).toString(16);
+              break;
+            case 'X':
+              arg = (parseInt(arg, 10) >>> 0).toString(16).toUpperCase();
+              break;
+          }
+          if (re.json.test(match[8])) {
+            output += arg;
+          } else {
+            if (re.number.test(match[8]) && (!is_positive || match[3])) {
+              sign = is_positive ? '+' : '-';
+              arg = arg.toString().replace(re.sign, '');
+            } else {
+              sign = '';
+            }
+            pad_character = match[4] ? match[4] === '0' ? '0' : match[4].charAt(1) : ' ';
+            pad_length = match[6] - (sign + arg).length;
+            pad = match[6] ? pad_length > 0 ? pad_character.repeat(pad_length) : '' : '';
+            output += match[5] ? sign + arg + pad : pad_character === '0' ? sign + pad + arg : pad + sign + arg;
+          }
+        }
+      }
+      return output;
+    }
+
+    var sprintf_cache = Object.create(null);
+
+    function sprintf_parse(fmt) {
+      if (sprintf_cache[fmt]) {
+        return sprintf_cache[fmt];
+      }
+
+      var _fmt = fmt,
+          match,
+          parse_tree = [],
+          arg_names = 0;
+      while (_fmt) {
+        if ((match = re.text.exec(_fmt)) !== null) {
+          parse_tree.push(match[0]);
+        } else if ((match = re.modulo.exec(_fmt)) !== null) {
+          parse_tree.push('%');
+        } else if ((match = re.placeholder.exec(_fmt)) !== null) {
+          if (match[2]) {
+            arg_names |= 1;
+            var field_list = [],
+                replacement_field = match[2],
+                field_match = [];
+            if ((field_match = re.key.exec(replacement_field)) !== null) {
+              field_list.push(field_match[1]);
+              while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
+                if ((field_match = re.key_access.exec(replacement_field)) !== null) {
+                  field_list.push(field_match[1]);
+                } else if ((field_match = re.index_access.exec(replacement_field)) !== null) {
+                  field_list.push(field_match[1]);
+                } else {
+                  throw new SyntaxError('[sprintf] failed to parse named argument key');
+                }
+              }
+            } else {
+              throw new SyntaxError('[sprintf] failed to parse named argument key');
+            }
+            match[2] = field_list;
+          } else {
+            arg_names |= 2;
+          }
+          if (arg_names === 3) {
+            throw new Error('[sprintf] mixing positional and named placeholders is not (yet) supported');
+          }
+          parse_tree.push(match);
+        } else {
+          throw new SyntaxError('[sprintf] unexpected placeholder');
+        }
+
+        _fmt = _fmt.substring(match[0].length);
+      }
+      return sprintf_cache[fmt] = parse_tree;
+    }
+
+    // Push to class
+    PhoenixHelper.prototype.sprintf = sprintf;
+    PhoenixHelper.prototype.vsprintf = vsprintf;
+  })(PhoenixHelper);
 })(jQuery);
 
 /**
@@ -614,27 +876,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     function PhoenixUI() {
       _classCallCheck(this, PhoenixUI);
 
-      var _this7 = _possibleConstructorReturn(this, (PhoenixUI.__proto__ || Object.getPrototypeOf(PhoenixUI)).call(this));
+      var _this10 = _possibleConstructorReturn(this, (PhoenixUI.__proto__ || Object.getPrototypeOf(PhoenixUI)).call(this));
 
-      _this7.aliveHandle = null;
-      return _this7;
+      _this10.aliveHandle = null;
+      return _this10;
     }
 
     _createClass(PhoenixUI, [{
       key: 'ready',
       value: function ready() {
-        var _this8 = this;
+        var _this11 = this;
 
         _get(PhoenixUI.prototype.__proto__ || Object.getPrototypeOf(PhoenixUI.prototype), 'ready', this).call(this);
 
         this.messageContainer = $(this.options.messageSelector);
 
         this.phoenix.on('validation.response', function (event) {
-          _this8.showValidateResponse(event.validation, event.state, event.$input, event.help);
+          _this11.showValidateResponse(event.validation, event.state, event.$input, event.help);
         });
 
         this.phoenix.on('validation.remove', function (event) {
-          _this8.removeValidateResponse(event.$element);
+          _this11.removeValidateResponse(event.$element);
         });
       }
 
@@ -701,7 +963,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'removeMessages',
       value: function removeMessages() {
-        throw new Error('Please implement this method.');
+        this.messageContainer.children().each(function () {
+          this.remove();
+        });
       }
 
       /**
@@ -748,7 +1012,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'confirm',
       value: function (_confirm2) {
-        function confirm(_x6, _x7) {
+        function confirm(_x7, _x8) {
           return _confirm2.apply(this, arguments);
         }
 
@@ -821,10 +1085,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     _createClass(PhoenixRouter, [{
       key: 'ready',
       value: function ready() {
-        var _this10 = this;
+        var _this13 = this;
 
         $(window).on('popstate', function (e) {
-          return _this10.phoenix.on('router.popstate', e);
+          return _this13.phoenix.on('router.popstate', e);
         });
       }
 
@@ -978,17 +1242,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     function PhoenixAjax() {
       _classCallCheck(this, PhoenixAjax);
 
-      var _this11 = _possibleConstructorReturn(this, (PhoenixAjax.__proto__ || Object.getPrototypeOf(PhoenixAjax)).call(this));
+      var _this14 = _possibleConstructorReturn(this, (PhoenixAjax.__proto__ || Object.getPrototypeOf(PhoenixAjax)).call(this));
 
-      _this11.$ = $;
+      _this14.$ = $;
 
-      _this11.config = {
+      _this14.config = {
         customMethod: false
       };
 
-      _this11.data = {};
+      _this14.data = {};
 
-      _this11.headers = {
+      _this14.headers = {
         GET: {},
         POST: {},
         PUT: {},
@@ -998,7 +1262,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         OPTIONS: {},
         _global: {}
       };
-      return _this11;
+      return _this14;
     }
 
     _createClass(PhoenixAjax, [{
@@ -1289,10 +1553,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'encrypt',
       value: function encrypt(key, data) {
-        var _this13 = this;
+        var _this16 = this;
 
         var code = data.split('').map(function (c, i) {
-          return c.charCodeAt(0) ^ _this13.keyCharAt(key, i);
+          return c.charCodeAt(0) ^ _this16.keyCharAt(key, i);
         }).join(',');
 
         return this.base64Encode(code);
@@ -1310,14 +1574,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'decrypt',
       value: function decrypt(key, data) {
-        var _this14 = this;
+        var _this17 = this;
 
         data = this.base64Decode(data);
 
         data = data.split(',');
 
         return data.map(function (c, i) {
-          return String.fromCharCode(c ^ _this14.keyCharAt(key, i));
+          return String.fromCharCode(c ^ _this17.keyCharAt(key, i));
         }).join("");
       }
 
@@ -1686,10 +1950,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     function PhoenixTranslator() {
       _classCallCheck(this, PhoenixTranslator);
 
-      var _this15 = _possibleConstructorReturn(this, (PhoenixTranslator.__proto__ || Object.getPrototypeOf(PhoenixTranslator)).call(this));
+      var _this18 = _possibleConstructorReturn(this, (PhoenixTranslator.__proto__ || Object.getPrototypeOf(PhoenixTranslator)).call(this));
 
-      _this15.keys = {};
-      return _this15;
+      _this18.keys = {};
+      return _this18;
     }
 
     /**
@@ -1706,43 +1970,64 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function translate(text) {
         var key = this.normalize(text);
 
-        for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-          args[_key3 - 1] = arguments[_key3];
+        for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+          args[_key4 - 1] = arguments[_key4];
         }
 
         if (args.length) {
           return this.sprintf.apply(this, [text].concat(args));
         }
 
+        return this.find(key);
+      }
+
+      /**
+       * Sptintf language string.
+       * @param {string} text
+       * @param {Array} args
+       */
+
+    }, {
+      key: 'sprintf',
+      value: function sprintf(text) {
+        for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+          args[_key5 - 1] = arguments[_key5];
+        }
+
+        return this.phoenix.vsprintf(this.find(text), args);
+      }
+
+      /**
+       * Find text.
+       * @param {string} key
+       * @returns {*}
+       */
+
+    }, {
+      key: 'find',
+      value: function find(key) {
         var langs = this.phoenix.data('phoenix.languages');
 
         if (langs[key]) {
           return langs[key];
         }
 
-        return text;
+        return key;
       }
+
+      /**
+       * Has language key.
+       * @param {string} key
+       * @returns {boolean}
+       */
+
     }, {
-      key: 'sprintf',
-      value: function (_sprintf) {
-        function sprintf(_x10) {
-          return _sprintf.apply(this, arguments);
-        }
+      key: 'has',
+      value: function has(key) {
+        var langs = this.phoenix.data('phoenix.languages');
 
-        sprintf.toString = function () {
-          return _sprintf.toString();
-        };
-
-        return sprintf;
-      }(function (text) {
-        for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-          args[_key4 - 1] = arguments[_key4];
-        }
-
-        args[0] = this.translate(text);
-
-        return sprintf.apply(sprintf, args);
-      })
+        return langs[key] !== undefined;
+      }
 
       /**
        * Add language key.
@@ -1750,7 +2035,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @param {string} key
        * @param {string} value
        *
-       * @return {Phoenix.Translator}
+       * @return {PhoenixTranslator}
        */
 
     }, {
@@ -1805,7 +2090,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     _createClass(PhoenixLegacy, [{
       key: 'created',
       value: function created() {
-        var _this17 = this;
+        var _this20 = this;
 
         var phoenix = this.phoenix;
 
@@ -1815,7 +2100,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var gridInited = false;
 
         phoenix.on('jquery.plugin.created', function (event) {
-          var debug = _this17.phoenix.data('windwalker.debug');
+          var debug = _this20.phoenix.data('windwalker.debug');
 
           // Legacy Form polyfill
           if (!formInited && event.name === 'form') {
@@ -1823,7 +2108,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               phoenix[method] = function () {
                 var _event$instance;
 
-                debug ? _this17.constructor.warn('Phoenix', method) : null;
+                debug ? _this20.constructor.warn('Phoenix', method) : null;
                 (_event$instance = event.instance)[method].apply(_event$instance, arguments);
               };
             });
@@ -1837,7 +2122,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               phoenix.Grid[method] = function () {
                 var _event$instance2;
 
-                debug ? _this17.constructor.warn('Phoenix.Grid', method) : null;
+                debug ? _this20.constructor.warn('Phoenix.Grid', method) : null;
                 (_event$instance2 = event.instance)[method].apply(_event$instance2, arguments);
               };
             });

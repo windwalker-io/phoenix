@@ -194,7 +194,7 @@ var Phoenix;
 })(Phoenix || (Phoenix = {}), jQuery);
 JS;
 
-        Asset::internalScript($js);
+        Asset::internalJS($js);
 
         $inited = true;
     }

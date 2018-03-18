@@ -146,6 +146,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         return this;
       }
+    }, {
+      key: 'removeField',
+      value: function removeField(input) {
+        this.inputs = this.inputs.filter(function (i, e) {
+          return input !== e;
+        });
+
+        return this;
+      }
 
       /**
        * Validate All.
@@ -205,22 +214,34 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           return true;
         }
 
-        if ($input.attr('type') === 'radio' || $input.attr('type') === 'checkbox') {
-          return true;
-        }
-
         if ($input.attr('required') || $input.hasClass('required')) {
-          // Handle radio & checkboxes
-          if ($input.prop("tagName").toLowerCase() === 'div' && $input.hasClass('input-list-container')) {
+          // Single Radio & Checkbox
+          if (($input.attr('type') === 'radio' || $input.attr('type') === 'checkbox') && !$input.is(':checked')) {
+            this.showResponse(this.STATE_EMPTY, $input);
+            return false;
+          } else if ($input.prop("tagName").toLowerCase() === 'div' && $input.hasClass('input-list-container')) {
+            // Input List (Radios & Checkboxes)
             if (!$input.find('input:checked').length) {
+              // Set as :invalid
+              $input.find('input').each(function () {
+                this.setCustomValidity('Please select at least one.');
+              });
+
               this.showResponse(this.STATE_EMPTY, $input);
 
               return false;
+            } else {
+              // Set as :valid
+              $input.find('input').each(function () {
+                this.setCustomValidity('');
+              });
+
+              this.showResponse(this.STATE_SUCCESS, $input);
             }
           }
 
           // Handle all fields and checkbox
-          else if (!$input.val() || $input.attr('type') === 'checkbox' && !$input.is(':checked')) {
+          else if (!$input.val() || Array.isArray($input.val()) && $input.val().length === 0) {
               this.showResponse(this.STATE_EMPTY, $input);
 
               return false;
@@ -244,7 +265,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         validator = this.validators[validator[1]];
 
         if (!validator || !validator.handler) {
-          this.showResponse(this.STATE_NONE, $input);
+          this.showResponse(this.STATE_SUCCESS, $input);
 
           return true;
         }
@@ -256,6 +277,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             help = help($input, this);
           }
 
+          // Set failure value as :invalid
+          $input[0].setCustomValidity('Input is invalid.');
           this.showResponse(this.STATE_FAIL, $input, help);
 
           return false;

@@ -197,13 +197,7 @@ JS;
             $conditions = static::getJSObject($conditions);
             $options    = static::getJSObject($options);
 
-            $js = <<<JS
-jQuery(function ($) {
-    $('$selector').dependsOn($conditions, $options);
-})
-JS;
-
-            static::internalJS($js);
+            PhoenixScript::domready("$('$selector').dependsOn($conditions, $options);");
         }
     }
 }

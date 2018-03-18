@@ -1,13 +1,7 @@
 /*
- *
- *
- *
  * Bootstrap 4 Component - Chosen
  * Version: 1.0.5
  * Copyright (c) 2017 Martin Haubek
- *
- *
- *
  */
 .chosen-select,
 .chosen-select-deselect {
@@ -323,3 +317,8 @@
   background-color: #0275d8;
   color: white;
   cursor: pointer; }
+/* Bootstrap validation by Asika */
+.form-group.has-invalid .chosen-container {
+  border: 1px solid #dc3545;
+  border-radius: 0.25rem;
+}

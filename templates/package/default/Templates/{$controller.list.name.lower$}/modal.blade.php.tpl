@@ -86,7 +86,8 @@
                         <tr>
                             {{-- CHECKBOX --}}
                             <td>
-                                <a href="#" onclick="parent.{{ $function }}('{{ $selector }}', '{{ $item->id }}', '{{ $item->title }}');">
+                                <a href="#"
+                                    onclick="parent.{{ $function }}('{{ $selector }}', '{{ $item->id }}', '{{ $item->title }}');">
                                     <span class="fa fa-angle-right text-muted"></span> {{ $item->title }}
                                 </a>
                             </td>
@@ -130,7 +131,7 @@
                 <input type="hidden" name="_method" value="PUT" />
 
                 {{-- TOKEN --}}
-                {!! \Windwalker\Core\Security\CsrfProtection::input() !!}
+                @formToken
             </div>
         </form>
     </div>

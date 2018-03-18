@@ -12,6 +12,7 @@ use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
+use Windwalker\Core\Model\DatabaseRepositoryInterface;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
@@ -104,7 +105,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
         }
 
         // Determine the name of the primary key for the data.
-        if (empty($this->keyName)) {
+        if (empty($this->keyName) && $this->model instanceof DatabaseRepositoryInterface) {
             $this->keyName = $this->model->getKeyName(false) ?: 'id';
         }
     }
