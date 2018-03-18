@@ -8,6 +8,7 @@
 
 namespace Phoenix\Provider;
 
+use Phoenix\Breadcrumb\BreadcrumbManager;
 use Phoenix\Html\HtmlHeaderManager;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Renderer\RendererManager;
@@ -63,6 +64,9 @@ class PhoenixProvider implements ServiceProviderInterface
 
         $container->share(HtmlHeaderManager::class, $closure)
             ->alias('html.header', HtmlHeaderManager::class);
+
+        $container->prepareSharedObject(BreadcrumbManager::class)
+            ->alias('breadcrumb', BreadcrumbManager::class);
 
         $container->extend(RendererManager::class, function (RendererManager $manager, Container $container) {
             $manager->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', PriorityQueue::LOW - 25);
