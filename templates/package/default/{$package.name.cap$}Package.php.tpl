@@ -42,27 +42,6 @@ class {$package.name.cap$}Package extends AbstractPackage
     }
 
     /**
-     * loadRouting
-     *
-     * @param MainRouter $router
-     * @param string     $group
-     *
-     * @return MainRouter
-     */
-    public function loadRouting(MainRouter $router, $group = null)
-    {
-        $router = parent::loadRouting($router, $group);
-
-        $router->group($group, function (MainRouter $router) {
-            $router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
-
-            // Merge other routes here...
-        });
-
-        return $router;
-    }
-
-    /**
      * prepareExecute
      *
      * @return  void
@@ -73,8 +52,8 @@ class {$package.name.cap$}Package extends AbstractPackage
         $this->checkAccess();
 
         // Assets
-        BootstrapScript::css(4);
-        BootstrapScript::script(4);
+        BootstrapScript::css(3);
+        BootstrapScript::script(3);
         BootstrapScript::fontAwesome(5);
         Asset::addCSS($this->name . '/css/{$package.name.lower$}.css');
 
@@ -112,5 +91,26 @@ class {$package.name.cap$}Package extends AbstractPackage
         }
 
         return $result;
+    }
+
+    /**
+     * loadRouting
+     *
+     * @param MainRouter $router
+     * @param string     $group
+     *
+     * @return MainRouter
+     */
+    public function loadRouting(MainRouter $router, $group = null)
+    {
+        $router = parent::loadRouting($router, $group);
+
+        $router->group($group, function (MainRouter $router) {
+            $router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
+
+            // Merge other routes here...
+        });
+
+        return $router;
     }
 }

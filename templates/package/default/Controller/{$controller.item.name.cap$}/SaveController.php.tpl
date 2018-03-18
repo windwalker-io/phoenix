@@ -41,6 +41,16 @@ class SaveController extends AbstractSaveController
     protected $model = '{$controller.item.name.cap$}';
 
     /**
+     * A hook before main process executing.
+     *
+     * @return  void
+     */
+    protected function prepareExecute()
+    {
+        parent::prepareExecute();
+    }
+
+    /**
      * Check user has access to modify this resource or not.
      *
      * Throw exception with 4xx code or return false to block unauthorised access.
@@ -55,16 +65,6 @@ class SaveController extends AbstractSaveController
     public function checkAccess($data)
     {
         return parent::checkAccess($data);
-    }
-
-    /**
-     * A hook before main process executing.
-     *
-     * @return  void
-     */
-    protected function prepareExecute()
-    {
-        parent::prepareExecute();
     }
 
     /**
