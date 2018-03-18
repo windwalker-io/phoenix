@@ -232,7 +232,12 @@ JS;
 
             CoreScript::moment(false, Translator::getLocale());
             static::addJS(static::phoenixName() . '/js/bootstrap/bootstrap-datetimepicker.min.js');
-            static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
+
+            if (static::$currentVersion === 3) {
+                static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap-datetimepicker.min.css');
+            } else {
+                static::addCSS(static::phoenixName() . '/css/bootstrap/bootstrap4-datetimepicker.min.css');
+            }
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
