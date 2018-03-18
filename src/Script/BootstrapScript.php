@@ -90,7 +90,7 @@ abstract class BootstrapScript extends AbstractPhoenixScript
         }
 
         if (!static::inited(__METHOD__, func_get_args())) {
-            PhoenixScript::domReady("$('{$selector}').tooltip();");
+            PhoenixScript::domready("$('{$selector}').tooltip();");
         }
     }
 
@@ -210,7 +210,7 @@ $('{$selector}').click(function(event) {
 });
 JS;
 
-            PhoenixScript::domReady($js);
+            PhoenixScript::domready($js);
         }
     }
 
@@ -268,7 +268,7 @@ $('$selector').datetimepicker($options).on('dp.change', function (event) {
 });
 JS;
 
-            PhoenixScript::domReady($js);
+            PhoenixScript::domready($js);
         }
     }
 
@@ -289,7 +289,7 @@ JS;
         if (!static::inited(__METHOD__, get_defined_vars())) {
             $time = (int) $time;
 
-            PhoenixScript::domReady("new LoadTab($('$selector'), $time);");
+            PhoenixScript::domready("new LoadTab($('$selector'), $time);");
         }
     }
 
@@ -310,7 +310,7 @@ JS;
         if (!static::inited(__METHOD__, get_defined_vars())) {
             $options = static::getJSObject($options);
 
-            PhoenixScript::domReady("$('$selector').buttonRadio($options);");
+            PhoenixScript::domready("$('$selector').buttonRadio($options);");
         }
     }
 

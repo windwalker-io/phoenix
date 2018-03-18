@@ -10,7 +10,6 @@ namespace Phoenix\Script;
 
 use Windwalker\Core\Asset\AbstractScript;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Security\CsrfProtection;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
 use Windwalker\Utilities\Arr;
@@ -31,6 +30,7 @@ abstract class PhoenixScript extends AbstractPhoenixScript
      * @var  array
      */
     public static $data = [];
+
     /**
      * Property domReady.
      *
@@ -105,7 +105,7 @@ JS;
             ];
 
             $options = static::mergeOptions($defaultOptions, $options);
-            $ui = '';
+            $ui      = '';
 
             if ($options['theme'] === 'bootstrap') {
                 static::addJS(static::phoenixName() . '/js/phoenix/ui-bootstrap.min.js');
@@ -120,7 +120,7 @@ window.$variable.use([$ui, PhoenixForm, PhoenixLegacy]);
 window.$variable.form('$formSelector');
 JS;
 
-            static::domReady($js);
+            static::domready($js);
         }
     }
 
@@ -182,7 +182,7 @@ $variable.use(PhoenixGrid);
 $variable.grid('$selector', $options);
 JS;
 
-            static::domReady($js);
+            static::domready($js);
         }
     }
 
@@ -242,7 +242,7 @@ select.on('chosen:updated', function () {
 select.trigger('chosen:updated');
 JS;
 
-            static::domReady($js);
+            static::domready($js);
         }
     }
 
@@ -298,7 +298,7 @@ JS;
         if (!static::inited(__METHOD__, get_defined_vars())) {
             $options = static::getJSObject($options);
 
-            static::domReady("$('$selector').multiselect('$selector', $options);");
+            static::domready("$('$selector').multiselect('$selector', $options);");
         }
     }
 
@@ -334,8 +334,8 @@ JS;
             static::translate('phoenix.message.validation.required');
             static::translate('phoenix.message.validation.failure');
 
-            static::domReady('Phoenix.use(PhoenixValidation);');
-            static::domReady("$variable.validation('$selector', $options);");
+            static::domready('Phoenix.use(PhoenixValidation);');
+            static::domready("$variable.validation('$selector', $options);");
         }
     }
 
@@ -359,7 +359,7 @@ JS;
                 $time *= 60000;
             }
 
-            static::domReady("Phoenix.keepAlive('$url', $time);");
+            static::domready("Phoenix.keepAlive('$url', $time);");
         }
     }
 
@@ -414,7 +414,7 @@ JS;
 
             $options = static::getJSObject($options);
 
-            static::domReady("$('$selector').listDependent('$dependentSelector', $options);");
+            static::domready("$('$selector').listDependent('$dependentSelector', $options);");
         }
     }
 
@@ -495,7 +495,7 @@ JS;
      *
      * @since  __DEPLOY_VERSION__
      */
-    public static function domReady($code, $name = null)
+    public static function domready($code, $name = null)
     {
         static $uid = 0;
 
