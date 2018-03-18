@@ -39,6 +39,22 @@ class GetController extends ItemDisplayController
     protected $view = '{$controller.item.name.cap$}';
 
     /**
+     * Check user has access to view this page.
+     *
+     * Throw exception with 4xx code to block unauthorised access.
+     *
+     * @return  bool Return FALSE if use has no access to view page.
+     *
+     * @throws \RuntimeException
+     * @throws \Windwalker\Router\Exception\RouteNotFoundException (404)
+     * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
+     */
+    public function authorise()
+    {
+        return parent::authorise();
+    }
+
+    /**
      * A hook before main process executing.
      *
      * @return  void
@@ -68,22 +84,6 @@ class GetController extends ItemDisplayController
         parent::prepareViewModel($view, $model);
 
         // Configure view and model here...
-    }
-
-    /**
-     * Check user has access to view this page.
-     *
-     * Throw exception with 4xx code to block unauthorised access.
-     *
-     * @return  bool Return FALSE if use has no access to view page.
-     *
-     * @throws \RuntimeException
-     * @throws \Windwalker\Router\Exception\RouteNotFoundException (404)
-     * @throws \Windwalker\Core\Security\Exception\UnauthorizedException (401 / 403)
-     */
-    public function authorise()
-    {
-        return parent::authorise();
     }
 
     /**

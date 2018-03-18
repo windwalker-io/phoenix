@@ -38,13 +38,11 @@ class MenuHelper extends AbstractHelper
         // Match route
         $route = $path;
 
-        if (strpos($route, '@') === false)
-        {
+        if (strpos($route, '@') === false) {
             $route = $view->getPackage()->getName() . '@' . $route;
         }
 
-        if ($view['app']->get('route.matched') == $route && $this->matchRequest($query))
-        {
+        if ($view['app']->get('route.matched') == $route && $this->matchRequest($query)) {
             return 'active';
         }
 
@@ -56,14 +54,10 @@ class MenuHelper extends AbstractHelper
 
         $success = false;
 
-        foreach ($path as $key => $pathSegment)
-        {
-            if (isset($routePath[$key]) && $routePath[$key] == $pathSegment && $this->matchRequest($query))
-            {
+        foreach ($path as $key => $pathSegment) {
+            if (isset($routePath[$key]) && $routePath[$key] == $pathSegment && $this->matchRequest($query)) {
                 $success = true;
-            }
-            else
-            {
+            } else {
                 $success = false;
             }
         }
@@ -82,8 +76,7 @@ class MenuHelper extends AbstractHelper
     {
         $input = Ioc::getInput();
 
-        if (!$query)
-        {
+        if (!$query) {
             return true;
         }
 

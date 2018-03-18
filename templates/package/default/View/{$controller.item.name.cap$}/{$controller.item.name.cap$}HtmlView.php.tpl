@@ -48,16 +48,16 @@ class {$controller.item.name.cap$}HtmlView extends EditView
     /**
      * prepareData
      *
-     * @param \Windwalker\Data\Data $data
+     * @param \Windwalker\Data\Data            $data
      *
      * @see  ItemView
      * ------------------------------------------------------
-     * @var                         $data ->state  \Windwalker\Registry\Registry
-     * @var                         $data ->item   \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record
+     * @var  \WindWalker\Structure\Structure   $data ->state
+     * @var  \{$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record $data ->item
      *
      * @see  EditView
      * ------------------------------------------------------
-     * @var                         $data ->form   \Windwalker\Form\Form
+     * @var    \Windwalker\Form\Form           $data ->form
      *
      * @return  void
      */

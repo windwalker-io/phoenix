@@ -52,6 +52,31 @@ class {$controller.item.name.cap$}Model extends AdminModel
     protected $reorderPosition = self::ORDER_POSITION_LAST;
 
     /**
+     * getReorderConditions
+     *
+     * @param Record|{$controller.item.name.cap$}Record $record
+     *
+     * @return  array  An array of conditions to add to ordering queries.
+     */
+    public function getReorderConditions(Record $record)
+    {
+        return parent::getReorderConditions($record);
+    }
+
+    /**
+     * Method to set new item ordering as first or last.
+     *
+     * @param   Record|{$controller.item.name.cap$}Record $record   Item table to save.
+     * @param   string              $position `first` or other are `last`.
+     *
+     * @return  void
+     */
+    public function setOrderPosition(Record $record, $position = self::ORDER_POSITION_LAST)
+    {
+        parent::setOrderPosition($record, $position);
+    }
+
+    /**
      * postGetItem
      *
      * @param DataInterface|{$controller.item.name.cap$}Record $item
@@ -85,30 +110,5 @@ class {$controller.item.name.cap$}Model extends AdminModel
     protected function postSaveHook(Record $record)
     {
         parent::postSaveHook($record);
-    }
-
-    /**
-     * getReorderConditions
-     *
-     * @param Record|{$controller.item.name.cap$}Record $record
-     *
-     * @return  array  An array of conditions to add to ordering queries.
-     */
-    public function getReorderConditions(Record $record)
-    {
-        return parent::getReorderConditions($record);
-    }
-
-    /**
-     * Method to set new item ordering as first or last.
-     *
-     * @param   Record|{$controller.item.name.cap$}Record $record   Item table to save.
-     * @param   string              $position `first` or other are `last`.
-     *
-     * @return  void
-     */
-    public function setOrderPosition(Record $record, $position = self::ORDER_POSITION_LAST)
-    {
-        parent::setOrderPosition($record, $position);
     }
 }

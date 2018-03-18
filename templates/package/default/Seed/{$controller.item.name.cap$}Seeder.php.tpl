@@ -29,8 +29,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
     {
         $faker = Factory::create();
 
-        foreach (range(1, 150) as $i)
-        {
+        foreach (range(1, 150) as $i) {
             $created = $faker->dateTimeThisYear;
             $data    = new Data;
 

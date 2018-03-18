@@ -27,74 +27,6 @@ class MenuHelper extends AbstractHelper
     const SINGULAR = 'singular';
 
     /**
-     * active
-     *
-     * @param string $path
-     * @param array  $query
-     * @param string $menu
-     *
-     * @return string
-     */
-    public function active($path, $query = [], $menu = 'mainmenu')
-    {
-        $view = $this->getParent()->getView();
-
-        // Match route
-        $route = $path;
-
-        if (strpos($route, '@') === false)
-        {
-            $route = $view->getPackage()->getName() . '@' . $route;
-        }
-
-        if ($view['app']->get('route.matched') == $route && $this->matchRequest($query))
-        {
-            return 'active';
-        }
-
-        // If route not matched, we match extra values from routing.
-        $routePath = $view['app']->get('route.extra.menu.' . $menu);
-
-        $path      = array_filter(explode('/', trim($path, '/')), 'strlen');
-        $routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
-
-        $success = false;
-
-        foreach ($path as $key => $pathSegment)
-        {
-            if (isset($routePath[$key]) && $routePath[$key] == $pathSegment && $this->matchRequest($query))
-            {
-                $success = true;
-            }
-            else
-            {
-                $success = false;
-            }
-        }
-
-        return $success ? 'active' : '';
-    }
-
-    /**
-     * matchRequest
-     *
-     * @param array $query
-     *
-     * @return  boolean
-     */
-    protected function matchRequest($query = [])
-    {
-        $input = Ioc::getInput();
-
-        if (!$query)
-        {
-            return true;
-        }
-
-        return !empty(ArrayHelper::query([$input->toArray()], $query));
-    }
-
-    /**
      * getSubmenus
      *
      * @return  array
@@ -106,15 +38,14 @@ class MenuHelper extends AbstractHelper
         $package = $view->getPackage();
         $links   = [];
 
-        foreach ($menus as $menu)
-        {
+        foreach ($menus as $menu) {
             $active = static::active($menu, 'submenu');
 
             $links[] = new HtmlElement(
                 'a',
                 Translator::translate($package->getName() . '.' . $menu),
                 [
-                    'href'  => $view->getRouter()->route($menu),
+                    'href' => $view->getRouter()->route($menu),
                     'class' => $active
                 ]
             );
@@ -140,25 +71,81 @@ class MenuHelper extends AbstractHelper
         $menus = [];
 
         /** @var \SplFileInfo $view */
-        foreach ($views as $view)
-        {
-            if ($view->isFile())
-            {
+        foreach ($views as $view) {
+            if ($view->isFile()) {
                 continue;
             }
 
             $name = strtolower($view->getBasename());
 
-            if ($inflection == static::PLURAL && $inflector->isPlural($name))
-            {
+            if ($inflection == static::PLURAL && $inflector->isPlural($name)) {
                 $menus[] = $name;
-            }
-            elseif ($inflection == static::SINGULAR && $inflector->isSingular($name))
-            {
+            } elseif ($inflection == static::SINGULAR && $inflector->isSingular($name)) {
                 $menus[] = $name;
             }
         }
 
         return $menus;
+    }
+
+    /**
+     * active
+     *
+     * @param string $path
+     * @param array  $query
+     * @param string $menu
+     *
+     * @return string
+     */
+    public function active($path, $query = [], $menu = 'mainmenu')
+    {
+        $view = $this->getParent()->getView();
+
+        // Match route
+        $route = $path;
+
+        if (strpos($route, '@') === false) {
+            $route = $view->getPackage()->getName() . '@' . $route;
+        }
+
+        if ($view['app']->get('route.matched') == $route && $this->matchRequest($query)) {
+            return 'active';
+        }
+
+        // If route not matched, we match extra values from routing.
+        $routePath = $view['app']->get('route.extra.menu.' . $menu);
+
+        $path      = array_filter(explode('/', trim($path, '/')), 'strlen');
+        $routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
+
+        $success = false;
+
+        foreach ($path as $key => $pathSegment) {
+            if (isset($routePath[$key]) && $routePath[$key] == $pathSegment && $this->matchRequest($query)) {
+                $success = true;
+            } else {
+                $success = false;
+            }
+        }
+
+        return $success ? 'active' : '';
+    }
+
+    /**
+     * matchRequest
+     *
+     * @param array $query
+     *
+     * @return  boolean
+     */
+    protected function matchRequest($query = [])
+    {
+        $input = Ioc::getInput();
+
+        if (!$query) {
+            return true;
+        }
+
+        return !empty(ArrayHelper::query([$input->toArray()], $query));
     }
 }

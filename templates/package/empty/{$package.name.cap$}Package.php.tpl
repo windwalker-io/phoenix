@@ -14,8 +14,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Filesystem\Folder;
 
-if (!defined('PACKAGE_{$package.name.upper$}_ROOT'))
-{
+if (!defined('PACKAGE_{$package.name.upper$}_ROOT')) {
     define('PACKAGE_{$package.name.upper$}_ROOT', __DIR__);
 }
 
@@ -89,13 +88,11 @@ class {$package.name.cap$}Package extends AbstractPackage
     {
         $router = parent::loadRouting($router, $group);
 
-        $router->group(
-            $group, function (MainRouter $router) {
+        $router->group($group, function (MainRouter $router) {
             $router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
 
             // Merge other routes here...
-        }
-        );
+        });
 
         return $router;
     }

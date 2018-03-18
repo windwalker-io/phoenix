@@ -32,16 +32,16 @@ class {$controller.list.name.cap$}HtmlView extends GridView
      * @var  array
      */
     protected $fields = [
-        'pk'          => 'id',
-        'title'       => 'title',
-        'alias'       => 'alias',
-        'state'       => 'state',
-        'ordering'    => 'ordering',
-        'author'      => 'created_by',
+        'pk' => 'id',
+        'title' => 'title',
+        'alias' => 'alias',
+        'state' => 'state',
+        'ordering' => 'ordering',
+        'author' => 'created_by',
         'author_name' => 'user_name',
-        'created'     => 'created',
-        'language'    => 'language',
-        'lang_title'  => 'lang_title'
+        'created' => 'created',
+        'language' => 'language',
+        'lang_title' => 'lang_title'
     ];
     /**
      * The grid config.
@@ -61,25 +61,25 @@ class {$controller.list.name.cap$}HtmlView extends GridView
     /**
      * prepareData
      *
-     * @param \Windwalker\Data\Data $data
+     * @param \Windwalker\Data\Data                 $data
      *
      * @see ListView
      * ------------------------------------------------------
-     * @var                         $data ->state          \Windwalker\Registry\Registry
-     * @var                         $data ->items          \Windwalker\Data\DataSet
-     * @var                         $data ->pagination     \Windwalker\Core\Pagination\Pagination
-     * @var                         $data ->total          integer
-     * @var                         $data ->limit          integer
-     * @var                         $data ->start          integer
-     * @var                         $data ->page           integer
+     * @var  \Windwalker\Structure\Structure        $data ->state
+     * @var  \Windwalker\Data\DataSet               $data ->items
+     * @var  \Windwalker\Core\Pagination\Pagination $data ->pagination
+     * @var  int                                    $data ->total
+     * @var  int                                    $data ->limit
+     * @var  int                                    $data ->start
+     * @var  int                                    $data ->page
      *
      * @see GridView
      * ------------------------------------------------------
-     * @var                         $data ->filterForm     \Windwalker\Form\Form
-     * @var                         $data ->batchForm      \Windwalker\Form\Form
-     * @var                         $data ->filterBar      \Windwalker\Core\Widget\Widget
-     * @var                         $data ->showFilterBar  boolean
-     * @var                         $data ->grid           \Phoenix\View\Helper\GridHelper
+     * @var  \Windwalker\Form\Form                  $data ->filterForm
+     * @var  \Windwalker\Form\Form                  $data ->batchForm
+     * @var  \Windwalker\Core\Widget\Widget         $data ->filterBar
+     * @var  boolean                                $data ->showFilterBar
+     * @var  \Phoenix\View\Helper\GridHelper        $data ->grid
      *
      * @return  void
      */
