@@ -10,17 +10,6 @@
  */
 ;(function($) {
   /**
-   * Plugin name.
-   *
-   * @type {string}
-   */
-  var plugin = 'multiselect';
-
-  var defaultOptions = {
-    duration: 100
-  };
-
-  /**
    * Multi Select.
    *
    * @param {jQuery} $element
@@ -28,28 +17,36 @@
    *
    * @constructor
    */
-  var PhoenixMultiSelect = function($element, options) {
-    var self = this;
-    this.form = $element;
-    this.boxes = $element.find('input.grid-checkbox[type=checkbox]');
-    this.last = false;
-    this.options = $.extend({}, defaultOptions, options);
+  class PhoenixMultiSelect {
+    static get pluginName() { return 'multiselect' }
+    static get defaultOptions() {
+      return {
+        duration: 100,
+        inputSelector: 'input.grid-checkbox[type=checkbox]'
+      }
+    }
 
-    this.boxes.parent().css('user-select', 'none');
+    constructor($element, options) {
+      const self = this;
+      this.options = $.extend({}, this.constructor.defaultOptions, options);
+      this.form = $element;
+      this.boxes = $element.find(this.options.inputSelector);
+      this.last = false;
 
-    this.boxes.on('click', function(event) {
-      self.select(this, event);
-    });
-  };
+      this.boxes.parent().css('user-select', 'none');
 
-  PhoenixMultiSelect.prototype = {
+      this.boxes.on('click', function(event) {
+        self.select(this, event);
+      });
+    }
+
     /**
      * Do select.
      *
      * @param {Element} element
      * @param {Event}   event
      */
-    select: function(element, event) {
+    select(element, event) {
       if (!this.last) {
         this.last = element;
 
@@ -57,11 +54,11 @@
       }
 
       if (event.shiftKey) {
-        var self = this;
-        var start = this.boxes.index(element);
-        var end = this.boxes.index(this.last);
+        const self = this;
+        const start = this.boxes.index(element);
+        const end = this.boxes.index(this.last);
 
-        var chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
+        const chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
 
         $.each(chs, function(i, e) {
           if (self.options.duration) {
@@ -77,14 +74,14 @@
 
       this.last = element;
     }
-  };
+  }
 
-  $.fn[plugin] = function(options) {
-    if (!this.data('phoenix.' + plugin)) {
-      this.data('phoenix.' + plugin, new PhoenixMultiSelect(this, options));
+  $.fn[PhoenixMultiSelect.pluginName] = function(options) {
+    if (!this.data('phoenix.' + PhoenixMultiSelect.pluginName)) {
+      this.data('phoenix.' + PhoenixMultiSelect.pluginName, new PhoenixMultiSelect(this, options));
     }
 
-    return this.data('phoenix.' + plugin);
+    return this.data('phoenix.' + PhoenixMultiSelect.pluginName);
   };
 
 })(jQuery);

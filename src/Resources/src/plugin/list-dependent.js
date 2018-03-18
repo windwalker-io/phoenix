@@ -8,28 +8,7 @@
 ;(function($) {
   "use strict";
 
-  var plugin = 'listDependent';
-
-  var nope = function(value, ele, dep) {
-  };
-
-  var defaultOptions = {
-    ajax: {
-      url: null,
-      value_field: 'value'
-    },
-    source: null,
-    text_field: 'title',
-    value_field: 'id',
-    first_option: null,
-    default_value: null,
-    initial_load: true,
-    empty_mark: '__EMPTY__',
-    hooks: {
-      before_request: nope,
-      after_request: nope
-    }
-  };
+  const nope = (value, ele, dep) => {};
 
   /**
    * Class init.
@@ -38,31 +17,48 @@
    * @param {Object}        options
    * @constructor
    */
-  var ListDependent = function($element, dependent, options) {
-    this.element = $element;
-    this.options = $.extend(true, {}, defaultOptions, options);
-    this.dependent = $(dependent);
-
-    this.bindEvents();
-
-    if (this.options.initial_load) {
-      this.changeList(this.dependent.val(), true);
+  class ListDependent {
+    static get pluginName() { return 'listDependent' }
+    static get defaultOptions() {
+      return {
+        ajax: {
+          url: null,
+          value_field: 'value'
+        },
+        source: null,
+        text_field: 'title',
+        value_field: 'id',
+        first_option: null,
+        default_value: null,
+        initial_load: true,
+        empty_mark: '__EMPTY__',
+        hooks: {
+          before_request: nope,
+          after_request: nope
+        }
+      };
     }
-  };
 
-  ListDependent.prototype = {
+    constructor($element, dependent, options) {
+      this.element = $element;
+      this.options = $.extend(true, {}, this.constructor.defaultOptions, options);
+      this.dependent = $(dependent);
+
+      this.bindEvents();
+
+      if (this.options.initial_load) {
+        this.changeList(this.dependent.val(), true);
+      }
+    }
 
     /**
      * Bind events.
      */
-    bindEvents: function() {
-      var self = this;
-
-      this.dependent.on('change', function(event) {
-        var $this = $(this);
-        self.changeList($this.val());
+    bindEvents() {
+      this.dependent.on('change', (event) => {
+        this.changeList($(event.currentTarget).val());
       });
-    },
+    }
 
     /**
      * Update the list elements.
@@ -70,7 +66,7 @@
      * @param {*}    value
      * @param {bool} initial
      */
-    changeList: function(value, initial) {
+    changeList(value, initial = null) {
       value = value || this.dependent.val();
 
       // Empty mark
@@ -83,7 +79,7 @@
       } else if (this.options.source) {
         this.sourceUpdate(value, initial);
       }
-    },
+    }
 
     /**
      * Update list by source.
@@ -91,11 +87,10 @@
      * @param {string} value
      * @param {bool}   initial
      */
-    sourceUpdate: function(value, initial) {
-      var self = this;
-      var source = this.options.source;
+    sourceUpdate(value, initial = null) {
+      const source = this.options.source;
 
-      this.beforeHook(value, self.element, self.dependent);
+      this.beforeHook(value, this.element, this.dependent);
 
       if (source[value]) {
         this.updateListElements(source[value]);
@@ -107,44 +102,43 @@
         }
       }
 
-      this.afterHook(value, self.element, self.dependent);
-    },
+      this.afterHook(value, this.element, this.dependent);
+    }
 
     /**
      * Do ajax.
      *
      * @param {string} value
      */
-    ajaxUpdate: function(value) {
-      var self = this;
-      var uri = new SimpleURI(this.options.ajax.url);
-      uri.setVar(this.options.ajax.value_field, value);
+    ajaxUpdate(value) {
+      const data = {};
+      data[this.options.ajax.value_field] = value;
 
-      self.beforeHook(value, self.element, self.dependent);
+      this.beforeHook(value, this.element, this.dependent);
 
-      $.get(uri.toString())
-        .done(function(response) {
+      $.get(this.options.ajax.url, data)
+        .done(response => {
           if (response.success) {
-            self.updateListElements(response.data);
+            this.updateListElements(response.data);
           } else {
             console.error(response.message);
           }
-        }).fail(function(response) {
+        }).fail(response => {
         console.error(response.message);
-      }).always(function() {
-        self.afterHook(value, self.element, self.dependent);
+      }).always(() => {
+        this.afterHook(value, this.element, this.dependent);
       });
-    },
+    }
 
     /**
      * Update list elements.
      *
      * @param {Array} items
      */
-    updateListElements: function(items) {
-      var self = this;
-      var textField = this.options.text_field;
-      var valueField = this.options.value_field;
+    updateListElements(items) {
+      const self = this;
+      const textField = this.options.text_field;
+      const valueField = this.options.value_field;
       self.element.empty();
 
       if (this.options.first_option) {
@@ -154,8 +148,8 @@
       }
 
       $.each(items, function() {
-        var value = this[valueField];
-        var option = $('<option>' + this[textField] + '</option>');
+        const value = this[valueField];
+        const option = $('<option>' + this[textField] + '</option>');
         option.attr('value', value);
 
         if (this.attributes) {
@@ -173,7 +167,7 @@
 
       self.element.trigger('chosen:updated');
       self.element.trigger('change');
-    },
+    }
 
     /**
      * Before hook.
@@ -183,11 +177,11 @@
      * @param {jQuery} dependent
      * @returns {*}
      */
-    beforeHook: function(value, element, dependent) {
-      var before = this.options.hooks.before_request;
+    beforeHook(value, element, dependent) {
+      const before = this.options.hooks.before_request;
 
       return before.call(this, value, element, dependent);
-    },
+    }
 
     /**
      * After hook.
@@ -197,12 +191,12 @@
      * @param {jQuery} dependent
      * @returns {*}
      */
-    afterHook: function(value, element, dependent) {
-      var after = this.options.hooks.after_request;
+    afterHook(value, element, dependent) {
+      const after = this.options.hooks.after_request;
 
       return after.call(this, value, element, dependent);
     }
-  };
+  }
 
   /**
    * Push plugins.
@@ -212,11 +206,11 @@
    *
    * @returns {*}
    */
-  $.fn[plugin] = function(dependent, options) {
-    if (!$.data(this, "phoenix." + plugin)) {
-      $.data(this, "phoenix." + plugin, new ListDependent(this, dependent, options));
+  $.fn[ListDependent.pluginName] = function(dependent, options) {
+    if (!$.data(this, "phoenix." + ListDependent.pluginName)) {
+      $.data(this, "phoenix." + ListDependent.pluginName, new ListDependent(this, dependent, options));
     }
 
-    return $.data(this, "phoenix." + plugin);
+    return $.data(this, "phoenix." + ListDependent.pluginName);
   };
 })(jQuery);

@@ -53,9 +53,8 @@ abstract class PhoenixScript extends AbstractPhoenixScript
         if (!static::inited(__METHOD__)) {
             JQueryScript::core();
             CoreScript::csrfToken();
-            CoreScript::sprintf();
 
-            static::addJS(static::phoenixName() . '/js/phoenix.min.js');
+            static::addJS(static::phoenixName() . '/js/phoenix/phoenix.min.js');
 
             static::data('windwalker.debug', WINDWALKER_DEBUG);
             static::data('phoenix.uri', Ioc::getUriData());
@@ -221,29 +220,26 @@ JS;
             $options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
 
             $js = <<<JS
-// Chosen select
-(function($) {
-    // Chosen for $selector
-	var select = $('{$selector}').chosen($options);
+// Chosen for $selector
+var select = $('{$selector}').chosen($options);
 
-	// Readonly hack by http://jsfiddle.net/eirc/v2es7L8o/
-	select.on('chosen:updated', function () {
-		if (select.attr('readonly')) {
-			var wasDisabled = select.is(':disabled');
+// Readonly hack by http://jsfiddle.net/eirc/v2es7L8o/
+select.on('chosen:updated', function () {
+    if (select.attr('readonly')) {
+        var wasDisabled = select.is(':disabled');
 
-			select.attr('disabled', 'disabled');
-			select.data('chosen').search_field_disabled();
+        select.attr('disabled', 'disabled');
+        select.data('chosen').search_field_disabled();
 
-			if (wasDisabled) {
-				select.attr('disabled', 'disabled');
-			} else {
-				select.removeAttr('disabled');
-			}
-		}
-	});
+        if (wasDisabled) {
+            select.attr('disabled', 'disabled');
+        } else {
+            select.removeAttr('disabled');
+        }
+    }
+});
 
-	select.trigger('chosen:updated');
-})(jQuery);
+select.trigger('chosen:updated');
 JS;
 
             static::domReady($js);
@@ -406,7 +402,6 @@ JS;
     public static function listDependent($selector, $dependentSelector, $source, array $options = [])
     {
         if (!static::inited(__METHOD__)) {
-            CoreScript::simpleUri();
             static::addJS(static::phoenixName() . '/js/phoenix/list-dependent.min.js');
         }
 
