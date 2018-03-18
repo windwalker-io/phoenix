@@ -10,6 +10,7 @@ namespace Phoenix\Model;
 
 use Windwalker\Core\Model\DatabaseModelRepository;
 use Windwalker\Data\DataInterface;
+use Windwalker\Ioc;
 use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
 
@@ -41,6 +42,14 @@ class ItemModel extends DatabaseModelRepository
 
             $item = $this->getRecord();
 
+            $dispatcher = Ioc::getDispatcher();
+
+            $dispatcher->triggerEvent('onModelBeforeLoad', [
+                'conditions' => $conditions,
+                'model' => $this,
+                'item' => $item
+            ]);
+
             try {
                 $item->load($conditions);
             } catch (NoResultException $e) {
@@ -48,6 +57,12 @@ class ItemModel extends DatabaseModelRepository
             }
 
             $this->postGetItem($item);
+
+            $dispatcher->triggerEvent('onModelAfterLoad', [
+                'conditions' => $conditions,
+                'model' => $this,
+                'item' => $item
+            ]);
 
             return $item;
         });
