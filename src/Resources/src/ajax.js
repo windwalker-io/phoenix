@@ -5,29 +5,48 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-var Phoenix;
-(function($, Phoenix) {
+(function($) {
   "use strict";
 
-  Phoenix.Ajax = {
-    $: $,
+  class PhoenixAjax extends PhoenixPlugin {
+    static get is() { return 'Ajax' }
 
-    config: {
-      customMethod: false,
-    },
+    static get proxies() {
+      return {};
+    }
 
-    data: {},
+    static get defaultOptions() {
+      return {}
+    }
 
-    headers: {
-      GET: {},
-      POST: {},
-      PUT: {},
-      PATCH: {},
-      DELETE: {},
-      HEAD: {},
-      OPTIONS: {},
-      _global: {}
-    },
+    constructor() {
+      super();
+
+      this.$ = $;
+
+      this.config = {
+        customMethod: false
+      };
+      
+      this.data = {};
+      
+      this.headers = {
+        GET: {},
+        POST: {},
+        PUT: {},
+        PATCH: {},
+        DELETE: {},
+        HEAD: {},
+        OPTIONS: {},
+        _global: {}
+      }
+    }
+
+    ready() {
+      super.ready();
+
+      this.headers._global['X-CSRF-Token'] = this.phoenix.data('csrf-token');
+    }
 
     /**
      * Send a GET request.
@@ -39,9 +58,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    get: function(url, data, headers, options) {
+    get(url, data, headers, options) {
       return this.request('GET', url, data, headers, options);
-    },
+    }
 
     /**
      * Send a POST request.
@@ -53,9 +72,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    post: function(url, data, headers, options) {
+    post(url, data, headers, options) {
       return this.request('POST', url, data, headers, options);
-    },
+    }
 
     /**
      * Send a PUT request.
@@ -67,9 +86,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    put: function(url, data, headers, options) {
+    put(url, data, headers, options) {
       return this.request('PUT', url, data, headers, options);
-    },
+    }
 
     /**
      * Send a PATCH request.
@@ -81,9 +100,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    patch: function(url, data, headers, options) {
+    patch(url, data, headers, options) {
       return this.request('PATCH', url, data, headers, options);
-    },
+    }
 
     /**
      * Send a DELETE request.
@@ -95,9 +114,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    sendDelete: function(url, data, headers, options) {
+    sendDelete(url, data, headers, options) {
       return this['delete'](url, data, headers, options);
-    },
+    }
 
     /**
      * Send a DELETE request.
@@ -109,9 +128,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    'delete': function(url, data, headers, options) {
+    'delete'(url, data, headers, options) {
       return this.request('DELETE', url, data, headers, options);
-    },
+    }
 
     /**
      * Send a HEAD request.
@@ -123,9 +142,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    head: function(url, data, headers, options) {
+    head(url, data, headers, options) {
       return this.request('HEAD', url, data, headers, options);
-    },
+    }
 
     /**
      * Send a OPTIONS request.
@@ -137,9 +156,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    options: function(url, data, headers, options) {
+    options(url, data, headers, options) {
       return this.request('OPTIONS', url, data, headers, options);
-    },
+    }
 
     /**
      * Send request.
@@ -152,9 +171,9 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    sendRequest: function(method, url, data, headers, options) {
+    sendRequest(method, url, data, headers, options) {
       return this.request(method, url, data, headers, options);
-    },
+    }
 
     /**
      * Send request.
@@ -167,7 +186,7 @@ var Phoenix;
      *
      * @returns {jqXHR}
      */
-    request: function(method, url, data, headers, options) {
+    request(method, url, data, headers, options) {
       options = options || {};
       headers = headers || {};
       data = data || {};
@@ -191,7 +210,7 @@ var Phoenix;
       options.headers = $.extend(true, {}, this.headers._global, this.headers[type], options.headers, headers);
 
       return this.$.ajax(url, options);
-    },
+    }
 
     /**
      * Set custom method with _method parameter.
@@ -200,13 +219,15 @@ var Phoenix;
      *
      * @returns {Ajax}
      */
-    customMethod: function() {
+    customMethod() {
       var clone = $.extend(true, {}, this);
 
       clone.config.customMethod = true;
 
       return clone;
     }
-  };
+  }
 
-})(jQuery, Phoenix || (Phoenix = {}));
+  window.PhoenixAjax = PhoenixAjax;
+
+})(jQuery);

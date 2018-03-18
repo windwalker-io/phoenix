@@ -173,6 +173,8 @@ JS;
         if (!static::inited(__METHOD__, get_defined_vars())) {
             // Inject Token to meta
             HtmlHeader::addMetadata('csrf-token', $token ?: CsrfProtection::getFormToken());
+
+            PhoenixScript::data('csrf-token', $token ?: CsrfProtection::getFormToken());
         }
     }
 

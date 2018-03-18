@@ -5,14 +5,13 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-var Phoenix;
-(function(Phoenix, $) {
+(($) => {
   "use strict";
 
   /**
    * Bootstrap Theme
    */
-  Phoenix.Theme = {
+  class PhoenixUIBootstrap3 extends PhoenixUI  {
     /**
      * Show Validation response.
      *
@@ -21,7 +20,7 @@ var Phoenix;
      * @param {jQuery}            $input
      * @param {string}            help
      */
-    showValidateResponse: function(validation, state, $input, help) {
+    showValidateResponse(validation, state, $input, help) {
       var $control = $input.parents('.form-group').first();
       var self = this;
 
@@ -52,7 +51,7 @@ var Phoenix;
           self.addValidateResponse($control, $input, icon, color, help);
         }, 100);
       }
-    },
+    }
 
     /**
      * Add validate effect to input, just override this method to fit other templates.
@@ -63,7 +62,7 @@ var Phoenix;
      * @param {string} color
      * @param {string} help
      */
-    addValidateResponse: function($control, $input, icon, color, help) {
+    addValidateResponse($control, $input, icon, color, help) {
       $control.addClass('has-' + color + ' has-feedback');
 
       var feedback = $('<span class="' + icon + ' form-control-feedback" aria-hidden="true"></span>');
@@ -89,14 +88,14 @@ var Phoenix;
           $input.parent().append(helpElement);
         }
       }
-    },
+    }
 
     /**
      * Remove validation response.
      *
      * @param {jQuery} $element
      */
-    removeValidateResponse: function($element) {
+    removeValidateResponse($element) {
       $element.find('.form-control-feedback').remove();
       $element.removeClass('has-error')
         .removeClass('has-success')
@@ -104,7 +103,7 @@ var Phoenix;
         .removeClass('has-feedback');
 
       $element.find('.help-block').remove();
-    },
+    }
 
     /**
      * Render message.
@@ -113,7 +112,7 @@ var Phoenix;
      * @param {string|Array} msg
      * @param {string}       type
      */
-    renderMessage: function(messageContainer, msg, type) {
+    renderMessage(messageContainer, msg, type) {
       type = type || 'info';
 
       var message = messageContainer.find('div.alert.alert-' + type),
@@ -131,50 +130,22 @@ var Phoenix;
       for (i in msg) {
         message.append('<p>' + msg[i] + '</p>');
       }
-    },
+    }
 
     /**
      * Remove all messages.
      *
      * @param {jQuery} messageContainer
      */
-    removeMessages: function(messageContainer) {
+    removeMessages(messageContainer) {
       var messages = messageContainer.children();
 
       messages.each(function() {
         this.remove();
       });
-    },
-
-    /**
-     * Toggle filter bar.
-     *
-     * @param {jQuery} container
-     * @param {jQuery} button
-     */
-    toggleFilter: function(container, button) {
-      var showClass = button.attr('data-class-show') || 'btn-primary';
-      var hideClass = button.attr('data-class-hide') || 'btn-default';
-
-      var icon = button.find('span.filter-button-icon');
-      var iconShowClass = icon.attr('data-class-show') || 'fa fa-angle-up';
-      var iconHideClass = icon.attr('data-class-hide') || 'fa fa-angle-down';
-
-      if (container.hasClass('shown')) {
-        button.removeClass(showClass).addClass(hideClass);
-        container.hide('fast');
-        container.removeClass('shown');
-
-        icon.removeClass(iconShowClass).addClass(iconHideClass);
-      }
-      else {
-        button.removeClass(hideClass).addClass(showClass);
-        container.show('fast');
-        container.addClass('shown');
-
-        icon.removeClass(iconHideClass).addClass(iconShowClass);
-      }
     }
-  };
+  }
 
-})(Phoenix || (Phoenix = {}), jQuery);
+  window.PhoenixUIBootstrap3 = PhoenixUIBootstrap3;
+
+})(jQuery);

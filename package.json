@@ -5,10 +5,10 @@
     "main": "index.js",
     "scripts": {
         "postinstall": "npm run build -- install",
-        "build": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile fusionfile.js",
-        "watch": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile fusionfile.js --watch",
-        "watch:reload": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile fusionfile.js --watch --livereload",
-        "prod": "cross-env NODE_ENV=production node_modules/gulp/bin/gulp.js --gulpfile fusionfile.js"
+        "build": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile=fusionfile.js",
+        "watch": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile=fusionfile.js --watch=1",
+        "watch:reload": "cross-env NODE_ENV=development node_modules/gulp/bin/gulp.js --gulpfile=fusionfile.js --watch=1 --livereload=1",
+        "prod": "cross-env NODE_ENV=production node_modules/gulp/bin/gulp.js --gulpfile=fusionfile.js"
     },
     "repository": {
         "type": "git",

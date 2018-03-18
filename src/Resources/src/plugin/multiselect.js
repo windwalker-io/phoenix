@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Part of Phoenix project.
  *
@@ -10,7 +8,7 @@
 /**
  * PhoenixMultiSelect
  */
-;(function ($) {
+;(function($) {
   /**
    * Plugin name.
    *
@@ -30,7 +28,7 @@
    *
    * @constructor
    */
-  var PhoenixMultiSelect = function PhoenixMultiSelect($element, options) {
+  var PhoenixMultiSelect = function($element, options) {
     var self = this;
     this.form = $element;
     this.boxes = $element.find('input.grid-checkbox[type=checkbox]');
@@ -39,7 +37,7 @@
 
     this.boxes.parent().css('user-select', 'none');
 
-    this.boxes.on('click', function (event) {
+    this.boxes.on('click', function(event) {
       self.select(this, event);
     });
   };
@@ -51,7 +49,7 @@
      * @param {Element} element
      * @param {Event}   event
      */
-    select: function select(element, event) {
+    select: function(element, event) {
       if (!this.last) {
         this.last = element;
 
@@ -65,27 +63,28 @@
 
         var chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
 
-        $.each(chs, function (i, e) {
+        $.each(chs, function(i, e) {
           if (self.options.duration) {
-            setTimeout(function () {
+            setTimeout(function() {
               e.checked = self.last.checked;
-            }, self.options.duration / chs.length * i);
-          } else {
+            }, (self.options.duration / chs.length) * i);
+          }
+          else {
             e.checked = self.last.checked;
           }
-        });
+        })
       }
 
       this.last = element;
     }
   };
 
-  $.fn[plugin] = function (options) {
+  $.fn[plugin] = function(options) {
     if (!this.data('phoenix.' + plugin)) {
       this.data('phoenix.' + plugin, new PhoenixMultiSelect(this, options));
     }
 
     return this.data('phoenix.' + plugin);
   };
+
 })(jQuery);
-//# sourceMappingURL=multiselect.js.map

@@ -26,6 +26,30 @@ fusion.task('js', function () {
   // Compile end
 });
 
+// The task `phoenix`
+fusion.task('phoenix', function () {
+  // Watch start
+  fusion.watch([
+    './src/Resources/src/**/*.js'
+  ]);
+  // Watch end
+
+  // Merge some core files
+  fusion.babel([
+    'src/Resources/src/phoenix.js',
+    'src/Resources/src/plugin.js',
+    'src/Resources/src/helper.js',
+    'src/Resources/src/ui.js',
+    'src/Resources/src/router.js',
+    'src/Resources/src/ajax.js',
+    'src/Resources/src/crypto.js',
+    'src/Resources/src/translator.js',
+    'src/Resources/src/legacy.js',
+  ], 'src/Resources/asset/js/phoenix.js');
+  fusion.babel('src/Resources/src/plugin/*.js', 'src/Resources/asset/js/phoenix/');
+  // Compile end
+});
+
 // The task `scss`
 fusion.task('scss', function () {
   // Watch start

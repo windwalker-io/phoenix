@@ -5,14 +5,13 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-var Phoenix;
-(function(Phoenix, $) {
+(($) => {
   "use strict";
 
   /**
    * Bootstrap Theme
    */
-  Phoenix.Theme = {
+  class PhoenixUIBootstrap4 extends PhoenixUI {
     /**
      * Show Validation response.
      *
@@ -21,10 +20,10 @@ var Phoenix;
      * @param {jQuery}            $input
      * @param {string}            help
      */
-    showValidateResponse: function(validation, state, $input, help) {
-      var $control = $input.parents('.form-group').first();
-      var $form = $input.parents('form');
-      var self = this;
+    showValidateResponse(validation, state, $input, help) {
+      const $control = $input.parents('.form-group').first();
+      const $form = $input.parents('form');
+      const self = this;
 
       // Add class to form
       if (!$form.hasClass('was-validated')) {
@@ -34,7 +33,7 @@ var Phoenix;
       this.removeValidateResponse($control);
 
       if (state != validation.STATE_NONE) {
-        var icon, color;
+        let icon, color;
 
         switch (state) {
           case validation.STATE_SUCCESS:
@@ -58,7 +57,7 @@ var Phoenix;
           self.addValidateResponse($control, $input, icon, color, help);
         }, 100);
       }
-    },
+    }
 
     /**
      * Add validate effect to input, just override this method to fit other templates.
@@ -69,8 +68,8 @@ var Phoenix;
      * @param {string} type
      * @param {string} help
      */
-    addValidateResponse: function($control, $input, icon, type, help) {
-      var color;
+    addValidateResponse($control, $input, icon, type, help) {
+      let color;
 
       color = type === 'success' ? 'valid' : 'invalid';
 
@@ -85,10 +84,10 @@ var Phoenix;
       }
 
       if (help) {
-        var feedback = '<span class="' + icon + '" aria-hidden="true"></span>';
-        var helpElement = $('<small class="' + color + '-feedback form-control-feedback">' + feedback + ' ' + help + '</small>');
+        const feedback = '<span class="' + icon + '" aria-hidden="true"></span>';
+        const helpElement = $('<small class="' + color + '-feedback form-control-feedback">' + feedback + ' ' + help + '</small>');
 
-        var tagName = $input.prop('tagName').toLowerCase();
+        const tagName = $input.prop('tagName').toLowerCase();
 
         if (tagName === 'div') {
           $input.append(helpElement);
@@ -96,36 +95,35 @@ var Phoenix;
           $input.parent().append(helpElement);
         }
       }
-    },
+    }
 
     /**
      * Remove validation response.
      *
      * @param {jQuery} $element
      */
-    removeValidateResponse: function($element) {
+    removeValidateResponse($element) {
       $element.find('.form-control-feedback').remove();
       $element.find('input')
         .removeClass('is-invalid')
         .removeClass('is-valid');
-    },
+    }
 
     /**
      * Render message.
      *
-     * @param {jQuery}       messageContainer
      * @param {string|Array} msg
      * @param {string}       type
      */
-    renderMessage: function(messageContainer, msg, type) {
+    renderMessage(msg, type) {
       type = type || 'info';
 
-      var message = messageContainer.find('div.alert.alert-' + type),
-        i;
+      let message = this.messageContainer.find('div.alert.alert-' + type);
+      let i;
 
       if (!message.length) {
         message = $('<div class="alert alert-' + type + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close"></div>');
-        messageContainer.append(message);
+        this.messageContainer.append(message);
       }
 
       if (typeof msg === 'string') {
@@ -135,49 +133,18 @@ var Phoenix;
       for (i in msg) {
         message.append('<p>' + msg[i] + '</p>');
       }
-    },
+    }
 
     /**
      * Remove all messages.
-     *
-     * @param {jQuery} messageContainer
      */
-    removeMessages: function(messageContainer) {
-      var messages = messageContainer.children();
-
-      messages.each(function() {
+    removeMessages() {
+      this.messageContainer.children().each(function() {
         this.remove();
       });
-    },
-
-    /**
-     * Toggle filter bar.
-     *
-     * @param {jQuery} container
-     * @param {jQuery} button
-     */
-    toggleFilter: function(container, button) {
-      var showClass = button.attr('data-class-show') || 'btn-primary';
-      var hideClass = button.attr('data-class-hide') || 'btn-default';
-
-      var icon = button.find('span.filter-button-icon');
-      var iconShowClass = icon.attr('data-class-show') || 'fa fa-angle-up';
-      var iconHideClass = icon.attr('data-class-hide') || 'fa fa-angle-down';
-
-      if (container.hasClass('shown')) {
-        button.removeClass(showClass).addClass(hideClass);
-        container.hide('fast');
-        container.removeClass('shown');
-
-        icon.removeClass(iconShowClass).addClass(iconHideClass);
-      } else {
-        button.removeClass(hideClass).addClass(showClass);
-        container.show('fast');
-        container.addClass('shown');
-
-        icon.removeClass(iconHideClass).addClass(iconShowClass);
-      }
     }
-  };
+  }
 
-})(Phoenix || (Phoenix = {}), jQuery);
+  window.PhoenixUIBootstrap4 = PhoenixUIBootstrap4;
+
+})(jQuery);

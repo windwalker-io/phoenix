@@ -5,7 +5,7 @@
         <input type="text" class="form-control input-sm form-control-sm" data-order-row="{{ $row }}"
                name="ordering[{{ $item->$keyName }}]" value="{{ $item->$orderField }}"
                onkeydown="if(event.keyCode == 13) return false;"/>
-        <div class="input-group-btn">
+        <div class="input-group-btn input-group-append">
             <button type="button" class="btn btn-default btn-outline-secondary btn-sm hasTooltip"
                     onclick="{{ $phoenixJsObject }}.Grid.reorder({{ $row }}, -1);"
                     title="@translate('phoenix.grid.ordering.moveup')">

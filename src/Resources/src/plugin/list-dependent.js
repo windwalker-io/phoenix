@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Part of phoenix project.
  *
@@ -7,12 +5,13 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-;(function ($) {
+;(function($) {
   "use strict";
 
   var plugin = 'listDependent';
 
-  var nope = function nope(value, ele, dep) {};
+  var nope = function(value, ele, dep) {
+  };
 
   var defaultOptions = {
     ajax: {
@@ -39,7 +38,7 @@
    * @param {Object}        options
    * @constructor
    */
-  var ListDependent = function ListDependent($element, dependent, options) {
+  var ListDependent = function($element, dependent, options) {
     this.element = $element;
     this.options = $.extend(true, {}, defaultOptions, options);
     this.dependent = $(dependent);
@@ -56,10 +55,10 @@
     /**
      * Bind events.
      */
-    bindEvents: function bindEvents() {
+    bindEvents: function() {
       var self = this;
 
-      this.dependent.on('change', function (event) {
+      this.dependent.on('change', function(event) {
         var $this = $(this);
         self.changeList($this.val());
       });
@@ -71,7 +70,7 @@
      * @param {*}    value
      * @param {bool} initial
      */
-    changeList: function changeList(value, initial) {
+    changeList: function(value, initial) {
       value = value || this.dependent.val();
 
       // Empty mark
@@ -92,7 +91,7 @@
      * @param {string} value
      * @param {bool}   initial
      */
-    sourceUpdate: function sourceUpdate(value, initial) {
+    sourceUpdate: function(value, initial) {
       var self = this;
       var source = this.options.source;
 
@@ -116,22 +115,23 @@
      *
      * @param {string} value
      */
-    ajaxUpdate: function ajaxUpdate(value) {
+    ajaxUpdate: function(value) {
       var self = this;
       var uri = new SimpleURI(this.options.ajax.url);
       uri.setVar(this.options.ajax.value_field, value);
 
       self.beforeHook(value, self.element, self.dependent);
 
-      $.get(uri.toString()).done(function (response) {
-        if (response.success) {
-          self.updateListElements(response.data);
-        } else {
-          console.error(response.message);
-        }
-      }).fail(function (response) {
+      $.get(uri.toString())
+        .done(function(response) {
+          if (response.success) {
+            self.updateListElements(response.data);
+          } else {
+            console.error(response.message);
+          }
+        }).fail(function(response) {
         console.error(response.message);
-      }).always(function () {
+      }).always(function() {
         self.afterHook(value, self.element, self.dependent);
       });
     },
@@ -141,7 +141,7 @@
      *
      * @param {Array} items
      */
-    updateListElements: function updateListElements(items) {
+    updateListElements: function(items) {
       var self = this;
       var textField = this.options.text_field;
       var valueField = this.options.value_field;
@@ -153,13 +153,13 @@
         items[0][valueField] = this.options.first_option[valueField];
       }
 
-      $.each(items, function () {
+      $.each(items, function() {
         var value = this[valueField];
         var option = $('<option>' + this[textField] + '</option>');
         option.attr('value', value);
 
         if (this.attributes) {
-          $.each(this.attributes, function (index) {
+          $.each(this.attributes, function(index) {
             option.attr(index, this);
           });
         }
@@ -183,7 +183,7 @@
      * @param {jQuery} dependent
      * @returns {*}
      */
-    beforeHook: function beforeHook(value, element, dependent) {
+    beforeHook: function(value, element, dependent) {
       var before = this.options.hooks.before_request;
 
       return before.call(this, value, element, dependent);
@@ -197,7 +197,7 @@
      * @param {jQuery} dependent
      * @returns {*}
      */
-    afterHook: function afterHook(value, element, dependent) {
+    afterHook: function(value, element, dependent) {
       var after = this.options.hooks.after_request;
 
       return after.call(this, value, element, dependent);
@@ -212,7 +212,7 @@
    *
    * @returns {*}
    */
-  $.fn[plugin] = function (dependent, options) {
+  $.fn[plugin] = function(dependent, options) {
     if (!$.data(this, "phoenix." + plugin)) {
       $.data(this, "phoenix." + plugin, new ListDependent(this, dependent, options));
     }
@@ -220,4 +220,3 @@
     return $.data(this, "phoenix." + plugin);
   };
 })(jQuery);
-//# sourceMappingURL=list-dependent.js.map
