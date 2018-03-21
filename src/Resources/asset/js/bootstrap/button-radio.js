@@ -39,26 +39,6 @@
 
     options = this.options;
 
-    $radios.each(function () {
-      var $radio = $(this);
-      var $input = $radio.find('input');
-      var $label = $radio.find('label');
-      var $text = $('<span>' + $label.text() + '</span>');
-
-      $label.hide();
-      $input.hide();
-      $radio.prepend($text);
-      $radio.removeClass('radio');
-
-      if ($input.prop('disabled')) {
-        $radio.addClass('disabled');
-      }
-
-      if ($input.prop('readonly')) {
-        $radio.addClass('readonly');
-      }
-    });
-
     $radios.addClass(options.buttonClass)
       .addClass(options.color['default']);
 
@@ -90,7 +70,39 @@
         input.prop('checked', true);
         input.trigger('change');
       }
-    }).trigger('click');
+    });
+
+    $radios.each(function () {
+      var $radio = $(this);
+      var $input = $radio.find('input');
+      var $label = $radio.find('label');
+      var $text = $('<span>' + $label.text() + '</span>');
+
+      $label.hide();
+      $input.hide();
+      $radio.prepend($text);
+      $radio.removeClass('radio');
+
+      if ($input.prop('checked')) {
+        if ($input.val() === '') {
+          $radio.addClass(options.activeClass).addClass(options.color.blue);
+        }
+        else if ($input.val() === '0') {
+          $radio.addClass(options.activeClass).addClass(options.color.red);
+        }
+        else {
+          $radio.addClass(options.activeClass).addClass(options.color.green);
+        }
+      }
+
+      if ($input.prop('disabled')) {
+        $radio.addClass('disabled');
+      }
+
+      if ($input.prop('readonly')) {
+        $radio.addClass('readonly');
+      }
+    });
 
     $radios.parent().trigger('button-radio.loaded');
 
