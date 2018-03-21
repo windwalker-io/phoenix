@@ -2109,7 +2109,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _event$instance;
 
                 debug ? _this20.constructor.warn('Phoenix', method) : null;
-                (_event$instance = event.instance)[method].apply(_event$instance, arguments);
+                return (_event$instance = event.instance)[method].apply(_event$instance, arguments);
               };
             });
 
@@ -2123,7 +2123,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _event$instance2;
 
                 debug ? _this20.constructor.warn('Phoenix.Grid', method) : null;
-                (_event$instance2 = event.instance)[method].apply(_event$instance2, arguments);
+                return (_event$instance2 = event.instance)[method].apply(_event$instance2, arguments);
               };
             });
 
