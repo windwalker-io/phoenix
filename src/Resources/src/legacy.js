@@ -27,7 +27,7 @@
           ['delete', 'get', 'patch', 'post', 'put', 'sendDelete', 'submit'].forEach((method) => {
             phoenix[method] = (...args) => {
               debug ? this.constructor.warn('Phoenix', method) : null;
-              event.instance[method](...args);
+              return event.instance[method](...args);
             }
           });
 
@@ -41,7 +41,7 @@
             .forEach((method) => {
               phoenix.Grid[method] = (...args) => {
                 debug ? this.constructor.warn('Phoenix.Grid', method) : null;
-                event.instance[method](...args);
+                return event.instance[method](...args);
               }
             });
 
