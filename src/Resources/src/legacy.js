@@ -6,6 +6,9 @@
  */
 
 (() => {
+  let formInited = false;
+  let gridInited = false;
+
   class PhoenixLegacy extends PhoenixPlugin {
     static get is() {
       return 'Legacy';
@@ -15,9 +18,6 @@
       const phoenix = this.phoenix;
 
       phoenix.Theme = phoenix.UI;
-
-      let formInited = false;
-      let gridInited = false;
 
       phoenix.on('jquery.plugin.created', event => {
         const debug = this.phoenix.data('windwalker.debug');

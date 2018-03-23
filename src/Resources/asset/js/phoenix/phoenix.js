@@ -2078,6 +2078,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  */
 
 (function () {
+  var formInited = false;
+  var gridInited = false;
+
   var PhoenixLegacy = function (_PhoenixPlugin8) {
     _inherits(PhoenixLegacy, _PhoenixPlugin8);
 
@@ -2095,9 +2098,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var phoenix = this.phoenix;
 
         phoenix.Theme = phoenix.UI;
-
-        var formInited = false;
-        var gridInited = false;
 
         phoenix.on('jquery.plugin.created', function (event) {
           var debug = _this20.phoenix.data('windwalker.debug');
