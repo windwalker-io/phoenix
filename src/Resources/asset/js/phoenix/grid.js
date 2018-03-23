@@ -103,13 +103,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
       this.form = element;
       this.options = $.extend(true, {}, this.constructor.defaultOptions, options);
+      this.phoenix = phoenix;
       this.core = phoenix.form(options.mainSelector);
       this.ui = phoenix.UI;
+
+      if (!this.core) {
+        throw new Error('PhoenixGrid is dependent on PhoenixForm');
+      }
+
+      if (!this.ui) {
+        throw new Error('PhoenixGrid is dependent on PhoenixUI');
+      }
 
       var selector = this.options.selector;
 
       this.searchContainer = this.form.find(selector.search.container);
-      this.searchButton = this.form.find(selector.search.button);
+      //this.searchButton = this.form.find(selector.search.button);
       this.searchClearButton = this.form.find(selector.search.clearButton);
       this.filterContainer = this.form.find(selector.filter.container);
       this.filterButton = this.form.find(selector.filter.button);
@@ -126,13 +135,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     _createClass(PhoenixGridElement, [{
       key: 'registerEvents',
       value: function registerEvents() {
-        var self = this;
+        var _this2 = this;
 
-        this.searchClearButton.click(function (event) {
-          self.searchContainer.find('input, textarea, select').val('');
-          self.filterContainer.find('input, textarea, select').val('');
+        this.searchClearButton.click(function () {
+          _this2.searchContainer.find('input, textarea, select').val('');
+          _this2.filterContainer.find('input, textarea, select').val('');
 
-          self.form.submit();
+          _this2.form.submit();
         });
 
         this.filterButton.click(function (event) {
@@ -149,7 +158,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       /**
        * Toggle filter bar.
        *
-       * @returns {PhoenixGrid}
+       * @returns {PhoenixGridElement}
        */
 
     }, {
@@ -203,8 +212,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
     }, {
       key: 'checkRow',
-      value: function checkRow(row, value) {
-        value = value || true;
+      value: function checkRow(row) {
+        var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
         var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
 
@@ -309,13 +318,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'deleteList',
       value: function deleteList(message, url, queries) {
-        var self = this;
+        var _this3 = this;
 
-        message = message || Phoenix.Translator.translate('phoenix.message.delete.confirm');
+        message = message || this.phoenix.__('phoenix.message.delete.confirm');
 
-        this.core.confirm(message, function (isConfirm) {
+        this.phoenix.confirm(message, function (isConfirm) {
           if (isConfirm) {
-            self.core['delete'](url, queries);
+            _this3.core['delete'](url, queries);
           }
         });
 
@@ -352,7 +361,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
     }, {
       key: 'toggleAll',
-      value: function toggleAll(value, duration) {
+      value: function toggleAll(value) {
+        var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+
         var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
 
         $.each(checkboxes, function (i, e) {
@@ -408,7 +419,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        * @param   {string}  msg
        * @param   {Event}   event
        *
-       * @returns {PhoenixGrid}
+       * @returns {PhoenixGridElement}
        */
 
     }, {

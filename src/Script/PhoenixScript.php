@@ -68,14 +68,28 @@ abstract class PhoenixScript extends AbstractPhoenixScript
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
-            $defaultOptions = [];
+            $defaultOptions = [
+                'theme' => BootstrapScript::$currentVersion === 3 ? 'bootstrap' : 'bootstrap4'
+            ];
 
-            $options = static::getJSObject($defaultOptions, $options);
+            $options = static::mergeOptions($defaultOptions, $options);
+
+            $ui = '';
+
+            if ($options['theme'] === 'bootstrap') {
+                static::addJS(static::phoenixName() . '/js/phoenix/ui-bootstrap.min.js');
+                $ui = 'PhoenixUIBootstrap3';
+            } elseif ($options['theme'] === 'bootstrap4') {
+                static::addJS(static::phoenixName() . '/js/phoenix/ui-bootstrap4.min.js');
+                $ui = 'PhoenixUIBootstrap4';
+            }
+
+            $options = static::getJSObject($options);
 
             $js = <<<JS
 // Phoenix Core
 var $variable = new PhoenixCore($options);
-$variable.use([PhoenixHelper, PhoenixRouter, PhoenixTranslator, PhoenixAjax, PhoenixCrypto]);
+$variable.use([$ui, PhoenixHelper, PhoenixRouter, PhoenixTranslator, PhoenixAjax, PhoenixCrypto]);
 $variable.Uri = window.$variable.data('phoenix.uri');
 JS;
 
@@ -91,8 +105,26 @@ JS;
      * @param array  $options
      *
      * @return void
+     *
+     * @deprecated Use PhoenixScript::form() instead.
      */
     public static function core($formSelector = '#admin-form', $variable = 'Phoenix', $options = [])
+    {
+        static::form($formSelector, $variable, $options);
+    }
+
+    /**
+     * form
+     *
+     * @param string $formSelector
+     * @param string $variable
+     * @param array  $options
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function form($formSelector = '#admin-form', $variable = 'Phoenix', $options = [])
     {
         if (!static::inited(__METHOD__)) {
             static::phoenix($variable, $options);
@@ -100,23 +132,8 @@ JS;
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
-            $defaultOptions = [
-                'theme' => BootstrapScript::$currentVersion === 3 ? 'bootstrap' : 'bootstrap4'
-            ];
-
-            $options = static::mergeOptions($defaultOptions, $options);
-            $ui      = '';
-
-            if ($options['theme'] === 'bootstrap') {
-                static::addJS(static::phoenixName() . '/js/phoenix/ui-bootstrap.min.js');
-                $ui = 'PhoenixUIBootstrap3';
-            } elseif ($options['theme'] === 'bootstrap4') {
-                static::addJS(static::phoenixName() . '/js/phoenix/ui-bootstrap4.min.js');
-                $ui = 'PhoenixUIBootstrap4';
-            }
-
             $js = <<<JS
-window.$variable.use([$ui, PhoenixForm, PhoenixLegacy]);
+window.$variable.use([PhoenixForm, PhoenixLegacy]);
 window.$variable.form('$formSelector');
 JS;
 
@@ -314,7 +331,7 @@ JS;
     public static function formValidation($selector = '#admin-form', $options = [], $variable = 'Phoenix')
     {
         if (!static::inited(__METHOD__)) {
-            static::core();
+            static::core($selector, $variable);
 
             static::addJS(static::phoenixName() . '/js/string/punycode.min.js');
             static::addJS(static::phoenixName() . '/js/phoenix/validation.min.js');
@@ -350,7 +367,7 @@ JS;
     public static function keepAlive($url = './', $time = null)
     {
         if (!static::inited(__METHOD__)) {
-            static::core();
+            static::phoenix();
 
             if ($time === null) {
                 $config = Ioc::getConfig();

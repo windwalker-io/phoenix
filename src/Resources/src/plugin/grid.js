@@ -61,13 +61,22 @@
     constructor(element, options, phoenix) {
       this.form = element;
       this.options = $.extend(true, {}, this.constructor.defaultOptions, options);
+      this.phoenix = phoenix;
       this.core = phoenix.form(options.mainSelector);
       this.ui = phoenix.UI;
 
-      var selector = this.options.selector;
+      if (!this.core) {
+        throw new Error('PhoenixGrid is dependent on PhoenixForm');
+      }
+
+      if (!this.ui) {
+        throw new Error('PhoenixGrid is dependent on PhoenixUI');
+      }
+
+      const selector = this.options.selector;
 
       this.searchContainer = this.form.find(selector.search.container);
-      this.searchButton = this.form.find(selector.search.button);
+      //this.searchButton = this.form.find(selector.search.button);
       this.searchClearButton = this.form.find(selector.search.clearButton);
       this.filterContainer = this.form.find(selector.filter.container);
       this.filterButton = this.form.find(selector.filter.button);
@@ -80,13 +89,11 @@
      * Start this object and events.
      */
     registerEvents() {
-      var self = this;
+      this.searchClearButton.click(() => {
+        this.searchContainer.find('input, textarea, select').val('');
+        this.filterContainer.find('input, textarea, select').val('');
 
-      this.searchClearButton.click(function(event) {
-        self.searchContainer.find('input, textarea, select').val('');
-        self.filterContainer.find('input, textarea, select').val('');
-
-        self.form.submit();
+        this.form.submit();
       });
 
       this.filterButton.click(function(event) {
@@ -103,7 +110,7 @@
     /**
      * Toggle filter bar.
      *
-     * @returns {PhoenixGrid}
+     * @returns {PhoenixGridElement}
      */
     toggleFilter() {
       this.ui.toggleFilter(this.filterContainer, this.filterButton);
@@ -120,7 +127,7 @@
      * @returns {boolean}
      */
     sort(ordering, direction) {
-      var orderingInput = this.form.find('input[name=list_ordering]');
+      let orderingInput = this.form.find('input[name=list_ordering]');
 
       if (!orderingInput.length) {
         orderingInput = $('<input name="list_ordering" type="hidden" value="" />');
@@ -128,7 +135,7 @@
         this.form.append(orderingInput);
       }
 
-      var directionInput = this.form.find('input[name=list_direction]');
+      let directionInput = this.form.find('input[name=list_direction]');
 
       if (!directionInput.length) {
         directionInput = $('<input name="list_direction" type="hidden" value="" />');
@@ -148,10 +155,8 @@
      * @param {number}  row
      * @param {boolean} value
      */
-    checkRow(row, value) {
-      value = value || true;
-
-      var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
+    checkRow(row, value = true) {
+      const ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
 
       if (!ch.length) {
         throw new Error('Checkbox of row: ' + row + ' not found.');
@@ -239,13 +244,11 @@
      * @returns {boolean}
      */
     deleteList(message, url, queries) {
-      var self = this;
+      message = message || this.phoenix.__('phoenix.message.delete.confirm');
 
-      message = message || Phoenix.Translator.translate('phoenix.message.delete.confirm');
-
-      this.core.confirm(message, function(isConfirm) {
+      this.phoenix.confirm(message, isConfirm => {
         if (isConfirm) {
-          self.core['delete'](url, queries);
+          this.core['delete'](url, queries);
         }
       });
 
@@ -276,8 +279,8 @@
      * @param  {boolean}          value     Checked or unchecked.
      * @param  {number|boolean}   duration  Duration to check all.
      */
-    toggleAll(value, duration) {
-      var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
+    toggleAll(value, duration = 100) {
+      const checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
 
       $.each(checkboxes, function(i, e) {
         if (duration) {
@@ -309,7 +312,7 @@
      * @returns {Element[]}
      */
     getChecked() {
-      var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]'),
+      const checkboxes = this.form.find('input.grid-checkbox[type=checkbox]'),
         result = [];
 
       $.each(checkboxes, function(i, e) {
@@ -327,7 +330,7 @@
      * @param   {string}  msg
      * @param   {Event}   event
      *
-     * @returns {PhoenixGrid}
+     * @returns {PhoenixGridElement}
      */
     hasChecked(msg, event) {
       msg = msg || Phoenix.Translator.translate('phoenix.message.grid.checked');
@@ -356,25 +359,25 @@
      * @returns {boolean}
      */
     reorderAll(url, queries) {
-      var self = this;
-      var origin = this.form.find('input[name=origin_ordering]');
+      const self = this;
+      const origin = this.form.find('input[name=origin_ordering]');
 
       // If origin exists, we diff them and only send changed group.
       if (origin.length) {
-        var originOrdering = origin.val().split(',');
-        var inputs = this.form.find('.ordering-control input');
+        const originOrdering = origin.val().split(',');
+        const inputs = this.form.find('.ordering-control input');
 
         this.toggleAll(false);
 
         inputs.each(function(i) {
-          var $this = $(this);
+          const $this = $(this);
 
           if ($this.val() !== originOrdering[i]) {
             // Check self
             self.checkRow($this.data('order-row'));
 
-            var tr = $this.parents('tr');
-            var group = tr.data('order-group');
+            const tr = $this.parents('tr');
+            const group = tr.data('order-group');
 
             // Check same group boxes
             if (group !== '') {
