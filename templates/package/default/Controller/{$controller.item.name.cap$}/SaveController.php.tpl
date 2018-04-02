@@ -25,12 +25,14 @@ class SaveController extends AbstractSaveController
      * @var  string
      */
     protected $listName = '{$controller.list.name.cap$}';
+
     /**
      * Property formControl.
      *
      * @var  string
      */
     protected $formControl = 'item';
+
     /**
      * The default Model.
      *

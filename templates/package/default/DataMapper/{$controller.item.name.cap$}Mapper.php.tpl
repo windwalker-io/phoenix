@@ -26,18 +26,21 @@ class {$controller.item.name.cap$}Mapper extends AbstractDatabaseMapperProxy
      * @var  string
      */
     protected static $table = Table::{$controller.list.name.upper$};
+
     /**
      * Property keys.
      *
      * @var  string
      */
     protected static $keys = 'id';
+
     /**
      * Property alias.
      *
      * @var  string
      */
     protected static $alias = '{$controller.item.name.lower$}';
+
     /**
      * Property dataClass.
      *

@@ -24,6 +24,7 @@ class {$controller.item.name.cap$}ListField extends ItemListField
      * @var  string
      */
     protected $table = Table::{$controller.list.name.upper$};
+
     /**
      * Property ordering.
      *

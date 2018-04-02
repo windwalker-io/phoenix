@@ -21,12 +21,14 @@ use Windwalker\Record\Record;
 class {$controller.item.name.cap$}Record extends Record
 {
     use {$controller.item.name.cap$}DataTrait;
+
     /**
      * Property table.
      *
      * @var  string
      */
     protected $table = Table::{$controller.list.name.upper$};
+
     /**
      * Property keys.
      *

@@ -26,6 +26,7 @@ class {$controller.list.name.cap$}HtmlView extends GridView
      * @var  string
      */
     protected $name = '{$controller.list.name.cap$}';
+
     /**
      * The fields mapper.
      *
@@ -43,6 +44,7 @@ class {$controller.list.name.cap$}HtmlView extends GridView
         'language' => 'language',
         'lang_title' => 'lang_title'
     ];
+
     /**
      * The grid config.
      *
@@ -51,6 +53,7 @@ class {$controller.list.name.cap$}HtmlView extends GridView
     protected $gridConfig = [
         'order_column' => '{$controller.item.name.lower$}.ordering'
     ];
+
     /**
      * Property simplePagination.
      *

@@ -29,6 +29,7 @@ class GetController extends ListDisplayController
      * @var  {$controller.list.name.cap$}Model
      */
     protected $model = '{$controller.list.name.cap$}';
+
     /**
      * Main View.
      *
@@ -37,6 +38,7 @@ class GetController extends ListDisplayController
      * @var  {$controller.list.name.cap$}HtmlView
      */
     protected $view = '{$controller.list.name.cap$}';
+
     /**
      * Property ordering.
      *
@@ -45,12 +47,14 @@ class GetController extends ListDisplayController
      * @var  string
      */
     protected $defaultOrdering = '{$controller.item.name.lower$}.id';
+
     /**
      * Property direction.
      *
      * @var  string
      */
     protected $defaultDirection = 'DESC';
+
     /**
      * The list limit per page..
      *

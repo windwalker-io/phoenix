@@ -29,6 +29,7 @@ class GetController extends DisplayController
      * @var  {$controller.list.name.cap$}Model
      */
     protected $model = '{$controller.list.name.cap$}';
+
     /**
      * Main View.
      *
