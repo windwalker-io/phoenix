@@ -126,12 +126,10 @@ JS;
      */
     public static function form($formSelector = '#admin-form', $variable = 'Phoenix', $options = [])
     {
-        if (!static::inited(__METHOD__)) {
+        if (!static::inited(__METHOD__, get_defined_vars())) {
             static::phoenix($variable, $options);
             static::addJS(static::phoenixName() . '/js/phoenix/form.min.js');
-        }
 
-        if (!static::inited(__METHOD__, get_defined_vars())) {
             $js = <<<JS
 window.$variable.use([PhoenixForm, PhoenixLegacy]);
 window.$variable.form('$formSelector');
