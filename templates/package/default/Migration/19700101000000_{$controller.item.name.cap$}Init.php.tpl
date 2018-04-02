@@ -20,8 +20,7 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
      */
     public function up()
     {
-        $this->createTable(
-            Table::{$controller.list.name.upper$}, function (Schema $schema) {
+        $this->createTable(Table::{$controller.list.name.upper$}, function (Schema $schema) {
             $schema->primary('id')->comment('Primary Key');
             $schema->varchar('title')->comment('Title');
             $schema->varchar('alias')->comment('Alias');
@@ -41,8 +40,7 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
             $schema->addIndex('alias');
             $schema->addIndex('language');
             $schema->addIndex('created_by');
-        }
-        );
+        });
     }
 
     /**

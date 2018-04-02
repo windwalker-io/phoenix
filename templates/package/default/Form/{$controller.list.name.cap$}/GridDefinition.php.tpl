@@ -34,8 +34,7 @@ class GridDefinition extends AbstractFieldDefinition
 		 * Add search fields as options, by default, model will search all columns.
 		 * If you hop that user can choose a field to search, change "display" to true.
 		 */
-        $this->group(
-            'search', function (Form $form) {
+        $this->group('search', function (Form $form) {
             // Search Field
             $this->list('field')
                 ->label(Translator::translate('phoenix.grid.search.field.label'))
@@ -49,8 +48,7 @@ class GridDefinition extends AbstractFieldDefinition
             $this->text('content')
                 ->label(Translator::translate('phoenix.grid.search.label'))
                 ->placeholder(Translator::translate('phoenix.grid.search.label'));
-        }
-        );
+        });
 
         /*
 		 * Filter Control
@@ -60,8 +58,7 @@ class GridDefinition extends AbstractFieldDefinition
 		 *
 		 * You can override filter actions in {$controller.list.name.cap$}Model::configureFilters()
 		 */
-        $this->group(
-            'filter', function (Form $form) {
+        $this->group('filter', function (Form $form) {
             // State
             $this->list('{$controller.item.name.lower$}.state')
                 ->label('State')
@@ -72,8 +69,7 @@ class GridDefinition extends AbstractFieldDefinition
                 ->option(Translator::translate('phoenix.grid.state.published'), '1')
                 ->option(Translator::translate('phoenix.grid.state.unpublished'), '0')
                 ->onchange('this.form.submit()');
-        }
-        );
+        });
 
         /*
 		 * This is batch form definition.
@@ -81,8 +77,7 @@ class GridDefinition extends AbstractFieldDefinition
 		 * Every field is a table column.
 		 * For example, you can add a 'category_id' field to update item category.
 		 */
-        $this->group(
-            'batch', function (Form $form) {
+        $this->group('batch', function (Form $form) {
             // Language
             $this->list('language')
                 ->label('Language')
@@ -94,7 +89,6 @@ class GridDefinition extends AbstractFieldDefinition
             // Author
             $this->text('created_by')
                 ->label('Author');
-        }
-        );
+        });
     }
 }

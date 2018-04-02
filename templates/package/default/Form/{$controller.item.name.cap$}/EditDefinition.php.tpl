@@ -38,8 +38,7 @@ class EditDefinition extends AbstractFieldDefinition
     public function doDefine(Form $form)
     {
         // Basic fieldset
-        $this->fieldset(
-            'basic', function (Form $form) {
+        $this->fieldset('basic', function (Form $form) {
             // ID
             $this->hidden('id');
 
@@ -76,12 +75,10 @@ class EditDefinition extends AbstractFieldDefinition
             $this->add('{$controller.item.name.lower$}_modal', {$controller.item.name.cap$}ModalField::class)
                 ->label('Modal Example')
                 ->set('placeholder', 'Select {$controller.item.name.cap$} Example');
-        }
-        );
+        });
 
         // Text Fieldset
-        $this->fieldset(
-            'text', function (Form $form) {
+        $this->fieldset('text', function (Form $form) {
             // Introtext
             $this->textarea('introtext')
                 ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
@@ -91,12 +88,10 @@ class EditDefinition extends AbstractFieldDefinition
             $this->textarea('fulltext')
                 ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
                 ->rows(10);
-        }
-        );
+        });
 
         // Created fieldset
-        $this->fieldset(
-            'created', function (Form $form) {
+        $this->fieldset('created', function (Form $form) {
             // State
             $this->switch('state')
                 ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.published'))
@@ -124,7 +119,6 @@ class EditDefinition extends AbstractFieldDefinition
             $this->text('modified_by')
                 ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'))
                 ->disabled();
-        }
-        );
+        });
     }
 }
