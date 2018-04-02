@@ -36,21 +36,24 @@ class JsCommandListener
 
             $asset->internalJS("jQuery.data(document, $store);");
 
-            $js = implode("\n", PhoenixScript::$domReady);
+            if (is_array(PhoenixScript::$domReady) && count(PhoenixScript::$domReady) > 0) {
+                $js = implode("\n", PhoenixScript::$domReady);
 
-            if (WINDWALKER_DEBUG) {
-                $js = str_replace("\n", "\n  ", $js);
+                if (WINDWALKER_DEBUG) {
+                    $js = str_replace("\n", "\n  ", $js);
 
-                $js = "/* DOM READY START */\n\n  $js\n\n/* DOM READY END */";
-            }
+                    $js = "/* DOM READY START */\n\n  $js\n\n/* DOM READY END */";
+                }
 
-            $js = <<<JS
+                $js = <<<JS
 jQuery(function ($) {
 $js
 });
 JS;
 
-            $asset->internalJS($js);
+                $asset->internalJS($js);
+            }
+
         }
     }
 }
