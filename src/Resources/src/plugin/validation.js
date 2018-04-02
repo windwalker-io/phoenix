@@ -295,13 +295,15 @@
     registerEvents() {
       const self = this;
 
-      this.form.on('submit', function(event) {
-        if (!self.validateAll()) {
+      this.form.on('submit', event => {
+        if (!this.validateAll()) {
           event.stopPropagation();
           event.preventDefault();
 
           return false;
         }
+
+        this.form.trigger('phoenix.validate.success');
 
         return true;
       });

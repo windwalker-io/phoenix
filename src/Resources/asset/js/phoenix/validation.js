@@ -361,15 +361,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'registerEvents',
       value: function registerEvents() {
+        var _this2 = this;
+
         var self = this;
 
         this.form.on('submit', function (event) {
-          if (!self.validateAll()) {
+          if (!_this2.validateAll()) {
             event.stopPropagation();
             event.preventDefault();
 
             return false;
           }
+
+          _this2.form.trigger('phoenix.validate.success');
 
           return true;
         });
