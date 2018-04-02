@@ -51,7 +51,7 @@
             this.tabButtons.on('click', function(e)
             {
                 // Store the selected tab href in localstorage
-                window.localStorage.setItem(self.storageKey, $(e.target).attr('href'));
+                window.localStorage.setItem(self.storageKey, $(e.currentTarget).attr('href'));
             });
         },
 
