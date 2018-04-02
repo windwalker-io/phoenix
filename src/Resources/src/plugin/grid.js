@@ -96,14 +96,14 @@
         this.form.submit();
       });
 
-      this.filterButton.click(function(event) {
-        self.toggleFilter();
+      this.filterButton.click(event => {
+        this.toggleFilter();
         event.stopPropagation();
         event.preventDefault();
       });
 
-      this.sortButtons.click(function(event) {
-        self.sort(this, event);
+      this.sortButtons.click(event => {
+        self.sort(event.currentTarget, event);
       });
     }
 

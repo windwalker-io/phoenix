@@ -145,13 +145,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         });
 
         this.filterButton.click(function (event) {
-          self.toggleFilter();
+          _this2.toggleFilter();
           event.stopPropagation();
           event.preventDefault();
         });
 
         this.sortButtons.click(function (event) {
-          self.sort(this, event);
+          self.sort(event.currentTarget, event);
         });
       }
 
