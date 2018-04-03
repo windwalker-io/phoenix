@@ -28,32 +28,31 @@ class JsCommandListener
      */
     public function onAssetRenderScripts(Event $event)
     {
-        if (PhoenixScript::$data !== []) {
-            /** @var AssetManager $asset */
-            $asset = $event['asset'];
+        /** @var AssetManager $asset */
+        $asset = $event['asset'];
 
+        if (PhoenixScript::$data !== []) {
             $store = json_encode(PhoenixScript::$data, WINDWALKER_DEBUG ? JSON_PRETTY_PRINT : 0);
 
             $asset->internalJS("jQuery.data(document, $store);");
+        }
 
-            if (is_array(PhoenixScript::$domReady) && count(PhoenixScript::$domReady) > 0) {
-                $js = implode("\n", PhoenixScript::$domReady);
+        if (is_array(PhoenixScript::$domReady) && count(PhoenixScript::$domReady) > 0) {
+            $js = implode("\n", PhoenixScript::$domReady);
 
-                if (WINDWALKER_DEBUG) {
-                    $js = str_replace("\n", "\n  ", $js);
+            if (WINDWALKER_DEBUG) {
+                $js = str_replace("\n", "\n  ", $js);
 
-                    $js = "/* DOM READY START */\n\n  $js\n\n/* DOM READY END */";
-                }
+                $js = "/* DOM READY START */\n\n  $js\n\n/* DOM READY END */";
+            }
 
-                $js = <<<JS
+            $js = <<<JS
 jQuery(function ($) {
 $js
 });
 JS;
 
-                $asset->internalJS($js);
-            }
-
+            $asset->internalJS($js);
         }
     }
 }
