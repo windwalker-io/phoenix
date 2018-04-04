@@ -349,7 +349,7 @@ JS;
             static::translate('phoenix.message.validation.required');
             static::translate('phoenix.message.validation.failure');
 
-            static::domready('Phoenix.use(PhoenixValidation);');
+            static::domready("$variable.use(PhoenixValidation);");
             static::domready("$variable.validation('$selector', $options);");
         }
     }
