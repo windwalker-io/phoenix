@@ -6,19 +6,19 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Model;
+namespace {$package.namespace$}{$package.name.cap$}\Repository;
 
 use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
-use Phoenix\Model\AdminModel;
+use Phoenix\Repository\AdminRepository;
 use Windwalker\Data\DataInterface;
 use Windwalker\Record\Record;
 
 /**
- * The {$controller.item.name.cap$}Model class.
+ * The {$controller.item.name.cap$}Repository class.
  *
  * @since  1.0
  */
-class {$controller.item.name.cap$}Model extends AdminModel
+class {$controller.item.name.cap$}Repository extends AdminRepository
 {
     /**
      * Property name.

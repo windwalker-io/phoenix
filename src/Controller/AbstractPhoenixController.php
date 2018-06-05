@@ -54,7 +54,7 @@ abstract class AbstractPhoenixController extends AbstractController
      *
      * @var  ModelRepository
      */
-    protected $model;
+    protected $repository;
 
     /**
      * Property prefix.
@@ -215,10 +215,28 @@ abstract class AbstractPhoenixController extends AbstractController
             return parent::getModel($name, $source, $forceNew);
         }
 
-        if (!$this->model instanceof ModelRepository || $forceNew) {
-            $this->model = parent::getModel($this->model, $source, $forceNew);
+        if (!$this->repository instanceof ModelRepository || $forceNew) {
+            $this->repository = parent::getModel($this->repository, $source, $forceNew);
         }
 
-        return $this->model;
+        return $this->repository;
+    }
+
+    /**
+     * __get
+     *
+     * @param   string $name
+     *
+     * @return  mixed
+     *
+     * @throws \OutOfRangeException
+     */
+    public function __get($name)
+    {
+        if ($name === 'model') {
+            return $this->repository;
+        }
+
+        return parent::__get($name);
     }
 }

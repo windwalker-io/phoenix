@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\Model;
+namespace Phoenix\Repository;
 
 use Windwalker\Record\NestedRecord;
 use Windwalker\Record\Record;
@@ -17,7 +17,7 @@ use Windwalker\Test\TestHelper;
  *
  * @since  1.1
  */
-class NestedAdminModel extends AdminModel
+class NestedAdminRepository extends AdminRepository
 {
     /**
      * prepareRecord

@@ -8,10 +8,10 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
-use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
+use {$package.namespace$}{$package.name.cap$}\Repository\{$controller.item.name.cap$}Repository;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView;
 use Phoenix\Controller\Display\DisplayController;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\View\AbstractView;
 
 /**
@@ -26,9 +26,9 @@ class GetController extends DisplayController
      *
      * If set model name here, controller will get model object by this name.
      *
-     * @var  {$controller.item.name.cap$}Model
+     * @var  {$controller.item.name.cap$}Repository
      */
-    protected $model = '{$controller.item.name.cap$}';
+    protected $repository = '{$controller.item.name.cap$}';
 
     /**
      * Main View.
@@ -64,7 +64,7 @@ class GetController extends DisplayController
     {
         /**
          * @var $view  {$controller.item.name.cap$}HtmlView
-         * @var $model {$controller.item.name.cap$}Model
+         * @var $model {$controller.item.name.cap$}Repository
          */
         parent::prepareViewModel($view, $model);
 

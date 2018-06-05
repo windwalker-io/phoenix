@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller\Display;
 
-use Phoenix\Model\ItemModel;
+use Phoenix\Repository\ItemRepository;
 use Phoenix\View\ItemView;
 use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\View\AbstractView;
@@ -16,7 +16,7 @@ use Windwalker\Core\View\AbstractView;
 /**
  * The GetController class.
  *
- * @method  ItemModel getModel($name = null, $source = null, $forceNew)
+ * @method  ItemRepository getModel($name = null, $source = null, $forceNew)
  * @method  ItemView  getView($name = null, $format = 'html', $engine = null, $forceNew = false)
  *
  * @since  1.0

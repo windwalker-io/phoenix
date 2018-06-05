@@ -53,14 +53,15 @@ class DisplayController extends AbstractPhoenixController
      * A hook before main process executing.
      *
      * @return  void
+     * @throws \Exception
      */
     protected function prepareExecute()
     {
         $this->format = $this->format ?: $this->app->get('route.extra.format', 'html');
         $this->layout = $this->layout ?: $this->app->get('route.extra.layout', $this->name);
-
-        $this->model = $this->getRepository();
-        $this->view  = $this->getView();
+        
+        $this->repository = $this->model = $this->getRepository();
+        $this->view       = $this->getView();
 
         // Prepare response
         $response = $this->response;
@@ -88,7 +89,7 @@ class DisplayController extends AbstractPhoenixController
      */
     protected function doExecute()
     {
-        $this->prepareViewRepository($this->view, $this->model);
+        $this->prepareViewRepository($this->view, $this->repository);
 
         if (!$this->authorise()) {
             throw new UnauthorizedException('You have no access to view this page.');
@@ -148,7 +149,7 @@ class DisplayController extends AbstractPhoenixController
     protected function prepareViewModel(AbstractView $view, ModelRepository $model)
     {
         // Here is B/C code
-        $this->view->setRepository($this->model, true, function (ModelRepository $model) {
+        $this->view->setRepository($this->repository, true, function (ModelRepository $model) {
             $this->prepareModelState($model);
         });
 

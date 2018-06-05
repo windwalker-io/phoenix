@@ -8,10 +8,10 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list.name.cap$};
 
-use {$package.namespace$}{$package.name.cap$}\Model\{$controller.list.name.cap$}Model;
+use {$package.namespace$}{$package.name.cap$}\Repository\{$controller.list.name.cap$}Repository;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\ListDisplayController;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\View\AbstractView;
 
 /**
@@ -26,9 +26,9 @@ class GetController extends ListDisplayController
      *
      * If set model name here, controller will get model object by this name.
      *
-     * @var  {$controller.list.name.cap$}Model
+     * @var  {$controller.list.name.cap$}Repository
      */
-    protected $model = '{$controller.list.name.cap$}';
+    protected $repository = '{$controller.list.name.cap$}';
 
     /**
      * Main View.
@@ -108,7 +108,7 @@ class GetController extends ListDisplayController
     {
         /**
          * @var $view  {$controller.list.name.cap$}HtmlView
-         * @var $model {$controller.list.name.cap$}Model
+         * @var $model {$controller.list.name.cap$}Repository
          */
         parent::prepareViewModel($view, $model);
 

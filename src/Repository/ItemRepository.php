@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Phoenix\Model;
+namespace Phoenix\Repository;
 
 use Windwalker\Core\Repository\DatabaseModelRepository;
 use Windwalker\Data\DataInterface;
@@ -19,7 +19,7 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class ItemModel extends DatabaseModelRepository
+class ItemRepository extends DatabaseModelRepository
 {
     /**
      * getItem

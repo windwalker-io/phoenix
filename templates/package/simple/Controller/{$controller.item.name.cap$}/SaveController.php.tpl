@@ -8,7 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.item.name.cap$};
 
-use {$package.namespace$}{$package.name.cap$}\Model\{$controller.item.name.cap$}Model;
+use {$package.namespace$}{$package.name.cap$}\Repository\{$controller.item.name.cap$}Repository;
 use Phoenix\Controller\AbstractSaveController;
 use Windwalker\Data\DataInterface;
 
@@ -45,9 +45,9 @@ class SaveController extends AbstractSaveController
      *
      * If set model name here, controller will get model object by this name.
      *
-     * @var  {$controller.item.name.cap$}Model
+     * @var  {$controller.item.name.cap$}Repository
      */
-    protected $model = '{$controller.item.name.cap$}';
+    protected $repository = '{$controller.item.name.cap$}';
 
     /**
      * A hook before main process executing.

@@ -8,8 +8,8 @@
 
 namespace Phoenix\Controller\Batch;
 
-use Phoenix\Model\AdminModel;
-use Phoenix\Model\AdminRepositoryInterface;
+use Phoenix\Repository\AdminRepository;
+use Phoenix\Repository\AdminRepositoryInterface;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
@@ -31,9 +31,9 @@ abstract class AbstractReorderController extends AbstractBatchController
     /**
      * Property model.
      *
-     * @var  AdminModel
+     * @var  AdminRepository
      */
-    protected $model;
+    protected $repository;
 
     /**
      * Property orderField.
@@ -70,7 +70,7 @@ abstract class AbstractReorderController extends AbstractBatchController
         $this->delta  = $this->input->post->get('delta');
 
         // Determine model
-        if (!$this->model instanceof AdminRepositoryInterface) {
+        if (!$this->repository instanceof AdminRepositoryInterface) {
             throw new \UnexpectedValueException(sprintf('%s model need extend to AdminModel', $this->getName()));
         }
     }
@@ -87,11 +87,11 @@ abstract class AbstractReorderController extends AbstractBatchController
             throw new UnauthorizedException('You have no access to modify these items.');
         }
 
-        $this->model['order.column'] = $this->orderField;
+        $this->repository['order.column'] = $this->orderField;
 
         // Move item
         if ($this->delta) {
-            $this->model->move($this->pks, $this->delta);
+            $this->repository->move($this->pks, $this->delta);
         } // Save order list
         else {
             // Do not order if no change.
@@ -109,7 +109,7 @@ abstract class AbstractReorderController extends AbstractBatchController
                 $order = $this->data;
             }
 
-            $this->model->reorder((array) $order);
+            $this->repository->reorder((array) $order);
         }
 
         return true;

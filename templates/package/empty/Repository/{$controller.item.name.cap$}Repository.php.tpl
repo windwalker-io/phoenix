@@ -6,16 +6,16 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Model;
+namespace {$package.namespace$}{$package.name.cap$}\Repository;
 
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 
 /**
- * The {$controller.item.name.cap$}Model class.
+ * The {$controller.item.name.cap$}Repository class.
  *
  * @since  1.0
  */
-class {$controller.item.name.cap$}Model extends ModelRepository
+class {$controller.item.name.cap$}Repository extends ModelRepository
 {
     /**
      * Property name.

@@ -8,7 +8,7 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\FormAwareRepositoryInterface;
+use Phoenix\Repository\FormAwareRepositoryInterface;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Repository\Exception\ValidateFailException;
 use Windwalker\Core\Security\Exception\UnauthorizedException;

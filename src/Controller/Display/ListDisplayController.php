@@ -8,8 +8,8 @@
 
 namespace Phoenix\Controller\Display;
 
-use Phoenix\Model\ListModel;
-use Phoenix\Model\ListRepositoryInterface;
+use Phoenix\Repository\ListRepository;
+use Phoenix\Repository\ListRepositoryInterface;
 use Phoenix\View\GridView;
 use Phoenix\View\ListView;
 use Windwalker\Core\Repository\ModelRepository;
@@ -19,7 +19,7 @@ use Windwalker\Form\Field\ListField;
 /**
  * The ListGetController class.
  *
- * @method  ListModel          getModel($name = null, $source = null, $forceNew)
+ * @method  ListRepository     getRepository($name = null, $source = null, $forceNew = false)
  * @method  ListView|GridView  getView($name = null, $format = 'html', $engine = null, $forceNew = false)
  *
  * @since  1.0
@@ -36,9 +36,9 @@ class ListDisplayController extends DisplayController
     /**
      * Property model.
      *
-     * @var  ListModel
+     * @var  ListRepository
      */
-    protected $model;
+    protected $repository;
 
     /**
      * The list limit per page..
@@ -125,7 +125,7 @@ class ListDisplayController extends DisplayController
 
         if ($search['field'] === '*' && isset($search['content'])) {
             // Get search fields
-            $form = $this->model->getForm('grid');
+            $form = $this->repository->getForm('grid');
 
             $searchField = $form->getField('field', 'search');
 

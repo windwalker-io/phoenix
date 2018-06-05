@@ -72,7 +72,7 @@ abstract class AbstractCopyController extends AbstractBatchController
     protected function save($pk, DataInterface $data)
     {
         // We load existing item first and bind data into it.
-        $record = $this->model->getRecord();
+        $record = $this->repository->getRecord();
 
         $record->reset();
 
@@ -80,7 +80,7 @@ abstract class AbstractCopyController extends AbstractBatchController
 
         $record->bind($data);
 
-        $recordClone = $this->model->getRecord();
+        $recordClone = $this->repository->getRecord();
 
         $condition = [];
 
@@ -113,6 +113,6 @@ abstract class AbstractCopyController extends AbstractBatchController
 
         unset($record->{$this->keyName});
 
-        return $this->model->save($record);
+        return $this->repository->save($record);
     }
 }

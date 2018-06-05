@@ -73,5 +73,32 @@ class PhoenixProvider implements ServiceProviderInterface
 
             return $manager;
         });
+
+        $this->registerClassAlias();
+    }
+
+    /**
+     * registerClassAlias
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function registerClassAlias()
+    {
+        class_alias(\Phoenix\Repository\AdminRepository::class,          \Phoenix\Model\AdminRepository::class);
+        class_alias(\Phoenix\Repository\AdminRepositoryInterface::class, \Phoenix\Model\AdminRepositoryInterface::class);
+        class_alias(\Phoenix\Repository\CrudRepository::class,           \Phoenix\Model\CrudRepository::class);
+        class_alias(\Phoenix\Repository\CrudRepositoryInterface::class,  \Phoenix\Model\CrudRepositoryInterface::class);
+        class_alias(\Phoenix\Repository\FormAwareRepositoryInterface::class, \Phoenix\Model\FormAwareRepositoryInterface::class);
+        class_alias(\Phoenix\Repository\ItemRepository::class,           \Phoenix\Model\ItemRepository::class);
+        class_alias(\Phoenix\Repository\ListRepository::class,           \Phoenix\Model\ListRepository::class);
+        class_alias(\Phoenix\Repository\ListRepositoryInterface::class,  \Phoenix\Model\ListRepositoryInterface::class);
+        class_alias(\Phoenix\Repository\NestedAdminRepository::class,    \Phoenix\Model\NestedAdminRepository::class);
+        class_alias(\Phoenix\Repository\Filter\AbstractFilterHelper::class,     \Phoenix\Model\Filter\AbstractFilterHelper::class);
+        class_alias(\Phoenix\Repository\Filter\FilterHelper::class,             \Phoenix\Model\Filter\FilterHelper::class);
+        class_alias(\Phoenix\Repository\Filter\FilterHelperInterface::class,    \Phoenix\Model\Filter\FilterHelperInterface::class);
+        class_alias(\Phoenix\Repository\Filter\SearchHelper::class,             \Phoenix\Model\Filter\SearchHelper::class);
+        class_alias(\Phoenix\Repository\Traits\FormAwareRepositoryTrait::class, \Phoenix\Model\Traits\FormAwareRepositoryTrait::class);
     }
 }

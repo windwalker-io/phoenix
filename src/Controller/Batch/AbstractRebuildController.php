@@ -41,11 +41,11 @@ class AbstractRebuildController extends AbstractBatchController
 
         try {
             /** @var NestedRecord $record */
-            $record = $this->model->getRecord();
+            $record = $this->repository->getRecord();
 
             $record->rebuild();
 
-            $ids = $this->model->getDataMapper()->findColumn('id', ['parent_id != 0']);
+            $ids = $this->repository->getDataMapper()->findColumn('id', ['parent_id != 0']);
 
             foreach ($ids as $id) {
                 $record->rebuildPath($id);

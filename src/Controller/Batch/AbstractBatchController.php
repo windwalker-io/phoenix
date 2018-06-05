@@ -92,7 +92,7 @@ abstract class AbstractBatchController extends AbstractPostController
     {
         $data->{$this->keyName} = $pk;
 
-        return $this->model->save($data);
+        return $this->repository->save($data);
     }
 
     /**
@@ -264,9 +264,9 @@ abstract class AbstractBatchController extends AbstractPostController
     public function getModel($name = null, $source = null, $forceNew = false)
     {
         // Force the singular model
-        if ($name === null && !$this->model instanceof ModelRepository) {
-            if (is_string($this->model)) {
-                $name = $this->model;
+        if ($name === null && !$this->repository instanceof ModelRepository) {
+            if (is_string($this->repository)) {
+                $name = $this->repository;
             } else {
                 $name = $name ?: $this->config['item_name'];
             }

@@ -8,8 +8,8 @@
 
 namespace Phoenix\Controller;
 
-use Phoenix\Model\CrudModel;
-use Phoenix\Model\CrudRepositoryInterface;
+use Phoenix\Repository\CrudRepository;
+use Phoenix\Repository\CrudRepositoryInterface;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Repository\DatabaseRepositoryInterface;
@@ -23,7 +23,7 @@ use Windwalker\Uri\Uri;
 /**
  * The AbstractAdminController class.
  *
- * @method  CrudModel  getModel($name = null, $source = null, $forceNew = false)
+ * @method  CrudRepository  getModel($name = null, $source = null, $forceNew = false)
  *
  * @since  1.0
  */
@@ -34,9 +34,9 @@ abstract class AbstractPostController extends AbstractPhoenixController
     /**
      * Property model.
      *
-     * @var  CrudModel
+     * @var  CrudRepository
      */
-    protected $model;
+    protected $repository;
 
     /**
      * Property data.
@@ -90,23 +90,23 @@ abstract class AbstractPostController extends AbstractPhoenixController
     {
         parent::prepareExecute();
 
-        $this->model      = $this->getModel();
+        $this->repository = $this->getModel();
         $this->dataObject = $this->getDataObject();
         $this->task       = $this->input->get('task');
 
         // Determine model
-        if (!$this->model instanceof CrudRepositoryInterface) {
+        if (!$this->repository instanceof CrudRepositoryInterface) {
             throw new \DomainException(sprintf(
                 '%s model should be instance of %s, class: %s given.',
-                $this->model->getName(),
+                $this->repository->getName(),
                 CrudRepositoryInterface::class,
-                get_class($this->model)
+                get_class($this->repository)
             ));
         }
 
         // Determine the name of the primary key for the data.
-        if (empty($this->keyName) && $this->model instanceof DatabaseRepositoryInterface) {
-            $this->keyName = $this->model->getKeyName(false) ?: 'id';
+        if (empty($this->keyName) && $this->repository instanceof DatabaseRepositoryInterface) {
+            $this->keyName = $this->repository->getKeyName(false) ?: 'id';
         }
     }
 

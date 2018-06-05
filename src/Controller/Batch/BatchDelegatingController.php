@@ -57,7 +57,7 @@ class BatchDelegatingController extends AbstractPhoenixController
         }
 
         // Keep model is string or null.
-        $model = $this->model instanceof ModelRepository ? null : $this->model;
+        $model = $this->repository instanceof ModelRepository ? null : $this->repository;
 
         /** @var AbstractController $controller */
         $controller = new $class;

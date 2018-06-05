@@ -6,9 +6,9 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Phoenix\Model;
+namespace Phoenix\Repository;
 
-use Phoenix\Model\Traits\FormAwareRepositoryTrait;
+use Phoenix\Repository\Traits\FormAwareRepositoryTrait;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Ioc;
@@ -20,7 +20,7 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class CrudModel extends ItemModel implements FormAwareRepositoryInterface, CrudRepositoryInterface
+class CrudRepository extends ItemRepository implements FormAwareRepositoryInterface, CrudRepositoryInterface
 {
     use FormAwareRepositoryTrait;
 

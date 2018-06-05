@@ -6,18 +6,19 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Model;
+namespace {$package.namespace$}{$package.name.cap$}\Repository;
 
-use Phoenix\Model\Filter\FilterHelperInterface;
-use Phoenix\Model\ListModel;
+use {$package.namespace$}{$package.name.cap$}\Table\Table;
+use Phoenix\Repository\Filter\FilterHelperInterface;
+use Phoenix\Repository\ListRepository;
 use Windwalker\Query\Query;
 
 /**
- * The {$controller.list.name.cap$}Model class.
+ * The {$controller.list.name.cap$}Repository class.
  *
  * @since  1.0
  */
-class {$controller.list.name.cap$}Model extends ListModel
+class {$controller.list.name.cap$}Repository extends ListRepository
 {
     /**
      * Property name.
@@ -47,7 +48,7 @@ class {$controller.list.name.cap$}Model extends ListModel
      */
     protected function configureTables()
     {
-        $this->addTable('{$controller.item.name.lower$}', '{$controller.list.name.lower$}');
+        $this->addTable('{$controller.item.name.lower$}', Table::{$controller.list.name.upper$});
     }
 
     /**
@@ -94,7 +95,7 @@ class {$controller.list.name.cap$}Model extends ListModel
      */
     protected function configureFilters(FilterHelperInterface $filterHelper)
     {
-        // Add your logic
+        // Configure filters
     }
 
     /**
@@ -117,6 +118,6 @@ class {$controller.list.name.cap$}Model extends ListModel
      */
     protected function configureSearches(FilterHelperInterface $searchHelper)
     {
-        // Add your logic
+        // Configure searches
     }
 }

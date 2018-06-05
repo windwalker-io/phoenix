@@ -6,17 +6,17 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Model;
+namespace {$package.namespace$}{$package.name.cap$}\Repository;
 
-use Phoenix\Model\ItemModel;
+use Phoenix\Repository\ItemRepository;
 use Windwalker\Data\DataInterface;
 
 /**
- * The {$controller.item.name.cap$}Model class.
+ * The {$controller.item.name.cap$}Repository class.
  *
  * @since  1.0
  */
-class {$controller.item.name.cap$}Model extends ItemModel
+class {$controller.item.name.cap$}Repository extends ItemRepository
 {
     /**
      * Property name.

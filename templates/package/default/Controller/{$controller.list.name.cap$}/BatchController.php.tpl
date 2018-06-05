@@ -24,5 +24,5 @@ class BatchController extends BatchDelegatingController
      *
      * @var  string
      */
-    protected $model = '{$controller.item.name.cap$}';
+    protected $repository = '{$controller.item.name.cap$}';
 }

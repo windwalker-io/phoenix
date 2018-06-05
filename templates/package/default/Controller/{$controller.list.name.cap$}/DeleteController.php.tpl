@@ -24,5 +24,5 @@ class DeleteController extends AbstractDeleteController
      *
      * @var  string
      */
-    protected $model = '{$controller.item.name.cap$}';
+    protected $repository = '{$controller.item.name.cap$}';
 }

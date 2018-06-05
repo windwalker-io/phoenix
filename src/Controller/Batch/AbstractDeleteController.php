@@ -45,6 +45,6 @@ abstract class AbstractDeleteController extends AbstractBatchController
     {
         $data->{$this->keyName} = $pk;
 
-        return $this->model->delete($pk);
+        return $this->repository->delete($pk);
     }
 }
