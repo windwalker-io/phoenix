@@ -29,11 +29,11 @@ class GridDefinition extends AbstractFieldDefinition
     protected function doDefine(Form $form)
     {
         /*
-		 * Search Control
-		 * -------------------------------------------------
-		 * Add search fields as options, by default, model will search all columns.
-		 * If you hop that user can choose a field to search, change "display" to true.
-		 */
+         * Search Control
+         * -------------------------------------------------
+         * Add search fields as options, by default, model will search all columns.
+         * If you hop that user can choose a field to search, change "display" to true.
+         */
         $this->group('search', function (Form $form) {
             // Search Field
             $this->list('field')
@@ -51,13 +51,13 @@ class GridDefinition extends AbstractFieldDefinition
         });
 
         /*
-		 * Filter Control
-		 * -------------------------------------------------
-		 * Add filter fields to this section.
-		 * Remember to add onchange event => this.form.submit(); or Phoenix.post();
-		 *
-		 * You can override filter actions in {$controller.list.name.cap$}Model::configureFilters()
-		 */
+         * Filter Control
+         * -------------------------------------------------
+         * Add filter fields to this section.
+         * Remember to add onchange event => this.form.submit(); or Phoenix.post();
+         *
+         * You can override filter actions in {$controller.list.name.cap$}Model::configureFilters()
+         */
         $this->group('filter', function (Form $form) {
             // State
             $this->list('{$controller.item.name.lower$}.state')
@@ -72,11 +72,11 @@ class GridDefinition extends AbstractFieldDefinition
         });
 
         /*
-		 * This is batch form definition.
-		 * -----------------------------------------------
-		 * Every field is a table column.
-		 * For example, you can add a 'category_id' field to update item category.
-		 */
+         * This is batch form definition.
+         * -----------------------------------------------
+         * Every field is a table column.
+         * For example, you can add a 'category_id' field to update item category.
+         */
         $this->group('batch', function (Form $form) {
             // Language
             $this->list('language')
