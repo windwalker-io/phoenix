@@ -39,6 +39,15 @@ abstract class AbstractPostController extends AbstractPhoenixController
     protected $repository;
 
     /**
+     * Property model.
+     *
+     * @var CrudRepository
+     *
+     * @deprecated  Use $repository instead.
+     */
+    protected $model;
+
+    /**
      * Property data.
      *
      * @var  array
@@ -85,12 +94,13 @@ abstract class AbstractPostController extends AbstractPhoenixController
      * @throws \Windwalker\Core\Security\Exception\UnauthorizedException
      * @throws \LogicException
      * @throws \DomainException
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {
         parent::prepareExecute();
 
-        $this->repository = $this->getModel();
+        $this->repository = $this->model = $this->getModel();
         $this->dataObject = $this->getDataObject();
         $this->task       = $this->input->get('task');
 
