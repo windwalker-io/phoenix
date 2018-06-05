@@ -50,6 +50,15 @@ class DisplayController extends AbstractPhoenixController
     protected $layout;
 
     /**
+     * B/C for old usage.
+     *
+     * @var ModelRepository
+     *
+     * @deprecated  Use $repository instead,
+     */
+    protected $model;
+
+    /**
      * A hook before main process executing.
      *
      * @return  void
