@@ -12,7 +12,7 @@ use Phoenix\Model\ListModel;
 use Phoenix\Model\ListRepositoryInterface;
 use Phoenix\View\GridView;
 use Phoenix\View\ListView;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Filter\InputFilter;
 use Windwalker\Form\Field\ListField;
 

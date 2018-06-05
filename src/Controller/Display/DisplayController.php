@@ -10,7 +10,7 @@ namespace Phoenix\Controller\Display;
 
 use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Controller\Middleware\JsonApiMiddleware;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\Response\HtmlViewResponse;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Core\View\AbstractView;
@@ -59,7 +59,7 @@ class DisplayController extends AbstractPhoenixController
         $this->format = $this->format ?: $this->app->get('route.extra.format', 'html');
         $this->layout = $this->layout ?: $this->app->get('route.extra.layout', $this->name);
 
-        $this->model = $this->getModel();
+        $this->model = $this->getRepository();
         $this->view  = $this->getView();
 
         // Prepare response
@@ -88,7 +88,7 @@ class DisplayController extends AbstractPhoenixController
      */
     protected function doExecute()
     {
-        $this->prepareViewModel($this->view, $this->model);
+        $this->prepareViewRepository($this->view, $this->model);
 
         if (!$this->authorise()) {
             throw new UnauthorizedException('You have no access to view this page.');
@@ -115,6 +115,7 @@ class DisplayController extends AbstractPhoenixController
      * @return AbstractView|HtmlView
      *
      * @throws \UnexpectedValueException
+     * @throws \Exception
      */
     public function getView($name = null, $format = null, $engine = null, $forceNew = false)
     {
@@ -141,11 +142,13 @@ class DisplayController extends AbstractPhoenixController
      * @param ModelRepository $model The default mode.
      *
      * @return  void
+     *
+     * @deprecated Use prepareViewRepository() instead.
      */
     protected function prepareViewModel(AbstractView $view, ModelRepository $model)
     {
         // Here is B/C code
-        $this->view->setModel($this->model, true, function (ModelRepository $model) {
+        $this->view->setRepository($this->model, true, function (ModelRepository $model) {
             $this->prepareModelState($model);
         });
 
@@ -154,6 +157,24 @@ class DisplayController extends AbstractPhoenixController
         $this->prepareViewData($this->view);
 
         // Add your logic after parent...
+    }
+
+    /**
+     * Prepare view and default repository.
+     *
+     * You can configure default model state here, or add more sub models to view.
+     * Remember to call parent to make sure default model already set in view.
+     *
+     * @param AbstractView    $view       The view to render page.
+     * @param ModelRepository $repository The default repository.
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function prepareViewRepository(AbstractView $view, ModelRepository $repository)
+    {
+        $this->prepareViewModel($view, $repository);
     }
 
     /**

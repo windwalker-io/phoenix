@@ -10,7 +10,7 @@ namespace Phoenix\Controller;
 
 use Phoenix\Model\FormAwareRepositoryInterface;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Model\Exception\ValidateFailException;
+use Windwalker\Core\Repository\Exception\ValidateFailException;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
@@ -73,7 +73,7 @@ abstract class AbstractSaveController extends AbstractPostController
      * @throws \LogicException
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Windwalker\Core\Model\Exception\ValidateFailException
+     * @throws \Windwalker\Core\Repository\Exception\ValidateFailException
      * @throws \Windwalker\Record\Exception\NoResultException
      */
     protected function doSave(DataInterface $data)

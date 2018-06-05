@@ -9,7 +9,7 @@
 namespace Phoenix\Controller\Batch;
 
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Model\Exception\ValidateFailException;
+use Windwalker\Core\Repository\Exception\ValidateFailException;
 use Windwalker\Data\Data;
 use Windwalker\Record\NestedRecord;
 

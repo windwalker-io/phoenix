@@ -10,8 +10,8 @@ namespace Phoenix\Controller\Batch;
 
 use Phoenix\Controller\AbstractPostController;
 use Windwalker\Core\Language\Translator;
-use Windwalker\Core\Model\Exception\ValidateFailException;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\Exception\ValidateFailException;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;

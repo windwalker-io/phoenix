@@ -8,7 +8,7 @@
 
 namespace Phoenix\Model;
 
-use Windwalker\Core\Model\Exception\ValidateFailException;
+use Windwalker\Core\Repository\Exception\ValidateFailException;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
 

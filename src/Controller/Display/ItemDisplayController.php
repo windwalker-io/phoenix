@@ -10,7 +10,7 @@ namespace Phoenix\Controller\Display;
 
 use Phoenix\Model\ItemModel;
 use Phoenix\View\ItemView;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\View\AbstractView;
 
 /**

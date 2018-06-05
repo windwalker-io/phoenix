@@ -12,7 +12,7 @@ use Phoenix\Model\CrudModel;
 use Phoenix\Model\CrudRepositoryInterface;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
 use Windwalker\Core\Frontend\Bootstrap;
-use Windwalker\Core\Model\DatabaseRepositoryInterface;
+use Windwalker\Core\Repository\DatabaseRepositoryInterface;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
