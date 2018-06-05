@@ -12,7 +12,7 @@ use Phoenix\Repository\ListRepository;
 use Phoenix\Repository\ListRepositoryInterface;
 use Phoenix\View\GridView;
 use Phoenix\View\ListView;
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Filter\InputFilter;
 use Windwalker\Form\Field\ListField;
 
@@ -73,13 +73,13 @@ class ListDisplayController extends DisplayController
     /**
      * prepareUserState
      *
-     * @param   ModelRepository|ListRepositoryInterface $model
+     * @param   Repository|ListRepositoryInterface $model
      *
      * @return  void
      *
      * @deprecated Override prepareViewModel() instead.
      */
-    protected function prepareModelState(ModelRepository $model)
+    protected function prepareModelState(Repository $model)
     {
         // Filter & Search
         $model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', [],

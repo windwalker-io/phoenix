@@ -8,7 +8,7 @@
 
 namespace Phoenix\Repository;
 
-use Windwalker\Core\Repository\DatabaseModelRepository;
+use Windwalker\Core\Repository\DatabaseRepository;
 use Windwalker\Data\DataInterface;
 use Windwalker\Ioc;
 use Windwalker\Record\Exception\NoResultException;
@@ -19,7 +19,7 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class ItemRepository extends DatabaseModelRepository
+class ItemRepository extends DatabaseRepository
 {
     /**
      * getItem

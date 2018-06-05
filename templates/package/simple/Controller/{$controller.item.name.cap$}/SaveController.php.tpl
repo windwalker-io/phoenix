@@ -41,7 +41,7 @@ class SaveController extends AbstractSaveController
     protected $listName = '{$controller.list.name.cap$}';
 
     /**
-     * The default Model.
+     * The default Repository.
      *
      * If set model name here, controller will get model object by this name.
      *

@@ -11,7 +11,7 @@ namespace Phoenix\Controller\Batch;
 use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Controller\Traits\CsrfProtectionTrait;
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\String\StringNormalise;
 
 /**
@@ -57,7 +57,7 @@ class BatchDelegatingController extends AbstractPhoenixController
         }
 
         // Keep model is string or null.
-        $model = $this->repository instanceof ModelRepository ? null : $this->repository;
+        $model = $this->repository instanceof Repository ? null : $this->repository;
 
         /** @var AbstractController $controller */
         $controller = new $class;

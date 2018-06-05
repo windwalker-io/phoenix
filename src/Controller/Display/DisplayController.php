@@ -10,7 +10,7 @@ namespace Phoenix\Controller\Display;
 
 use Phoenix\Controller\AbstractPhoenixController;
 use Windwalker\Core\Controller\Middleware\JsonApiMiddleware;
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Response\HtmlViewResponse;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Core\View\AbstractView;
@@ -52,7 +52,7 @@ class DisplayController extends AbstractPhoenixController
     /**
      * B/C for old usage.
      *
-     * @var ModelRepository
+     * @var Repository
      *
      * @deprecated  Use $repository instead,
      */
@@ -148,17 +148,17 @@ class DisplayController extends AbstractPhoenixController
      * You can configure default model state here, or add more sub models to view.
      * Remember to call parent to make sure default model already set in view.
      *
-     * @param AbstractView    $view  The view to render page.
-     * @param ModelRepository $model The default mode.
+     * @param AbstractView $view  The view to render page.
+     * @param Repository   $model The default mode.
      *
      * @return  void
      *
      * @deprecated Use prepareViewRepository() instead.
      */
-    protected function prepareViewModel(AbstractView $view, ModelRepository $model)
+    protected function prepareViewModel(AbstractView $view, Repository $model)
     {
         // Here is B/C code
-        $this->view->setRepository($this->repository, true, function (ModelRepository $model) {
+        $this->view->setRepository($this->repository, true, function (Repository $model) {
             $this->prepareModelState($model);
         });
 
@@ -175,14 +175,14 @@ class DisplayController extends AbstractPhoenixController
      * You can configure default model state here, or add more sub models to view.
      * Remember to call parent to make sure default model already set in view.
      *
-     * @param AbstractView    $view       The view to render page.
-     * @param ModelRepository $repository The default repository.
+     * @param AbstractView $view       The view to render page.
+     * @param Repository   $repository The default repository.
      *
      * @return  void
      *
      * @since  __DEPLOY_VERSION__
      */
-    protected function prepareViewRepository(AbstractView $view, ModelRepository $repository)
+    protected function prepareViewRepository(AbstractView $view, Repository $repository)
     {
         $this->prepareViewModel($view, $repository);
     }
@@ -204,13 +204,13 @@ class DisplayController extends AbstractPhoenixController
     /**
      * prepareUserState
      *
-     * @param   ModelRepository $model
+     * @param   Repository $model
      *
      * @return  void
      *
      * @deprecated Override prepareViewModel() instead.
      */
-    protected function prepareModelState(ModelRepository $model)
+    protected function prepareModelState(Repository $model)
     {
     }
 

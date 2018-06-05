@@ -11,7 +11,7 @@ namespace Phoenix\Controller\Batch;
 use Phoenix\Controller\AbstractPostController;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Repository\Exception\ValidateFailException;
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
@@ -257,14 +257,14 @@ abstract class AbstractBatchController extends AbstractPostController
      * @param mixed  $source
      * @param bool   $forceNew
      *
-     * @return ModelRepository
+     * @return Repository
      *
      * @throws \DomainException
      */
     public function getModel($name = null, $source = null, $forceNew = false)
     {
         // Force the singular model
-        if ($name === null && !$this->repository instanceof ModelRepository) {
+        if ($name === null && !$this->repository instanceof Repository) {
             if (is_string($this->repository)) {
                 $name = $this->repository;
             } else {

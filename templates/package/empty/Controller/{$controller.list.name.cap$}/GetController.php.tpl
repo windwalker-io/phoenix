@@ -11,7 +11,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Controller\{$controller.list
 use {$package.namespace$}{$package.name.cap$}\Repository\{$controller.list.name.cap$}Repository;
 use {$package.namespace$}{$package.name.cap$}\View\{$controller.list.name.cap$}\{$controller.list.name.cap$}HtmlView;
 use Phoenix\Controller\Display\DisplayController;
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\View\AbstractView;
 
 /**
@@ -22,7 +22,7 @@ use Windwalker\Core\View\AbstractView;
 class GetController extends DisplayController
 {
     /**
-     * The default Model.
+     * The default Repository.
      *
      * If set model name here, controller will get model object by this name.
      *
@@ -43,6 +43,7 @@ class GetController extends DisplayController
      * A hook before main process executing.
      *
      * @return  void
+     * @throws \Exception
      */
     protected function prepareExecute()
     {
@@ -50,25 +51,27 @@ class GetController extends DisplayController
     }
 
     /**
-     * Prepare view and default model.
+     * Prepare view and default repository.
      *
      * You can configure default model state here, or add more sub models to view.
      * Remember to call parent to make sure default model already set in view.
      *
-     * @param AbstractView    $view  The view to render page.
-     * @param ModelRepository $model The default mode.
+     * @param AbstractView $view       The view to render page.
+     * @param Repository   $repository The default repository.
      *
      * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
      */
-    protected function prepareViewModel(AbstractView $view, ModelRepository $model)
+    protected function prepareViewRepository(AbstractView $view, Repository $repository)
     {
         /**
-         * @var $view  {$controller.list.name.cap$}HtmlView
-         * @var $model {$controller.list.name.cap$}Repository
+         * @var $view       {$controller.list.name.cap$}HtmlView
+         * @var $repository {$controller.list.name.cap$}Repository
          */
-        parent::prepareViewModel($view, $model);
+        parent::prepareViewRepository($view, $repository);
 
-        // Configure view and model here...
+        // Configure view and repository here...
     }
 
     /**

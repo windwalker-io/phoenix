@@ -18,7 +18,7 @@ use Phoenix\Controller\Batch\AbstractCopyController;
 class CopyController extends AbstractCopyController
 {
     /**
-     * The default model.
+     * The default Repository.
      *
      * Keep model name here to make sure controller get singular model to handle copy.
      *

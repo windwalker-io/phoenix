@@ -11,7 +11,7 @@ namespace Phoenix\Controller\Display;
 use Phoenix\Repository\AdminRepository;
 use Phoenix\Repository\CrudRepository;
 use Phoenix\View\EditView;
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\View\AbstractView;
 
 /**
@@ -40,12 +40,12 @@ class EditDisplayController extends ItemDisplayController
      * You can configure default model state here, or add more sub models to view.
      * Remember to call parent to make sure default model already set in view.
      *
-     * @param AbstractView    $view  The view to render page.
-     * @param ModelRepository $model The default mode.
+     * @param AbstractView $view  The view to render page.
+     * @param Repository   $model The default mode.
      *
      * @return  void
      */
-    protected function prepareViewModel(AbstractView $view, ModelRepository $model)
+    protected function prepareViewModel(AbstractView $view, Repository $model)
     {
         parent::prepareViewModel($view, $model);
 

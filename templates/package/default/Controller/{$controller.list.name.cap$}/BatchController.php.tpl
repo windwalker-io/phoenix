@@ -18,7 +18,7 @@ use Phoenix\Controller\Batch\BatchDelegatingController;
 class BatchController extends BatchDelegatingController
 {
     /**
-     * The default model.
+     * The default Repository.
      *
      * Keep model name here to make sure controller get singular model to handle update.
      *

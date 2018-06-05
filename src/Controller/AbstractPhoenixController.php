@@ -9,7 +9,7 @@
 namespace Phoenix\Controller;
 
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
@@ -48,11 +48,11 @@ abstract class AbstractPhoenixController extends AbstractController
     protected $listName;
 
     /**
-     * The default Model.
+     * The default Repository.
      *
      * If set model name here, controller will get model object by this name.
      *
-     * @var  ModelRepository
+     * @var  Repository
      */
     protected $repository;
 
@@ -207,7 +207,7 @@ abstract class AbstractPhoenixController extends AbstractController
      * @param mixed  $source
      * @param bool   $forceNew
      *
-     * @return  ModelRepository
+     * @return  Repository
      */
     public function getModel($name = null, $source = null, $forceNew = false)
     {
@@ -215,7 +215,7 @@ abstract class AbstractPhoenixController extends AbstractController
             return parent::getModel($name, $source, $forceNew);
         }
 
-        if (!$this->repository instanceof ModelRepository || $forceNew) {
+        if (!$this->repository instanceof Repository || $forceNew) {
             $this->repository = parent::getModel($this->repository, $source, $forceNew);
         }
 

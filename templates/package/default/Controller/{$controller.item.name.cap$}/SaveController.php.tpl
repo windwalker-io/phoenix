@@ -34,7 +34,7 @@ class SaveController extends AbstractSaveController
     protected $formControl = 'item';
 
     /**
-     * The default Model.
+     * The default Repository.
      *
      * If set model name here, controller will get model object by this name.
      *

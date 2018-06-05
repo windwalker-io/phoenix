@@ -8,14 +8,14 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Repository;
 
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 
 /**
  * The {$controller.list.name.cap$}Repository class.
  *
  * @since  1.0
  */
-class {$controller.list.name.cap$}Repository extends ModelRepository
+class {$controller.list.name.cap$}Repository extends Repository
 {
     /**
      * Property name.
