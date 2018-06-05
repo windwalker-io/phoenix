@@ -31,7 +31,7 @@
         "moment-timezone": "*",
         "punycode": "1.*",
         "requirejs": "*",
-        "silicone": "*",
+        "silicone": "^1.0.0-beta1",
         "sprintf-js": "1.*",
         "underscore": "*",
         "underscore.string": "*",
