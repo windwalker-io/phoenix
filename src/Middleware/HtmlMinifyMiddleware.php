@@ -12,7 +12,6 @@ use Asika\Minifier\JsMinifier;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
-use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Stream\Stream;
 use Windwalker\Middleware\MiddlewareInterface;
 

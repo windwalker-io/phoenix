@@ -9,8 +9,8 @@
 namespace Phoenix\Controller;
 
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\DI\Container;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;

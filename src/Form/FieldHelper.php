@@ -8,14 +8,12 @@
 
 namespace Phoenix\Form;
 
-use Phoenix\Field\SwitchField;
 use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\JQueryScript;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Field\CheckboxesField;
 use Windwalker\Form\Field\CheckboxField;
 use Windwalker\Form\Field\HiddenField;
-use Windwalker\Form\Field\RadioField;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Arr;
 

@@ -9,7 +9,6 @@
 namespace Phoenix\Html;
 
 use Windwalker\Dom\HtmlElement;
-use Windwalker\Utilities\Arr;
 
 /**
  * The HtmlHeaderManager class.
