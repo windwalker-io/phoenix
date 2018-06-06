@@ -84,8 +84,8 @@ class DisplayController extends AbstractPhoenixController
         );
 
         // Prepare Json Middleware
-        if ($this->format === 'json' && array_search(JsonApiMiddleware::class,
-                iterator_to_array(clone $this->middlewares)) === false) {
+        if ($this->format === 'json'
+            && !in_array(JsonApiMiddleware::class, iterator_to_array(clone $this->middlewares), true)) {
             $this->addMiddleware(JsonApiMiddleware::class);
         }
     }
@@ -172,8 +172,8 @@ class DisplayController extends AbstractPhoenixController
     /**
      * Prepare view and default repository.
      *
-     * You can configure default model state here, or add more sub models to view.
-     * Remember to call parent to make sure default model already set in view.
+     * You can configure default repository state here, or add more sub repositories to view.
+     * Remember to call parent to make sure default repository already set in view.
      *
      * @param AbstractView $view       The view to render page.
      * @param Repository   $repository The default repository.
