@@ -121,7 +121,7 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/bootstrap/dist/css/bootstrap.*`, `${destPath}/css/bootstrap/4/`);
   fusion.copy(`${nodePath}/bootstrap/dist/js/bootstrap.bundle.*`, `${destPath}/js/bootstrap/4/`);
 
-  fusion.copy(`${nodePath}/bootstrap/scss/*`, `${destPath}/css/bootstrap/4/scss/`);
+  fusion.copy(`${nodePath}/bootstrap/scss/**/*`, `${destPath}/css/bootstrap/4/scss/`);
 
   fusion.copy(`${nodePath}/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.*`, `${destPath}/css/bootstrap/`);
   fusion.copy(`${nodePath}/eonasdan-bootstrap-datetimepicker/build/js/*`, `${destPath}/js/bootstrap/`);
