@@ -201,22 +201,23 @@ abstract class AbstractPhoenixController extends AbstractController
     }
 
     /**
-     * getModel
+     * getRepository
      *
      * @param string $name
      * @param mixed  $source
      * @param bool   $forceNew
      *
      * @return  Repository
+     * @throws \Exception
      */
-    public function getModel($name = null, $source = null, $forceNew = false)
+    public function getRepository($name = null, $source = null, $forceNew = false)
     {
         if ($name) {
-            return parent::getModel($name, $source, $forceNew);
+            return parent::getRepository($name, $source, $forceNew);
         }
 
         if (!$this->repository instanceof Repository || $forceNew) {
-            $this->repository = parent::getModel($this->repository, $source, $forceNew);
+            $this->repository = parent::getRepository($this->repository ?: $this->model, $source, $forceNew);
         }
 
         return $this->repository;
