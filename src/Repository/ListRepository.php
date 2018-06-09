@@ -341,6 +341,80 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
     }
 
     /**
+     * from
+     *
+     * @param string $alias
+     * @param string $table
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function from($alias, $table)
+    {
+        $this->addTable($alias, $table);
+
+        return $this;
+    }
+
+    /**
+     * leftJoin
+     *
+     * @param string  $alias
+     * @param string  $table
+     * @param mixed   $condition
+     * @param boolean $prefix
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function leftJoin($alias, $table, $condition = null, $prefix = null)
+    {
+        $this->addTable($alias, $table, $condition, 'LEFT', $prefix);
+
+        return $this;
+    }
+
+    /**
+     * rightJoin
+     *
+     * @param string  $alias
+     * @param string  $table
+     * @param mixed   $condition
+     * @param boolean $prefix
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function rightJoin($alias, $table, $condition = null, $prefix = null)
+    {
+        $this->addTable($alias, $table, $condition, 'RIGHT', $prefix);
+
+        return $this;
+    }
+
+    /**
+     * innerJoin
+     *
+     * @param string  $alias
+     * @param string  $table
+     * @param mixed   $condition
+     * @param boolean $prefix
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function innerJoin($alias, $table, $condition = null, $prefix = null)
+    {
+        $this->addTable($alias, $table, $condition, 'INNER', $prefix);
+
+        return $this;
+    }
+
+    /**
      * Method to get property QueryHelper
      *
      * @param bool $new
