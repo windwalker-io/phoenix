@@ -12,6 +12,7 @@ use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\User\User;
 use Windwalker\Data\DataInterface;
 use Windwalker\Filter\OutputFilter;
+use Windwalker\Form\Filter\MaxLengthFilter;
 use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
 
@@ -126,7 +127,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      */
     public function handleAlias($alias)
     {
-        return OutputFilter::stringURLSafe($alias);
+        return (new MaxLengthFilter(255))->clean(OutputFilter::stringURLSafe($alias));
     }
 
     /**
