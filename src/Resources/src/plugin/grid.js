@@ -138,7 +138,7 @@
       let directionInput = this.form.find('input[name=list_direction]');
 
       if (!directionInput.length) {
-        directionInput = $('<input name="list_direction" type="hidden" value="" />');
+        directionInput = $('<input name="list_direction" type="hidden" value="">');
 
         this.form.append(directionInput);
       }

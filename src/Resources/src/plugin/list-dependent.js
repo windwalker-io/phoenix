@@ -207,10 +207,10 @@
    * @returns {*}
    */
   $.fn[ListDependent.pluginName] = function(dependent, options) {
-    if (!$.data(this, "phoenix." + ListDependent.pluginName)) {
-      $.data(this, "phoenix." + ListDependent.pluginName, new ListDependent(this, dependent, options));
+    if (!this.data("phoenix." + ListDependent.pluginName)) {
+      this.data("phoenix." + ListDependent.pluginName, new ListDependent(this, dependent, options));
     }
 
-    return $.data(this, "phoenix." + ListDependent.pluginName);
+    return this.data("phoenix." + ListDependent.pluginName);
   };
 })(jQuery);
