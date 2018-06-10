@@ -37,17 +37,17 @@ class GridDefinition extends AbstractFieldDefinition
         $this->group('search', function (Form $form) {
             // Search Field
             $this->list('field')
-                ->label(Translator::translate('phoenix.grid.search.field.label'))
+                ->label(__('phoenix.grid.search.field.label'))
                 ->set('display', false)
                 ->defaultValue('*')
-                ->option(Translator::translate('phoenix.core.all'), '*')
-                ->option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'), '{$controller.item.name.lower$}.title')
-                ->option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'), '{$controller.item.name.lower$}.alias');
+                ->option(__('phoenix.core.all'), '*')
+                ->option(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'), '{$controller.item.name.lower$}.title')
+                ->option(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'), '{$controller.item.name.lower$}.alias');
 
             // Search Content
             $this->text('content')
-                ->label(Translator::translate('phoenix.grid.search.label'))
-                ->placeholder(Translator::translate('phoenix.grid.search.label'));
+                ->label(__('phoenix.grid.search.label'))
+                ->placeholder(__('phoenix.grid.search.label'));
         });
 
         /*
@@ -65,9 +65,9 @@ class GridDefinition extends AbstractFieldDefinition
                 ->addClass('hasChosen')
                 // Add empty option to support single deselect button
                 ->option('', '')
-                ->option(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select'), '')
-                ->option(Translator::translate('phoenix.grid.state.published'), '1')
-                ->option(Translator::translate('phoenix.grid.state.unpublished'), '0')
+                ->option(__('{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select'), '')
+                ->option(__('phoenix.grid.state.published'), '1')
+                ->option(__('phoenix.grid.state.unpublished'), '0')
                 ->onchange('this.form.submit()');
         });
 

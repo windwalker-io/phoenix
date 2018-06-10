@@ -13,7 +13,6 @@ use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}
 use Phoenix\Form\Filter\UtcFilter;
 use Phoenix\Form\PhoenixFieldTrait;
 use Windwalker\Core\Form\AbstractFieldDefinition;
-use Windwalker\Core\Language\Translator;
 use Windwalker\Form\Form;
 use Windwalker\Validator\Rule;
 
@@ -44,24 +43,24 @@ class EditDefinition extends AbstractFieldDefinition
 
             // Title
             $this->text('title')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
                 ->addFilter('trim')
                 ->required(true);
 
             // Alias
             $this->text('alias')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'))
-                ->description(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias.desc'));
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'))
+                ->description(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias.desc'));
 
             // Image
             $this->text('image')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.image'));
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.image'));
 
             // URL
             $this->text('url')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
                 ->addValidator(Rule\UrlValidator::class)
-                ->set('class', 'validate-url');
+                ->class('validate-url');
 
             // Example: {$controller.item.name.cap$} List
             // TODO: Please remove this field in production
@@ -81,12 +80,12 @@ class EditDefinition extends AbstractFieldDefinition
         $this->fieldset('text', function (Form $form) {
             // Introtext
             $this->textarea('introtext')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
                 ->rows(10);
 
             // Fulltext
             $this->textarea('fulltext')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
                 ->rows(10);
         });
 
@@ -94,7 +93,7 @@ class EditDefinition extends AbstractFieldDefinition
         $this->fieldset('created', function (Form $form) {
             // State
             $this->switch('state')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.published'))
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.published'))
                 ->class('')
                 ->color('success')
                 ->circle(true)
@@ -102,22 +101,22 @@ class EditDefinition extends AbstractFieldDefinition
 
             // Created
             $this->calendar('created')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.created'))
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.created'))
                 ->addFilter(UtcFilter::class);
 
             // Modified
             $this->calendar('modified')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'))
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'))
                 ->addFilter(UtcFilter::class)
                 ->disabled();
 
             // Author
             $this->text('created_by')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.author'));
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.author'));
 
             // Modified User
             $this->text('modified_by')
-                ->label(Translator::translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'))
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'))
                 ->disabled();
         });
     }
