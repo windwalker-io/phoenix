@@ -80,11 +80,11 @@ class {$controller.item.name.cap$}HtmlView extends EditView
     protected function prepareScripts()
     {
         PhoenixScript::core();
-        PhoenixScript::chosen('select.hasChosen');
+        PhoenixScript::select2('select.has-select2');
         PhoenixScript::formValidation();
         BootstrapScript::checkbox(BootstrapScript::FONTAWESOME);
         BootstrapScript::buttonRadio();
-        BootstrapScript::tooltip();
+        BootstrapScript::tooltip('.has-tooltip');
     }
 
     /**

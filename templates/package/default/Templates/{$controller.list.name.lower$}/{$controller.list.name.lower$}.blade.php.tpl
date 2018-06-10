@@ -116,7 +116,7 @@
                                 <td class="text-nowrap">
                             <span class="btn-group">
                                 {!! $grid->published($item->state) !!}
-                                <button type="button" class="btn btn-default btn-light btn-sm hasTooltip"
+                                <button type="button" class="btn btn-default btn-light btn-sm has-tooltip"
                                     onclick="Phoenix.Grid.copyRow({{ $i }});"
                                     title="@lang('phoenix.toolbar.duplicate')">
                                     <span class="fa fa-fw fa-copy text-info"></span>
@@ -143,7 +143,7 @@
 
                                 {{-- CREATED --}}
                                 <td class="text-nowrap">
-                            <span class="hasTooltip"
+                            <span class="has-tooltip"
                                 title="{{ $datetime::toLocalTime($item->created, 'Y-m-d H:i:s') }}">
                                 {{ $datetime::toLocalTime($item->created, 'Y-m-d') }}
                             </span>
@@ -156,7 +156,7 @@
 
                                 {{-- DELETE --}}
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-default btn-outline-secondary btn-sm hasTooltip"
+                                    <button type="button" class="btn btn-default btn-outline-secondary btn-sm has-tooltip"
                                         onclick="Phoenix.Grid.deleteRow({{ $i }});"
                                         title="@lang('phoenix.toolbar.delete')">
                                         <span class="fa fa-fw fa-trash"></span>

@@ -62,7 +62,7 @@ class GridDefinition extends AbstractFieldDefinition
             // State
             $this->list('{$controller.item.name.lower$}.state')
                 ->label('State')
-                ->addClass('hasChosen')
+                ->addClass('has-select2')
                 // Add empty option to support single deselect button
                 ->option('', '')
                 ->option(__('{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select'), '')
@@ -81,7 +81,7 @@ class GridDefinition extends AbstractFieldDefinition
             // Language
             $this->list('language')
                 ->label('Language')
-                ->addClass('col-md-12 hasChosen')
+                ->class('col-md-12 has-select2')
                 ->option('-- Select Language --', '')
                 ->option('English', 'en-GB')
                 ->option('Chinese Traditional', 'zh-TW');

@@ -67,7 +67,7 @@ class EditDefinition extends AbstractFieldDefinition
             $this->add('{$controller.item.name.lower$}_list', {$controller.item.name.cap$}ListField::class)
                 ->label('List Example')
                 ->option('- Select {$controller.item.name.cap$} Example -', '')
-                ->addClass('hasChosen');
+                ->addClass('has-select2');
 
             // Example: {$controller.item.name.cap$} Modal
             // TODO: Please remove this field in production

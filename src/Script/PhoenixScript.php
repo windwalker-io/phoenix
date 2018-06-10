@@ -350,10 +350,13 @@ $('{$selector}').select2($optionsString);
 // Fix for select2 v4.RC1
 $('{$selector}').each(function () {
     var \$select2Container = $(this).data('select2').\$container;
-    var option = $(this).find('option[data-placeholder]');
-    if (option.length) {
-        \$select2Container.find('.select2-selection__placeholder').text(option.text());
-    }
+    
+    $(this).find('option[value=""]').each(function () {
+        if ($(this).text().trim()) {
+            \$select2Container.find('.select2-selection__placeholder').text($(this).text());
+            return false;
+        }
+    });
 });
 JS;
 
