@@ -18,7 +18,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <?php if ($pagination->getFirst()): ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
-               class="hasTooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
+               class="has-tooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
                 <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.first'); ?>
@@ -30,7 +30,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <?php if ($pagination->getPrevious()): ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
-               class="hasTooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
+               class="has-tooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
                 <span class="fa fa-backward"></span>
                 <span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.previous'); ?>
@@ -75,7 +75,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <?php if ($pagination->getNext()): ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
-               class="hasTooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
+               class="has-tooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
                 <span class="fa fa-forward"></span>
                 <span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.next'); ?>
@@ -87,7 +87,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <?php if ($pagination->getLast()): ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getLast()])); ?>"
-               class="hasTooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.last'); ?>">
+               class="has-tooltip page-link" title="<?php echo Translator::translate('phoenix.pagination.last'); ?>">
                 <span class="fa fa-fast-forward"></span>
                 <span class="sr-only">
 					<?php echo Translator::translate('phoenix.pagination.last'); ?>

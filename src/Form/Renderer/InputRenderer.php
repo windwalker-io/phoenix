@@ -88,7 +88,7 @@ class InputRenderer implements FormRendererInterface
             return '';
         }
 
-        $attribs['class'] .= ' hasTooltip ' . $field->getAttribute('labelWidth', 'col-md-3');
+        $attribs['class'] .= ' has-tooltip ' . $field->getAttribute('labelWidth', 'col-md-3');
 
         $label = $field->getLabel();
 

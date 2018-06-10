@@ -18,7 +18,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <div class="btn-group pull-left">
         <?php if ($pagination->getFirst()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
-               class="hasTooltip btn btn-default"
+               class="has-tooltip btn btn-default"
                title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
                 <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
@@ -29,7 +29,7 @@ use Windwalker\Core\Pagination\PaginationResult;
 
         <?php if ($pagination->getPrevious()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
-               class="hasTooltip btn btn-default"
+               class="has-tooltip btn btn-default"
                title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
                 <span class="fa fa-backward"></span>
                 <span class="sr-only">
@@ -42,7 +42,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <div class="pull-right">
         <?php if ($pagination->getNext()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
-               class="hasTooltip btn btn-default"
+               class="has-tooltip btn btn-default"
                title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
                 <span class="fa fa-forward"></span>
                 <span class="sr-only">
