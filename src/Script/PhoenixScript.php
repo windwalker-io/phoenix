@@ -140,6 +140,24 @@ JS;
     }
 
     /**
+     * loadScript
+     *
+     * @param string $uri
+     * @param bool   $autoConvert
+     * @param string $variable
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function loadScript($uri, $autoConvert = true, $variable = 'Phoenix')
+    {
+        $autoConvertArg = $autoConvert ? 'true' : 'false';
+
+        static::domready("$variable.loadScript('$uri', $autoConvertArg)");
+    }
+
+    /**
      * route
      *
      * @param   string $route
