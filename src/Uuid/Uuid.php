@@ -21,6 +21,8 @@ namespace Phoenix\Uuid;
  * Based on Andrew Moore's work in php.net
  *
  * @link   https://gist.github.com/dahnielson/508447
+ *
+ * @deprecated  Use ramsey/uuid instead.
  */
 class Uuid
 {
