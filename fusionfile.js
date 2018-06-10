@@ -125,6 +125,11 @@ fusion.task('install', function () {
 
   fusion.copy(`${nodePath}/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.*`, `${destPath}/css/bootstrap/`);
   fusion.copy(`${nodePath}/eonasdan-bootstrap-datetimepicker/build/js/*`, `${destPath}/js/bootstrap/`);
+
+  fusion.copy(`${nodePath}/select2/dist/js/select2.js`, `${destPath}/js/select2/`);
+  fusion.copy(`${nodePath}/select2/dist/js/select2.min.js`, `${destPath}/js/select2/`);
+  fusion.copy(`${nodePath}/select2/dist/css/*`, `${destPath}/css/select2/`);
+  fusion.copy(`${nodePath}/select2-bootstrap4-theme/dist/*`, `${destPath}/css/select2/bs4/`);
 });
 
 fusion.default(['js', 'scss']);

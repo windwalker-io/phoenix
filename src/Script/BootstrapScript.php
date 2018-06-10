@@ -81,7 +81,7 @@ abstract class BootstrapScript extends AbstractPhoenixScript
      *
      * @return  void
      */
-    public static function tooltip($selector = '.hasTooltip')
+    public static function tooltip($selector = '.hasTooltip, .has-tooltip')
     {
         $asset = static::getAsset();
 

@@ -280,6 +280,88 @@ JS;
     }
 
     /**
+     * select2
+     *
+     * @param string $selector
+     * @param array  $options
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function select2($selector = null, array $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            JQueryScript::core();
+
+            static::addJS(static::phoenixName() . '/js/select2/select2.min.js');
+            static::addCSS(static::phoenixName() . '/css/select2/select2.min.css');
+
+            if (BootstrapScript::$currentVersion === 3) {
+                static::addCSS(static::phoenixName() . '/css/select2/bs3/select2-bootstrap.min.css');
+            } else {
+                // TODO: Use official BS4 theme if PR merged. @see https://github.com/select2/select2-bootstrap-theme/pull/72
+                static::addCSS(static::phoenixName() . '/css/select2/bs4/select2-bootstrap4.min.css');
+            }
+
+            static::translate('phoenix.select2.noresult');
+
+            // Hack for readonly
+            static::internalCSS(<<<CSS
+select[readonly].select2-hidden-accessible + .select2-container {
+  pointer-events: none;
+  touch-action: none;
+}
+select[readonly].select2-hidden-accessible + .select2-container .select2-selection {
+  background: #eee;
+  box-shadow: none;
+}
+select[readonly].select2-hidden-accessible + .select2-container .select2-selection__arrow,
+select[readonly].select2-hidden-accessible + .select2-container .select2-selection__clear {
+  display: none;
+}
+CSS
+            );
+
+            static::internalJS(<<<JS
+
+JS
+            );
+        }
+
+        if ($selector !== null && !static::inited(__METHOD__, get_defined_vars())) {
+            $defaultOptions = [
+                'theme' => BootstrapScript::$currentVersion === 3 ? 'bootstrap' : 'bootstrap4',
+                'allowClear' => true,
+                'minimumResultsForSearch' => 10,
+                'placeholder' => __('phoenix.select2.placeholder'),
+                'language' => [
+                    'noResults' => static::wrapFunction("return Phoenix.__('phoenix.select2.noresult')")
+                    // TODO: More translations
+                ]
+            ];
+
+            $optionsString = static::getJSObject($defaultOptions, $options);
+
+            $js = <<<JS
+// Select2 for: `$selector`
+$('{$selector}').select2($optionsString);
+
+// Fix for select2 v4.RC1
+$('{$selector}').each(function () {
+    var \$select2Container = $(this).data('select2').\$container;
+    var option = $(this).find('option[data-placeholder]');
+    if (option.length) {
+        \$select2Container.find('.select2-selection__placeholder').text(option.text());
+    }
+});
+JS;
+
+            static::domready($js);
+        }
+    }
+
+    /**
      * translator
      *
      * @deprecated No longer needs this method, just call PhoenixScript::phoenix();
