@@ -8,12 +8,12 @@
         <div class="input-group-btn input-group-append">
             <button type="button" class="btn btn-default btn-outline-secondary btn-sm hasTooltip"
                     onclick="{{ $phoenixJsObject }}.Grid.reorder({{ $row }}, -1);"
-                    title="@translate('phoenix.grid.ordering.moveup')">
+                    title="@lang('phoenix.grid.ordering.moveup')">
                 <span class="fa fa-chevron-up"></span>
             </button>
             <button type="button" class="btn btn-default btn-outline-secondary btn-sm hasTooltip"
                     onclick="{{ $phoenixJsObject }}.Grid.reorder({{ $row }}, +1);"
-                    title="@translate('phoenix.grid.ordering.movedown')">
+                    title="@lang('phoenix.grid.ordering.movedown')">
                 <span class="fa fa-chevron-down"></span>
             </button>
         </div>

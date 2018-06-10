@@ -17,7 +17,7 @@
     <button data-toggle="collapse" class="btn btn-default toolbar-toggle-button"
         data-target="#admin-toolbar-buttons">
         <span class="fa fa-wrench"></span>
-        @translate('phoenix.toolbar.toggle')
+        @lang('phoenix.toolbar.toggle')
     </button>
     <div id="admin-toolbar-buttons" class="admin-toolbar-buttons">
         <hr />

@@ -17,19 +17,19 @@
 <a role="button" class="btn btn-primary btn-sm btn-wide phoenix-btn-new"
     href="{{ $router->route('{$controller.item.name.lower$}', ['new' => true]) }}">
     <span class="fa fa-plus"></span>
-    @translate('phoenix.toolbar.new')
+    @lang('phoenix.toolbar.new')
 </a>
 
 <button type="button" class="btn btn-info btn-sm phoenix-btn-duplicate"
     onclick="Phoenix.Grid.hasChecked();Phoenix.post();">
     <span class="fa fa-copy"></span>
-    @translate('phoenix.toolbar.duplicate')
+    @lang('phoenix.toolbar.duplicate')
 </button>
 
 <div class="dropdown btn-group phoenix-btn-state-dropdown">
     <button class="btn btn-default btn-secondary btn-sm dropdown-toggle" type="button" id="state-dropdown-toggle"
         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        @translate('phoenix.toolbar.state.change')
+        @lang('phoenix.toolbar.state.change')
     </button>
 
     <ul class="dropdown-menu">
@@ -37,13 +37,13 @@
             <a href="javascript://" class="dropdown-item phoenix-btn-publish"
                 onclick="Phoenix.Grid.hasChecked().batch('publish');">
                 <span class="fa fa-check text-success"></span>
-                @translate('phoenix.toolbar.publish')
+                @lang('phoenix.toolbar.publish')
             </a>
 
             <a href="javascript://" class="dropdown-item phoenix-btn-unpublish"
                 onclick="Phoenix.Grid.hasChecked().batch('unpublish');">
                 <span class="fa fa-remove fa-times text-danger"></span>
-                @translate('phoenix.toolbar.unpublish')
+                @lang('phoenix.toolbar.unpublish')
             </a>
         </li>
     </ul>
@@ -52,11 +52,11 @@
 <button type="button" class="btn btn-default btn-dark btn-sm phoenix-btn-batch" data-toggle="modal"
     data-target="#batch-modal" onclick="Phoenix.Grid.hasChecked(null, event);">
     <span class="fa fa-sliders fa-sliders-h"></span>
-    @translate('phoenix.toolbar.batch')
+    @lang('phoenix.toolbar.batch')
 </button>
 
 <button type="button" class="btn btn-default btn-outline-danger btn-sm phoenix-btn-delete"
     onclick="Phoenix.Grid.hasChecked().deleteList();">
     <span class="fa fa-trash"></span>
-    @translate('phoenix.toolbar.delete')
+    @lang('phoenix.toolbar.delete')
 </button>

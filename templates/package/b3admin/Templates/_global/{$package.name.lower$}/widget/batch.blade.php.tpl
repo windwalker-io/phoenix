@@ -25,12 +25,12 @@ $copy = isset($copy) ? $copy : true;
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="batch-modal-title">
-                    <span class="fa fa-sliders"></span> @translate('phoenix.batch.modal.title')
+                    <span class="fa fa-sliders"></span> @lang('phoenix.batch.modal.title')
                 </h4>
             </div>
             <div class="modal-body">
                 <p>
-                    @translate('phoenix.batch.modal.desc')
+                    @lang('phoenix.batch.modal.desc')
                 </p>
                 <hr />
                 <div class="form-horizontal">
@@ -40,18 +40,18 @@ $copy = isset($copy) ? $copy : true;
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">
                     <span class="fa fa-remove"></span>
-                    @translate('phoenix.core.close')
+                    @lang('phoenix.core.close')
                 </button>
                 @if ($update)
                     <button type="button" class="btn btn-info" onclick="Phoenix.Grid.hasChecked();Phoenix.patch()">
                         <span class="fa fa-check"></span>
-                        @translate('phoenix.core.update')
+                        @lang('phoenix.core.update')
                     </button>
                 @endif
                 @if ($copy)
                     <button type="button" class="btn btn-primary" onclick="Phoenix.Grid.hasChecked();Phoenix.post()">
                         <span class="fa fa-copy"></span>
-                        @translate('phoenix.core.copy')
+                        @lang('phoenix.core.copy')
                     </button>
                 @endif
             </div>

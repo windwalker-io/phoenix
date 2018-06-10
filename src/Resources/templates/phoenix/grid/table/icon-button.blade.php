@@ -1,11 +1,11 @@
 {{-- Part of Phoenix project. --}}
 
 @if (!empty($only_icon))
-    <span class="{{ $icon or '' }} hasTooltip" title="@translate($title)"></span>
+    <span class="{{ $icon or '' }} hasTooltip" title="@lang($title)"></span>
 @else
     <button type="button"
             class="grid-boolean-icon data-state-{{ $value or '' }} btn {{ $options['button_color'] or 'btn-default btn-light' }} btn-sm hasTooltip"
-            title="@translate($title)"
+            title="@lang($title)"
             {{ !empty($disabled) ? 'disabled' : null }}
 
             @if (!empty($task))

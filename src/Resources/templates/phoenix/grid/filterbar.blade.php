@@ -10,7 +10,7 @@ $filterFields = $form->getFields(null, 'filter');
 ?>
 {{-- Mobile Title --}}
 <h3 class="visible-xs-block d-sm-block d-md-none">
-    @translate('phoenix.grid.filter.title')
+    @lang('phoenix.grid.filter.title')
 </h3>
 
 @if ($search || $filter)
@@ -36,7 +36,7 @@ $filterFields = $form->getFields(null, 'filter');
                 {{-- Submit Button --}}
                 <span class="input-group-btn input-group-append">
             <button class="btn btn-default btn-outline-secondary hasTooltip" type="submit"
-                    title="@translate('phoenix.grid.search.button.desc')">
+                    title="@lang('phoenix.grid.search.button.desc')">
                 <span class="fa fa-search"></span>
             </button>
         </span>
@@ -52,8 +52,8 @@ $filterFields = $form->getFields(null, 'filter');
                         class="btn {{ $show ? 'btn-primary btn-dark' : 'btn-default btn-outline-secondary' }} filter-toggle-button hasTooltip"
                         data-class-show="btn-primary btn-dark"
                         data-class-hide="btn-default btn-outline-secondary"
-                        title="@translate('phoenix.grid.filter.button.desc')">
-                    @translate('phoenix.grid.filter.button.text')
+                        title="@lang('phoenix.grid.filter.button.desc')">
+                    @lang('phoenix.grid.filter.button.text')
 
                     {{-- Button Icon --}}
                     <span
@@ -66,7 +66,7 @@ $filterFields = $form->getFields(null, 'filter');
 
             {{-- Clear Button --}}
             <button type="button" class="btn btn-default btn-outline-secondary search-clear-button hasTooltip"
-                    title="@translate('phoenix.grid.clear.button.desc')">
+                    title="@lang('phoenix.grid.clear.button.desc')">
                 <span class="fa fa-remove fa-times"></span>
             </button>
         </div>

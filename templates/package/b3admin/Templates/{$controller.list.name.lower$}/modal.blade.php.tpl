@@ -41,14 +41,14 @@
         <div class="filter-bar">
             <button class="btn btn-default pull-right" onclick="parent.{{ $function }}('{{ $selector }}', '', '');">
                 <span class="fa fa-remove text-danger"></span>
-                @translate('phoenix.grid.modal.button.cancel')
+                @lang('phoenix.grid.modal.button.cancel')
             </button>
             {!! $filterBar->render(['form' => $form, 'show' => $showFilterBar]) !!}
         </div>
 
         {{-- RESPONSIVE TABLE DESC --}}
         <p class="visible-xs-block">
-            @translate('phoenix.grid.responsive.table.desc')
+            @lang('phoenix.grid.responsive.table.desc')
         </p>
 
         <div class="grid-table table-responsive">

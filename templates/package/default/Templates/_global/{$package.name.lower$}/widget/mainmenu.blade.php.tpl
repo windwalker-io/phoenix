@@ -15,7 +15,7 @@
 @section('nav')
     <li class="nav-item {{ $helper->menu->active('dashboard') }}">
         <a class="nav-link" href="#">
-            @translate('phoenix.title.dashboard')
+            @lang('phoenix.title.dashboard')
         </a>
     </li>
 @stop

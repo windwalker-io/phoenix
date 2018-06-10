@@ -18,7 +18,7 @@
     <button type="button" class="btn btn-success btn-sm btn-wide phoenix-btn-save"
         onclick="Phoenix.post();">
         <span class="fa fa-save"></span>
-        @translate('phoenix.toolbar.save')
+        @lang('phoenix.toolbar.save')
     </button>
     <button type="button" class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split"
         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -32,7 +32,7 @@
                 href="javascript://"
                 onclick="Phoenix.post(null, {task: 'save2copy'});">
                 <span class="fa fa-copy text-info"></span>
-                @translate('phoenix.toolbar.save2copy')
+                @lang('phoenix.toolbar.save2copy')
             </a>
         </li>
 
@@ -41,7 +41,7 @@
                 href="javascript://"
                 onclick="Phoenix.post(null, {task: 'save2new'});">
                 <span class="fa fa-plus text-primary"></span>
-                @translate('phoenix.toolbar.save2new')
+                @lang('phoenix.toolbar.save2new')
             </a>
         </li>
     </ul>
@@ -50,11 +50,11 @@
 <button type="button" class="btn btn-primary btn-outline-primary btn-sm phoenix-btn-save2close"
     onclick="Phoenix.post(null, {task: 'save2close'});">
     <span class="fa fa-check"></span>
-    @translate('phoenix.toolbar.save2close')
+    @lang('phoenix.toolbar.save2close')
 </button>
 
 <a role="button" class="btn btn-default btn-outline-secondary btn-sm phoenix-btn-cancel"
     href="{{ $router->route('{$controller.list.name.lower$}') }}">
     <span class="fa fa-remove fa-times"></span>
-    @translate('phoenix.toolbar.cancel')
+    @lang('phoenix.toolbar.cancel')
 </a>

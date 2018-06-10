@@ -44,7 +44,7 @@
 
         {{-- RESPONSIVE TABLE DESC --}}
         <p class="visible-xs-block">
-            @translate('phoenix.grid.responsive.table.desc')
+            @lang('phoenix.grid.responsive.table.desc')
         </p>
 
         <div class="grid-table table-responsive">
@@ -89,7 +89,7 @@
 
                     {{-- DELETE --}}
                     <th width="1%" class="text-nowrap">
-                        @translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.delete')
+                        @lang('{$package.name.lower$}.{$controller.item.name.lower$}.field.delete')
                     </th>
 
                     {{-- ID --}}
@@ -115,7 +115,7 @@
                             <span class="btn-group">
                                 {!! $grid->published($item->state) !!}
                                 <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.copyRow({{ $i }});"
-                                    title="@translate('phoenix.toolbar.duplicate')">
+                                    title="@lang('phoenix.toolbar.duplicate')">
                                     <span class="fa fa-fw fa-copy text-info"></span>
                                 </button>
                             </span>
@@ -153,7 +153,7 @@
                         {{-- DELETE --}}
                         <td class="text-center">
                             <button type="button" class="btn btn-default btn-xs hasTooltip" onclick="Phoenix.Grid.deleteRow({{ $i }});"
-                                title="@translate('phoenix.toolbar.delete')">
+                                title="@lang('phoenix.toolbar.delete')">
                                 <span class="fa fa-fw fa-trash"></span>
                             </button>
                         </td>

@@ -46,7 +46,7 @@
             @if (count($items))
                 {{-- RESPONSIVE TABLE DESC --}}
                 <p class="visible-xs-block d-sm-block d-md-none">
-                    @translate('phoenix.grid.responsive.table.desc')
+                    @lang('phoenix.grid.responsive.table.desc')
                 </p>
 
                 <div class="grid-table">
@@ -91,7 +91,7 @@
 
                             {{-- DELETE --}}
                             <th width="1%" class="text-nowrap">
-                                @translate('{$package.name.lower$}.{$controller.item.name.lower$}.field.delete')
+                                @lang('{$package.name.lower$}.{$controller.item.name.lower$}.field.delete')
                             </th>
 
                             {{-- ID --}}
@@ -118,7 +118,7 @@
                                 {!! $grid->published($item->state) !!}
                                 <button type="button" class="btn btn-default btn-light btn-sm hasTooltip"
                                     onclick="Phoenix.Grid.copyRow({{ $i }});"
-                                    title="@translate('phoenix.toolbar.duplicate')">
+                                    title="@lang('phoenix.toolbar.duplicate')">
                                     <span class="fa fa-fw fa-copy text-info"></span>
                                 </button>
                             </span>
@@ -158,7 +158,7 @@
                                 <td class="text-center">
                                     <button type="button" class="btn btn-default btn-outline-secondary btn-sm hasTooltip"
                                         onclick="Phoenix.Grid.deleteRow({{ $i }});"
-                                        title="@translate('phoenix.toolbar.delete')">
+                                        title="@lang('phoenix.toolbar.delete')">
                                         <span class="fa fa-fw fa-trash"></span>
                                     </button>
                                 </td>
@@ -184,7 +184,7 @@
             @else
                 <div class="grid-no-items card bg-light" style="padding: 125px 0;">
                     <div class="card-body text-center">
-                        <h3 class="text-secondary">@translate('phoenix.grid.no.items')</h3>
+                        <h3 class="text-secondary">@lang('phoenix.grid.no.items')</h3>
                     </div>
                 </div>
             @endif
