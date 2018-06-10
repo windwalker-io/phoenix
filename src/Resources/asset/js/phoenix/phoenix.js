@@ -1528,6 +1528,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 (function () {
   "use strict";
 
+  var globalSerial = 1;
+
   var PhoenixCrypto = function (_PhoenixPlugin6) {
     _inherits(PhoenixCrypto, _PhoenixPlugin6);
 
@@ -1638,6 +1640,67 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
         }();
       }
+
+      /**
+       * Get uniqid like php's unidid().
+       *
+       * @see http://locutus.io/php/misc/uniqid/
+       *
+       * @param {string}  prefix
+       * @param {boolean} moreEntropy
+       * @returns {*}
+       */
+
+    }, {
+      key: 'uniqid',
+      value: function uniqid() {
+        var prefix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var moreEntropy = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        var retId = void 0;
+        var _formatSeed = function _formatSeed(seed, reqWidth) {
+          seed = parseInt(seed, 10).toString(16); // to hex str
+          if (reqWidth < seed.length) {
+            // so long we split
+            return seed.slice(seed.length - reqWidth);
+          }
+          if (reqWidth > seed.length) {
+            // so short we pad
+            return Array(1 + (reqWidth - seed.length)).join('0') + seed;
+          }
+          return seed;
+        };
+
+        var $global = typeof window !== 'undefined' ? window : global;
+        $global.$locutus = $global.$locutus || {};
+        var $locutus = $global.$locutus;
+        $locutus.php = $locutus.php || {};
+
+        if (!$locutus.php.uniqidSeed) {
+          // init seed with big random int
+          $locutus.php.uniqidSeed = Math.floor(Math.random() * 0x75bcd15);
+        }
+
+        $locutus.php.uniqidSeed++;
+
+        // start with prefix, add current milliseconds hex string
+        retId = prefix;
+        retId += _formatSeed(parseInt(new Date().getTime() / 1000, 10), 8);
+        // add seed hex string
+        retId += _formatSeed($locutus.php.uniqidSeed, 5);
+
+        if (moreEntropy) {
+          // for more entropy we add a float lower to 10
+          retId += (Math.random() * 10).toFixed(8).toString();
+        }
+
+        return retId;
+      }
+    }, {
+      key: 'serial',
+      value: function serial() {
+        return globalSerial++;
+      }
     }], [{
       key: 'is',
       get: function get() {
@@ -1652,7 +1715,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           encrypt: 'encrypt',
           decrypt: 'decrypt',
           uuid4: 'uuid4',
-          md5: 'md5'
+          md5: 'md5',
+          uniqid: 'uniqid'
         };
       }
     }, {

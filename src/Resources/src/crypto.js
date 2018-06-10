@@ -11,6 +11,8 @@
 (function() {
   "use strict";
 
+  let globalSerial = 1;
+
   class PhoenixCrypto extends PhoenixPlugin {
     static get is() { return 'Crypto' }
 
@@ -22,6 +24,7 @@
         decrypt: 'decrypt',
         uuid4: 'uuid4',
         md5: 'md5',
+        uniqid: 'uniqid'
       };
     }
 
@@ -102,6 +105,60 @@
       return (function b(a) {
         return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b)
       })();
+    }
+
+    /**
+     * Get uniqid like php's unidid().
+     *
+     * @see http://locutus.io/php/misc/uniqid/
+     *
+     * @param {string}  prefix
+     * @param {boolean} moreEntropy
+     * @returns {*}
+     */
+    uniqid (prefix = '', moreEntropy = false) {
+      let retId;
+      const _formatSeed = function (seed, reqWidth) {
+        seed = parseInt(seed, 10).toString(16); // to hex str
+        if (reqWidth < seed.length) {
+          // so long we split
+          return seed.slice(seed.length - reqWidth)
+        }
+        if (reqWidth > seed.length) {
+          // so short we pad
+          return Array(1 + (reqWidth - seed.length)).join('0') + seed
+        }
+        return seed
+      };
+
+      const $global = (typeof window !== 'undefined' ? window : global);
+      $global.$locutus = $global.$locutus || {};
+      const $locutus = $global.$locutus;
+      $locutus.php = $locutus.php || {};
+
+      if (!$locutus.php.uniqidSeed) {
+        // init seed with big random int
+        $locutus.php.uniqidSeed = Math.floor(Math.random() * 0x75bcd15)
+      }
+
+      $locutus.php.uniqidSeed++;
+
+      // start with prefix, add current milliseconds hex string
+      retId = prefix;
+      retId += _formatSeed(parseInt(new Date().getTime() / 1000, 10), 8);
+      // add seed hex string
+      retId += _formatSeed($locutus.php.uniqidSeed, 5);
+
+      if (moreEntropy) {
+        // for more entropy we add a float lower to 10
+        retId += (Math.random() * 10).toFixed(8).toString()
+      }
+
+      return retId;
+    }
+
+    serial() {
+      return globalSerial++;
     }
   }
 
