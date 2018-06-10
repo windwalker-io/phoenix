@@ -124,6 +124,6 @@ abstract class AbstractReorderController extends AbstractBatchController
      */
     public function getSuccessMessage($data = null)
     {
-        return Translator::translate($this->langPrefix . 'message.batch.reorder.success');
+        return __($this->langPrefix . 'message.batch.reorder.success');
     }
 }

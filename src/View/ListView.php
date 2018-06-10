@@ -51,7 +51,7 @@ class ListView extends AbstractPhoenixHtmView
     public function setTitle($title = null)
     {
         $title = $title ?: Translator::sprintf('phoenix.title.list',
-            Translator::translate($this->langPrefix . $this->getName() . '.title'));
+            __($this->langPrefix . $this->getName() . '.title'));
 
         return parent::setTitle($title);
     }

@@ -70,6 +70,6 @@ class AbstractRebuildController extends AbstractBatchController
      */
     public function getSuccessMessage($data = null)
     {
-        return Translator::translate($this->langPrefix . 'message.batch.' . $this->action . '.success');
+        return __($this->langPrefix . 'message.batch.' . $this->action . '.success');
     }
 }

@@ -19,10 +19,10 @@ use Windwalker\Core\Pagination\PaginationResult;
         <?php if ($pagination->getFirst()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
                class="has-tooltip btn btn-default"
-               title="<?php echo Translator::translate('phoenix.pagination.first'); ?>">
+               title="<?php echo __('phoenix.pagination.first'); ?>">
                 <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
-                    <?php echo Translator::translate('phoenix.pagination.first'); ?>
+                    <?php echo __('phoenix.pagination.first'); ?>
                 </span>
             </a>
         <?php endif; ?>
@@ -30,10 +30,10 @@ use Windwalker\Core\Pagination\PaginationResult;
         <?php if ($pagination->getPrevious()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
                class="has-tooltip btn btn-default"
-               title="<?php echo Translator::translate('phoenix.pagination.previous'); ?>">
+               title="<?php echo __('phoenix.pagination.previous'); ?>">
                 <span class="fa fa-backward"></span>
                 <span class="sr-only">
-                    <?php echo Translator::translate('phoenix.pagination.previous'); ?>
+                    <?php echo __('phoenix.pagination.previous'); ?>
                 </span>
             </a>
         <?php endif; ?>
@@ -43,10 +43,10 @@ use Windwalker\Core\Pagination\PaginationResult;
         <?php if ($pagination->getNext()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
                class="has-tooltip btn btn-default"
-               title="<?php echo Translator::translate('phoenix.pagination.next'); ?>">
+               title="<?php echo __('phoenix.pagination.next'); ?>">
                 <span class="fa fa-forward"></span>
                 <span class="sr-only">
-					<?php echo Translator::translate('phoenix.pagination.next'); ?>
+					<?php echo __('phoenix.pagination.next'); ?>
 				</span>
             </a>
         <?php endif; ?>

@@ -130,7 +130,7 @@ abstract class AbstractSaveController extends AbstractPostController
      */
     public function getSuccessMessage($data = null)
     {
-        return Translator::translate($this->langPrefix . 'message.save.success');
+        return __($this->langPrefix . 'message.save.success');
     }
 
     /**

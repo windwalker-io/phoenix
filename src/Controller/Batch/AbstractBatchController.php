@@ -112,11 +112,11 @@ abstract class AbstractBatchController extends AbstractPostController
         }
 
         if ($data->isNull() && !$this->allowNullData) {
-            throw new ValidateFailException(Translator::translate('phoenix.message.batch.data.empty'));
+            throw new ValidateFailException(__('phoenix.message.batch.data.empty'));
         }
 
         if (count($this->pks) < 1) {
-            throw new ValidateFailException(Translator::translate($this->langPrefix . 'message.batch.item.empty'));
+            throw new ValidateFailException(__($this->langPrefix . 'message.batch.item.empty'));
         }
 
         $this->validate($data);

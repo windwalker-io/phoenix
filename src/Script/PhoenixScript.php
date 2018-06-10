@@ -245,9 +245,9 @@ JS;
             $defaultOptions = [
                 'allow_single_deselect' => true,
                 'disable_search_threshold' => 10,
-                'placeholder_text_multiple' => Translator::translate('phoenix.chosen.text,multiple'),
-                'placeholder_text_single' => Translator::translate('phoenix.chosen.text.single'),
-                'no_results_text' => Translator::translate('phoenix.chosen.text.noresult'),
+                'placeholder_text_multiple' => __('phoenix.chosen.text,multiple'),
+                'placeholder_text_single' => __('phoenix.chosen.text.single'),
+                'no_results_text' => __('phoenix.chosen.text.noresult'),
             ];
 
             $options = static::getJSObject(ArrayHelper::merge($defaultOptions, $options));
@@ -388,7 +388,7 @@ JS;
     {
         static::phoenix();
 
-        $text = Translator::translate($key);
+        $text = __($key);
 
         /** @var Language $language */
         $language = Translator::getInstance();
