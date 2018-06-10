@@ -17,7 +17,7 @@
         @php( isset($attribs['class']) ? $attribs['class'] : null )
         @php( $attribs['class'] .= ' form-group' )
 
-        <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attribs) !!}>
+        <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attribs) !!} data-form-group>
             {!! $labelHtml !!}
             <div
                 class="{{ $noLabel || $hideLabel ? 'col-md-12' : $field->get('fieldWidth', 'col-md-9') }} input-container">

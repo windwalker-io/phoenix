@@ -179,7 +179,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
               var target = $(this);
 
               if (!target.is(':visible')) {
-                target = target.parents('#' + target.attr('id') + '-control');
+                target = target.parents('#' + target.attr('id') + '-control, [data-form-group]');
               }
 
               $('html, body').animate({

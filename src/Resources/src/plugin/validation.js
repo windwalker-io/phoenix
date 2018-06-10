@@ -129,7 +129,7 @@
             let target = $(this);
 
             if (!target.is(':visible')) {
-              target = target.parents('#' + target.attr('id') + '-control');
+              target = target.parents('#' + target.attr('id') + '-control, [data-form-group]');
             }
 
             $('html, body').animate({
