@@ -343,11 +343,22 @@ JS
 
             $optionsString = static::getJSObject($defaultOptions, $options);
 
+            /*
+             * Some workaround to fix select2 issues.
+             * [1]: https://github.com/select2/select2/issues/4653#issuecomment-358944224
+             * [2]: https://github.com/select2/select2/issues/4384#issuecomment-228464364
+             */
             $js = <<<JS
 // Select2 for: `$selector`
 $('{$selector}').select2($optionsString);
 
-// Fix for select2 v4.RC1
+// Fix for 4.0.3 [1]
+$('{$selector}').on('select2:close', function () {
+    var input = $(this).parent().find('.select2-search__field').focus();
+    setTimeout(function () { input.focus(); }, 100);
+});
+
+// Fix for select2 v4.RC1 [2]
 $('{$selector}').each(function () {
     var \$select2Container = $(this).data('select2').\$container;
     
