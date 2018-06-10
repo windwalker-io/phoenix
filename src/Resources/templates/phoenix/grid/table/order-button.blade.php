@@ -1,7 +1,7 @@
 {{-- Part of Phoenix project. --}}
 
 @if ($saveOrder)
-    <div class="input-group ordering-control">
+    <div class="input-group ordering-control flex-nowrap">
         <input type="text" class="form-control input-sm form-control-sm" data-order-row="{{ $row }}"
                name="ordering[{{ $item->$keyName }}]" value="{{ $item->$orderField }}"
                onkeydown="if(event.keyCode == 13) return false;"/>
