@@ -572,17 +572,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function loadScript(urls) {
         var _this9 = this;
 
+        var autoConvert = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
         if (typeof urls === 'string') {
           urls = [urls];
         }
 
         var promises = [];
         var data = {};
+        var endsWith = function endsWith(str, suffix) {
+          return str.indexOf(suffix, str.length - suffix.length) >= 0;
+        };
         data[this.phoenix.asset('version')] = '1';
 
         urls.forEach(function (url) {
+          var ext = url.split('.').pop();
+          var loadUri = url;
+
+          if (autoConvert) {
+            var assetFile = void 0,
+                assetMinFile = void 0;
+
+            if (endsWith(url, '.min.' + ext)) {
+              assetMinFile = url;
+              assetFile = url.slice(0, -('.min.' + ext).length) + '.' + ext;
+            } else {
+              assetFile = url;
+              assetMinFile = url.slice(0, -('.' + ext).length) + '.min.' + ext;
+            }
+
+            loadUri = _this9.phoenix.data('windwalker.debug') ? assetFile : assetMinFile;
+          }
+
           promises.push($.getScript({
-            url: _this9.addUriBase(url),
+            url: _this9.addUriBase(loadUri),
             cache: true,
             data: data
           }));
@@ -595,7 +618,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function addUriBase(uri) {
         var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'path';
 
-        if (uri.substr(0, 2) === '/' || uri.substr(0, 4) === 'http') {
+        if (uri.substr(0, 2) === '//' || uri.substr(0, 4) === 'http') {
           return uri;
         }
 
@@ -1012,7 +1035,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'confirm',
       value: function (_confirm2) {
-        function confirm(_x7, _x8) {
+        function confirm(_x8, _x9) {
           return _confirm2.apply(this, arguments);
         }
 

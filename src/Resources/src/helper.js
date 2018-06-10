@@ -46,30 +46,48 @@
       return confirmed;
     }
 
-    loadScript(urls) {
+    loadScript(urls, autoConvert = true) {
       if (typeof urls === 'string') {
         urls = [urls];
       }
 
       const promises = [];
       const data = {};
+      const endsWith = (str, suffix) => str.indexOf(suffix, str.length - suffix.length) >= 0;
       data[this.phoenix.asset('version')] = '1';
 
       urls.forEach(url => {
+        const ext = url.split('.').pop();
+        let loadUri = url;
+
+        if (autoConvert) {
+          let assetFile, assetMinFile;
+
+          if (endsWith(url, '.min.' + ext)) {
+            assetMinFile = url;
+            assetFile = url.slice(0, -`.min.${ext}`.length) + '.' + ext;
+          } else {
+            assetFile = url;
+            assetMinFile = url.slice(0, -`.${ext}`.length) + '.min.' + ext;
+          }
+
+          loadUri = this.phoenix.data('windwalker.debug') ? assetFile : assetMinFile;
+        }
+
         promises.push(
           $.getScript({
-            url: this.addUriBase(url),
+            url: this.addUriBase(loadUri),
             cache: true,
             data
           })
-        )
+        );
       });
 
       return $.when(...promises);
     }
 
     addUriBase(uri, type = 'path') {
-      if (uri.substr(0, 2) === '/' || uri.substr(0, 4) === 'http') {
+      if (uri.substr(0, 2) === '//' || uri.substr(0, 4) === 'http') {
         return uri;
       }
 
