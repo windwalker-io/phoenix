@@ -13,6 +13,7 @@ use {$package.namespace$}{$package.name.cap$}\Field\{$controller.item.name.cap$}
 use Phoenix\Form\Filter\UtcFilter;
 use Phoenix\Form\PhoenixFieldTrait;
 use Windwalker\Core\Form\AbstractFieldDefinition;
+use Windwalker\Form\Filter\MaxLengthFilter;
 use Windwalker\Form\Form;
 use Windwalker\Validator\Rule;
 
@@ -45,6 +46,7 @@ class EditDefinition extends AbstractFieldDefinition
             $this->text('title')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
                 ->addFilter('trim')
+                ->addFilter(new MaxLengthFilter(255))
                 ->required(true);
 
             // Alias
@@ -59,6 +61,7 @@ class EditDefinition extends AbstractFieldDefinition
             // URL
             $this->text('url')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
+                ->addFilter(new MaxLengthFilter(255))
                 ->addValidator(Rule\UrlValidator::class)
                 ->class('validate-url');
 
@@ -81,11 +84,13 @@ class EditDefinition extends AbstractFieldDefinition
             // Introtext
             $this->textarea('introtext')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
+                ->addFilter(new MaxLengthFilter(MaxLengthFilter::TEXT_MAX_UTF8))
                 ->rows(10);
 
             // Fulltext
             $this->textarea('fulltext')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
+                ->addFilter(new MaxLengthFilter(MaxLengthFilter::TEXT_MAX_UTF8))
                 ->rows(10);
         });
 

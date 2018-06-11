@@ -25,8 +25,8 @@ class {$controller.item.name.cap$}Init extends AbstractMigration
             $schema->varchar('title')->comment('Title');
             $schema->varchar('alias')->comment('Alias');
             $schema->varchar('url')->comment('URL');
-            $schema->longtext('introtext')->comment('Intro Text');
-            $schema->longtext('fulltext')->comment('Full Text');
+            $schema->text('introtext')->comment('Intro Text');
+            $schema->text('fulltext')->comment('Full Text');
             $schema->varchar('image')->comment('Main Image');
             $schema->tinyint('state')->signed(true)->comment('0: unpublished, 1:published');
             $schema->integer('ordering')->comment('Ordering');
