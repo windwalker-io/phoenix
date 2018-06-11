@@ -1,11 +1,9 @@
 /*!
  * Select2 Bootstrap4 Theme v1.0.0 (https://github.com/berkan52/select2-bootstrap4-theme)
- * 
- * A theme for Select2 v4 and Bootstrap 4.0.0-beta.2 
- * 
- * Release v1.0.0 - 12-12-2017 
  * Copyright 2017 Berkan Akyürek <berkan52@gmail.com> 
- * Licensed under MIT 
+ * Licensed under MIT
+ *
+ * Modified by asika32764
  */
 .select2-container--bootstrap4 {
   display: block;
