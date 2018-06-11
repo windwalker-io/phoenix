@@ -66,7 +66,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  Data
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function pop()
     {
@@ -80,7 +80,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  Data
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function get($key)
     {
@@ -95,7 +95,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function set($key, Data $item)
     {
@@ -111,7 +111,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function map(callable $callback)
     {
@@ -135,7 +135,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  DataSet
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function getItems()
     {
@@ -149,7 +149,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function setItems($items)
     {

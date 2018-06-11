@@ -28,7 +28,7 @@ use Windwalker\Data\DataSet;
  * @method  static Data               get($key)
  * @method  static BreadcrumbManager  set($key, Data $item)
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.3
  */
 class Breadcrumb extends AbstractProxyFacade
 {

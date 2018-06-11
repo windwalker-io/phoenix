@@ -46,7 +46,7 @@ abstract class PhoenixScript extends AbstractPhoenixScript
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public static function phoenix($variable = 'Phoenix', array $options = [])
     {
@@ -122,7 +122,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public static function form($formSelector = '#admin-form', $variable = 'Phoenix', $options = [])
     {
@@ -148,7 +148,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public static function loadScript($uri, $autoConvert = true, $variable = 'Phoenix')
     {
@@ -287,7 +287,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4
      */
     public static function select2($selector = null, array $options = [])
     {
@@ -622,7 +622,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public static function domready($code, $name = null)
     {

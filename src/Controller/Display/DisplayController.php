@@ -180,7 +180,7 @@ class DisplayController extends AbstractPhoenixController
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4
      */
     protected function prepareViewRepository(AbstractView $view, Repository $repository)
     {

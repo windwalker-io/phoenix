@@ -60,8 +60,6 @@ class GetController extends ItemDisplayController
      * @param Repository   $repository The default repository.
      *
      * @return  void
-     *
-     * @since  __DEPLOY_VERSION__
      */
     protected function prepareViewRepository(AbstractView $view, Repository $repository)
     {

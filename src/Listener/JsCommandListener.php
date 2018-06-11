@@ -15,7 +15,7 @@ use Windwalker\Event\Event;
 /**
  * The JsStorageListener class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.3
  */
 class JsCommandListener
 {
