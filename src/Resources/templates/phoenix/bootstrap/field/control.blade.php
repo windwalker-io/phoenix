@@ -8,6 +8,7 @@
  */
 \Phoenix\Form\FieldHelper::handle($field, $attribs);
 
+$defaultInputWidth = \Phoenix\Script\BootstrapScript::$currentVersion === 3 ? 'col-md-9' : 'col';
 ?>
 
 @if (isset($attribs['transition']))
@@ -18,9 +19,11 @@
         @php( $attribs['class'] .= ' form-group' )
 
         <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attribs) !!} data-form-group>
-            {!! $labelHtml !!}
+            @if (!$noLabel)
+                {!! $labelHtml !!}
+            @endif
             <div
-                class="{{ $noLabel || $hideLabel ? 'col-md-12' : $field->get('fieldWidth', 'col-md-9') }} input-container">
+                class="{{ $noLabel || $hideLabel ? 'col-md-12' : $field->get('fieldWidth', $defaultInputWidth) }} input-container">
                 {!! $inputHtml !!}
             </div>
         </div>

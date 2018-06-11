@@ -256,7 +256,7 @@
   color: #343a40;
 }
 .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__clear {
-  margin-top: 0.75rem;
+  height: 2rem;
 }
 .select2-container--bootstrap4 .select2-selection--single.input-sm, .input-group-sm .select2-container--bootstrap4 .select2-selection--single, .form-group-sm .select2-container--bootstrap4 .select2-selection--single {
   border-radius: 0.2rem;
