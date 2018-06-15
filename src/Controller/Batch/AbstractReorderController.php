@@ -10,7 +10,6 @@ namespace Phoenix\Controller\Batch;
 
 use Phoenix\Repository\AdminRepository;
 use Phoenix\Repository\AdminRepositoryInterface;
-use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 

@@ -158,7 +158,7 @@ abstract class AbstractPackageController extends AbstractTaskController
         $config['package.name']      = $name;
         $config['package.namespace'] = $class;
 
-        $this->replace = new Structure;
+        $this->replace = new Structure();
 
         $this->replace['package.namespace'] = $class;
 

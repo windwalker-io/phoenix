@@ -40,21 +40,21 @@ class SubsystemController extends AbstractPackageController
         $this->config['item_name'] = StringHelper::quote('controller.item.name.cap', $this->config['tagVariables']);
         $this->config['list_name'] = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
 
-        $this->doAction(new Subsystem\PrepareAction);
-        $this->doAction(new Subsystem\CopyItemAction);
-        $this->doAction(new Subsystem\CopyListAction);
+        $this->doAction(new Subsystem\PrepareAction());
+        $this->doAction(new Subsystem\CopyItemAction());
+        $this->doAction(new Subsystem\CopyListAction());
 
         // Some dirty things handling
-        $this->doAction(new AddSubmenuAction);
-        $this->doAction(new AddTableNameAction);
-        $this->doAction(new CopyMigrationAction);
-        $this->doAction(new AddSeederAction);
+        $this->doAction(new AddSubmenuAction());
+        $this->doAction(new AddTableNameAction());
+        $this->doAction(new CopyMigrationAction());
+        $this->doAction(new AddSeederAction());
 
         if ($this->config['migrate']) {
-            $this->doAction(new MigrateAction);
+            $this->doAction(new MigrateAction());
 
             if ($this->config['seed']) {
-                $this->doAction(new SeedAction);
+                $this->doAction(new SeedAction());
             }
         }
     }

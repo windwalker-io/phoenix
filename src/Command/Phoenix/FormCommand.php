@@ -39,7 +39,7 @@ class FormCommand extends Command
      */
     protected function init()
     {
-        $this->addCommand(new GenFieldCommand);
+        $this->addCommand(new GenFieldCommand());
 
         $this->addGlobalOption('d')
             ->alias('dir')

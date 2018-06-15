@@ -25,7 +25,7 @@ $filterFields = $form->getFields(null, 'filter');
                 {!! $field->appendAttribute('class', ' form-control')->renderInput() !!}
             @else
                 <input id="{{ $field->getId() }}" name="{{ $field->getFieldName() }}" value="{{ $field->getValue() }}"
-                       type="hidden"/>
+                    type="hidden" />
             @endif
 
             {{-- Search Input --}}
@@ -36,7 +36,7 @@ $filterFields = $form->getFields(null, 'filter');
                 {{-- Submit Button --}}
                 <span class="input-group-btn input-group-append">
             <button class="btn btn-default btn-outline-secondary has-tooltip" type="submit"
-                    title="@lang('phoenix.grid.search.button.desc')">
+                title="@lang('phoenix.grid.search.button.desc')">
                 <span class="fa fa-search"></span>
             </button>
         </span>
@@ -49,10 +49,10 @@ $filterFields = $form->getFields(null, 'filter');
             @if ($filter && count($filterFields))
                 {{-- Filter Toggle Button --}}
                 <button type="button"
-                        class="btn {{ $show ? 'btn-primary btn-dark' : 'btn-default btn-outline-secondary' }} filter-toggle-button has-tooltip"
-                        data-class-show="btn-primary btn-dark"
-                        data-class-hide="btn-default btn-outline-secondary"
-                        title="@lang('phoenix.grid.filter.button.desc')">
+                    class="btn {{ $show ? 'btn-primary btn-dark' : 'btn-default btn-outline-secondary' }} filter-toggle-button has-tooltip"
+                    data-class-show="btn-primary btn-dark"
+                    data-class-hide="btn-default btn-outline-secondary"
+                    title="@lang('phoenix.grid.filter.button.desc')">
                     @lang('phoenix.grid.filter.button.text')
 
                     {{-- Button Icon --}}
@@ -66,7 +66,7 @@ $filterFields = $form->getFields(null, 'filter');
 
             {{-- Clear Button --}}
             <button type="button" class="btn btn-default btn-outline-secondary search-clear-button has-tooltip"
-                    title="@lang('phoenix.grid.clear.button.desc')">
+                title="@lang('phoenix.grid.clear.button.desc')">
                 <span class="fa fa-remove fa-times"></span>
             </button>
         </div>

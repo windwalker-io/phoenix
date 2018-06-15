@@ -15,7 +15,7 @@ if ($field->attr('v-model')) {
 ?>
 <label class="phoenix-switch" for="{{ $field->getId() }}">
     <input id="{{ $attribs['id'] }}-unchecked" name="{{ $field->getFieldName() }}" type="hidden"
-           value="{{ $field->get('unchecked_value', 0) }}"
+        value="{{ $field->get('unchecked_value', 0) }}"
         {{ $field->get('disabled') ? 'disabled="disabled"' : '' }}
     />
     {!! $field->buildInput($attribs) !!}

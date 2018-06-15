@@ -24,18 +24,21 @@ class ConvertCommand extends Command
      * @var bool
      */
     public static $isEnabled = true;
+
     /**
      * Console(Argument) name.
      *
      * @var  string
      */
     protected $name = 'convert';
+
     /**
      * The command description.
      *
      * @var  string
      */
     protected $description = 'Convert a package back to template.';
+
     /**
      * The usage to tell user how to use this command.
      *

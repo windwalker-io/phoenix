@@ -6,7 +6,6 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Pagination\PaginationResult;
 
 /**
@@ -18,7 +17,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <?php if ($pagination->getFirst()): ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
-               class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.first'); ?>">
+                class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.first'); ?>">
                 <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
 					<?php echo __('phoenix.pagination.first'); ?>
@@ -30,7 +29,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <?php if ($pagination->getPrevious()): ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
-               class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.previous'); ?>">
+                class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.previous'); ?>">
                 <span class="fa fa-backward"></span>
                 <span class="sr-only">
 					<?php echo __('phoenix.pagination.previous'); ?>
@@ -75,7 +74,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <?php if ($pagination->getNext()): ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
-               class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.next'); ?>">
+                class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.next'); ?>">
                 <span class="fa fa-forward"></span>
                 <span class="sr-only">
 					<?php echo __('phoenix.pagination.next'); ?>
@@ -87,7 +86,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     <?php if ($pagination->getLast()): ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getLast()])); ?>"
-               class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.last'); ?>">
+                class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.last'); ?>">
                 <span class="fa fa-fast-forward"></span>
                 <span class="sr-only">
 					<?php echo __('phoenix.pagination.last'); ?>

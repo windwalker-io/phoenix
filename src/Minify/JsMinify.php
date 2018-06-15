@@ -42,7 +42,7 @@ class JsMinify extends AbstractAssetMinify
      */
     protected function createMinifier()
     {
-        return new JsMinifier;
+        return new JsMinifier();
     }
 
     /**

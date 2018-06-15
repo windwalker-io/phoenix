@@ -27,6 +27,5 @@ class NullFiledDefinition implements FieldDefinitionInterface
      */
     public function define(Form $form)
     {
-
     }
 }

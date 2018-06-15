@@ -53,7 +53,7 @@ trait FormAwareRepositoryTrait
             $item = $item->dump(true);
         }
 
-        return (new Data)
+        return (new Data())
             ->bind($item)
             ->bind($this['form.data'])
             ->dump(true);
@@ -91,7 +91,7 @@ trait FormAwareRepositoryTrait
         $renderer = $this->get('field.renderer', $this->formRenderer);
 
         if (class_exists($renderer)) {
-            $form->setRenderer(new $renderer);
+            $form->setRenderer(new $renderer());
         }
 
         Ioc::getDispatcher()->triggerEvent('onModelAfterGetForm', [
@@ -116,7 +116,7 @@ trait FormAwareRepositoryTrait
     public function getFieldDefinition($definition = null, $name = null)
     {
         if (class_exists($definition) && is_subclass_of($definition, FieldDefinitionInterface::class)) {
-            return new $definition;
+            return new $definition();
         }
 
         $name = $name ?: $this->getName();
@@ -130,11 +130,11 @@ trait FormAwareRepositoryTrait
             );
 
             if (!class_exists($class)) {
-                return new NullFiledDefinition;
+                return new NullFiledDefinition();
             }
         }
 
-        return new $class;
+        return new $class();
     }
 
     /**

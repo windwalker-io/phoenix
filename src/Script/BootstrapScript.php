@@ -18,6 +18,7 @@ use Windwalker\Core\Language\Translator;
 abstract class BootstrapScript extends AbstractPhoenixScript
 {
     const GLYPHICONS = 'glyphicons';
+
     const FONTAWESOME = 'fontawesome';
 
     /**
@@ -106,14 +107,14 @@ abstract class BootstrapScript extends AbstractPhoenixScript
 
             $asset->addStyle(static::phoenixName() . '/css/bootstrap/awesome-checkbox.min.css');
 
-            $font = 'Glyphicons Halflings';
+            $font    = 'Glyphicons Halflings';
             $content = '\\e013';
-            $weight = '"normal"';
+            $weight  = '"normal"';
 
             if ($iconSet === static::FONTAWESOME) {
                 $content = '\\f00c';
-                $font = static::$faVersion === 4 ? 'FontAwesome' : 'Font Awesome 5 Free';
-                $weight = static::$faVersion === 4 ? $weight : 900;
+                $font    = static::$faVersion === 4 ? 'FontAwesome' : 'Font Awesome 5 Free';
+                $weight  = static::$faVersion === 4 ? $weight : 900;
             }
 
             $css = <<<CSS

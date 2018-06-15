@@ -1,4 +1,3 @@
-
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         @foreach ($paths as $i => $path)

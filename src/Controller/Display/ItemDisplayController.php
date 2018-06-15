@@ -72,6 +72,5 @@ class ItemDisplayController extends DisplayController
      */
     protected function prepareModelState(Repository $model)
     {
-
     }
 }

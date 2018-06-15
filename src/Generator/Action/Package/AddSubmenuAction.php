@@ -54,6 +54,5 @@ HTML;
         file_put_contents($file, $code);
 
         $this->io->out('[<info>Action</info>] Add menu item: ' . $name . ' submenu.');
-
     }
 }

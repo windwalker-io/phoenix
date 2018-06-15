@@ -269,7 +269,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
     public function getDataObject()
     {
         if (!$this->dataObject) {
-            return $this->dataObject = new Data;
+            return $this->dataObject = new Data();
         }
 
         return $this->dataObject;

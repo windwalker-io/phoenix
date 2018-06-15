@@ -6,7 +6,6 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Pagination\PaginationResult;
 
 /**
@@ -18,8 +17,8 @@ use Windwalker\Core\Pagination\PaginationResult;
     <div class="btn-group pull-left">
         <?php if ($pagination->getFirst()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
-               class="has-tooltip btn btn-default"
-               title="<?php echo __('phoenix.pagination.first'); ?>">
+                class="has-tooltip btn btn-default"
+                title="<?php echo __('phoenix.pagination.first'); ?>">
                 <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
                     <?php echo __('phoenix.pagination.first'); ?>
@@ -29,8 +28,8 @@ use Windwalker\Core\Pagination\PaginationResult;
 
         <?php if ($pagination->getPrevious()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
-               class="has-tooltip btn btn-default"
-               title="<?php echo __('phoenix.pagination.previous'); ?>">
+                class="has-tooltip btn btn-default"
+                title="<?php echo __('phoenix.pagination.previous'); ?>">
                 <span class="fa fa-backward"></span>
                 <span class="sr-only">
                     <?php echo __('phoenix.pagination.previous'); ?>
@@ -42,8 +41,8 @@ use Windwalker\Core\Pagination\PaginationResult;
     <div class="pull-right">
         <?php if ($pagination->getNext()): ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
-               class="has-tooltip btn btn-default"
-               title="<?php echo __('phoenix.pagination.next'); ?>">
+                class="has-tooltip btn btn-default"
+                title="<?php echo __('phoenix.pagination.next'); ?>">
                 <span class="fa fa-forward"></span>
                 <span class="sr-only">
 					<?php echo __('phoenix.pagination.next'); ?>

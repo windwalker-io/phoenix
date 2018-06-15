@@ -115,7 +115,7 @@ class TranslatorHelper
         }
 
         if (!$flatten) {
-            $reg = new Structure;
+            $reg = new Structure();
 
             foreach ($orphans as $key => $value) {
                 $reg->set($key, $value);
@@ -193,7 +193,7 @@ class TranslatorHelper
             file_put_contents($file, '');
         }
 
-        $orphans = new Structure;
+        $orphans = new Structure();
         $orphans->loadFile($file, $format, ['processSections' => true]);
 
         $orphans->loadString(static::getFormattedOrphans($format), $format, ['processSections' => true]);

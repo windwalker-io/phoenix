@@ -197,7 +197,7 @@ JS;
      *
      * @deprecated  sprintf() fork to Phoenix.Helper.sprintf(), just use it.
      *
-     * @since  1.3
+     * @since       1.3
      */
     public static function sprintf()
     {

@@ -52,8 +52,8 @@ class SendGridAdapter implements MailerAdapterInterface
      */
     public function send(MailMessage $message)
     {
-        $mail            = new Mail;
-        $personalization = new Personalization;
+        $mail            = new Mail();
+        $personalization = new Personalization();
         $mail->setSubject($message->getSubject());
 
         foreach ($message->getFrom() as $email => $name) {
@@ -73,7 +73,7 @@ class SendGridAdapter implements MailerAdapterInterface
         }
 
         foreach ($message->getFiles() as $file) {
-            $attach = new Attachment;
+            $attach = new Attachment();
 
             if ($file->getFilename()) {
                 $attach->setFilename($file->getFilename());

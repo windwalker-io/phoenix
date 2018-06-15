@@ -16,7 +16,7 @@ use Windwalker\Data\DataSet;
 /**
  * The Breadcrumb class.
  *
- * @see BreadcrumbManager
+ * @see    BreadcrumbManager
  *
  * @method  static BreadcrumbManager  push(string $title, string $link = null, bool $active = false)
  * @method  static Data               pop()

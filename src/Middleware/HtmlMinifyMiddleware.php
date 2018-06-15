@@ -38,7 +38,7 @@ class HtmlMinifyMiddleware extends AbstractWebMiddleware
 
         if (strpos($response->getHeaderLine('content-type'), 'text/html') !== false) {
             $body = $response->getBody()->__toString();
-            
+
             // Minify JS first
             $body = preg_replace_callback(
                 '/<script(.*?)>(.*?)<\/script>/is',

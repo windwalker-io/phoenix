@@ -24,6 +24,7 @@ use Windwalker\String\StringInflector;
 abstract class AbstractPhoenixController extends AbstractController
 {
     const SINGULAR = 'singular';
+
     const PLURAL = 'plural';
 
     /**
@@ -83,7 +84,6 @@ abstract class AbstractPhoenixController extends AbstractController
             $this->config['item_name'] = $this->itemName ?: $name;
             $this->config['list_name'] = $this->listName ?: $inflector->toPlural($this->config['item_name']);
         } elseif ($this->inflection == self::PLURAL) {
-
             $this->config['list_name'] = $this->listName ?: $name;
             $this->config['item_name'] = $this->itemName ?: $inflector->toSingular($this->config['list_name']);
         }

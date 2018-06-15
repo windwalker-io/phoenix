@@ -66,7 +66,7 @@ class HtmlHeaderManager
      */
     public function __construct(Metadata $metadata = null)
     {
-        $this->metadata = $metadata ?: new Metadata;
+        $this->metadata = $metadata ?: new Metadata();
     }
 
     /**

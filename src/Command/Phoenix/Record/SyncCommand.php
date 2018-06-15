@@ -96,7 +96,7 @@ class SyncCommand extends CoreCommand
         if (class_exists($recordClass)) {
             try {
                 /** @var Record $record */
-                $record = new $recordClass;
+                $record = new $recordClass();
                 $table  = $record->getTableName();
             } catch (\Exception $e) {
                 // Nothing
@@ -129,11 +129,11 @@ class SyncCommand extends CoreCommand
             'columns' => $fields,
         ];
 
-        $content = (new Edge(new EdgeStringLoader))->render($this->getTemplate(), $data);
+        $content = (new Edge(new EdgeStringLoader()))->render($this->getTemplate(), $data);
 
         $file = $package->getDir() . '/Record/Traits/' . $shortName . '.php';
 
-        if (is_file($file) && !(new BooleanPrompter)->ask('File: <comment>' . $file . '</comment> exists, do you want to override it? [N/y]: ',
+        if (is_file($file) && !(new BooleanPrompter())->ask('File: <comment>' . $file . '</comment> exists, do you want to override it? [N/y]: ',
                 false)) {
             throw new \RuntimeException('  Canceled...');
         }
@@ -178,6 +178,5 @@ trait {{ \$short_name }}
 }
 
 TMPL;
-
     }
 }

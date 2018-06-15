@@ -41,6 +41,6 @@ class AssetCommand extends Command
      */
     protected function init()
     {
-        $this->addCommand(new MinifyCommand);
+        $this->addCommand(new MinifyCommand());
     }
 }

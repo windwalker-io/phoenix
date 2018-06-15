@@ -2,6 +2,6 @@
 
 <div class="checkbox checkbox-primary single-checkbox">
     <input type="checkbox" id="grid-cb-{{ $row }}" class="grid-checkbox" data-row-number="{{ $row }}"
-           name="id[{{ $row }}]" value="{{ $item->$keyName }}"/>
+        name="id[{{ $row }}]" value="{{ $item->$keyName }}" />
     <label for="grid-cb-{{ $row }}" style=""></label>
 </div>

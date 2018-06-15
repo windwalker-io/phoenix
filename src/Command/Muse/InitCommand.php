@@ -24,18 +24,21 @@ class InitCommand extends Command
      * @var bool
      */
     public static $isEnabled = true;
+
     /**
      * Console(Argument) name.
      *
      * @var  string
      */
     protected $name = 'init';
+
     /**
      * The command description.
      *
      * @var  string
      */
     protected $description = 'Init a new package.';
+
     /**
      * The usage to tell user how to use this command.
      *

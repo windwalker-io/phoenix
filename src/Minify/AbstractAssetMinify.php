@@ -194,7 +194,7 @@ abstract class AbstractAssetMinify
             // $file = str_replace('localhost', '127.0.0.1', $file);
         }
 
-        $http = new HttpClient;
+        $http = new HttpClient();
 
         $content = $http->get($file)->getBody()->getContents();
 

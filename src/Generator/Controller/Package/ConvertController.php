@@ -19,7 +19,6 @@ use Windwalker\Filesystem\Folder;
  */
 class ConvertController extends AbstractPackageController
 {
-
     /**
      * Execute the controller.
      *
@@ -39,7 +38,7 @@ class ConvertController extends AbstractPackageController
         $this->config->set('dir.dest', $src);
         $this->config->set('dir.src', $dest);
 
-        $this->doAction(new Action\ConvertTemplateAction);
+        $this->doAction(new Action\ConvertTemplateAction());
 
         // Rename migration
         if (is_dir($src . '/Migration')) {

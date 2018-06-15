@@ -32,7 +32,7 @@ class CssMinify extends AbstractAssetMinify
      */
     protected function createMinifier()
     {
-        return new CssMinifier;
+        return new CssMinifier();
     }
 
     /**

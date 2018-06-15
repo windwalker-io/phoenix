@@ -39,6 +39,6 @@ class RecordCommand extends CoreCommand
      */
     protected function init()
     {
-        $this->addCommand(new SyncCommand);
+        $this->addCommand(new SyncCommand());
     }
 }

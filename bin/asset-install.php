@@ -120,10 +120,8 @@ $assets = [
     ],
 ];
 
-foreach ($assets as $module => $files)
-{
-    foreach ($files as $src => $dest)
-    {
+foreach ($assets as $module => $files) {
+    foreach ($files as $src => $dest) {
         echo "fusion.copy(`\${nodePath}/$module/$src`, `\${destPath}/$dest`);\n";
     }
 }

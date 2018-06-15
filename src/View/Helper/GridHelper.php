@@ -95,7 +95,7 @@ class GridHelper
     {
         $this->view   = $view;
         $this->config = $config = ($config instanceof Structure) ? $config : new Structure($config);
-        $this->state  = $state = $view['state'] ?: new Structure;
+        $this->state  = $state = $view['state'] ?: new Structure();
 
         // Merge fields
         $fields = $config->get('field');

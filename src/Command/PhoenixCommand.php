@@ -41,8 +41,8 @@ class PhoenixCommand extends Command
      */
     protected function init()
     {
-        $this->addCommand(new AssetCommand);
-        $this->addCommand(new FormCommand);
-        $this->addCommand(new RecordCommand);
+        $this->addCommand(new AssetCommand());
+        $this->addCommand(new FormCommand());
+        $this->addCommand(new RecordCommand());
     }
 }

@@ -18,6 +18,7 @@ use Windwalker\Record\Record;
 interface AdminRepositoryInterface
 {
     const ORDER_POSITION_FIRST = 'first';
+
     const ORDER_POSITION_LAST = 'last';
 
     /**

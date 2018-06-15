@@ -68,7 +68,7 @@ class DisplayController extends AbstractPhoenixController
     {
         $this->format = $this->format ?: $this->app->get('route.extra.format', 'html');
         $this->layout = $this->layout ?: $this->app->get('route.extra.layout', $this->name);
-        
+
         $this->repository = $this->model = $this->getRepository();
         $this->view       = $this->getView();
 
@@ -165,7 +165,6 @@ class DisplayController extends AbstractPhoenixController
         $this->assignModels($this->view);
 
         $this->prepareViewData($this->view);
-
         // Add your logic after parent...
     }
 

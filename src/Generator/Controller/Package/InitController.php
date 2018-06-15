@@ -39,14 +39,14 @@ class InitController extends AbstractPackageController
             throw new \RuntimeException('Package: ' . $ns . $package . ' exists. Use add-subsystem, add-item or add-list.');
         }
 
-        $this->doAction(new Action\CopyAllAction);
-        $this->doAction(new Action\Package\RenameMigrationAction);
+        $this->doAction(new Action\CopyAllAction());
+        $this->doAction(new Action\Package\RenameMigrationAction());
 
         if ($this->config['migrate']) {
-            $this->doAction(new MigrateAction);
+            $this->doAction(new MigrateAction());
 
             if ($this->config['seed']) {
-                $this->doAction(new SeedAction);
+                $this->doAction(new SeedAction());
             }
         }
     }

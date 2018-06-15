@@ -747,7 +747,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
     public function getFilterHelper($new = false)
     {
         if (!$this->filterHelper || $new) {
-            $this->filterHelper = new FilterHelper;
+            $this->filterHelper = new FilterHelper();
         }
 
         return $this->filterHelper;
@@ -777,7 +777,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
     public function getSearchHelper($new = false)
     {
         if (!$this->searchHelper || $new) {
-            $this->searchHelper = new SearchHelper;
+            $this->searchHelper = new SearchHelper();
         }
 
         $this->searchHelper->fuzzySearching((bool) $this->fuzzySearching());

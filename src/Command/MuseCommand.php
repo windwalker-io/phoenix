@@ -39,11 +39,11 @@ class MuseCommand extends Command
      */
     protected function init()
     {
-        $this->addCommand(new Muse\InitCommand);
-        $this->addCommand(new Muse\SubsystemCommand);
-        $this->addCommand(new Muse\ItemCommand);
-        $this->addCommand(new Muse\ListCommand);
-        $this->addCommand(new Muse\ConvertCommand);
+        $this->addCommand(new Muse\InitCommand());
+        $this->addCommand(new Muse\SubsystemCommand());
+        $this->addCommand(new Muse\ItemCommand());
+        $this->addCommand(new Muse\ListCommand());
+        $this->addCommand(new Muse\ConvertCommand());
 
         $this->addGlobalOption('type')
             ->description('Generate type.')
