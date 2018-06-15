@@ -38,7 +38,6 @@ class {$package.name.cap$}Package extends AbstractPackage
     public function boot()
     {
         parent::boot();
-
         // Add your own boot logic
     }
 
@@ -86,8 +85,10 @@ class {$package.name.cap$}Package extends AbstractPackage
     {
         if (WINDWALKER_DEBUG) {
             if (class_exists(DebuggerHelper::class)) {
-                DebuggerHelper::addCustomData('Language Orphans',
-                    '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
+                DebuggerHelper::addCustomData(
+                    'Language Orphans',
+                    '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>'
+                );
             }
         }
 

@@ -33,7 +33,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
 
         foreach (range(1, 150) as $i) {
             $created = $faker->dateTimeThisYear;
-            $data    = new Data;
+            $data    = new Data();
 
             $data['title']       = ucwords(trim($faker->sentence(random_int(3, 5)), '.'));
             $data['alias']       = OutputFilter::stringURLUnicodeSlug($data['title']);

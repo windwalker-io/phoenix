@@ -61,7 +61,7 @@ class {$package.name.cap$}Package extends AbstractPackage
      */
     protected function checkAccess()
     {
-
+        //
     }
 
     /**

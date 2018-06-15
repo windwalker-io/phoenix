@@ -62,7 +62,7 @@ class {$package.name.cap$}Package extends AbstractPackage
      */
     protected function checkAccess()
     {
-
+        //
     }
 
     /**
@@ -76,8 +76,10 @@ class {$package.name.cap$}Package extends AbstractPackage
     {
         if (WINDWALKER_DEBUG) {
             if (class_exists('Windwalker\Debugger\Helper\DebuggerHelper')) {
-                DebuggerHelper::addCustomData('Language Orphans',
-                    '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>');
+                DebuggerHelper::addCustomData(
+                    'Language Orphans',
+                    '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>'
+                );
             }
         }
 
