@@ -84,13 +84,13 @@ class EditDefinition extends AbstractFieldDefinition
             // Introtext
             $this->textarea('introtext')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
-                ->addFilter(new MaxLengthFilter(21844)) // @see https://stackoverflow.com/a/23169977
+                ->addFilter(new MaxLengthFilter(MaxLengthFilter::TEXT_MAX_UTF8))
                 ->rows(10);
 
             // Fulltext
             $this->textarea('fulltext')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
-                ->addFilter(new MaxLengthFilter(21844)) // @see https://stackoverflow.com/a/23169977
+                ->addFilter(new MaxLengthFilter(MaxLengthFilter::TEXT_MAX_UTF8))
                 ->rows(10);
         });
 
