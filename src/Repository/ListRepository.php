@@ -348,7 +348,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  $this
      *
-     * @since  3.4
+     * @since  1.6
      */
     public function from($alias, $table)
     {
@@ -367,7 +367,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  $this
      *
-     * @since  3.4
+     * @since  1.6
      */
     public function leftJoin($alias, $table, $condition = null, $prefix = null)
     {
@@ -386,7 +386,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  $this
      *
-     * @since  3.4
+     * @since  1.6
      */
     public function rightJoin($alias, $table, $condition = null, $prefix = null)
     {
@@ -405,7 +405,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  $this
      *
-     * @since  3.4
+     * @since  1.6
      */
     public function innerJoin($alias, $table, $condition = null, $prefix = null)
     {

@@ -82,7 +82,7 @@ class PhoenixProvider implements ServiceProviderInterface
      *
      * @return  void
      *
-     * @since  3.4
+     * @since  1.6
      */
     protected function registerClassAlias()
     {

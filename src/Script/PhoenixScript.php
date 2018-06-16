@@ -287,7 +287,7 @@ JS;
      *
      * @return  void
      *
-     * @since  3.4
+     * @since  1.6
      */
     public static function select2($selector = null, array $options = [])
     {
