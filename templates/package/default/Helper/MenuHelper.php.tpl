@@ -30,6 +30,7 @@ class MenuHelper extends AbstractHelper
      * getSubmenus
      *
      * @return  array
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getSubmenus()
     {

@@ -53,6 +53,7 @@ class SaveController extends AbstractSaveController
      * A hook before main process executing.
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {

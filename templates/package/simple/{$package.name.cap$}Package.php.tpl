@@ -29,8 +29,9 @@ class {$package.name.cap$}Package extends AbstractPackage
     /**
      * initialise
      *
-     * @throws  \LogicException
      * @return  void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function boot()
     {
@@ -41,6 +42,7 @@ class {$package.name.cap$}Package extends AbstractPackage
      * prepareExecute
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {

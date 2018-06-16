@@ -101,6 +101,7 @@ class GetController extends ListDisplayController
      * @param Repository   $repository The default repository.
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareViewRepository(AbstractView $view, Repository $repository)
     {

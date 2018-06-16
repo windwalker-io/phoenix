@@ -98,6 +98,7 @@ class {$controller.item.name.cap$}Repository extends AdminRepository
      * @param Record|{$controller.item.name.cap$}Record $record
      *
      * @return  void
+     * @throws \Exception
      */
     protected function prepareRecord(Record $record)
     {

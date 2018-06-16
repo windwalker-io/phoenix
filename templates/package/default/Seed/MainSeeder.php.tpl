@@ -19,6 +19,7 @@ class MainSeeder extends AbstractSeeder
      * doExecute
      *
      * @return  void
+     * @throws ReflectionException
      */
     public function doExecute()
     {
@@ -31,6 +32,7 @@ class MainSeeder extends AbstractSeeder
      * doClear
      *
      * @return  void
+     * @throws ReflectionException
      */
     public function doClear()
     {
