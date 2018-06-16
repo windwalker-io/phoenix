@@ -153,6 +153,7 @@ class DisplayController extends AbstractPhoenixController
      *
      * @return  void
      *
+     * @throws \ReflectionException
      * @deprecated Use prepareViewRepository() instead.
      */
     protected function prepareViewModel(AbstractView $view, Repository $model)
@@ -179,6 +180,7 @@ class DisplayController extends AbstractPhoenixController
      *
      * @return  void
      *
+     * @throws \ReflectionException
      * @since  1.6
      */
     protected function prepareViewRepository(AbstractView $view, Repository $repository)

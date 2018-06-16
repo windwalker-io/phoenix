@@ -27,6 +27,8 @@ class PhoenixPackage extends AbstractPackage
      * init
      *
      * @return  void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function boot()
     {

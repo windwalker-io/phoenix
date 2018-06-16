@@ -59,6 +59,7 @@ abstract class AbstractReorderController extends AbstractBatchController
      * prepareExecute
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {

@@ -37,8 +37,8 @@ class BatchDelegatingController extends AbstractPhoenixController
      *
      * @return  mixed
      *
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
+     * @throws \ReflectionException
+     * @throws \Throwable
      */
     protected function doExecute()
     {

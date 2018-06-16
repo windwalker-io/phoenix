@@ -49,6 +49,7 @@ abstract class AbstractSaveController extends AbstractPostController
      * A hook before main process executing.
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {
@@ -68,12 +69,7 @@ abstract class AbstractSaveController extends AbstractPostController
      *
      * @return void
      *
-     * @throws \UnexpectedValueException
-     * @throws \LogicException
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Windwalker\Core\Repository\Exception\ValidateFailException
-     * @throws \Windwalker\Record\Exception\NoResultException
+     * @throws \Exception
      */
     protected function doSave(DataInterface $data)
     {
@@ -160,6 +156,7 @@ abstract class AbstractSaveController extends AbstractPostController
      * @param DataInterface|Entity $data
      *
      * @return  DataInterface|Entity
+     * @throws \Exception
      */
     protected function prepareStore(DataInterface $data)
     {
@@ -181,7 +178,7 @@ abstract class AbstractSaveController extends AbstractPostController
      *
      * @return  void
      *
-     * @throws ValidateFailException
+     * @throws \Exception
      */
     protected function validate(DataInterface $data)
     {
@@ -199,7 +196,7 @@ abstract class AbstractSaveController extends AbstractPostController
      *
      * @return  string
      *
-     * @throws \OutOfRangeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function getFailRedirect(DataInterface $data = null)
     {
@@ -215,7 +212,7 @@ abstract class AbstractSaveController extends AbstractPostController
      *
      * @return  string
      *
-     * @throws \OutOfRangeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function getSuccessRedirect(DataInterface $data = null)
     {

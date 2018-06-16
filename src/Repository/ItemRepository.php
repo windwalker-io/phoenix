@@ -27,7 +27,7 @@ class ItemRepository extends DatabaseRepository
      * @param   mixed $conditions
      *
      * @return  Record
-     * @throws \InvalidArgumentException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getItem($conditions = null)
     {

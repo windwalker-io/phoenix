@@ -25,6 +25,7 @@ class NestedAdminRepository extends AdminRepository
      * @param Record $record
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareRecord(Record $record)
     {
@@ -45,6 +46,7 @@ class NestedAdminRepository extends AdminRepository
      * @param Record $record
      *
      * @return  void
+     * @throws \Exception
      */
     protected function postSaveHook(Record $record)
     {
@@ -59,6 +61,7 @@ class NestedAdminRepository extends AdminRepository
      * @param string $orderField
      *
      * @return bool
+     * @throws \Exception
      */
     public function reorderAll($conditions = [], $orderField = null)
     {
@@ -78,6 +81,7 @@ class NestedAdminRepository extends AdminRepository
      * @param string    $orderField
      *
      * @return  bool
+     * @throws \Exception
      */
     public function move($ids, $delta, $orderField = null)
     {

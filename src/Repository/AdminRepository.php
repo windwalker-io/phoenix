@@ -42,7 +42,8 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      *
      * @param DataInterface $data
      *
-     * @return  boolean
+     * @return DataInterface|\Windwalker\DataMapper\Entity\Entity
+     * @throws \Exception
      */
     public function save(DataInterface $data)
     {
@@ -67,7 +68,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      *
      * @return  void
      *
-     * @throws \LogicException
+     * @throws \Exception
      */
     protected function prepareRecord(Record $record)
     {
@@ -163,6 +164,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      * @param string    $orderField
      *
      * @return  bool
+     * @throws \Exception
      */
     public function move($ids, $delta, $orderField = null)
     {
@@ -212,6 +214,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      * @param string $orderField
      *
      * @return  boolean
+     * @throws \Exception
      */
     public function reorder($orders = [], $orderField = null)
     {
@@ -267,6 +270,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      * @param string $orderField
      *
      * @return bool
+     * @throws \Exception
      */
     public function reorderAll($conditions = [], $orderField = null)
     {

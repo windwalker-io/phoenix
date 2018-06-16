@@ -38,11 +38,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
      *
      * @return  DataInterface|Entity
      *
-     * @throws  \LogicException
-     * @throws  \UnexpectedValueException
-     * @throws  \Windwalker\Record\Exception\NoResultException
-     * @throws  \InvalidArgumentException
-     * @throws  \RuntimeException
+     * @throws \Exception
      */
     public function save(DataInterface $data)
     {
@@ -123,8 +119,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
      *
      * @return  boolean
      *
-     * @throws \UnexpectedValueException
-     * @throws \Windwalker\Record\Exception\NoResultException
+     * @throws \Exception
      */
     public function delete($conditions = null)
     {

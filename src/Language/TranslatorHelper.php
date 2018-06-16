@@ -31,6 +31,7 @@ class TranslatorHelper
      * @param string $format
      *
      * @return  void
+     * @throws \ReflectionException
      */
     public static function loadAll($package, $format = 'ini')
     {

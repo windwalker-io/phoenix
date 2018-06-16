@@ -26,6 +26,8 @@ class SeedAction extends AbstractAction
      * Do this execute.
      *
      * @return  mixed
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function doExecute()
     {

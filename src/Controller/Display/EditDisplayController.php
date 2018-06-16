@@ -28,6 +28,7 @@ class EditDisplayController extends ItemDisplayController
      * A hook before main process executing.
      *
      * @return  void
+     * @throws \Exception
      */
     protected function prepareExecute()
     {

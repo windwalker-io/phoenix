@@ -46,6 +46,7 @@ abstract class AbstractCopyController extends AbstractBatchController
      * A hook before main process executing.
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {
@@ -60,14 +61,9 @@ abstract class AbstractCopyController extends AbstractBatchController
      * @param int|string    $pk
      * @param DataInterface $data
      *
-     * @return  boolean
+     * @return DataInterface|\Windwalker\DataMapper\Entity\Entity
      *
-     * @throws \Windwalker\Record\Exception\NoResultException
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \DomainException
+     * @throws \Exception
      */
     protected function save($pk, DataInterface $data)
     {

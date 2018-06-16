@@ -56,6 +56,7 @@ class MinifyCommand extends CoreCommand
      * doExecute
      *
      * @return  int
+     * @throws \ReflectionException
      */
     protected function doExecute()
     {

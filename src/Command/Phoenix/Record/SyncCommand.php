@@ -62,6 +62,9 @@ class SyncCommand extends CoreCommand
      *
      * @return int
      *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     * @throws \Windwalker\Edge\Exception\EdgeException
      * @since  2.0
      */
     protected function doExecute()

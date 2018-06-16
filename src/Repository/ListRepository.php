@@ -85,6 +85,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * getAllowFields
      *
      * @return  array
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getAllowFields()
     {
@@ -109,7 +110,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * getItems
      *
      * @return  DataSet
-     * @throws \RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getItems()
     {
@@ -146,7 +147,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * @param Query $query
      *
      * @return  Query
-     * @throws \RuntimeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function getListQuery(Query $query = null)
     {
@@ -255,6 +256,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * @param mixed  $default
      *
      * @return  string
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function filterField($field, $default = null)
     {
@@ -271,6 +273,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * @param  array $data
      *
      * @return  array
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function filterDataFields(array $data)
     {
@@ -436,6 +439,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * @param integer $total
      *
      * @return Pagination
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getPagination($total = null)
     {
@@ -461,8 +465,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * getTotal
      *
      * @return  integer
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getTotal()
     {
@@ -499,6 +502,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * getStart
      *
      * @return  integer
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getStart()
     {

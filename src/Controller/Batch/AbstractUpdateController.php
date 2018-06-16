@@ -28,6 +28,7 @@ abstract class AbstractUpdateController extends AbstractBatchController
      * A hook before main process executing.
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {
@@ -55,7 +56,7 @@ abstract class AbstractUpdateController extends AbstractBatchController
      *
      * @return  array
      *
-     * @throws \DomainException
+     * @throws \Exception
      */
     protected function filter($data)
     {

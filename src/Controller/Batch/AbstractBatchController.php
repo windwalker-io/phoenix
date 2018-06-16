@@ -65,6 +65,7 @@ abstract class AbstractBatchController extends AbstractPostController
      * A hook before main process executing.
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {
@@ -81,12 +82,7 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @return  DataInterface
      *
-     * @throws NoResultException
-     * @throws ValidateFailException
-     * @throws \UnexpectedValueException
-     * @throws \LogicException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     protected function save($pk, DataInterface $data)
     {
@@ -259,7 +255,7 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @return Repository
      *
-     * @throws \DomainException
+     * @throws \Exception
      */
     public function getModel($name = null, $source = null, $forceNew = false)
     {

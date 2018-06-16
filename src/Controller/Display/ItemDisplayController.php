@@ -47,6 +47,7 @@ class ItemDisplayController extends DisplayController
      * @param Repository   $model The default mode.
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareViewModel(AbstractView $view, Repository $model)
     {

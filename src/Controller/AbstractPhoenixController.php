@@ -68,8 +68,10 @@ abstract class AbstractPhoenixController extends AbstractController
      * Class init.
      *
      * @param Input           $input
-     * @param Container       $container
      * @param AbstractPackage $package
+     * @param Container       $container
+     *
+     * @throws \ReflectionException
      */
     public function __construct(Input $input = null, AbstractPackage $package = null, Container $container = null)
     {

@@ -40,6 +40,7 @@ abstract class AbstractDeleteController extends AbstractBatchController
      * @param   DataInterface $data
      *
      * @return  boolean
+     * @throws \Exception
      */
     protected function save($pk, DataInterface $data)
     {

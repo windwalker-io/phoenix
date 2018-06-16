@@ -91,6 +91,7 @@ class ModalField extends TextField
      * @param array $attrs
      *
      * @return  string
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function buildInput($attrs)
     {
@@ -123,6 +124,7 @@ class ModalField extends TextField
      * getTitle
      *
      * @return  Data
+     * @throws \Exception
      */
     protected function getTitle()
     {
@@ -142,7 +144,7 @@ class ModalField extends TextField
      * getUrl
      *
      * @return  string
-     * @throws \OutOfRangeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function getUrl()
     {
