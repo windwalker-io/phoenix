@@ -543,6 +543,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      *
      * @param {string}   message
      * @param {Function} callback
+     * @param {Function} falseCallback
      */
 
 
@@ -559,13 +560,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         return confirm;
       }(function (message, callback) {
+        var falseCallback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
         message = message || 'Are you sure?';
+
+        var d = $.Deferred();
+        var when = $.when(d);
+
+        if (callback) {
+          when.done(callback);
+        }
+
+        if (falseCallback) {
+          when.catch(callback);
+        }
 
         var confirmed = confirm(message);
 
-        callback(confirmed);
+        if (confirmed) {
+          d.resolve(confirmed);
+        } else {
+          d.reject(confirmed);
+        }
 
-        return confirmed;
+        return when;
       })
     }, {
       key: 'loadScript',
@@ -1035,7 +1053,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'confirm',
       value: function (_confirm2) {
-        function confirm(_x8, _x9) {
+        function confirm(_x9, _x10) {
           return _confirm2.apply(this, arguments);
         }
 

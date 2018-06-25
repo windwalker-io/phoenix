@@ -35,15 +35,31 @@
      *
      * @param {string}   message
      * @param {Function} callback
+     * @param {Function} falseCallback
      */
-    confirm(message, callback) {
+    confirm(message, callback, falseCallback = null) {
       message = message || 'Are you sure?';
+
+      const d = $.Deferred();
+      const when = $.when(d);
+
+      if (callback) {
+        when.done(callback);
+      }
+
+      if (falseCallback) {
+        when.catch(callback);
+      }
 
       const confirmed = confirm(message);
 
-      callback(confirmed);
+      if (confirmed) {
+        d.resolve(confirmed);
+      } else {
+        d.reject(confirmed);
+      }
 
-      return confirmed;
+      return when;
     }
 
     loadScript(urls, autoConvert = true) {
