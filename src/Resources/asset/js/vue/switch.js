@@ -51,6 +51,8 @@
       }
 
       this.idName = this.id || 'input-' + this.getDashedName();
+
+      this.currentValue = this.value;
     },
 
     methods: {
