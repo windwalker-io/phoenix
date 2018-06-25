@@ -337,4 +337,18 @@ JS;
             }
         }
     }
+
+    /**
+     * switcher
+     *
+     * @return  void
+     *
+     * @since  1.6.2
+     */
+    public static function switcher()
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addCSS(static::phoenixName() . '/css/bootstrap/switch.min.css');
+        }
+    }
 }

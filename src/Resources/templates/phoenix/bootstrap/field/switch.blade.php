@@ -7,13 +7,14 @@
  */
 
 $color = $field->get('color', 'primary');
+$size = $field->get('size');
 
 if ($field->attr('v-model')) {
     $attribs[':true-value']  = $field->get('unchecked_value', 0);
     $attribs[':false-value'] = $field->get('checked_value', 1);
 }
 ?>
-<label class="phoenix-switch" for="{{ $field->getId() }}">
+<label class="phoenix-switch{{ $size ? ' switch-' . $size : '' }}" for="{{ $field->getId() }}">
     <input id="{{ $attribs['id'] }}-unchecked" name="{{ $field->getFieldName() }}" type="hidden"
         value="{{ $field->get('unchecked_value', 0) }}"
         {{ $field->get('disabled') ? 'disabled="disabled"' : '' }}

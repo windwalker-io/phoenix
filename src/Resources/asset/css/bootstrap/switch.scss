@@ -37,12 +37,10 @@
     bottom: 4px;
     background-color: white;
     -webkit-transition: .4s;
-    transition: .4s;
+    transition: .25s;
   }
 
   input:checked + .switch-slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
     transform: translateX(26px);
   }
 
@@ -63,20 +61,61 @@
 
   /* Rounded sliders */
   .switch-slider.slider-round {
-    border-radius: 10px;
+    border-radius: .25rem;
   }
 
   .switch-slider.slider-round:before {
-    border-radius: 7px;
+    border-radius: .18rem;
   }
 
-  /* Circle sliders */
+  // Circle sliders
   .switch-slider.slider-circle {
     border-radius: 50px;
   }
 
   .switch-slider.slider-circle:before {
-    border-radius: 50%;
+    border-radius: 100px;
+  }
+
+  // Size
+  &.switch-sm {
+    width: 46px;
+    height: 24px;
+
+    .switch-slider:before {
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+    }
+
+    input:checked + .switch-slider:before {
+      transform: translateX(22px);
+    }
+
+    //.switch-slider.slider-round {
+    //  border-radius: .2rem;
+    //}
+    //
+    //.switch-slider.slider-round:before {
+    //  border-radius: .15rem;
+    //}
+  }
+
+  &.switch-lg {
+    width: 100px;
+    height: 34px;
+
+    .switch-slider:before {
+      height: 26px;
+      width: 45px;
+      left: 4px;
+      bottom: 4px;
+    }
+
+    input:checked + .switch-slider:before {
+      transform: translateX(47px);
+    }
   }
 }
 

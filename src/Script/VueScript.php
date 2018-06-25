@@ -237,4 +237,21 @@ JS;
 
         return $fields;
     }
+
+    /**
+     * switcher
+     *
+     * @return  void
+     *
+     * @since  1.6.2
+     */
+    public static function switcher()
+    {
+        if (!static::inited(__METHOD__)) {
+            static::core();
+            BootstrapScript::switcher();
+
+            static::addJS(static::phoenixName() . '/js/vue/switch.min.js');
+        }
+    }
 }

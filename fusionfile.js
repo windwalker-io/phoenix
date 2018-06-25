@@ -46,6 +46,9 @@ fusion.task('phoenix', function () {
     'src/Resources/asset/js/phoenix/phoenix.js'
   );
   fusion.babel('src/Resources/src/plugin/*.js', 'src/Resources/asset/js/phoenix/');
+
+  // Vue
+  fusion.babel('src/Resources/src/vue/*.js', 'src/Resources/asset/js/vue/');
   // Compile end
 });
 

@@ -9,6 +9,7 @@
 namespace Phoenix\Field;
 
 use Phoenix\PhoenixPackage;
+use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Form\Field\CheckboxField;
@@ -20,6 +21,7 @@ use Windwalker\Form\Field\CheckboxField;
  * @method $this|mixed circle(bool $value = null)
  * @method $this|mixed shape(string $value = null)
  * @method $this|mixed color(string $value = null)
+ * @method $this|mixed size(string $value = null)
  * @method $this|mixed checkedValue(string $value = null)
  * @method $this|mixed uncheckedValue(string $value = null)
  *
@@ -96,9 +98,7 @@ class SwitchField extends CheckboxField
             return;
         }
 
-        $alias = PackageHelper::getAlias(PhoenixPackage::class);
-
-        Asset::addCSS($alias . '/css/bootstrap/switch.min.css');
+        BootstrapScript::switcher();
 
         static::$inited = true;
     }
@@ -117,6 +117,7 @@ class SwitchField extends CheckboxField
             'circle',
             'shape',
             'color',
+            'size',
             'checkedValue' => 'checked_value',
             'uncheckedValue' => 'unchecked_value',
         ]);
