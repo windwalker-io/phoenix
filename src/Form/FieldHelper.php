@@ -79,7 +79,7 @@ class FieldHelper
                     }
                 } else {
                     $conditions = [
-                        sprintf('input[name="%s"]', $target->getFieldName()) => ['values' => $values],
+                        sprintf('[name="%s"]', $target->getFieldName()) => ['values' => $values],
                     ];
                 }
 
