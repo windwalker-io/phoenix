@@ -71,11 +71,15 @@ class FieldHelper
 
                 if ($target instanceof CheckboxesField) {
                     foreach ($values as $value) {
-                        $conditions[sprintf("input[name='%s[]'][value='%s']", $target->getFieldName(), $value)] = ['checked' => true];
+                        $conditions[
+                            sprintf("input[name='%s[]'][value='%s']", $target->getFieldName(), $value)
+                        ] = ['checked' => true];
                     }
                 } elseif ($target instanceof CheckboxField) {
                     foreach ($values as $value) {
-                        $conditions[sprintf("input[name='%s'][value='%s']", $target->getFieldName(), $value)] = ['checked' => true];
+                        $conditions[
+                            sprintf("input[name='%s'][value='%s']", $target->getFieldName(), $value)
+                        ] = ['checked' => true];
                     }
                 } else {
                     $conditions = [
