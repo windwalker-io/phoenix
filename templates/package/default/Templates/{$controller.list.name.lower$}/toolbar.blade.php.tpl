@@ -36,13 +36,13 @@
         <li>
             <a href="javascript://" class="dropdown-item phoenix-btn-publish"
                 onclick="Phoenix.Grid.hasChecked().batch('publish');">
-                <span class="fa fa-check text-success"></span>
+                <span class="fa fa-fw fa-check text-success"></span>
                 @lang('phoenix.toolbar.publish')
             </a>
 
             <a href="javascript://" class="dropdown-item phoenix-btn-unpublish"
                 onclick="Phoenix.Grid.hasChecked().batch('unpublish');">
-                <span class="fa fa-remove fa-times text-danger"></span>
+                <span class="fa fa-fw fa-remove fa-times text-danger"></span>
                 @lang('phoenix.toolbar.unpublish')
             </a>
         </li>
