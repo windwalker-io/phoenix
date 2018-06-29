@@ -57,14 +57,16 @@ abstract class PhoenixScript extends AbstractPhoenixScript
             static::addJS(static::phoenixName() . '/js/phoenix/phoenix.min.js');
 
             static::data('windwalker.debug', WINDWALKER_DEBUG);
-            static::data('phoenix.uri', Ioc::getUriData());
-            static::data('phoenix.uri', [
-                'asset' => [
-                    'path' => static::getAsset()->path,
-                    'root' => static::getAsset()->root,
-                    'version' => static::getAsset()->getVersion()
+            static::data('phoenix.uri', array_merge(
+                (array) Ioc::getUriData(),
+                [
+                    'asset' => [
+                        'path' => static::getAsset()->path,
+                        'root' => static::getAsset()->root,
+                        'version' => static::getAsset()->getVersion()
+                    ]
                 ]
-            ]);
+            ));
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
