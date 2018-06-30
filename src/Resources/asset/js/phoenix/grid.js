@@ -362,7 +362,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'toggleAll',
       value: function toggleAll(value) {
-        var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+        var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
         var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
 

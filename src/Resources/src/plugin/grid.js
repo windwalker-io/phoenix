@@ -279,7 +279,7 @@
      * @param  {boolean}          value     Checked or unchecked.
      * @param  {number|boolean}   duration  Duration to check all.
      */
-    toggleAll(value, duration = 100) {
+    toggleAll(value, duration = 0) {
       const checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
 
       $.each(checkboxes, function(i, e) {
