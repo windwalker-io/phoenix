@@ -15,6 +15,7 @@
         keepAlive: 'keepAlive',
         stopKeepAlive: 'stopKeepAlive',
         loadScript: 'loadScript',
+        numberFormat: 'numberFormat',
         sprintf: 'sprintf',
         vsprintf: 'vsprintf',
       };
@@ -127,6 +128,32 @@
      */
     stopKeepAlive() {
       clearInterval(this.aliveHandle);
+    }
+
+    /**
+     * Number format like php function.
+     *
+     * @param {string|number} number
+     * @param {number}        decimals
+     * @param {string}        decPoint
+     * @param {string}        thousandsSep
+     * @returns {string}
+     */
+    numberFormat(number, decimals = 0, decPoint = '.', thousandsSep = ',') {
+      decimals = decimals || 0;
+      number = parseFloat(number);
+
+      let roundedNumber = Math.round(Math.abs(number) * ('1e' + decimals)) + '';
+      let numbersString = decimals ? roundedNumber.slice(0, decimals * -1) : roundedNumber;
+      let decimalsString = decimals ? roundedNumber.slice(decimals * -1) : '';
+      let formattedNumber = "";
+
+      while (numbersString.length > 3) {
+        formattedNumber += thousandsSep + numbersString.slice(-3);
+        numbersString = numbersString.slice(0, -3);
+      }
+
+      return (number < 0 ? '-' : '') + numbersString + formattedNumber + (decimalsString ? (decPoint + decimalsString) : '');
     }
   }
 

@@ -518,6 +518,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           keepAlive: 'keepAlive',
           stopKeepAlive: 'stopKeepAlive',
           loadScript: 'loadScript',
+          numberFormat: 'numberFormat',
           sprintf: 'sprintf',
           vsprintf: 'vsprintf'
         };
@@ -668,6 +669,39 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'stopKeepAlive',
       value: function stopKeepAlive() {
         clearInterval(this.aliveHandle);
+      }
+
+      /**
+       * Number format like php function.
+       *
+       * @param {string|number} number
+       * @param {number}        decimals
+       * @param {string}        decPoint
+       * @param {string}        thousandsSep
+       * @returns {string}
+       */
+
+    }, {
+      key: 'numberFormat',
+      value: function numberFormat(number) {
+        var decimals = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+        var decPoint = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '.';
+        var thousandsSep = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : ',';
+
+        decimals = decimals || 0;
+        number = parseFloat(number);
+
+        var roundedNumber = Math.round(Math.abs(number) * ('1e' + decimals)) + '';
+        var numbersString = decimals ? roundedNumber.slice(0, decimals * -1) : roundedNumber;
+        var decimalsString = decimals ? roundedNumber.slice(decimals * -1) : '';
+        var formattedNumber = "";
+
+        while (numbersString.length > 3) {
+          formattedNumber += thousandsSep + numbersString.slice(-3);
+          numbersString = numbersString.slice(0, -3);
+        }
+
+        return (number < 0 ? '-' : '') + numbersString + formattedNumber + (decimalsString ? decPoint + decimalsString : '');
       }
     }]);
 
@@ -1053,7 +1087,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'confirm',
       value: function (_confirm2) {
-        function confirm(_x9, _x10) {
+        function confirm(_x12, _x13) {
           return _confirm2.apply(this, arguments);
         }
 
