@@ -244,13 +244,17 @@
      * @returns {boolean}
      */
     deleteList(message, url, queries) {
-      message = message || this.phoenix.__('phoenix.message.delete.confirm');
+      message = message == null ? this.phoenix.__('phoenix.message.delete.confirm') : message;
 
-      this.phoenix.confirm(message, isConfirm => {
-        if (isConfirm) {
-          this.core['delete'](url, queries);
-        }
-      });
+      if (message !== false) {
+        this.phoenix.confirm(message, isConfirm => {
+          if (isConfirm) {
+            this.core['delete'](url, queries);
+          }
+        });
+      } else {
+        this.core['delete'](url, queries);
+      }
 
       return true;
     }
@@ -266,11 +270,19 @@
      * @returns {boolean}
      */
     deleteRow(row, msg, url, queries) {
-      this.toggleAll(false);
+      msg = msg || this.phoenix.__('phoenix.message.delete.confirm');
 
-      this.checkRow(row);
+      this.phoenix.confirm(msg, isConfirm => {
+        if (isConfirm) {
+          this.toggleAll(false);
 
-      return this.deleteList(msg, url, queries);
+          this.checkRow(row);
+
+          this.deleteList(false, url, queries);
+        }
+      });
+
+      return true;
     }
 
     /**

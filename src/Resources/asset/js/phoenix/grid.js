@@ -320,13 +320,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       value: function deleteList(message, url, queries) {
         var _this3 = this;
 
-        message = message || this.phoenix.__('phoenix.message.delete.confirm');
+        message = message == null ? this.phoenix.__('phoenix.message.delete.confirm') : message;
 
-        this.phoenix.confirm(message, function (isConfirm) {
-          if (isConfirm) {
-            _this3.core['delete'](url, queries);
-          }
-        });
+        if (message !== false) {
+          this.phoenix.confirm(message, function (isConfirm) {
+            if (isConfirm) {
+              _this3.core['delete'](url, queries);
+            }
+          });
+        } else {
+          this.core['delete'](url, queries);
+        }
 
         return true;
       }
@@ -345,11 +349,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'deleteRow',
       value: function deleteRow(row, msg, url, queries) {
-        this.toggleAll(false);
+        var _this4 = this;
 
-        this.checkRow(row);
+        msg = msg || this.phoenix.__('phoenix.message.delete.confirm');
 
-        return this.deleteList(msg, url, queries);
+        this.phoenix.confirm(msg, function (isConfirm) {
+          if (isConfirm) {
+            _this4.toggleAll(false);
+
+            _this4.checkRow(row);
+
+            _this4.deleteList(false, url, queries);
+          }
+        });
+
+        return true;
       }
 
       /**
