@@ -318,17 +318,22 @@ JS;
     /**
      * fontAwesome
      *
-     * @param int $version
+     * @param int   $version
+     * @param array $options
      *
      * @return  void
      */
-    public static function fontAwesome($version = 4)
+    public static function fontAwesome($version = 4, array $options = [])
     {
         if (!static::inited(__METHOD__)) {
             static::$faVersion = (int) $version;
 
             if ($version === 5) {
-                static::addCSS(static::phoenixName() . '/css/fontawesome-all.min.css');
+                static::addCSS(static::phoenixName() . '/css/fontawesome/all.min.css');
+
+                if (!empty($options['v4shims'])) {
+                    static::addCSS(static::phoenixName() . '/css/fontawesome/v4-shims.min.css');
+                }
 
                 // TODO: Make sure FA fix this then remove.
                 static::internalCSS(".fa.fab { font-family: 'Font Awesome 5 Brands'; }");
