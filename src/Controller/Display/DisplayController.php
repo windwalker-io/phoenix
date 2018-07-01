@@ -95,6 +95,7 @@ class DisplayController extends AbstractPhoenixController
      *
      * @return  mixed
      * @throws \RuntimeException
+     * @throws \ReflectionException
      */
     protected function doExecute()
     {
@@ -106,8 +107,8 @@ class DisplayController extends AbstractPhoenixController
 
         if ($this->view instanceof LayoutRenderableInterface) {
             $this->view->setLayout($this->layout);
-        } // Only show debugger in HTML view
-        elseif (class_exists(DebuggerHelper::class)) {
+        } elseif (class_exists(DebuggerHelper::class)) {
+            // Only show debugger in HTML view
             DebuggerHelper::disableConsole();
         }
 

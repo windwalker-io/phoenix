@@ -43,15 +43,15 @@ class ItemDisplayController extends DisplayController
      * You can configure default model state here, or add more sub models to view.
      * Remember to call parent to make sure default model already set in view.
      *
-     * @param AbstractView $view  The view to render page.
-     * @param Repository   $model The default mode.
+     * @param AbstractView $view       The view to render page.
+     * @param Repository   $repository The default mode.
      *
      * @return  void
      * @throws \ReflectionException
      */
-    protected function prepareViewModel(AbstractView $view, Repository $model)
+    protected function prepareViewRepository(AbstractView $view, Repository $repository)
     {
-        parent::prepareViewModel($view, $model);
+        parent::prepareViewRepository($view, $repository);
 
         $pk = $this->input->get($this->keyName);
 
@@ -59,7 +59,7 @@ class ItemDisplayController extends DisplayController
             $pk = [$this->keyName => $pk];
         }
 
-        $model['load.conditions'] = $pk;
+        $repository['load.conditions'] = $pk;
     }
 
     /**
