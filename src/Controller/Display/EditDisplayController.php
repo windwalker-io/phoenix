@@ -18,7 +18,7 @@ use Windwalker\Core\View\AbstractView;
  * The EditGetController class.
  *
  * @method  AdminRepository|CrudRepository  getModel($name = null, $source = null, $forceNew = false)
- * @method  EditView              getView($name = null, $format = 'html', $engine = null, $forceNew = false)
+ * @method  EditView                        getView($name = null, $format = 'html', $engine = null, $forceNew = false)
  *
  * @since  1.0.5
  */
@@ -41,20 +41,21 @@ class EditDisplayController extends ItemDisplayController
      * You can configure default model state here, or add more sub models to view.
      * Remember to call parent to make sure default model already set in view.
      *
-     * @param AbstractView $view  The view to render page.
-     * @param Repository   $model The default mode.
+     * @param AbstractView $view       The view to render page.
+     * @param Repository   $repository The default mode.
      *
      * @return  void
+     * @throws \ReflectionException
      */
-    protected function prepareViewModel(AbstractView $view, Repository $model)
+    protected function prepareViewRepository(AbstractView $view, Repository $repository)
     {
-        parent::prepareViewModel($view, $model);
+        parent::prepareViewRepository($view, $repository);
 
         if ($this->input->get('new') !== null) {
             $this->removeUserState($this->getContext('edit.data'));
         }
 
-        $model['form.data'] = $this->getUserState($this->getContext('edit.data'));
+        $repository['form.data'] = $this->getUserState($this->getContext('edit.data'));
 
         $this->removeUserState($this->getContext('edit.data'));
     }
