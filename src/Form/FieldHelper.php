@@ -14,6 +14,7 @@ use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Field\CheckboxesField;
 use Windwalker\Form\Field\CheckboxField;
 use Windwalker\Form\Field\HiddenField;
+use Windwalker\Form\Field\RadioField;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Arr;
 
@@ -81,7 +82,13 @@ class FieldHelper
                             sprintf("input[name='%s'][value='%s']", $target->getFieldName(), $value)
                         ] = ['checked' => true];
                     }
+                } elseif ($target instanceof RadioField) {
+                    // Radio needs input selector
+                    $conditions = [
+                        sprintf('input[name="%s"]', $target->getFieldName()) => ['values' => $values],
+                    ];
                 } else {
+                    // For select and textarea, we don't use input selector
                     $conditions = [
                         sprintf('[name="%s"]', $target->getFieldName()) => ['values' => $values],
                     ];
