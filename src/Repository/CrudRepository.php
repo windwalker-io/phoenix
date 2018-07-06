@@ -60,28 +60,24 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
 
         $record->bind($dumped);
 
-        $dispatcher = Ioc::getDispatcher();
-
-        $dispatcher->triggerEvent('onModelBeforeSave', [
-            'conditions' => $conditions,
-            'model' => $this,
-            'data' => $data,
-            'record' => $record,
+        $this->triggerEvent('BeforeSave', [
+            'conditions'  => $conditions,
+            'data'        => $data,
+            'record'      => $record,
             'updateNulls' => $this->updateNulls,
         ]);
 
-        $this->prepareRecord($record);
+        $this->prepareSave($record);
 
         $record->validate()
             ->store($this->updateNulls);
 
-        $this->postSaveHook($record);
+        $this->postSave($record);
 
-        $dispatcher->triggerEvent('onModelAfterSave', [
-            'conditions' => $conditions,
-            'model' => $this,
-            'data' => $data,
-            'record' => $record,
+        $this->triggerEvent('AfterSave', [
+            'conditions'  => $conditions,
+            'data'        => $data,
+            'record'      => $record,
             'updateNulls' => $this->updateNulls,
         ]);
 
@@ -96,6 +92,8 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
      * @param Record $record
      *
      * @return  void
+     *
+     * @deprecated  Use postSave() instead.
      */
     protected function postSaveHook(Record $record)
     {
@@ -107,9 +105,39 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
      * @param Record $record
      *
      * @return  void
+     *
+     * @deprecated  Use prepareSave() instead.
      */
     protected function prepareRecord(Record $record)
     {
+    }
+
+    /**
+     * prepareSave
+     *
+     * @param Record $data
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function prepareSave(Record $data)
+    {
+        $this->prepareRecord($data);
+    }
+
+    /**
+     * postSave
+     *
+     * @param Record $data
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function postSave(Record $data)
+    {
+        $this->postSaveHook($data);
     }
 
     /**
@@ -127,9 +155,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
 
         $record = $this->getRecord();
 
-        $dispatcher = Ioc::getDispatcher();
-
-        $dispatcher->triggerEvent('onModelBeforeDelete', [
+        $this->triggerEvent('BeforeDelete', [
             'conditions' => $conditions,
             'model' => $this,
             'record' => $record,
@@ -137,11 +163,16 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
 
         try {
             // Find record first to check we can delete it.
-            $record->load($conditions)->delete();
+            $record->load($conditions);
 
-            $dispatcher->triggerEvent('onModelAfterDelete', [
+            $this->prepareDelete($conditions, $record);
+
+            $record->delete();
+
+            $this->postDelete($conditions, $record);
+
+            $this->triggerEvent('AfterDelete', [
                 'conditions' => $conditions,
-                'model' => $this,
                 'record' => $record,
                 'result' => true,
             ]);
@@ -150,6 +181,36 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
         }
 
         return true;
+    }
+
+    /**
+     * prepareDelete
+     *
+     * @param array  $conditions
+     * @param Record $data
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function prepareDelete($conditions, Record $data)
+    {
+        //
+    }
+
+    /**
+     * postDelete
+     *
+     * @param array  $conditions
+     * @param Record $data
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function postDelete($conditions, Record $data)
+    {
+        //
     }
 
     /**

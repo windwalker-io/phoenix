@@ -10,6 +10,7 @@ namespace Phoenix\Repository;
 
 use Windwalker\Core\Repository\DatabaseRepository;
 use Windwalker\Data\DataInterface;
+use Windwalker\Event\Event;
 use Windwalker\Ioc;
 use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
@@ -42,15 +43,14 @@ class ItemRepository extends DatabaseRepository
 
             $item = $this->getRecord();
 
-            $dispatcher = Ioc::getDispatcher();
-
-            $dispatcher->triggerEvent('onModelBeforeLoad', [
+            $this->triggerEvent('BeforeLoad', [
                 'conditions' => $conditions,
-                'model' => $this,
                 'item' => $item
             ]);
 
             try {
+                $this->prepareGetItem($conditions);
+
                 $item->load($conditions);
             } catch (NoResultException $e) {
                 return $item->reset(false);
@@ -58,14 +58,27 @@ class ItemRepository extends DatabaseRepository
 
             $this->postGetItem($item);
 
-            $dispatcher->triggerEvent('onModelAfterLoad', [
+            $this->triggerEvent('AfterLoad', [
                 'conditions' => $conditions,
-                'model' => $this,
                 'item' => $item
             ]);
 
             return $item;
         });
+    }
+
+    /**
+     * prepareGetItem
+     *
+     * @param array $conditions
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function prepareGetItem(array $conditions)
+    {
+        //
     }
 
     /**
@@ -77,5 +90,62 @@ class ItemRepository extends DatabaseRepository
      */
     protected function postGetItem(DataInterface $item)
     {
+        //
+    }
+
+    /**
+     * onBeforeLoad
+     *
+     * @param Event $event
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function onBeforeLoad(Event $event)
+    {
+        //
+    }
+
+    /**
+     * onAfterLoad
+     *
+     * @param Event $event
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function onAfterLoad(Event $event)
+    {
+        //
+    }
+
+    /**
+     * triggerCrudEvent
+     *
+     * @param string $action
+     * @param array  $params
+     *
+     * @return  \Windwalker\Event\EventInterface
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function triggerEvent($action, array $params = [])
+    {
+        $dispatcher = Ioc::getDispatcher();
+
+        $params['model'] = $this;
+        $params['repository'] = $this;
+
+        $selfEvent = 'on' . $action;
+
+        if (is_callable([$this, $selfEvent])) {
+            $this->$selfEvent(new Event($selfEvent, $params));
+        }
+
+        $dispatcher->triggerEvent('onModel' . $action, $params);
+
+        return $dispatcher->triggerEvent('onRepository' . $action, $params);
     }
 }
