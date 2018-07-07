@@ -8,6 +8,7 @@
 
 namespace Phoenix\Controller\Batch;
 
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Data\DataInterface;
 use Windwalker\String\StringHelper;
 
@@ -40,6 +41,15 @@ abstract class AbstractCopyController extends AbstractBatchController
     protected $incrementFields = [
         'title' => StringHelper::INCREMENT_STYLE_DEFAULT,
         'alias' => StringHelper::INCREMENT_STYLE_DASH,
+    ];
+
+    /**
+     * Property dateFields.
+     *
+     * @var  array
+     */
+    protected $createdFields = [
+        'created',
     ];
 
     /**
@@ -109,6 +119,25 @@ abstract class AbstractCopyController extends AbstractBatchController
 
         unset($record->{$this->keyName});
 
+        // Update created date
+        foreach ($this->createdFields as $field) {
+            if ($record->hasField($field)) {
+                $record->$field = $this->getDate();
+            }
+        }
+
         return $this->repository->save($record);
+    }
+
+    /**
+     * getDate
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function getDate()
+    {
+        return Chronos::create()->toSql();
     }
 }

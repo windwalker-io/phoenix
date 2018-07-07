@@ -43,7 +43,6 @@ class MuseCommand extends Command
         $this->addCommand(new Muse\SubsystemCommand());
         $this->addCommand(new Muse\ItemCommand());
         $this->addCommand(new Muse\ListCommand());
-        $this->addCommand(new Muse\ModelCommand());
         $this->addCommand(new Muse\ConvertCommand());
 
         $this->addGlobalOption('type')
