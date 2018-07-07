@@ -236,4 +236,37 @@ abstract class AbstractPhoenixController extends AbstractController
 
         return parent::__get($name);
     }
+
+    /**
+     * run when writing data to inaccessible members.
+     *
+     * @param $name  string
+     * @param $value mixed
+     *
+     * @return void
+     */
+    public function __set($name, $value)
+    {
+        if ($name === 'model') {
+            $this->repository = $value;
+        }
+
+        $this->$name = $value;
+    }
+
+    /**
+     * is triggered by calling isset() or empty() on inaccessible members.
+     *
+     * @param $name string
+     *
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        if ($name === 'model') {
+            return true;
+        }
+
+        return isset($this->$name);
+    }
 }

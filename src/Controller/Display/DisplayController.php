@@ -50,15 +50,6 @@ class DisplayController extends AbstractPhoenixController
     protected $layout;
 
     /**
-     * B/C for old usage.
-     *
-     * @var Repository
-     *
-     * @deprecated  Use $repository instead,
-     */
-    protected $model;
-
-    /**
      * A hook before main process executing.
      *
      * @return  void
@@ -69,7 +60,7 @@ class DisplayController extends AbstractPhoenixController
         $this->format = $this->format ?: $this->app->get('route.extra.format', 'html');
         $this->layout = $this->layout ?: $this->app->get('route.extra.layout', $this->name);
 
-        $this->repository = $this->model = $this->getRepository();
+        $this->repository = $this->getRepository();
         $this->view       = $this->getView();
 
         // Prepare response
