@@ -644,4 +644,24 @@ JS;
 
         static::$domReady[$name] = $code;
     }
+
+    /**
+     * shortLangCode
+     *
+     * @param string $code
+     *
+     * @return  string
+     *
+     * @since  1.6.5
+     */
+    public static function shortLangCode($code)
+    {
+        list($first, $last) = explode('-', $code, 2);
+
+        if (strtolower($first) === strtolower($last)) {
+            return strtolower($first);
+        }
+
+        return strtolower($first) . '-' . strtoupper($last);
+    }
 }
