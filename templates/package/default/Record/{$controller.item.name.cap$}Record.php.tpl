@@ -8,7 +8,7 @@
 
 namespace {$package.namespace$}{$package.name.cap$}\Record;
 
-use {$package.namespace$}{$package.name.cap$}\Record\Traits\{$controller.item.name.cap$}DataTrait;
+use {$package.namespace$}{$package.name.cap$}\Record\Columns\{$controller.item.name.cap$}DataInterface;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Windwalker\Event\Event;
 use Windwalker\Record\Record;
@@ -18,10 +18,8 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class {$controller.item.name.cap$}Record extends Record
+class {$controller.item.name.cap$}Record extends Record implements {$controller.item.name.cap$}DataInterface
 {
-    use {$controller.item.name.cap$}DataTrait;
-
     /**
      * Property table.
      *

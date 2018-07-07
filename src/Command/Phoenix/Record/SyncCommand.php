@@ -12,6 +12,7 @@ use Windwalker\Console\Exception\WrongArgumentException;
 use Windwalker\Console\Prompter\BooleanPrompter;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Ioc;
 use Windwalker\Edge\Edge;
 use Windwalker\Edge\Loader\EdgeStringLoader;
@@ -122,22 +123,23 @@ class SyncCommand extends CoreCommand
         }
 
         // Prepare Trait name
-        $name      = end(explode('\\', $recordClass));
+        $classParts = explode('\\', $recordClass);
+        $name      = end($classParts);
         $name      = str_replace('Record', '', $name);
-        $shortName = ucfirst($name) . 'DataTrait';
+        $shortName = ucfirst($name) . 'DataInterface';
 
         $data = [
-            'package_namespace' => $pkgNamespace . '\\Record\\Traits',
+            'package_namespace' => $pkgNamespace . '\\Record\\Columns',
             'short_name' => $shortName,
             'columns' => $fields,
         ];
 
         $content = (new Edge(new EdgeStringLoader()))->render($this->getTemplate(), $data);
 
-        $file = $package->getDir() . '/Record/Traits/' . $shortName . '.php';
+        $file = $package->getDir() . '/Record/Columns/' . $shortName . '.php';
 
-        if (is_file($file) && !(new BooleanPrompter())->ask('File: <comment>' . $file . '</comment> exists, do you want to override it? [N/y]: ',
-                false)) {
+        if (is_file($file) && !(new BooleanPrompter())
+                ->ask('File: <comment>' . $file . '</comment> exists, do you want to override it? [N/y]: ', false)) {
             throw new \RuntimeException('  Canceled...');
         }
 
@@ -155,12 +157,14 @@ class SyncCommand extends CoreCommand
      */
     protected function getTemplate()
     {
+        $year = Chronos::create()->year;
+
         return <<<TMPL
 {!! '<' . '?php' !!}
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
+ * @copyright  Copyright (C) {$year} LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -172,10 +176,8 @@ namespace {{ \$package_namespace }};
 @foreach (\$columns as \$column)
  * @property  {{ \$column['type'] }}  {{ \$column['name'] }}
 @endforeach
- *
- * @since  1.1
  */
-trait {{ \$short_name }}
+interface {{ \$short_name }}
 {
 
 }

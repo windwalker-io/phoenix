@@ -95,25 +95,38 @@ class {$controller.item.name.cap$}Repository extends AdminRepository
     /**
      * prepareRecord
      *
-     * @param Record|{$controller.item.name.cap$}Record $record
+     * @param Record|{$controller.item.name.cap$}Record $data
      *
      * @return  void
      * @throws \Exception
      */
-    protected function prepareRecord(Record $record)
+    protected function prepareSave(Record $data)
     {
-        parent::prepareRecord($record);
+        parent::prepareSave($data);
     }
 
     /**
      * postSaveHook
      *
-     * @param Record|{$controller.item.name.cap$}Record $record
+     * @param Record|{$controller.item.name.cap$}Record $data
      *
      * @return  void
      */
-    protected function postSaveHook(Record $record)
+    protected function postSave(Record $data)
     {
-        parent::postSaveHook($record);
+        parent::postSave($data);
+    }
+
+    /**
+     * postDelete
+     *
+     * @param array               $conditions
+     * @param Record|{$controller.item.name.cap$}Record $data
+     *
+     * @return  void
+     */
+    protected function postDelete($conditions, Record $data)
+    {
+        parent::postDelete($conditions, $data);
     }
 }

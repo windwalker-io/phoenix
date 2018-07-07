@@ -2,16 +2,16 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
- * @license    GNU General Public License version 2 or later.
+ * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
+ * @license    __LICENSE__
  */
 
-namespace {$package.namespace$}{$package.name.cap$}\Record\Traits;
+namespace {$package.namespace$}{$package.name.cap$}\Record\Columns;
 
 /**
- * The {$controller.item.name.cap$}DataTrait class.
+ * The {$controller.item.name.cap$}DataInterface class.
  *
- * @property  integer id
+ * @property  int     id
  * @property  string  title
  * @property  string  alias
  * @property  string  url
@@ -21,14 +21,15 @@ namespace {$package.namespace$}{$package.name.cap$}\Record\Traits;
  * @property  string  state
  * @property  string  ordering
  * @property  string  created
- * @property  integer created_by
+ * @property  int     created_by
  * @property  string  modified
- * @property  integer modified_by
+ * @property  int     modified_by
  * @property  string  language
  * @property  string  params
  *
- * @since  1.1
+ * @since  __DEPLOY_VERSION__
  */
-trait {$controller.item.name.cap$}DataTrait
+interface {$controller.item.name.cap$}DataInterface
 {
+
 }

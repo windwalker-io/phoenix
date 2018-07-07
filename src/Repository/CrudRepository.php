@@ -11,7 +11,6 @@ namespace Phoenix\Repository;
 use Phoenix\Repository\Traits\FormAwareRepositoryTrait;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
-use Windwalker\Ioc;
 use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
 
