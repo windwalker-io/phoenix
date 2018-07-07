@@ -66,14 +66,8 @@ abstract class AbstractPhoenixController extends AbstractController
 
     /**
      * Class init.
-     *
-     * @param Input           $input
-     * @param AbstractPackage $package
-     * @param Container       $container
-     *
-     * @throws \ReflectionException
      */
-    public function __construct(Input $input = null, AbstractPackage $package = null, Container $container = null)
+    public function __construct()
     {
         $this->config = $this->getConfig();
 
@@ -82,15 +76,15 @@ abstract class AbstractPhoenixController extends AbstractController
         // Guess name
         $inflector = StringInflector::getInstance();
 
-        if ($this->inflection == self::SINGULAR) {
+        if ($this->inflection === self::SINGULAR) {
             $this->config['item_name'] = $this->itemName ?: $name;
             $this->config['list_name'] = $this->listName ?: $inflector->toPlural($this->config['item_name']);
-        } elseif ($this->inflection == self::PLURAL) {
+        } elseif ($this->inflection === self::PLURAL) {
             $this->config['list_name'] = $this->listName ?: $name;
             $this->config['item_name'] = $this->itemName ?: $inflector->toSingular($this->config['list_name']);
         }
 
-        parent::__construct($input, $package, $container);
+        parent::__construct();
     }
 
     /**
