@@ -40,6 +40,14 @@ class GetController extends EditDisplayController
     protected $view = '{$controller.item.name.cap$}';
 
     /**
+     * Class init.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
      * A hook before main process executing.
      *
      * @return  void

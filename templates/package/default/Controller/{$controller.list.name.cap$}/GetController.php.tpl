@@ -65,6 +65,14 @@ class GetController extends ListDisplayController
     protected $limit;
 
     /**
+     * Class init.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
      * Check user has access to view this page.
      *
      * Throw exception with 4xx code to block unauthorised access.

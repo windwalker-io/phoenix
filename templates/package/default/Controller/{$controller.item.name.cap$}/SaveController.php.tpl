@@ -43,6 +43,14 @@ class SaveController extends AbstractSaveController
     protected $repository = '{$controller.item.name.cap$}';
 
     /**
+     * Class init.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
      * A hook before main process executing.
      *
      * @return  void

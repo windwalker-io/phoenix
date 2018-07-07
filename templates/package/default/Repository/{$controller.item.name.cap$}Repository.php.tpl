@@ -11,7 +11,9 @@ namespace {$package.namespace$}{$package.name.cap$}\Repository;
 use {$package.namespace$}{$package.name.cap$}\Record\{$controller.item.name.cap$}Record;
 use Phoenix\Repository\AdminRepository;
 use Windwalker\Data\DataInterface;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Record\Record;
+use Windwalker\Structure\Structure;
 
 /**
  * The {$controller.item.name.cap$}Repository class.
@@ -54,6 +56,19 @@ class {$controller.item.name.cap$}Repository extends AdminRepository
      * @var  string
      */
     protected $reorderPosition = self::ORDER_POSITION_LAST;
+
+    /**
+     * Instantiate the model.
+     *
+     * @param   Structure|array        $config The model config.
+     * @param   AbstractDatabaseDriver $db     The database driver.
+     *
+     * @since   1.0
+     */
+    public function __construct($config = null, AbstractDatabaseDriver $db = null)
+    {
+        parent::__construct($config, $db);
+    }
 
     /**
      * getReorderConditions

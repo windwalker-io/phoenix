@@ -13,7 +13,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Table;
  *
  * @since  1.0
  */
-interface Table
+abstract class Table
 {
     const {$controller.list.name.upper$} = '{$controller.list.name.lower$}';
 

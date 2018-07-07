@@ -11,7 +11,9 @@ namespace {$package.namespace$}{$package.name.cap$}\Repository;
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Phoenix\Repository\Filter\FilterHelperInterface;
 use Phoenix\Repository\ListRepository;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Query\Query;
+use Windwalker\Structure\Structure;
 
 /**
  * The {$controller.list.name.cap$}Repository class.
@@ -40,6 +42,19 @@ class {$controller.list.name.cap$}Repository extends ListRepository
      * @var  array
      */
     protected $fieldMapping = [];
+
+    /**
+     * Instantiate the model.
+     *
+     * @param   Structure|array        $config The model config.
+     * @param   AbstractDatabaseDriver $db     The database driver.
+     *
+     * @since   1.0
+     */
+    public function __construct($config = null, AbstractDatabaseDriver $db = null)
+    {
+        parent::__construct($config, $db);
+    }
 
     /**
      * configureTables
