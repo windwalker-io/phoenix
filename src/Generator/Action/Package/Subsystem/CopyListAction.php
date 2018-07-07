@@ -37,7 +37,7 @@ class CopyListAction extends AbstractAction
             'Controller/%s',
             'Field',
             'Form/%s',
-            'Model/%sModel.php.tpl',
+            'Repository/%sRepository.php.tpl',
             'Templates/' . StringHelper::quote('controller.list.name.lower', $this->config['tagVariables']),
             'View/%s',
         ];

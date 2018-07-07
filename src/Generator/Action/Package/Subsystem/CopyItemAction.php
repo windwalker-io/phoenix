@@ -37,7 +37,7 @@ class CopyItemAction extends AbstractAction
             'Controller/%s',
             'Field',
             'Form/%s',
-            'Model/%sModel.php.tpl',
+            'Repository/%sRepository.php.tpl',
             'View/%s',
             'Templates/' . StringHelper::quote('controller.item.name.lower', $this->config['tagVariables']),
         ];
