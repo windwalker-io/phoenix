@@ -449,11 +449,42 @@ JS;
      * @param string $variable
      *
      * @return  void
+     *
+     * @deprecated  Use validation() and v2.
      */
     public static function formValidation($selector = '#admin-form', $options = [], $variable = 'Phoenix')
     {
         if (!static::inited(__METHOD__)) {
             static::core($selector, $variable);
+
+            static::addJS(static::phoenixName() . '/js/string/punycode.min.js');
+            static::addJS(static::phoenixName() . '/js/phoenix/validation-v1.min.js');
+        }
+
+        if (!static::inited(__METHOD__, get_defined_vars())) {
+            $defaultOptions = [
+                'scroll' => [
+                    'enabled' => true,
+                    'offset' => -100,
+                    'duration' => 1000,
+                ],
+            ];
+
+            $options = static::getJSObject($defaultOptions, $options);
+
+            static::translate('phoenix.message.validation.required');
+            static::translate('phoenix.message.validation.failure');
+
+            static::domready("$variable.use(PhoenixValidationV1);");
+            static::domready("$variable.validation('$selector', $options);");
+        }
+    }
+
+    public static function validation($selector = '#admin-form', $options = [], $variable = 'Phoenix')
+    {
+        if (!static::inited(__METHOD__)) {
+            static::phoenix($variable);
+            static::form($selector, $variable);
 
             static::addJS(static::phoenixName() . '/js/string/punycode.min.js');
             static::addJS(static::phoenixName() . '/js/phoenix/validation.min.js');
@@ -470,8 +501,21 @@ JS;
 
             $options = static::getJSObject($defaultOptions, $options);
 
-            static::translate('phoenix.message.validation.required');
-            static::translate('phoenix.message.validation.failure');
+            static::translate([
+                'phoenix.message.validation.required',
+                'phoenix.message.validation.failure',
+                'phoenix.message.validation.value.missing',
+                'phoenix.message.validation.type.mismatch',
+                'phoenix.message.validation.pattern.mismatch',
+                'phoenix.message.validation.too.long',
+                'phoenix.message.validation.too.short',
+                'phoenix.message.validation.range.underflow',
+                'phoenix.message.validation.range.overflow',
+                'phoenix.message.validation.step.mismatch',
+                'phoenix.message.validation.bad.input',
+                'phoenix.message.validation.custom.error',
+                'phoenix.message.validation.valid',
+            ]);
 
             static::domready("$variable.use(PhoenixValidation);");
             static::domready("$variable.validation('$selector', $options);");

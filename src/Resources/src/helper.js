@@ -11,6 +11,7 @@
 
     static get proxies() {
       return {
+        isDebug: 'isDebug',
         confirm: 'confirm',
         keepAlive: 'keepAlive',
         stopKeepAlive: 'stopKeepAlive',
@@ -29,6 +30,10 @@
       super();
 
       this.aliveHandle = null;
+    }
+
+    isDebug() {
+      return this.phoenix.data('windwalker.debug');
     }
 
     /**

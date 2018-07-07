@@ -25,12 +25,12 @@
    * @param {Object} options
    * @constructor
    */
-  class PhoenixValidation extends PhoenixJQueryPlugin {
+  class PhoenixValidationV1 extends PhoenixJQueryPlugin {
     static get is() { return 'Validation' }
 
     static get pluginName() { return 'validation' }
 
-    static get pluginClass() { return PhoenixValidationElement }
+    static get pluginClass() { return PhoenixValidationV1Element }
 
     static get proxies() {
       return {
@@ -39,7 +39,7 @@
     }
   }
 
-  class PhoenixValidationElement {
+  class PhoenixValidationV1Element {
     static get defaultOptions() {
       return {
         events: ['change'],
@@ -86,12 +86,7 @@
       this.validators = [];
       this.handlers = {};
       this.theme = {};
-      this.inputs = this.form.find('input, select, textarea');
-
-      // Stop native validation
-      if (this.form.length) {
-        // this.form.attr('novalidate');
-      }
+      this.inputs = this.form.find('input, select, textarea, div.input-list-container');
 
       this.registerDefaultValidators();
       this.registerEvents();
@@ -104,8 +99,6 @@
      * @returns {PhoenixValidationElement}
      */
     addField(input) {
-      this.registerInputEvents(input);
-
       this.inputs = this.inputs.add(input);
 
       return this;
@@ -126,16 +119,14 @@
       const self = this, inValid = [];
       let scroll = self.options.scroll.enabled;
 
-      this.inputs.each((i, input) => {
-        const result = this.validate(input);
-
-        if (!result) {
-          inValid.push(input);
+      this.inputs.each(function() {
+        if (!self.validate(this)) {
+          inValid.push(this);
 
           // Scroll
           if (scroll) {
             // Find displayed element
-            let target = $(input);
+            let target = $(this);
 
             if (!target.is(':visible')) {
               target = target.parents('#' + target.attr('id') + '-control, [data-form-group]');
@@ -160,81 +151,88 @@
      * @returns {boolean}
      */
     validate(input) {
-      if (!input) {
+      let $input = $(input), className, validator;
+
+      if ($input.attr('disabled')) {
+        this.showResponse(this.STATE_NONE, $input);
+
         return true;
       }
 
-      let $input = $(input);
-      let help;
-      let result = true;
 
-      if (this.form.length) {
-        this.form.addClass('was-validated');
-      }
+      if ($input.attr('required') || $input.hasClass('required')) {
+        // Single Radio & Checkbox
+        if (($input.attr('type') === 'radio' || $input.attr('type') === 'checkbox') && !$input.is(':checked')) {
+          this.showResponse(this.STATE_EMPTY, $input);
+          return false;
+        } else if ($input.prop("tagName").toLowerCase() === 'div' && $input.hasClass('input-list-container')) {
+          // Input List (Radios & Checkboxes)
+          if (!$input.find('input:checked').length) {
+            // Set as :invalid
+            $input.find('input').each(function () {
+              this.setCustomValidity('Please select at least one.');
+            });
 
-      // Clear state
-      this.showResponse(this.STATE_NONE, $input);
-      input.setCustomValidity('');
+            this.showResponse(this.STATE_EMPTY, $input);
 
-      // Check custom validity
-      const validates = ($input.data('validate') || '').split('|');
+            return false;
+          } else {
+            // Set as :valid
+            $input.find('input').each(function () {
+              this.setCustomValidity('');
+            });
 
-      if ($input.val() !== '' && validates.length) {
-        for (let i in validates) {
-          const validator = this.validators[validates[i]];
-
-          if (validator && !validator.handler($input.val(), $input)) {
-            help = validator.options.notice;
-
-            if (typeof  help === 'function') {
-              help = help($input, this);
-            }
-
-            // Set failure value as :invalid
-            input.setCustomValidity(this.phoenix.__('phoenix.message.validation.type.mismatch'));
-
-            result = false;
-
-            break;
+            this.showResponse(this.STATE_SUCCESS, $input);
           }
+        }
+
+        // Handle all fields and checkbox
+        else if (!$input.val() || (Array.isArray($input.val()) && $input.val().length === 0)) {
+          this.showResponse(this.STATE_EMPTY, $input);
+
+          return false;
         }
       }
 
-      // Check native validity
-      if (result) {
-        result = input.checkValidity();
+      // Is value exists, validate this type.
+      className = $input.attr('class');
+
+      if (className) {
+        validator = className.match(/validate-([a-zA-Z0-9_|-]+)/);
       }
 
-      if (result) {
+      // Empty value and no validator config, set response to none.
+      if (!$input.val() || !validator) {
+        this.showResponse(this.STATE_NONE, $input);
+
         return true;
       }
 
-      const state = input.validity;
+      validator = this.validators[validator[1]];
 
-      // Handle required message.
-      if (state.valueMissing) {
-        help = this.phoenix.__('phoenix.message.validation.value.missing');
-        this.phoenix.isDebug() ? console.warn(`[Debug] Field: ${$input.attr('name')} validity state: value-missing.`) : null;
-        this.showResponse(this.STATE_EMPTY, $input, help);
+      if (!validator || !validator.handler) {
+        this.showResponse(this.STATE_SUCCESS, $input);
+
+        return true;
+      }
+
+      if (!validator.handler($input.val(), $input)) {
+        let help = validator.options.notice;
+
+        if (typeof  help === 'function') {
+          help = help($input, this);
+        }
+
+        // Set failure value as :invalid
+        $input[0].setCustomValidity('Input is invalid.');
+        this.showResponse(this.STATE_FAIL, $input, help);
+
         return false;
       }
 
-      // Handle types message
-      for (let key in state) {
-        if (state[key] === true) {
-          const type = camelTo(key, '-');
+      this.showResponse(this.STATE_SUCCESS, $input);
 
-          help = $input.data(type + '-message') || this.phoenix.__('phoenix.message.validation.' + camelTo(key, '.'));
-
-          this.phoenix.isDebug() ? console.warn(`[Debug] Field: ${$input.attr('name')} validity state: ${type}.`) : null;
-
-          break;
-        }
-      }
-
-      this.showResponse(this.STATE_FAIL, $input, help);
-
-      return result;
+      return true;
     }
 
     /**
@@ -295,6 +293,8 @@
      * Register events.
      */
     registerEvents() {
+      const self = this;
+
       this.form.on('submit', event => {
         if (!this.validateAll()) {
           event.stopPropagation();
@@ -308,13 +308,9 @@
         return true;
       });
 
-      this.registerInputEvents(this.inputs);
-    }
-
-    registerInputEvents($input) {
-      $.each(this.options.events, (i, event) => {
-        $input.on(event, (e) => {
-          this.validate(e.currentTarget);
+      $.each(this.options.events, function() {
+        self.inputs.on(this, function() {
+          self.validate(this);
         });
       });
     }
@@ -331,13 +327,14 @@
     }
   }
 
-  function camelTo(str, sep) {
-    return str.replace(/([a-z])([A-Z])/g, `$1${sep}$2`).toLowerCase();
-  }
-
   handlers.username = function(value, element) {
     const regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
     return !regex.test(value);
+  };
+
+  handlers.password = function(value, element) {
+    const regex = /^\S[\S ]{2,98}\S$/;
+    return regex.test(value);
   };
 
   handlers.numeric = function(value, element) {
@@ -380,6 +377,6 @@
     return regex.test(value);
   };
 
-  window.PhoenixValidation = PhoenixValidation;
+  window.PhoenixValidationV1 = PhoenixValidationV1;
 
 })(jQuery);

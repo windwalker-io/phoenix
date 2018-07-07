@@ -46,24 +46,26 @@ class EditDefinition extends AbstractFieldDefinition
             $this->text('title')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
                 ->addFilter('trim')
-                ->addFilter(new MaxLengthFilter(255))
+                ->maxlength(255)
                 ->required(true);
 
             // Alias
             $this->text('alias')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'))
-                ->description(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias.desc'));
+                ->description(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias.desc'))
+                ->maxlength(255);
 
             // Image
             $this->text('image')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.image'));
+                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.image'))
+                ->maxlength(255);
 
             // URL
             $this->text('url')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
-                ->addFilter(new MaxLengthFilter(255))
+                ->maxlength(255)
                 ->addValidator(Rule\UrlValidator::class)
-                ->class('validate-url');
+                ->attr('data-validate', 'url');
 
             // Example: {$controller.item.name.cap$} List
             // TODO: Please remove this field in production
@@ -84,13 +86,13 @@ class EditDefinition extends AbstractFieldDefinition
             // Introtext
             $this->textarea('introtext')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
-                ->addFilter(new MaxLengthFilter(MaxLengthFilter::TEXT_MAX_UTF8))
+                ->maxlength(static::TEXT_MAX_UTF8)
                 ->rows(10);
 
             // Fulltext
             $this->textarea('fulltext')
                 ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
-                ->addFilter(new MaxLengthFilter(MaxLengthFilter::TEXT_MAX_UTF8))
+                ->maxlength(static::TEXT_MAX_UTF8)
                 ->rows(10);
         });
 

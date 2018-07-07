@@ -514,6 +514,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'proxies',
       get: function get() {
         return {
+          isDebug: 'isDebug',
           confirm: 'confirm',
           keepAlive: 'keepAlive',
           stopKeepAlive: 'stopKeepAlive',
@@ -539,16 +540,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       return _this8;
     }
 
-    /**
-     * Confirm popup.
-     *
-     * @param {string}   message
-     * @param {Function} callback
-     * @param {Function} falseCallback
-     */
-
-
     _createClass(PhoenixHelper, [{
+      key: 'isDebug',
+      value: function isDebug() {
+        return this.phoenix.data('windwalker.debug');
+      }
+
+      /**
+       * Confirm popup.
+       *
+       * @param {string}   message
+       * @param {Function} callback
+       * @param {Function} falseCallback
+       */
+
+    }, {
       key: 'confirm',
       value: function (_confirm) {
         function confirm(_x4, _x5) {

@@ -37,16 +37,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
    * @constructor
    */
 
-  var PhoenixValidation = function (_PhoenixJQueryPlugin) {
-    _inherits(PhoenixValidation, _PhoenixJQueryPlugin);
+  var PhoenixValidationV1 = function (_PhoenixJQueryPlugin) {
+    _inherits(PhoenixValidationV1, _PhoenixJQueryPlugin);
 
-    function PhoenixValidation() {
-      _classCallCheck(this, PhoenixValidation);
+    function PhoenixValidationV1() {
+      _classCallCheck(this, PhoenixValidationV1);
 
-      return _possibleConstructorReturn(this, (PhoenixValidation.__proto__ || Object.getPrototypeOf(PhoenixValidation)).apply(this, arguments));
+      return _possibleConstructorReturn(this, (PhoenixValidationV1.__proto__ || Object.getPrototypeOf(PhoenixValidationV1)).apply(this, arguments));
     }
 
-    _createClass(PhoenixValidation, null, [{
+    _createClass(PhoenixValidationV1, null, [{
       key: 'is',
       get: function get() {
         return 'Validation';
@@ -59,7 +59,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'pluginClass',
       get: function get() {
-        return PhoenixValidationElement;
+        return PhoenixValidationV1Element;
       }
     }, {
       key: 'proxies',
@@ -70,11 +70,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
     }]);
 
-    return PhoenixValidation;
+    return PhoenixValidationV1;
   }(PhoenixJQueryPlugin);
 
-  var PhoenixValidationElement = function () {
-    _createClass(PhoenixValidationElement, null, [{
+  var PhoenixValidationV1Element = function () {
+    _createClass(PhoenixValidationV1Element, null, [{
       key: 'defaultOptions',
       get: function get() {
         return {
@@ -88,8 +88,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
     }]);
 
-    function PhoenixValidationElement(element, options, phoenix) {
-      _classCallCheck(this, PhoenixValidationElement);
+    function PhoenixValidationV1Element(element, options, phoenix) {
+      _classCallCheck(this, PhoenixValidationV1Element);
 
       /**
        * Validate success.
@@ -125,12 +125,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       this.validators = [];
       this.handlers = {};
       this.theme = {};
-      this.inputs = this.form.find('input, select, textarea');
-
-      // Stop native validation
-      if (this.form.length) {
-        // this.form.attr('novalidate');
-      }
+      this.inputs = this.form.find('input, select, textarea, div.input-list-container');
 
       this.registerDefaultValidators();
       this.registerEvents();
@@ -144,11 +139,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
      */
 
 
-    _createClass(PhoenixValidationElement, [{
+    _createClass(PhoenixValidationV1Element, [{
       key: 'addField',
       value: function addField(input) {
-        this.registerInputEvents(input);
-
         this.inputs = this.inputs.add(input);
 
         return this;
@@ -172,22 +165,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'validateAll',
       value: function validateAll() {
-        var _this2 = this;
-
         var self = this,
             inValid = [];
         var scroll = self.options.scroll.enabled;
 
-        this.inputs.each(function (i, input) {
-          var result = _this2.validate(input);
-
-          if (!result) {
-            inValid.push(input);
+        this.inputs.each(function () {
+          if (!self.validate(this)) {
+            inValid.push(this);
 
             // Scroll
             if (scroll) {
               // Find displayed element
-              var target = $(input);
+              var target = $(this);
 
               if (!target.is(':visible')) {
                 target = target.parents('#' + target.attr('id') + '-control, [data-form-group]');
@@ -215,81 +204,89 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'validate',
       value: function validate(input) {
-        if (!input) {
+        var $input = $(input),
+            className = void 0,
+            validator = void 0;
+
+        if ($input.attr('disabled')) {
+          this.showResponse(this.STATE_NONE, $input);
+
           return true;
         }
 
-        var $input = $(input);
-        var help = void 0;
-        var result = true;
+        if ($input.attr('required') || $input.hasClass('required')) {
+          // Single Radio & Checkbox
+          if (($input.attr('type') === 'radio' || $input.attr('type') === 'checkbox') && !$input.is(':checked')) {
+            this.showResponse(this.STATE_EMPTY, $input);
+            return false;
+          } else if ($input.prop("tagName").toLowerCase() === 'div' && $input.hasClass('input-list-container')) {
+            // Input List (Radios & Checkboxes)
+            if (!$input.find('input:checked').length) {
+              // Set as :invalid
+              $input.find('input').each(function () {
+                this.setCustomValidity('Please select at least one.');
+              });
 
-        if (this.form.length) {
-          this.form.addClass('was-validated');
-        }
+              this.showResponse(this.STATE_EMPTY, $input);
 
-        // Clear state
-        this.showResponse(this.STATE_NONE, $input);
-        input.setCustomValidity('');
+              return false;
+            } else {
+              // Set as :valid
+              $input.find('input').each(function () {
+                this.setCustomValidity('');
+              });
 
-        // Check custom validity
-        var validates = ($input.data('validate') || '').split('|');
-
-        if ($input.val() !== '' && validates.length) {
-          for (var i in validates) {
-            var validator = this.validators[validates[i]];
-
-            if (validator && !validator.handler($input.val(), $input)) {
-              help = validator.options.notice;
-
-              if (typeof help === 'function') {
-                help = help($input, this);
-              }
-
-              // Set failure value as :invalid
-              input.setCustomValidity(this.phoenix.__('phoenix.message.validation.type.mismatch'));
-
-              result = false;
-
-              break;
+              this.showResponse(this.STATE_SUCCESS, $input);
             }
           }
+
+          // Handle all fields and checkbox
+          else if (!$input.val() || Array.isArray($input.val()) && $input.val().length === 0) {
+              this.showResponse(this.STATE_EMPTY, $input);
+
+              return false;
+            }
         }
 
-        // Check native validity
-        if (result) {
-          result = input.checkValidity();
+        // Is value exists, validate this type.
+        className = $input.attr('class');
+
+        if (className) {
+          validator = className.match(/validate-([a-zA-Z0-9_|-]+)/);
         }
 
-        if (result) {
+        // Empty value and no validator config, set response to none.
+        if (!$input.val() || !validator) {
+          this.showResponse(this.STATE_NONE, $input);
+
           return true;
         }
 
-        var state = input.validity;
+        validator = this.validators[validator[1]];
 
-        // Handle required message.
-        if (state.valueMissing) {
-          help = this.phoenix.__('phoenix.message.validation.value.missing');
-          this.phoenix.isDebug() ? console.warn('[Debug] Field: ' + $input.attr('name') + ' validity state: value-missing.') : null;
-          this.showResponse(this.STATE_EMPTY, $input, help);
+        if (!validator || !validator.handler) {
+          this.showResponse(this.STATE_SUCCESS, $input);
+
+          return true;
+        }
+
+        if (!validator.handler($input.val(), $input)) {
+          var help = validator.options.notice;
+
+          if (typeof help === 'function') {
+            help = help($input, this);
+          }
+
+          // Set failure value as :invalid
+          $input[0].setCustomValidity('Input is invalid.');
+          this.showResponse(this.STATE_FAIL, $input, help);
+
           return false;
         }
 
-        // Handle types message
-        for (var key in state) {
-          if (state[key] === true) {
-            var type = camelTo(key, '-');
+        this.showResponse(this.STATE_SUCCESS, $input);
 
-            help = $input.data(type + '-message') || this.phoenix.__('phoenix.message.validation.' + camelTo(key, '.'));
-
-            this.phoenix.isDebug() ? console.warn('[Debug] Field: ' + $input.attr('name') + ' validity state: ' + type + '.') : null;
-
-            break;
-          }
-        }
-
-        this.showResponse(this.STATE_FAIL, $input, help);
-
-        return result;
+        return true;
       }
 
       /**
@@ -364,31 +361,26 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     }, {
       key: 'registerEvents',
       value: function registerEvents() {
-        var _this3 = this;
+        var _this2 = this;
+
+        var self = this;
 
         this.form.on('submit', function (event) {
-          if (!_this3.validateAll()) {
+          if (!_this2.validateAll()) {
             event.stopPropagation();
             event.preventDefault();
 
             return false;
           }
 
-          _this3.form.trigger('phoenix.validate.success');
+          _this2.form.trigger('phoenix.validate.success');
 
           return true;
         });
 
-        this.registerInputEvents(this.inputs);
-      }
-    }, {
-      key: 'registerInputEvents',
-      value: function registerInputEvents($input) {
-        var _this4 = this;
-
-        $.each(this.options.events, function (i, event) {
-          $input.on(event, function (e) {
-            _this4.validate(e.currentTarget);
+        $.each(this.options.events, function () {
+          self.inputs.on(this, function () {
+            self.validate(this);
           });
         });
       }
@@ -408,16 +400,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
     }]);
 
-    return PhoenixValidationElement;
+    return PhoenixValidationV1Element;
   }();
-
-  function camelTo(str, sep) {
-    return str.replace(/([a-z])([A-Z])/g, '$1' + sep + '$2').toLowerCase();
-  }
 
   handlers.username = function (value, element) {
     var regex = new RegExp("[\<|\>|\"|\'|\%|\;|\(|\)|\&]", "i");
     return !regex.test(value);
+  };
+
+  handlers.password = function (value, element) {
+    var regex = /^\S[\S ]{2,98}\S$/;
+    return regex.test(value);
   };
 
   handlers.numeric = function (value, element) {
@@ -460,6 +453,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     return regex.test(value);
   };
 
-  window.PhoenixValidation = PhoenixValidation;
+  window.PhoenixValidationV1 = PhoenixValidationV1;
 })(jQuery);
-//# sourceMappingURL=validation.js.map
+//# sourceMappingURL=validation-v1.js.map

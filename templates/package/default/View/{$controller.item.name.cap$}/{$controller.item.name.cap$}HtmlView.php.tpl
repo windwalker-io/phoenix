@@ -81,7 +81,7 @@ class {$controller.item.name.cap$}HtmlView extends EditView
     {
         PhoenixScript::core();
         PhoenixScript::select2('select.has-select2');
-        PhoenixScript::formValidation();
+        PhoenixScript::validation();
         BootstrapScript::checkbox(BootstrapScript::FONTAWESOME);
         BootstrapScript::buttonRadio();
         BootstrapScript::tooltip('.has-tooltip');
