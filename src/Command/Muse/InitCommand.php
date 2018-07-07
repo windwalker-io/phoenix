@@ -63,6 +63,15 @@ class InitCommand extends Command
         $this->addGlobalOption('s')
             ->alias('seed')
             ->description('Run seeder.');
+
+        $this->addGlobalOption('controller')
+            ->description('Only Controller.');
+
+        $this->addGlobalOption('model')
+            ->description('Only Model.');
+
+        $this->addGlobalOption('view')
+            ->description('Only View.');
     }
 
     /**

@@ -33,14 +33,26 @@ class CopyListAction extends AbstractAction
         $dest = $this->config['dir.dest'];
         $list = StringHelper::quote('controller.list.name.cap', $this->config['tagVariables']);
 
-        $files = [
-            'Controller/%s',
-            'Field',
-            'Form/%s',
-            'Repository/%sRepository.php.tpl',
-            'Templates/' . StringHelper::quote('controller.list.name.lower', $this->config['tagVariables']),
-            'View/%s',
-        ];
+        $files = [];
+
+        if (!empty($this->config['all']) || !empty($this->config['only_controller'])) {
+            $files[] = 'Controller/%s';
+        }
+
+        if (!empty($this->config['all']) || !empty($this->config['only_model'])) {
+            $files = array_merge($files, [
+                'Field',
+                'Form/%s',
+                'Repository/%sRepository.php.tpl',
+            ]);
+        }
+
+        if (!empty($this->config['all']) || !empty($this->config['only_view'])) {
+            $files = array_merge($files, [
+                'View/%s',
+                'Templates/' . StringHelper::quote('controller.list.name.lower', $this->config['tagVariables']),
+            ]);
+        }
 
         foreach ($files as $file) {
             $file = sprintf($file, $list);

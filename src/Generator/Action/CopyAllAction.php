@@ -31,8 +31,11 @@ class CopyAllAction extends AbstractAction
         $config = $this->config;
 
         if (!is_dir($config['dir.tmpl'])) {
-            throw new \RuntimeException(sprintf('Template "%s" of %s not exists', $config['template'],
-                $config['type']));
+            throw new \RuntimeException(sprintf(
+                'Template "%s" of %s not exists',
+                $config['template'],
+                $config['type'])
+            );
         }
 
         $copyOperator->copy($config['dir.src'], $config['dir.dest'], $this->replace);

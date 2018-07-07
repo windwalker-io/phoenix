@@ -117,11 +117,15 @@ class GeneratorController extends AbstractMuseController
         $this->name     = $config['name'] = $name;
         $this->type     = $config['type'] = $type;
         $this->template = $config['template'] = $this->command->getOption('t');
-        $this->template = $config['table'] = $this->command->getOption('table');
+        $this->table    = $config['table'] = $this->command->getOption('table');
 
         $config['tagVariables'] = (array) $this->tagVariables;
         $config['migrate']      = $this->command->getOption('migrate');
         $config['seed']         = $this->command->getOption('seed');
+        $config['only_controller'] = $this->command->getOption('controller');
+        $config['only_model']      = $this->command->getOption('model');
+        $config['only_view']       = $this->command->getOption('view');
+        $config['all']             = (!$config['only_controller'] && !$config['only_model'] && !$config['only_view']);
 
         // Get Handler
         $task = StringNormalise::toClassNamespace(str_replace('.', '\\', $task));

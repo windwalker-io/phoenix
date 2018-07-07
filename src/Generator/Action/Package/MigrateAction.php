@@ -10,6 +10,7 @@ namespace Phoenix\Generator\Action\Package;
 
 use Phoenix\Generator\Action\AbstractAction;
 use Windwalker\Console\IO\IOInterface;
+use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Console\WindwalkerConsole;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\PackageHelper;
@@ -46,10 +47,13 @@ class MigrateAction extends AbstractAction
             PackageHelper::getInstance()->addPackage($package, $packageClass);
         }
 
-        $dir = WINDWALKER_SOURCE . '/' . str_replace('\\', '/',
-                MvcHelper::getPackageNamespace($packageClass, 1)) . '/Migration';
+        $dir = WINDWALKER_SOURCE . '/' . str_replace(
+            '\\',
+            '/',
+            MvcHelper::getPackageNamespace($packageClass, 1)
+        ) . '/Migration';
 
-        /** @var WindwalkerConsole $app */
+        /** @var CoreConsole $app */
         $app = Ioc::getApplication();
 
         // A dirty work to call migration command.

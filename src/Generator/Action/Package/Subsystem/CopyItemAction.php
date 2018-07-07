@@ -33,14 +33,26 @@ class CopyItemAction extends AbstractAction
         $dest = $this->config['dir.dest'];
         $item = StringHelper::quote('controller.item.name.cap', $this->config['tagVariables']);
 
-        $files = [
-            'Controller/%s',
-            'Field',
-            'Form/%s',
-            'Repository/%sRepository.php.tpl',
-            'View/%s',
-            'Templates/' . StringHelper::quote('controller.item.name.lower', $this->config['tagVariables']),
-        ];
+        $files = [];
+
+        if (!empty($this->config['all']) || !empty($this->config['only_controller'])) {
+            $files[] = 'Controller/%s';
+        }
+
+        if (!empty($this->config['all']) || !empty($this->config['only_model'])) {
+            $files = array_merge($files, [
+                'Field',
+                'Form/%s',
+                'Repository/%sRepository.php.tpl',
+            ]);
+        }
+
+        if (!empty($this->config['all']) || !empty($this->config['only_view'])) {
+            $files = array_merge($files, [
+                'View/%s',
+                'Templates/' . StringHelper::quote('controller.item.name.lower', $this->config['tagVariables']),
+            ]);
+        }
 
         foreach ($files as $file) {
             $file = sprintf($file, $item);
