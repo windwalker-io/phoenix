@@ -392,7 +392,7 @@ JS;
     /**
      * langKey
      *
-     * @param   string $key
+     * @param   string|array $key
      *
      * @return  void
      * @throws \InvalidArgumentException
@@ -400,6 +400,14 @@ JS;
     public static function translate($key)
     {
         static::phoenix();
+
+        if (is_array($key)) {
+            foreach ($key as $keyName) {
+                static::translate($keyName);
+            }
+
+            return;
+        }
 
         $text = __($key);
 
