@@ -129,8 +129,11 @@ class InputRenderer implements FormRendererInterface
             return $this->$method($field, $attribs);
         }
 
-        $attribs          = Arr::def($attribs, 'class', '');
-        $attribs['class'] .= ' form-control';
+        $attribs = Arr::def($attribs, 'class', '');
+
+        $attribs['class'] .= ($field->get('readonly') || $field->get('disabled')) && $field->get('plain')
+            ? ' form-control-plaintext'
+            : ' form-control';
 
         return $field->buildInput($attribs);
     }

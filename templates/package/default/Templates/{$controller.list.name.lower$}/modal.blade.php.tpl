@@ -33,6 +33,10 @@
     @include('toolbar')
 @stop
 
+@push('script')
+    {{-- Add Script Here --}}
+@endpush
+
 @section('body')
     <div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
         <form name="admin-form" id="admin-form" action="{{ $uri['full'] }}" method="POST" enctype="multipart/form-data">
@@ -59,11 +63,6 @@
                         {{-- STATE --}}
                         <th width="5%" class="text-nowrap">
                             {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
-                        </th>
-
-                        {{-- AUTHOR --}}
-                        <th width="15%" class="text-nowrap">
-                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
                         </th>
 
                         {{-- CREATED --}}
@@ -95,11 +94,6 @@
                             {{-- STATE --}}
                             <td class="text-center">
                                 {!! $grid->published($item->state, ['only_icon' => true]) !!}
-                            </td>
-
-                            {{-- AUTHOR --}}
-                            <td>
-                                {{ property_exists($item, 'user_name') ? $item->user_name : $item->created_by }}
                             </td>
 
                             {{-- CREATED --}}

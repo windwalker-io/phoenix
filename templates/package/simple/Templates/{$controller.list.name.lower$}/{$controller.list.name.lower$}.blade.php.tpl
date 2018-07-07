@@ -23,8 +23,12 @@
 
 @extends('_global.html')
 
+@push('script')
+    {{-- Add Script Here --}}
+@endpush
+
 @section('content')
-    <div class="container {$controller.item.name.lower$}-item">
+    <div class="container {$controller.item.name.lower$}-list">
         <h1>{$controller.item.name.cap$} List</h1>
         <div class="{$controller.list.name.lower$}-items">
             @foreach ($items as $i => $item)

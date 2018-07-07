@@ -21,6 +21,10 @@
 
 @extends('_global.html')
 
+@push('script')
+    {{-- Add Script Here --}}
+@endpush
+
 @section('content')
     <div class="container {$controller.item.name.lower$}-item">
         <h1>{$controller.item.name.cap$} Item</h1>

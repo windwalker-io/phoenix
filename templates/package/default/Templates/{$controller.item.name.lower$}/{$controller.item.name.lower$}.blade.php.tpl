@@ -26,6 +26,10 @@
     @include('toolbar')
 @stop
 
+@push('script')
+    {{-- Add Script Here --}}
+@endpush
+
 @section('admin-body')
     <form name="admin-form" id="admin-form" action="{{ $router->route('{$controller.item.name.lower$}', ['id' => $item->id]) }}" method="POST"
         enctype="multipart/form-data">

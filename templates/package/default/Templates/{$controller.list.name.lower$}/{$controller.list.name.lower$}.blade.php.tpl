@@ -33,6 +33,10 @@
     @include('toolbar')
 @stop
 
+@push('script')
+    {{-- Add Script Here --}}
+@endpush
+
 @section('admin-body')
     <div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
         <form name="admin-form" id="admin-form" action="{{ $router->route('{$controller.list.name.lower$}') }}" method="POST"
