@@ -140,7 +140,7 @@ class ItemRepository extends DatabaseRepository
 
         $selfEvent = 'on' . $action;
 
-        if (is_callable([$this, $selfEvent])) {
+        if (method_exists($this, $selfEvent)) {
             $this->$selfEvent(new Event($selfEvent, $params));
         }
 

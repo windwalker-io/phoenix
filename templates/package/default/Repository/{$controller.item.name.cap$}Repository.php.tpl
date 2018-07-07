@@ -93,7 +93,7 @@ class {$controller.item.name.cap$}Repository extends AdminRepository
     }
 
     /**
-     * prepareRecord
+     * prepareSave
      *
      * @param Record|{$controller.item.name.cap$}Record $data
      *
@@ -106,11 +106,12 @@ class {$controller.item.name.cap$}Repository extends AdminRepository
     }
 
     /**
-     * postSaveHook
+     * postSave
      *
      * @param Record|{$controller.item.name.cap$}Record $data
      *
      * @return  void
+     * @throws \Exception
      */
     protected function postSave(Record $data)
     {

@@ -10,7 +10,6 @@ namespace Phoenix\Repository;
 
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\User\User;
-use Windwalker\Data\DataInterface;
 use Windwalker\Filter\OutputFilter;
 use Windwalker\Form\Filter\MaxLengthFilter;
 use Windwalker\Record\Exception\NoResultException;
@@ -38,84 +37,83 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
     protected $reorderPosition = self::ORDER_POSITION_LAST;
 
     /**
-     * save
+     * prepareSave
      *
-     * @param DataInterface $data
-     *
-     * @return DataInterface|\Windwalker\DataMapper\Entity\Entity
-     * @throws \Exception
-     */
-    public function save(DataInterface $data)
-    {
-        $result = parent::save($data);
-
-        // Reorder
-        if ($result && $this->get('order.position') == static::ORDER_POSITION_FIRST) {
-            $pk = $data->{$this->getKeyName()};
-
-            $this->reorder([$pk => 0]);
-
-            $this->state->set('order.position', null);
-        }
-
-        return $result;
-    }
-
-    /**
-     * prepareRecord
-     *
-     * @param Record $record
+     * @param Record $data
      *
      * @return  void
      *
      * @throws \Exception
      */
-    protected function prepareRecord(Record $record)
+    protected function prepareSave(Record $data)
     {
+        parent::prepareSave($data);
+
         $date = $this->getDate();
         $user = $this->getUserData();
         $key  = $this->getKeyName();
 
         // Alias
-        if ($record->hasField('alias')) {
-            if (!$record->alias) {
-                $record->alias = $this->handleAlias(trim($record->title));
+        if ($data->hasField('alias')) {
+            if (!$data->alias) {
+                $data->alias = $this->handleAlias(trim($data->title));
             } else {
-                $record->alias = $this->handleAlias(trim($record->alias));
+                $data->alias = $this->handleAlias(trim($data->alias));
             }
 
-            if (!$record->alias) {
-                $record->alias = OutputFilter::stringURLSafe(trim($date->toSql()));
+            if (!$data->alias) {
+                $data->alias = OutputFilter::stringURLSafe(trim($date->toSql()));
             }
         }
 
         // Created date
-        if ($record->hasField('created')) {
-            if (!$record->created) {
-                $record->created = $date->toSql();
+        if ($data->hasField('created')) {
+            if (!$data->created) {
+                $data->created = $date->toSql();
             }
         }
 
         // Modified date
-        if ($record->hasField('modified')) {
-            $record->modified = $record->$key ? $date->toSql() : Chronos::getNullDate();
+        if ($data->hasField('modified')) {
+            $data->modified = $data->$key ? $date->toSql() : Chronos::getNullDate();
         }
 
         // Created user
-        if ($record->hasField('created_by') && !$record->created_by) {
-            $record->created_by = $user->id;
+        if ($data->hasField('created_by') && !$data->created_by) {
+            $data->created_by = $user->id;
         }
 
         // Modified user
-        if ($record->hasField('modified_by') && $record->$key) {
-            $record->modified_by = $user->id;
+        if ($data->hasField('modified_by') && $data->$key) {
+            $data->modified_by = $user->id;
         }
 
         // Set Ordering or Nested ordering
-        if ($record->hasField($this->state->get('order.column', 'ordering'))) {
-            if (empty($record->$key)) {
-                $this->setOrderPosition($record, $this->reorderPosition);
+        if ($data->hasField($this->state->get('order.column', 'ordering'))) {
+            if (empty($data->$key)) {
+                $this->setOrderPosition($data, $this->reorderPosition);
             }
+        }
+    }
+
+    /**
+     * postSave
+     *
+     * @param Record $data
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     * @throws \Exception
+     */
+    protected function postSave(Record $data)
+    {
+        parent::postSave($data);
+
+        if ($this->get('order.position') === static::ORDER_POSITION_FIRST) {
+            $pk = $data->{$this->getKeyName()};
+
+            $this->reorder([$pk => 0]);
         }
     }
 
@@ -182,11 +180,11 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
             $neighbor  = $this->getRecord();
             $condition = $this->getReorderConditions($record);
 
-            // Move down
             if ($delta > 0) {
+                // Move down
                 $condition[] = $this->db->quoteName($orderField) . ' > ' . (int) $record->$orderField;
-            } // Move up
-            else {
+            } else {
+                // Move up
                 $condition[] = $this->db->quoteName($orderField) . ' < ' . (int) $record->$orderField;
             }
 
@@ -344,7 +342,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
 
         $position = $this->get('order.position', $position);
 
-        if ($position == static::ORDER_POSITION_FIRST) {
+        if ($position === static::ORDER_POSITION_FIRST) {
             if (empty($record->$orderField)) {
                 $record->$orderField = 1;
 
