@@ -50,8 +50,10 @@ class ListView extends AbstractPhoenixHtmView
      */
     public function setTitle($title = null)
     {
-        $title = $title ?: Translator::sprintf('phoenix.title.list',
-            __($this->langPrefix . $this->getName() . '.title'));
+        $title = $title ?: Translator::sprintf(
+            'phoenix.title.list',
+            __($this->langPrefix . $this->getName() . '.title')
+        );
 
         return parent::setTitle($title);
     }
@@ -86,15 +88,15 @@ class ListView extends AbstractPhoenixHtmView
     protected function preparePagination(DataInterface $data)
     {
         if ($this->simplePagination) {
-            $this->model->getConfig()->set('list.fix_page', false);
+            $this->repository->getConfig()->set('list.fix_page', false);
             $data->total      = null;
-            $data->pagination = $this->model->getSimplePagination()
+            $data->pagination = $this->repository->getSimplePagination()
                 ->template('phoenix.pagination.simple')
                 ->setRouter($this->getRouter());
         } else {
-            $this->model->getConfig()->set('list.fix_page', $this->fixPage);
-            $data->total      = $data->total ?: $this->model->getTotal();
-            $data->pagination = $this->model->getPagination()
+            $this->repository->getConfig()->set('list.fix_page', $this->fixPage);
+            $data->total      = $data->total ?: $this->repository->getTotal();
+            $data->pagination = $this->repository->getPagination()
                 ->template('phoenix.pagination.default')
                 ->setRouter($this->getRouter());
         }
