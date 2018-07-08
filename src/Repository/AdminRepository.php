@@ -103,7 +103,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      * @throws \Exception
      */
     protected function postSave(Record $data)

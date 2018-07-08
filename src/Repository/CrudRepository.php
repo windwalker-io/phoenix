@@ -118,7 +118,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     protected function prepareSave(Record $data)
     {
@@ -132,7 +132,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     protected function postSave(Record $data)
     {
@@ -190,7 +190,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     protected function prepareDelete($conditions, Record $data)
     {
@@ -205,7 +205,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     protected function postDelete($conditions, Record $data)
     {

@@ -74,7 +74,7 @@ class ItemRepository extends DatabaseRepository
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     protected function prepareGetItem(array $conditions)
     {
@@ -100,7 +100,7 @@ class ItemRepository extends DatabaseRepository
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     protected function onBeforeLoad(Event $event)
     {
@@ -114,7 +114,7 @@ class ItemRepository extends DatabaseRepository
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     public function onAfterLoad(Event $event)
     {
@@ -129,7 +129,7 @@ class ItemRepository extends DatabaseRepository
      *
      * @return  \Windwalker\Event\EventInterface
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     protected function triggerEvent($action, array $params = [])
     {

@@ -134,7 +134,7 @@ abstract class AbstractCopyController extends AbstractBatchController
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.6
      */
     protected function getDate()
     {
