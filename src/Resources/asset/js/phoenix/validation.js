@@ -129,7 +129,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
       // Stop native validation
       if (this.form.length) {
-        // this.form.attr('novalidate');
+        this.form.attr('novalidate');
       }
 
       this.registerDefaultValidators();
