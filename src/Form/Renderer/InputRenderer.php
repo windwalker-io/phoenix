@@ -8,6 +8,7 @@
 
 namespace Phoenix\Form\Renderer;
 
+use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Form\Field\AbstractField;
@@ -131,7 +132,8 @@ class InputRenderer implements FormRendererInterface
 
         $attribs = Arr::def($attribs, 'class', '');
 
-        $attribs['class'] .= ($field->get('readonly') || $field->get('disabled')) && $field->get('plain')
+        $attribs['class'] .= ($field->get('readonly') || $field->get('disabled')) && $field->get('plain-text')
+            && BootstrapScript::$currentVersion === 4
             ? ' form-control-plaintext'
             : ' form-control';
 
