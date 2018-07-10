@@ -7,7 +7,7 @@
  * @var $package  \{$package.namespace$}{$package.name.cap$}\{$package.name.cap$}Package                 Package object.
  * @var $view     \{$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$}\{$controller.item.name.cap$}HtmlView    View object.
  * @var $uri      \Windwalker\Uri\UriData                     Uri information, example: $uri->path
- * @var $datetime \Windwalker\Core\DateTime\DateTime          PHP DateTime object of current time.
+ * @var $chronos  \Windwalker\Core\DateTime\DateTime          PHP DateTime object of current time.
  * @var $helper   \Windwalker\Core\View\Helper\Set\HelperSet  The Windwalker HelperSet object.
  * @var $router   \Windwalker\Core\Router\MainRouter          Route builder object.
  * @var $asset    \Windwalker\Core\Asset\AssetManager         The Asset manager.
