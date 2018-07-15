@@ -68,6 +68,10 @@ class FieldHelper
                 list($group, $name) = StringHelper::explode('.', $selector, 2, 'array_unshift');
                 $target = $form->getField($name, $group);
 
+                if ($target === null) {
+                    throw new \UnexpectedValueException("Field: {$group}.{$name} not found.");
+                }
+
                 $conditions = [];
 
                 if ($target instanceof CheckboxesField) {
