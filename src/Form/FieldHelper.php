@@ -69,7 +69,7 @@ class FieldHelper
                 $target = $form->getField($name, $group);
 
                 if ($target === null) {
-                    throw new \UnexpectedValueException("Field: {$group}.{$name} not found.");
+                    throw new \UnexpectedValueException("Field: {$selector} not found.");
                 }
 
                 $conditions = [];
