@@ -49,6 +49,8 @@ class PhoenixProvider implements ServiceProviderInterface
      */
     public function register(Container $container)
     {
+        $this->registerClassAlias();
+
         if ($container->getParent()) {
             $container = $container->getParent();
         }
@@ -73,8 +75,6 @@ class PhoenixProvider implements ServiceProviderInterface
 
             return $manager;
         });
-
-        $this->registerClassAlias();
     }
 
     /**
@@ -86,6 +86,12 @@ class PhoenixProvider implements ServiceProviderInterface
      */
     protected function registerClassAlias()
     {
+        static $registered = false;
+
+        if ($registered) {
+            return;
+        }
+
         class_alias(\Phoenix\Repository\AdminRepository::class, \Phoenix\Model\AdminModel::class);
         class_alias(\Phoenix\Repository\AdminRepositoryInterface::class, \Phoenix\Model\AdminRepositoryInterface::class);
         class_alias(\Phoenix\Repository\CrudRepository::class, \Phoenix\Model\CrudModel::class);
@@ -100,5 +106,7 @@ class PhoenixProvider implements ServiceProviderInterface
         class_alias(\Phoenix\Repository\Filter\FilterHelperInterface::class, \Phoenix\Model\Filter\FilterHelperInterface::class);
         class_alias(\Phoenix\Repository\Filter\SearchHelper::class, \Phoenix\Model\Filter\SearchHelper::class);
         class_alias(\Phoenix\Repository\Traits\FormAwareRepositoryTrait::class, \Phoenix\Model\Traits\FormAwareRepositoryTrait::class);
+
+        $registered = true;
     }
 }
