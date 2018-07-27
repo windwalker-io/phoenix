@@ -76,7 +76,7 @@ class ItemRepository extends DatabaseRepository
      *
      * @since  1.6
      */
-    protected function prepareGetItem(array $conditions)
+    protected function prepareGetItem($conditions)
     {
         //
     }
