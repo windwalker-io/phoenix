@@ -13,6 +13,8 @@ use Windwalker\Core\Seeder\AbstractSeeder;
 use Windwalker\Data\Data;
 use Windwalker\Filter\OutputFilter;
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace -- Ignore seeder file
+
 /**
  * The {$controller.item.name.cap$}Seeder class.
  *

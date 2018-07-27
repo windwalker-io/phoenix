@@ -6,6 +6,8 @@
  * @license    GNU General Public License version 2 or later;
  */
 
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace -- Ignore migration file
+
 use {$package.namespace$}{$package.name.cap$}\Table\Table;
 use Windwalker\Core\Migration\AbstractMigration;
 use Windwalker\Database\Schema\Schema;
