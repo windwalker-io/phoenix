@@ -11,14 +11,12 @@ const fusion = require('windwalker-fusion');
 fusion.task('js', function () {
   // Watch start
   fusion.watch([
-    'src/Resources/asset/js/bootstrap/tab-state.js',
-    'src/Resources/asset/js/bootstrap/button-radio.js',
+    'src/Resources/asset/src/bootstrap/**/*.js'
   ]);
   // Watch end
 
   // Compile Start
-  fusion.js('src/Resources/asset/js/bootstrap/tab-state.js');
-  fusion.js('src/Resources/asset/js/bootstrap/button-radio.js');
+  fusion.babel('src/Resources/src/bootstrap/**/*.js', 'src/Resources/asset/js/bootstrap/');
   // Compile end
 });
 

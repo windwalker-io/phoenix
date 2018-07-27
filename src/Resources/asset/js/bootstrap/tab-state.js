@@ -1,3 +1,9 @@
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 /**
  * Part of Phoenix project.
  *
@@ -11,10 +17,10 @@
  *
  * @see  https://github.com/joomla/joomla-cms/blob/staging/media/system/js/tabs-state.js
  */
-;(function($)
-{
-    "use strict";
+(function () {
+  'use strict';
 
+  var LoadTab = function () {
     /**
      * Class init.
      *
@@ -23,121 +29,134 @@
      *
      * @constructor
      */
-    var LoadTab = function($element, time)
-    {
-        var self = this;
-        time = time || 100;
+    function LoadTab($element, time) {
+      var _this = this;
 
-        this.$element = $element;
-        this.tabButtons = $element.find('a[data-toggle="tab"]');
-        this.storageKey = 'tab-href-' + self.hashCode(location.href);
+      _classCallCheck(this, LoadTab);
 
-        this.bindEvents();
+      time = time || 100;
 
-        setTimeout(function()
-        {
-            self.switchTab();
-        }, time);
-    };
+      this.$element = $element;
+      this.tabButtons = $element.find('a[data-toggle="tab"]');
+      this.storageKey = 'tab-href-' + this.hashCode(location.href);
 
-    LoadTab.prototype = {
-        /**
-         * Bind events.
-         */
-        bindEvents: function()
-        {
-            var self = this;
+      this.bindEvents();
 
-            this.tabButtons.on('click', function(e)
-            {
-                // Store the selected tab href in localstorage
-                window.localStorage.setItem(self.storageKey, $(e.currentTarget).attr('href'));
-            });
-        },
+      setTimeout(function () {
+        _this.switchTab();
+      }, time);
+    }
 
-        /**
-         * Active tab.
-         *
-         * @param {string} href
-         */
-        activateTab: function(href)
-        {
-            var $el = this.$element.find('a[data-toggle="tab"][href*="' + href + '"]');
-            $el.tab('show');
-        },
+    /**
+     * Bind events.
+     */
 
-        /**
-         * Has tab.
-         *
-         * @param {string} href
-         *
-         * @returns {*}
-         */
-        hasTab: function(href)
-        {
-            return this.$element.find('a[data-toggle="tab"][href*="' + href + '"]').length;
-        },
 
-        /**
-         * Switch tab.
-         *
-         * @returns {boolean}
-         */
-        switchTab: function()
-        {
-            if (localStorage.getItem('tab-href'))
-            {
-                // When moving from tab area to a different view
-                if (!this.hasTab(localStorage.getItem(this.storageKey)))
-                {
-                    localStorage.removeItem(this.storageKey);
-                    return true;
-                }
+    _createClass(LoadTab, [{
+      key: 'bindEvents',
+      value: function bindEvents() {
+        var _this2 = this;
 
-                // Clean default tabs
-                this.$element.find('a[data-toggle="tab"]').parent().removeClass('active');
+        this.tabButtons.on('click', function (e) {
+          // Store the selected tab href in localstorage
+          window.localStorage.setItem(_this2.storageKey, $(e.currentTarget).attr('href'));
+        });
+      }
 
-                var tabhref = localStorage.getItem(this.storageKey);
+      /**
+       * Active tab.
+       *
+       * @param {string} href
+       */
 
-                // Add active attribute for selected tab indicated by url
-                this.activateTab(tabhref);
+    }, {
+      key: 'activateTab',
+      value: function activateTab(href) {
+        var $el = this.$element.find('a[data-toggle="tab"][href*="' + href + '"]');
+        $el.tab('show');
+      }
 
-                // Check whether internal tab is selected (in format <tabname>-<id>)
-                var seperatorIndex = tabhref.indexOf('-');
+      /**
+       * Has tab.
+       *
+       * @param {string} href
+       *
+       * @returns {*}
+       */
 
-                if (seperatorIndex !== -1)
-                {
-                    var singular = tabhref.substring(0, seperatorIndex);
-                    var plural = singular + "s";
+    }, {
+      key: 'hasTab',
+      value: function hasTab(href) {
+        return this.$element.find('a[data-toggle="tab"][href*="' + href + '"]').length;
+      }
 
-                    this.activateTab(plural);
-                }
-            }
-        },
-        /**
-         * Hash code.
-         *
-         * @param {String} text
-         *
-         * @returns {number}
-         */
-        hashCode: function(text) {
-            var hash = 0;
-            var word;
+      /**
+       * Switch tab.
+       *
+       * @returns {boolean}
+       */
 
-            if (text.length === 0) {
-                return hash;
-            }
+    }, {
+      key: 'switchTab',
+      value: function switchTab() {
+        if (localStorage.getItem('tab-href')) {
+          // When moving from tab area to a different view
+          if (!this.hasTab(localStorage.getItem(this.storageKey))) {
+            localStorage.removeItem(this.storageKey);
+            return true;
+          }
 
-            for (var i = 0; i < text.length; i++) {
-                word = text.charCodeAt(i);
-                hash = ((hash << 5) - hash) + word;
-                hash = hash & hash; // Convert to 32bit integer
-            }
+          // Clean default tabs
+          this.$element.find('a[data-toggle="tab"]').parent().removeClass('active');
 
-            return hash;
+          var tabhref = localStorage.getItem(this.storageKey);
+
+          // Add active attribute for selected tab indicated by url
+          this.activateTab(tabhref);
+
+          // Check whether internal tab is selected (in format <tabname>-<id>)
+          var seperatorIndex = tabhref.indexOf('-');
+
+          if (seperatorIndex !== -1) {
+            var singular = tabhref.substring(0, seperatorIndex);
+            var plural = singular + 's';
+
+            this.activateTab(plural);
+          }
         }
-    };
+      }
 
-    window.LoadTab = LoadTab;
-})(jQuery);
+      /**
+       * Hash code.
+       *
+       * @param {String} text
+       *
+       * @returns {number}
+       */
+
+    }, {
+      key: 'hashCode',
+      value: function hashCode(text) {
+        var hash = 0;
+        var word = void 0;
+
+        if (text.length === 0) {
+          return hash;
+        }
+
+        for (var i = 0; i < text.length; i++) {
+          word = text.charCodeAt(i);
+          hash = (hash << 5) - hash + word;
+          hash = hash & hash; // Convert to 32bit integer
+        }
+
+        return hash;
+      }
+    }]);
+
+    return LoadTab;
+  }();
+
+  window.LoadTab = LoadTab;
+})();
+//# sourceMappingURL=tab-state.js.map
