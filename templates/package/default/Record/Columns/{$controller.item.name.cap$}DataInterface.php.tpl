@@ -11,6 +11,12 @@ namespace {$package.namespace$}{$package.name.cap$}\Record\Columns;
 /**
  * The {$controller.item.name.cap$}DataInterface class.
  *
+ * Run
+ * ```
+ * php windwalker phoenix record sync {$package.name.lower$} {$controller.item.name.lower$}
+ * ```
+ * to update fields.
+ *
  * @property  int     id
  * @property  string  title
  * @property  string  alias

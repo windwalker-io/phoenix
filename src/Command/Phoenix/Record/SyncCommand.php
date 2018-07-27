@@ -122,7 +122,7 @@ class SyncCommand extends CoreCommand
             ];
         }
 
-        // Prepare Trait name
+        // Prepare interface name
         $classParts = explode('\\', $recordClass);
         $name      = end($classParts);
         $name      = str_replace('Record', '', $name);
@@ -132,6 +132,8 @@ class SyncCommand extends CoreCommand
             'package_namespace' => $pkgNamespace . '\\Record\\Columns',
             'short_name' => $shortName,
             'columns' => $fields,
+            'name' => strtolower($name),
+            'package_name' => $package->getName()
         ];
 
         $content = (new Edge(new EdgeStringLoader()))->render($this->getTemplate(), $data);
@@ -172,6 +174,12 @@ namespace {{ \$package_namespace }};
 
 /**
  * The {{ \$short_name }} class.
+ *
+ * Run
+ * ```
+ * php windwalker phoenix record sync {{ \$package_name }} {{ \$name }}
+ * ```
+ * to update fields.
  *
 @foreach (\$columns as \$column)
  * @property  {{ \$column['type'] }}  {{ \$column['name'] }}
