@@ -62,11 +62,11 @@ class FieldDefinitionGenerator
         return <<<HTML
 // $label
 \$this->text('$name')
-	->label('$label')
-	->description('{$column->Comment}')
-	->class('')
-	->labelClass('')
-	->defaultValue(null);
+    ->label('$label')
+    ->description('{$column->Comment}')
+    ->class('')
+    ->labelClass('')
+    ->defaultValue(null);
 HTML;
     }
 
@@ -85,13 +85,13 @@ HTML;
         return <<<HTML
 // $label
 \$this->radio('$name')
-	->label('$label')
-	->description('{$column->Comment}')
-	->option('Yes', 1)
-	->option('No', 0)
-	->class('')
-	->labelClass('')
-	->defaultValue(1);
+    ->label('$label')
+    ->description('{$column->Comment}')
+    ->option('Yes', 1)
+    ->option('No', 0)
+    ->class('')
+    ->labelClass('')
+    ->defaultValue(1);
 HTML;
     }
 
@@ -121,12 +121,12 @@ HTML;
         return <<<HTML
 // $label
 \$this->list('$name')
-	->label('$label')
-	->description('{$column->Comment}')
-	$options
-	->class('')
-	->labelClass('')
-	->defaultValue(1);
+    ->label('$label')
+    ->description('{$column->Comment}')
+    $options
+    ->class('')
+    ->labelClass('')
+    ->defaultValue(1);
 HTML;
     }
 
@@ -145,12 +145,12 @@ HTML;
         return <<<HTML
 // $label
 \$this->textarea('$name')
-	->label('$label')
-	->description('{$column->Comment}')
-	->class('')
-	->labelClass('')
-	->rows(7)
-	->defaultValue(null);
+    ->label('$label')
+    ->description('{$column->Comment}')
+    ->class('')
+    ->labelClass('')
+    ->rows(7)
+    ->defaultValue(null);
 HTML;
     }
 
@@ -217,19 +217,19 @@ HTML;
         return <<<HTML
 // $label
 \$this->password('$name')
-	->description('Password')
-	->label('$label')
-	->class('')
-	->labelClass('')
-	->autocomplete('off');
+    ->description('Password')
+    ->label('$label')
+    ->class('')
+    ->labelClass('')
+    ->autocomplete('off');
 
 // Confirm Password
 \$this->password('password2')
-	->label('Confirm Password')
-	->description('Confirm Password')
-	->class('')
-	->labelClass('')
-	->autocomplete('off');
+    ->label('Confirm Password')
+    ->description('Confirm Password')
+    ->class('')
+    ->labelClass('')
+    ->autocomplete('off');
 HTML;
     }
 
@@ -248,11 +248,11 @@ HTML;
         return <<<HTML
 // $label
 \$this->calendar('$name')
-	->label('$label')
-	->description('{$column->Comment}')
-	->class('')
-	->labelClass('')
-	->defaultValue(null);
+    ->label('$label')
+    ->description('{$column->Comment}')
+    ->class('')
+    ->labelClass('')
+    ->defaultValue(null);
 HTML;
     }
 }

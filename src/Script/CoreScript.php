@@ -79,12 +79,12 @@ abstract class CoreScript extends AbstractPhoenixScript
         if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict) {
             $js = <<<JS
 (function(s) {
-	var us = function(underscore)
-	{
-		underscore.string = underscore.string || s;
-	};
-	us(window._ || (window._ = {}));
-	us(window.underscore || (window.underscore = {}));
+    var us = function(underscore)
+    {
+        underscore.string = underscore.string || s;
+    };
+    us(window._ || (window._ = {}));
+    us(window.underscore || (window.underscore = {}));
 })(s);
 JS;
 

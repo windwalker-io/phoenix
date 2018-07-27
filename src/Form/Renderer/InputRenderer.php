@@ -187,8 +187,8 @@ class InputRenderer implements FormRendererInterface
      */
     public static function renderSwitch(AbstractField $field, array $attribs = [])
     {
-//		$attribs = Arr::def($attribs, 'class', '');
-//		$attribs['class'] .= ' checkbox-container input-list-container';
+//        $attribs = Arr::def($attribs, 'class', '');
+//        $attribs['class'] .= ' checkbox-container input-list-container';
 
         $attribs          = Arr::def($attribs, 'class', '');
         $attribs['class'] .= ' form-control';

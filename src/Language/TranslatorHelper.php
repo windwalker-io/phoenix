@@ -144,7 +144,6 @@ class TranslatorHelper
 
         switch (strtolower($format)) {
             case 'ini':
-
                 $orphans = static::getOrphans();
 
                 foreach ($orphans as $key => $value) {
@@ -164,7 +163,7 @@ class TranslatorHelper
             case 'yaml':
             case 'yml':
                 $options['inline'] = 99;
-
+                // No break
             default:
                 $orphans = static::getOrphans(false);
                 $returns = $orphans;

@@ -37,7 +37,7 @@ class AddSeederAction extends AbstractAction
         $added = false;
 
         if (strpos($code, '$this->execute(' . $name . 'Seeder::class);') === false) {
-            $replace = "        $this->execute({$name}Seeder::class);\n\n";
+            $replace = "        \$this->execute({$name}Seeder::class);\n\n";
 
             $code = GeneratorHelper::addBeforePlaceholder('seeder-execute', $code, $replace);
 

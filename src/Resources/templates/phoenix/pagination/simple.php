@@ -45,8 +45,8 @@ use Windwalker\Core\Pagination\PaginationResult;
                 title="<?php echo __('phoenix.pagination.next'); ?>">
                 <span class="fa fa-forward"></span>
                 <span class="sr-only">
-					<?php echo __('phoenix.pagination.next'); ?>
-				</span>
+                    <?php echo __('phoenix.pagination.next'); ?>
+                </span>
             </a>
         <?php endif; ?>
     </div>

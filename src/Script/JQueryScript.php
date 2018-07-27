@@ -101,9 +101,9 @@ abstract class JQueryScript extends AbstractPhoenixScript
 // Color picker
 jQuery(document).ready(function($)
 {
-	$('$selector').each(function() {
-		$(this).minicolors($options);
-	});
+    $('$selector').each(function() {
+        $(this).minicolors($options);
+    });
 });
 JS;
             static::internalJS($js);
@@ -144,7 +144,7 @@ JS;
             $js = <<<JS
 // Highlight Text
 jQuery(document).ready(function($) {
-	$('$selector').highlight('$text', $options);
+    $('$selector').highlight('$text', $options);
 });
 JS;
             static::internalJS($js);

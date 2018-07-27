@@ -20,8 +20,8 @@ use Windwalker\Core\Pagination\PaginationResult;
                 class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.first'); ?>">
                 <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
-					<?php echo __('phoenix.pagination.first'); ?>
-				</span>
+                    <?php echo __('phoenix.pagination.first'); ?>
+                </span>
             </a>
         </li>
     <?php endif; ?>
@@ -32,8 +32,8 @@ use Windwalker\Core\Pagination\PaginationResult;
                 class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.previous'); ?>">
                 <span class="fa fa-backward"></span>
                 <span class="sr-only">
-					<?php echo __('phoenix.pagination.previous'); ?>
-				</span>
+                    <?php echo __('phoenix.pagination.previous'); ?>
+                </span>
             </a>
         </li>
     <?php endif; ?>
@@ -77,8 +77,8 @@ use Windwalker\Core\Pagination\PaginationResult;
                 class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.next'); ?>">
                 <span class="fa fa-forward"></span>
                 <span class="sr-only">
-					<?php echo __('phoenix.pagination.next'); ?>
-				</span>
+                    <?php echo __('phoenix.pagination.next'); ?>
+                </span>
             </a>
         </li>
     <?php endif; ?>
@@ -89,8 +89,8 @@ use Windwalker\Core\Pagination\PaginationResult;
                 class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.last'); ?>">
                 <span class="fa fa-fast-forward"></span>
                 <span class="sr-only">
-					<?php echo __('phoenix.pagination.last'); ?>
-				</span>
+                    <?php echo __('phoenix.pagination.last'); ?>
+                </span>
             </a>
         </li>
     <?php endif; ?>
