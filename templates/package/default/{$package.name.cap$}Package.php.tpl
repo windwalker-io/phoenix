@@ -17,10 +17,6 @@ use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Router\Exception\RouteNotFoundException;
 
-if (!defined('PACKAGE_{$package.name.upper$}_ROOT')) {
-    define('PACKAGE_{$package.name.upper$}_ROOT', __DIR__);
-}
-
 /**
  * The {$package.name.cap$}Package class.
  *
@@ -28,6 +24,9 @@ if (!defined('PACKAGE_{$package.name.upper$}_ROOT')) {
  */
 class {$package.name.cap$}Package extends AbstractPackage
 {
+    const DIR = __DIR__;
+    const FILE = __FILE__;
+
     /**
      * initialise
      *
