@@ -225,11 +225,10 @@ class HtmlHeaderManager
         }
 
         return (string) new HtmlElement('link', null, [
-                'rel' => 'shortcut icon',
-                'type' => 'image/x-icon',
-                'href' => $this->favicon,
-            ]
-        );
+            'rel' => 'shortcut icon',
+            'type' => 'image/x-icon',
+            'href' => $this->favicon,
+        ]);
     }
 
     /**

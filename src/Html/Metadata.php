@@ -49,10 +49,9 @@ class Metadata extends Data
 
         foreach ((array) $content as $item) {
             $this->metadata[$name][] = new HtmlElement('meta', null, [
-                    'name' => $this->escape($name),
-                    'content' => $this->escape($item),
-                ]
-            );
+                'name' => $this->escape($name),
+                'content' => $this->escape($item),
+            ]);
         }
 
         return $this;
@@ -91,10 +90,9 @@ class Metadata extends Data
 
         foreach ((array) $content as $item) {
             $this->openGraphs[$type][] = new HtmlElement('meta', null, [
-                    'property' => $this->escape($type),
-                    'content' => $this->escape($item),
-                ]
-            );
+                'property' => $this->escape($type),
+                'content' => $this->escape($item),
+            ]);
         }
 
         return $this;

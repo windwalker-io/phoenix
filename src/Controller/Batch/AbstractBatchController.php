@@ -181,8 +181,11 @@ abstract class AbstractBatchController extends AbstractPostController
      */
     public function getSuccessMessage($data = null)
     {
-        return Translator::plural($this->langPrefix . 'message.batch.' . $this->action . '.success', count($this->pks),
-            count($this->pks));
+        return Translator::plural(
+            $this->langPrefix . 'message.batch.' . $this->action . '.success',
+            count($this->pks),
+            count($this->pks)
+        );
     }
 
     /**

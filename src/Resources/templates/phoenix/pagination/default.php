@@ -14,7 +14,8 @@ use Windwalker\Core\Pagination\PaginationResult;
  */
 ?>
 <ul class="pagination windwalker-pagination">
-    <?php if ($pagination->getFirst()): ?>
+
+    <?php if ($pagination->getFirst()) : ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
                 class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.first'); ?>">
@@ -26,7 +27,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php if ($pagination->getPrevious()): ?>
+    <?php if ($pagination->getPrevious()) : ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
                 class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.previous'); ?>">
@@ -38,7 +39,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php if ($pagination->getLess()): ?>
+    <?php if ($pagination->getLess()) : ?>
         <li class="page-item">
             <a class="page-link" href="<?php echo $this->escape($route(['page' => $pagination->getLess()])); ?>">
                 <span class="fa fa-chevron-left"></span>
@@ -47,14 +48,15 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php foreach ($pagination->getPages() as $k => $page): ?>
+    <?php foreach ($pagination->getPages() as $k => $page) : ?>
         <?php $active = ($page == 'current') ? 'active' : ''; ?>
         <li class="page-item <?php echo $active; ?>">
-            <?php if (!$active): ?>
+
+            <?php if (!$active) : ?>
                 <a class="page-link" href="<?php echo $this->escape($route(['page' => $k])); ?>">
                     <?php echo $k; ?>
                 </a>
-            <?php else: ?>
+            <?php else : ?>
                 <a class="page-link" href="javascript:void(0);">
                     <?php echo $k; ?>
                 </a>
@@ -62,7 +64,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endforeach; ?>
 
-    <?php if ($pagination->getMore()): ?>
+    <?php if ($pagination->getMore()) : ?>
         <li class="page-item">
             <a class="page-link" href="<?php echo $this->escape($route(['page' => $pagination->getMore()])); ?>">
                 <?php echo __('phoenix.pagination.more'); ?>
@@ -71,7 +73,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php if ($pagination->getNext()): ?>
+    <?php if ($pagination->getNext()) : ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
                 class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.next'); ?>">
@@ -83,7 +85,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php if ($pagination->getLast()): ?>
+    <?php if ($pagination->getLast()) : ?>
         <li class="page-item">
             <a href="<?php echo $this->escape($route(['page' => $pagination->getLast()])); ?>"
                 class="has-tooltip page-link" title="<?php echo __('phoenix.pagination.last'); ?>">

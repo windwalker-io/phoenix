@@ -75,8 +75,9 @@ class MinifyCommand extends CoreCommand
         if (is_file($path)) {
             $files = [new \SplFileInfo($path)];
         } elseif (is_dir($path)) {
-            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path,
-                \FilesystemIterator::FOLLOW_SYMLINKS));
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS)
+            );
         } else {
             throw new \InvalidArgumentException('No path');
         }

@@ -68,8 +68,10 @@ class GridView extends ListView
      */
     public function setTitle($title = null)
     {
-        $title = $title ?: Translator::sprintf('phoenix.title.grid',
-            __($this->langPrefix . $this->getName() . '.title'));
+        $title = $title ?: __(
+            'phoenix.title.grid',
+            __($this->langPrefix . $this->getName() . '.title')
+        );
 
         return parent::setTitle($title);
     }
@@ -104,8 +106,8 @@ class GridView extends ListView
     protected function handleFilterBar(Data $data)
     {
         // Widget
-        $data->filterBar     = $data->filterBar ?: WidgetHelper::createWidget('phoenix.grid.filterbar', 'edge',
-            $this->package);
+        $data->filterBar     = $data->filterBar
+            ?: WidgetHelper::createWidget('phoenix.grid.filterbar', 'edge', $this->package);
         $data->showFilterBar = false;
 
         // Handler filter bar

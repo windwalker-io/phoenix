@@ -95,10 +95,12 @@ JS
             ];
 
             $headers = static::mergeOptions($defaultHealders, $headers);
-            $headers = array_intersect_key($headers,
-                array_flip(['common', 'custom', 'delete', 'patch', 'post', 'put']));
+            $headers = array_intersect_key(
+                $headers,
+                array_flip(['common', 'custom', 'delete', 'patch', 'post', 'put'])
+            );
 
-            $js[] = "// Init Vue-resource http settings.";
+            $js[] = '// Init Vue-resource http settings.';
             $js[] = "Vue.http.options = Object.assign({}, Vue.http.options, $options);";
 
             foreach ($headers as $key => $headerLines) {

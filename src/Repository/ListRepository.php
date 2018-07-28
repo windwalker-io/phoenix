@@ -457,8 +457,8 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
     {
         $this->config->set('list.fix_page', false);
 
-        return (new Pagination($this->getPage() ?: 1, $this->getLimit(), -1,
-            1))->template('windwalker.pagination.simple');
+        return (new Pagination($this->getPage() ?: 1, $this->getLimit(), -1, 1))
+            ->template('windwalker.pagination.simple');
     }
 
     /**

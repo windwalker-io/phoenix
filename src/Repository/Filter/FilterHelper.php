@@ -59,7 +59,7 @@ class FilterHelper extends AbstractFilterHelper
          *
          * @param   Query  $query The query object.
          * @param   string $field The field name.
-         * @param   string $value The filter value.
+         * @param   mixed  $value The filter value.
          *
          * @return  Query
          */
@@ -75,8 +75,10 @@ class FilterHelper extends AbstractFilterHelper
                 }
 
                 return $query;
-            } // Filter String
-            elseif ((string) $value !== '') {
+            }
+
+            if ((string) $value !== '') {
+                // Filter String
                 $query->where($query->quoteName($field) . ' = ' . $query->quote($value));
             }
 

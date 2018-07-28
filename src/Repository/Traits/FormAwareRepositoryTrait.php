@@ -182,12 +182,16 @@ trait FormAwareRepositoryTrait
         foreach ($errors as $error) {
             $field = $error->getField();
 
-            if ($error->getResult() == ValidateResult::STATUS_REQUIRED) {
-                $msg[ValidateResult::STATUS_REQUIRED][] = Translator::sprintf('phoenix.message.validation.required',
-                    $field->getLabel() ?: $field->getName(false));
-            } elseif ($error->getResult() == ValidateResult::STATUS_FAILURE) {
-                $msg[ValidateResult::STATUS_FAILURE][] = Translator::sprintf('phoenix.message.validation.failure',
-                    $field->getLabel() ?: $field->getName(false));
+            if ($error->getResult() === ValidateResult::STATUS_REQUIRED) {
+                $msg[ValidateResult::STATUS_REQUIRED][] = __(
+                    'phoenix.message.validation.required',
+                    $field->getLabel() ?: $field->getName(false)
+                );
+            } elseif ($error->getResult() === ValidateResult::STATUS_FAILURE) {
+                $msg[ValidateResult::STATUS_FAILURE][] = __(
+                    'phoenix.message.validation.failure',
+                    $field->getLabel() ?: $field->getName(false)
+                );
             }
         }
 

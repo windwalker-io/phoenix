@@ -5,6 +5,8 @@
  * @package Minify
  */
 
+// phpcs:disable -- No core file
+
 namespace Phoenix\Minify;
 
 /**

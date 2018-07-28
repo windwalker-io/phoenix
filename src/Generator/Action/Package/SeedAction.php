@@ -49,8 +49,8 @@ class SeedAction extends AbstractAction
         }
 
         $seedClass = $this->config['replace.controller.item.name.cap'] . 'Seeder';
-        $dir       = WINDWALKER_SOURCE . '/' . str_replace('\\', '/',
-                MvcHelper::getPackageNamespace($packageClass, 1)) . '/Seed';
+        $dir       = WINDWALKER_SOURCE . '/' .
+            str_replace('\\', '/', MvcHelper::getPackageNamespace($packageClass, 1)) . '/Seed';
 
         /** @var WindwalkerConsole $app */
         $app = Ioc::getApplication();

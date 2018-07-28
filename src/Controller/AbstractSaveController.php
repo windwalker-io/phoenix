@@ -243,8 +243,10 @@ abstract class AbstractSaveController extends AbstractPostController
             default:
                 $pk = $data->{$this->keyName};
 
-                return $this->router->route(strtolower($this->getName()),
-                    $this->getRedirectQuery([$this->keyName => $pk]));
+                return $this->router->route(
+                    strtolower($this->getName()),
+                    $this->getRedirectQuery([$this->keyName => $pk])
+                );
         }
     }
 }

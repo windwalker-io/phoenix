@@ -48,8 +48,7 @@ class EditView extends ItemView
      */
     public function setTitle($title = null)
     {
-        $title = $title ?: Translator::sprintf('phoenix.title.edit',
-            __($this->langPrefix . $this->getName() . '.title'));
+        $title = $title ?: __('phoenix.title.edit', __($this->langPrefix . $this->getName() . '.title'));
 
         return parent::setTitle($title);
     }
@@ -72,7 +71,7 @@ class EditView extends ItemView
             throw new \UnexpectedValueException('You must use a Model implemented ' . FormAwareRepositoryInterface::class . ' in EditView');
         }
 
-        $data->form = $data->form ?: $this->model->getForm($this->formDefinition, $this->formControl,
-            $this->formLoadData);
+        $data->form = $data->form
+            ?: $this->model->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
     }
 }

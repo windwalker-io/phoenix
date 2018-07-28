@@ -82,10 +82,19 @@ class ListDisplayController extends DisplayController
     protected function prepareModelState(Repository $model)
     {
         // Filter & Search
-        $model['input.search'] = $this->getUserStateFromInput($this->getContext('list.search'), 'search', [],
-            InputFilter::ARRAY_TYPE);
-        $model['input.filter'] = $this->getUserStateFromInput($this->getContext('list.filter'), 'filter', [],
-            InputFilter::ARRAY_TYPE);
+        $model['input.search'] = $this->getUserStateFromInput(
+            $this->getContext('list.search'),
+            'search',
+            [],
+            InputFilter::ARRAY_TYPE
+        );
+
+        $model['input.filter'] = $this->getUserStateFromInput(
+            $this->getContext('list.filter'),
+            'filter',
+            [],
+            InputFilter::ARRAY_TYPE
+        );
 
         foreach ((array) $this->handleSearches($model['input.search']) as $key => $value) {
             $model->addSearch($key, $value);

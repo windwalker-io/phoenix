@@ -92,8 +92,9 @@ abstract class AbstractReorderController extends AbstractBatchController
         // Move item
         if ($this->delta) {
             $this->repository->move($this->pks, $this->delta);
-        } // Save order list
-        else {
+        } else {
+            // Save order list
+
             // Do not order if no change.
             if (array_values($this->data) === array_values($this->origin)) {
                 return true;
@@ -104,8 +105,8 @@ abstract class AbstractReorderController extends AbstractBatchController
                 $pks = array_flip($this->pks);
 
                 $order = array_intersect_key($this->data, $pks);
-            } // Order whole page
-            else {
+            } else {
+                // Order whole page
                 $order = $this->data;
             }
 
