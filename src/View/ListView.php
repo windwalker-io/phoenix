@@ -8,7 +8,6 @@
 
 namespace Phoenix\View;
 
-use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;

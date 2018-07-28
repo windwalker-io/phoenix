@@ -15,7 +15,6 @@ use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
-use Windwalker\Record\Exception\NoResultException;
 
 /**
  * The AbstractBatchController class.

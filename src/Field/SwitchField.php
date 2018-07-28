@@ -8,10 +8,7 @@
 
 namespace Phoenix\Field;
 
-use Phoenix\PhoenixPackage;
 use Phoenix\Script\BootstrapScript;
-use Windwalker\Core\Asset\Asset;
-use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Form\Field\CheckboxField;
 
 /**

@@ -10,7 +10,6 @@ namespace Phoenix\Repository\Traits;
 
 use Phoenix\Form\NullFiledDefinition;
 use Phoenix\Form\Renderer\InputRenderer;
-use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
 use Windwalker\Core\Repository\Exception\ValidateFailException;

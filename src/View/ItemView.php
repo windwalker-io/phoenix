@@ -8,8 +8,6 @@
 
 namespace Phoenix\View;
 
-use Windwalker\Core\Language\Translator;
-
 /**
  * The ItemView class.
  *

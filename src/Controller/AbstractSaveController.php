@@ -9,7 +9,6 @@
 namespace Phoenix\Controller;
 
 use Phoenix\Repository\FormAwareRepositoryInterface;
-use Windwalker\Core\Repository\Exception\ValidateFailException;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;

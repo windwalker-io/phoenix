@@ -9,7 +9,6 @@
 namespace Phoenix\View;
 
 use Phoenix\Repository\FormAwareRepositoryInterface;
-use Windwalker\Core\Language\Translator;
 
 /**
  * The EditView class.
