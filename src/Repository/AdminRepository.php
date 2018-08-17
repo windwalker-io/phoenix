@@ -8,6 +8,7 @@
 
 namespace Phoenix\Repository;
 
+use Admin\DataMapper\MseriesMapper;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\User\User;
 use Windwalker\Filter\OutputFilter;
@@ -177,20 +178,21 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
         foreach ((array) $ids as $id) {
             $record->load($id);
 
-            $neighbor  = $this->getRecord();
             $condition = $this->getReorderConditions($record);
 
             if ($delta > 0) {
                 // Move down
                 $condition[] = $this->db->quoteName($orderField) . ' > ' . (int) $record->$orderField;
+                $dir = 'ASC';
             } else {
                 // Move up
                 $condition[] = $this->db->quoteName($orderField) . ' < ' . (int) $record->$orderField;
+                $dir = 'DESC';
             }
 
-            try {
-                $neighbor->load($condition);
-            } catch (NoResultException $e) {
+            $neighbor = $record->getDataMapper()->findOne($condition, $orderField . ' ' . $dir);
+
+            if ($neighbor->isNull()) {
                 continue;
             }
 
