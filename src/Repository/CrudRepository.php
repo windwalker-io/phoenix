@@ -160,24 +160,28 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
             'record' => $record,
         ]);
 
-        try {
-            // Find record first to check we can delete it.
-            $record->load($conditions);
+        do {
+            $found = true;
 
-            $this->prepareDelete($conditions, $record);
+            try {
+                // Find record first to check we can delete it.
+                $record->load($conditions);
 
-            $record->delete();
+                $this->prepareDelete($conditions, $record);
 
-            $this->postDelete($conditions, $record);
+                $record->delete();
 
-            $this->triggerEvent('AfterDelete', [
-                'conditions' => $conditions,
-                'record' => $record,
-                'result' => true,
-            ]);
-        } catch (NoResultException $e) {
-            return false;
-        }
+                $this->postDelete($conditions, $record);
+
+                $this->triggerEvent('AfterDelete', [
+                    'conditions' => $conditions,
+                    'record' => $record,
+                    'result' => true,
+                ]);
+            } catch (NoResultException $e) {
+                $found = false;
+            }
+        } while ($found);
 
         return true;
     }
