@@ -63,6 +63,8 @@ class FieldHelper
         if ($showon && is_array($showon)) {
             $form = $field->getForm();
 
+            $conditions = [];
+
             foreach ($showon as $selector => $values) {
                 $values = array_map('strval', (array) $values);
                 list($group, $name) = StringHelper::explode('.', $selector, 2, 'array_unshift');
@@ -71,8 +73,6 @@ class FieldHelper
                 if ($target === null) {
                     throw new \UnexpectedValueException("Field: {$selector} not found.");
                 }
-
-                $conditions = [];
 
                 if ($target instanceof CheckboxesField) {
                     foreach ($values as $value) {
@@ -88,18 +88,14 @@ class FieldHelper
                     }
                 } elseif ($target instanceof RadioField) {
                     // Radio needs input selector
-                    $conditions = [
-                        sprintf('input[name="%s"]', $target->getFieldName()) => ['values' => $values],
-                    ];
+                    $conditions[sprintf('input[name="%s"]', $target->getFieldName())] = ['values' => $values];
                 } else {
                     // For select and textarea, we don't use input selector
-                    $conditions = [
-                        sprintf('[name="%s"]', $target->getFieldName()) => ['values' => $values],
-                    ];
+                    $conditions[sprintf('[name="%s"]', $target->getFieldName())] = ['values' => $values];
                 }
-
-                JQueryScript::dependsOn('#' . Arr::get($attribs, 'id'), $conditions);
             }
+
+            JQueryScript::dependsOn('#' . Arr::get($attribs, 'id'), $conditions);
         }
     }
 }
