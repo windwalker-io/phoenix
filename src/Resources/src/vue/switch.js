@@ -34,7 +34,7 @@
     props: {
       id: String,
       classes: String,
-      value: [String, Number],
+      value: [String, Number, Boolean, Object],
       name: String,
       disabled: Boolean,
       trueValue: {

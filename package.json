@@ -20,6 +20,7 @@
     },
     "homepage": "https://github.com/ventoviro/phoenix#readme",
     "dependencies": {
+        "@claviska/jquery-minicolors": "^2.2.6",
         "backbone": "*",
         "bootstrap": "^4.0.0",
         "eonasdan-bootstrap-datetimepicker": "4.*",

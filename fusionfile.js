@@ -131,6 +131,11 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/select2/dist/js/select2.min.js`, `${destPath}/js/select2/`);
   fusion.copy(`${nodePath}/select2/dist/css/*`, `${destPath}/css/select2/`);
   fusion.copy(`${nodePath}/select2-bootstrap4-theme/dist/*`, `${destPath}/css/select2/bs4/`);
+
+  fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.css`, `${destPath}/css/jquery/`);
+  fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.js`, `${destPath}/js/jquery/`);
+  fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.min.js`, `${destPath}/js/jquery/`);
+  fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.png`, `${destPath}/images/jquery/`);
 });
 
 fusion.default(['js', 'scss']);
