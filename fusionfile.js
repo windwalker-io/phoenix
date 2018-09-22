@@ -134,8 +134,8 @@ fusion.task('install', function () {
 
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.css`, `${destPath}/css/jquery/`);
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.js`, `${destPath}/js/jquery/`);
+  fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.png`, `${destPath}/css/jquery/`);
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.min.js`, `${destPath}/js/jquery/`);
-  fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.png`, `${destPath}/images/jquery/`);
 });
 
 fusion.default(['js', 'scss']);
