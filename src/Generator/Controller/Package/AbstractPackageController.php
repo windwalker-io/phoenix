@@ -178,9 +178,17 @@ abstract class AbstractPackageController extends AbstractTaskController
         $config->mergeTo('replace', $this->replace);
 
         // Set copy dir.
+        $src = $io->getOption('dest');
+
+        if ($src) {
+            $src = WINDWALKER_ROOT . '/' . $src;
+        } else {
+            $src = WINDWALKER_SOURCE;
+        }
+
         $config->set(
             'dir.dest',
-            WINDWALKER_SOURCE . '/' . $this->replace['package.namespace'] . $this->replace['package.name.cap']
+            $src . '/' . $this->replace['package.namespace'] . $this->replace['package.name.cap']
         );
 
         $config->set('dir.tmpl', PHOENIX_TEMPLATES . '/package/' . $config['template']);

@@ -68,7 +68,7 @@ class ListDisplayController extends DisplayController
      *
      * @var  bool
      */
-    protected $fuzzingSearching = true;
+    protected $fuzzingSearching = false;
 
     /**
      * prepareUserState

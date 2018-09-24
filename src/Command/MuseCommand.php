@@ -49,6 +49,9 @@ class MuseCommand extends Command
             ->description('Generate type.')
             ->defaultValue('package');
 
+        $this->addGlobalOption('dest')
+            ->description('Destination path');
+
         $this->addGlobalOption('t')
             ->alias('tmpl')
             ->defaultValue('default')

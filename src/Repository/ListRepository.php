@@ -813,7 +813,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
     public function fuzzySearching($bool = null)
     {
         if ($bool === null) {
-            return $this->get('fuzzy_searching', true);
+            return $this->get('fuzzy_searching', false);
         }
 
         $this['fuzzy_searching'] = (bool) $bool;

@@ -34,15 +34,13 @@
     props: {
       id: String,
       classes: String,
-      value: [String, Number, Boolean, Object],
+      value: null,
       name: String,
       disabled: Boolean,
       trueValue: {
-        type: String,
         default: '1'
       },
       falseValue: {
-        type: String,
         default: '0'
       },
       size: {
