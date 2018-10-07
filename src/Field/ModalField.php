@@ -238,11 +238,21 @@ class ModalField extends AbstractField
 
         $dataMapper = new DataMapper($table);
 
-        $items = $dataMapper->find([$keyField => $value]);
+        $items = $dataMapper->find([$keyField => $value], null, null, null, $keyField);
 
         $items = $this->prepareItems($items);
 
-        return $items->dump();
+        if (!$this->sortable()) {
+            return array_values($items->dump());
+        }
+
+        $sortedItems = [];
+
+        foreach ($value as $id) {
+            $sortedItems[$id] = $items[$id];
+        }
+
+        return array_values($sortedItems);
     }
 
     /**

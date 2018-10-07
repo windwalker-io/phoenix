@@ -1,6 +1,10 @@
 {{-- Part of Phoenix project. --}}
 
 <?php
+/**
+ * @var $field \Phoenix\Field\ModalField
+ */
+
 \Phoenix\Script\BootstrapScript::modal();
 $disabled = $attrs['readonly'] || $attrs['disabled'];
 ?>
@@ -25,9 +29,9 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
             </div>
         </div>
         @if ($field->get('list_type') === \Phoenix\Field\ModalField::TYPE_LIST)
-        <div class="modal-list-container list-group list-group-flush" style="max-height: 300px; overflow-y: auto">
-            {{-- items --}}
-        </div>
+            <div class="modal-list-container list-group list-group-flush" style="max-height: 300px; overflow-y: auto">
+                {{-- items --}}
+            </div>
         @endif
     </div>
 
@@ -57,35 +61,11 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
                             <span class="fa fa-trash"></span>
                         </button>
 
-                        <input type="hidden" name="{{ $field->getName(true) }}[]" value="@{{ value }}" />
+                        <input type="hidden" name="{{ $field->getFieldName() }}[]" value="@{{ value }}" />
                     </div>
                 </div>
             </div>
         </script>
     @endif
-
-    {{--<input type="text"--}}
-        {{--disabled="disabled"--}}
-        {{--readonly="readonly"--}}
-        {{--id="{{ $attrs['id'] }}-title"--}}
-        {{--class="form-control {{ $field->get('titleClass') }}"--}}
-        {{--value="{{ $title or '' }}"--}}
-        {{--placeholder="{{ $attrs['placeholder'] }}"--}}
-    {{--/>--}}
-    {{--@if (!$disabled)--}}
-        {{--<span class="input-group-btn input-group-append">--}}
-            {{--<a class="btn btn-info hasModal {{ $disabled ? 'disabled' : null }}" role="button"--}}
-                {{--href="{{ $disabled ? 'javascript:void(0);' : $url }}">--}}
-                {{--@lang($field->getAttribute('buttonText', 'phoenix.form.field.modal.button.text'))--}}
-            {{--</a>--}}
-
-            {{--@if (!$attrs['required'])--}}
-                {{--<a href="javascript://" role="button" class="btn btn-default btn-info unselect-button"--}}
-                    {{--onclick="Phoenix.Field.Modal.select('#{{ $id }}-wrap', '', '')">--}}
-                    {{--<span class="fa fa-remove fa-times"></span>--}}
-                {{--</a>--}}
-            {{--@endif--}}
-        {{--</span>--}}
-    {{--@endif--}}
 
 </div>
