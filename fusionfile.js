@@ -11,12 +11,14 @@ const fusion = require('windwalker-fusion');
 fusion.task('js', function () {
   // Watch start
   fusion.watch([
-    'src/Resources/asset/src/bootstrap/**/*.js'
+    'src/Resources/src/bootstrap/**/*.js',
+    'src/Resources/src/field/**/*.js'
   ]);
   // Watch end
 
   // Compile Start
   fusion.babel('src/Resources/src/bootstrap/**/*.js', 'src/Resources/asset/js/bootstrap/');
+  fusion.babel('src/Resources/src/field/**/*.js', 'src/Resources/asset/js/field/');
   // Compile end
 });
 
@@ -136,6 +138,8 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.js`, `${destPath}/js/jquery/`);
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.png`, `${destPath}/css/jquery/`);
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.min.js`, `${destPath}/js/jquery/`);
+
+  fusion.copy(`${nodePath}/sortablejs/*.js`, `${destPath}/js/sortablejs/`);
 });
 
 fusion.default(['js', 'scss']);

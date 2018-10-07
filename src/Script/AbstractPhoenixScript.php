@@ -24,7 +24,7 @@ abstract class AbstractPhoenixScript extends AbstractScript
      *
      * @return  string
      */
-    protected static function phoenixName()
+    public static function phoenixName()
     {
         static $name;
 

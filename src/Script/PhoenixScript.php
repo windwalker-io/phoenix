@@ -324,11 +324,6 @@ select[readonly].select2-hidden-accessible + .select2-container .select2-selecti
 }
 CSS
             );
-
-            static::internalJS(<<<JS
-
-JS
-            );
         }
 
         if ($selector !== null && !static::inited(__METHOD__, get_defined_vars())) {
@@ -693,12 +688,13 @@ JS;
      * shortLangCode
      *
      * @param string $code
+     * @param string $separator
      *
      * @return  string
      *
      * @since  1.6.5
      */
-    public static function shortLangCode($code)
+    public static function shortLangCode($code, $separator = '_')
     {
         list($first, $last) = explode('-', $code, 2);
 
@@ -706,6 +702,39 @@ JS;
             return strtolower($first);
         }
 
-        return strtolower($first) . '-' . strtoupper($last);
+        return strtolower($first) . $separator . strtoupper($last);
+    }
+
+    /**
+     * sortableJS
+     *
+     * @param string  $selector
+     * @param array   $options
+     *
+     * @return  void
+     *
+     * @since  1.6.9
+     */
+    public static function sortableJS($selector = null, array $options = [])
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addJS(static::phoenixName() . '/js/sortablejs/Sortable.min.js');
+        }
+
+        if ($selector !== null && !static::inited(__METHOD__, get_defined_vars())) {
+            $defaultOptions = [
+                ''
+            ];
+
+            $optionsString = static::getJSObject($defaultOptions, $options);
+
+            $js = <<<JS
+$('$selector').each(function () {
+  new Sortable(this, $optionsString);
+});
+JS;
+
+            static::domready($js);
+        }
     }
 }

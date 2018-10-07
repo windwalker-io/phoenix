@@ -8,14 +8,20 @@
 
 namespace Phoenix\Field;
 
+use Phoenix\PhoenixPackage;
+use Phoenix\Script\CoreScript;
 use Phoenix\Script\JQueryScript;
+use Phoenix\Script\PhoenixScript;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
+use Windwalker\Data\DataSet;
 use Windwalker\DataMapper\DataMapper;
 use Windwalker\Dom\HtmlElement;
-use Windwalker\Form\Field\TextField;
+use Windwalker\Dom\HtmlElements;
+use Windwalker\Form\Field\AbstractField;
+use Windwalker\Html\Option;
 
 /**
  * The ModalField class.
@@ -28,14 +34,27 @@ use Windwalker\Form\Field\TextField;
  * @method  mixed|$this  query(string $value = null)
  * @method  mixed|$this  keyField(string $value = null)
  * @method  mixed|$this  titleField(string $value = null)
+ * @method  mixed|$this  imageField(string $value = null)
  * @method  mixed|$this  titleClass(string $value = null)
  * @method  mixed|$this  buttonText(string $value = null)
  * @method  mixed|$this  layout(string $value = null)
+ * @method  mixed|$this  multiple(bool $value = null)
+ * @method  mixed|$this  listType(string $value = null)
+ * @method  mixed|$this  itemTemplate(string $value = null)
+ * @method  mixed|$this  hasImage(bool $value = null)
+ * @method  mixed|$this  sortable(bool $value = null)
+ * @method  mixed|$this  placeholder(string $value = null)
+ * @method  mixed|$this  onchange(string $value = null)
+ * @method  mixed|$this  onfocus(string $value = null)
+ * @method  mixed|$this  onblur(string $value = null)
  *
  * @since  1.0
  */
-class ModalField extends TextField
+class ModalField extends AbstractField
 {
+    const TYPE_TAG = 'tag';
+    const TYPE_LIST = 'list';
+
     /**
      * Property table.
      *
@@ -56,6 +75,13 @@ class ModalField extends TextField
      * @var  string
      */
     protected $keyField = 'id';
+
+    /**
+     * Property imageField.
+     *
+     * @var  string
+     */
+    protected $imageField = 'image';
 
     /**
      * Property package.
@@ -86,6 +112,30 @@ class ModalField extends TextField
     protected $query = [];
 
     /**
+     * prepareRenderInput
+     *
+     * @param array $attrs
+     *
+     * @return  void
+     */
+    public function prepare(&$attrs)
+    {
+        $attrs['type'] = $this->type ?: 'hidden';
+        $attrs['name'] = $this->getFieldName();
+        $attrs['id'] = $this->getAttribute('id', $this->getId());
+        $attrs['placeholder'] = $this->getAttribute('placeholder');
+        $attrs['class'] = $this->getAttribute('class');
+        $attrs['readonly'] = $this->getAttribute('readonly');
+        $attrs['disabled'] = $this->getAttribute('disabled');
+        $attrs['onchange'] = $this->getAttribute('onchange');
+        $attrs['onfocus'] = $this->getAttribute('onfocus');
+        $attrs['onblur'] = $this->getAttribute('onblur');
+        $attrs['value'] = $this->getValue();
+
+        $attrs['required'] = $this->required;
+    }
+
+    /**
      * buildInput
      *
      * @param array $attrs
@@ -99,6 +149,7 @@ class ModalField extends TextField
 
         $this->package = $this->get('package', $this->package);
         $this->view    = $this->get('view', $this->view);
+        $multiple = $this->get('multiple');
 
         $attribs = $attrs;
 
@@ -107,16 +158,42 @@ class ModalField extends TextField
         $input['type']             = 'hidden';
         $input['data-value-store'] = true;
 
+        $items = [];
+
+        if ($multiple) {
+            $this->def('list_type', static::TYPE_TAG);
+
+            if ($this->listType() === static::TYPE_TAG) {
+                $input->setName('select');
+                $input['multiple'] = true;
+                $input['name'] .= '[]';
+                unset($input['type'], $input['value']);
+
+                $items = $this->getItems();
+
+                $options = new HtmlElements();
+
+                foreach ($items as $item) {
+                    $options[] = new Option($item->title, $item->value, ['selected' => true]);
+                }
+
+                $input->setContent($options);
+            }
+        }
+
         $url = $this->get('url') ?: $this->getUrl();
         $id  = $this->getId();
 
-        return WidgetHelper::render($this->get('layout', 'phoenix.form.field.modal'), [
+        $defaultLayout = $this->get('multiple') ? 'phoenix.form.field.modal-multiple' : 'phoenix.form.field.modal';
+
+        return WidgetHelper::render($this->get('layout', $defaultLayout), [
             'id' => $id,
-            'title' => $this->getTitle(),
+            'title' => $multiple ? '' : $this->getTitle(),
             'input' => $input,
             'url' => $url,
             'attrs' => $attrs,
             'field' => $this,
+            'items' => $items
         ], WidgetHelper::EDGE);
     }
 
@@ -141,6 +218,58 @@ class ModalField extends TextField
     }
 
     /**
+     * getItems
+     *
+     * @return  Data[]
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function getItems()
+    {
+        $table    = $this->table ?: $this->get('table', $this->view);
+        $value    = $this->getValue();
+        $keyField = $this->get('key_field', $this->keyField);
+
+        if (is_string($value)) {
+            $value = array_filter(explode(',', $value), 'strlen');
+        }
+
+        $dataMapper = new DataMapper($table);
+
+        $items = $dataMapper->find([$keyField => $value]);
+
+        $items = $this->prepareItems($items);
+
+        return $items->dump();
+    }
+
+    /**
+     * prepareItems
+     *
+     * @param DataSet|Data[] $items
+     *
+     * @return  DataSet|Data[]
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function prepareItems(DataSet $items)
+    {
+        $keyField   = $this->get('key_field', $this->keyField);
+        $titleField = $this->get('title_field', $this->titleField);
+        $imageField = $this->get('image_field', $this->imageField);
+
+        foreach ($items as $item) {
+            $item->title = $item->$titleField;
+            $item->value = $item->$keyField;
+            $item->image = $item->$imageField;
+        }
+
+        return $items;
+    }
+
+    /**
      * getUrl
      *
      * @return  string
@@ -155,10 +284,20 @@ class ModalField extends TextField
         $route = $this->get('route', $this->route) ?: $this->view;
         $query = $this->get('query', $this->query);
 
+        $defaultFunction = 'Phoenix.Field.Modal.select';
+
+        if ($this->get('multiple')) {
+            if ($this->listType() === static::TYPE_TAG) {
+                $defaultFunction = 'Phoenix.Field.Modal.selectAsTag';
+            } else {
+                $defaultFunction = 'Phoenix.Field.Modal.selectAsList';
+            }
+        }
+
         return $package->router->route($route, array_merge([
             'layout' => 'modal',
             'selector' => '#' . $this->getId() . '-wrap',
-            'function' => $this->get('function', 'Phoenix.Field.Modal.select'),
+            'function' => $this->get('function', $defaultFunction),
         ], $query));
     }
 
@@ -166,39 +305,45 @@ class ModalField extends TextField
      * prepareScript
      *
      * @return  void
+     * @throws \Exception
      */
     protected function prepareScript()
     {
         static $inited = false;
 
-        if ($inited) {
-            return;
+        if (!$inited) {
+            JQueryScript::ui(['effect']);
+            CoreScript::underscore();
+            PhoenixScript::translate('phoenix.form.field.modal.already.selected');
+            Asset::addJS(PackageHelper::getAlias(PhoenixPackage::class) . '/js/field/modal-field.min.js');
+
+            $inited = true;
         }
 
-        JQueryScript::ui(['effect']);
+        if ($this->multiple()) {
+            if ($this->listType() === static::TYPE_LIST) {
+                $options = json_encode([
+                    'itemTemplate' => $this->itemTemplate() ?: '#' . $this->getId() . '-item-tmpl'
+                ]);
+                $items = json_encode($this->getItems());
 
-        $js = <<<JS
-// Phoenix.Field.Modal
-var Phoenix;
-(function(Phoenix, $) {
-    (function() {
-        Phoenix.Field.Modal = {
-            select: function(selector, id, title) {
-                var ele = $(selector);
-
-                ele.find('.input-group input').attr('value', title).trigger('change').delay(250).effect('highlight');
-                ele.find('input[data-value-store]').attr('value', id).trigger('change');
-
-                $('#phoenix-iframe-modal').modal('hide');
-            }
-        };
-    })(Phoenix.Field || (Phoenix.Field = {}));
-})(Phoenix || (Phoenix = {}), jQuery);
+                $js = <<<JS
+new Phoenix.Field.ModalList('#{$this->getId()}-wrap', $items, $options);
 JS;
 
-        Asset::internalJS($js);
+                PhoenixScript::domready($js);
 
-        $inited = true;
+                if ($this->sortable()) {
+                    PhoenixScript::sortableJS('#' . $this->getId() . '-wrap .modal-list-container', [
+                        'handle' => '.drag-handle'
+                    ]);
+                }
+            } else {
+                PhoenixScript::select2('#' . $this->getId(), [
+                    'placeholder' => $this->placeholder()
+                ]);
+            }
+        }
     }
 
     /**
@@ -217,9 +362,19 @@ JS;
             'query',
             'keyField' => 'key_field',
             'titleField' => 'title_field',
+            'imageField' => 'image_field',
             'titleClass',
             'buttonText',
             'layout',
+            'multiple',
+            'listType' => 'list_type',
+            'itemTemplate' => 'item_template',
+            'hasImage' => 'has_image',
+            'sortable',
+            'placeholder',
+            'onchange',
+            'onfocus',
+            'onblur',
         ]);
     }
 }
