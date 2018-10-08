@@ -236,6 +236,8 @@ class ModalField extends AbstractField
             $value = array_filter(explode(',', $value), 'strlen');
         }
 
+        $value = (array) $value;
+
         if ($value === []) {
             return [];
         }
