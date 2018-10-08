@@ -236,6 +236,10 @@ class ModalField extends AbstractField
             $value = array_filter(explode(',', $value), 'strlen');
         }
 
+        if ($value === []) {
+            return [];
+        }
+
         $dataMapper = new DataMapper($table);
 
         $items = $dataMapper->find([$keyField => $value], null, null, null, $keyField);
@@ -249,7 +253,9 @@ class ModalField extends AbstractField
         $sortedItems = [];
 
         foreach ($value as $id) {
-            $sortedItems[$id] = $items[$id];
+            if ($items->offsetExists($id)) {
+                $sortedItems[$id] = $items[$id];
+            }
         }
 
         return array_values($sortedItems);
@@ -335,6 +341,7 @@ class ModalField extends AbstractField
                 $options = json_encode([
                     'itemTemplate' => $this->itemTemplate() ?: '#' . $this->getId() . '-item-tmpl'
                 ]);
+
                 $items = json_encode($this->getItems());
 
                 $js = <<<JS
