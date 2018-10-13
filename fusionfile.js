@@ -11,14 +11,14 @@ const fusion = require('windwalker-fusion');
 fusion.task('js', function () {
   // Watch start
   fusion.watch([
-    'src/Resources/src/bootstrap/**/*.js',
-    'src/Resources/src/field/**/*.js'
+    'asset/src/bootstrap/**/*.js',
+    'asset/src/field/**/*.js'
   ]);
   // Watch end
 
   // Compile Start
-  fusion.babel('src/Resources/src/bootstrap/**/*.js', 'src/Resources/asset/js/bootstrap/');
-  fusion.babel('src/Resources/src/field/**/*.js', 'src/Resources/asset/js/field/');
+  fusion.babel('asset/src/bootstrap/**/*.js', 'src/Resources/asset/js/bootstrap/');
+  fusion.babel('asset/src/field/**/*.js', 'src/Resources/asset/js/field/');
   // Compile end
 });
 
@@ -26,29 +26,29 @@ fusion.task('js', function () {
 fusion.task('phoenix', function () {
   // Watch start
   fusion.watch([
-    './src/Resources/src/**/*.js'
+    './asset/src/**/*.js'
   ]);
   // Watch end
 
   // Merge some core files
   fusion.babel(
     [
-      'src/Resources/src/phoenix.js',
-      'src/Resources/src/plugin.js',
-      'src/Resources/src/helper.js',
-      'src/Resources/src/ui.js',
-      'src/Resources/src/router.js',
-      'src/Resources/src/ajax.js',
-      'src/Resources/src/crypto.js',
-      'src/Resources/src/translator.js',
-      'src/Resources/src/legacy.js',
+      'asset/src/phoenix.js',
+      'asset/src/plugin.js',
+      'asset/src/helper.js',
+      'asset/src/ui.js',
+      'asset/src/router.js',
+      'asset/src/ajax.js',
+      'asset/src/crypto.js',
+      'asset/src/translator.js',
+      'asset/src/legacy.js',
     ],
     'src/Resources/asset/js/phoenix/phoenix.js'
   );
-  fusion.babel('src/Resources/src/plugin/*.js', 'src/Resources/asset/js/phoenix/');
+  fusion.babel('asset/src/plugin/*.js', 'src/Resources/asset/js/phoenix/');
 
   // Vue
-  fusion.babel('src/Resources/src/vue/*.js', 'src/Resources/asset/js/vue/');
+  fusion.babel('asset/src/vue/*.js', 'src/Resources/asset/js/vue/');
   // Compile end
 });
 
