@@ -107,14 +107,23 @@ $(() => {
 
         item.slideUp(400, () => {
           item.remove();
+          this.toggleRequired();
         });
       });
 
       list.append(itemHtml);
+      this.toggleRequired();
 
       if (highlight) {
         itemHtml.effect('highlight');
       }
+    }
+
+    toggleRequired() {
+      const items = this.$ele.find('[data-value-store]');
+      const placeholder = this.$ele.find('[data-validation-placeholder]');
+      console.log(items.length);
+      placeholder.attr('disabled', items.length !== 0);
     }
   }
 });

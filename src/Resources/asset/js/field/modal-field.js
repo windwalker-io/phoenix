@@ -112,6 +112,8 @@ $(function () {
     }, {
       key: 'append',
       value: function append(item) {
+        var _this2 = this;
+
         var highlight = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
         var list = this.$ele.find('.modal-list-container');
@@ -127,14 +129,24 @@ $(function () {
 
           item.slideUp(400, function () {
             item.remove();
+            _this2.toggleRequired();
           });
         });
 
         list.append(itemHtml);
+        this.toggleRequired();
 
         if (highlight) {
           itemHtml.effect('highlight');
         }
+      }
+    }, {
+      key: 'toggleRequired',
+      value: function toggleRequired() {
+        var items = this.$ele.find('[data-value-store]');
+        var placeholder = this.$ele.find('[data-validation-placeholder]');
+        console.log(items.length);
+        placeholder.attr('disabled', items.length !== 0);
       }
     }]);
 

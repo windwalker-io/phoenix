@@ -32,6 +32,11 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
             <div class="modal-list-container list-group list-group-flush" style="max-height: {{ $field->get('height', 300) }}px; overflow-y: auto">
                 {{-- items --}}
             </div>
+            @if ($field->get('required'))
+                <input type="text" name="{{ $field->getFieldName() }}-placeholder" value=""
+                    data-validation-placeholder class="form-control" style="display: none;"
+                    {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attrs) !!} />
+            @endif
         @endif
     </div>
 
@@ -61,7 +66,7 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
                             <span class="fa fa-trash"></span>
                         </button>
 
-                        <input type="hidden" name="{{ $field->getFieldName() }}[]" value="@{{ value }}" />
+                        <input data-value-store type="hidden" name="{{ $field->getFieldName() }}[]" value="@{{ value }}" />
                     </div>
                 </div>
             </div>
