@@ -73,7 +73,7 @@ class ItemListField extends SqlListField
         $postQuery = $this->get('post_query', $this->get('postQuery'));
 
         if (is_callable($postQuery)) {
-            call_user_func($postQuery, $query, $this);
+            $postQuery($query, $this);
         }
 
         return (array) $db->setQuery($query)->loadAll();
