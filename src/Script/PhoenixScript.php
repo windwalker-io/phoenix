@@ -737,4 +737,26 @@ JS;
             static::domready($js);
         }
     }
+
+    /**
+     * disableWhenSubmit
+     *
+     * @param string $formSelector
+     * @param string $buttonsSelector
+     *
+     * @return  void
+     *
+     * @since  1.6.11
+     */
+    public static function disableWhenSubmit($formSelector = '#admin-form', $buttonsSelector = '#admin-toolbar button')
+    {
+        if (!static::inited(__METHOD__)) {
+            static::domready(<<<JS
+$('$formSelector').on('submit', () => {
+  $('$buttonsSelector').attr('disabled', true);
+});
+JS
+            );
+        }
+    }
 }
