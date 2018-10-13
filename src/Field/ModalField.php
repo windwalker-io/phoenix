@@ -47,6 +47,7 @@ use Windwalker\Html\Option;
  * @method  mixed|$this  onchange(string $value = null)
  * @method  mixed|$this  onfocus(string $value = null)
  * @method  mixed|$this  onblur(string $value = null)
+ * @method  mixed|$this  height(int $value = null)
  *
  * @since  1.0
  */
@@ -394,6 +395,7 @@ JS;
             'onchange',
             'onfocus',
             'onblur',
+            'height',
         ]);
     }
 }

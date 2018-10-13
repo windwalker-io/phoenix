@@ -29,7 +29,7 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
             </div>
         </div>
         @if ($field->get('list_type') === \Phoenix\Field\ModalField::TYPE_LIST)
-            <div class="modal-list-container list-group list-group-flush" style="max-height: 300px; overflow-y: auto">
+            <div class="modal-list-container list-group list-group-flush" style="max-height: {{ $field->get('height', 300) }}px; overflow-y: auto">
                 {{-- items --}}
             </div>
         @endif
