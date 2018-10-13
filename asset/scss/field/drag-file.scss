@@ -1,0 +1,33 @@
+// Part of earth file.
+
+.drag-file-input {
+  height: 100px;
+  cursor: pointer;
+
+  input {
+    height: 100%;
+    cursor: pointer;
+
+    &.hover + label {
+      border-color: #333;
+    }
+  }
+
+  label {
+    height: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    transition: border-color .3s;
+    cursor: pointer;
+
+    > span {
+      display: inline-block;
+      width: 100%;
+    }
+  }
+
+  label::after {
+    content: none !important;
+  }
+}

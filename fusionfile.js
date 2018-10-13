@@ -7,6 +7,19 @@
 
 const fusion = require('windwalker-fusion');
 
+// The task `scss`
+fusion.task('scss', function () {
+  // Watch start
+  fusion.watch([
+    'asset/scss/**/*.scss',
+  ]);
+  // Watch end
+
+  // Compile Start
+  fusion.sass('asset/scss/**/*.scss', 'src/Resources/asset/css/');
+  // Compile end
+});
+
 // The task `js`
 fusion.task('js', function () {
   // Watch start
@@ -49,19 +62,6 @@ fusion.task('phoenix', function () {
 
   // Vue
   fusion.babel('asset/src/vue/*.js', 'src/Resources/asset/js/vue/');
-  // Compile end
-});
-
-// The task `scss`
-fusion.task('scss', function () {
-  // Watch start
-  fusion.watch([
-    'src/Resources/asset/css/**/*.scss'
-  ]);
-  // Watch end
-
-  // Compile Start
-  fusion.sass('src/Resources/asset/css/bootstrap/switch.scss');
   // Compile end
 });
 
@@ -142,7 +142,7 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/sortablejs/*.js`, `${destPath}/js/sortablejs/`);
 });
 
-fusion.default(['js', 'scss']);
+fusion.default(['js', 'scss', 'phoenix']);
 
 /*
  * APIs
