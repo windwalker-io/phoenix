@@ -46,18 +46,18 @@
     }
 
     bindEvents() {
-      if (this.form.data('toolbar')) {
-        $(this.form.data('toolbar')).find('*[data-action]').on('click', (e) => {
+      if (this.form.attr('data-toolbar')) {
+        $(this.form.attr('data-toolbar')).find('*[data-action]').on('click', (e) => {
           this.form.trigger('phoenix.submit', e.currentTarget);
         });
       }
 
       this.form.on('phoenix.submit', (e, button) => {
         const $button = $(button);
-        const action = $button.data('action');
-        const target = $button.data('target') || null;
+        const action = $button.attr('data-action');
+        const target = $button.attr('data-target') || null;
         const query = $button.data('query') || {};
-        query['task'] = $button.data('task') || null;
+        query['task'] = $button.attr('data-task') || null;
 
         this[action](target, query);
       });

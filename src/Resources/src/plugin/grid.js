@@ -386,10 +386,10 @@
 
           if ($this.val() !== originOrdering[i]) {
             // Check self
-            self.checkRow($this.data('order-row'));
+            self.checkRow($this.attr('data-order-row'));
 
             const tr = $this.parents('tr');
-            const group = tr.data('order-group');
+            const group = tr.attr('data-order-group');
 
             // Check same group boxes
             if (group !== '') {

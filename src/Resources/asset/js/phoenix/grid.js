@@ -483,10 +483,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
             if ($this.val() !== originOrdering[i]) {
               // Check self
-              self.checkRow($this.data('order-row'));
+              self.checkRow($this.attr('data-order-row'));
 
               var tr = $this.parents('tr');
-              var group = tr.data('order-group');
+              var group = tr.attr('data-order-group');
 
               // Check same group boxes
               if (group !== '') {

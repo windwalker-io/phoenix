@@ -91,18 +91,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       value: function bindEvents() {
         var _this2 = this;
 
-        if (this.form.data('toolbar')) {
-          $(this.form.data('toolbar')).find('*[data-action]').on('click', function (e) {
+        if (this.form.attr('data-toolbar')) {
+          $(this.form.attr('data-toolbar')).find('*[data-action]').on('click', function (e) {
             _this2.form.trigger('phoenix.submit', e.currentTarget);
           });
         }
 
         this.form.on('phoenix.submit', function (e, button) {
           var $button = $(button);
-          var action = $button.data('action');
-          var target = $button.data('target') || null;
+          var action = $button.attr('data-action');
+          var target = $button.attr('data-target') || null;
           var query = $button.data('query') || {};
-          query['task'] = $button.data('task') || null;
+          query['task'] = $button.attr('data-task') || null;
 
           _this2[action](target, query);
         });

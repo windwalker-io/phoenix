@@ -232,7 +232,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         input.setCustomValidity('');
 
         // Check custom validity
-        var validates = ($input.data('validate') || '').split('|');
+        var validates = ($input.attr('data-validate') || '').split('|');
 
         if ($input.val() !== '' && validates.length) {
           for (var i in validates) {
@@ -279,7 +279,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           if (state[key] === true) {
             var type = camelTo(key, '-');
 
-            help = $input.data(type + '-message') || this.phoenix.__('phoenix.message.validation.' + camelTo(key, '.'));
+            help = $input.attr('data-' + type + '-message') || this.phoenix.__('phoenix.message.validation.' + camelTo(key, '.'));
 
             this.phoenix.isDebug() ? console.warn('[Debug] Field: ' + $input.attr('name') + ' validity state: ' + type + '.') : null;
 

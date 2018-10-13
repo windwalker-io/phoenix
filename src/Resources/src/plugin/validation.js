@@ -177,7 +177,7 @@
       input.setCustomValidity('');
 
       // Check custom validity
-      const validates = ($input.data('validate') || '').split('|');
+      const validates = ($input.attr('data-validate') || '').split('|');
 
       if ($input.val() !== '' && validates.length) {
         for (let i in validates) {
@@ -224,7 +224,7 @@
         if (state[key] === true) {
           const type = camelTo(key, '-');
 
-          help = $input.data(type + '-message') || this.phoenix.__('phoenix.message.validation.' + camelTo(key, '.'));
+          help = $input.attr('data-' + type + '-message') || this.phoenix.__('phoenix.message.validation.' + camelTo(key, '.'));
 
           this.phoenix.isDebug() ? console.warn(`[Debug] Field: ${$input.attr('name')} validity state: ${type}.`) : null;
 
