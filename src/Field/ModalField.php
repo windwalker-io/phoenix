@@ -29,6 +29,7 @@ use Windwalker\Html\Option;
  * @method  mixed|$this  package(string $value = null)
  * @method  mixed|$this  view(string $value = null)
  * @method  mixed|$this  url(string $value = null)
+ * @method  mixed|$this  function(string $value = null)
  * @method  mixed|$this  table(string $value = null)
  * @method  mixed|$this  route(string $value = null)
  * @method  mixed|$this  query(string $value = null)
@@ -384,6 +385,7 @@ JS;
             'titleField' => 'title_field',
             'imageField' => 'image_field',
             'titleClass',
+            'function',
             'buttonText',
             'layout',
             'multiple',
