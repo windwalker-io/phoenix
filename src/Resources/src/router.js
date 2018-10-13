@@ -59,6 +59,10 @@
       return this.addQuery(url, query);
     }
 
+    has(route) {
+      return undefined !== this.phoenix.data('phoenix.routes')[route];
+    }
+
     addQuery(url, query = null) {
       if (query === null) {
         return url;

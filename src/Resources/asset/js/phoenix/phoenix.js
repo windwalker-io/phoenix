@@ -1215,6 +1215,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return this.addQuery(url, query);
       }
     }, {
+      key: 'has',
+      value: function has(route) {
+        return undefined !== this.phoenix.data('phoenix.routes')[route];
+      }
+    }, {
       key: 'addQuery',
       value: function addQuery(url) {
         var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
