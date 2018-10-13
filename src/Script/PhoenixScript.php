@@ -743,17 +743,21 @@ JS;
      *
      * @param string $formSelector
      * @param string $buttonsSelector
+     * @param string $event
      *
      * @return  void
      *
      * @since  1.6.11
      */
-    public static function disableWhenSubmit($formSelector = '#admin-form', $buttonsSelector = '#admin-toolbar button')
-    {
+    public static function disableWhenSubmit(
+        $formSelector = '#admin-form',
+        $buttonsSelector = '#admin-toolbar button, #admin-toolbar a',
+        $event = 'phoenix.validate.success'
+    ) {
         if (!static::inited(__METHOD__)) {
             static::domready(<<<JS
-$('$formSelector').on('submit', () => {
-  $('$buttonsSelector').attr('disabled', true);
+$('$formSelector').on('$event', () => {
+  $('$buttonsSelector').attr('disabled', true).addClass('disabled').attr('href', 'javascript://');
 });
 JS
             );
