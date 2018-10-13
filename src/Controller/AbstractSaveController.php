@@ -45,6 +45,13 @@ abstract class AbstractSaveController extends AbstractPostController
     protected $formControl = 'item';
 
     /**
+     * Property guards.
+     *
+     * @var  array
+     */
+    protected $guards = [];
+
+    /**
      * A hook before main process executing.
      *
      * @return  void
@@ -164,7 +171,11 @@ abstract class AbstractSaveController extends AbstractPostController
         if ($model instanceof FormAwareRepositoryInterface) {
             $result = $model->prepareStore($data->dump(true));
 
-            return $data->bind($result, true);
+            $data->bind($result, true);
+        }
+
+        foreach ($this->guards as $field) {
+            unset($data->$field);
         }
 
         return $data;
