@@ -111,6 +111,8 @@ trait FormAwareRepositoryTrait
      * @param string $name
      *
      * @return FieldDefinitionInterface
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function getFieldDefinition($definition = null, $name = null)
     {
@@ -133,7 +135,7 @@ trait FormAwareRepositoryTrait
             }
         }
 
-        return new $class();
+        return Ioc::getContainer()->newInstance($class);
     }
 
     /**
