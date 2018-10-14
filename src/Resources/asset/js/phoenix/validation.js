@@ -268,7 +268,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         // Handle required message.
         if (state.valueMissing) {
-          help = this.phoenix.__('phoenix.message.validation.value.missing');
+          help = $input.attr('data-value-missing-message') || this.phoenix.__('phoenix.message.validation.value.missing');
           this.phoenix.isDebug() ? console.warn('[Debug] Field: ' + $input.attr('name') + ' validity state: value-missing.') : null;
           this.showResponse(this.STATE_EMPTY, $input, help);
           return false;
