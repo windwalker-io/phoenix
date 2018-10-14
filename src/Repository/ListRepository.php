@@ -17,6 +17,7 @@ use Windwalker\Core\Repository\DatabaseRepository;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
+use Windwalker\Query\QueryElement;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -933,6 +934,46 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
 
             $this->state->push('query.where', $condition);
         }
+
+        return $this;
+    }
+
+    /**
+     * whereIn
+     *
+     * @param string $column
+     * @param array  $values
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function whereIn($column, array $values)
+    {
+        $query = $this->db->getQuery(true);
+        $condition = $query->format('%n %r', $column, new QueryElement('IN()', $query->quote($values)));
+
+        $this->state->push('query.where', $condition);
+
+        return $this;
+    }
+
+    /**
+     * whereIn
+     *
+     * @param string $column
+     * @param array  $values
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function whereNotIn($column, array $values)
+    {
+        $query = $this->db->getQuery(true);
+        $condition = $query->format('%n %r', $column, new QueryElement('NOT IN()', $query->quote($values)));
+
+        $this->state->push('query.where', $condition);
 
         return $this;
     }
