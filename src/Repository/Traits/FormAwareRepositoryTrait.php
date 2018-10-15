@@ -135,7 +135,11 @@ trait FormAwareRepositoryTrait
             }
         }
 
-        return Ioc::getContainer()->newInstance($class);
+        if (is_string($class)) {
+            $class = Ioc::getContainer()->newInstance($class);
+        }
+
+        return $class;
     }
 
     /**
