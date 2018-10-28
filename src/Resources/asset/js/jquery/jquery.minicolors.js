@@ -35,7 +35,7 @@
       keywords: '',
       letterCase: 'lowercase',
       opacity: false,
-      position: 'bottom left',
+      position: 'bottom',
       show: null,
       showSpeed: 100,
       theme: 'default',
@@ -110,8 +110,8 @@
         } else {
           // Setter
           $(this).each(function() {
-            if(typeof(data) === 'object' && data !== 'null') {
-              if(data.opacity) {
+            if(typeof(data) === 'object' && data !== null) {
+              if(data.opacity !== undefined) {
                 $(this).attr('data-opacity', keepWithin(data.opacity, 0, 1));
               }
               if(data.color) {
@@ -142,6 +142,7 @@
   function init(input, settings) {
     var minicolors = $('<div class="minicolors" />');
     var defaults = $.minicolors.defaults;
+    var name;
     var size;
     var swatches;
     var swatch;
@@ -156,8 +157,8 @@
 
     // The wrapper
     minicolors
-    .addClass('minicolors-theme-' + settings.theme)
-    .toggleClass('minicolors-with-opacity', settings.opacity);
+      .addClass('minicolors-theme-' + settings.theme)
+      .toggleClass('minicolors-with-opacity', settings.opacity);
 
     // Custom positioning
     if(settings.position !== undefined) {
@@ -175,13 +176,13 @@
 
     // The input
     input
-    .addClass('minicolors-input')
-    .data('minicolors-initialized', false)
-    .data('minicolors-settings', settings)
-    .prop('size', size)
-    .wrap(minicolors)
-    .after(
-      '<div class="minicolors-panel minicolors-slider-' + settings.control + '">' +
+      .addClass('minicolors-input')
+      .data('minicolors-initialized', false)
+      .data('minicolors-settings', settings)
+      .prop('size', size)
+      .wrap(minicolors)
+      .after(
+        '<div class="minicolors-panel minicolors-slider-' + settings.control + '">' +
       '<div class="minicolors-slider minicolors-sprite">' +
       '<div class="minicolors-picker"></div>' +
       '</div>' +
@@ -193,7 +194,7 @@
       '<div class="minicolors-picker"><div></div></div>' +
       '</div>' +
       '</div>'
-    );
+      );
 
     // The swatch
     if(!settings.inline) {
@@ -212,18 +213,25 @@
     if(settings.swatches && settings.swatches.length !== 0) {
       panel.addClass('minicolors-with-swatches');
       swatches = $('<ul class="minicolors-swatches"></ul>')
-      .appendTo(panel);
+        .appendTo(panel);
       for(i = 0; i < settings.swatches.length; ++i) {
-        swatch = settings.swatches[i];
+        // allow for custom objects as swatches
+        if($.type(settings.swatches[i]) === 'object') {
+          name = settings.swatches[i].name;
+          swatch = settings.swatches[i].color;
+        } else {
+          name = '';
+          swatch = settings.swatches[i];
+        }
         swatch = isRgb(swatch) ? parseRgb(swatch, true) : hex2rgb(parseHex(swatch, true));
-        $('<li class="minicolors-swatch minicolors-sprite"><span class="minicolors-swatch-color"></span></li>')
-        .appendTo(swatches)
-        .data('swatch-color', settings.swatches[i])
-        .find('.minicolors-swatch-color')
-        .css({
-          backgroundColor: rgb2hex(swatch),
-          opacity: swatch.a
-        });
+        $('<li class="minicolors-swatch minicolors-sprite"><span class="minicolors-swatch-color" title="' + name + '"></span></li>')
+          .appendTo(swatches)
+          .data('swatch-color', settings.swatches[i])
+          .find('.minicolors-swatch-color')
+          .css({
+            backgroundColor: rgb2hex(swatch),
+            opacity: swatch.a
+          });
         settings.swatches[i] = swatch;
       }
     }
@@ -268,11 +276,16 @@
     hide();
 
     minicolors.addClass('minicolors-focus');
-    panel
-    .stop(true, true)
-    .fadeIn(settings.showSpeed, function() {
-      if(settings.show) settings.show.call(input.get(0));
-    });
+    if (panel.animate) {
+      panel
+        .stop(true, true)
+        .fadeIn(settings.showSpeed, function () {
+          if (settings.show) settings.show.call(input.get(0));
+        });
+    } else {
+      panel.css('opacity', 1);
+      if (settings.show) settings.show.call(input.get(0));
+    }
   }
 
   // Hides all dropdown panels
@@ -283,11 +296,16 @@
       var panel = minicolors.find('.minicolors-panel');
       var settings = input.data('minicolors-settings');
 
-      panel.fadeOut(settings.hideSpeed, function() {
-        if(settings.hide) settings.hide.call(input.get(0));
+      if (panel.animate) {
+        panel.fadeOut(settings.hideSpeed, function () {
+          if (settings.hide) settings.hide.call(input.get(0));
+          minicolors.removeClass('minicolors-focus');
+        });
+      } else {
+        panel.css('opacity', 0);
+        if (settings.hide) settings.hide.call(input.get(0));
         minicolors.removeClass('minicolors-focus');
-      });
-
+      }
     });
   }
 
@@ -301,7 +319,7 @@
     var x = Math.round(event.pageX - offsetX);
     var y = Math.round(event.pageY - offsetY);
     var duration = animate ? settings.animationSpeed : 0;
-    var wx, wy, r, phi;
+    var wx, wy, r, phi, styles;
 
     // Touch support
     if(event.originalEvent.changedTouches) {
@@ -332,23 +350,22 @@
     }
 
     // Move the picker
+    styles = {
+      top: y + 'px'
+    };
     if(target.is('.minicolors-grid')) {
+      styles.left = x + 'px';
+    }
+    if (picker.animate) {
       picker
-      .stop(true)
-      .animate({
-        top: y + 'px',
-        left: x + 'px'
-      }, duration, settings.animationEasing, function() {
-        updateFromControl(input, target);
-      });
+        .stop(true)
+        .animate(styles, duration, settings.animationEasing, function() {
+          updateFromControl(input, target);
+        });
     } else {
       picker
-      .stop(true)
-      .animate({
-        top: y + 'px'
-      }, duration, settings.animationEasing, function() {
-        updateFromControl(input, target);
-      });
+        .css(styles);
+      updateFromControl(input, target);
     }
   }
 
@@ -814,13 +831,13 @@
     rgba[0] = keepWithin(parseInt(rgba[0], 10), 0, 255);
     rgba[1] = keepWithin(parseInt(rgba[1], 10), 0, 255);
     rgba[2] = keepWithin(parseInt(rgba[2], 10), 0, 255);
-    if(rgba[3]) {
+    if(rgba[3] !== undefined) {
       rgba[3] = keepWithin(parseFloat(rgba[3], 10), 0, 1);
     }
 
     // Return RGBA object
     if( obj ) {
-      if (rgba[3]) {
+      if (rgba[3] !== undefined) {
         return {
           r: rgba[0],
           g: rgba[1],
@@ -975,7 +992,7 @@
   }
 
   // Handle events
-  $([document, top.document])
+  $([document])
     // Hide on clicks outside of the control
     .on('mousedown.minicolors touchstart.minicolors', function(event) {
       if(!$(event.target).parents().add(event.target).hasClass('minicolors')) {
@@ -1051,8 +1068,8 @@
           value = settings.defaultValue;
         } else if(settings.format === 'rgb') {
           value = settings.opacity ?
-          parseRgb('rgba(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ',' + input.attr('data-opacity') + ')') :
-          parseRgb('rgb(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ')');
+            parseRgb('rgba(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ',' + input.attr('data-opacity') + ')') :
+            parseRgb('rgb(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ')');
         } else {
           value = rgb2hex(rgba);
         }
@@ -1062,9 +1079,9 @@
       swatchOpacity = settings.opacity ? input.attr('data-opacity') : 1;
       if(value.toLowerCase() === 'transparent') swatchOpacity = 0;
       input
-      .closest('.minicolors')
-      .find('.minicolors-input-swatch > span')
-      .css('opacity', swatchOpacity);
+        .closest('.minicolors')
+        .find('.minicolors-input-swatch > span')
+        .css('opacity', swatchOpacity);
 
       // Set input value
       input.val(value);
@@ -1080,7 +1097,7 @@
     .on('keydown.minicolors', '.minicolors-input', function(event) {
       var input = $(this);
       if(!input.data('minicolors-initialized')) return;
-      switch(event.keyCode) {
+      switch(event.which) {
       case 9: // tab
         hide();
         break;
