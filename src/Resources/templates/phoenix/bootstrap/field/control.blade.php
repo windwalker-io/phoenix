@@ -5,10 +5,17 @@
  * @var $attribs   array
  * @var $noLabel   bool
  * @var $hideLabel bool
+ * @var $options   array
  */
 \Phoenix\Form\FieldHelper::handle($field, $attribs);
 
-$defaultInputWidth = \Phoenix\Script\BootstrapScript::$currentVersion === 3 ? 'col-md-9' : 'col';
+if (\Phoenix\Script\BootstrapScript::$currentVersion === 3) {
+    $defaultInputWidth = 'col-md-9';
+} elseif (!empty($options['vertical'])) {
+    $defaultInputWidth = 'col-md-12 col-12';
+} else {
+    $defaultInputWidth = 'col';
+}
 ?>
 
 @if (isset($attribs['transition']))
