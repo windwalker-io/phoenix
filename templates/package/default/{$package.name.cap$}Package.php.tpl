@@ -8,9 +8,9 @@
 
 namespace {$package.namespace$}{$package.name.cap$};
 
-use Phoenix\Language\TranslatorHelper;
 use Phoenix\Script\BootstrapScript;
 use Windwalker\Core\Asset\Asset;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
@@ -25,6 +25,7 @@ use Windwalker\Router\Exception\RouteNotFoundException;
 class {$package.name.cap$}Package extends AbstractPackage
 {
     const DIR = __DIR__;
+
     const FILE = __FILE__;
 
     /**
@@ -57,7 +58,7 @@ class {$package.name.cap$}Package extends AbstractPackage
         Asset::addCSS($this->name . '/css/{$package.name.lower$}.css');
 
         // Language
-        TranslatorHelper::loadAll($this, 'ini');
+        Translator::loadAll($this, 'ini');
     }
 
     /**
@@ -86,7 +87,7 @@ class {$package.name.cap$}Package extends AbstractPackage
             if (class_exists(DebuggerHelper::class)) {
                 DebuggerHelper::addCustomData(
                     'Language Orphans',
-                    '<pre>' . TranslatorHelper::getFormattedOrphans() . '</pre>'
+                    '<pre>' . Translator::getFormattedOrphans() . '</pre>'
                 );
             }
         }
@@ -108,7 +109,6 @@ class {$package.name.cap$}Package extends AbstractPackage
 
         $router->group($group, function (MainRouter $router) {
             $router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
-
             // Merge other routes here...
         });
 

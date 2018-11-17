@@ -9,6 +9,7 @@
 namespace Phoenix\Language;
 
 use Windwalker\Core\Language\Translator;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
@@ -21,14 +22,32 @@ use Windwalker\Structure\StructureHelper;
  * The TranslatorHelper class.
  *
  * @since  1.0
+ *
+ * @deprecated Use Translator directly.
  */
 class TranslatorHelper
 {
     /**
+     * loadFile
+     *
+     * @param string $file
+     * @param string $format
+     * @param string $package
+     *
+     * @return  \Windwalker\Core\Language\CoreLanguage
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function loadFile($file, $format = 'ini', $package = null)
+    {
+        return Translator::loadFile($file, $format, $package);
+    }
+
+    /**
      * loadAll
      *
-     * @param string $package
-     * @param string $format
+     * @param string|AbstractPackage $package
+     * @param string                 $format
      *
      * @return  void
      * @throws \ReflectionException

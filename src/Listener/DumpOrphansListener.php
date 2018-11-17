@@ -8,9 +8,9 @@
 
 namespace Phoenix\Listener;
 
-use Phoenix\Language\TranslatorHelper;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Language\Translator;
 use Windwalker\Event\Event;
 
 /**
@@ -36,7 +36,7 @@ class DumpOrphansListener
 
         // Un comment this line, Translator will export all orphans to /cache/language
         if ($app->get('language.debug')) {
-            TranslatorHelper::dumpOrphans('ini');
+            Translator::dumpOrphans('ini');
         }
     }
 }
