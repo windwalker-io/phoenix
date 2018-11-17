@@ -36,6 +36,13 @@ abstract class BootstrapScript extends AbstractPhoenixScript
     public static $faVersion = 4;
 
     /**
+     * Property faPackage.
+     *
+     * @var  string
+     */
+    public static $faFont = 'FontAwesome';
+
+    /**
      * css
      *
      * @param int $version
@@ -84,8 +91,6 @@ abstract class BootstrapScript extends AbstractPhoenixScript
      */
     public static function tooltip($selector = '.hasTooltip, .has-tooltip')
     {
-        $asset = static::getAsset();
-
         if (!static::inited(__METHOD__)) {
             static::script();
         }
@@ -113,7 +118,7 @@ abstract class BootstrapScript extends AbstractPhoenixScript
 
             if ($iconSet === static::FONTAWESOME) {
                 $content = '\\f00c';
-                $font    = static::$faVersion === 4 ? 'FontAwesome' : 'Font Awesome 5 Free';
+                $font    = static::$faFont;
                 $weight  = static::$faVersion === 4 ? $weight : 900;
             }
 
@@ -329,16 +334,22 @@ JS;
             static::$faVersion = (int) $version;
 
             if ($version === 5) {
+                static::$faFont = 'Font Awesome 5 Free';
                 static::addCSS(static::phoenixName() . '/css/fontawesome/all.min.css');
 
                 if (!empty($options['v4shims'])) {
                     static::addCSS(static::phoenixName() . '/css/fontawesome/v4-shims.min.css');
                 }
 
+                if (!empty($options['pro'])) {
+                    static::$faFont = 'Font Awesome 5 Pro';
+                }
+
                 // TODO: Make sure FA fix this then remove.
                 static::internalCSS(".fa.fab { font-family: 'Font Awesome 5 Brands'; }");
             } else {
                 static::addCSS(static::phoenixName() . '/css/font-awesome.min.css');
+                static::$faFont = 'FontAwesome';
             }
         }
     }
