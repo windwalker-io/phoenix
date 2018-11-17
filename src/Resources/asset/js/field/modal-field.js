@@ -146,7 +146,7 @@ $(function () {
       value: function toggleRequired() {
         var items = this.$ele.find('[data-value-store]');
         var placeholder = this.$ele.find('[data-validation-placeholder]');
-        console.log(items.length);
+
         placeholder.attr('disabled', items.length !== 0);
       }
     }]);

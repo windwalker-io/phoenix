@@ -123,7 +123,7 @@ $(() => {
     toggleRequired() {
       const items = this.$ele.find('[data-value-store]');
       const placeholder = this.$ele.find('[data-validation-placeholder]');
-      console.log(items.length);
+
       placeholder.attr('disabled', items.length !== 0);
     }
   }
