@@ -163,17 +163,23 @@ class IconButton
      *
      * @param  mixed   $value
      * @param  integer $row
+     * @param array    $options
      *
      * @return string
-     * @throws \InvalidArgumentException
      */
-    public function render($value = null, $row = null)
+    public function render($value = null, $row = null, array $options = [])
     {
         $default = $this->getState($value);
 
         $default = $default ?: $this->getState('_default');
 
-        $default        = Arr::mergeRecursive($this->getState('_default'), $default, $this->options);
+        $default = Arr::mergeRecursive(
+            $this->getState('_default'),
+            $default,
+            $this->options,
+            $options
+        );
+
         $default['row'] = (int) $row;
 
         return WidgetHelper::render($this->template, $default, WidgetHelper::EDGE);
