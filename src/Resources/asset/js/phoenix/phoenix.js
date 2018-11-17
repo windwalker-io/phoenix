@@ -1545,6 +1545,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           options.contentType = false;
         }
 
+        if (typeof options.dataType === 'undefined') {
+          options.dataType = 'json';
+        }
+
         options.data = typeof data === 'string' || isFormData ? data : $.extend(true, {}, this.data, options.data, data);
 
         options.type = method.toUpperCase() || 'GET';
@@ -1558,7 +1562,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         options.headers = $.extend(true, {}, this.headers._global, this.headers[type], options.headers, headers);
 
-        return this.$.ajax(url, options);
+        return this.$.ajax(url, options).fail(function (xhr, error) {
+          if (error === 'parsererror') {
+            xhr.statusText = 'Unable to parse data.';
+          }
+        });
       }
 
       /**
