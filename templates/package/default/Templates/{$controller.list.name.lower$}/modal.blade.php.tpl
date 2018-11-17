@@ -25,6 +25,9 @@
  * @var $i             integer
  * @var $pagination    \Windwalker\Core\Pagination\Pagination
  */
+
+$url = new \Windwalker\Uri\Uri($uri->full);
+$url->delVar('page');
 ?>
 
 @extends('_global.{$package.name.lower$}.pure')
@@ -39,7 +42,7 @@
 
 @section('body')
     <div id="phoenix-admin" class="{$controller.list.name.lower$}-container grid-container">
-        <form name="admin-form" id="admin-form" action="{{ $uri['full'] }}" method="POST" enctype="multipart/form-data">
+        <form name="admin-form" id="admin-form" action="{{ $url }}" method="POST" enctype="multipart/form-data">
 
             {{-- FILTER BAR --}}
             <div class="filter-bar">

@@ -9,7 +9,7 @@
 
 # {$controller.list.name.cap$}
 {$controller.list.name.lower$}:
-    pattern: /{$controller.list.name.lower$}(/page)
+    pattern: /{$controller.list.name.lower$}
     controller: {$controller.list.name.cap$}
     action:
         post: CopyController
