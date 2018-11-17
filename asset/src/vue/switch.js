@@ -18,7 +18,8 @@
         :true-value="trueValue" :false-value="falseValue" :disabled="disabled"
         :value="trueValue"
         :checked="currentValue == trueValue"
-        @change="changed($event)">
+        @change="changed"
+        @click="click">
     <span
         class="switch-slider"
         :class="['slider-' + shape, color ? 'btn-' + color : 'btn-default']"
@@ -71,11 +72,15 @@
       },
       changed($event) {
         this.currentValue = $event.srcElement.checked ? this.trueValue : this.falseValue;
+      },
+      click($event) {
+        this.$emit('click', $event);
       }
     },
     watch: {
       currentValue() {
         this.$emit('input', this.currentValue);
+        this.$emit('change', this.currentValue);
       },
 
       value() {
