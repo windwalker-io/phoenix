@@ -32,12 +32,7 @@ class PrepareAction extends AbstractAction
         $dest = $this->config['dir.dest'];
 
         $files = [
-            'DataMapper',
-            'Field',
             'Resources/language',
-            'Resources/routing',
-            'Record',
-            'Seed',
         ];
 
         foreach ($files as $file) {

@@ -36,14 +36,20 @@ class CopyListAction extends AbstractAction
         $files = [];
 
         if (!empty($this->config['all']) || !empty($this->config['only_controller'])) {
-            $files[] = 'Controller/%s';
+            $files = array_merge($files, [
+                'Controller/%s',
+                'Resources/routing',
+            ]);
         }
 
         if (!empty($this->config['all']) || !empty($this->config['only_model'])) {
             $files = array_merge($files, [
+                'DataMapper',
                 'Field',
                 'Form/%s',
                 'Repository/%sRepository.php.tpl',
+                'Record',
+                'Seed',
             ]);
         }
 
