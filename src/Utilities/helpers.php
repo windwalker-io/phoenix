@@ -6,6 +6,8 @@
  * @license    __LICENSE__
  */
 
+namespace Phoenix;
+
 if (!function_exists('bignum')) {
     /**
      * bc
@@ -19,7 +21,7 @@ if (!function_exists('bignum')) {
     function bignum($value)
     {
         if (!class_exists(\Brick\Math\BigDecimal::class)) {
-            throw new DomainException('Please install brick/math first.');
+            throw new \DomainException('Please install brick/math first.');
         }
 
         return \Brick\Math\BigDecimal::of($value);
