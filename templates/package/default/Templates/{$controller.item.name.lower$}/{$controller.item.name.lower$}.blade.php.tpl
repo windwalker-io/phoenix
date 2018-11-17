@@ -36,29 +36,33 @@
 
         <div class="row">
             <div class="col-md-7">
-                <fieldset id="fieldset-basic" class="form-horizontal">
-                    <legend>@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.basic')</legend>
+                <div id="fieldset-basic" class="fieldset-card form-horizontal card mb-4">
+                    <h5 class="card-header">@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.basic')</h5>
+                    <div class="card-body">
 
-                    {!! $form->renderFields('basic') !!}
-                </fieldset>
+                        {!! $form->renderFields('basic') !!}
+                    </div>
+                </div>
 
-                <fieldset id="fieldset-text" class="form-horizontal">
-                    <legend>@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.text')</legend>
-
-                    {!! $form->renderFields('text') !!}
-                </fieldset>
+                <div id="fieldset-text" class="fieldset-card form-horizontal card mb-4">
+                    <h5 class="card-header">@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.text')</h5>
+                    <div class="card-body">
+                        {!! $form->renderFields('text') !!}
+                    </div>
+                </div>
             </div>
             <div class="col-md-5">
-                <fieldset id="fieldset-created" class="form-horizontal">
-                    <legend>@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.created')</legend>
-
+                <div id="fieldset-created" class="fieldset-card form-horizontal card mb-4">
+                    <h5 class="card-header">@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.created')</h5>
+                    <div class="card-body">
                     {!! $form->renderFields('created') !!}
-                </fieldset>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="hidden-inputs">
-            @formToken()
+            @formToken
         </div>
 
     </form>
