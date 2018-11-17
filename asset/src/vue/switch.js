@@ -57,8 +57,8 @@
       }
     },
     created() {
-      if (this.name == null) {
-        throw new Error('[Phoenix Switch] You must provide "name" attribute.');
+      if (this.name == null && this.id === null) {
+        throw new Error('[Phoenix Switch] You must provide "name" or "id" attribute.');
       }
 
       this.idName = this.id || 'input-' + this.getDashedName();
