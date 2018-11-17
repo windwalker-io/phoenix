@@ -186,20 +186,25 @@
      *
      * @returns {jqXHR}
      */
-    request(method, url, data, headers, options) {
-      options = options || {};
-      headers = headers || {};
-      data = data || {};
-      url = url || '';
-
+    request(method, url = '', data = {}, headers = {}, options = {}) {
       if (typeof url === 'object') {
         options = url;
         url = options.url;
       }
 
-      options.data = typeof data === 'string' ? data : $.extend(true, {}, this.data, options.data, data);
+      const isFormData = data instanceof FormData;
+
+      if (isFormData) {
+        options.processData = false;
+        options.contentType = false;
+      }
+
+      options.data = typeof data === 'string' || isFormData
+        ? data
+        : $.extend(true, {}, this.data, options.data, data);
+
       options.type = method.toUpperCase() || 'GET';
-      var type = options.type;
+      const type = options.type;
 
       if (['POST', 'GET'].indexOf(options.type) === -1 && this.config.customMethod) {
         headers['X-HTTP-Method-Override'] = options.type;

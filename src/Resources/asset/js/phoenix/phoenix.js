@@ -1527,18 +1527,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     }, {
       key: 'request',
-      value: function request(method, url, data, headers, options) {
-        options = options || {};
-        headers = headers || {};
-        data = data || {};
-        url = url || '';
+      value: function request(method) {
+        var url = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+        var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var headers = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+        var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
         if ((typeof url === 'undefined' ? 'undefined' : _typeof(url)) === 'object') {
           options = url;
           url = options.url;
         }
 
-        options.data = typeof data === 'string' ? data : $.extend(true, {}, this.data, options.data, data);
+        var isFormData = data instanceof FormData;
+
+        if (isFormData) {
+          options.processData = false;
+          options.contentType = false;
+        }
+
+        options.data = typeof data === 'string' || isFormData ? data : $.extend(true, {}, this.data, options.data, data);
+
         options.type = method.toUpperCase() || 'GET';
         var type = options.type;
 
