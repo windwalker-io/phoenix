@@ -64,7 +64,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         $btn.addClass(options.activeClass).addClass($input.attr('data-color-class')).removeClass(options.color.default);
 
         $input.prop('checked', true);
-        $input.trigger('change');
+        $input[0].dispatchEvent(new Event('change'));
       }
     });
 
