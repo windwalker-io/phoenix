@@ -24,6 +24,7 @@ $(() => {
 
       ele.find('.input-group input').attr('value', value.title).trigger('change').delay(250).effect('highlight');
       ele.find('input[data-value-store]').attr('value', value.value).trigger('change');
+      ele.find('.modal-field-image-preview').css('background-image', `url(${value.image})`);
 
       $('#phoenix-iframe-modal').modal('hide');
     },

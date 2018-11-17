@@ -89,7 +89,7 @@ $url->delVar('page');
                             {{-- CHECKBOX --}}
                             <td>
                                 <a href="#"
-                                    onclick="parent.{{ $function }}('{{ $selector }}', '{{ $item->id }}', '{{ $item->title }}');">
+                                    onclick="parent.{{ $function }}('{{ $selector }}', { value: '{{ $item->id }}', title: '{{ $item->title }}', image: '{{ $item->image }}' });">
                                     <span class="fa fa-angle-right text-muted"></span> {{ $item->title }}
                                 </a>
                             </td>

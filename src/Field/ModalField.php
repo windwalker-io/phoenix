@@ -13,6 +13,7 @@ use Phoenix\Script\CoreScript;
 use Phoenix\Script\JQueryScript;
 use Phoenix\Script\PhoenixScript;
 use Windwalker\Core\Asset\Asset;
+use Windwalker\Core\Cache\RuntimeCacheTrait;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Data\Data;
@@ -54,6 +55,8 @@ use Windwalker\Html\Option;
  */
 class ModalField extends AbstractField
 {
+    use RuntimeCacheTrait;
+
     const TYPE_TAG = 'tag';
     const TYPE_LIST = 'list';
 
@@ -144,6 +147,7 @@ class ModalField extends AbstractField
      *
      * @return  string
      * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Exception
      */
     public function buildInput($attrs)
     {
@@ -152,6 +156,8 @@ class ModalField extends AbstractField
         $this->package = $this->get('package', $this->package);
         $this->view    = $this->get('view', $this->view);
         $multiple = $this->get('multiple');
+        $title = '';
+        $image = '';
 
         $attribs = $attrs;
 
@@ -181,6 +187,12 @@ class ModalField extends AbstractField
 
                 $input->setContent($options);
             }
+        } else {
+            $title = $this->getTitle();
+
+            if ($this->hasImage()) {
+                $image = (string) $this->getImage();
+            }
         }
 
         $url = $this->get('url') ?: $this->getUrl();
@@ -190,7 +202,8 @@ class ModalField extends AbstractField
 
         return WidgetHelper::render($this->get('layout', $defaultLayout), [
             'id' => $id,
-            'title' => $multiple ? '' : $this->getTitle(),
+            'title' => $title, // For single
+            'image' => $image, // For single
             'input' => $input,
             'url' => $url,
             'attrs' => $attrs,
@@ -204,19 +217,52 @@ class ModalField extends AbstractField
      *
      * @return  Data
      * @throws \Exception
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function getTitle()
     {
-        $table      = $this->table ?: $this->get('table', $this->view);
-        $value      = $this->getValue();
-        $keyField   = $this->get('key_field', $this->keyField);
         $titleField = $this->get('title_field', $this->titleField);
 
-        $dataMapper = new DataMapper($table);
+        return $this->getItem()->$titleField;
+    }
 
-        $data = $dataMapper->findOne([$keyField => $value]);
+    /**
+     * getImage
+     *
+     * @return  string
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function getImage()
+    {
+        $imageField = $this->get('image_field', $this->imageField);
 
-        return $data->$titleField;
+        return $this->getItem()->$imageField;
+    }
+
+    /**
+     * getItem
+     *
+     * @return  Data
+     *
+     * @throws \Exception
+     * @throws \Psr\Cache\InvalidArgumentException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function getItem()
+    {
+        return $this->fetch('item', function () {
+            $table      = $this->table ?: $this->get('table', $this->view);
+            $value      = $this->getValue();
+            $keyField   = $this->get('key_field', $this->keyField);
+
+            $dataMapper = new DataMapper($table);
+
+            return $dataMapper->findOne([$keyField => $value]);
+        });
     }
 
     /**
