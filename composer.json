@@ -18,7 +18,10 @@
     "autoload": {
         "psr-4": {
             "Phoenix\\": "src/"
-        }
+        },
+        "files": [
+            "src/Utilities/helpers.php"
+        ]
     },
     "extra": {
         "branch-alias": {
