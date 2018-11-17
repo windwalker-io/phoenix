@@ -118,14 +118,14 @@
 
                                 {{-- STATE --}}
                                 <td class="text-nowrap">
-                            <span class="btn-group">
-                                {!! $grid->published($item->state) !!}
-                                <button type="button" class="btn btn-default btn-light btn-sm has-tooltip"
-                                    onclick="Phoenix.Grid.copyRow({{ $i }});"
-                                    title="@lang('phoenix.toolbar.duplicate')">
-                                    <span class="fa fa-fw fa-copy text-info"></span>
-                                </button>
-                            </span>
+                                    <span class="btn-group">
+                                        {!! $grid->published($item->state) !!}
+                                        <button type="button" class="btn btn-default btn-light btn-sm has-tooltip"
+                                            onclick="Phoenix.Grid.copyRow({{ $i }});"
+                                            title="@lang('phoenix.toolbar.duplicate')">
+                                            <span class="fa fa-fw fa-copy text-info"></span>
+                                        </button>
+                                    </span>
                                 </td>
 
                                 {{-- TITLE --}}
@@ -147,10 +147,10 @@
 
                                 {{-- CREATED --}}
                                 <td class="text-nowrap">
-                            <span class="has-tooltip"
-                                title="{{ $datetime::toLocalTime($item->created, 'Y-m-d H:i:s') }}">
-                                {{ $datetime::toLocalTime($item->created, 'Y-m-d') }}
-                            </span>
+                                    <span class="has-tooltip"
+                                        title="{{ $datetime::toLocalTime($item->created, 'Y-m-d H:i:s') }}">
+                                        {{ $datetime::toLocalTime($item->created, 'Y-m-d') }}
+                                    </span>
                                 </td>
 
                                 {{-- LANGUAGE --}}
