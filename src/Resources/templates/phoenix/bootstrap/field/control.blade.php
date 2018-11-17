@@ -31,7 +31,24 @@ if (\Phoenix\Script\BootstrapScript::$currentVersion === 3) {
             @endif
             <div
                 class="{{ $noLabel || $hideLabel ? 'col-md-12' : $field->get('fieldWidth', $defaultInputWidth) }} input-container">
-                {!! $inputHtml !!}
+
+                @if ($field->get('prepend') || $field->get('append'))
+                    <div class="input-group">
+                        @if ($field->get('prepend'))
+                            <div class="input-group-prepend">
+                                {!! $field->get('prepend') !!}
+                            </div>
+                        @endif
+                        {!! $inputHtml !!}
+                        @if ($field->get('append'))
+                            <div class="input-group-append">
+                                {!! $field->get('append') !!}
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    {!! $inputHtml !!}
+                @endif
             </div>
         </div>
 
