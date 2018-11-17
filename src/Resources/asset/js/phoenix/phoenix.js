@@ -2249,6 +2249,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         phoenix.Theme = phoenix.UI;
 
+        // Uri
+        phoenix.Uri = phoenix.data('phoenix.uri');
+
         phoenix.on('jquery.plugin.created', function (event) {
           var debug = _this20.phoenix.data('windwalker.debug');
 

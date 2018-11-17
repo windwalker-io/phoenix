@@ -19,6 +19,9 @@
 
       phoenix.Theme = phoenix.UI;
 
+      // Uri
+      phoenix.Uri = phoenix.data('phoenix.uri');
+
       phoenix.on('jquery.plugin.created', event => {
         const debug = this.phoenix.data('windwalker.debug');
 
