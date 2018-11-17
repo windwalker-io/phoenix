@@ -250,6 +250,11 @@ body.sidebar-hide {
   }
 }
 
+// Select2
+.select2-container {
+  width: 100% !important;
+}
+
 // Chosen
 .chosen-container {
   cursor: pointer;
