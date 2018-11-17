@@ -34,15 +34,24 @@ class TimezoneFilter implements FilterInterface
     protected $to;
 
     /**
+     * Property format.
+     *
+     * @var string
+     */
+    protected $format;
+
+    /**
      * TimezoneFilter constructor.
      *
      * @param string $from
      * @param string $to
+     * @param string $format
      */
-    public function __construct($from = null, $to = 'UTC')
+    public function __construct($from = null, $to = 'UTC', $format = null)
     {
         $this->from = $from ?: Ioc::getConfig()->get('system.timezone', 'UTC');
         $this->to   = $to;
+        $this->format = $format ?: Chronos::getSqlFormat();
     }
 
     /**
@@ -55,13 +64,13 @@ class TimezoneFilter implements FilterInterface
     public function clean($text)
     {
         if (!$text) {
-            return $text;
+            return Chronos::getNullDate();
         }
 
         if ($this->from === $this->to) {
-            return $text;
+            return Chronos::toFormat($text, $this->format);
         }
 
-        return Chronos::convert($text, $this->from, $this->to);
+        return Chronos::convert($text, $this->from, $this->to, $this->format);
     }
 }
