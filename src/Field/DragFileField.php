@@ -21,7 +21,7 @@ use Windwalker\Form\Field\FileField;
  * @method  mixed|$this  accepted(string $value = null)
  * @method  mixed|$this  layout(string $value = null)
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.7.3
  */
 class DragFileField extends FileField
 {
@@ -77,7 +77,7 @@ class DragFileField extends FileField
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     protected function prepareScript()
     {

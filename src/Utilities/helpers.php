@@ -16,7 +16,7 @@ if (!function_exists('bignum')) {
      *
      * @return  \Brick\Math\BigDecimal
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     function bignum($value)
     {

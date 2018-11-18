@@ -233,7 +233,7 @@ class ModalField extends AbstractField
      *
      * @throws \Psr\Cache\InvalidArgumentException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     protected function getImage()
     {
@@ -250,7 +250,7 @@ class ModalField extends AbstractField
      * @throws \Exception
      * @throws \Psr\Cache\InvalidArgumentException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     protected function getItem()
     {
@@ -272,7 +272,7 @@ class ModalField extends AbstractField
      *
      * @throws \Exception
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     protected function getItems()
     {
@@ -318,7 +318,7 @@ class ModalField extends AbstractField
      *
      * @return  DataSet|Data[]
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     protected function prepareItems(DataSet $items)
     {

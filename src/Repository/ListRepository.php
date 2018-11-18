@@ -946,7 +946,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  $this
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     public function whereIn($column, array $values)
     {
@@ -966,7 +966,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  $this
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     public function whereNotIn($column, array $values)
     {

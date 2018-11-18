@@ -36,7 +36,7 @@ class TranslatorHelper
      *
      * @return  \Windwalker\Core\Language\CoreLanguage
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.7.3
      */
     public static function loadFile($file, $format = 'ini', $package = null)
     {
