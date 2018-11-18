@@ -43,6 +43,6 @@ class ItemView extends AbstractPhoenixHtmView
     {
         parent::prepareData($data);
 
-        $data->item = $data->item ?: $this->model->getItem();
+        $data->item = $data->item ?: $this->repository->getItem();
     }
 }

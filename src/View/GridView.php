@@ -86,7 +86,7 @@ class GridView extends ListView
     {
         parent::prepareData($data);
 
-        $data->form = $data->form ?: $this->model->getForm('grid', null, true);
+        $data->form = $data->form ?: $this->repository->getForm('grid', null, true);
 
         $this->handleFilterBar($data);
         $this->handleModal($data);

@@ -24,6 +24,7 @@ use Windwalker\Uri\Uri;
  * The AbstractAdminController class.
  *
  * @method  CrudRepository  getModel($name = null, $source = null, $forceNew = false)
+ * @method  CrudRepository  getRepository($name = null, $source = null, $forceNew = false)
  *
  * @since  1.0
  */
@@ -100,7 +101,7 @@ abstract class AbstractPostController extends AbstractPhoenixController
     {
         parent::prepareExecute();
 
-        $this->repository = $this->model = $this->getModel();
+        $this->repository = $this->repository = $this->getRepository();
         $this->dataObject = $this->getDataObject();
         $this->task       = $this->input->get('task');
 

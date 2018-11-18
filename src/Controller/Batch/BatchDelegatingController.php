@@ -53,16 +53,20 @@ class BatchDelegatingController extends AbstractPhoenixController
         $class = $resolver->resolveController($this->package, $this->getName() . '\Batch\\' . $task . 'Controller');
 
         if (!$class) {
-            throw new \DomainException(StringNormalise::toClassNamespace($this->getName() . '\Batch\\' . $task) . 'Controller not found');
+            throw new \DomainException(
+                StringNormalise::toClassNamespace(
+                    $this->getName() . '\Batch\\' . $task
+                ) . 'Controller not found'
+            );
         }
 
         // Keep model is string or null.
-        $model = $this->repository instanceof Repository ? null : $this->repository;
+        $repository = $this->repository instanceof Repository ? null : $this->repository;
 
         /** @var AbstractController $controller */
         $controller = new $class();
         $controller->setName($this->getName());
-        $controller->config->set('item_name', $model ?: $this->config['item_name']);
+        $controller->config->set('item_name', $repository ?: $this->config['item_name']);
         $controller->config->set('list_name', $this->config['list_name']);
 
         $this->hmvc($controller, $this->input->compact([

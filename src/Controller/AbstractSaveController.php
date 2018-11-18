@@ -83,7 +83,7 @@ abstract class AbstractSaveController extends AbstractPostController
 
         $this->validate($data);
 
-        $this->getModel()->save($data);
+        $this->getRepository()->save($data);
     }
 
     /**
@@ -166,10 +166,10 @@ abstract class AbstractSaveController extends AbstractPostController
      */
     protected function prepareStore(DataInterface $data)
     {
-        $model = $this->getModel();
+        $repository = $this->getRepository();
 
-        if ($model instanceof FormAwareRepositoryInterface) {
-            $result = $model->prepareStore($data->dump(true));
+        if ($repository instanceof FormAwareRepositoryInterface) {
+            $result = $repository->prepareStore($data->dump(true));
 
             $data->bind($result, true);
         }
@@ -192,10 +192,10 @@ abstract class AbstractSaveController extends AbstractPostController
      */
     protected function validate(DataInterface $data)
     {
-        $model = $this->getModel();
+        $repository = $this->getRepository();
 
-        if ($model instanceof FormAwareRepositoryInterface) {
-            $model->validate($data->dump(true));
+        if ($repository instanceof FormAwareRepositoryInterface) {
+            $repository->validate($data->dump(true));
         }
     }
 

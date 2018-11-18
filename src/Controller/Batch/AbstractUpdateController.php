@@ -60,10 +60,10 @@ abstract class AbstractUpdateController extends AbstractBatchController
      */
     protected function filter($data)
     {
-        /** @var FormAwareRepositoryInterface $model */
-        $model = $this->getModel($this->getName());
+        /** @var FormAwareRepositoryInterface $repository */
+        $repository = $this->getRepository($this->getName());
 
-        $form = $model->getForm('grid');
+        $form = $repository->getForm('grid');
 
         $form->bind(['batch' => $data]);
 

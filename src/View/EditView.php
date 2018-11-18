@@ -64,13 +64,15 @@ class EditView extends ItemView
     {
         parent::prepareData($data);
 
-        $model = $this->model->getModel();
+        $repository = $this->repository->getRepository();
 
-        if (!$model instanceof FormAwareRepositoryInterface) {
-            throw new \UnexpectedValueException('You must use a Model implemented ' . FormAwareRepositoryInterface::class . ' in EditView');
+        if (!$repository instanceof FormAwareRepositoryInterface) {
+            throw new \UnexpectedValueException(
+                'You must use a Model implemented ' . FormAwareRepositoryInterface::class . ' in EditView'
+            );
         }
 
         $data->form = $data->form
-            ?: $this->model->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
+            ?: $this->repository->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
     }
 }

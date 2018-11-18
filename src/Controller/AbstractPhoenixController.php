@@ -210,7 +210,7 @@ abstract class AbstractPhoenixController extends AbstractController
         }
 
         if (!$this->repository instanceof Repository || $forceNew) {
-            $this->repository = parent::getRepository($this->repository ?: $this->model, $source, $forceNew);
+            $this->repository = parent::getRepository($this->repository ?: $this->repository, $source, $forceNew);
         }
 
         return $this->repository;

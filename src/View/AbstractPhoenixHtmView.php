@@ -43,7 +43,7 @@ abstract class AbstractPhoenixHtmView extends HtmlView
      */
     protected function prepareRender($data)
     {
-        $data->state = $data->state ?: $this->model->getState();
+        $data->state = $data->state ?: $this->repository->getState();
 
         $this->langPrefix = $this->langPrefix ?: $this->getPackage()->getName() . '.';
 
