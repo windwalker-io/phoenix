@@ -90,18 +90,13 @@ abstract class AbstractPostController extends AbstractPhoenixController
      *
      * @return  void
      *
-     * @throws \Windwalker\Router\Exception\RouteNotFoundException
-     * @throws \RuntimeException
-     * @throws \Windwalker\Core\Security\Exception\UnauthorizedException
-     * @throws \LogicException
-     * @throws \DomainException
-     * @throws \ReflectionException
+     * @throws \Exception
      */
     protected function prepareExecute()
     {
         parent::prepareExecute();
 
-        $this->repository = $this->repository = $this->getRepository();
+        $this->model      = $this->repository = $this->getRepository();
         $this->dataObject = $this->getDataObject();
         $this->task       = $this->input->get('task');
 

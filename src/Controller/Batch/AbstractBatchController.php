@@ -65,6 +65,7 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @return  void
      * @throws \ReflectionException
+     * @throws \Exception
      */
     protected function prepareExecute()
     {
@@ -259,12 +260,37 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @throws \Exception
      */
-    public function getModel($name = null, $source = null, $forceNew = false)
+    public function getRepository($name = null, $source = null, $forceNew = false)
     {
         // Force the singular model
         if ($name === null && !$this->repository instanceof Repository) {
             if (is_string($this->repository)) {
                 $name = $this->repository;
+            } else {
+                $name = $name ?: $this->config['item_name'];
+            }
+        }
+
+        return parent::getRepository($name, $source, $forceNew);
+    }
+
+    /**
+     * getModel
+     *
+     * @param string $name
+     * @param mixed  $source
+     * @param bool   $forceNew
+     *
+     * @return Repository
+     *
+     * @throws \Exception
+     */
+    public function getModel($name = null, $source = null, $forceNew = false)
+    {
+        // Force the singular model
+        if ($name === null && !$this->model instanceof Repository) {
+            if (is_string($this->model)) {
+                $name = $this->model;
             } else {
                 $name = $name ?: $this->config['item_name'];
             }
