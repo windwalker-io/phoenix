@@ -66,8 +66,8 @@ class InputRenderer implements FormRendererInterface
 
         return WidgetHelper::render('phoenix.bootstrap.field.control', [
             'field' => $field,
-            'labelHtml' => $noLabel ? '' : $field->renderLabel(),
-            'inputHtml' => $field->renderInput(),
+            'labelHtml' => $noLabel ? '' : $field->renderLabel($options),
+            'inputHtml' => $field->renderInput($options),
             'attribs' => $attribs,
             'noLabel' => $noLabel,
             'hideLabel' => $hideLabel,
@@ -81,15 +81,20 @@ class InputRenderer implements FormRendererInterface
      * @param AbstractField $field
      * @param array         $attribs
      *
+     * @param array         $options
+     *
      * @return string
      */
-    public function renderLabel(AbstractField $field, array $attribs = [])
+    public function renderLabel(AbstractField $field, array $attribs = [], array $options = [])
     {
         if ($field instanceof HiddenField) {
             return '';
         }
 
-        $attribs['class'] .= ' has-tooltip ' . $field->getAttribute('labelWidth', 'col-md-3');
+        $attribs['class'] .= ' has-tooltip ' . $field->getAttribute(
+            'labelWidth',
+            Arr::get($options, 'vertical') ? 'col-md-12 col-12' : 'col-md-3'
+        );
 
         $label = $field->getLabel();
 
@@ -109,10 +114,11 @@ class InputRenderer implements FormRendererInterface
      *
      * @param   AbstractField $field
      * @param   array         $attribs
+     * @param   array         $options
      *
      * @return string
      */
-    public function renderInput(AbstractField $field, array $attribs = [])
+    public function renderInput(AbstractField $field, array $attribs = [], array $options = [])
     {
         $type = $field->getType();
 
@@ -121,13 +127,13 @@ class InputRenderer implements FormRendererInterface
         $handler = static::getRenderer($type);
 
         if ($handler) {
-            return $handler($field);
+            return $handler($field, $attribs, $options);
         }
 
         $method = 'render' . ucfirst($type);
 
         if (is_callable([$this, $method])) {
-            return $this->$method($field, $attribs);
+            return $this->$method($field, $attribs, $options);
         }
 
         $attribs = Arr::def($attribs, 'class', '');
