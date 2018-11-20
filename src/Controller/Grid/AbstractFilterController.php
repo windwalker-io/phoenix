@@ -33,6 +33,22 @@ abstract class AbstractFilterController extends AbstractPhoenixController
      */
     protected function doExecute()
     {
+        // Use getUserStateFromInput() to store filters to session.
+        $model['list.search']    = $this->getUserStateFromInput(
+            $this->getContext('list.search'),
+            'search',
+            [],
+            InputFilter::ARRAY_TYPE
+        );
+        $model['list.filter']    = $this->getUserStateFromInput(
+            $this->getContext('list.filter'),
+            'filter',
+            [],
+            InputFilter::ARRAY_TYPE
+        );
+        $model['list.ordering']  = $this->getUserStateFromInput($this->getContext('list.ordering'), 'list_ordering');
+        $model['list.direction'] = $this->getUserStateFromInput($this->getContext('list.direction'), 'list_direction');
+
         $uri = new Uri($this->app->uri->full);
         $uri->delVar('filter');
 
