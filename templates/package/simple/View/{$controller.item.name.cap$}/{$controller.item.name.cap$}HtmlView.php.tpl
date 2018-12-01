@@ -9,6 +9,7 @@
 namespace {$package.namespace$}{$package.name.cap$}\View\{$controller.item.name.cap$};
 
 use Phoenix\View\ItemView;
+use Windwalker\Data\Data;
 
 /**
  * The {$controller.item.name.cap$}HtmlView class.
@@ -35,25 +36,29 @@ class {$controller.item.name.cap$}HtmlView extends ItemView
     {
         parent::prepareData($data);
 
-        $this->prepareScripts();
-        $this->prepareMetadata();
+        $this->prepareScripts($data);
+        $this->prepareMetadata($data);
     }
 
     /**
-     * prepareDocument
+     * prepareScripts
+     *
+     * @param Data $data
      *
      * @return  void
      */
-    protected function prepareScripts()
+    protected function prepareScripts(Data $data)
     {
     }
 
     /**
      * prepareMetadata
      *
+     * @param Data $data
+     *
      * @return  void
      */
-    protected function prepareMetadata()
+    protected function prepareMetadata(Data $data)
     {
         $this->setTitle();
     }

@@ -12,6 +12,7 @@ use Phoenix\Script\BootstrapScript;
 use Phoenix\Script\PhoenixScript;
 use Phoenix\View\GridView;
 use Phoenix\View\ListView;
+use Windwalker\Data\Data;
 
 /**
  * The {$controller.list.name.cap$}HtmlView class.
@@ -90,16 +91,18 @@ class {$controller.list.name.cap$}HtmlView extends GridView
     {
         parent::prepareData($data);
 
-        $this->prepareScripts();
-        $this->prepareMetadata();
+        $this->prepareScripts($data);
+        $this->prepareMetadata($data);
     }
 
     /**
-     * prepareDocument
+     * prepareScripts
+     *
+     * @param Data $data
      *
      * @return  void
      */
-    protected function prepareScripts()
+    protected function prepareScripts(Data $data)
     {
         PhoenixScript::core();
         PhoenixScript::grid();
@@ -112,9 +115,11 @@ class {$controller.list.name.cap$}HtmlView extends GridView
     /**
      * prepareMetadata
      *
+     * @param Data $data
+     *
      * @return  void
      */
-    protected function prepareMetadata()
+    protected function prepareMetadata(Data $data)
     {
         $this->setTitle();
     }
