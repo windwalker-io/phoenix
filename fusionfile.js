@@ -140,6 +140,8 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.min.js`, `${destPath}/js/jquery/`);
 
   fusion.copy(`${nodePath}/sortablejs/*.js`, `${destPath}/js/sortablejs/`);
+
+  fusion.copy(`${nodePath}/velocity-animate/velocity.*`, `${destPath}/js/velocity/`);
 });
 
 fusion.default(['js', 'scss', 'phoenix']);

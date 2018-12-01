@@ -38,6 +38,7 @@
         "sprintf-js": "1.*",
         "underscore": "*",
         "underscore.string": "*",
+        "velocity-animate": "^2.0.5",
         "vue": "^2.5.13",
         "vue-resource": "^1.4.0",
         "vue-router": "^3.0.0",

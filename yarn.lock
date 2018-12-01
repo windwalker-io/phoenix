@@ -4558,6 +4558,10 @@ value-or-function@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/value-or-function/-/value-or-function-3.0.0.tgz#1c243a50b595c1be54a754bfece8563b9ff8d813"
 
+velocity-animate@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/velocity-animate/-/velocity-animate-2.0.5.tgz#35130c89887b3e9cfaa26b515b921dec9d2e2a57"
+
 verror@1.10.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/verror/-/verror-1.10.0.tgz#3a105ca17053af55d6e270c1f8288682e18da400"

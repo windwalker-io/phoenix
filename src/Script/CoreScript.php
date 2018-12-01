@@ -219,4 +219,24 @@ JS;
             static::addJS(static::phoenixName() . '/js/ivia/ivia.min.js');
         }
     }
+
+    /**
+     * velocity
+     *
+     * @param bool $uiPack
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function velocity($uiPack = false)
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addJS(static::phoenixName() . '/js/velocity/velocity.min.js');
+        }
+
+        if ($uiPack && !static::inited(__METHOD__, $uiPack)) {
+            static::addJS(static::phoenixName() . '/js/velocity/velocity.ui.min.js');
+        }
+    }
 }
