@@ -8,6 +8,7 @@
 
 namespace Phoenix\Controller;
 
+use Phoenix\Repository\CrudRepositoryInterface;
 use Phoenix\Repository\FormAwareRepositoryInterface;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
@@ -55,7 +56,7 @@ abstract class AbstractSaveController extends AbstractPostController
      * A hook before main process executing.
      *
      * @return  void
-     * @throws \ReflectionException
+     * @throws \Exception
      */
     protected function prepareExecute()
     {
@@ -79,6 +80,16 @@ abstract class AbstractSaveController extends AbstractPostController
      */
     protected function doSave(DataInterface $data)
     {
+        // Determine model
+        if (!$this->repository instanceof CrudRepositoryInterface) {
+            throw new \DomainException(sprintf(
+                '%s model should be instance of %s, class: %s given.',
+                $this->repository->getName(),
+                CrudRepositoryInterface::class,
+                get_class($this->repository)
+            ));
+        }
+
         $data = $this->prepareStore($data);
 
         $this->validate($data);

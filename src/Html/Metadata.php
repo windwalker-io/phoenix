@@ -47,6 +47,10 @@ class Metadata extends Data
             $this->metadata[$name] = [];
         }
 
+        if (is_stringable($content)) {
+            $content = (string) $content;
+        }
+
         foreach ((array) $content as $item) {
             $this->metadata[$name][] = new HtmlElement('meta', null, [
                 'name' => $this->escape($name),
@@ -86,6 +90,10 @@ class Metadata extends Data
     {
         if (!isset($this->openGraphs[$type]) || $replace) {
             $this->openGraphs[$type] = [];
+        }
+
+        if (is_stringable($content)) {
+            $content = (string) $content;
         }
 
         foreach ((array) $content as $item) {

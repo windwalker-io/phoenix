@@ -100,16 +100,6 @@ abstract class AbstractPostController extends AbstractPhoenixController
         $this->dataObject = $this->getDataObject();
         $this->task       = $this->input->get('task');
 
-        // Determine model
-        if (!$this->repository instanceof CrudRepositoryInterface) {
-            throw new \DomainException(sprintf(
-                '%s model should be instance of %s, class: %s given.',
-                $this->repository->getName(),
-                CrudRepositoryInterface::class,
-                get_class($this->repository)
-            ));
-        }
-
         // Determine the name of the primary key for the data.
         if (empty($this->keyName) && $this->repository instanceof DatabaseRepositoryInterface) {
             $this->keyName = $this->repository->getKeyName(false) ?: 'id';

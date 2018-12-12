@@ -62,6 +62,13 @@ abstract class AbstractPhoenixController extends AbstractController
     protected $langPrefix = 'phoenix.';
 
     /**
+     * Property redirectValidate.
+     *
+     * @var  bool
+     */
+    protected $redirectValidate = true;
+
+    /**
      * Class init.
      */
     public function __construct()

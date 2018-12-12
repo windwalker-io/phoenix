@@ -9,6 +9,7 @@
 namespace Phoenix\View;
 
 use Phoenix\Repository\FormAwareRepositoryInterface;
+use Windwalker\Form\Form;
 
 /**
  * The EditView class.
@@ -64,15 +65,26 @@ class EditView extends ItemView
     {
         parent::prepareData($data);
 
+        $data->form = $data->form ?: $this->getForm();
+    }
+
+    /**
+     * getForm
+     *
+     * @return  Form
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function getForm()
+    {
         $repository = $this->repository->getRepository();
 
         if (!$repository instanceof FormAwareRepositoryInterface) {
             throw new \UnexpectedValueException(
-                'You must use a Model implemented ' . FormAwareRepositoryInterface::class . ' in EditView'
+                'You must use a Repository implemented ' . FormAwareRepositoryInterface::class . ' in EditView'
             );
         }
 
-        $data->form = $data->form
-            ?: $this->repository->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
+        return $repository->getForm($this->formDefinition, $this->formControl, $this->formLoadData);
     }
 }

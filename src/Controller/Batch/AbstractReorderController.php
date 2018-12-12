@@ -68,11 +68,6 @@ abstract class AbstractReorderController extends AbstractBatchController
         $this->data   = $this->input->getArray('ordering', []);
         $this->origin = explode(',', $this->input->post->getString('origin_ordering'));
         $this->delta  = $this->input->post->get('delta');
-
-        // Determine model
-        if (!$this->repository instanceof AdminRepositoryInterface) {
-            throw new \UnexpectedValueException(sprintf('%s model need extend to AdminModel', $this->getName()));
-        }
     }
 
     /**
@@ -83,6 +78,11 @@ abstract class AbstractReorderController extends AbstractBatchController
      */
     protected function doExecute()
     {
+        // Determine model
+        if (!$this->repository instanceof AdminRepositoryInterface) {
+            throw new \UnexpectedValueException(sprintf('%s model need extend to AdminModel', $this->getName()));
+        }
+
         if (!$this->checkAccess($this->data)) {
             throw new UnauthorizedException('You have no access to modify these items.');
         }
