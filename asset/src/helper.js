@@ -16,6 +16,7 @@
         keepAlive: 'keepAlive',
         stopKeepAlive: 'stopKeepAlive',
         loadScript: 'loadScript',
+        notify: 'notify',
         numberFormat: 'numberFormat',
         sprintf: 'sprintf',
         vsprintf: 'vsprintf',
@@ -114,6 +115,16 @@
       }
 
       return this.phoenix.asset(type) + '/' + uri;
+    }
+
+    /**
+     * Notify information.
+     * @param {string|Array} message
+     * @param {string}       type
+     * @returns {*}
+     */
+    notify(message, type = 'info') {
+      return this.phoenix.addMessage(message, type);
     }
 
     /**

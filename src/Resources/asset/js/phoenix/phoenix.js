@@ -519,6 +519,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           keepAlive: 'keepAlive',
           stopKeepAlive: 'stopKeepAlive',
           loadScript: 'loadScript',
+          notify: 'notify',
           numberFormat: 'numberFormat',
           sprintf: 'sprintf',
           vsprintf: 'vsprintf'
@@ -648,6 +649,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
 
         return this.phoenix.asset(type) + '/' + uri;
+      }
+
+      /**
+       * Notify information.
+       * @param {string|Array} message
+       * @param {string}       type
+       * @returns {*}
+       */
+
+    }, {
+      key: 'notify',
+      value: function notify(message) {
+        var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'info';
+
+        return this.phoenix.addMessage(message, type);
       }
 
       /**
@@ -1093,7 +1109,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'confirm',
       value: function (_confirm2) {
-        function confirm(_x12, _x13) {
+        function confirm(_x13, _x14) {
           return _confirm2.apply(this, arguments);
         }
 
