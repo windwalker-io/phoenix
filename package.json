@@ -39,6 +39,7 @@
         "silicone": "^1.0.0-beta1",
         "sortablejs": "^1.7.0",
         "sprintf-js": "1.*",
+        "systemjs": "^2.1.1",
         "underscore": "*",
         "underscore.string": "*",
         "velocity-animate": "^2.0.5",

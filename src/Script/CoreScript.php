@@ -8,10 +8,12 @@
 
 namespace Phoenix\Script;
 
+use Lyrasoft\Unidev\Script\UnidevScript;
 use Phoenix\Html\HtmlHeader;
 use Windwalker\Core\Browser\WhichBrowserFactory;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Security\CsrfProtection;
+use Windwalker\Dom\HtmlElement;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -26,6 +28,8 @@ abstract class CoreScript extends AbstractPhoenixScript
     /**
      * requireJS
      *
+     * @param string $uri
+     *
      * @return  void
      */
     public static function requireJS($uri = null)
@@ -36,6 +40,29 @@ abstract class CoreScript extends AbstractPhoenixScript
 
         if (!static::inited(__METHOD__, get_defined_vars()) && $uri) {
             static::internalJS("require(['$uri']);");
+        }
+    }
+
+    /**
+     * systemJS
+     *
+     * @param string $uri
+     *
+     * @return  void
+     *
+     * @since   1.7.7
+     */
+    public static function systemJS($uri = null)
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addJS(static::phoenixName() . '/js/core/systemjs/system.min.js');
+        }
+
+        if (!static::inited(__METHOD__, get_defined_vars()) && $uri) {
+            $uri = static::getAsset()->handleUri($uri);
+            $uri = static::getAsset()->appendVersion($uri);
+
+            static::internalJS("System.import('$uri');");
         }
     }
 

@@ -70,21 +70,26 @@ fusion.task('install', function () {
   const nodePath = 'node_modules';
   const destPath = 'src/Resources/asset';
 
+  // Underscore
   fusion.copy(`${nodePath}/underscore/underscore.*`, `${destPath}/js/core/`);
-
   fusion.copy(`${nodePath}/underscore.string/dist/*`, `${destPath}/js/core/`);
 
+  // Require JS
   fusion.copy(`${nodePath}/requirejs/require.js`, `${destPath}/js/core/require.js`);
 
+  // Backbone
   fusion.copy(`${nodePath}/backbone/backbone.js`, `${destPath}/js/core/backbone.js`);
   fusion.copy(`${nodePath}/backbone/backbone-min.js`, `${destPath}/js/core/backbone.min.js`);
 
+  // Punycode
   fusion.copy(`${nodePath}/punycode/punycode.js`, `${destPath}/js/string/punycode.js`);
 
+  // jQuery
   fusion.copy(`${nodePath}/jquery/dist/jquery.js`, `${destPath}/js/jquery/`);
   fusion.copy(`${nodePath}/jquery/dist/jquery.min.js`, `${destPath}/js/jquery/`);
   fusion.copy(`${nodePath}/jquery/dist/jquery.min.map`, `${destPath}/js/jquery/`);
 
+  // Vue
   fusion.copy(`${nodePath}/vue/dist/vue.js`, `${destPath}/js/vue/vue.js`);
   fusion.copy(`${nodePath}/vue/dist/vue.min.js`, `${destPath}/js/vue/vue.min.js`);
   fusion.copy(`${nodePath}/vue-resource/dist/vue-resource.js`, `${destPath}/js/vue/vue-resource.js`);
@@ -98,6 +103,7 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/vuex/dist/vuex.min.js`, `${destPath}/js/vue/vuex.min.js`);
   fusion.copy(`${nodePath}/vue2-animate/dist/*`, `${destPath}/css/vue/`);
 
+  // Moment.js
   fusion.copy(`${nodePath}/moment/moment.js`, `${destPath}/js/datetime/moment.js`);
   fusion.copy(`${nodePath}/moment/locale/en-gb.js`, `${destPath}/js/datetime/locale/en-gb.js`);
   fusion.copy(`${nodePath}/moment/locale/zh-tw.js`, `${destPath}/js/datetime/locale/zh-tw.js`);
@@ -108,19 +114,24 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/moment-timezone/moment-timezone.js`, `${destPath}/js/datetime/moment-timezone.js`);
   fusion.copy(`${nodePath}/moment-timezone/builds/moment-timezone.min.js`, `${destPath}/js/datetime/moment-timezone.min.js`);
 
+  // Silicone
   fusion.copy(`${nodePath}/silicone/dist/*`, `${destPath}/css/silicone/`);
 
+  // Sprintf.js
   fusion.copy(`${nodePath}/sprintf-js/dist/sprintf*`, `${destPath}/js/core/`);
 
+  // Ivia
   fusion.copy(`${nodePath}/ivia/dist/ivia.js`, `${destPath}/js/ivia/ivia.js`);
   fusion.copy(`${nodePath}/ivia/dist/ivia.min.js`, `${destPath}/js/ivia/ivia.min.js`);
   fusion.copy(`${nodePath}/ivia/dist/ivia.js.map`, `${destPath}/js/ivia/ivia.js.map`);
 
+  // Font Awesome
   fusion.copy(`${nodePath}/font-awesome/css/font-awesome.css`, `${destPath}/css/font-awesome.css`);
   fusion.copy(`${nodePath}/font-awesome/css/font-awesome.css.map`, `${destPath}/css/font-awesome.css.map`);
   fusion.copy(`${nodePath}/font-awesome/css/font-awesome.min.css`, `${destPath}/css/font-awesome.min.css`);
   fusion.copy(`${nodePath}/font-awesome/fonts/*`, `${destPath}/fonts/`);
 
+  // Bootstrap
   fusion.copy(`${nodePath}/bootstrap/dist/css/bootstrap.*`, `${destPath}/css/bootstrap/4/`);
   fusion.copy(`${nodePath}/bootstrap/dist/js/bootstrap.bundle.*`, `${destPath}/js/bootstrap/4/`);
 
@@ -129,19 +140,26 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.*`, `${destPath}/css/bootstrap/`);
   fusion.copy(`${nodePath}/eonasdan-bootstrap-datetimepicker/build/js/*`, `${destPath}/js/bootstrap/`);
 
+  // Select2
   fusion.copy(`${nodePath}/select2/dist/js/select2.js`, `${destPath}/js/select2/`);
   fusion.copy(`${nodePath}/select2/dist/js/select2.min.js`, `${destPath}/js/select2/`);
   fusion.copy(`${nodePath}/select2/dist/css/*`, `${destPath}/css/select2/`);
   fusion.copy(`${nodePath}/select2-bootstrap4-theme/dist/*`, `${destPath}/css/select2/bs4/`);
 
+  // jQuery minicolors
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.css`, `${destPath}/css/jquery/`);
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.js`, `${destPath}/js/jquery/`);
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.png`, `${destPath}/css/jquery/`);
   fusion.copy(`${nodePath}/@claviska/jquery-minicolors/jquery.minicolors.min.js`, `${destPath}/js/jquery/`);
 
+  // Sortable.js
   fusion.copy(`${nodePath}/sortablejs/*.js`, `${destPath}/js/sortablejs/`);
 
+  // Velocity
   fusion.copy(`${nodePath}/velocity-animate/velocity.*`, `${destPath}/js/velocity/`);
+
+  // SystemJS
+  fusion.copy(`${nodePath}/systemjs/dist/*`, `${destPath}/js/core/systemjs/`);
 });
 
 fusion.default(['js', 'scss', 'phoenix']);
