@@ -1,8 +1,10 @@
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+"use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
  * Part of Phoenix project.
@@ -14,7 +16,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /**
  * PhoenixMultiSelect
  */
-;(function ($) {
+;
+
+(function ($) {
   /**
    * Multi Select.
    *
@@ -23,14 +27,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    *
    * @constructor
    */
-  var PhoenixMultiSelect = function () {
+  var PhoenixMultiSelect =
+  /*#__PURE__*/
+  function () {
     _createClass(PhoenixMultiSelect, null, [{
-      key: 'pluginName',
+      key: "pluginName",
       get: function get() {
         return 'multiselect';
       }
     }, {
-      key: 'defaultOptions',
+      key: "defaultOptions",
       get: function get() {
         return {
           duration: 100,
@@ -47,14 +53,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       this.form = $element;
       this.boxes = $element.find(this.options.inputSelector);
       this.last = false;
-
       this.boxes.parent().css('user-select', 'none');
-
       this.boxes.on('click', function (event) {
         self.select(this, event);
       });
     }
-
     /**
      * Do select.
      *
@@ -64,11 +67,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 
     _createClass(PhoenixMultiSelect, [{
-      key: 'select',
+      key: "select",
       value: function select(element, event) {
         if (!this.last) {
           this.last = element;
-
           return;
         }
 
@@ -76,9 +78,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           var self = this;
           var start = this.boxes.index(element);
           var end = this.boxes.index(this.last);
-
           var chs = this.boxes.slice(Math.min(start, end), Math.max(start, end) + 1);
-
           $.each(chs, function (i, e) {
             if (self.options.duration) {
               setTimeout(function () {

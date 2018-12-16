@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -8,24 +8,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
  * @license    __LICENSE__
  */
-
 // Custom file input
 $(function () {
   // Polyfill sweetalert
   var swal = window.swal || function swal(title) {
     var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
     alert(title + ' / ' + message);
   };
 
-  Phoenix.plugin('dragFile', function () {
+  Phoenix.plugin('dragFile',
+  /*#__PURE__*/
+  function () {
     function _class($element, $options) {
       _classCallCheck(this, _class);
 
       $element.on('change', function (e) {
-        var $self = $(e.currentTarget);
+        var $self = $(e.currentTarget); //get the file name
 
-        //get the file name
         var files = $self[0].files;
         var limit = $self.attr('data-max-files');
         var sizeLimit = $self.attr('data-max-size');
@@ -35,7 +34,7 @@ $(function () {
         }).filter(function (v) {
           return v.length > 0;
         });
-        var text = void 0;
+        var text;
 
         if (!placeholder) {
           if ($self.attr('multiple')) {
@@ -43,16 +42,16 @@ $(function () {
           } else {
             placeholder = Phoenix.__('phoenix.form.field.drag.file.placeholder.single');
           }
-        }
+        } // Files limit
 
-        // Files limit
+
         if (limit && files.length > limit) {
           swal(Phoenix.__('phoenix.form.field.drag.file.message.max.files', limit), '', 'warning');
           e.preventDefault();
           return;
-        }
+        } // Files size
 
-        // Files size
+
         var fileSize = 0;
         Array.prototype.forEach.call(files, function (file) {
           if (acceptExtensions.length && acceptExtensions.indexOf(file.name.split('.').pop().toLowerCase()) === -1) {
@@ -70,14 +69,14 @@ $(function () {
         }
 
         if (files.length > 1) {
-          text = '<span class="fa fa-files fa-copy"></span> \n                    ' + Phoenix.__('phoenix.form.field.drag.file.selected', files.length);
+          text = "<span class=\"fa fa-files fa-copy\"></span> \n                    ".concat(Phoenix.__('phoenix.form.field.drag.file.selected', files.length));
         } else if (files.length === 1) {
-          text = '<span class="fa fa-file"></span> ' + files[0].name;
+          text = "<span class=\"fa fa-file\"></span> ".concat(files[0].name);
         } else {
-          text = '<span class="fa fa-upload"></span> ' + placeholder;
-        }
+          text = "<span class=\"fa fa-upload\"></span> ".concat(placeholder);
+        } //replace the "Choose a file" label
 
-        //replace the "Choose a file" label
+
         $self.next('.custom-file-label').find('span').html(text);
       }).on('dragover', function (e) {
         $(e.currentTarget).addClass('hover');

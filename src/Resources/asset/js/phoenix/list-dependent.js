@@ -1,8 +1,10 @@
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+"use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
  * Part of phoenix project.
@@ -10,12 +12,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @copyright  Copyright (C) 2017 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
+;
 
-;(function ($) {
+(function ($) {
   "use strict";
 
   var nope = function nope(value, ele, dep) {};
-
   /**
    * Class init.
    * @param {jQuery}        $element
@@ -24,14 +26,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
    * @constructor
    */
 
-  var ListDependent = function () {
+
+  var ListDependent =
+  /*#__PURE__*/
+  function () {
     _createClass(ListDependent, null, [{
-      key: 'pluginName',
+      key: "pluginName",
       get: function get() {
         return 'listDependent';
       }
     }, {
-      key: 'defaultOptions',
+      key: "defaultOptions",
       get: function get() {
         return {
           ajax: {
@@ -59,21 +64,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       this.element = $element;
       this.options = $.extend(true, {}, this.constructor.defaultOptions, options);
       this.dependent = $(dependent);
-
       this.bindEvents();
 
       if (this.options.initial_load) {
         this.changeList(this.dependent.val(), true);
       }
     }
-
     /**
      * Bind events.
      */
 
 
     _createClass(ListDependent, [{
-      key: 'bindEvents',
+      key: "bindEvents",
       value: function bindEvents() {
         var _this = this;
 
@@ -81,7 +84,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _this.changeList($(event.currentTarget).val());
         });
       }
-
       /**
        * Update the list elements.
        *
@@ -90,13 +92,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: 'changeList',
+      key: "changeList",
       value: function changeList(value) {
         var initial = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        value = value || this.dependent.val(); // Empty mark
 
-        value = value || this.dependent.val();
-
-        // Empty mark
         if (value === '') {
           value = this.options.empty_mark;
         }
@@ -107,7 +107,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.sourceUpdate(value, initial);
         }
       }
-
       /**
        * Update list by source.
        *
@@ -116,12 +115,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: 'sourceUpdate',
+      key: "sourceUpdate",
       value: function sourceUpdate(value) {
         var initial = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
         var source = this.options.source;
-
         this.beforeHook(value, this.element, this.dependent);
 
         if (source[value]) {
@@ -136,7 +133,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         this.afterHook(value, this.element, this.dependent);
       }
-
       /**
        * Do ajax.
        *
@@ -144,15 +140,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: 'ajaxUpdate',
+      key: "ajaxUpdate",
       value: function ajaxUpdate(value) {
         var _this2 = this;
 
         var data = {};
         data[this.options.ajax.value_field] = value;
-
         this.beforeHook(value, this.element, this.dependent);
-
         $.get(this.options.ajax.url, data).done(function (response) {
           if (response.success) {
             _this2.updateListElements(response.data);
@@ -165,7 +159,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _this2.afterHook(value, _this2.element, _this2.dependent);
         });
       }
-
       /**
        * Update list elements.
        *
@@ -173,7 +166,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: 'updateListElements',
+      key: "updateListElements",
       value: function updateListElements(items) {
         var self = this;
         var textField = this.options.text_field;
@@ -203,11 +196,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           self.element.append(option);
         });
-
         self.element.trigger('chosen:updated');
         self.element.trigger('change');
       }
-
       /**
        * Before hook.
        *
@@ -218,13 +209,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: 'beforeHook',
+      key: "beforeHook",
       value: function beforeHook(value, element, dependent) {
         var before = this.options.hooks.before_request;
-
         return before.call(this, value, element, dependent);
       }
-
       /**
        * After hook.
        *
@@ -235,17 +224,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        */
 
     }, {
-      key: 'afterHook',
+      key: "afterHook",
       value: function afterHook(value, element, dependent) {
         var after = this.options.hooks.after_request;
-
         return after.call(this, value, element, dependent);
       }
     }]);
 
     return ListDependent;
   }();
-
   /**
    * Push plugins.
    *

@@ -1,12 +1,22 @@
-'use strict';
+"use strict";
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 /**
  * Part of Phoenix project.
@@ -18,49 +28,51 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 /**
  * PhoenixGrid
  */
-;(function ($) {
+;
+
+(function ($) {
   "use strict";
 
-  var PhoenixGrid = function (_PhoenixJQueryPlugin) {
+  var PhoenixGrid =
+  /*#__PURE__*/
+  function (_PhoenixJQueryPlugin) {
     _inherits(PhoenixGrid, _PhoenixJQueryPlugin);
 
     function PhoenixGrid() {
       _classCallCheck(this, PhoenixGrid);
 
-      return _possibleConstructorReturn(this, (PhoenixGrid.__proto__ || Object.getPrototypeOf(PhoenixGrid)).apply(this, arguments));
+      return _possibleConstructorReturn(this, _getPrototypeOf(PhoenixGrid).apply(this, arguments));
     }
 
     _createClass(PhoenixGrid, null, [{
-      key: 'is',
+      key: "is",
       get: function get() {
         return 'Grid';
       }
     }, {
-      key: 'proxies',
+      key: "proxies",
       get: function get() {
         return {
           grid: 'createPlugin'
         };
       }
-
       /**
        * Plugin name.
        * @returns {string}
        */
 
     }, {
-      key: 'pluginName',
+      key: "pluginName",
       get: function get() {
         return 'grid';
       }
     }, {
-      key: 'pluginClass',
+      key: "pluginClass",
       get: function get() {
         return PhoenixGridElement;
       }
     }, {
-      key: 'defaultOptions',
-
+      key: "defaultOptions",
 
       /**
        * Default options.
@@ -74,9 +86,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     return PhoenixGrid;
   }(PhoenixJQueryPlugin);
 
-  var PhoenixGridElement = function () {
+  var PhoenixGridElement =
+  /*#__PURE__*/
+  function () {
     _createClass(PhoenixGridElement, null, [{
-      key: 'defaultOptions',
+      key: "defaultOptions",
       get: function get() {
         return {
           mainSelector: '',
@@ -116,45 +130,41 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       }
 
       var selector = this.options.selector;
+      this.searchContainer = this.form.find(selector.search.container); //this.searchButton = this.form.find(selector.search.button);
 
-      this.searchContainer = this.form.find(selector.search.container);
-      //this.searchButton = this.form.find(selector.search.button);
       this.searchClearButton = this.form.find(selector.search.clearButton);
       this.filterContainer = this.form.find(selector.filter.container);
       this.filterButton = this.form.find(selector.filter.button);
       this.sortButtons = this.form.find(selector.sort.button);
-
       this.registerEvents();
     }
-
     /**
      * Start this object and events.
      */
 
 
     _createClass(PhoenixGridElement, [{
-      key: 'registerEvents',
+      key: "registerEvents",
       value: function registerEvents() {
-        var _this2 = this;
+        var _this = this;
 
         this.searchClearButton.click(function () {
-          _this2.searchContainer.find('input, textarea, select').val('');
-          _this2.filterContainer.find('input, textarea, select').val('');
+          _this.searchContainer.find('input, textarea, select').val('');
 
-          _this2.form.submit();
+          _this.filterContainer.find('input, textarea, select').val('');
+
+          _this.form.submit();
         });
-
         this.filterButton.click(function (event) {
-          _this2.toggleFilter();
+          _this.toggleFilter();
+
           event.stopPropagation();
           event.preventDefault();
         });
-
         this.sortButtons.click(function (event) {
           self.sort(event.currentTarget, event);
         });
       }
-
       /**
        * Toggle filter bar.
        *
@@ -162,13 +172,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'toggleFilter',
+      key: "toggleFilter",
       value: function toggleFilter() {
         this.ui.toggleFilter(this.filterContainer, this.filterButton);
-
         return this;
       }
-
       /**
        * Sort two items.
        *
@@ -179,13 +187,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'sort',
+      key: "sort",
       value: function sort(ordering, direction) {
         var orderingInput = this.form.find('input[name=list_ordering]');
 
         if (!orderingInput.length) {
           orderingInput = $('<input name="list_ordering" type="hidden" value="" />');
-
           this.form.append(orderingInput);
         }
 
@@ -193,16 +200,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         if (!directionInput.length) {
           directionInput = $('<input name="list_direction" type="hidden" value="">');
-
           this.form.append(directionInput);
         }
 
         orderingInput.val(ordering);
         directionInput.val(direction);
-
         return this.core.put();
       }
-
       /**
        * Check a row's checkbox.
        *
@@ -211,10 +215,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'checkRow',
+      key: "checkRow",
       value: function checkRow(row) {
         var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
         var ch = this.form.find('input.grid-checkbox[data-row-number=' + row + ']');
 
         if (!ch.length) {
@@ -223,7 +226,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         ch[0].checked = value;
       }
-
       /**
        * Update a row.
        *
@@ -235,15 +237,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'updateRow',
+      key: "updateRow",
       value: function updateRow(row, url, queries) {
         this.toggleAll(false);
-
         this.checkRow(row);
-
         return this.core.patch(url, queries);
       }
-
       /**
        * Update a row with batch task.
        *
@@ -256,15 +255,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'doTask',
+      key: "doTask",
       value: function doTask(task, row, url, queries) {
         queries = queries || {};
-
         queries.task = task;
-
         return this.updateRow(row, url, queries);
       }
-
       /**
        * Batch update items.
        *
@@ -276,15 +272,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'batch',
+      key: "batch",
       value: function batch(task, url, queries) {
         queries = queries || {};
-
         queries.task = task;
-
         return this.core.patch(url, queries);
       }
-
       /**
        * Copy a row.
        *
@@ -296,15 +289,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'copyRow',
+      key: "copyRow",
       value: function copyRow(row, url, queries) {
         this.toggleAll(false);
-
         this.checkRow(row);
-
         return this.core.post(url, queries);
       }
-
       /**
        * Delete checked items.
        *
@@ -316,16 +306,16 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'deleteList',
+      key: "deleteList",
       value: function deleteList(message, url, queries) {
-        var _this3 = this;
+        var _this2 = this;
 
         message = message == null ? this.phoenix.__('phoenix.message.delete.confirm') : message;
 
         if (message !== false) {
           this.phoenix.confirm(message, function (isConfirm) {
             if (isConfirm) {
-              _this3.core['delete'](url, queries);
+              _this2.core['delete'](url, queries);
             }
           });
         } else {
@@ -334,7 +324,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         return true;
       }
-
       /**
        * Delete an itme.
        *
@@ -347,25 +336,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'deleteRow',
+      key: "deleteRow",
       value: function deleteRow(row, msg, url, queries) {
-        var _this4 = this;
+        var _this3 = this;
 
         msg = msg || this.phoenix.__('phoenix.message.delete.confirm');
-
         this.phoenix.confirm(msg, function (isConfirm) {
           if (isConfirm) {
-            _this4.toggleAll(false);
+            _this3.toggleAll(false);
 
-            _this4.checkRow(row);
+            _this3.checkRow(row);
 
-            _this4.deleteList(false, url, queries);
+            _this3.deleteList(false, url, queries);
           }
         });
-
         return true;
       }
-
       /**
        * Toggle all checkboxes.
        *
@@ -374,12 +360,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'toggleAll',
+      key: "toggleAll",
       value: function toggleAll(value) {
         var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
         var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]');
-
         $.each(checkboxes, function (i, e) {
           if (duration) {
             // A little pretty effect
@@ -390,10 +374,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
             e.checked = value;
           }
         });
-
         return this;
       }
-
       /**
        * Count checked checkboxes.
        *
@@ -401,11 +383,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'countChecked',
+      key: "countChecked",
       value: function countChecked() {
         return this.getChecked().length;
       }
-
       /**
        * Get Checked boxes.
        *
@@ -413,20 +394,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'getChecked',
+      key: "getChecked",
       value: function getChecked() {
         var checkboxes = this.form.find('input.grid-checkbox[type=checkbox]'),
             result = [];
-
         $.each(checkboxes, function (i, e) {
           if (e.checked) {
             result.push(e);
           }
         });
-
         return result;
       }
-
       /**
        * Validate there has one or more checked boxes.
        *
@@ -437,14 +415,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'hasChecked',
+      key: "hasChecked",
       value: function hasChecked(msg, event) {
         msg = msg || Phoenix.Translator.translate('phoenix.message.grid.checked');
 
         if (!this.countChecked()) {
-          alert(msg);
+          alert(msg); // If you send event object as second argument, we will stop all actions.
 
-          // If you send event object as second argument, we will stop all actions.
           if (event) {
             event.stopPropagation();
             event.preventDefault();
@@ -455,7 +432,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         return this;
       }
-
       /**
        * Reorder all.
        *
@@ -466,29 +442,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'reorderAll',
+      key: "reorderAll",
       value: function reorderAll(url, queries) {
         var self = this;
-        var origin = this.form.find('input[name=origin_ordering]');
+        var origin = this.form.find('input[name=origin_ordering]'); // If origin exists, we diff them and only send changed group.
 
-        // If origin exists, we diff them and only send changed group.
         if (origin.length) {
           var originOrdering = origin.val().split(',');
           var inputs = this.form.find('.ordering-control input');
-
           this.toggleAll(false);
-
           inputs.each(function (i) {
             var $this = $(this);
 
             if ($this.val() !== originOrdering[i]) {
               // Check self
               self.checkRow($this.attr('data-order-row'));
-
               var tr = $this.parents('tr');
-              var group = tr.attr('data-order-group');
+              var group = tr.attr('data-order-group'); // Check same group boxes
 
-              // Check same group boxes
               if (group !== '') {
                 tr.siblings('[data-order-group=' + group + ']').find('input.grid-checkbox').prop('checked', true);
               }
@@ -498,7 +469,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
         return this.batch('reorder', url, queries);
       }
-
       /**
        * Reorder items.
        *
@@ -511,11 +481,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'reorder',
+      key: "reorder",
       value: function reorder(row, delta, url, queries) {
         queries = queries || {};
         queries.delta = delta;
-
         return this.doTask('reorder', row, url, queries);
       }
     }]);

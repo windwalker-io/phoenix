@@ -1,12 +1,22 @@
-'use strict';
+"use strict";
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 /**
  * Part of phoenix project.
@@ -14,53 +24,52 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
  * @license    __LICENSE__
  */
-
 (function ($) {
-  var PhoenixForm = function (_PhoenixJQueryPlugin) {
+  var PhoenixForm =
+  /*#__PURE__*/
+  function (_PhoenixJQueryPlugin) {
     _inherits(PhoenixForm, _PhoenixJQueryPlugin);
 
     function PhoenixForm() {
       _classCallCheck(this, PhoenixForm);
 
-      return _possibleConstructorReturn(this, (PhoenixForm.__proto__ || Object.getPrototypeOf(PhoenixForm)).apply(this, arguments));
+      return _possibleConstructorReturn(this, _getPrototypeOf(PhoenixForm).apply(this, arguments));
     }
 
     _createClass(PhoenixForm, null, [{
-      key: 'is',
+      key: "is",
       get: function get() {
         return 'Form';
       }
     }, {
-      key: 'proxies',
+      key: "proxies",
       get: function get() {
         return {
           form: 'createPlugin'
         };
       }
-
       /**
        * Plugin name.
        * @returns {string}
        */
 
     }, {
-      key: 'pluginName',
+      key: "pluginName",
       get: function get() {
         return 'form';
       }
     }, {
-      key: 'pluginClass',
+      key: "pluginClass",
       get: function get() {
         return PhoenixFormElement;
       }
-
       /**
        * Default options.
        * @returns {Object}
        */
 
     }, {
-      key: 'defaultOptions',
+      key: "defaultOptions",
       get: function get() {
         return {};
       }
@@ -69,7 +78,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
     return PhoenixForm;
   }(PhoenixJQueryPlugin);
 
-  var PhoenixFormElement = function () {
+  var PhoenixFormElement =
+  /*#__PURE__*/
+  function () {
     /**
      * Constructor.
      * @param {jQuery} $form
@@ -79,21 +90,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       _classCallCheck(this, PhoenixFormElement);
 
       options = $.extend(true, {}, this.constructor.defaultOptions, options);
-
       this.form = $form;
       this.options = options;
-
       this.bindEvents();
     }
 
     _createClass(PhoenixFormElement, [{
-      key: 'bindEvents',
+      key: "bindEvents",
       value: function bindEvents() {
-        var _this2 = this;
+        var _this = this;
 
         if (this.form.attr('data-toolbar')) {
           $(this.form.attr('data-toolbar')).find('*[data-action]').on('click', function (e) {
-            _this2.form.trigger('phoenix.submit', e.currentTarget);
+            _this.form.trigger('phoenix.submit', e.currentTarget);
           });
         }
 
@@ -104,10 +113,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
           var query = $button.data('query') || {};
           query['task'] = $button.attr('data-task') || null;
 
-          _this2[action](target, query);
+          _this[action](target, query);
         });
       }
-
       /**
        * Make a request.
        *
@@ -120,7 +128,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'submit',
+      key: "submit",
       value: function submit(url, queries, method, customMethod) {
         var form = this.form;
 
@@ -129,23 +137,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
           if (!methodInput.length) {
             methodInput = $('<input name="_method" type="hidden">');
-
             form.append(methodInput);
           }
 
           methodInput.val(customMethod);
-        }
+        } // Set queries into form.
 
-        // Set queries into form.
+
         if (queries) {
-          var input = void 0;
-
+          var input;
           $.each(queries, function (key, value) {
             input = form.find('input[name="' + key + '"]');
 
             if (!input.length) {
               input = $('<input name="' + key + '" type="hidden">');
-
               form.append(input);
             }
 
@@ -162,10 +167,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
         }
 
         form.submit();
-
         return true;
       }
-
       /**
        * Make a GET request.
        *
@@ -177,11 +180,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'get',
+      key: "get",
       value: function get(url, queries, customMethod) {
         return this.submit(url, queries, 'GET', customMethod);
       }
-
       /**
        * Post form.
        *
@@ -193,13 +195,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'post',
+      key: "post",
       value: function post(url, queries, customMethod) {
         customMethod = customMethod || 'POST';
-
         return this.submit(url, queries, 'POST', customMethod);
       }
-
       /**
        * Make a PUT request.
        *
@@ -210,11 +210,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'put',
+      key: "put",
       value: function put(url, queries) {
         return this.post(url, queries, 'PUT');
       }
-
       /**
        * Make a PATCH request.
        *
@@ -225,11 +224,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'patch',
+      key: "patch",
       value: function patch(url, queries) {
         return this.post(url, queries, 'PATCH');
       }
-
       /**
        * Make a DELETE request.
        *
@@ -240,11 +238,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'sendDelete',
+      key: "sendDelete",
       value: function sendDelete(url, queries) {
         return this['delete'](url, queries);
       }
-
       /**
        * Make a DELETE request.
        *
@@ -255,7 +252,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
        */
 
     }, {
-      key: 'delete',
+      key: "delete",
       value: function _delete(url, queries) {
         return this.post(url, queries, 'DELETE');
       }

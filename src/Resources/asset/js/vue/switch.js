@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
  * Part of phoenix project.
@@ -6,18 +6,16 @@
  * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
  * @license    __LICENSE__
  */
-
 (function () {
   var PhoenixSwitch = window.PhoenixSwitch = {
     name: 'phoenix-switch',
-    template: '\n<label class="phoenix-switch" :for="idName" :class="[size ? \'switch-\' + size : \'\']">\n    <input :id="idName + \'-unchecked\'" :name="name" type="hidden"\n        :value="falseValue"\n        :disabled="disabled"\n    />\n    <input type="checkbox" :name="name" :id="idName" class="form-control" :class="classes"\n        :true-value="trueValue" :false-value="falseValue" :disabled="disabled"\n        :value="trueValue"\n        :checked="currentValue == trueValue"\n        @change="changed"\n        @click="click">\n    <span\n        class="switch-slider"\n        :class="[\'slider-\' + shape, color ? \'btn-\' + color : \'btn-default\']"\n    ></span>\n</label>\n    ',
+    template: "\n<label class=\"phoenix-switch\" :for=\"idName\" :class=\"[size ? 'switch-' + size : '']\">\n    <input :id=\"idName + '-unchecked'\" :name=\"name\" type=\"hidden\"\n        :value=\"falseValue\"\n        :disabled=\"disabled\"\n    />\n    <input type=\"checkbox\" :name=\"name\" :id=\"idName\" class=\"form-control\" :class=\"classes\"\n        :true-value=\"trueValue\" :false-value=\"falseValue\" :disabled=\"disabled\"\n        :value=\"trueValue\"\n        :checked=\"currentValue == trueValue\"\n        @change=\"changed\"\n        @click=\"click\">\n    <span\n        class=\"switch-slider\"\n        :class=\"['slider-' + shape, color ? 'btn-' + color : 'btn-default']\"\n    ></span>\n</label>\n    ",
     data: function data() {
       return {
         idName: '',
         currentValue: null
       };
     },
-
     props: {
       id: String,
       classes: String,
@@ -49,10 +47,8 @@
       }
 
       this.idName = this.id || 'input-' + this.getDashedName();
-
       this.currentValue = this.value;
     },
-
     methods: {
       getDashedName: function getDashedName() {
         return this.name.replace(/\[/g, '-').replace(/]/, '');

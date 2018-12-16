@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -8,12 +8,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
-
 (function ($) {
   "use strict";
 
   var plugin = 'buttonRadio';
-
   var defaultOptions = {
     selector: '.btn-group .radio',
     buttonClass: 'btn',
@@ -25,7 +23,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       blue: 'btn-primary'
     }
   };
-
   /**
    * Button Radio
    *
@@ -40,15 +37,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     this.element = $(element);
     this.options = $.extend(true, {}, defaultOptions, options);
-    var colors = [];
+    var colors = []; // Turn radios into btn-group
 
-    // Turn radios into btn-group
     var $radios = this.element.find(this.options.selector);
-
     options = this.options;
-
     $radios.addClass(options.buttonClass).addClass(options.color['default']);
-
     $radios.on('click', function (e) {
       var $btn = $(e.currentTarget);
       var $group = $btn.parent().find('.' + options.buttonClass);
@@ -60,26 +53,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       if (!$input.prop('checked')) {
         $group.addClass(options.color.default).removeClass(options.activeClass).removeClass(colors);
-
         $btn.addClass(options.activeClass).addClass($input.attr('data-color-class')).removeClass(options.color.default);
-
         $input.prop('checked', true);
         $input[0].dispatchEvent(new Event('change'));
       }
     });
-
     $radios.each(function () {
       var $radio = $(this);
       var $input = $radio.find('input');
       var $label = $radio.find('label');
       var $text = $('<span>' + $label.text() + '</span>');
-
       $label.hide();
       $input.hide();
       $radio.prepend($text);
-      $radio.removeClass('radio');
+      $radio.removeClass('radio'); // Prepare color schema
 
-      // Prepare color schema
       var color = $input.attr('data-color-class');
 
       if (color == null) {
@@ -114,13 +102,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         $radio.addClass('readonly');
       }
     });
+    $radios.parent().trigger('button-radio.loaded'); // Make color elements unique
 
-    $radios.parent().trigger('button-radio.loaded');
-
-    // Make color elements unique
     colors = $.unique(colors);
   };
-
   /**
    * Push to plugins.
    *
