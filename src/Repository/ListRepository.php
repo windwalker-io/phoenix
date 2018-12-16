@@ -848,7 +848,21 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      */
     public function hasFilter($key)
     {
-        return $this->get('list.filter.' . $key) !== null;
+        return (string) $this->get('list.filter.' . $key) !== '';
+    }
+
+    /**
+     * getFilter
+     *
+     * @param string $key
+     *
+     * @return  mixed
+     *
+     * @since  1.7.7
+     */
+    public function getFilter($key)
+    {
+        return $this->get('list.filter.' . $key);
     }
 
     /**
@@ -877,7 +891,21 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      */
     public function hasSearch($key)
     {
-        return $this->get('list.search.' . $key) !== null;
+        return (string) $this->get('list.search.' . $key) !== '';
+    }
+
+    /**
+     * getSearch
+     *
+     * @param string $key
+     *
+     * @return  mixed
+     *
+     * @since  1.7.7
+     */
+    public function getSearch($key)
+    {
+        return $this->get('list.search.' . $key);
     }
 
     /**
