@@ -84,7 +84,7 @@ abstract class CoreScript extends AbstractPhoenixScript
         }
 
         if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict) {
-            $asset->internalScript('var underscore = _.noConflict();');
+            $asset->internalScript('var underscore = _;');
         }
     }
 
@@ -106,8 +106,7 @@ abstract class CoreScript extends AbstractPhoenixScript
         if (!static::inited(__METHOD__, (bool) $noConflict) && $noConflict) {
             $js = <<<JS
 (function(s) {
-    var us = function(underscore)
-    {
+    var us = function(underscore) {
         underscore.string = underscore.string || s;
     };
     us(window._ || (window._ = {}));
