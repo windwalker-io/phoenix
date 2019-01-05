@@ -11,9 +11,12 @@
  * @var $router   \Windwalker\Core\Router\PackageRouter       Route builder object.
  * @var $asset    \Windwalker\Core\Asset\AssetManager         The Asset manager.
  */
+
+/** @var \Phoenix\Html\MenuHelper $menu */
+$menu = $app->make(\Phoenix\Html\MenuHelper::class);
 ?>
 @section('nav')
-    <li class="nav-item {{ $helper->menu->active('dashboard') }}">
+    <li class="nav-item {{ $menu->active('dashboard') }}">
         <a class="nav-link" href="#">
             @lang('phoenix.title.dashboard')
         </a>
