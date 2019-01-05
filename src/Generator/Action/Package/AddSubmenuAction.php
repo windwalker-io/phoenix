@@ -40,8 +40,8 @@ class AddSubmenuAction extends AbstractAction
         }
 
         $replace = <<<HTML
-    <li class="nav-item {{ \$helper->menu->active('$name') }}">
-        <a href="{{ \$router->route('$name') }}" class="nav-link {{ \$helper->menu->active('$name') }}">
+    <li class="nav-item {{ \$menu->active('$name') }}">
+        <a href="{{ \$router->route('$name') }}" class="nav-link {{ \$menu->active('$name') }}">
             @lang('$package.$name.title')
         </a>
     </li>

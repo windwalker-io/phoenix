@@ -11,6 +11,9 @@
  * @var $router   \Windwalker\Core\Router\PackageRouter       Route builder object.
  * @var $asset    \Windwalker\Core\Asset\AssetManager         The Asset manager.
  */
+
+/** @var \Phoenix\Html\MenuHelper $menu */
+$menu = $app->make(\Phoenix\Html\MenuHelper::class);
 ?>
 
 <h3 class="visible-xs-block d-sm-block d-md-none">
@@ -18,14 +21,14 @@
 </h3>
 
 <ul id="submenu" class="nav nav-stacked nav-pills flex-column">
-    <li class="{{ $helper->menu->active('categories') }}">
-        <a href="#" class="nav-link {{ $helper->menu->active('categories') }}">
+    <li class="nav-item {{ $menu->active('categories') }}">
+        <a href="#" class="nav-link {{ $menu->active('categories') }}">
             Example Item
         </a>
     </li>
 
-    <li class="{{ $helper->menu->active('{$controller.list.name.lower$}') }}">
-        <a href="{{ $router->route('{$controller.list.name.lower$}') }}" class="nav-link {{ $helper->menu->active('{$controller.list.name.lower$}') }}">
+    <li class="{{ $menu->active('{$controller.list.name.lower$}') }}">
+        <a href="nav-item {{ $router->route('{$controller.list.name.lower$}') }}" class="nav-link {{ $menu->active('{$controller.list.name.lower$}') }}">
             @lang('{$package.name.lower$}.{$controller.list.name.lower$}.title')
         </a>
     </li>

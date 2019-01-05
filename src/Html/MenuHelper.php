@@ -34,6 +34,13 @@ class MenuHelper
     protected $input;
 
     /**
+     * Property activeString.
+     *
+     * @var  string
+     */
+    protected $activeString = 'active';
+
+    /**
      * MenuHelper constructor.
      *
      * @param PackageResolver $packageResolver
@@ -104,6 +111,22 @@ class MenuHelper
     }
 
     /**
+     * active
+     *
+     * @param string|array $path
+     * @param array        $query
+     * @param string       $menu
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function active($path, array $query = [], string $menu = 'mainmenu'): string
+    {
+        return $this->is($path, $query, $menu) ? $this->activeString : '';
+    }
+
+    /**
      * matchRequest
      *
      * @param array $query
@@ -117,5 +140,33 @@ class MenuHelper
         }
 
         return !empty(ArrayHelper::query([$this->input->toArray()], $query));
+    }
+
+    /**
+     * Method to get property ActiveString
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getActiveString(): string
+    {
+        return $this->activeString;
+    }
+
+    /**
+     * Method to set property activeString
+     *
+     * @param   string $activeString
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function activeString(string $activeString)
+    {
+        $this->activeString = $activeString;
+
+        return $this;
     }
 }
