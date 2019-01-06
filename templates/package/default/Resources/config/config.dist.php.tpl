@@ -13,7 +13,7 @@ return [
 
     'routing' => [
         'files' => [
-            'main' => \{$package.namespace$}{$package.name.cap$}\{$package.name.cap$}Package::DIR . '/routing.yml'
+            'main' => \{$package.namespace$}{$package.name.cap$}\{$package.name.cap$}Package::dir() . '/routing.php'
         ]
     ],
 

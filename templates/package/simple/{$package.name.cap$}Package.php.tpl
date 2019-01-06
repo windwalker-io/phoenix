@@ -23,10 +23,6 @@ use Windwalker\Filesystem\Folder;
  */
 class {$package.name.cap$}Package extends AbstractPackage
 {
-    const DIR = __DIR__;
-
-    const FILE = __FILE__;
-
     /**
      * initialise
      *

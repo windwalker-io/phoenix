@@ -14,7 +14,6 @@ use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
-use Windwalker\Filesystem\Folder;
 use Windwalker\Router\Exception\RouteNotFoundException;
 
 /**
@@ -24,10 +23,6 @@ use Windwalker\Router\Exception\RouteNotFoundException;
  */
 class {$package.name.cap$}Package extends AbstractPackage
 {
-    const DIR = __DIR__;
-
-    const FILE = __FILE__;
-
     /**
      * initialise
      *
@@ -38,6 +33,7 @@ class {$package.name.cap$}Package extends AbstractPackage
     public function boot()
     {
         parent::boot();
+
         // Add your own boot logic
     }
 
@@ -93,25 +89,5 @@ class {$package.name.cap$}Package extends AbstractPackage
         }
 
         return $result;
-    }
-
-    /**
-     * loadRouting
-     *
-     * @param MainRouter $router
-     * @param string     $group
-     *
-     * @return MainRouter
-     */
-    public function loadRouting(MainRouter $router, $group = null)
-    {
-        $router = parent::loadRouting($router, $group);
-
-        $router->group($group, function (MainRouter $router) {
-            $router->addRouteFromFiles(Folder::files(__DIR__ . '/Resources/routing'), $this->getName());
-            // Merge other routes here...
-        });
-
-        return $router;
     }
 }
