@@ -160,6 +160,9 @@ fusion.task('install', function () {
 
   // SystemJS
   fusion.copy(`${nodePath}/systemjs/dist/*`, `${destPath}/js/core/systemjs/`);
+
+  // URL Polyfill
+  fusion.copy(`${nodePath}/url-polyfill/*.js`, `${destPath}/js/core/`);
 });
 
 fusion.default(['js', 'scss', 'phoenix']);
