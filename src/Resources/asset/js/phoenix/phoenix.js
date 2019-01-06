@@ -1577,6 +1577,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         return this.$.ajax(url, options).fail(function (xhr, error) {
           if (error === 'parsererror') {
             xhr.statusText = 'Unable to parse data.';
+          } else {
+            xhr.statusText = decodeURIComponent(xhr.statusText);
           }
         });
       }

@@ -222,6 +222,8 @@
         .fail((xhr, error) => {
           if (error === 'parsererror') {
             xhr.statusText = 'Unable to parse data.';
+          } else {
+            xhr.statusText = decodeURIComponent(xhr.statusText);
           }
         });
     }
