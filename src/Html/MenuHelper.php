@@ -10,6 +10,8 @@ namespace Phoenix\Html;
 
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\IO\Input;
+use Windwalker\Router\Route;
+use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -111,6 +113,49 @@ class MenuHelper
     }
 
     /**
+     * inGroup
+     *
+     * @param string|array $groups
+     * @param array        $query
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function inGroup($groups, array $query = []): bool
+    {
+        $groups = Arr::toArray($groups);
+
+        $matched = $this->getMatchedRoute();
+        
+        $currentGroups = array_keys($matched->getExtra('groups', []));
+        
+        $active = array_intersect($groups, $currentGroups) !== [];
+        
+        return $active && $this->matchRequest($query);
+    }
+
+    /**
+     * inPackage
+     *
+     * @param string|array $packages
+     * @param array        $query
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function inPackage($packages, array $query = []): bool
+    {
+        $packages = Arr::toArray($packages);
+
+        $route = $this->getMatchedRoute();
+
+        return in_array((string) $route->getExtra('package'), $packages, true)
+            && $this->matchRequest($query);
+    }
+
+    /**
      * active
      *
      * @param string|array $path
@@ -140,6 +185,19 @@ class MenuHelper
         }
 
         return !empty(ArrayHelper::query([$this->input->toArray()], $query));
+    }
+
+    /**
+     * getMatchedRoute
+     *
+     * @return  Route
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getMatchedRoute(): Route
+    {
+        $package = $this->packageResolver->getCurrentPackage();
+        return $package->router->getMatched();
     }
 
     /**
