@@ -91,7 +91,7 @@ abstract class PhoenixScript extends AbstractPhoenixScript
             $js = <<<JS
 // Phoenix Core
 var $variable = new PhoenixCore($options);
-$variable.use([$ui, PhoenixHelper, PhoenixRouter, PhoenixTranslator, PhoenixAjax, PhoenixCrypto]);
+$variable.use([$ui, PhoenixHelper, PhoenixRouter, PhoenixTranslator, PhoenixAjax, PhoenixCrypto, PhoenixStack]);
 $variable.Uri = window.$variable.data('phoenix.uri');
 JS;
 

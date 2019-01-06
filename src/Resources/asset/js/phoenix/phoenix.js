@@ -1,5 +1,7 @@
 "use strict";
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
@@ -376,26 +378,26 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         phoenix[plugin.constructor.is] = plugin;
         var proxies = plugin.constructor.proxies;
 
-        var _loop = function _loop(name) {
-          if (!proxies.hasOwnProperty(name)) {
+        var _loop = function _loop(_name) {
+          if (!proxies.hasOwnProperty(_name)) {
             return "continue";
           }
 
-          var origin = proxies[name];
+          var origin = proxies[_name];
 
-          if (phoenix[name] !== undefined) {
-            throw new Error("Property: ".concat(name, " has exists in Phoenix instance."));
+          if (phoenix[_name] !== undefined) {
+            throw new Error("Property: ".concat(_name, " has exists in Phoenix instance."));
           }
 
           if (typeof origin === 'function') {
-            phoenix[name] = origin;
+            phoenix[_name] = origin;
           } else if (plugin[origin] !== undefined) {
             if (typeof plugin[origin] === 'function') {
-              phoenix[name] = function () {
+              phoenix[_name] = function () {
                 return plugin[origin].apply(plugin, arguments);
               };
             } else {
-              Object.defineProperties(phoenix, name, {
+              Object.defineProperties(phoenix, _name, {
                 get: function get() {
                   return plugin[origin];
                 },
@@ -409,8 +411,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           }
         };
 
-        for (var name in proxies) {
-          var _ret = _loop(name);
+        for (var _name in proxies) {
+          var _ret = _loop(_name);
 
           if (_ret === "continue") continue;
         }
@@ -428,8 +430,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           return;
         }
 
-        for (var _name in plugin.constructor.proxies) {
-          delete phoenix[_name];
+        for (var _name2 in plugin.constructor.proxies) {
+          delete phoenix[_name2];
         }
 
         delete phoenix[plugin.constructor.is];
@@ -2254,6 +2256,205 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   window.PhoenixTranslator = PhoenixTranslator;
 })();
 /**
+ * Part of Phoenix project.
+ *
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
+ */
+
+/**
+ * Phoenix.Stack
+ */
+
+
+(function () {
+  "use strict";
+
+  var PhoenixStack =
+  /*#__PURE__*/
+  function (_PhoenixPlugin8) {
+    _inherits(PhoenixStack, _PhoenixPlugin8);
+
+    _createClass(PhoenixStack, null, [{
+      key: "is",
+      get: function get() {
+        return 'Stack';
+      }
+    }, {
+      key: "proxies",
+      get: function get() {
+        return {
+          stack: 'get'
+        };
+      }
+    }]);
+
+    function PhoenixStack() {
+      var _this16;
+
+      _classCallCheck(this, PhoenixStack);
+
+      _this16 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixStack).call(this));
+
+      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this16)), "stacks", {});
+
+      return _this16;
+    }
+
+    _createClass(PhoenixStack, [{
+      key: "create",
+      value: function create(name) {
+        var store = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+        if (name == null) {
+          throw new Error('Please provide a name.');
+        }
+
+        return new Stack(name, store);
+      }
+    }, {
+      key: "get",
+      value: function get(name) {
+        var store = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+        if (name == null) {
+          throw new Error('Please provide a name.');
+        }
+
+        if (!this.stacks[name]) {
+          this.stacks[name] = new Stack(name, store);
+        }
+
+        return this.stacks[name];
+      }
+    }, {
+      key: "set",
+      value: function set(name, stack) {
+        if (name == null) {
+          throw new Error('Please provide a name.');
+        }
+
+        this.stacks[name] = stack;
+        return this;
+      }
+    }, {
+      key: "remove",
+      value: function remove() {
+        delete this.stacks[name];
+        return this;
+      }
+    }, {
+      key: "all",
+      value: function all() {
+        return this.stacks;
+      }
+    }]);
+
+    return PhoenixStack;
+  }(PhoenixPlugin);
+
+  var Stack =
+  /*#__PURE__*/
+  function () {
+    function Stack(name) {
+      var store = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+      _classCallCheck(this, Stack);
+
+      _defineProperty(this, "name", '');
+
+      _defineProperty(this, "store", []);
+
+      _defineProperty(this, "observers", []);
+
+      this.name = name;
+      this.store = store;
+    }
+
+    _createClass(Stack, [{
+      key: "push",
+      value: function push() {
+        var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+        var r = this.store.push(value);
+        this.notice();
+        return r;
+      }
+    }, {
+      key: "pop",
+      value: function pop() {
+        var r = this.store.pop();
+        this.notice();
+        return r;
+      }
+    }, {
+      key: "clear",
+      value: function clear() {
+        this.store = [];
+        this.notice();
+        return this;
+      }
+    }, {
+      key: "isEmpty",
+      value: function isEmpty() {
+        return this.store.length === 0;
+      }
+    }, {
+      key: "peek",
+      value: function peek() {
+        return this.store;
+      }
+    }, {
+      key: "observe",
+      value: function observe(handler) {
+        this.observers.push({
+          handler: handler
+        });
+        return this;
+      }
+    }, {
+      key: "once",
+      value: function once(handler) {
+        this.observers.push({
+          handler: handler,
+          once: true
+        });
+        return this;
+      }
+    }, {
+      key: "notice",
+      value: function notice() {
+        var _this17 = this;
+
+        this.observers.forEach(function (observer) {
+          observer.handler(_this17, _this17.length);
+        });
+        this.observers = this.observers.filter(function (observer) {
+          return observer.once !== true;
+        });
+        return this;
+      }
+    }, {
+      key: "off",
+      value: function off() {
+        var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        this.observers = this.observers.filter(function (observer) {
+          return observer !== callback;
+        });
+        return this;
+      }
+    }, {
+      key: "length",
+      get: function get() {
+        return this.store.length;
+      }
+    }]);
+
+    return Stack;
+  }();
+
+  window.PhoenixStack = PhoenixStack;
+})();
+/**
  * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
@@ -2267,8 +2468,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   var PhoenixLegacy =
   /*#__PURE__*/
-  function (_PhoenixPlugin8) {
-    _inherits(PhoenixLegacy, _PhoenixPlugin8);
+  function (_PhoenixPlugin9) {
+    _inherits(PhoenixLegacy, _PhoenixPlugin9);
 
     function PhoenixLegacy() {
       _classCallCheck(this, PhoenixLegacy);
@@ -2279,14 +2480,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _createClass(PhoenixLegacy, [{
       key: "created",
       value: function created() {
-        var _this16 = this;
+        var _this18 = this;
 
         var phoenix = this.phoenix;
         phoenix.Theme = phoenix.UI; // Uri
 
         phoenix.Uri = phoenix.data('phoenix.uri');
         phoenix.on('jquery.plugin.created', function (event) {
-          var debug = _this16.phoenix.data('windwalker.debug'); // Legacy Form polyfill
+          var debug = _this18.phoenix.data('windwalker.debug'); // Legacy Form polyfill
 
 
           if (!formInited && event.name === 'form') {
@@ -2294,7 +2495,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
               phoenix[method] = function () {
                 var _event$instance;
 
-                debug ? _this16.constructor.warn('Phoenix', method) : null;
+                debug ? _this18.constructor.warn('Phoenix', method) : null;
                 return (_event$instance = event.instance)[method].apply(_event$instance, arguments);
               };
             });
@@ -2307,7 +2508,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
               phoenix.Grid[method] = function () {
                 var _event$instance2;
 
-                debug ? _this16.constructor.warn('Phoenix.Grid', method) : null;
+                debug ? _this18.constructor.warn('Phoenix.Grid', method) : null;
                 return (_event$instance2 = event.instance)[method].apply(_event$instance2, arguments);
               };
             });

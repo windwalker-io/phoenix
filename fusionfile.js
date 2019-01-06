@@ -54,6 +54,7 @@ fusion.task('phoenix', function () {
       'asset/src/ajax.js',
       'asset/src/crypto.js',
       'asset/src/translator.js',
+      'asset/src/stack.js',
       'asset/src/legacy.js',
     ],
     'src/Resources/asset/js/phoenix/phoenix.js'
