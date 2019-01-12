@@ -156,6 +156,9 @@ fusion.task('install', function () {
   // Sortable.js
   fusion.copy(`${nodePath}/sortablejs/*.js`, `${destPath}/js/sortablejs/`);
 
+  // Vue Draggable
+  fusion.copy(`${nodePath}/vuedraggable/dist/*`, `${destPath}/js/vue/`);
+
   // Velocity
   fusion.copy(`${nodePath}/velocity-animate/velocity.*`, `${destPath}/js/velocity/`);
 

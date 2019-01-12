@@ -57,10 +57,10 @@ class InlineField extends TextField
      */
     public function buildInput($attrs)
     {
-        $this->form = $this->form ?: new Form();
+        $this->inlineForm = $this->inlineForm ?: new Form();
 
         return WidgetHelper::render($this->get('layout', 'phoenix.form.field.inline'), [
-            'form' => $this->form,
+            'form' => $this->inlineForm,
             'attrs' => $attrs,
             'field' => $this,
         ], WidgetHelper::EDGE);
@@ -75,11 +75,11 @@ class InlineField extends TextField
      */
     public function configure(callable $handler)
     {
-        $this->form = $this->form ?: new Form();
+        $this->inlineForm = $this->inlineForm ?: new Form();
 
         $group = $this->get('as_group') ? $this->getGroup() . '.' . $this->getName() : $this->getGroup();
 
-        $this->form->wrap('inline-' . $this->getName(true), trim($group, '.'), $handler);
+        $this->inlineForm->wrap('inline-' . $this->getName(true), trim($group, '.'), $handler);
     }
 
     /**

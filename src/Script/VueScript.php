@@ -256,4 +256,21 @@ JS;
             static::addJS(static::phoenixName() . '/js/vue/switch.min.js');
         }
     }
+
+    /**
+     * draggable
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function draggable(): void
+    {
+        if (!static::inited(__METHOD__)) {
+            VueScript::core();
+            PhoenixScript::sortableJS();
+
+            static::addJS(static::phoenixName() . '/js/vue/vuedraggable.min.js');
+        }
+    }
 }

@@ -13,6 +13,7 @@ use Phoenix\Field\DragFileField;
 use Phoenix\Field\InlineField;
 use Phoenix\Field\ItemListField;
 use Phoenix\Field\ModalField;
+use Phoenix\Field\RepeatableField;
 use Phoenix\Field\SqlListField;
 use Phoenix\Field\SwitchField;
 
@@ -26,6 +27,7 @@ use Phoenix\Field\SwitchField;
  * @method  SwitchField   switch ($name = null, $label = null)
  * @method  InlineField   inline($name = null, $label = null)
  * @method  DragFileField dragFile($name = null, $label = null)
+ * @method  RepeatableField repeatable($name = null, $label = null)
  *
  * @since  1.1
  */
