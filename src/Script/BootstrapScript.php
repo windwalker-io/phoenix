@@ -194,25 +194,40 @@ CSS;
 HTML;
 
             Asset::getTemplate()->addTemplate('phoenix.iframe.modal', $html);
+
+            $js = <<<JS
+window.Phoenix = window.Phoenix || {};
+window.Phoenix.Modal = {
+  init: function () {
+    var self = this;
+    this.modal = $('#phoenix-iframe-modal');
+    this.iframe = this.modal.find('iframe');
+
+    this.modal.on('hide.bs.modal', function () {
+      self.iframe.attr('src', '');
+    });
+  },
+  open: function (href) {
+    this.iframe.attr('src', href);
+    this.modal.modal('show');
+  },
+  close: function () {
+    this.modal.hide();
+  }
+};
+window.Phoenix.Modal.init();
+JS;
+
+            PhoenixScript::domready($js);
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
             $js = <<<JS
 // Modal task
-$('{$selector}').click(function(event) {
-    var link   = $(this);
-    var modal  = $('#phoenix-iframe-modal');
-    var href   = link.attr('href');
-    var iframe = modal.find('iframe');
-
-    iframe.attr('src', href);
-    modal.modal('show');
-    modal.on('hide.bs.modal', function() {
-        iframe.attr('src', '');
-    });
-
+$('{$selector}').on('click', function(event) {
     event.stopPropagation();
     event.preventDefault();
+    window.Phoenix.Modal.open($(this).attr('href'));
 });
 JS;
 

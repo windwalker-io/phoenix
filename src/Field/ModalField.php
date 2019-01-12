@@ -50,6 +50,7 @@ use Windwalker\Html\Option;
  * @method  mixed|$this  onfocus(string $value = null)
  * @method  mixed|$this  onblur(string $value = null)
  * @method  mixed|$this  height(int $value = null)
+ * @method  mixed|$this  max(int $value = null)
  *
  * @since  1.0
  */
@@ -380,7 +381,10 @@ class ModalField extends AbstractField
         if (!$inited) {
             JQueryScript::ui(['effect']);
             CoreScript::underscore();
-            PhoenixScript::translate('phoenix.form.field.modal.already.selected');
+            PhoenixScript::translate([
+                'phoenix.form.field.modal.already.selected',
+                'phoenix.form.field.modal.max.selected'
+            ]);
             Asset::addJS(PackageHelper::getAlias(PhoenixPackage::class) . '/js/field/modal-field.min.js');
 
             $inited = true;
@@ -444,6 +448,7 @@ JS;
             'onfocus',
             'onblur',
             'height',
+            'max',
         ]);
     }
 }

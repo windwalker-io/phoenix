@@ -126,5 +126,26 @@ $(() => {
 
       placeholder.attr('disabled', items.length !== 0);
     }
+
+    open(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const max = this.$ele.attr('data-max-items');
+
+      if (!max) {
+        return;
+      }
+
+      if ($('.modal-list-container .list-group-item').length >= max) {
+        alert(
+          Phoenix.__('phoenix.form.field.modal.max.selected', max)
+        );
+
+        return;
+      }
+
+      Phoenix.Modal.open($(event.currentTarget).attr('href'));
+    }
   }
 });

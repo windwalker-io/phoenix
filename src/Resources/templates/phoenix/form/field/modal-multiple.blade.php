@@ -9,7 +9,7 @@
 $disabled = $attrs['readonly'] || $attrs['disabled'];
 ?>
 
-<div id="{{ $id }}-wrap">
+<div id="{{ $id }}-wrap" data-modal-list @attr('data-max-items', $field->max())>
     <div class="card">
         <div class="card-body p-2 d-flex">
             @if ($field->get('list_type') === \Phoenix\Field\ModalField::TYPE_TAG)
@@ -22,8 +22,9 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
                 </div>
             @endif
             <div class="modal-field-toolbar ml-auto">
-                <a class="btn btn-info hasModal {{ $disabled ? 'disabled' : null }}" role="button"
-                    href="{{ $disabled ? 'javascript:void(0);' : $url }}">
+                <a class="btn btn-info {{ $disabled ? 'disabled' : null }}" role="button"
+                    href="{{ $disabled ? 'javascript:void(0);' : $url }}"
+                    onclick="$(this).closest('[data-modal-list]').data('modal-list').open(event)">
                     @lang($field->getAttribute('buttonText', 'phoenix.form.field.modal.button.text'))
                 </a>
             </div>
