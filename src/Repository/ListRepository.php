@@ -99,6 +99,10 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
         $tables = $this->getQueryHelper()->getTables();
 
         foreach ($tables as $alias => $table) {
+            if (!is_string($table['name'])) {
+                continue;
+            }
+
             foreach ($this->db->getTable($table['name'])->getColumns() as $column) {
                 $fields[] = $alias . '.' . $column;
             }
