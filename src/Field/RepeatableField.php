@@ -91,7 +91,7 @@ class RepeatableField extends AbstractField
      *
      * @return  Form
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     protected function getRepeatableForm(): Form
     {
@@ -134,7 +134,7 @@ class RepeatableField extends AbstractField
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     protected function prepareScript(array $attrs, Form $form): void
     {

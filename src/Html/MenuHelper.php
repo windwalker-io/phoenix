@@ -17,7 +17,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The MenuHelper class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8
  */
 class MenuHelper
 {
@@ -120,7 +120,7 @@ class MenuHelper
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     public function inGroup($groups, array $query = []): bool
     {
@@ -143,7 +143,7 @@ class MenuHelper
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     public function inPackage($packages, array $query = []): bool
     {
@@ -164,7 +164,7 @@ class MenuHelper
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     public function active($path, array $query = [], string $menu = 'mainmenu'): string
     {
@@ -192,7 +192,7 @@ class MenuHelper
      *
      * @return  Route
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     public function getMatchedRoute(): Route
     {
@@ -205,7 +205,7 @@ class MenuHelper
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     public function getActiveString(): string
     {
@@ -219,7 +219,7 @@ class MenuHelper
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     public function activeString(string $activeString)
     {

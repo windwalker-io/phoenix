@@ -73,7 +73,7 @@ class EditView extends ItemView
      *
      * @return  Form
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8
      */
     protected function getForm()
     {
