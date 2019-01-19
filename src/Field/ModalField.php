@@ -33,7 +33,7 @@ use Windwalker\Html\Option;
  * @method  mixed|$this  function(string $value = null)
  * @method  mixed|$this  table(string $value = null)
  * @method  mixed|$this  route(string $value = null)
- * @method  mixed|$this  query(string $value = null)
+ * @method  mixed|$this  query(array $value = null)
  * @method  mixed|$this  keyField(string $value = null)
  * @method  mixed|$this  titleField(string $value = null)
  * @method  mixed|$this  imageField(string $value = null)
