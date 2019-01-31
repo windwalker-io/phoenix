@@ -24,6 +24,6 @@ $router->group('{$controller.item.name.lower$}')
             ->controller('{$controller.list.name.cap$}')
             ->postAction('CopyController')
             ->putAction('FilterController')
-            ->patchAction( 'BatchController')
+            ->patchAction('BatchController')
             ->extra('layout', '{$controller.list.name.lower$}');
     });
