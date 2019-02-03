@@ -18,6 +18,7 @@ use Windwalker\Data\DataSet;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
 use Windwalker\Query\QueryElement;
+use function Windwalker\tap;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -107,8 +108,10 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
                 $fields[] = $alias . '.' . $column;
             }
         }
-
-        return $this->setCache('allow.fields', array_unique($fields));
+        
+        return tap(array_unique($fields), function (array $fields) {
+            $this->setCache('allow.fields', array_unique($fields));
+        });
     }
 
     /**
@@ -209,8 +212,10 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
         $queryHelper->registerQueryTables($query);
 
         $this->postGetQuery($query);
-
-        return $this->setCache('list.query', $query);
+        
+        return tap($query, function ($query) {
+            $this->setCache('list.query', $query);
+        });
     }
 
     /**
@@ -265,7 +270,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      */
     public function filterField($field, $default = null)
     {
-        if (in_array($field, $this->getAllowFields())) {
+        if (in_array($field, $this->getAllowFields(), true)) {
             return $field;
         }
 
@@ -287,7 +292,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
         $return = [];
 
         foreach ($data as $field => $value) {
-            if (in_array($field, $allowFields)) {
+            if (in_array($field, $allowFields, true)) {
                 $return[$field] = $value;
             }
         }
@@ -309,7 +314,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
             return $this->fieldMapping[$field];
         }
 
-        return ($default === null) ? $field : $default;
+        return $default ?? $field;
     }
 
     /**
@@ -448,7 +453,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      */
     public function getPagination($total = null)
     {
-        $total = $total !== null ? $total : $this->getTotal();
+        $total = $total ?? $this->getTotal();
 
         return new Pagination($this->getPage() ?: 1, $this->getLimit(), $total);
     }
@@ -478,7 +483,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
             $query = clone $this->getListQuery();
 
             // Use fast COUNT(*) on Query objects if there no GROUP BY or HAVING clause:
-            if ($query instanceof Query && $query->type == 'select'
+            if ($query instanceof Query && $query->type === 'select'
                 && $query->group === null && $query->having === null) {
                 $query = clone $query;
 
@@ -490,7 +495,10 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
             // Otherwise fall back to inefficient way of counting all results.
             $subQuery = clone $query;
 
-            $subQuery->clear('select')->clear('order')->clear('limit')->select('COUNT(*) AS ' . $query->quoteName('count'));
+            $subQuery->clear('select')
+                ->clear('order')
+                ->clear('limit')
+                ->select('COUNT(*) AS ' . $query->quoteName('count'));
 
             $query = $this->db->getQuery(true);
 
@@ -591,6 +599,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * @param array $filters The filters values.
      *
      * @return  Query The db query object.
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function processFilters(Query $query, $filters = [])
     {
@@ -638,6 +647,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * @param array $searches The search values.
      *
      * @return  Query The db query object.
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function processSearches(Query $query, $searches = [])
     {
@@ -721,7 +731,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
 
                 $field = $this->mapField($value[0]);
 
-                if (!empty($field) && $field[strlen($field) - 1] != ')') {
+                if (!empty($field) && $field[strlen($field) - 1] !== ')') {
                     $field = $query->quoteName($field);
                 }
 
@@ -1138,7 +1148,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
             $k = trim($k, '.');
 
             // Check key has separator
-            if (strpos($k, $separator) !== false || !is_array($v)) {
+            if (!is_array($v) || strpos($k, $separator) !== false) {
                 $return[$k] = $v;
 
                 continue;
