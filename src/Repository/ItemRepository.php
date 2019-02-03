@@ -36,7 +36,7 @@ class ItemRepository extends DatabaseRepository
 
         $conditions = $conditions ?: $state['load.conditions'];
 
-        return $this->fetch('item.' . json_encode($conditions), function () use ($conditions, $state) {
+        return $this->once('item.' . json_encode($conditions), function () use ($conditions, $state) {
             if (!$conditions) {
                 return $this->getRecord()->reset(false);
             }

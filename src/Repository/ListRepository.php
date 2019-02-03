@@ -124,7 +124,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
 
         $cid = $this['cache.id'] ?: 'items';
 
-        return $this->fetch($cid, function () {
+        return $this->once($cid, function () {
             $query = $this->getListQuery($this->db->getQuery(true));
 
             $items = $this->getList($query, $this->getStart(), $this->get('list.limit'));
@@ -474,7 +474,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      */
     public function getTotal()
     {
-        return $this->fetch('total', function () {
+        return $this->once('total', function () {
             $query = clone $this->getListQuery();
 
             // Use fast COUNT(*) on Query objects if there no GROUP BY or HAVING clause:
@@ -511,7 +511,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      */
     public function getStart()
     {
-        return $this->fetch('start', function () {
+        return $this->once('start', function () {
             $start = $this->state['list.start'];
 
             if ($this->config->get('list.fix_page', false)) {

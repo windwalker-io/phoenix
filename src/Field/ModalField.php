@@ -255,7 +255,7 @@ class ModalField extends AbstractField
      */
     protected function getItem()
     {
-        return $this->fetch('item', function () {
+        return $this->once('item', function () {
             $table      = $this->table ?: $this->get('table', $this->view);
             $value      = $this->getValue();
             $keyField   = $this->get('key_field', $this->keyField);
