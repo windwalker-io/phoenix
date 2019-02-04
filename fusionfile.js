@@ -46,6 +46,8 @@ fusion.task('phoenix', function () {
   // Merge some core files
   fusion.babel(
     [
+      'asset/src/mixwith.js',
+      'asset/src/events.js',
       'asset/src/phoenix.js',
       'asset/src/plugin.js',
       'asset/src/helper.js',

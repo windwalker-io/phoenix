@@ -1,26 +1,10 @@
 "use strict";
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
@@ -29,6 +13,22 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -39,13 +39,476 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 /**
  * Part of phoenix project.
  *
+ * Modified version of mixwith.js. @see https://raw.githubusercontent.com/justinfagnani/mixwith.js/
+ *
+ * @copyright  Copyright (C) 2019 ${ORGANIZATION}.
+ * @license    __LICENSE__
+ */
+(function () {
+  'use strict'; // used by apply() and isApplicationOf()
+
+  var _appliedMixin = '__mixwith_appliedMixin';
+  /**
+   * A function that returns a subclass of its argument.
+   *
+   * @example
+   * const M = (superclass) => class extends superclass {
+   *   getMessage() {
+   *     return "Hello";
+   *   }
+   * }
+   *
+   * @typedef {Function} MixinFunction
+   * @param {Function} superclass
+   * @return {Function} A subclass of `superclass`
+   */
+
+  /**
+   * Applies `mixin` to `superclass`.
+   *
+   * `apply` stores a reference from the mixin application to the unwrapped mixin
+   * to make `isApplicationOf` and `hasMixin` work.
+   *
+   * This function is usefull for mixin wrappers that want to automatically enable
+   * {@link hasMixin} support.
+   *
+   * @example
+   * const Applier = (mixin) => wrap(mixin, (superclass) => apply(superclass, mixin));
+   *
+   * // M now works with `hasMixin` and `isApplicationOf`
+   * const M = Applier((superclass) => class extends superclass {});
+   *
+   * class C extends M(Object) {}
+   * let i = new C();
+   * hasMixin(i, M); // true
+   *
+   * @function
+   * @param {Function} superclass A class or constructor function
+   * @param {MixinFunction} mixin The mixin to apply
+   * @return {Function} A subclass of `superclass` produced by `mixin`
+   */
+
+  var apply = function apply(superclass, mixin) {
+    var application = mixin(superclass);
+    application.prototype[_appliedMixin] = unwrap(mixin);
+    return application;
+  };
+  /**
+   * Returns `true` iff `proto` is a prototype created by the application of
+   * `mixin` to a superclass.
+   *
+   * `isApplicationOf` works by checking that `proto` has a reference to `mixin`
+   * as created by `apply`.
+   *
+   * @function
+   * @param {Object} proto A prototype object created by {@link apply}.
+   * @param {MixinFunction} mixin A mixin function used with {@link apply}.
+   * @return {boolean} whether `proto` is a prototype created by the application of
+   * `mixin` to a superclass
+   */
+
+
+  var isApplicationOf = function isApplicationOf(proto, mixin) {
+    return proto.hasOwnProperty(_appliedMixin) && proto[_appliedMixin] === unwrap(mixin);
+  };
+  /**
+   * Returns `true` iff `o` has an application of `mixin` on its prototype
+   * chain.
+   *
+   * @function
+   * @param {Object} o An object
+   * @param {MixinFunction} mixin A mixin applied with {@link apply}
+   * @return {boolean} whether `o` has an application of `mixin` on its prototype
+   * chain
+   */
+
+
+  var hasMixin = function hasMixin(o, mixin) {
+    while (o != null) {
+      if (isApplicationOf(o, mixin)) return true;
+      o = Object.getPrototypeOf(o);
+    }
+
+    return false;
+  }; // used by wrap() and unwrap()
+
+
+  var _wrappedMixin = '__mixwith_wrappedMixin';
+  /**
+   * Sets up the function `mixin` to be wrapped by the function `wrapper`, while
+   * allowing properties on `mixin` to be available via `wrapper`, and allowing
+   * `wrapper` to be unwrapped to get to the original function.
+   *
+   * `wrap` does two things:
+   *   1. Sets the prototype of `mixin` to `wrapper` so that properties set on
+   *      `mixin` inherited by `wrapper`.
+   *   2. Sets a special property on `mixin` that points back to `mixin` so that
+   *      it can be retreived from `wrapper`
+   *
+   * @function
+   * @param {MixinFunction} mixin A mixin function
+   * @param {MixinFunction} wrapper A function that wraps {@link mixin}
+   * @return {MixinFunction} `wrapper`
+   */
+
+  var wrap = function wrap(mixin, wrapper) {
+    Object.setPrototypeOf(wrapper, mixin);
+
+    if (!mixin[_wrappedMixin]) {
+      mixin[_wrappedMixin] = mixin;
+    }
+
+    return wrapper;
+  };
+  /**
+   * Unwraps the function `wrapper` to return the original function wrapped by
+   * one or more calls to `wrap`. Returns `wrapper` if it's not a wrapped
+   * function.
+   *
+   * @function
+   * @param {MixinFunction} wrapper A wrapped mixin produced by {@link wrap}
+   * @return {MixinFunction} The originally wrapped mixin
+   */
+
+
+  var unwrap = function unwrap(wrapper) {
+    return wrapper[_wrappedMixin] || wrapper;
+  };
+
+  var _cachedApplications = '__mixwith_cachedApplications';
+  /**
+   * Decorates `mixin` so that it caches its applications. When applied multiple
+   * times to the same superclass, `mixin` will only create one subclass, memoize
+   * it and return it for each application.
+   *
+   * Note: If `mixin` somehow stores properties its classes constructor (static
+   * properties), or on its classes prototype, it will be shared across all
+   * applications of `mixin` to a super class. It's reccomended that `mixin` only
+   * access instance state.
+   *
+   * @function
+   * @param {MixinFunction} mixin The mixin to wrap with caching behavior
+   * @return {MixinFunction} a new mixin function
+   */
+
+  var Cached = function Cached(mixin) {
+    return wrap(mixin, function (superclass) {
+      // Get or create a symbol used to look up a previous application of mixin
+      // to the class. This symbol is unique per mixin definition, so a class will have N
+      // applicationRefs if it has had N mixins applied to it. A mixin will have
+      // exactly one _cachedApplicationRef used to store its applications.
+      var cachedApplications = superclass[_cachedApplications];
+
+      if (!cachedApplications) {
+        cachedApplications = superclass[_cachedApplications] = new Map();
+      }
+
+      var application = cachedApplications.get(mixin);
+
+      if (!application) {
+        application = mixin(superclass);
+        cachedApplications.set(mixin, application);
+      }
+
+      return application;
+    });
+  };
+  /**
+   * Decorates `mixin` so that it only applies if it's not already on the
+   * prototype chain.
+   *
+   * @function
+   * @param {MixinFunction} mixin The mixin to wrap with deduplication behavior
+   * @return {MixinFunction} a new mixin function
+   */
+
+
+  var DeDupe = function DeDupe(mixin) {
+    return wrap(mixin, function (superclass) {
+      return hasMixin(superclass.prototype, mixin) ? superclass : mixin(superclass);
+    });
+  };
+  /**
+   * Adds [Symbol.hasInstance] (ES2015 custom instanceof support) to `mixin`.
+   *
+   * @function
+   * @param {MixinFunction} mixin The mixin to add [Symbol.hasInstance] to
+   * @return {MixinFunction} the given mixin function
+   */
+
+
+  var HasInstance = function HasInstance(mixin) {
+    if (Symbol && Symbol.hasInstance && !mixin[Symbol.hasInstance]) {
+      Object.defineProperty(mixin, Symbol.hasInstance, {
+        value: function value(o) {
+          return hasMixin(o, mixin);
+        }
+      });
+    }
+
+    return mixin;
+  };
+  /**
+   * A basic mixin decorator that applies the mixin with {@link apply} so that it
+   * can be used with {@link isApplicationOf}, {@link hasMixin} and the other
+   * mixin decorator functions.
+   *
+   * @function
+   * @param {MixinFunction} mixin The mixin to wrap
+   * @return {MixinFunction} a new mixin function
+   */
+
+
+  var BareMixin = function BareMixin(mixin) {
+    return wrap(mixin, function (s) {
+      return apply(s, mixin);
+    });
+  };
+  /**
+   * Decorates a mixin function to add deduplication, application caching and
+   * instanceof support.
+   *
+   * @function
+   * @param {MixinFunction} mixin The mixin to wrap
+   * @return {MixinFunction} a new mixin function
+   */
+
+
+  var Mixin = function Mixin(mixin) {
+    return DeDupe(Cached(BareMixin(mixin)));
+  };
+  /**
+   * A fluent interface to apply a list of mixins to a superclass.
+   *
+   * ```javascript
+   * class X extends mix(Object).with(A, B, C) {}
+   * ```
+   *
+   * The mixins are applied in order to the superclass, so the prototype chain
+   * will be: X->C'->B'->A'->Object.
+   *
+   * This is purely a convenience function. The above example is equivalent to:
+   *
+   * ```javascript
+   * class X extends C(B(A(Object))) {}
+   * ```
+   *
+   * @function
+   * @param {Function} [superclass=Object]
+   * @return {MixinBuilder}
+   */
+
+
+  var mix = function mix(superclass) {
+    return new MixinBuilder(superclass);
+  };
+
+  var MixinBuilder =
+  /*#__PURE__*/
+  function () {
+    function MixinBuilder(superclass) {
+      _classCallCheck(this, MixinBuilder);
+
+      this.superclass = superclass ||
+      /*#__PURE__*/
+      function () {
+        function _class() {
+          _classCallCheck(this, _class);
+        }
+
+        return _class;
+      }();
+    }
+    /**
+     * Applies `mixins` in order to the superclass given to `mix()`.
+     *
+     * @param {Array.<Mixin>} mixins
+     * @return {Function} a subclass of `superclass` with `mixins` applied
+     */
+
+
+    _createClass(MixinBuilder, [{
+      key: "with",
+      value: function _with() {
+        for (var _len = arguments.length, mixins = new Array(_len), _key = 0; _key < _len; _key++) {
+          mixins[_key] = arguments[_key];
+        }
+
+        return mixins.reduce(function (c, m) {
+          return m(c);
+        }, this.superclass);
+      }
+    }]);
+
+    return MixinBuilder;
+  }();
+
+  window.Mixin = Mixin;
+  window.mix = mix;
+})();
+/**
+ * Part of earth project.
+ *
+ * @copyright  Copyright (C) 2019 ${ORGANIZATION}.
+ * @license    __LICENSE__
+ */
+
+
+(function () {
+  'use strict';
+
+  window.PhoenixEventMixin = Mixin(function (superclass) {
+    var _temp;
+
+    return _temp =
+    /*#__PURE__*/
+    function (_superclass) {
+      _inherits(_temp, _superclass);
+
+      function _temp() {
+        var _getPrototypeOf2;
+
+        var _this;
+
+        _classCallCheck(this, _temp);
+
+        for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
+
+        _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(_temp)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+        _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "_listeners", {});
+
+        return _this;
+      }
+
+      _createClass(_temp, [{
+        key: "on",
+        value: function on(event, handler) {
+          var _this2 = this;
+
+          if (Array.isArray(event)) {
+            event.forEach(function (e) {
+              return _this2.on(e, handler);
+            });
+            return this;
+          }
+
+          if (this._listeners[event] === undefined) {
+            this._listeners[event] = [];
+          }
+
+          this._listeners[event].push(handler);
+
+          return this;
+        }
+      }, {
+        key: "once",
+        value: function once(event, handler) {
+          var _this3 = this;
+
+          if (Array.isArray(event)) {
+            event.forEach(function (e) {
+              return _this3.once(e, handler);
+            });
+            return this;
+          }
+
+          handler._once = true;
+          this.on(event, handler);
+        }
+      }, {
+        key: "off",
+        value: function off(event) {
+          var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+          if (callback !== null) {
+            this._listeners[event] = this.listeners(event).filter(function (listener) {
+              return listener !== callback;
+            });
+            return this;
+          }
+
+          delete this._listeners[event];
+          return this;
+        }
+      }, {
+        key: "trigger",
+        value: function trigger(event) {
+          var _this4 = this;
+
+          for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+            args[_key3 - 1] = arguments[_key3];
+          }
+
+          if (Array.isArray(event)) {
+            event.forEach(function (e) {
+              return _this4.trigger(e);
+            });
+            return this;
+          }
+
+          this.listeners(event).forEach(function (listener) {
+            listener.apply(void 0, args);
+          }); // Remove once
+
+          this._listeners[event] = this.listeners(event).filter(function (listener) {
+            return listener._once !== true;
+          });
+          return this;
+        }
+      }, {
+        key: "listeners",
+        value: function listeners(event) {
+          if (typeof event !== 'string') {
+            throw new Error("get listeners event name should only use string.");
+          }
+
+          return this._listeners[event] === undefined ? [] : this._listeners[event];
+        }
+      }]);
+
+      return _temp;
+    }(superclass), _temp;
+  });
+
+  window.PhoenixEvent =
+  /*#__PURE__*/
+  function (_PhoenixEventMixin) {
+    _inherits(PhoenixEvent, _PhoenixEventMixin);
+
+    function PhoenixEvent() {
+      _classCallCheck(this, PhoenixEvent);
+
+      return _possibleConstructorReturn(this, _getPrototypeOf(PhoenixEvent).apply(this, arguments));
+    }
+
+    return PhoenixEvent;
+  }(PhoenixEventMixin(
+  /*#__PURE__*/
+  function () {
+    function _class3() {
+      _classCallCheck(this, _class3);
+    }
+
+    return _class3;
+  }()));
+})();
+/**
+ * Part of phoenix project.
+ *
  * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
  * @license    __LICENSE__
  */
+
+
 (function ($) {
   var PhoenixCore =
   /*#__PURE__*/
-  function () {
+  function (_mix$with) {
+    _inherits(PhoenixCore, _mix$with);
+
     _createClass(PhoenixCore, null, [{
       key: "defaultOptions",
 
@@ -59,37 +522,40 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }]);
 
     function PhoenixCore() {
-      var _this = this;
+      var _this5;
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       _classCallCheck(this, PhoenixCore);
 
-      this.options = $.extend(true, {}, this.constructor.defaultOptions, options);
-      this._listeners = {};
-      this.waits = []; // Wait dom ready
+      _this5 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixCore).call(this));
+      _this5.options = $.extend(true, {}, _this5.constructor.defaultOptions, options);
+      _this5._listeners = {};
+      _this5.waits = []; // Wait dom ready
 
-      this.wait(function (resolve) {
+      _this5.wait(function (resolve) {
         $(function () {
           return resolve();
         });
       }); // Ready
 
+
       $(function () {
-        _this.completed().then(function () {
-          return _this.trigger('loaded');
+        _this5.completed().then(function () {
+          return _this5.trigger('loaded');
         });
       });
+      return _this5;
     }
 
     _createClass(PhoenixCore, [{
       key: "use",
       value: function use(plugin) {
-        var _this2 = this;
+        var _this6 = this;
 
         if (Array.isArray(plugin)) {
           plugin.forEach(function (p) {
-            return _this2.use(p);
+            return _this6.use(p);
           });
           return this;
         }
@@ -115,93 +581,26 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         return this;
       }
     }, {
-      key: "on",
-      value: function on(event, handler) {
-        var _this3 = this;
-
-        if (Array.isArray(event)) {
-          event.forEach(function (e) {
-            return _this3.on(e, handler);
-          });
-          return this;
-        }
-
-        if (this._listeners[event] === undefined) {
-          this._listeners[event] = [];
-        }
-
-        this._listeners[event].push(handler);
-
-        return this;
-      }
-    }, {
-      key: "once",
-      value: function once(event, handler) {
-        var _this4 = this;
-
-        if (Array.isArray(event)) {
-          event.forEach(function (e) {
-            return _this4.once(e, handler);
-          });
-          return this;
-        }
-
-        handler._once = true;
-        this.on(event, handler);
-      }
-    }, {
-      key: "off",
-      value: function off(event) {
-        var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-        if (callback !== null) {
-          this._listeners[event] = this.listeners(event).filter(function (listener) {
-            return listener !== callback;
-          });
-          return this;
-        }
-
-        delete this._listeners[event];
-        return this;
+      key: "tap",
+      value: function tap(value, callback) {
+        callback(value);
+        return value;
       }
     }, {
       key: "trigger",
       value: function trigger(event) {
-        var _this5 = this;
+        var _get2,
+            _this7 = this;
 
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
+        for (var _len4 = arguments.length, args = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+          args[_key4 - 1] = arguments[_key4];
         }
 
-        if (Array.isArray(event)) {
-          event.forEach(function (e) {
-            return _this5.trigger(e);
-          });
-          return this;
-        }
-
-        this.listeners(event).forEach(function (listener) {
-          listener.apply(void 0, args);
-        }); // Remove once
-
-        this._listeners[event] = this.listeners(event).filter(function (listener) {
-          return listener._once !== true;
+        return this.tap((_get2 = _get(_getPrototypeOf(PhoenixCore.prototype), "trigger", this)).call.apply(_get2, [this, event].concat(args)), function () {
+          if (_this7.data('windwalker.debug')) {
+            console.debug("[Phoenix Event] ".concat(event), args, _this7.listeners(event));
+          }
         });
-
-        if (this.data('windwalker.debug')) {
-          console.debug("[Phoenix Event] ".concat(event), args, this.listeners(event));
-        }
-
-        return this;
-      }
-    }, {
-      key: "listeners",
-      value: function listeners(event) {
-        if (typeof event !== 'string') {
-          throw new Error("get listeners event name should only use string.");
-        }
-
-        return this._listeners[event] === undefined ? [] : this._listeners[event];
       }
     }, {
       key: "data",
@@ -253,8 +652,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         $.fn[name] = function () {
           if (!this.data('phoenix.' + name)) {
-            for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-              args[_key2] = arguments[_key2];
+            for (var _len5 = arguments.length, args = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+              args[_key5] = arguments[_key5];
             }
 
             var _instance = _construct(_plugin, [this].concat(args));
@@ -281,7 +680,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }]);
 
     return PhoenixCore;
-  }();
+  }(mix(
+  /*#__PURE__*/
+  function () {
+    function _class4() {
+      _classCallCheck(this, _class4);
+    }
+
+    return _class4;
+  }()).with(PhoenixEventMixin));
 
   window.PhoenixCore = PhoenixCore;
 })(jQuery);
@@ -340,7 +747,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _createClass(PhoenixPlugin, [{
       key: "boot",
       value: function boot(phoenix) {
-        var _this6 = this;
+        var _this8 = this;
 
         this.phoenix = phoenix;
         var name = this.constructor.is.toLowerCase(); // Merge to global options
@@ -350,7 +757,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         this.created(); // DOM Ready hook
 
         $(function () {
-          return _this6.ready();
+          return _this8.ready();
         }); // Phoenix onload hook
 
         this.phoenix.on('loaded', this.loaded);
@@ -460,8 +867,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         options.mainSelector = selector;
 
-        for (var _len3 = arguments.length, args = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
-          args[_key3 - 2] = arguments[_key3];
+        for (var _len6 = arguments.length, args = new Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
+          args[_key6 - 2] = arguments[_key6];
         }
 
         return (_$ = $(selector))[this.constructor.pluginName].apply(_$, [options, this.phoenix].concat(args));
@@ -539,13 +946,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }]);
 
     function PhoenixHelper() {
-      var _this7;
+      var _this9;
 
       _classCallCheck(this, PhoenixHelper);
 
-      _this7 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixHelper).call(this));
-      _this7.aliveHandle = null;
-      return _this7;
+      _this9 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixHelper).call(this));
+      _this9.aliveHandle = null;
+      return _this9;
     }
 
     _createClass(PhoenixHelper, [{
@@ -600,7 +1007,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "loadScript",
       value: function loadScript(urls) {
-        var _this8 = this;
+        var _this10 = this;
 
         var autoConvert = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
@@ -631,11 +1038,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
               assetMinFile = url.slice(0, -".".concat(ext).length) + '.min.' + ext;
             }
 
-            loadUri = _this8.phoenix.data('windwalker.debug') ? assetFile : assetMinFile;
+            loadUri = _this10.phoenix.data('windwalker.debug') ? assetFile : assetMinFile;
           }
 
           promises.push($.getScript({
-            url: _this8.addUriBase(loadUri),
+            url: _this10.addUriBase(loadUri),
             cache: true,
             data: data
           }));
@@ -996,28 +1403,28 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }]);
 
     function PhoenixUI() {
-      var _this9;
+      var _this11;
 
       _classCallCheck(this, PhoenixUI);
 
-      _this9 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixUI).call(this));
-      _this9.aliveHandle = null;
-      return _this9;
+      _this11 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixUI).call(this));
+      _this11.aliveHandle = null;
+      return _this11;
     }
 
     _createClass(PhoenixUI, [{
       key: "ready",
       value: function ready() {
-        var _this10 = this;
+        var _this12 = this;
 
         _get(_getPrototypeOf(PhoenixUI.prototype), "ready", this).call(this);
 
         this.messageContainer = $(this.options.messageSelector);
         this.phoenix.on('validation.response', function (event) {
-          _this10.showValidateResponse(event.validation, event.state, event.$input, event.help);
+          _this12.showValidateResponse(event.validation, event.state, event.$input, event.help);
         });
         this.phoenix.on('validation.remove', function (event) {
-          _this10.removeValidateResponse(event.$element);
+          _this12.removeValidateResponse(event.$element);
         });
       }
       /**
@@ -1195,10 +1602,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _createClass(PhoenixRouter, [{
       key: "ready",
       value: function ready() {
-        var _this11 = this;
+        var _this13 = this;
 
         $(window).on('popstate', function (e) {
-          return _this11.phoenix.on('router.popstate', e);
+          return _this13.phoenix.on('router.popstate', e);
         });
       }
       /**
@@ -1354,17 +1761,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }]);
 
     function PhoenixAjax() {
-      var _this12;
+      var _this14;
 
       _classCallCheck(this, PhoenixAjax);
 
-      _this12 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixAjax).call(this));
-      _this12.$ = $;
-      _this12.config = {
+      _this14 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixAjax).call(this));
+      _this14.$ = $;
+      _this14.config = {
         customMethod: false
       };
-      _this12.data = {};
-      _this12.headers = {
+      _this14.data = {};
+      _this14.headers = {
         GET: {},
         POST: {},
         PUT: {},
@@ -1374,7 +1781,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         OPTIONS: {},
         _global: {}
       };
-      return _this12;
+      return _this14;
     }
 
     _createClass(PhoenixAjax, [{
@@ -1670,10 +2077,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "encrypt",
       value: function encrypt(key, data) {
-        var _this13 = this;
+        var _this15 = this;
 
         var code = data.split('').map(function (c, i) {
-          return c.charCodeAt(0) ^ _this13.keyCharAt(key, i);
+          return c.charCodeAt(0) ^ _this15.keyCharAt(key, i);
         }).join(',');
         return this.base64Encode(code);
       }
@@ -1689,12 +2096,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "decrypt",
       value: function decrypt(key, data) {
-        var _this14 = this;
+        var _this16 = this;
 
         data = this.base64Decode(data);
         data = data.split(',');
         return data.map(function (c, i) {
-          return String.fromCharCode(c ^ _this14.keyCharAt(key, i));
+          return String.fromCharCode(c ^ _this16.keyCharAt(key, i));
         }).join("");
       }
       /**
@@ -2142,13 +2549,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }]);
 
     function PhoenixTranslator() {
-      var _this15;
+      var _this17;
 
       _classCallCheck(this, PhoenixTranslator);
 
-      _this15 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixTranslator).call(this));
-      _this15.keys = {};
-      return _this15;
+      _this17 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixTranslator).call(this));
+      _this17.keys = {};
+      return _this17;
     }
     /**
      * Translate a string.
@@ -2164,8 +2571,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       value: function translate(text) {
         var key = this.normalize(text);
 
-        for (var _len4 = arguments.length, args = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-          args[_key4 - 1] = arguments[_key4];
+        for (var _len7 = arguments.length, args = new Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
+          args[_key7 - 1] = arguments[_key7];
         }
 
         if (args.length) {
@@ -2183,8 +2590,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "sprintf",
       value: function sprintf(text) {
-        for (var _len5 = arguments.length, args = new Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-          args[_key5 - 1] = arguments[_key5];
+        for (var _len8 = arguments.length, args = new Array(_len8 > 1 ? _len8 - 1 : 0), _key8 = 1; _key8 < _len8; _key8++) {
+          args[_key8 - 1] = arguments[_key8];
         }
 
         return this.phoenix.vsprintf(this.find(text), args);
@@ -2290,15 +2697,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }]);
 
     function PhoenixStack() {
-      var _this16;
+      var _this18;
 
       _classCallCheck(this, PhoenixStack);
 
-      _this16 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixStack).call(this));
+      _this18 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixStack).call(this));
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this16)), "stacks", {});
+      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this18)), "stacks", {});
 
-      return _this16;
+      return _this18;
     }
 
     _createClass(PhoenixStack, [{
@@ -2423,10 +2830,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "notice",
       value: function notice() {
-        var _this17 = this;
+        var _this19 = this;
 
         this.observers.forEach(function (observer) {
-          observer.handler(_this17, _this17.length);
+          observer.handler(_this19, _this19.length);
         });
         this.observers = this.observers.filter(function (observer) {
           return observer.once !== true;
@@ -2480,14 +2887,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _createClass(PhoenixLegacy, [{
       key: "created",
       value: function created() {
-        var _this18 = this;
+        var _this20 = this;
 
         var phoenix = this.phoenix;
         phoenix.Theme = phoenix.UI; // Uri
 
         phoenix.Uri = phoenix.data('phoenix.uri');
         phoenix.on('jquery.plugin.created', function (event) {
-          var debug = _this18.phoenix.data('windwalker.debug'); // Legacy Form polyfill
+          var debug = _this20.phoenix.data('windwalker.debug'); // Legacy Form polyfill
 
 
           if (!formInited && event.name === 'form') {
@@ -2495,7 +2902,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
               phoenix[method] = function () {
                 var _event$instance;
 
-                debug ? _this18.constructor.warn('Phoenix', method) : null;
+                debug ? _this20.constructor.warn('Phoenix', method) : null;
                 return (_event$instance = event.instance)[method].apply(_event$instance, arguments);
               };
             });
@@ -2508,7 +2915,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
               phoenix.Grid[method] = function () {
                 var _event$instance2;
 
-                debug ? _this18.constructor.warn('Phoenix.Grid', method) : null;
+                debug ? _this20.constructor.warn('Phoenix.Grid', method) : null;
                 return (_event$instance2 = event.instance)[method].apply(_event$instance2, arguments);
               };
             });

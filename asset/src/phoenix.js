@@ -6,7 +6,7 @@
  */
 
 ($ => {
-  class PhoenixCore {
+  class PhoenixCore extends mix(class {}).with(PhoenixEventMixin) {
     /**
      * Default options.
      * @returns {Object}
@@ -16,6 +16,7 @@
     }
 
     constructor(options = {}) {
+      super();
       this.options = $.extend(true, {}, this.constructor.defaultOptions, options);
       this._listeners = {};
       this.waits = [];
@@ -61,69 +62,18 @@
       return this;
     }
 
-    on(event, handler) {
-      if (Array.isArray(event)) {
-        event.forEach(e => this.on(e, handler));
-        return this;
-      }
+    tap(value, callback) {
+      callback(value);
 
-      if (this._listeners[event] === undefined) {
-        this._listeners[event] = [];
-      }
-
-      this._listeners[event].push(handler);
-
-      return this;
-    }
-
-    once(event, handler) {
-      if (Array.isArray(event)) {
-        event.forEach(e => this.once(e, handler));
-        return this;
-      }
-
-      handler._once = true;
-
-      this.on(event, handler);
-    }
-
-    off(event, callback = null) {
-      if (callback !== null) {
-        this._listeners[event] = this.listeners(event).filter((listener) => listener !== callback);
-        return this;
-      }
-
-      delete this._listeners[event];
-
-      return this;
+      return value;
     }
 
     trigger(event, ...args) {
-      if (Array.isArray(event)) {
-        event.forEach(e => this.trigger(e));
-        return this;
-      }
-
-      this.listeners(event).forEach(listener => {
-        listener(...args);
+      return this.tap(super.trigger(event, ...args), () => {
+        if (this.data('windwalker.debug')) {
+          console.debug(`[Phoenix Event] ${event}`, args, this.listeners(event));
+        }
       });
-
-      // Remove once
-      this._listeners[event] = this.listeners(event).filter((listener) => listener._once !== true);
-
-      if (this.data('windwalker.debug')) {
-        console.debug(`[Phoenix Event] ${event}`, args, this.listeners(event));
-      }
-
-      return this;
-    }
-
-    listeners(event) {
-      if (typeof event !== 'string') {
-        throw new Error(`get listeners event name should only use string.`);
-      }
-
-      return this._listeners[event] === undefined ? [] : this._listeners[event];
     }
 
     data(name, value) {
