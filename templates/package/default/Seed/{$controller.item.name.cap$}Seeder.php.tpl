@@ -36,7 +36,7 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
             $created = $faker->dateTimeThisYear;
             $data    = new Data();
 
-            $data['title']       = (string) str($faker->sentence(2))->trim('.')->toUpperCase();
+            $data['title']       = (string) str($faker->sentence(2))->trim('.')->upperCaseWords();
             $data['alias']       = OutputFilter::stringURLUnicodeSlug($data['title']);
             $data['url']         = $faker->url;
             $data['introtext']   = $faker->paragraph(5);
