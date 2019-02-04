@@ -26,24 +26,23 @@ class {$controller.item.name.cap$}Seeder extends AbstractSeeder
      * doExecute
      *
      * @return  void
-     * @throws Exception
      */
     public function doExecute()
     {
-        $faker = Factory::create('en_GB');
+        $faker = $this->faker->create();
         $userIds = range(20, 100);
 
         foreach (range(1, 150) as $i) {
             $created = $faker->dateTimeThisYear;
             $data    = new Data();
 
-            $data['title']       = ucwords(trim($faker->sentence(random_int(3, 5)), '.'));
+            $data['title']       = (string) str($faker->sentence(2))->trim('.')->toUpperCase();
             $data['alias']       = OutputFilter::stringURLUnicodeSlug($data['title']);
             $data['url']         = $faker->url;
             $data['introtext']   = $faker->paragraph(5);
             $data['fulltext']    = $faker->paragraph(5);
             $data['image']       = $faker->imageUrl();
-            $data['state']       = $faker->randomElement([1, 1, 0]);
+            $data['state']       = $faker->optional(0.75, 0)->passthrough(1);
             $data['ordering']    = $i;
             $data['created']     = $created->format($this->getDateFormat());
             $data['created_by']  = $faker->randomElement($userIds);
