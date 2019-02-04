@@ -67,7 +67,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
 
         // Created date
         if ($data->hasField('created')) {
-            if (!$data->created) {
+            if (!$data->created || $data->created === $this->db->getNullDate()) {
                 $data->created = $date->toSql();
             }
         }
