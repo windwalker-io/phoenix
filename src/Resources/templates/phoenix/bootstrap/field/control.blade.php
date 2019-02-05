@@ -17,41 +17,32 @@ if (\Phoenix\Script\BootstrapScript::$currentVersion === 3) {
     $defaultInputWidth = 'col-md-9';
 }
 ?>
+@php( isset($attribs['class']) ? $attribs['class'] : null )
+@php( $attribs['class'] .= ' form-group' )
 
-@if (isset($attribs['transition']))
-    <transition name="{{ $attribs['transition'] }}">
-        @endif
+<div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attribs) !!} data-form-group>
+    @if (!$noLabel)
+        {!! $labelHtml !!}
+    @endif
+    <div
+        class="{{ $noLabel || $hideLabel ? 'col-md-12' : $field->get('fieldWidth', $defaultInputWidth) }} input-container">
 
-        @php( isset($attribs['class']) ? $attribs['class'] : null )
-        @php( $attribs['class'] .= ' form-group' )
-
-        <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attribs) !!} data-form-group>
-            @if (!$noLabel)
-                {!! $labelHtml !!}
-            @endif
-            <div
-                class="{{ $noLabel || $hideLabel ? 'col-md-12' : $field->get('fieldWidth', $defaultInputWidth) }} input-container">
-
-                @if ($field->get('prepend') || $field->get('append'))
-                    <div class="input-group">
-                        @if ($field->get('prepend'))
-                            <div class="input-group-prepend">
-                                {!! $field->get('prepend') !!}
-                            </div>
-                        @endif
-                        {!! $inputHtml !!}
-                        @if ($field->get('append'))
-                            <div class="input-group-append">
-                                {!! $field->get('append') !!}
-                            </div>
-                        @endif
+        @if ($field->get('prepend') || $field->get('append'))
+            <div class="input-group">
+                @if ($field->get('prepend'))
+                    <div class="input-group-prepend">
+                        {!! $field->get('prepend') !!}
                     </div>
-                @else
-                    {!! $inputHtml !!}
+                @endif
+                {!! $inputHtml !!}
+                @if ($field->get('append'))
+                    <div class="input-group-append">
+                        {!! $field->get('append') !!}
+                    </div>
                 @endif
             </div>
-        </div>
-
-        @if (isset($attribs['transition']))
-    </transition>
-@endif
+        @else
+            {!! $inputHtml !!}
+        @endif
+    </div>
+</div>
