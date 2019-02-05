@@ -14,7 +14,7 @@ if (\Phoenix\Script\BootstrapScript::$currentVersion === 3) {
 } elseif (!empty($options['vertical'])) {
     $defaultInputWidth = 'col-md-12 col-12';
 } else {
-    $defaultInputWidth = 'col';
+    $defaultInputWidth = 'col-md-9';
 }
 ?>
 
