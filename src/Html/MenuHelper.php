@@ -101,7 +101,8 @@ class MenuHelper
             $routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
 
             foreach ($paths as $key => $pathSegment) {
-                if (isset($routePath[$key]) && $routePath[$key] === $pathSegment && $this->matchRequest($query)) {
+                if (isset($routePath[$key]) && $routePath[$key] === $pathSegment && $this->matchRequest($query)
+                    && count($paths) === ($key + 1)) {
                     return true;
                 }
 
