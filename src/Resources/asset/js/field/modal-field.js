@@ -147,6 +147,7 @@ $(function () {
         var max = this.$ele.attr('data-max-items');
 
         if (!max) {
+          Phoenix.Modal.open($(event.currentTarget).attr('href'));
           return;
         }
 
