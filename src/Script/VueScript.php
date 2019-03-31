@@ -123,8 +123,6 @@ JS
     public static function router()
     {
         if (!static::inited(__METHOD__)) {
-            static::core();
-
             static::addJS(static::phoenixName() . '/js/vue/vue-router.min.js');
         }
     }
@@ -135,6 +133,8 @@ JS
      * @see  https://yuche.github.io/vue-strap/
      *
      * @return  void
+     *
+     * @deprecated Use Bootstrap-Vue instead()
      */
     public static function strap()
     {
@@ -143,6 +143,21 @@ JS
             BootstrapScript::script();
 
             static::addJS(static::phoenixName() . '/js/vue/vue-strap.min.js');
+        }
+    }
+
+    /**
+     * bootstrapVue
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function bootstrapVue(): void
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addJS(static::phoenixName() . '/js/vue/bootstrap/bootstrap-vue.min.js');
+            static::addCSS(static::phoenixName() . '/js/vue/bootstrap/bootstrap-vue.min.css');
         }
     }
 
@@ -250,7 +265,6 @@ JS;
     public static function switcher()
     {
         if (!static::inited(__METHOD__)) {
-            static::core();
             BootstrapScript::switcher();
 
             static::addJS(static::phoenixName() . '/js/vue/switch.min.js');
@@ -267,10 +281,39 @@ JS;
     public static function draggable(): void
     {
         if (!static::inited(__METHOD__)) {
-            VueScript::core();
             PhoenixScript::sortableJS();
 
             static::addJS(static::phoenixName() . '/js/vue/vuedraggable.min.js');
+        }
+    }
+
+    /**
+     * slideUpDown
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function slideUpDown(): void
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addJS(static::phoenixName() . '/js/vue/vue-slide-up-down.umd.js');
+
+            static::internalJS("Vue.component('slide-up-down', VueSlideUpDown);");
+        }
+    }
+
+    /**
+     * filters
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function filters(): void
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addJS(static::phoenixName() . '/js/vue/vue2-filters.min.js');
         }
     }
 }

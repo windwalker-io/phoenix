@@ -161,6 +161,15 @@ fusion.task('install', function () {
   // Vue Draggable
   fusion.copy(`${nodePath}/vuedraggable/dist/*`, `${destPath}/js/vue/`);
 
+  // Bootstrap Vue
+  fusion.copy(`${nodePath}/bootstrap-vue/dist/*`, `${destPath}/js/vue/bootstrap/`);
+
+  // Vue Slide Up Down
+  fusion.copy(`${nodePath}/vue-slide-up-down/dist/vue-slide-up-down.umd.js`, `${destPath}/js/vue/`);
+
+  // Vue2 Filters
+  fusion.copy(`${nodePath}/vue2-filters/dist/*`, `${destPath}/js/vue/`);
+
   // Velocity
   fusion.copy(`${nodePath}/velocity-animate/velocity.*`, `${destPath}/js/velocity/`);
 
