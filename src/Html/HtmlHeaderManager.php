@@ -9,6 +9,7 @@
 namespace Phoenix\Html;
 
 use Windwalker\Dom\HtmlElement;
+use function Windwalker\h;
 
 /**
  * The HtmlHeaderManager class.
@@ -149,7 +150,7 @@ class HtmlHeaderManager
     public function addCustomTag($tag, $content = null, $attribs = [])
     {
         if (!$tag instanceof HtmlElement) {
-            $tag = new HtmlElement($tag, $content, $attribs);
+            $tag = h($tag, $attribs, $content);
         }
 
         $this->customTags[] = $tag;
@@ -224,7 +225,7 @@ class HtmlHeaderManager
             return null;
         }
 
-        return (string) new HtmlElement('link', null, [
+        return (string) h('link', [
             'rel' => 'shortcut icon',
             'type' => 'image/x-icon',
             'href' => $this->favicon,
@@ -240,7 +241,7 @@ class HtmlHeaderManager
      */
     public function renderTitle($separator = '|')
     {
-        return (string) new HtmlElement('title', $this->getPageTitle($separator));
+        return (string) h('title', [], $this->getPageTitle($separator));
     }
 
     /**

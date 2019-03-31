@@ -14,6 +14,7 @@ use Windwalker\Dom\HtmlElement;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Renderer\FormRendererInterface;
+use function Windwalker\h;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -106,7 +107,7 @@ class InputRenderer implements FormRendererInterface
             $label .= ' <span class="fa fa-question-circle">';
         }
 
-        return (string) new HtmlElement('label', $label, $attribs);
+        return (string) h('label', $attribs, $label);
     }
 
     /**

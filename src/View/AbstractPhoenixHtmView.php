@@ -12,6 +12,7 @@ use Phoenix\Html\HtmlHeader;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Data\Data;
+use Windwalker\Renderer\AbstractRenderer;
 
 /**
  * The AbstractRadHtmView class.
@@ -23,7 +24,7 @@ abstract class AbstractPhoenixHtmView extends HtmlView
     /**
      * Property renderer.
      *
-     * @var  string
+     * @var  string|AbstractRenderer
      */
     protected $renderer = RendererHelper::EDGE;
 

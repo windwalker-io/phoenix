@@ -10,6 +10,7 @@ namespace Phoenix\Html;
 
 use Windwalker\Data\Data;
 use Windwalker\Dom\HtmlElement;
+use function Windwalker\h;
 
 /**
  * The Metadata class.
@@ -52,7 +53,7 @@ class Metadata extends Data
         }
 
         foreach ((array) $content as $item) {
-            $this->metadata[$name][] = new HtmlElement('meta', null, [
+            $this->metadata[$name][] = h('meta', [
                 'name' => $this->escape($name),
                 'content' => $this->escape($item),
             ]);
@@ -97,7 +98,7 @@ class Metadata extends Data
         }
 
         foreach ((array) $content as $item) {
-            $this->openGraphs[$type][] = new HtmlElement('meta', null, [
+            $this->openGraphs[$type][] = h('meta', [
                 'property' => $this->escape($type),
                 'content' => $this->escape($item),
             ]);
