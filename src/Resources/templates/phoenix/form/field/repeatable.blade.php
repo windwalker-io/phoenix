@@ -27,8 +27,8 @@ $form->setRenderer($field->getForm()->getRenderer());
         </tr>
         </thead>
         <tbody v-model="items" is="{{ $field->sortable() ? 'draggable' : 'tbody' }}" element="tbody"
-            :options="{handle: '.drag-handle'}">
-            <tr v-for="(item, i) of items" :key="item.__key">
+            :options="{ handle: '.drag-handle', animation: 300 }">
+            <tr v-for="(item, i) of items" :key="item.__key" :ref="`repeat-item-${i}`">
                 @if ($field->sortable())
                     <td>
                         <div class="drag-handle" style="cursor: move;">

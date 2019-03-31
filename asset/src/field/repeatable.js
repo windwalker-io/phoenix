@@ -32,12 +32,22 @@
 
       addItem(i) {
         this.items.splice(i + 1, 0, this.prepareItem(this.getEmptyItem()));
+
+        this.$nextTick(() => {
+          const el = this.$refs['repeat-item-' + (i + 1)][0];
+
+          $(el).css('display', 'none').fadeIn();
+        });
       },
 
       delItem(i) {
-        this.items.splice(i, 1);
+        const el = this.$refs['repeat-item-' + i][0];
 
-        this.makeSureDefaultItem();
+        $(el).fadeOut(() => {
+          this.items.splice(i, 1);
+
+          this.makeSureDefaultItem();
+        });
       },
 
       prepareItem(item) {

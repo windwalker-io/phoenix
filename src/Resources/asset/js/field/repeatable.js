@@ -28,11 +28,23 @@
         return "".concat(this.control, "[").concat(i, "][").concat(field, "]");
       },
       addItem: function addItem(i) {
+        var _this = this;
+
         this.items.splice(i + 1, 0, this.prepareItem(this.getEmptyItem()));
+        this.$nextTick(function () {
+          var el = _this.$refs['repeat-item-' + (i + 1)][0];
+          $(el).css('display', 'none').fadeIn();
+        });
       },
       delItem: function delItem(i) {
-        this.items.splice(i, 1);
-        this.makeSureDefaultItem();
+        var _this2 = this;
+
+        var el = this.$refs['repeat-item-' + i][0];
+        $(el).fadeOut(function () {
+          _this2.items.splice(i, 1);
+
+          _this2.makeSureDefaultItem();
+        });
       },
       prepareItem: function prepareItem(item) {
         if (!item.__key) {
