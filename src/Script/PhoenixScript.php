@@ -475,26 +475,27 @@ JS;
         }
     }
 
-    public static function validation($selector = '#admin-form', $options = [], $variable = 'Phoenix')
-    {
+    /**
+     * validation
+     *
+     * @param string $selector
+     * @param array  $options
+     * @param string $variable
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function validation(
+        ?string $selector = '#admin-form',
+        array $options = [],
+        string $variable = 'Phoenix'
+    ): void {
         if (!static::inited(__METHOD__)) {
             static::phoenix($variable);
-            static::form($selector, $variable);
 
             static::addJS(static::phoenixName() . '/js/string/punycode.min.js');
             static::addJS(static::phoenixName() . '/js/phoenix/validation.min.js');
-        }
-
-        if (!static::inited(__METHOD__, get_defined_vars())) {
-            $defaultOptions = [
-                'scroll' => [
-                    'enabled' => true,
-                    'offset' => -100,
-                    'duration' => 1000,
-                ],
-            ];
-
-            $options = static::getJSObject($defaultOptions, $options);
 
             static::translate([
                 'phoenix.message.validation.required',
@@ -511,8 +512,25 @@ JS;
                 'phoenix.message.validation.custom.error',
                 'phoenix.message.validation.valid',
             ]);
+        }
 
+        if (!static::inited(__METHOD__, $variable)) {
             static::domready("$variable.use(PhoenixValidation);");
+        }
+
+        if ($selector && !static::inited(__METHOD__, $selector)) {
+            static::form($selector, $variable);
+
+            $defaultOptions = [
+                'scroll' => [
+                    'enabled' => true,
+                    'offset' => -100,
+                    'duration' => 1000,
+                ],
+            ];
+
+            $options = static::getJSObject($defaultOptions, $options);
+
             static::domready("$variable.validation('$selector', $options);");
         }
     }

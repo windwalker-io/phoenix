@@ -90,7 +90,7 @@
 
       // Stop native validation
       if (this.form.length) {
-        this.form.attr('novalidate');
+        this.form.attr('novalidate', true);
       }
 
       this.registerDefaultValidators();
