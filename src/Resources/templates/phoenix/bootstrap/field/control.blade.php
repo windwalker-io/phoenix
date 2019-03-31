@@ -44,5 +44,11 @@ if (\Phoenix\Script\BootstrapScript::$currentVersion === 3) {
         @else
             {!! $inputHtml !!}
         @endif
+
+        @if ($field->help())
+            <span class="small form-text text-muted">
+                {!! $field->help() !!}
+            </span>
+        @endif
     </div>
 </div>
