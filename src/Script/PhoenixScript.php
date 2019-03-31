@@ -9,6 +9,7 @@
 namespace Phoenix\Script;
 
 use Windwalker\Core\Asset\AbstractScript;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
@@ -57,6 +58,10 @@ abstract class PhoenixScript extends AbstractPhoenixScript
             static::addJS(static::phoenixName() . '/js/phoenix/phoenix.min.js');
 
             static::data('windwalker.debug', WINDWALKER_DEBUG);
+            static::data('phoenix.date', [
+                'timezone' => Ioc::getConfig()->get('system.timezone'),
+                'empty' => Chronos::getNullDate()
+            ]);
             static::data('phoenix.uri', array_merge(
                 (array) Ioc::getUriData(),
                 [
@@ -461,6 +466,7 @@ JS;
                 'scroll' => [
                     'enabled' => true,
                     'offset' => -100,
+                    'duration' => 1000,
                     'duration' => 1000,
                 ],
             ];

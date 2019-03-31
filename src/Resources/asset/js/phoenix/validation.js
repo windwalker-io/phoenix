@@ -141,7 +141,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
       this.inputs = this.form.find('input, select, textarea'); // Stop native validation
 
       if (this.form.length) {
-        this.form.attr('novalidate');
+        this.form.attr('novalidate', true);
       }
 
       this.registerDefaultValidators();

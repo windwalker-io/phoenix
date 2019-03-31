@@ -15,6 +15,8 @@
         confirm: 'confirm',
         keepAlive: 'keepAlive',
         stopKeepAlive: 'stopKeepAlive',
+        isNullDate: 'isNullDate',
+        getNullDate: 'getNullDate',
         loadScript: 'loadScript',
         notify: 'notify',
         numberFormat: 'numberFormat',
@@ -135,8 +137,8 @@
      *
      * @return {number}
      */
-    keepAlive(url, time) {
-      return this.aliveHandle = window.setInterval(() => $.get('/'), time);
+    keepAlive(url, time = 60000) {
+      return this.aliveHandle = window.setInterval(() => $.get(url), time);
     }
 
     /**
@@ -144,6 +146,28 @@
      */
     stopKeepAlive() {
       clearInterval(this.aliveHandle);
+
+      this.aliveHandle =  null;
+
+      return this;
+    }
+
+    /**
+     * Is NULL date from default SQL.
+     *
+     * @param {string} date
+     */
+    isNullDate(date) {
+      return ['0000-00-00 00:00:00', this.getNullDate()].indexOf(date) !== -1;
+    }
+
+    /**
+     * Get NULL date from default SQL.
+     *
+     * @returns {string}
+     */
+    getNullDate() {
+      return this.phoenix.data('phoenix.date')['empty'];
     }
 
     /**

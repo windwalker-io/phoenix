@@ -931,6 +931,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           confirm: 'confirm',
           keepAlive: 'keepAlive',
           stopKeepAlive: 'stopKeepAlive',
+          isNullDate: 'isNullDate',
+          getNullDate: 'getNullDate',
           loadScript: 'loadScript',
           notify: 'notify',
           numberFormat: 'numberFormat',
@@ -1084,9 +1086,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     }, {
       key: "keepAlive",
-      value: function keepAlive(url, time) {
+      value: function keepAlive(url) {
+        var time = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 60000;
         return this.aliveHandle = window.setInterval(function () {
-          return $.get('/');
+          return $.get(url);
         }, time);
       }
       /**
@@ -1097,6 +1100,30 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       key: "stopKeepAlive",
       value: function stopKeepAlive() {
         clearInterval(this.aliveHandle);
+        this.aliveHandle = null;
+        return this;
+      }
+      /**
+       * Is NULL date from default SQL.
+       *
+       * @param {string} date
+       */
+
+    }, {
+      key: "isNullDate",
+      value: function isNullDate(date) {
+        return ['0000-00-00 00:00:00', this.getNullDate()].indexOf(date) !== -1;
+      }
+      /**
+       * Get NULL date from default SQL.
+       *
+       * @returns {string}
+       */
+
+    }, {
+      key: "getNullDate",
+      value: function getNullDate() {
+        return this.phoenix.data('phoenix.date')['empty'];
       }
       /**
        * Number format like php function.
