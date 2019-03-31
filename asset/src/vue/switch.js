@@ -58,11 +58,16 @@
       }
     },
     created() {
-      if (this.name == null && this.id === null) {
-        throw new Error('[Phoenix Switch] You must provide "name" or "id" attribute.');
-      }
+      this.idName = this.id;
 
-      this.idName = this.id || 'input-' + this.getDashedName();
+      if (!this.idName) {
+        if (this.name) {
+          this.idName = 'input-' + this.getDashedName();
+        } else {
+          this.idName = 'input-switch-' + new Date().getTime()
+            + '-' + (Math.random() * 10000000000000000).toString();
+        }
+      }
 
       this.currentValue = this.value;
     },
