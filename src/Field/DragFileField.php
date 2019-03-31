@@ -18,7 +18,6 @@ use Windwalker\Form\Field\FileField;
  *
  * @method  mixed|$this  maxFiles(int $value = null)
  * @method  mixed|$this  maxSize(int $value = null)
- * @method  mixed|$this  accepted(string $value = null)
  * @method  mixed|$this  layout(string $value = null)
  *
  * @since  1.7.3
@@ -113,7 +112,6 @@ JS;
     protected function getAccessors()
     {
         return array_merge(parent::getAccessors(), [
-            'accepted',
             'maxFiles' => 'max_files',
             'maxSize' => 'max_size',
             'layout',
