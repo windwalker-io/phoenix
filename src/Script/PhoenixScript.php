@@ -13,6 +13,7 @@ use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
+use Windwalker\String\Str;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -409,15 +410,30 @@ JS;
             return;
         }
 
-        $text = __($key);
+        $handler = Translator::getNormalizeHandler();
+        $trans = [];
 
-        /** @var Language $language */
-        $language = Translator::getInstance();
-        $handler  = $language->getNormalizeHandler();
+        if (Str::endsWith($key, '*')) {
+            $key = substr($key, 0, -1);
+            $key = $handler($key);
 
-        $key = $handler($key);
+            $strings = Translator::getStrings();
 
-        static::data('phoenix.languages', [$key => $text], true);
+            foreach ($strings as $k => $string) {
+                $k = $handler($k);
+
+                if (strpos($k, $key) === 0) {
+                    $trans[$k] = __($k);
+                }
+            }
+        } else {
+            $key = $handler($key);
+
+            $trans[$key] = __($key);
+        }
+
+
+        static::data('phoenix.languages', $trans, true);
     }
 
     /**
@@ -503,21 +519,7 @@ JS;
             static::addJS(static::phoenixName() . '/js/string/punycode.min.js');
             static::addJS(static::phoenixName() . '/js/phoenix/validation.min.js');
 
-            static::translate([
-                'phoenix.message.validation.required',
-                'phoenix.message.validation.failure',
-                'phoenix.message.validation.value.missing',
-                'phoenix.message.validation.type.mismatch',
-                'phoenix.message.validation.pattern.mismatch',
-                'phoenix.message.validation.too.long',
-                'phoenix.message.validation.too.short',
-                'phoenix.message.validation.range.underflow',
-                'phoenix.message.validation.range.overflow',
-                'phoenix.message.validation.step.mismatch',
-                'phoenix.message.validation.bad.input',
-                'phoenix.message.validation.custom.error',
-                'phoenix.message.validation.valid',
-            ]);
+            static::translate('phoenix.message.validation.*');
         }
 
         if (!static::inited(__METHOD__, $variable)) {
