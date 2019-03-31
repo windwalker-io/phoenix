@@ -8,7 +8,11 @@
         title="@lang($title)"
         {{ !empty($disabled) ? 'disabled' : null }}
 
-        @if (!empty($task))
+        @if (!empty($options['onclick']))
+        onclick="{!! $options['onclick'] !!}"
+        @elseif (!empty($options['href']))
+        onclick="location.href = '{{ $options['href'] }}'"
+        @elseif (!empty($task))
         onclick="{{ $phoenix_js_object }}.Grid.doTask('{{ $task or '' }}', {{ $row or '' }})"
         @endif
     >
