@@ -36,7 +36,7 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
                     </a>
 
                     @if (!$attrs['required'])
-                        <a href="javascript://" role="button" class="btn btn-default btn-info unselect-button"
+                        <a href="javascript://" role="button" class="btn btn-info unselect-button"
                             onclick="Phoenix.Field.Modal.select('#{{ $id }}-wrap', '', '')">
                             <span class="fa fa-remove fa-times"></span>
                         </a>
