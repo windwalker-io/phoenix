@@ -212,7 +212,7 @@ window.Phoenix.Modal = {
     this.modal.modal('show');
   },
   close: function () {
-    this.modal.hide();
+    this.modal.modal('hide');
   }
 };
 window.Phoenix.Modal.init();
