@@ -43,6 +43,13 @@ class MenuHelper
     protected $activeString = 'active';
 
     /**
+     * Property pathVars.
+     *
+     * @var  array
+     */
+    protected $pathVars = ['path', 'paths'];
+
+    /**
      * MenuHelper constructor.
      *
      * @param PackageResolver $packageResolver
@@ -185,7 +192,15 @@ class MenuHelper
             return true;
         }
 
-        return !empty(ArrayHelper::query([$this->input->toArray()], $query));
+        $requests = $this->input->toArray();
+
+        foreach ($requests as $key => &$request) {
+            if (in_array($key, $this->pathVars, true)) {
+                $request = implode('/', $request);
+            }
+        }
+        
+        return !empty(ArrayHelper::query([$requests], $query));
     }
 
     /**
@@ -198,6 +213,7 @@ class MenuHelper
     public function getMatchedRoute(): Route
     {
         $package = $this->packageResolver->getCurrentPackage();
+
         return $package->router->getMatched();
     }
 
@@ -222,10 +238,56 @@ class MenuHelper
      *
      * @since  1.8
      */
-    public function activeString(string $activeString)
+    public function activeString(string $activeString): self
     {
         $this->activeString = $activeString;
 
         return $this;
+    }
+
+    /**
+     * addPathVar
+     *
+     * @param string|array $path
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function addPathVar($path): self
+    {
+        $path = (array) $path;
+
+        $this->pathVars = array_merge($this->pathVars, $path);
+
+        return $this;
+    }
+
+    /**
+     * setPathVars
+     *
+     * @param array $paths
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function setPathVars(array $paths = []): self
+    {
+        $this->pathVars = $paths;
+
+        return $this;
+    }
+
+    /**
+     * Method to get property PathVars
+     *
+     * @return  array
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getPathVars(): array
+    {
+        return $this->pathVars;
     }
 }
