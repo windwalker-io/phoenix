@@ -8,8 +8,12 @@
 
 namespace Phoenix\Repository;
 
+use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
+use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Record\NestedRecord;
 use Windwalker\Record\Record;
+use function Windwalker\tap;
 use Windwalker\Test\TestHelper;
 
 /**
@@ -20,23 +24,50 @@ use Windwalker\Test\TestHelper;
 class NestedAdminRepository extends AdminRepository
 {
     /**
-     * prepareRecord
+     * Property saveData.
      *
-     * @param Record $record
+     * @var Data
+     */
+    protected $saveData;
+
+    /**
+     * prepareSave
+     *
+     * @param Record|NestedRecord $data
      *
      * @return  void
-     * @throws \ReflectionException
+     *
+     * @throws \Exception
      */
-    protected function prepareRecord(Record $record)
+    protected function prepareSave(Record $data)
     {
-        /** @var NestedRecord $record */
-        parent::prepareRecord($record);
+        parent::prepareSave($data);
 
         // Auto set location for batch copy
-        $key = $record->getKeyName();
+        $key = $data->getKeyName();
 
-        if (!$record->$key && !TestHelper::getValue($record, 'locationId')) {
-            $record->setLocation($record->parent_id, $record::LOCATION_LAST_CHILD);
+        if (!$data->$key && !TestHelper::getValue($data, 'locationId')) {
+            $data->setLocation($data->parent_id, NestedRecord::LOCATION_LAST_CHILD);
+        }
+    }
+
+    /**
+     * save
+     *
+     * @param DataInterface|Entity $data
+     *
+     * @return  DataInterface|Entity
+     *
+     * @throws \Exception
+     */
+    public function save(DataInterface $data)
+    {
+        $this->saveData = $data;
+
+        try {
+            return parent::save($data);
+        } finally {
+            $this->saveData = null;
         }
     }
 
@@ -48,10 +79,12 @@ class NestedAdminRepository extends AdminRepository
      * @return  void
      * @throws \Exception
      */
-    protected function postSaveHook(Record $record)
+    protected function postSave(Record $record)
     {
         /** @var NestedRecord $record */
-        $record->rebuild();
+        if ($this->saveData->parent_id !== null) {
+            $record->rebuild();
+        }
     }
 
     /**

@@ -135,6 +135,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      * @param bool   $tz
      *
      * @return Chronos
+     * @throws \Exception
      */
     public function getDate($date = 'now', $tz = Chronos::TZ_LOCALE)
     {
