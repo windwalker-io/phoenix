@@ -69,6 +69,8 @@ $filterFields = $form->getFields(null, 'filter');
                 title="@lang('phoenix.grid.clear.button.desc')">
                 <span class="fa fa-remove fa-times"></span>
             </button>
+
+            {!! $bar ?? '' !!}
         </div>
     </div>
 @endif

@@ -44,7 +44,8 @@
 
             {{-- FILTER BAR --}}
             <div class="filter-bar">
-                {!! $filterBar->render(['form' => $form, 'show' => $showFilterBar]) !!}
+                @component('phoenix.grid.filterbar', ['form' => $form, 'show' => $showFilterBar])
+                @endcomponent
             </div>
 
             @if (count($items))
