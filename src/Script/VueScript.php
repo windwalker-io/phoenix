@@ -151,7 +151,7 @@ JS
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.3
      */
     public static function bootstrapVue(): void
     {
@@ -292,7 +292,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.3
      */
     public static function slideUpDown(): void
     {
@@ -308,7 +308,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.3
      */
     public static function filters(): void
     {

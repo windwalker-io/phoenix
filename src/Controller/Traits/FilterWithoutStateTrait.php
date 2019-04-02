@@ -13,7 +13,7 @@ use Windwalker\Filter\InputFilter;
 /**
  * The FilterWithoutStateTrait class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8.3
  */
 trait FilterWithoutStateTrait
 {

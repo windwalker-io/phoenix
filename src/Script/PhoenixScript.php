@@ -506,7 +506,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.3
      */
     public static function validation(
         ?string $selector = '#admin-form',

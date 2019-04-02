@@ -252,7 +252,7 @@ class MenuHelper
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.3
      */
     public function addPathVar($path): self
     {
@@ -270,7 +270,7 @@ class MenuHelper
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.3
      */
     public function setPathVars(array $paths = []): self
     {
@@ -284,7 +284,7 @@ class MenuHelper
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.3
      */
     public function getPathVars(): array
     {
