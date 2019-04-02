@@ -551,10 +551,14 @@ JS;
      *
      * @return  void
      */
-    public static function keepAlive($url = './', $time = null)
+    public static function keepAlive($url = null, $time = null)
     {
         if (!static::inited(__METHOD__)) {
             static::phoenix();
+
+            if ($url === null) {
+                $url = Ioc::getUriData()->root;
+            }
 
             if ($time === null) {
                 $config = Ioc::getConfig();

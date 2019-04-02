@@ -45,7 +45,7 @@ class GridDefinition extends AbstractFieldDefinition
                 ->option(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'), '{$controller.item.name.lower$}.alias');
 
             // Search Content
-            $this->text('content')
+            $this->search('content')
                 ->label(__('phoenix.grid.search.label'))
                 ->placeholder(__('phoenix.grid.search.label'));
         });

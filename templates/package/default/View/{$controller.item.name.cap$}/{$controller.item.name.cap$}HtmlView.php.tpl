@@ -88,6 +88,8 @@ class {$controller.item.name.cap$}HtmlView extends EditView
         BootstrapScript::checkbox(BootstrapScript::FONTAWESOME);
         BootstrapScript::buttonRadio();
         BootstrapScript::tooltip('.has-tooltip');
+        PhoenixScript::disableWhenSubmit();
+        PhoenixScript::keepAlive($this->package->app->uri->root);
     }
 
     /**
