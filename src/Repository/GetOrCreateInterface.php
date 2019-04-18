@@ -14,7 +14,7 @@ use Windwalker\Data\DataInterface;
 /**
  * Interface GetOrCreateInterface
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8.4
  */
 interface GetOrCreateInterface
 {
@@ -26,7 +26,7 @@ interface GetOrCreateInterface
      *
      * @return  Data
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.4
      */
     public function getItemOrCreate($conditions, $data = []): Data;
 }

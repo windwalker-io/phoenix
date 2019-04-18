@@ -33,7 +33,7 @@ namespace {$package.namespace$}{$package.name.cap$}\Record\Columns;
  * @property  string  language
  * @property  string  params
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8.4
  */
 interface {$controller.item.name.cap$}DataInterface
 {
