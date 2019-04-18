@@ -7,16 +7,20 @@
 
 (() => {
   window.RepeatableField = {
+    name: 'repeatable-field',
     data: {
       control: '',
       id: '',
       items: [],
       fields: [],
+      ensureFirstRow: 0
     },
     created() {
       this.items.map(this.prepareItem);
 
-      this.makeSureDefaultItem();
+      if (this.ensureFirstRow) {
+        this.makeSureDefaultItem();
+      }
     },
     mounted() {
       //
@@ -45,6 +49,10 @@
 
         $(el).fadeOut(() => {
           this.items.splice(i, 1);
+
+          if (this.ensureFirstRow) {
+            this.makeSureDefaultItem();
+          }
         });
       },
 
@@ -58,6 +66,12 @@
 
       getEmptyItem() {
         return $.extend({}, this.fields);
+      },
+
+      makeSureDefaultItem() {
+        if (this.items.length === 0) {
+          this.items.push(this.prepareItem(this.getEmptyItem()));
+        }
       }
     }
   };

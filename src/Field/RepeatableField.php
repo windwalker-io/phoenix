@@ -25,6 +25,7 @@ use Windwalker\String\Str;
  * @method  mixed|$this  layout(string $value = null)
  * @method  mixed|$this  configure(bool|callable|AbstractFieldDefinition $value = null)
  * @method  mixed|$this  sortable(bool $value = null)
+ * @method  mixed|$this  ensureFirstRow(bool $value = null)
  *
  * @since  1.4.2
  */
@@ -166,6 +167,7 @@ class RepeatableField extends AbstractField
 
         $control = $this->getFieldName();
         $id = $this->getId();
+        $ensureFirstRow = (int) $this->ensureFirstRow();
         $values = Asset::getJSObject($values);
         $fields = Asset::getJSObject($fields);
 
@@ -177,7 +179,8 @@ $(function () {
       control: '$control',
       id: '$id',
       items: $values,
-      fields: $fields
+      fields: $fields,
+      ensureFirstRow: $ensureFirstRow
     }
   });
   
@@ -198,7 +201,8 @@ JS;
         return array_merge(parent::getAccessors(), [
             'layout',
             'configure',
-            'sortable'
+            'sortable',
+            'ensureFirstRow',
         ]);
     }
 }
