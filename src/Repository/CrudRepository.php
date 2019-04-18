@@ -9,6 +9,7 @@
 namespace Phoenix\Repository;
 
 use Phoenix\Repository\Traits\FormAwareRepositoryTrait;
+use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
 use Windwalker\Record\Exception\NoResultException;
@@ -19,7 +20,9 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class CrudRepository extends ItemRepository implements FormAwareRepositoryInterface, CrudRepositoryInterface
+class CrudRepository extends ItemRepository implements FormAwareRepositoryInterface,
+    CrudRepositoryInterface,
+    GetOrCreateInterface
 {
     use FormAwareRepositoryTrait;
 
@@ -83,6 +86,50 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
         $data->bind($record->dump(true));
 
         return $data;
+    }
+
+    /**
+     * getItemOrCreate
+     *
+     * @param mixed               $conditions
+     * @param array|DataInterface $data
+     * @param bool                $useConditions
+     *
+     * @return  Data
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Exception
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getItemOrCreate($conditions, $data = [], bool $useConditions = true): Data
+    {
+        $item = $this->getItem($conditions);
+
+        if ($item->notNull()) {
+            return $item;
+        }
+
+        if (!$data instanceof DataInterface) {
+            $data = new Data($data);
+        }
+
+        if ($useConditions) {
+            $conds = $conditions;
+
+            if (is_scalar($conds)) {
+                $conds = [$this->getKeyName() => $conds];
+            }
+
+            if (is_array($conds)) {
+                $data->bind($conds);
+            }
+        }
+
+        $this->save($data);
+
+        $this->resetCache();
+
+        return $this->getItem($conditions);
     }
 
     /**
