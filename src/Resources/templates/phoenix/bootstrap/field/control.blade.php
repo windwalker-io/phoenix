@@ -31,13 +31,13 @@ if (\Phoenix\Script\BootstrapScript::$currentVersion === 3) {
             <div class="input-group">
                 @if ($field->get('prepend'))
                     <div class="input-group-prepend">
-                        {!! $field->get('prepend') !!}
+                        {!! \Windwalker\String\Str::toString($field->get('prepend')) !!}
                     </div>
                 @endif
                 {!! $inputHtml !!}
                 @if ($field->get('append'))
                     <div class="input-group-append">
-                        {!! $field->get('append') !!}
+                        {!! \Windwalker\String\Str::toString($field->get('append')) !!}
                     </div>
                 @endif
             </div>
