@@ -34,6 +34,7 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
                 {{-- items --}}
             </div>
             @if ($field->get('required'))
+                @unset($attrs['value'])
                 <input type="text" name="{{ $field->getFieldName() }}-placeholder" value=""
                     data-validation-placeholder class="form-control" style="display: none;"
                     {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attrs) !!} />
