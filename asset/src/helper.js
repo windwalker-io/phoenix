@@ -11,6 +11,8 @@
 
     static get proxies() {
       return {
+        $get: 'get',
+        $set: 'set',
         isDebug: 'isDebug',
         confirm: 'confirm',
         keepAlive: 'keepAlive',
@@ -33,6 +35,42 @@
       super();
 
       this.aliveHandle = null;
+    }
+
+    get(obj, path) {
+      const keys = Array.isArray(path) ? path : path.split('.');
+
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+
+        if (!obj || !obj.hasOwnProperty(key)) {
+          obj = undefined;
+          break;
+        }
+
+        obj = obj[key];
+      }
+
+      return obj;
+    }
+
+    set(obj, path, value) {
+      const keys = Array.isArray(path) ? path : path.split('.');
+      let i;
+
+      for (i = 0; i < keys.length - 1; i++) {
+        const key = keys[i];
+        console.log(obj.hasOwnProperty(key), key);
+        if (!obj.hasOwnProperty(key)) {
+          obj[key] = {};
+        }
+
+        obj = obj[key];
+      }
+
+      obj[keys[i]] = value;
+
+      return value;
     }
 
     isDebug() {

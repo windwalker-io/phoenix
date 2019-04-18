@@ -22,11 +22,11 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -378,7 +378,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(_temp)).call.apply(_getPrototypeOf2, [this].concat(args)));
 
-        _defineProperty(_assertThisInitialized(_this), "_listeners", {});
+        _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "_listeners", {});
 
         return _this;
       }
@@ -927,6 +927,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       key: "proxies",
       get: function get() {
         return {
+          $get: 'get',
+          $set: 'set',
           isDebug: 'isDebug',
           confirm: 'confirm',
           keepAlive: 'keepAlive',
@@ -958,6 +960,44 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     _createClass(PhoenixHelper, [{
+      key: "get",
+      value: function get(obj, path) {
+        var keys = Array.isArray(path) ? path : path.split('.');
+
+        for (var i = 0; i < keys.length; i++) {
+          var key = keys[i];
+
+          if (!obj || !obj.hasOwnProperty(key)) {
+            obj = undefined;
+            break;
+          }
+
+          obj = obj[key];
+        }
+
+        return obj;
+      }
+    }, {
+      key: "set",
+      value: function set(obj, path, value) {
+        var keys = Array.isArray(path) ? path : path.split('.');
+        var i;
+
+        for (i = 0; i < keys.length - 1; i++) {
+          var key = keys[i];
+          console.log(obj.hasOwnProperty(key), key);
+
+          if (!obj.hasOwnProperty(key)) {
+            obj[key] = {};
+          }
+
+          obj = obj[key];
+        }
+
+        obj[keys[i]] = value;
+        return value;
+      }
+    }, {
       key: "isDebug",
       value: function isDebug() {
         return this.phoenix.data('windwalker.debug');
@@ -2730,7 +2770,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _this18 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixStack).call(this));
 
-      _defineProperty(_assertThisInitialized(_this18), "stacks", {});
+      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this18)), "stacks", {});
 
       return _this18;
     }
