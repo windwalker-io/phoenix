@@ -45,8 +45,6 @@
 
         $(el).fadeOut(() => {
           this.items.splice(i, 1);
-
-          this.makeSureDefaultItem();
         });
       },
 
@@ -60,12 +58,6 @@
 
       getEmptyItem() {
         return $.extend({}, this.fields);
-      },
-
-      makeSureDefaultItem() {
-        if (this.items.length === 0) {
-          this.items.push(this.prepareItem(this.getEmptyItem()));
-        }
       }
     }
   };

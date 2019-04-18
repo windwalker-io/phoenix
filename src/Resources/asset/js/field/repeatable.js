@@ -42,8 +42,6 @@
         var el = this.$refs['repeat-item-' + i][0];
         $(el).fadeOut(function () {
           _this2.items.splice(i, 1);
-
-          _this2.makeSureDefaultItem();
         });
       },
       prepareItem: function prepareItem(item) {
@@ -55,11 +53,6 @@
       },
       getEmptyItem: function getEmptyItem() {
         return $.extend({}, this.fields);
-      },
-      makeSureDefaultItem: function makeSureDefaultItem() {
-        if (this.items.length === 0) {
-          this.items.push(this.prepareItem(this.getEmptyItem()));
-        }
       }
     }
   };

@@ -22,7 +22,10 @@ $form->setRenderer($field->getForm()->getRenderer());
                 </th>
             @endforeach
             <th class="text-right">
-                <span class="fa fa-cog"></span>
+                <button type="button" class="btn btn-sm btn-success btn-primary"
+                    @click="addItem(-1)">
+                    <span class="fa fa-plus"></span>
+                </button>
             </th>
         </tr>
         </thead>
