@@ -23,22 +23,22 @@
       name: String,
       disabled: Boolean,
       trueValue: {
-        default: '1'
+        "default": '1'
       },
       falseValue: {
-        default: '0'
+        "default": '0'
       },
       size: {
         type: String,
-        default: 'default'
+        "default": 'default'
       },
       color: {
         type: String,
-        default: 'primary'
+        "default": 'primary'
       },
       shape: {
         type: String,
-        default: 'square'
+        "default": 'square'
       }
     },
     created: function created() {

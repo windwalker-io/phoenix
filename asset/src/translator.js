@@ -42,7 +42,9 @@
         return this.sprintf(text, ...args);
       }
 
-      return this.find(key);
+      const translated =  this.find(key);
+
+      return translated !== null ? this.wrapDebug(translated, true) : this.wrapDebug(text, false);
     }
 
     /**
@@ -66,7 +68,7 @@
         return langs[key];
       }
 
-      return key;
+      return null;
     }
 
     /**
@@ -105,8 +107,20 @@
      * @return {string}
      */
      normalize(text) {
-      return text.replace(/[^A-Z0-9]+/ig, '.');
-    }
+       return text.replace(/[^A-Z0-9]+/ig, '.');
+     }
+
+     wrapDebug(text, success) {
+       if (this.phoenix.isDebug()) {
+         if (success) {
+           return '**' + text + '**';
+         }
+
+         return '??' + text + '??';
+       }
+
+       return text;
+     }
   }
 
   window.PhoenixTranslator = PhoenixTranslator;

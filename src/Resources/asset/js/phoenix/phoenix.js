@@ -22,11 +22,11 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -378,7 +378,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(_temp)).call.apply(_getPrototypeOf2, [this].concat(args)));
 
-        _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "_listeners", {});
+        _defineProperty(_assertThisInitialized(_this), "_listeners", {});
 
         return _this;
       }
@@ -688,7 +688,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     return _class4;
-  }()).with(PhoenixEventMixin));
+  }())["with"](PhoenixEventMixin));
 
   window.PhoenixCore = PhoenixCore;
 })(jQuery);
@@ -1033,7 +1033,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         }
 
         if (falseCallback) {
-          when.catch(callback);
+          when["catch"](callback);
         }
 
         var confirmed = confirm(message);
@@ -2646,7 +2646,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           return this.sprintf.apply(this, [text].concat(args));
         }
 
-        return this.find(key);
+        var translated = this.find(key);
+        return translated !== null ? this.wrapDebug(translated, true) : this.wrapDebug(text, false);
       }
       /**
        * Sptintf language string.
@@ -2678,7 +2679,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           return langs[key];
         }
 
-        return key;
+        return null;
       }
       /**
        * Has language key.
@@ -2721,6 +2722,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       key: "normalize",
       value: function normalize(text) {
         return text.replace(/[^A-Z0-9]+/ig, '.');
+      }
+    }, {
+      key: "wrapDebug",
+      value: function wrapDebug(text, success) {
+        if (this.phoenix.isDebug()) {
+          if (success) {
+            return '**' + text + '**';
+          }
+
+          return '??' + text + '??';
+        }
+
+        return text;
       }
     }]);
 
@@ -2770,7 +2784,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _this18 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixStack).call(this));
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this18)), "stacks", {});
+      _defineProperty(_assertThisInitialized(_this18), "stacks", {});
 
       return _this18;
     }
