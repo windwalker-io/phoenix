@@ -62,6 +62,23 @@ class MenuHelper
     }
 
     /**
+     * isActive
+     *
+     * @param bool        $result
+     * @param string|null $activeString
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function isActive(bool $result, ?string $activeString = null): string
+    {
+        $activeString = $activeString ?: $this->activeString;
+
+        return $result ? $activeString : '';
+    }
+
+    /**
      * active
      *
      * @param string|array $path
