@@ -17,6 +17,7 @@ use Windwalker\Form\Form;
  *
  * @method  mixed|$this  asGroup(bool $value = null)
  * @method  mixed|$this  layout(string $value = null)
+ * @method  mixed|$this  showLabel(bool $value = null)
  *
  * @since  1.4.2
  */
@@ -62,7 +63,7 @@ class InlineField extends TextField
         return WidgetHelper::render($this->get('layout', 'phoenix.form.field.inline'), [
             'form' => $this->inlineForm,
             'attrs' => $attrs,
-            'field' => $this,
+            'field' => $this
         ], WidgetHelper::EDGE);
     }
 
@@ -92,6 +93,7 @@ class InlineField extends TextField
         return array_merge(parent::getAccessors(), [
             'asGroup' => 'as_group',
             'layout',
+            'showLabel' => 'show_label'
         ]);
     }
 }

@@ -2,10 +2,14 @@
 <?php
 /**
  * @var $form \Windwalker\Form\Form
+ * @var $field \Phoenix\Field\InlineField
+ * @var $form \Windwalker\Form\Form
+ * @var $fields \Windwalker\Form\Field\AbstractField[]
  */
 
 $bs4 = \Phoenix\Script\BootstrapScript::$currentVersion === 4;
 $fields = $form->getFields('inline-' . $field->getName(true));
+$showLabel = $field->showLabel() ?? false;
 $count = count($fields);
 $i = 1;
 ?>
@@ -20,9 +24,17 @@ $i = 1;
 
         $attrs['class'] = $subField->getType() . '-field flex-grow-1 ' . ($count === $i ? '' : 'mr-sm-3') . ' ' . $attrs['class'];
         $attrs['style'] = ($bs4 ? '' : 'display: inline-block;') . $attrs['style'];
+        
+        if (!$showLabel) {
+            $subField->appendAttribute('labelClass', 'sr-only');
+        }
+
+        $subField->appendAttribute('labelWidth', 'w-100');
         ?>
         <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attrs) !!}>
-            {!! $subField->appendAttribute('labelClass', 'sr-only')->renderLabel() !!}
+            @if (trim($subField->getLabel()))
+                {!! $subField->renderLabel() !!}
+            @endif
             {!! $subField->renderInput() !!}
         </div>
         @php($i++)
