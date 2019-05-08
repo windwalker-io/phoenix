@@ -159,7 +159,7 @@ fusion.task('install', function () {
   fusion.copy(`${nodePath}/sortablejs/*.js`, `${destPath}/js/sortablejs/`);
 
   // Vue Draggable
-  fusion.copy(`${nodePath}/vuedraggable/dist/*`, `${destPath}/js/vue/`);
+  fusion.copy(`${nodePath}/vuedraggable/dist/*`, `${destPath}/js/vue/draggable/`);
 
   // Bootstrap Vue
   fusion.copy(`${nodePath}/bootstrap-vue/dist/*`, `${destPath}/js/vue/bootstrap/`);

@@ -283,7 +283,7 @@ JS;
         if (!static::inited(__METHOD__)) {
             PhoenixScript::sortableJS();
 
-            static::addJS(static::phoenixName() . '/js/vue/vuedraggable.min.js');
+            static::addJS(static::phoenixName() . '/js/vue/draggable/vuedraggable.umd.min.js');
         }
     }
 
