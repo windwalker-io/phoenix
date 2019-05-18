@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*!
  * BootstrapVue Custom CSS (https://bootstrap-vue.js.org)
  */
@@ -47,7 +48,7 @@
   display: none !important;
 }
 
-.b-dropdown-form {
+.dropdown.b-dropdown .b-dropdown-form {
   display: inline-block;
   padding: 0.25rem 1.5rem;
   width: 100%;
@@ -55,14 +56,15 @@
   font-weight: 400;
 }
 
-.b-dropdown-form:first-child {
-  border-top-left-radius: calc(0.25rem - 1px);
-  border-top-right-radius: calc(0.25rem - 1px);
+.dropdown.b-dropdown .b-dropdown-form:focus {
+  outline: 1px dotted !important;
+  outline: 5px auto -webkit-focus-ring-color !important;
 }
 
-.b-dropdown-form:last-child {
-  border-bottom-right-radius: calc(0.25rem - 1px);
-  border-bottom-left-radius: calc(0.25rem - 1px);
+.dropdown.b-dropdown .b-dropdown-form.disabled, .dropdown.b-dropdown .b-dropdown-form:disabled {
+  outline: 0 !important;
+  color: #6c757d;
+  pointer-events: none;
 }
 
 .b-dropdown-text {
@@ -72,16 +74,6 @@
   width: 100%;
   clear: both;
   font-weight: lighter;
-}
-
-.b-dropdown-text:first-child {
-  border-top-left-radius: calc(0.25rem - 1px);
-  border-top-right-radius: calc(0.25rem - 1px);
-}
-
-.b-dropdown-text:last-child {
-  border-bottom-right-radius: calc(0.25rem - 1px);
-  border-bottom-left-radius: calc(0.25rem - 1px);
 }
 
 .input-group > .input-group-prepend > .btn-group > .btn,
@@ -393,20 +385,20 @@ input[type="color"].form-control:disabled {
   font-size: inherit;
   line-height: inherit;
   opacity: 0.4;
-  content: "\2195";
+  content: "↕";
   speak: none;
 }
 
 .table.b-table > thead > tr > th[aria-sort][aria-sort="ascending"]::after,
 .table.b-table > tfoot > tr > th[aria-sort][aria-sort="ascending"]::after {
   opacity: 1;
-  content: "\2193";
+  content: "↓";
 }
 
 .table.b-table > thead > tr > th[aria-sort][aria-sort="descending"]::after,
 .table.b-table > tfoot > tr > th[aria-sort][aria-sort="descending"]::after {
   opacity: 1;
-  content: "\2191";
+  content: "↑";
 }
 
 @media (max-width: 575.98px) {
