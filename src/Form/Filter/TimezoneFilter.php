@@ -60,11 +60,12 @@ class TimezoneFilter implements FilterInterface
      * @param string $text
      *
      * @return  mixed
+     * @throws \Exception
      */
     public function clean($text)
     {
         if (!$text) {
-            return Chronos::getNullDate();
+            return $text;
         }
 
         if ($this->from === $this->to) {
