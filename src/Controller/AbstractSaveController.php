@@ -67,6 +67,10 @@ abstract class AbstractSaveController extends AbstractPostController
         } else {
             $this->data = (array) $this->input->toArray();
         }
+
+        $data = $this->getDataObject();
+
+        $data->bind($this->data);
     }
 
     /**
@@ -114,8 +118,6 @@ abstract class AbstractSaveController extends AbstractPostController
         $this->isNew = !$pk;
 
         $data = $this->getDataObject();
-
-        $data->bind($this->data);
 
         if (!$this->checkAccess($data)) {
             throw new UnauthorizedException('You have no access to modify this resource.');
