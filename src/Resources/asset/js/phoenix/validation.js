@@ -257,6 +257,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
         if (result) {
           result = input.checkValidity();
+          this.showResponse(this.STATE_SUCCESS, $input, help);
         }
 
         if (result) {
@@ -306,7 +307,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
           validation: this
         });
         $input.trigger({
-          type: 'phoenix.validate.' + state,
+          type: 'phoenix.validate.input.' + state,
           input: $input,
           state: state,
           help: help
@@ -447,6 +448,12 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
   handlers.ip = function (value, element) {
     var regex = /^((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))*$/;
     return regex.test(value);
+  };
+
+  handlers['password-confirm'] = function (value, element) {
+    var selector = element.attr('data-confirm-target');
+    var target = $(selector);
+    return target.val() === value;
   };
 
   window.PhoenixValidation = PhoenixValidation;

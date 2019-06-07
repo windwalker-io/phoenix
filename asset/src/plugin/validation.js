@@ -203,6 +203,7 @@
       // Check native validity
       if (result) {
         result = input.checkValidity();
+        this.showResponse(this.STATE_SUCCESS, $input, help);
       }
 
       if (result) {
@@ -250,7 +251,7 @@
       this.phoenix.trigger('validation.response', {state, $input, help, validation: this});
 
       $input.trigger({
-        type: 'phoenix.validate.' + state,
+        type: 'phoenix.validate.input.' + state,
         input: $input,
         state: state,
         help: help
@@ -378,6 +379,13 @@
   handlers.ip = function(value, element) {
     const regex = /^((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))*$/;
     return regex.test(value);
+  };
+
+  handlers['password-confirm'] = function (value, element) {
+    const selector = element.attr('data-confirm-target');
+    const target = $(selector);
+
+    return target.val() === value;
   };
 
   window.PhoenixValidation = PhoenixValidation;
