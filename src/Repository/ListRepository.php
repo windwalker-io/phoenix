@@ -522,7 +522,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
         return $this->once('start', function () {
             $start = $this->state['list.start'];
 
-            if ($this->config->get('list.fix_page', false)) {
+            if ($this->config->get('list.fix_page', true)) {
                 $limit = $this->getLimit();
                 $total = $this->getTotal();
 

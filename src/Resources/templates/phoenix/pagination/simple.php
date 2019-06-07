@@ -13,11 +13,11 @@ use Windwalker\Core\Pagination\PaginationResult;
  * @var callable         $route
  */
 ?>
-<div class="windwalker-pagination">
-    <div class="btn-group pull-left">
+<div class="windwalker-pagination d-flex">
+    <div class="btn-group">
         <?php if ($pagination->getFirst()) : ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
-                class="has-tooltip btn btn-default"
+                class="has-tooltip btn btn-outline-secondary"
                 title="<?php echo __('phoenix.pagination.first'); ?>">
                 <span class="fa fa-fast-backward"></span>
                 <span class="sr-only">
@@ -28,7 +28,7 @@ use Windwalker\Core\Pagination\PaginationResult;
 
         <?php if ($pagination->getPrevious()) : ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
-                class="has-tooltip btn btn-default"
+                class="has-tooltip btn btn-outline-secondary"
                 title="<?php echo __('phoenix.pagination.previous'); ?>">
                 <span class="fa fa-backward"></span>
                 <span class="sr-only">
@@ -38,10 +38,10 @@ use Windwalker\Core\Pagination\PaginationResult;
         <?php endif; ?>
     </div>
 
-    <div class="pull-right">
+    <div class="btn-group ml-auto">
         <?php if ($pagination->getNext()) : ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
-                class="has-tooltip btn btn-default"
+                class="has-tooltip btn btn-outline-secondary"
                 title="<?php echo __('phoenix.pagination.next'); ?>">
                 <span class="fa fa-forward"></span>
                 <span class="sr-only">

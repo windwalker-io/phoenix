@@ -68,9 +68,9 @@ class ListView extends AbstractPhoenixHtmView
     {
         parent::prepareData($data);
 
-        $data->items = $data->items ?: $this->repository->getItems();
-
         $this->preparePagination($data);
+
+        $data->items = $data->items ?: $this->repository->getItems();
 
         $data->limit = $data->limit ?: $this->repository->getLimit();
         $data->start = $data->start ?: $this->repository->getStart();
