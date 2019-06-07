@@ -64,7 +64,7 @@ class BatchDelegatingController extends AbstractPhoenixController
         $repository = $this->repository instanceof Repository ? null : $this->repository;
 
         /** @var AbstractController $controller */
-        $controller = new $class();
+        $controller = $this->container->newInstance($class);
         $controller->setName($this->getName());
         $controller->config->set('item_name', $repository ?: $this->config['item_name']);
         $controller->config->set('list_name', $this->config['list_name']);
