@@ -1,5 +1,5 @@
 /*!
- * BoostrapVue 2.0.0-rc.20
+ * BoostrapVue 2.0.0-rc.22
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -10,9 +10,16 @@
 
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var Vue = _interopDefault(require('vue'));
+var vueFunctionalDataMerge = require('vue-functional-data-merge');
+var portalVue = require('portal-vue');
+var Popper = _interopDefault(require('popper.js'));
+
+//
 
 /**
  * Utilities to get information about the current environment
@@ -23,7 +30,11 @@ var hasDocumentSupport = typeof document !== 'undefined';
 var hasNavigatorSupport = typeof navigator !== 'undefined';
 var hasPromiseSupport = typeof Promise !== 'undefined';
 var hasMutationObserverSupport = typeof MutationObserver !== 'undefined' || typeof WebKitMutationObserver !== 'undefined' || typeof MozMutationObserver !== 'undefined';
-var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Determine if the browser supports the option passive for events
+var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Browser type sniffing
+
+var userAgent = isBrowser ? window.navigator.userAgent.toLowerCase() : '';
+var isJSDOM = userAgent.indexOf('jsdom') > 0;
+var isIE = /msie|trident/.test(userAgent); // Determine if the browser supports the option passive for events
 
 var hasPassiveEventSupport = function () {
   var passiveEventSupported = false;
@@ -51,7 +62,11 @@ var hasPassiveEventSupport = function () {
   return passiveEventSupported;
 }();
 var hasTouchSupport = isBrowser && ('ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0);
-var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent); // --- Getters ---
+var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent);
+var hasIntersectionObserverSupport = isBrowser && 'IntersectionObserver' in window && 'IntersectionObserverEntry' in window && // Edge 15 and UC Browser lack support for `isIntersecting`
+// but we an use intersectionRatio > 0 instead
+// 'isIntersecting' in window.IntersectionObserverEntry.prototype &&
+'intersectionRatio' in window.IntersectionObserverEntry.prototype; // --- Getters ---
 
 var getEnv = function getEnv(key) {
   var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -1139,18 +1154,6 @@ var get = function get(obj, path) {
   }) ? obj : defaultValue;
 };
 
-var memoize = function memoize(fn) {
-  var cache = create(null);
-  return function () {
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    var argsKey = JSON.stringify(args);
-    return cache[argsKey] = cache[argsKey] || fn.apply(null, args);
-  };
-};
-
 //
 // BREAKPOINT DEFINITIONS
 //
@@ -1283,25 +1286,159 @@ var DEFAULTS = {
     solid: false
   },
   BToaster: {
-    ariaLive: 'polite',
-    ariaAtomic: 'true',
+    ariaLive: null,
+    ariaAtomic: null,
     role: null
   },
   BTooltip: {
+    delay: 0,
     boundary: 'scrollParent',
     boundaryPadding: 5
   },
   BPopover: {
+    delay: 0,
     boundary: 'scrollParent',
     boundaryPadding: 5
-  } // This contains user defined configuration
-
+  }
 };
-var CONFIG = {}; // Method to get a deep clone (immutable) copy of the defaults
+var BvConfig = Vue.extend({
+  created: function created() {
+    // Non reactive private properties
+    this.$_config = {};
+    this.$_cachedBreakpoints = null;
+  },
+  methods: {
+    getDefaults: function getDefaults() {
+      // Returns a copy of the defaults
+      return cloneDeep(DEFAULTS);
+    },
+    getConfig: function getConfig() {
+      // Returns a copy of the user config
+      return cloneDeep(this.$_config);
+    },
+    resetConfig: function resetConfig() {
+      // Clear the config. For testing purposes only
+      this.$_config = {};
+    },
+    getConfigValue: function getConfigValue(key) {
+      // First we try the user config, and if key not found we fall back to default value
+      // NOTE: If we deep clone DEFAULTS into config, then we can skip the fallback for get
+      return cloneDeep(get(this.$_config, key, get(DEFAULTS, key)));
+    },
+    getComponentConfig: function getComponentConfig(cmpName) {
+      var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      // Return the particular config value for key for if specified,
+      // otherwise we return the full config
+      return key ? this.getConfigValue("".concat(cmpName, ".").concat(key)) : this.getConfigValue(cmpName) || {};
+    },
+    getBreakpoints: function getBreakpoints() {
+      // Convenience method for getting all breakpoint names
+      return this.getConfigValue('breakpoints');
+    },
+    getBreakpointsCached: function getBreakpointsCached() {
+      // Convenience method for getting all breakpoint names
+      // Caches the results after first access
+      if (!this.$_cachedBreakpoints) {
+        this.$_cachedBreakpoints = this.getBreakpoints();
+      }
 
-var getDefaults = function getDefaults() {
-  return cloneDeep(DEFAULTS);
-}; // Method to set the config
+      return cloneDeep(this.$_cachedBreakpoints);
+    },
+    getBreakpointsUp: function getBreakpointsUp() {
+      // Convenience method for getting breakpoints with
+      // the smallest breakpoint set as ''
+      // Useful for components that create breakpoint specific props
+      var breakpoints = this.getBreakpoints();
+      breakpoints[0] = '';
+      return breakpoints;
+    },
+    getBreakpointsUpCached: function getBreakpointsUpCached() {
+      // Convenience method for getting breakpoints with
+      // the smallest breakpoint set as ''
+      // Useful for components that create breakpoint specific props
+      // Caches the results after first access
+      var breakpoints = this.getBreakpointsCached();
+      breakpoints[0] = '';
+      return breakpoints;
+    },
+    getBreakpointsDown: function getBreakpointsDown() {
+      // Convenience method for getting breakpoints with
+      // the largest breakpoint set as ''
+      // Useful for components that create breakpoint specific props
+      var breakpoints = this.getBreakpoints();
+      breakpoints[breakpoints.length - 1] = '';
+      return breakpoints;
+    },
+    getBreakpointsDownCached: function getBreakpointsDownCached()
+    /* istanbul ignore next: we don't use this method anywhere, yet */
+    {
+      // Convenience method for getting breakpoints with
+      // the largest breakpoint set as ''
+      // Useful for components that create breakpoint specific props
+      // Caches the results after first access
+      var breakpoints = this.getBreakpointsCached();
+      breakpoints[breakpoints.length - 1] = '';
+      return breakpoints;
+    },
+    setConfig: function setConfig() {
+      var _this = this;
+
+      var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      if (!isObject(config)) {
+        /* istanbul ignore next */
+        return;
+      }
+
+      keys(config).filter(function (cmpName) {
+        return config.hasOwnProperty(cmpName);
+      }).forEach(function (cmpName) {
+        if (!DEFAULTS.hasOwnProperty(cmpName)) {
+          /* istanbul ignore next */
+          warn("config: unknown config property \"".concat(cmpName, "\""));
+          /* istanbul ignore next */
+
+          return;
+        }
+
+        var cmpConfig = config[cmpName];
+
+        if (cmpName === 'breakpoints') {
+          // Special case for breakpoints
+          var breakpoints = config.breakpoints;
+
+          if (!isArray$1(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
+            return !isString(b) || b.length === 0;
+          })) {
+            /* istanbul ignore next */
+            warn('config: "breakpoints" must be an array of at least 2 breakpoint names');
+          } else {
+            _this.$_config.breakpoints = cloneDeep(breakpoints);
+          }
+        } else if (isObject(cmpConfig)) {
+          keys(cmpConfig).filter(function (key) {
+            return cmpConfig.hasOwnProperty(key);
+          }).forEach(function (key) {
+            if (!DEFAULTS[cmpName].hasOwnProperty(key)) {
+              /* istanbul ignore next */
+              warn("config: unknown config property \"".concat(cmpName, ".{$key}\""));
+            } else {
+              // If we pre-populate the config with defaults, we can skip this line
+              _this.$_config[cmpName] = _this.$_config[cmpName] || {};
+
+              if (!isUndefined(cmpConfig[key])) {
+                _this.$_config[cmpName][key] = cloneDeep(cmpConfig[key]);
+              }
+            }
+          });
+        }
+      });
+    }
+  }
+}); // This contains user defined configuration manager object.
+// This object should be treated as private!
+
+Vue.prototype.$bvConfig = Vue.prototype.$bvConfig || new BvConfig(); // Method to get a deep clone (immutable) copy of the defaults
 // Merges in only known top-level and sub-level keys
 //   Vue.use(BootstrapVue, config)
 // or
@@ -1311,64 +1448,8 @@ var getDefaults = function getDefaults() {
 
 var setConfig = function setConfig() {
   var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  if (!isObject(config)) {
-    /* istanbul ignore next */
-    return;
-  }
-
-  keys(config).filter(function (cmpName) {
-    return config.hasOwnProperty(cmpName);
-  }).forEach(function (cmpName) {
-    if (!DEFAULTS.hasOwnProperty(cmpName)) {
-      /* istanbul ignore next */
-      warn("config: unknown config property \"".concat(cmpName, "\""));
-      /* istanbul ignore next */
-
-      return;
-    }
-
-    var cmpConfig = config[cmpName];
-
-    if (cmpName === 'breakpoints') {
-      // Special case for breakpoints
-      var breakpoints = config.breakpoints;
-
-      if (!isArray$1(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
-        return !isString(b) || b.length === 0;
-      })) {
-        /* istanbul ignore next */
-        warn('config: "breakpoints" must be an array of at least 2 breakpoint names');
-      } else {
-        CONFIG.breakpoints = cloneDeep(breakpoints);
-      }
-    } else if (isObject(cmpConfig)) {
-      keys(cmpConfig).filter(function (key) {
-        return cmpConfig.hasOwnProperty(key);
-      }).forEach(function (key) {
-        if (!DEFAULTS[cmpName].hasOwnProperty(key)) {
-          /* istanbul ignore next */
-          warn("config: unknown config property \"".concat(cmpName, ".{$key}\""));
-        } else {
-          // If we pre-populate the config with defaults, we can skip this line
-          CONFIG[cmpName] = CONFIG[cmpName] || {};
-
-          if (!isUndefined(cmpConfig[key])) {
-            CONFIG[cmpName][key] = cloneDeep(cmpConfig[key]);
-          }
-        }
-      });
-    }
-  });
+  Vue.prototype.$bvConfig.setConfig(config);
 }; // Reset the user config to default
-// Returns a deep clone (immutable) copy
-
-
-var getConfigValue = function getConfigValue(key) {
-  // First we try the user config, and if key not found we fall back to default value
-  // NOTE: If we deep clone DEFAULTS into config, then we can skip the fallback for get
-  return cloneDeep(get(CONFIG, key, get(getDefaults(), key)));
-}; // Method to grab a config value for a particular component.
 // Returns a deep clone (immutable) copy
 
 
@@ -1376,44 +1457,39 @@ var getComponentConfig = function getComponentConfig(cmpName) {
   var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   // Return the particular config value for key for if specified,
   // otherwise we return the full config
-  return key ? getConfigValue("".concat(cmpName, ".").concat(key)) : getConfigValue(cmpName) || {};
+  return Vue.prototype.$bvConfig.getComponentConfig(cmpName, key);
 }; // Convenience method for getting all breakpoint names
 
 
 var getBreakpoints = function getBreakpoints() {
-  return getConfigValue('breakpoints');
+  return Vue.prototype.$bvConfig.getBreakpoints();
 }; // Convenience method for getting all breakpoint names
-// Caches the results after first access
-
-
-var getBreakpointsCached = memoize(function () {
-  return getConfigValue('breakpoints');
-}); // Convenience method for getting breakpoints with
 // the smallest breakpoint set as ''
 // Useful for components that create breakpoint specific props
 // Caches the results after first access
 
 
-var getBreakpointsUpCached = memoize(function () {
-  var breakpoints = getBreakpointsCached().slice();
-  breakpoints[0] = '';
-  return breakpoints;
-}); // Convenience method for getting breakpoints with
+var getBreakpointsUpCached = function getBreakpointsUpCached() {
+  return Vue.prototype.$bvConfig.getBreakpointsUpCached();
+}; // Convenience method for getting breakpoints with
 
-var MULTIPLE_VUE_WARNING = "Multiple instances of Vue detected!\nSee: https://bootstrap-vue.js.org/docs#using-module-bundlers";
-var checkMultipleVueWarned = false;
 /**
- * Checks if there are multiple instances of Vue, and warns (once) about issues.
+ * Checks if there are multiple instances of Vue, and warns (once) about possible issues.
  * @param {object} Vue
  */
 
-var checkMultipleVue = function checkMultipleVue(Vue$1) {
-  /* istanbul ignore next */
-  if (!checkMultipleVueWarned && Vue !== Vue$1) {
-    warn(MULTIPLE_VUE_WARNING);
+var checkMultipleVue = function () {
+  var checkMultipleVueWarned = false;
+  var MULTIPLE_VUE_WARNING = ['Multiple instances of Vue detected!', 'You may need to set up an alias for Vue in your bundler config.', 'See: https://bootstrap-vue.js.org/docs#using-module-bundlers'].join('\n');
+  return function (Vue$1) {
+    /* istanbul ignore next */
+    if (!checkMultipleVueWarned && Vue !== Vue$1 && !isJSDOM) {
+      warn(MULTIPLE_VUE_WARNING);
+    }
+
     checkMultipleVueWarned = true;
-  }
-};
+  };
+}();
 /**
  * Plugin install factory function.
  * @param {object} { components, directives }
@@ -1511,598 +1587,6 @@ var registerDirectives = function registerDirectives(Vue) {
     registerDirective(Vue, directive, directives[directive]);
   }
 };
-/**
- * Install plugin if window.Vue available
- * @param {object} Plugin definition
- */
-
-var vueUse = function vueUse(VuePlugin) {
-  /* istanbul ignore next */
-  if (hasWindowSupport && window.Vue) {
-    window.Vue.use(VuePlugin);
-  }
-};
-
-//
-
-function _typeof$1(obj) {
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof$1 = function (obj) {
-      return typeof obj;
-    };
-  } else {
-    _typeof$1 = function (obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-  }
-
-  return _typeof$1(obj);
-}
-
-function _toConsumableArray$1(arr) {
-  return _arrayWithoutHoles$1(arr) || _iterableToArray$1(arr) || _nonIterableSpread$1();
-}
-
-function _arrayWithoutHoles$1(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
-}
-
-function _iterableToArray$1(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-}
-
-function _nonIterableSpread$1() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
-}
-
-var inBrowser = typeof window !== 'undefined';
-function freeze(item) {
-  if (Array.isArray(item) || _typeof$1(item) === 'object') {
-    return Object.freeze(item);
-  }
-
-  return item;
-}
-function combinePassengers(transports) {
-  var slotProps = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  return transports.reduce(function (passengers, transport) {
-    var temp = transport.passengers[0];
-    var newPassengers = typeof temp === 'function' ? temp(slotProps) : transport.passengers;
-    return passengers.concat(newPassengers);
-  }, []);
-}
-function stableSort(array, compareFn) {
-  return array.map(function (v, idx) {
-    return [idx, v];
-  }).sort(function (a, b) {
-    return compareFn(a[1], b[1]) || a[0] - b[0];
-  }).map(function (c) {
-    return c[1];
-  });
-}
-function pick(obj, keys) {
-  return keys.reduce(function (acc, key) {
-    if (obj.hasOwnProperty(key)) {
-      acc[key] = obj[key];
-    }
-
-    return acc;
-  }, {});
-}
-
-var transports = {};
-var targets = {};
-var sources = {};
-var Wormhole = Vue.extend({
-  data: function data() {
-    return {
-      transports: transports,
-      targets: targets,
-      sources: sources,
-      trackInstances: inBrowser
-    };
-  },
-  methods: {
-    open: function open(transport) {
-      if (!inBrowser) return;
-      var to = transport.to,
-          from = transport.from,
-          passengers = transport.passengers,
-          _transport$order = transport.order,
-          order = _transport$order === void 0 ? Infinity : _transport$order;
-      if (!to || !from || !passengers) return;
-      var newTransport = {
-        to: to,
-        from: from,
-        passengers: freeze(passengers),
-        order: order
-      };
-      var keys = Object.keys(this.transports);
-
-      if (keys.indexOf(to) === -1) {
-        Vue.set(this.transports, to, []);
-      }
-
-      var currentIndex = this.$_getTransportIndex(newTransport); // Copying the array here so that the PortalTarget change event will actually contain two distinct arrays
-
-      var newTransports = this.transports[to].slice(0);
-
-      if (currentIndex === -1) {
-        newTransports.push(newTransport);
-      } else {
-        newTransports[currentIndex] = newTransport;
-      }
-
-      this.transports[to] = stableSort(newTransports, function (a, b) {
-        return a.order - b.order;
-      });
-    },
-    close: function close(transport) {
-      var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var to = transport.to,
-          from = transport.from;
-      if (!to || !from) return;
-
-      if (!this.transports[to]) {
-        return;
-      }
-
-      if (force) {
-        this.transports[to] = [];
-      } else {
-        var index = this.$_getTransportIndex(transport);
-
-        if (index >= 0) {
-          // Copying the array here so that the PortalTarget change event will actually contain two distinct arrays
-          var newTransports = this.transports[to].slice(0);
-          newTransports.splice(index, 1);
-          this.transports[to] = newTransports;
-        }
-      }
-    },
-    registerTarget: function registerTarget(target, vm, force) {
-      if (!inBrowser) return;
-
-      if (this.trackInstances && !force && this.targets[target]) {
-        console.warn("[portal-vue]: Target ".concat(target, " already exists"));
-      }
-
-      this.$set(this.targets, target, Object.freeze([vm]));
-    },
-    unregisterTarget: function unregisterTarget(target) {
-      this.$delete(this.targets, target);
-    },
-    registerSource: function registerSource(source, vm, force) {
-      if (!inBrowser) return;
-
-      if (this.trackInstances && !force && this.sources[source]) {
-        console.warn("[portal-vue]: source ".concat(source, " already exists"));
-      }
-
-      this.$set(this.sources, source, Object.freeze([vm]));
-    },
-    unregisterSource: function unregisterSource(source) {
-      this.$delete(this.sources, source);
-    },
-    hasTarget: function hasTarget(to) {
-      return !!(this.targets[to] && this.targets[to][0]);
-    },
-    hasSource: function hasSource(to) {
-      return !!(this.sources[to] && this.sources[to][0]);
-    },
-    hasContentFor: function hasContentFor(to) {
-      return !!this.transports[to] && !!this.transports[to].length;
-    },
-    // Internal
-    $_getTransportIndex: function $_getTransportIndex(_ref) {
-      var to = _ref.to,
-          from = _ref.from;
-
-      for (var i in this.transports[to]) {
-        if (this.transports[to][i].from === from) {
-          return +i;
-        }
-      }
-
-      return -1;
-    }
-  }
-});
-var wormhole = new Wormhole(transports);
-
-var _id = 1;
-var Portal = Vue.extend({
-  name: 'portal',
-  props: {
-    disabled: {
-      type: Boolean
-    },
-    name: {
-      type: String,
-      default: function _default() {
-        return String(_id++);
-      }
-    },
-    order: {
-      type: Number,
-      default: 0
-    },
-    slim: {
-      type: Boolean
-    },
-    slotProps: {
-      type: Object,
-      default: function _default() {
-        return {};
-      }
-    },
-    tag: {
-      type: String,
-      default: 'DIV'
-    },
-    to: {
-      type: String,
-      default: function _default() {
-        return String(Math.round(Math.random() * 10000000));
-      }
-    }
-  },
-  created: function created() {
-    var _this = this;
-
-    this.$nextTick(function () {
-      wormhole.registerSource(_this.name, _this);
-    });
-  },
-  mounted: function mounted() {
-    if (!this.disabled) {
-      this.sendUpdate();
-    }
-  },
-  updated: function updated() {
-    if (this.disabled) {
-      this.clear();
-    } else {
-      this.sendUpdate();
-    }
-  },
-  beforeDestroy: function beforeDestroy() {
-    wormhole.unregisterSource(this.name);
-    this.clear();
-  },
-  watch: {
-    to: function to(newValue, oldValue) {
-      oldValue && oldValue !== newValue && this.clear(oldValue);
-      this.sendUpdate();
-    }
-  },
-  methods: {
-    clear: function clear(target) {
-      var closer = {
-        from: this.name,
-        to: target || this.to
-      };
-      wormhole.close(closer);
-    },
-    normalizeSlots: function normalizeSlots() {
-      return this.$scopedSlots.default ? [this.$scopedSlots.default] : this.$slots.default;
-    },
-    normalizeOwnChildren: function normalizeOwnChildren(children) {
-      return typeof children === 'function' ? children(this.slotProps) : children;
-    },
-    sendUpdate: function sendUpdate() {
-      var slotContent = this.normalizeSlots();
-
-      if (slotContent) {
-        var transport = {
-          from: this.name,
-          to: this.to,
-          passengers: _toConsumableArray$1(slotContent),
-          order: this.order
-        };
-        wormhole.open(transport);
-      } else {
-        this.clear();
-      }
-    }
-  },
-  render: function render(h) {
-    var children = this.$slots.default || this.$scopedSlots.default || [];
-    var Tag = this.tag;
-
-    if (children && this.disabled) {
-      return children.length <= 1 && this.slim ? this.normalizeOwnChildren(children)[0] : h(Tag, [this.normalizeOwnChildren(children)]);
-    } else {
-      return this.slim ? h() : h(Tag, {
-        class: {
-          'v-portal': true
-        },
-        style: {
-          display: 'none'
-        },
-        key: 'v-portal-placeholder'
-      });
-    }
-  }
-});
-
-var PortalTarget = Vue.extend({
-  name: 'portalTarget',
-  props: {
-    multiple: {
-      type: Boolean,
-      default: false
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    slim: {
-      type: Boolean,
-      default: false
-    },
-    slotProps: {
-      type: Object,
-      default: function _default() {
-        return {};
-      }
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    transition: {
-      type: [String, Object, Function]
-    }
-  },
-  data: function data() {
-    return {
-      transports: wormhole.transports,
-      firstRender: true
-    };
-  },
-  created: function created() {
-    var _this = this;
-
-    this.$nextTick(function () {
-      wormhole.registerTarget(_this.name, _this);
-    });
-  },
-  watch: {
-    ownTransports: function ownTransports() {
-      this.$emit('change', this.children().length > 0);
-    },
-    name: function name(newVal, oldVal) {
-      /**
-       * TODO
-       * This should warn as well ...
-       */
-      wormhole.unregisterTarget(oldVal);
-      wormhole.registerTarget(newVal, this);
-    }
-  },
-  mounted: function mounted() {
-    var _this2 = this;
-
-    if (this.transition) {
-      this.$nextTick(function () {
-        // only when we have a transition, because it causes a re-render
-        _this2.firstRender = false;
-      });
-    }
-  },
-  beforeDestroy: function beforeDestroy() {
-    wormhole.unregisterTarget(this.name);
-  },
-  computed: {
-    ownTransports: function ownTransports() {
-      var transports = this.transports[this.name] || [];
-
-      if (this.multiple) {
-        return transports;
-      }
-
-      return transports.length === 0 ? [] : [transports[transports.length - 1]];
-    },
-    passengers: function passengers() {
-      return combinePassengers(this.ownTransports, this.slotProps);
-    }
-  },
-  methods: {
-    // can't be a computed prop because it has to "react" to $slot changes.
-    children: function children() {
-      return this.passengers.length !== 0 ? this.passengers : this.$scopedSlots.default ? this.$scopedSlots.default(this.slotProps) : this.$slots.default || [];
-    },
-    // can't be a computed prop because it has to "react" to this.children().
-    noWrapper: function noWrapper() {
-      var noWrapper = this.slim && !this.transition;
-
-      if (noWrapper && this.children().length > 1) {
-        console.warn('[portal-vue]: PortalTarget with `slim` option received more than one child element.');
-      }
-
-      return noWrapper;
-    }
-  },
-  render: function render(h) {
-    var noWrapper = this.noWrapper();
-    var children = this.children();
-    var Tag = this.transition || this.tag;
-    return noWrapper ? children[0] : this.slim && !Tag ? h() : h(Tag, {
-      props: {
-        // if we have a transition component, pass the tag if it exists
-        tag: this.transition && this.tag ? this.tag : undefined
-      },
-      class: {
-        'vue-portal-target': true
-      }
-    }, children);
-  }
-});
-
-var _id$1 = 0;
-var portalProps = ['disabled', 'name', 'order', 'slim', 'slotProps', 'tag', 'to'];
-var targetProps = ['multiple', 'transition'];
-var MountingPortal = Vue.extend({
-  name: 'MountingPortal',
-  inheritAttrs: false,
-  props: {
-    append: {
-      type: [Boolean, String]
-    },
-    bail: {
-      type: Boolean
-    },
-    mountTo: {
-      type: String,
-      required: true
-    },
-    // Portal
-    disabled: {
-      type: Boolean
-    },
-    // name for the portal
-    name: {
-      type: String,
-      default: function _default() {
-        return 'mounted_' + String(_id$1++);
-      }
-    },
-    order: {
-      type: Number,
-      default: 0
-    },
-    slim: {
-      type: Boolean
-    },
-    slotProps: {
-      type: Object,
-      default: function _default() {
-        return {};
-      }
-    },
-    tag: {
-      type: String,
-      default: 'DIV'
-    },
-    // name for the target
-    to: {
-      type: String,
-      default: function _default() {
-        return String(Math.round(Math.random() * 10000000));
-      }
-    },
-    // Target
-    multiple: {
-      type: Boolean,
-      default: false
-    },
-    targetSlim: {
-      type: Boolean
-    },
-    targetSlotProps: {
-      type: Object,
-      default: function _default() {
-        return {};
-      }
-    },
-    targetTag: {
-      type: String,
-      default: 'div'
-    },
-    transition: {
-      type: [String, Object, Function]
-    }
-  },
-  created: function created() {
-    if (typeof document === 'undefined') return;
-    var el = document.querySelector(this.mountTo);
-
-    if (!el) {
-      console.error("[portal-vue]: Mount Point '".concat(this.mountTo, "' not found in document"));
-      return;
-    }
-
-    var props = this.$props; // Target already exists
-
-    if (wormhole.targets[props.name]) {
-      if (props.bail) {
-        console.warn("[portal-vue]: Target ".concat(props.name, " is already mounted.\n        Aborting because 'bail: true' is set"));
-      } else {
-        this.portalTarget = wormhole.targets[props.name];
-      }
-
-      return;
-    }
-
-    var append = props.append;
-
-    if (append) {
-      var type = typeof append === 'string' ? append : 'DIV';
-      var mountEl = document.createElement(type);
-      el.appendChild(mountEl);
-      el = mountEl;
-    } // get props for target from $props
-    // we have to rename a few of them
-
-
-    var _props = pick(this.$props, targetProps);
-
-    _props.slim = this.targetSlim;
-    _props.tag = this.targetTag;
-    _props.slotProps = this.targetSlotProps;
-    _props.name = this.to;
-    this.portalTarget = new PortalTarget({
-      el: el,
-      parent: this.$parent || this,
-      propsData: _props
-    });
-  },
-  beforeDestroy: function beforeDestroy() {
-    var target = this.portalTarget;
-
-    if (this.append) {
-      var el = target.$el;
-      el.parentNode.removeChild(el);
-    }
-
-    target.$destroy();
-  },
-  render: function render(h) {
-    if (!this.portalTarget) {
-      console.warn("[portal-vue] Target wasn't mounted");
-      return h();
-    } // if there's no "manual" scoped slot, so we create a <Portal> ourselves
-
-
-    if (!this.$scopedSlots.manual) {
-      var props = pick(this.$props, portalProps);
-      return h(Portal, {
-        props: props,
-        attrs: this.$attrs,
-        on: this.$listeners,
-        scopedSlots: this.$scopedSlots
-      }, this.$slots.default);
-    } // else, we render the scoped slot
-
-
-    var content = this.$scopedSlots.manual({
-      to: this.to
-    }); // if user used <template> for the scoped slot
-    // content will be an array
-
-    if (Array.isArray(content)) {
-      content = content[0];
-    }
-
-    if (!content) return h();
-    return content;
-  }
-});
 
 var w = hasWindowSupport ? window : {};
 var d = hasDocumentSupport ? document : {};
@@ -2146,14 +1630,15 @@ var MutationObs = w.MutationObserver || w.WebKitMutationObserver || w.MozMutatio
 // Exported only for testing purposes
 
 var parseEventOptions = function parseEventOptions(options) {
-  if (!hasPassiveEventSupport) {
+  /* istanbul ignore else: can't test in JSDOM, as it supports passive */
+  if (hasPassiveEventSupport) {
+    return isObject(options) ? options : {
+      useCapture: Boolean(options || false)
+    };
+  } else {
     // Need to translate to actual Boolean value
     return Boolean(isObject(options) ? options.useCapture : options);
   }
-
-  return isObject(options) ? options : {
-    useCapture: Boolean(options || false)
-  };
 }; // Attach an event listener to an element
 
 var eventOn = function eventOn(el, evtName, handler, options) {
@@ -2372,62 +1857,6 @@ var position = function position(el)
   };
 };
 
-var NAME = 'BModalTarget';
-var modalTargetName = "BV-".concat(NAME); // Pivate internal component used by ModalManager.
-// Not to be used directly by humans.
-// @vue/component
-
-var BModalTarget = Vue.extend({
-  name: NAME,
-  data: function data() {
-    return {
-      doRender: false
-    };
-  },
-  destroyed: function destroyed()
-  /* istanbul ignore next */
-  {
-    // Ensure we get removed from DOM when destroyed
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-  },
-  beforeMount: function beforeMount() {
-    var self = this; // There can be only one modal target in the document
-
-    /* istanbul ignore if */
-
-    if (wormhole.hasTarget(modalTargetName)) {
-      this.$once('hook:mounted', function () {
-        self.$nextTick(function () {
-          requestAF(function () {
-            self.$destroy();
-          });
-        });
-      });
-    } else {
-      this.doRender = true;
-    }
-  },
-  render: function render(h) {
-    /* istanbul ignore else */
-    if (this.doRender) {
-      return h(PortalTarget, {
-        staticClass: 'b-modal-target',
-        props: {
-          tag: 'div',
-          name: modalTargetName,
-          multiple: true,
-          transition: null,
-          slim: false
-        }
-      });
-    } else {
-      return h('div');
-    }
-  }
-});
-
 /**
  * Private ModalManager helper
  * Handles controlling modal stacking zIndexes and body adjustments/classes
@@ -2457,9 +1886,6 @@ var ModalManager = Vue.extend({
     },
     modalsAreOpen: function modalsAreOpen() {
       return this.modalCount > 0;
-    },
-    modalTargetName: function modalTargetName$1() {
-      return modalTargetName;
     }
   },
   watch: {
@@ -2495,12 +1921,7 @@ var ModalManager = Vue.extend({
     registerModal: function registerModal(modal) {
       var _this2 = this;
 
-      // Make sure the modal target exists
-      if (!modal.static) {
-        this.ensureTarget(modal);
-      } // Register the modal if not already registered
-
-
+      // Register the modal if not already registered
       if (modal && this.modals.indexOf(modal) === -1) {
         // Add modal to modals array
         this.modals.push(modal);
@@ -2547,31 +1968,8 @@ var ModalManager = Vue.extend({
       return this.scrollbarWidth || 0;
     },
     // Private methods
-    ensureTarget: function ensureTarget(modal) {
-      var _this3 = this;
-
-      if (isBrowser && !wormhole.hasTarget(this.modalTargetName)) {
-        var div = document.createElement('div');
-        document.body.appendChild(div);
-        var target = new BModalTarget({
-          // Set parent/root to the modal's $root
-          parent: modal.$root
-        });
-        target.$mount(div);
-        target.$once('hook:beforeDestroy', function () {
-          _this3.modals.forEach(function (modal) {
-            // Hide any modals that may be in the target, if
-            // target is destroyed, using the 'FORCE' trigger
-            // which makes the hide event non-cancelable
-            if (!modal.static) {
-              modal.hide('FORCED');
-            }
-          });
-        });
-      }
-    },
     updateModals: function updateModals(modals) {
-      var _this4 = this;
+      var _this3 = this;
 
       var baseZIndex = this.getBaseZIndex();
       var scrollbarWidth = this.getScrollbarWidth();
@@ -2579,8 +1977,8 @@ var ModalManager = Vue.extend({
         // We update data values on each modal
         modal.zIndex = baseZIndex + index;
         modal.scrollbarWidth = scrollbarWidth;
-        modal.isTop = index === _this4.modals.length - 1;
-        modal.isBodyOverflowing = _this4.isBodyOverflowing;
+        modal.isTop = index === _this3.modals.length - 1;
+        modal.isBodyOverflowing = _this3.isBodyOverflowing;
       });
     },
     resetModal: function resetModal(modal) {
@@ -2801,8 +2199,6 @@ function (_BvEvent) {
 
   return BvModalEvent;
 }(BvEvent); // Named exports
-
-var __assign=function(){return (__assign=Object.assign||function(e){for(var a,s=1,t=arguments.length;s<t;s++)for(var r in a=arguments[s])Object.prototype.hasOwnProperty.call(a,r)&&(e[r]=a[r]);return e}).apply(this,arguments)};function mergeData(){for(var e,a,s={},t=arguments.length;t--;)for(var r=0,c=Object.keys(arguments[t]);r<c.length;r++)switch(e=c[r]){case"class":case"style":case"directives":Array.isArray(s[e])||(s[e]=[]),s[e]=s[e].concat(arguments[t][e]);break;case"staticClass":if(!arguments[t][e])break;void 0===s[e]&&(s[e]=""),s[e]&&(s[e]+=" "),s[e]+=arguments[t][e].trim();break;case"on":case"nativeOn":s[e]||(s[e]={});for(var n=0,o=Object.keys(arguments[t][e]||{});n<o.length;n++)a=o[n],s[e][a]?s[e][a]=[].concat(s[e][a],arguments[t][e][a]):s[e][a]=arguments[t][e][a];break;case"attrs":case"props":case"domProps":case"scopedSlots":case"staticStyle":case"hook":case"transition":s[e]||(s[e]={}),s[e]=__assign({},arguments[t][e],s[e]);break;case"slot":case"key":case"ref":case"tag":case"show":case"keepAlive":default:s[e]||(s[e]=arguments[t][e]);}return s}
 
 var identity = function identity(x) {
   return x;
@@ -3115,7 +2511,7 @@ var BLink = Vue.extend({
         parent: parent
       })
     };
-    var componentData = mergeData(data, {
+    var componentData = vueFunctionalDataMerge.mergeData(data, {
       class: {
         active: props.active,
         disabled: props.disabled
@@ -3146,7 +2542,7 @@ var BLink = Vue.extend({
   }
 });
 
-var NAME$1 = 'BButton';
+var NAME = 'BButton';
 var btnProps = {
   block: {
     type: Boolean,
@@ -3163,7 +2559,7 @@ var btnProps = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$1, 'variant');
+      return getComponentConfig(NAME, 'variant');
     }
   },
   type: {
@@ -3175,6 +2571,10 @@ var btnProps = {
     default: 'button'
   },
   pill: {
+    type: Boolean,
+    default: false
+  },
+  squared: {
     type: Boolean,
     default: false
   },
@@ -3231,7 +2631,7 @@ var isNonStandardTag = function isNonStandardTag(props) {
 var computeClass = function computeClass(props) {
   var _ref;
 
-  return ["btn-".concat(props.variant || getComponentConfig(NAME$1, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), Boolean(props.size)), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
+  return ["btn-".concat(props.variant || getComponentConfig(NAME, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), Boolean(props.size)), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
 }; // Compute the link props to pass to b-link (if required)
 
 
@@ -3277,7 +2677,7 @@ var computeAttrs = function computeAttrs(props, data) {
 
 
 var BButton = Vue.extend({
-  name: NAME$1,
+  name: NAME,
   functional: true,
   props: props,
   render: function render(h, _ref2) {
@@ -3318,7 +2718,7 @@ var BButton = Vue.extend({
       attrs: computeAttrs(props, data),
       on: on
     };
-    return h(link ? BLink : props.tag, mergeData(data, componentData), children);
+    return h(link ? BLink : props.tag, vueFunctionalDataMerge.mergeData(data, componentData), children);
   }
 });
 
@@ -3361,7 +2761,7 @@ var normalizeSlot = function normalizeSlot(name) {
   return isFunction(slot) ? slot(scope) : slot;
 }; // Named exports
 
-var NAME$2 = 'BButtonClose';
+var NAME$1 = 'BButtonClose';
 var props$1 = {
   disabled: {
     type: Boolean,
@@ -3370,19 +2770,19 @@ var props$1 = {
   ariaLabel: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$2, 'ariaLabel');
+      return getComponentConfig(NAME$1, 'ariaLabel');
     }
   },
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$2, 'textVariant');
+      return getComponentConfig(NAME$1, 'textVariant');
     }
   } // @vue/component
 
 };
 var BButtonClose = Vue.extend({
-  name: NAME$2,
+  name: NAME$1,
   functional: true,
   props: props$1,
   render: function render(h, _ref) {
@@ -3421,7 +2821,7 @@ var BButtonClose = Vue.extend({
       };
     }
 
-    return h('button', mergeData(data, componentData), normalizeSlot('default', {}, $scopedSlots, $slots));
+    return h('button', vueFunctionalDataMerge.mergeData(data, componentData), normalizeSlot('default', {}, $scopedSlots, $slots));
   }
 });
 
@@ -3573,6 +2973,92 @@ var normalizeSlotMixin = {
   }
 };
 
+var NO_FADE_PROPS = {
+  name: '',
+  enterClass: '',
+  enterActiveClass: '',
+  enterToClass: 'show',
+  leaveClass: 'show',
+  leaveActiveClass: '',
+  leaveToClass: ''
+};
+
+var FADE_PROPS = _objectSpread({}, NO_FADE_PROPS, {
+  enterActiveClass: 'fade',
+  leaveActiveClass: 'fade'
+});
+
+var BVTransition = Vue.extend({
+  name: 'BVTransition',
+  functional: true,
+  props: {
+    noFade: {
+      // Only applicable to the built in transition
+      // Has no effect if `trans-props` provided
+      type: Boolean,
+      default: false
+    },
+    mode: {
+      type: String // default: undefined
+
+    },
+    // For user supplied transitions (if needed)
+    transProps: {
+      type: Object,
+      default: null
+    }
+  },
+  render: function render(h, _ref) {
+    var children = _ref.children,
+        data = _ref.data,
+        listeners = _ref.listeners,
+        props = _ref.props;
+    var transProps = props.transProps;
+
+    if (!isPlainObject(transProps)) {
+      transProps = props.noFade ? NO_FADE_PROPS : FADE_PROPS;
+    }
+
+    transProps = _objectSpread({
+      mode: props.mode
+    }, transProps, {
+      // We always need `css` true
+      css: true
+    });
+    return h('transition', // Any listeners will get merged here
+    vueFunctionalDataMerge.mergeData(data, {
+      props: transProps
+    }), children);
+  }
+});
+
+/*
+ * Key Codes (events)
+ */
+var KEY_CODES = {
+  SPACE: 32,
+  ENTER: 13,
+  ESC: 27,
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  PAGEUP: 33,
+  PAGEDOWN: 34,
+  HOME: 36,
+  END: 35,
+  TAB: 9,
+  SHIFT: 16,
+  CTRL: 17,
+  BACKSPACE: 8,
+  ALT: 18,
+  PAUSE: 19,
+  BREAK: 19,
+  INSERT: 45,
+  INS: 45,
+  DELETE: 46
+};
+
 /**
  * Observe a DOM element changes, falls back to eventListener mode
  * @param {Element} el The DOM element to observe
@@ -3643,32 +3129,184 @@ var observeDom = function observeDom(el, callback, opts)
   return obs;
 };
 
-/*
- * Key Codes (events)
+/**
+ * SSR safe types
  */
-var KEY_CODES = {
-  SPACE: 32,
-  ENTER: 13,
-  ESC: 27,
-  LEFT: 37,
-  UP: 38,
-  RIGHT: 39,
-  DOWN: 40,
-  PAGEUP: 33,
-  PAGEDOWN: 34,
-  HOME: 36,
-  END: 35,
-  TAB: 9,
-  SHIFT: 16,
-  CTRL: 17,
-  BACKSPACE: 8,
-  ALT: 18,
-  PAUSE: 19,
-  BREAK: 19,
-  INSERT: 45,
-  INS: 45,
-  DELETE: 46
-};
+var w$1 = hasWindowSupport ? window : {};
+var HTMLElement = w$1.HTMLElement || Object;
+
+//
+// Single root node portaling of content, which retains parent/child hierarchy,
+// Unlike Portal-Vue where portaled content is no longer a descendent of
+// it's inteden parent components
+//
+// Private components for use by Tooltips, Popovers and Modals
+//
+// Based on vue-simple-portal
+// https://github.com/LinusBorg/vue-simple-portal
+// Tranporter target used by BTransporterSingle
+// Supports only a single root element.
+// @vue/component
+
+var BTransporterTargetSingle = Vue.extend({
+  // as an abstract component, it doesn't appear in the $parent chain of
+  // components, which means the next parent of any component rendered inside
+  // of this one will be the parent from which is was portal'd
+  abstract: true,
+  name: 'BTransporterTargetSingle',
+  props: {
+    nodes: {
+      // Even though we only support a single root element,
+      // vNodes are always passed as an array
+      type: [Array, Function] // default: undefined
+
+    }
+  },
+  data: function data(vm) {
+    return {
+      updatedNodes: vm.nodes
+    };
+  },
+  destroyed: function destroyed() {
+    var el = this.$el;
+    el && el.parentNode && el.parentNode.removeChild(el);
+  },
+  render: function render(h) {
+    var nodes = isFunction(this.updatedNodes) ? this.updatedNodes({}) : this.updatedNodes;
+    nodes = concat(nodes).filter(Boolean);
+    /* istanbul ignore else */
+
+    if (nodes && nodes.length > 0 && !nodes[0].text) {
+      return nodes[0];
+    } else {
+      return h(false);
+    }
+  }
+}); // This omponent has no root element, so only a single VNode is allowed
+// @vue/component
+
+var BTransporterSingle = Vue.extend({
+  name: 'BTransporterSingle',
+  mixins: [normalizeSlotMixin],
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    container: {
+      // String: CSS selector,
+      // HTMLElement: Element reference
+      // Mainly needed for tooltips/popovers inside modals
+      type: [String, HTMLElement],
+      default: 'body'
+    },
+    tag: {
+      // This should be set to match the root element type
+      type: String,
+      default: 'div'
+    }
+  },
+  watch: {
+    disabled: {
+      immediate: true,
+      handler: function handler(disabled) {
+        disabled ? this.unmountTarget() : this.$nextTick(this.mountTarget);
+      }
+    }
+  },
+  created: function created() {
+    this._bv_defaultFn = null;
+    this._bv_target = null;
+  },
+  beforeMount: function beforeMount() {
+    this.mountTarget();
+  },
+  updated: function updated() {
+    var _this = this;
+
+    // Placed in a nextTick to ensure that children have completed
+    // updating before rendering in the target
+    this.$nextTick(function () {
+      _this.updateTarget();
+    });
+  },
+  beforeDestroy: function beforeDestroy() {
+    this.unmountTarget();
+    this._bv_defaultFn = null;
+  },
+  methods: {
+    // Get the element which the target should be appended to
+    getContainer: function getContainer() {
+      /* istanbul ignore else */
+      if (isBrowser) {
+        var container = this.container;
+        return isString(container) ? select(container) : container;
+      } else {
+        return null;
+      }
+    },
+    // Mount the target
+    mountTarget: function mountTarget() {
+      if (!this._bv_target) {
+        var container = this.getContainer();
+
+        if (container) {
+          var el = document.createElement('div');
+          container.appendChild(el);
+          this._bv_target = new BTransporterTargetSingle({
+            el: el,
+            parent: this,
+            propsData: {
+              // Initial nodes to be rendered
+              nodes: concat(this.normalizeSlot('default', {}))
+            }
+          });
+        }
+      }
+    },
+    // Update the content of the target
+    updateTarget: function updateTarget() {
+      if (isBrowser && this._bv_target) {
+        var defaultFn = this.$scopedSlots.default;
+
+        if (!this.disabled) {
+          /* istanbul ignore else: only applicable in Vue 2.5.x */
+          if (defaultFn && this._bv_defaultFn !== defaultFn) {
+            // We only update the target component if the scoped slot
+            // function is a fresh one. The new slot syntax (since Vue 2.6)
+            // can cache unchanged slot functions and we want to respect that here.
+            this._bv_target.updatedNodes = defaultFn;
+          } else if (!defaultFn) {
+            // We also need to be back compatable with non-scoped default slot (i.e. 2.5.x)
+            this._bv_target.updatedNodes = this.$slots.default;
+          }
+        } // Update the scoped slot function cache
+
+
+        this._bv_defaultFn = defaultFn;
+      }
+    },
+    // Unmount the target
+    unmountTarget: function unmountTarget() {
+      if (this._bv_target) {
+        this._bv_target.$destroy();
+
+        this._bv_target = null;
+      }
+    }
+  },
+  render: function render(h) {
+    if (this.disabled) {
+      var nodes = concat(this.normalizeSlot('default', {})).filter(Boolean);
+
+      if (nodes.length > 0 && !nodes[0].text) {
+        return nodes[0];
+      }
+    }
+
+    return h(false);
+  }
+});
 
 var stripTagsRegex = /(<([^>]+)>)/gi; // Removes any thing that looks like an HTML tag from the supplied string
 
@@ -3685,7 +3323,7 @@ var htmlOrText = function htmlOrText(innerHTML, textContent) {
   } : {};
 };
 
-var NAME$3 = 'BModal'; // ObserveDom config to detect changes in modal content
+var NAME$2 = 'BModal'; // ObserveDom config to detect changes in modal content
 // so that we can adjust the modal padding if needed
 
 var OBSERVER_CONFIG = {
@@ -3711,13 +3349,13 @@ var props$2 = {
   titleTag: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'titleTag');
+      return getComponentConfig(NAME$2, 'titleTag');
     }
   },
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'size');
+      return getComponentConfig(NAME$2, 'size');
     }
   },
   centered: {
@@ -3755,25 +3393,25 @@ var props$2 = {
   headerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerBgVariant');
+      return getComponentConfig(NAME$2, 'headerBgVariant');
     }
   },
   headerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerBorderVariant');
+      return getComponentConfig(NAME$2, 'headerBorderVariant');
     }
   },
   headerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerTextVariant');
+      return getComponentConfig(NAME$2, 'headerTextVariant');
     }
   },
   headerCloseVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerCloseVariant');
+      return getComponentConfig(NAME$2, 'headerCloseVariant');
     }
   },
   headerClass: {
@@ -3783,13 +3421,13 @@ var props$2 = {
   bodyBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'bodyBgVariant');
+      return getComponentConfig(NAME$2, 'bodyBgVariant');
     }
   },
   bodyTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'bodyTextVariant');
+      return getComponentConfig(NAME$2, 'bodyTextVariant');
     }
   },
   modalClass: {
@@ -3811,19 +3449,19 @@ var props$2 = {
   footerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'footerBgVariant');
+      return getComponentConfig(NAME$2, 'footerBgVariant');
     }
   },
   footerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'footerBorderVariant');
+      return getComponentConfig(NAME$2, 'footerBorderVariant');
     }
   },
   footerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'footerTextVariant');
+      return getComponentConfig(NAME$2, 'footerTextVariant');
     }
   },
   footerClass: {
@@ -3869,13 +3507,13 @@ var props$2 = {
   headerCloseLabel: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerCloseLabel');
+      return getComponentConfig(NAME$2, 'headerCloseLabel');
     }
   },
   cancelTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'cancelTitle');
+      return getComponentConfig(NAME$2, 'cancelTitle');
     }
   },
   cancelTitleHtml: {
@@ -3884,7 +3522,7 @@ var props$2 = {
   okTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'okTitle');
+      return getComponentConfig(NAME$2, 'okTitle');
     }
   },
   okTitleHtml: {
@@ -3893,13 +3531,13 @@ var props$2 = {
   cancelVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'cancelVariant');
+      return getComponentConfig(NAME$2, 'cancelVariant');
     }
   },
   okVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'okVariant');
+      return getComponentConfig(NAME$2, 'okVariant');
     }
   },
   lazy: {
@@ -3917,7 +3555,7 @@ var props$2 = {
 
 };
 var BModal = Vue.extend({
-  name: NAME$3,
+  name: NAME$2,
   mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
   model: {
     prop: 'visible',
@@ -3926,19 +3564,19 @@ var BModal = Vue.extend({
   props: props$2,
   data: function data() {
     return {
-      is_hidden: true,
-      // If should not be in document
-      is_visible: false,
+      isHidden: true,
+      // If modal should not be in document
+      isVisible: false,
       // Controls modal visible state
-      is_transitioning: false,
+      isTransitioning: false,
       // Used for style control
-      is_show: false,
+      isShow: false,
       // Used for style control
-      is_block: false,
+      isBlock: false,
       // Used for style control
-      is_opening: false,
+      isOpening: false,
       // To signal that the modal is in the process of opening
-      is_closing: false,
+      isClosing: false,
       // To signal that the modal is in the process of closing
       ignoreBackdropClick: false,
       // Used to signify if click out listener should ignore the click
@@ -3955,8 +3593,8 @@ var BModal = Vue.extend({
     modalClasses: function modalClasses() {
       return [{
         fade: !this.noFade,
-        show: this.is_show,
-        'd-block': this.is_block
+        show: this.isShow,
+        'd-block': this.isBlock
       }, this.modalClass];
     },
     modalStyles: function modalStyles() {
@@ -3970,12 +3608,6 @@ var BModal = Vue.extend({
       var _ref;
 
       return [(_ref = {}, _defineProperty(_ref, "modal-".concat(this.size), Boolean(this.size)), _defineProperty(_ref, 'modal-dialog-centered', this.centered), _defineProperty(_ref, 'modal-dialog-scrollable', this.scrollable), _ref), this.dialogClass];
-    },
-    backdropClasses: function backdropClasses() {
-      return {
-        fade: !this.noFade,
-        show: this.is_show || this.noFade
-      };
     },
     headerClasses: function headerClasses() {
       var _ref2;
@@ -4005,7 +3637,7 @@ var BModal = Vue.extend({
         cancel: this.onCancel,
         close: this.onClose,
         hide: this.hide,
-        visible: this.is_visible
+        visible: this.isVisible
       };
     }
   },
@@ -4033,7 +3665,7 @@ var BModal = Vue.extend({
     this.listenOnRoot('bv::modal::show', this.modalListener); // Initially show modal?
 
     if (this.visible === true) {
-      this.show();
+      this.$nextTick(this.show);
     }
   },
   beforeDestroy: function beforeDestroy() {
@@ -4047,28 +3679,44 @@ var BModal = Vue.extend({
     this.setEnforceFocus(false);
     this.setResizeEvent(false);
 
-    if (this.is_visible) {
-      this.is_visible = false;
-      this.is_show = false;
-      this.is_transitioning = false;
+    if (this.isVisible) {
+      this.isVisible = false;
+      this.isShow = false;
+      this.isTransitioning = false;
     }
   },
   methods: {
+    // Private method to update the v-model
     updateModel: function updateModel(val) {
       if (val !== this.visible) {
         this.$emit('change', val);
       }
     },
-    // Public Methods
+    // Private method to create a BvModalEvent object
+    buildEvent: function buildEvent(type) {
+      var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      return new BvModalEvent(type, _objectSpread({
+        // Default options
+        cancelable: false,
+        target: this.$refs.modal || this.$el || null,
+        relatedTarget: null,
+        trigger: null
+      }, opts, {
+        // Options that can't be overridden
+        vueTarget: this,
+        componentId: this.safeId()
+      }));
+    },
+    // Public method to show modal
     show: function show() {
-      if (this.is_visible || this.is_opening) {
+      if (this.isVisible || this.isOpening) {
         // If already open, on in the process of opening, do nothing
 
         /* istanbul ignore next */
         return;
       }
 
-      if (this.is_closing) {
+      if (this.isClosing) {
         // If we are in the process of closing, wait until hidden before re-opening
 
         /* istanbul ignore next: very difficult to test */
@@ -4078,20 +3726,16 @@ var BModal = Vue.extend({
         return;
       }
 
-      this.is_opening = true; // Set the element to return focus to when closed
+      this.isOpening = true; // Set the element to return focus to when closed
 
       this.return_focus = this.return_focus || this.getActiveElement();
-      var showEvt = new BvModalEvent('show', {
-        cancelable: true,
-        vueTarget: this,
-        target: this.$refs.modal,
-        relatedTarget: null,
-        componentId: this.safeId()
+      var showEvt = this.buildEvent('show', {
+        cancelable: true
       });
       this.emitEvent(showEvt); // Don't show if canceled
 
-      if (showEvt.defaultPrevented || this.is_visible) {
-        this.is_opening = false; // Ensure the v-model reflects the current state
+      if (showEvt.defaultPrevented || this.isVisible) {
+        this.isOpening = false; // Ensure the v-model reflects the current state
 
         this.updateModel(false);
         return;
@@ -4100,19 +3744,18 @@ var BModal = Vue.extend({
 
       this.doShow();
     },
-    hide: function hide(trigger) {
-      if (!this.is_visible || this.is_closing) {
+    // Public method to hide modal
+    hide: function hide() {
+      var trigger = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+      if (!this.isVisible || this.isClosing) {
         /* istanbul ignore next */
         return;
       }
 
-      this.is_closing = true;
-      var hideEvt = new BvModalEvent('hide', {
+      this.isClosing = true;
+      var hideEvt = this.buildEvent('hide', {
         cancelable: trigger !== 'FORCE',
-        vueTarget: this,
-        target: this.$refs.modal,
-        relatedTarget: null,
-        componentId: this.safeId(),
         trigger: trigger || null
       }); // We emit specific event for one of the three built-in buttons
 
@@ -4126,8 +3769,8 @@ var BModal = Vue.extend({
 
       this.emitEvent(hideEvt); // Hide if not canceled
 
-      if (hideEvt.defaultPrevented || !this.is_visible) {
-        this.is_closing = false; // Ensure v-model reflects current state
+      if (hideEvt.defaultPrevented || !this.isVisible) {
+        this.isClosing = false; // Ensure v-model reflects current state
 
         this.updateModel(true);
         return;
@@ -4141,7 +3784,7 @@ var BModal = Vue.extend({
       } // Trigger the hide transition
 
 
-      this.is_visible = false; // Update the v-model
+      this.isVisible = false; // Update the v-model
 
       this.updateModel(false);
     },
@@ -4151,7 +3794,7 @@ var BModal = Vue.extend({
         this.return_focus = triggerEl;
       }
 
-      if (this.is_visible) {
+      if (this.isVisible) {
         this.hide('toggle');
       } else {
         this.show();
@@ -4160,8 +3803,8 @@ var BModal = Vue.extend({
     // Private method to get the current document active element
     getActiveElement: function getActiveElement() {
       if (isBrowser) {
-        var activeElement = document.activeElement; // Note: On IE11, `document.activeElement` may be null. So we test it for
-        // truthyness first.
+        var activeElement = document.activeElement; // Note: On IE11, `document.activeElement` may be null.
+        // So we test it for truthiness first.
         // https://github.com/bootstrap-vue/bootstrap-vue/issues/3206
         // Returning focus to document.body may cause unwanted scrolls, so we
         // exclude setting focus on body
@@ -4190,43 +3833,38 @@ var BModal = Vue.extend({
 
       modalManager.registerModal(this); // Place modal in DOM
 
-      this.is_hidden = false;
+      this.isHidden = false;
       this.$nextTick(function () {
         // We do this in `$nextTick()` to ensure the modal is in DOM first
         // before we show it
-        _this.is_visible = true;
-        _this.is_opening = false; // Update the v-model
+        _this.isVisible = true;
+        _this.isOpening = false; // Update the v-model
 
-        _this.updateModel(true); // Observe changes in modal content and adjust if necessary
+        _this.updateModel(true);
 
-
-        _this._observer = observeDom(_this.$refs.content, _this.checkModalOverflow.bind(_this), OBSERVER_CONFIG);
+        _this.$nextTick(function () {
+          // In a nextTick in case modal content is lazy
+          // Observe changes in modal content and adjust if necessary
+          _this._observer = observeDom(_this.$refs.content, _this.checkModalOverflow.bind(_this), OBSERVER_CONFIG);
+        });
       });
     },
     // Transition handlers
     onBeforeEnter: function onBeforeEnter() {
-      this.is_transitioning = true;
+      this.isTransitioning = true;
       this.setResizeEvent(true);
     },
     onEnter: function onEnter() {
-      this.is_block = true;
+      this.isBlock = true;
     },
     onAfterEnter: function onAfterEnter() {
       var _this2 = this;
 
       this.checkModalOverflow();
-      this.is_show = true;
-      this.is_transitioning = false;
+      this.isShow = true;
+      this.isTransitioning = false;
       this.$nextTick(function () {
-        var shownEvt = new BvModalEvent('shown', {
-          cancelable: false,
-          vueTarget: _this2,
-          target: _this2.$refs.modal,
-          relatedTarget: null,
-          componentId: _this2.safeId()
-        });
-
-        _this2.emitEvent(shownEvt);
+        _this2.emitEvent(_this2.buildEvent('shown'));
 
         _this2.focusFirst();
 
@@ -4234,39 +3872,30 @@ var BModal = Vue.extend({
       });
     },
     onBeforeLeave: function onBeforeLeave() {
-      this.is_transitioning = true;
+      this.isTransitioning = true;
       this.setResizeEvent(false);
     },
     onLeave: function onLeave() {
       // Remove the 'show' class
-      this.is_show = false;
+      this.isShow = false;
     },
     onAfterLeave: function onAfterLeave() {
       var _this3 = this;
 
-      this.is_block = false;
-      this.is_transitioning = false;
+      this.isBlock = false;
+      this.isTransitioning = false;
       this.setEnforceFocus(false);
       this.isModalOverflowing = false;
-      this.is_hidden = true;
+      this.isHidden = true;
       this.$nextTick(function () {
         _this3.returnFocusTo();
 
-        _this3.is_closing = false;
-        _this3.return_focus = null; // TODO: Need to find a way to pass the `trigger` property
+        _this3.isClosing = false;
+        _this3.return_focus = null;
+        modalManager.unregisterModal(_this3); // TODO: Need to find a way to pass the `trigger` property
         //       to the `hidden` event, not just only the `hide` event
 
-        var hiddenEvt = new BvModalEvent('hidden', {
-          cancelable: false,
-          vueTarget: _this3,
-          target: _this3.$el,
-          relatedTarget: null,
-          componentId: _this3.safeId()
-        });
-
-        _this3.emitEvent(hiddenEvt);
-
-        modalManager.unregisterModal(_this3);
+        _this3.emitEvent(_this3.buildEvent('hidden'));
       });
     },
     // Event emitter
@@ -4298,7 +3927,7 @@ var BModal = Vue.extend({
     onClickOut: function onClickOut(evt) {
       // Do nothing if not visible, backdrop click disabled, or element
       // that generated click event is no longer in document body
-      if (!this.is_visible || this.noCloseOnBackdrop || !contains(document.body, evt.target)) {
+      if (!this.isVisible || this.noCloseOnBackdrop || !contains(document.body, evt.target)) {
         return;
       }
 
@@ -4325,7 +3954,7 @@ var BModal = Vue.extend({
     },
     onEsc: function onEsc(evt) {
       // If ESC pressed, hide modal
-      if (evt.keyCode === KEY_CODES.ESC && this.is_visible && !this.noCloseOnEsc) {
+      if (evt.keyCode === KEY_CODES.ESC && this.isVisible && !this.noCloseOnEsc) {
         this.hide('esc');
       }
     },
@@ -4334,7 +3963,7 @@ var BModal = Vue.extend({
       // If focus leaves modal, bring it back
       var modal = this.$refs.modal;
 
-      if (!this.noEnforceFocus && this.isTop && this.is_visible && modal && document !== evt.target && !contains(modal, evt.target)) {
+      if (!this.noEnforceFocus && this.isTop && this.isVisible && modal && document !== evt.target && !contains(modal, evt.target)) {
         modal.focus({
           preventScroll: true
         });
@@ -4355,18 +3984,18 @@ var BModal = Vue.extend({
     },
     // Root listener handlers
     showHandler: function showHandler(id, triggerEl) {
-      if (id === this.id) {
+      if (id === this.safeId()) {
         this.return_focus = triggerEl || this.getActiveElement();
         this.show();
       }
     },
     hideHandler: function hideHandler(id) {
-      if (id === this.id) {
+      if (id === this.safeId()) {
         this.hide('event');
       }
     },
     toggleHandler: function toggleHandler(id, triggerEl) {
-      if (id === this.id) {
+      if (id === this.safeId()) {
         this.toggle(triggerEl);
       }
     },
@@ -4378,8 +4007,6 @@ var BModal = Vue.extend({
     },
     // Focus control handlers
     focusFirst: function focusFirst() {
-      // TODO: Add support for finding input element with 'autofocus'
-      //       attribute set and focus that element
       // Don't try and focus if we are SSR
       if (isBrowser) {
         var modal = this.$refs.modal;
@@ -4412,14 +4039,12 @@ var BModal = Vue.extend({
       }
     },
     checkModalOverflow: function checkModalOverflow() {
-      if (this.is_visible) {
+      if (this.isVisible) {
         var modal = this.$refs.modal;
         this.isModalOverflowing = modal.scrollHeight > document.documentElement.clientHeight;
       }
     },
     makeModal: function makeModal(h) {
-      var _this5 = this;
-
       // Modal header
       var header = h(false);
 
@@ -4432,14 +4057,12 @@ var BModal = Vue.extend({
           if (!this.hideHeaderClose) {
             closeButton = h(BButtonClose, {
               props: {
-                disabled: this.is_transitioning,
+                disabled: this.isTransitioning,
                 ariaLabel: this.headerCloseLabel,
                 textVariant: this.headerCloseVariant || this.headerTextVariant
               },
               on: {
-                click: function click(evt) {
-                  _this5.onClose();
-                }
+                click: this.onClose
               }
             }, [this.normalizeSlot('modal-header-close', {})]);
           }
@@ -4482,12 +4105,10 @@ var BModal = Vue.extend({
               props: {
                 variant: this.cancelVariant,
                 size: this.buttonSize,
-                disabled: this.cancelDisabled || this.busy || this.is_transitioning
+                disabled: this.cancelDisabled || this.busy || this.isTransitioning
               },
               on: {
-                click: function click(evt) {
-                  _this5.onCancel();
-                }
+                click: this.onCancel
               }
             }, [this.normalizeSlot('modal-cancel', {}) || this.cancelTitleHtml || stripTags(this.cancelTitle)]);
           }
@@ -4496,12 +4117,10 @@ var BModal = Vue.extend({
             props: {
               variant: this.okVariant,
               size: this.buttonSize,
-              disabled: this.okDisabled || this.busy || this.is_transitioning
+              disabled: this.okDisabled || this.busy || this.isTransitioning
             },
             on: {
-              click: function click(evt) {
-                _this5.onOk();
-              }
+              click: this.onOk
             }
           }, [this.normalizeSlot('modal-ok', {}) || this.okTitleHtml || stripTags(this.okTitle)]);
           modalFooter = [cancelButton, okButton];
@@ -4546,21 +4165,24 @@ var BModal = Vue.extend({
         directives: [{
           name: 'show',
           rawName: 'v-show',
-          value: this.is_visible,
-          expression: 'is_visible'
+          value: this.isVisible,
+          expression: 'isVisible'
         }],
         attrs: {
           id: this.safeId(),
           role: 'dialog',
           tabindex: '-1',
-          'aria-hidden': this.is_visible ? null : 'true',
-          'aria-modal': this.is_visible ? 'true' : null
+          'aria-hidden': this.isVisible ? null : 'true',
+          'aria-modal': this.isVisible ? 'true' : null
         },
         on: {
           keydown: this.onEsc,
           click: this.onClickOut
         }
       }, [modalDialog]); // Wrap modal in transition
+      // Sadly, we can't use BVTransition here due to the differences in
+      // transition durations for .modal and .modal-dialog. Not until
+      // issue https://github.com/vuejs/vue/issues/9986 is resolved
 
       modal = h('transition', {
         props: {
@@ -4572,32 +4194,36 @@ var BModal = Vue.extend({
           leaveToClass: ''
         },
         on: {
-          'before-enter': this.onBeforeEnter,
+          beforeEnter: this.onBeforeEnter,
           enter: this.onEnter,
-          'after-enter': this.onAfterEnter,
-          'before-leave': this.onBeforeLeave,
+          afterEnter: this.onAfterEnter,
+          beforeLeave: this.onBeforeLeave,
           leave: this.onLeave,
-          'after-leave': this.onAfterLeave
+          afterLeave: this.onAfterLeave
         }
       }, [modal]); // Modal backdrop
 
       var backdrop = h(false);
 
-      if (!this.hideBackdrop && (this.is_visible || this.is_transitioning || this.is_block)) {
+      if (!this.hideBackdrop && this.isVisible) {
         backdrop = h('div', {
           staticClass: 'modal-backdrop',
-          class: this.backdropClasses,
           attrs: {
             id: this.safeId('__BV_modal_backdrop_')
           }
         }, [this.normalizeSlot('modal-backdrop', {})]);
-      } // Tab trap to prevent page from scrolling to next element in
-      // tab index during enforce focus tab cycle
+      }
 
+      backdrop = h(BVTransition, {
+        props: {
+          noFade: this.noFade
+        }
+      }, [backdrop]); // Tab trap to prevent page from scrolling to next element in
+      // tab index during enforce focus tab cycle
 
       var tabTrap = h(false);
 
-      if (this.is_visible && this.isTop && !this.noEnforceFocus) {
+      if (this.isVisible && this.isTop && !this.noEnforceFocus) {
         tabTrap = h('div', {
           attrs: {
             tabindex: '0'
@@ -4616,15 +4242,11 @@ var BModal = Vue.extend({
     }
   },
   render: function render(h) {
-    // Wrap in a portal
-    return h(Portal, {
-      props: {
-        name: "b-modal-".concat(this._uid),
-        to: modalManager.modalTargetName,
-        slim: true,
-        disabled: this.static
-      }
-    }, [!this.is_hidden || this.static && !this.lazy ? this.makeModal(h) : h(false)]);
+    if (this.static) {
+      return this.lazy && this.isHidden ? h(false) : this.makeModal(h);
+    } else {
+      return this.isHidden ? h(false) : h(BTransporterSingle, {}, [this.makeModal(h)]);
+    }
   }
 });
 
@@ -4656,243 +4278,12 @@ var filterOptions = function filterOptions(options) {
 
     return memo;
   }, {});
-}; // Create a private sub-component that extends BModal
-// which self-destructs after hidden
-// @vue/component
+}; // Method to install `$bvModal` VM injection
 
 
-var MsgBox = Vue.extend({
-  name: 'BMsgBox',
-  extends: BModal,
-  destroyed: function destroyed() {
-    // Make sure we not in document any more
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-  },
-  mounted: function mounted() {
-    var _this = this;
+var install = function install(Vue) {
+  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    // Self destruct handler
-    var handleDestroy = function handleDestroy() {
-      var self = _this;
-
-      _this.$nextTick(function () {
-        // In a `setTimeout()` to release control back to application
-        setTimeout(function () {
-          return self.$destroy();
-        }, 0);
-      });
-    }; // Self destruct if parent destroyed
-
-
-    this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
-
-    this.$once('hidden', handleDestroy); // Self destruct on route change
-
-    /* istanbul ignore if */
-
-    if (this.$router && this.$route) {
-      var unwatch = this.$watch('$router', handleDestroy);
-      this.$once('hook:beforeDestroy', unwatch);
-    } // Should we also self destruct on parent deactivation?
-    // Show the `MsgBox`
-
-
-    this.show();
-  }
-}); // Method to generate the on-demand modal message box
-// Returns a promise that resolves to a value returned by the resolve
-
-var asyncMsgBox = function asyncMsgBox(props, $parent) {
-  var resolver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultResolver;
-
-  if (warnNotClient(PROP_NAME) || warnNoPromiseSupport(PROP_NAME)) {
-    // Should this throw an error?
-
-    /* istanbul ignore next */
-    return;
-  } // Create an instance of `MsgBox` component
-
-
-  var msgBox = new MsgBox({
-    // We set parent as the local VM so these modals can emit events on
-    // the app `$root`, as needed by things like tooltips and popovers
-    // And it helps to ensure `MsgBox` is destroyed when parent is destroyed
-    parent: $parent,
-    // Preset the prop values
-    propsData: _objectSpread({}, filterOptions(getComponentConfig('BModal') || {}), {
-      // Defaults that user can override
-      hideHeaderClose: true,
-      hideHeader: !(props.title || props.titleHtml)
-    }, omit(props, ['msgBoxContent']), {
-      // Props that can't be overridden
-      lazy: false,
-      busy: false,
-      visible: false,
-      noStacking: false,
-      noEnforceFocus: false
-    })
-  }); // Convert certain props to scoped slots
-
-  keys(propsToSlots).forEach(function (prop) {
-    if (!isUndefined(props[prop])) {
-      // Can be a string, or array of VNodes.
-      // Alternatively, user can use HTML version of prop to pass an HTML string.
-      msgBox.$slots[propsToSlots[prop]] = concat(props[prop]);
-    }
-  }); // Create a mount point (a DIV)
-
-  var div = document.createElement('div');
-  document.body.appendChild(div); // Return a promise that resolves when hidden, or rejects on destroyed
-
-  return new Promise(function (resolve, reject) {
-    var resolved = false;
-    msgBox.$once('hook:destroyed', function () {
-      if (!resolved) {
-        /* istanbul ignore next */
-        reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
-      }
-    });
-    msgBox.$on('hide', function (bvModalEvt) {
-      if (!bvModalEvt.defaultPrevented) {
-        var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
-
-        if (!bvModalEvt.defaultPrevented) {
-          resolved = true;
-          resolve(result);
-        }
-      }
-    }); // Mount the `MsgBox`, which will auto-trigger it to show
-
-    msgBox.$mount(div);
-  });
-}; // BvModal instance property class
-
-
-var BvModal =
-/*#__PURE__*/
-function () {
-  function BvModal(vm) {
-    _classCallCheck(this, BvModal);
-
-    // Assign the new properties to this instance
-    assign$1(this, {
-      _vm: vm,
-      _root: vm.$root
-    }); // Set these properties as read-only and non-enumerable
-
-    defineProperties(this, {
-      _vm: readonlyDescriptor(),
-      _root: readonlyDescriptor()
-    });
-  } // --- Instance methods ---
-  // Show modal with the specified ID args are for future use
-
-
-  _createClass(BvModal, [{
-    key: "show",
-    value: function show(id) {
-      if (id && this._root) {
-        var _this$_root;
-
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        (_this$_root = this._root).$emit.apply(_this$_root, ['bv::show::modal', id].concat(args));
-      }
-    } // Hide modal with the specified ID args are for future use
-
-  }, {
-    key: "hide",
-    value: function hide(id) {
-      if (id && this._root) {
-        var _this$_root2;
-
-        for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-          args[_key2 - 1] = arguments[_key2];
-        }
-
-        (_this$_root2 = this._root).$emit.apply(_this$_root2, ['bv::hide::modal', id].concat(args));
-      }
-    } // TODO: Could make Promise versions of above that first checks
-    //       if modal is in document (by ID) and if not found reject
-    //       the Promise. Otherwise waits for hide/hidden event and
-    //       then resolves returning the `BvModalEvent` object
-    //       (which contains the details)
-    // The following methods require Promise support!
-    // IE 11 and others do not support Promise natively, so users
-    // should have a Polyfill loaded (which they need anyways for IE 11 support)
-    // Opens a user defined message box and returns a promise
-
-  }, {
-    key: "msgBox",
-    value: function msgBox(content) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var resolver = arguments.length > 2 ? arguments[2] : undefined;
-
-      if (!content || warnNoPromiseSupport(PROP_NAME) || warnNotClient(PROP_NAME) || !isFunction(resolver)) {
-        // Should this throw an error?
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      var props = _objectSpread({}, filterOptions(options), {
-        msgBoxContent: content
-      });
-
-      return asyncMsgBox(props, this._vm, resolver);
-    } // Open a message box with OK button only and returns a promise
-
-  }, {
-    key: "msgBoxOk",
-    value: function msgBoxOk(message) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      // Pick the modal props we support from options
-      var props = _objectSpread({}, options, {
-        // Add in overrides and our content prop
-        okOnly: true,
-        okDisabled: false,
-        hideFooter: false,
-        msgBoxContent: message
-      });
-
-      return this.msgBox(message, props, function (bvModalEvt) {
-        // Always resolve to true for OK
-        return true;
-      });
-    } // Open a message box modal with OK and CANCEL buttons
-    // and returns a promise
-
-  }, {
-    key: "msgBoxConfirm",
-    value: function msgBoxConfirm(message) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      // Set the modal props we support from options
-      var props = _objectSpread({}, options, {
-        // Add in overrides and our content prop
-        okOnly: false,
-        okDisabled: false,
-        cancelDisabled: false,
-        hideFooter: false
-      });
-
-      return this.msgBox(message, props, function (bvModalEvt) {
-        var trigger = bvModalEvt.trigger;
-        return trigger === 'ok' ? true : trigger === 'cancel' ? false : null;
-      });
-    }
-  }]);
-
-  return BvModal;
-}(); // Method to install `$bvModal` VM injection
-
-
-var install = function install(_Vue) {
   if (install.installed) {
     // Only install once
 
@@ -4900,9 +4291,231 @@ var install = function install(_Vue) {
     return;
   }
 
-  install.installed = true; // Add our instance mixin
+  install.installed = true;
+  setConfig(config); // Create a private sub-component that extends BModal
+  // which self-destructs after hidden
+  // @vue/component
 
-  _Vue.mixin({
+  var BMsgBox = Vue.extend({
+    name: 'BMsgBox',
+    extends: BModal,
+    destroyed: function destroyed() {
+      // Make sure we not in document any more
+      if (this.$el && this.$el.parentNode) {
+        this.$el.parentNode.removeChild(this.$el);
+      }
+    },
+    mounted: function mounted() {
+      var _this = this;
+
+      // Self destruct handler
+      var handleDestroy = function handleDestroy() {
+        var self = _this;
+
+        _this.$nextTick(function () {
+          // In a `setTimeout()` to release control back to application
+          setTimeout(function () {
+            return self.$destroy();
+          }, 0);
+        });
+      }; // Self destruct if parent destroyed
+
+
+      this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+
+      this.$once('hidden', handleDestroy); // Self destruct on route change
+
+      /* istanbul ignore if */
+
+      if (this.$router && this.$route) {
+        var unwatch = this.$watch('$router', handleDestroy);
+        this.$once('hook:beforeDestroy', unwatch);
+      } // Show the `BMsgBox`
+
+
+      this.show();
+    }
+  }); // Method to generate the on-demand modal message box
+  // Returns a promise that resolves to a value returned by the resolve
+
+  var asyncMsgBox = function asyncMsgBox(props, $parent) {
+    var resolver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultResolver;
+
+    if (warnNotClient(PROP_NAME) || warnNoPromiseSupport(PROP_NAME)) {
+      /* istanbul ignore next */
+      return;
+    } // Create an instance of `BMsgBox` component
+
+
+    var msgBox = new BMsgBox({
+      // We set parent as the local VM so these modals can emit events on
+      // the app `$root`, as needed by things like tooltips and popovers
+      // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
+      parent: $parent,
+      // Preset the prop values
+      propsData: _objectSpread({}, filterOptions(getComponentConfig('BModal') || {}), {
+        // Defaults that user can override
+        hideHeaderClose: true,
+        hideHeader: !(props.title || props.titleHtml)
+      }, omit(props, ['msgBoxContent']), {
+        // Props that can't be overridden
+        lazy: false,
+        busy: false,
+        visible: false,
+        noStacking: false,
+        noEnforceFocus: false
+      })
+    }); // Convert certain props to scoped slots
+
+    keys(propsToSlots).forEach(function (prop) {
+      if (!isUndefined(props[prop])) {
+        // Can be a string, or array of VNodes.
+        // Alternatively, user can use HTML version of prop to pass an HTML string.
+        msgBox.$slots[propsToSlots[prop]] = concat(props[prop]);
+      }
+    }); // Return a promise that resolves when hidden, or rejects on destroyed
+
+    return new Promise(function (resolve, reject) {
+      var resolved = false;
+      msgBox.$once('hook:destroyed', function () {
+        if (!resolved) {
+          /* istanbul ignore next */
+          reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
+        }
+      });
+      msgBox.$on('hide', function (bvModalEvt) {
+        if (!bvModalEvt.defaultPrevented) {
+          var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
+
+          if (!bvModalEvt.defaultPrevented) {
+            resolved = true;
+            resolve(result);
+          }
+        }
+      }); // Create a mount point (a DIV) and mount the msgBo which will trigger it to show
+
+      var div = document.createElement('div');
+      document.body.appendChild(div);
+      msgBox.$mount(div);
+    });
+  }; // BvModal instance class
+
+
+  var BvModal =
+  /*#__PURE__*/
+  function () {
+    function BvModal(vm) {
+      _classCallCheck(this, BvModal);
+
+      // Assign the new properties to this instance
+      assign$1(this, {
+        _vm: vm,
+        _root: vm.$root
+      }); // Set these properties as read-only and non-enumerable
+
+      defineProperties(this, {
+        _vm: readonlyDescriptor(),
+        _root: readonlyDescriptor()
+      });
+    } // --- Instance methods ---
+    // Show modal with the specified ID args are for future use
+
+
+    _createClass(BvModal, [{
+      key: "show",
+      value: function show(id) {
+        if (id && this._root) {
+          var _this$_root;
+
+          for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+          }
+
+          (_this$_root = this._root).$emit.apply(_this$_root, ['bv::show::modal', id].concat(args));
+        }
+      } // Hide modal with the specified ID args are for future use
+
+    }, {
+      key: "hide",
+      value: function hide(id) {
+        if (id && this._root) {
+          var _this$_root2;
+
+          for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+            args[_key2 - 1] = arguments[_key2];
+          }
+
+          (_this$_root2 = this._root).$emit.apply(_this$_root2, ['bv::hide::modal', id].concat(args));
+        }
+      } // The following methods require Promise support!
+      // IE 11 and others do not support Promise natively, so users
+      // should have a Polyfill loaded (which they need anyways for IE 11 support)
+      // Opens a user defined message box and returns a promise
+      // Not yet documented
+
+    }, {
+      key: "msgBox",
+      value: function msgBox(content) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var resolver = arguments.length > 2 ? arguments[2] : undefined;
+
+        if (!content || warnNoPromiseSupport(PROP_NAME) || warnNotClient(PROP_NAME) || !isFunction(resolver)) {
+          /* istanbul ignore next */
+          return;
+        }
+
+        return asyncMsgBox(_objectSpread({}, filterOptions(options), {
+          msgBoxContent: content
+        }), this._vm, resolver);
+      } // Open a message box with OK button only and returns a promise
+
+    }, {
+      key: "msgBoxOk",
+      value: function msgBoxOk(message) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        // Pick the modal props we support from options
+        var props = _objectSpread({}, options, {
+          // Add in overrides and our content prop
+          okOnly: true,
+          okDisabled: false,
+          hideFooter: false,
+          msgBoxContent: message
+        });
+
+        return this.msgBox(message, props, function (bvModalEvt) {
+          // Always resolve to true for OK
+          return true;
+        });
+      } // Open a message box modal with OK and CANCEL buttons
+      // and returns a promise
+
+    }, {
+      key: "msgBoxConfirm",
+      value: function msgBoxConfirm(message) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        // Set the modal props we support from options
+        var props = _objectSpread({}, options, {
+          // Add in overrides and our content prop
+          okOnly: false,
+          okDisabled: false,
+          cancelDisabled: false,
+          hideFooter: false
+        });
+
+        return this.msgBox(message, props, function (bvModalEvt) {
+          var trigger = bvModalEvt.trigger;
+          return trigger === 'ok' ? true : trigger === 'cancel' ? false : null;
+        });
+      }
+    }]);
+
+    return BvModal;
+  }(); // Add our instance mixin
+
+
+  Vue.mixin({
     beforeCreate: function beforeCreate() {
       // Because we need access to `$root` for `$emits`, and VM for parenting,
       // we have to create a fresh instance of `BvModal` for each VM
@@ -4911,9 +4524,8 @@ var install = function install(_Vue) {
   }); // Define our read-only `$bvModal` instance property
   // Placed in an if just in case in HMR mode
 
-
-  if (!_Vue.prototype.hasOwnProperty(PROP_NAME)) {
-    defineProperty(_Vue.prototype, PROP_NAME, {
+  if (!Vue.prototype.hasOwnProperty(PROP_NAME)) {
+    defineProperty(Vue.prototype, PROP_NAME, {
       get: function get() {
         /* istanbul ignore next */
         if (!this || !this[PROP_NAME_PRIV]) {
@@ -4931,7 +4543,7 @@ var BVModalPlugin = {
   install: install
 };
 
-var NAME$4 = 'BToaster';
+var NAME$3 = 'BToaster';
 var props$3 = {
   name: {
     type: String,
@@ -4940,21 +4552,21 @@ var props$3 = {
   ariaLive: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$4, 'ariaLive');
+      return getComponentConfig(NAME$3, 'ariaLive');
     }
   },
   ariaAtomic: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$4, 'ariaAtomic');
-    } // Allowed: 'true' or 'false'
+      return getComponentConfig(NAME$3, 'ariaAtomic');
+    } // Allowed: 'true' or 'false' or null
 
   },
   role: {
     // Aria role
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$4, 'role');
+      return getComponentConfig(NAME$3, 'role');
     }
     /*
     transition: {
@@ -4999,7 +4611,7 @@ var DefaultTransition = Vue.extend({
 }); // @vue/component
 
 var BToaster = Vue.extend({
-  name: NAME$4,
+  name: NAME$3,
   props: props$3,
   data: function data() {
     return {
@@ -5016,7 +4628,7 @@ var BToaster = Vue.extend({
     this.staticName = this.name;
     /* istanbul ignore if */
 
-    if (wormhole.hasTarget(this.staticName)) {
+    if (portalVue.Wormhole.hasTarget(this.staticName)) {
       warn("b-toaster: A <portal-target> with name '".concat(this.name, "' already exists in the document."));
       this.dead = true;
     } else {
@@ -5044,14 +4656,8 @@ var BToaster = Vue.extend({
     });
 
     if (this.doRender) {
-      var $target = h(PortalTarget, {
+      var $target = h(portalVue.PortalTarget, {
         staticClass: 'b-toaster-slot',
-        attrs: {
-          role: this.role || null,
-          // fallback to null to make sure attribute doesn't exist
-          'aria-live': this.ariaLive,
-          'aria-atomic': this.ariaAtomic
-        },
         props: {
           name: this.staticName,
           multiple: true,
@@ -5065,7 +4671,11 @@ var BToaster = Vue.extend({
         staticClass: 'b-toaster',
         class: [this.staticName],
         attrs: {
-          id: this.staticName
+          id: this.staticName,
+          role: this.role || null,
+          // Fallback to null to make sure attribute doesn't exist
+          'aria-live': this.ariaLive,
+          'aria-atomic': this.ariaAtomic
         }
       }, [$target]);
     }
@@ -5074,16 +4684,19 @@ var BToaster = Vue.extend({
   }
 });
 
-var NAME$5 = 'BToast';
+var NAME$4 = 'BToast';
 var MIN_DURATION = 1000;
+var EVENT_OPTIONS = {
+  passive: true,
+  capture: false // --- Props ---
+
+};
 var props$4 = {
   id: {
+    // Even though the ID prop is provided by idMixin, we
+    // add it here for $bvToast props filtering
     type: String,
     default: null
-  },
-  visible: {
-    type: Boolean,
-    default: false
   },
   title: {
     type: String,
@@ -5092,13 +4705,17 @@ var props$4 = {
   toaster: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$5, 'toaster');
+      return getComponentConfig(NAME$4, 'toaster');
     }
+  },
+  visible: {
+    type: Boolean,
+    default: false
   },
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$5, 'variant');
+      return getComponentConfig(NAME$4, 'variant');
     }
   },
   isStatus: {
@@ -5117,7 +4734,7 @@ var props$4 = {
   autoHideDelay: {
     type: [Number, String],
     default: function _default() {
-      return getComponentConfig(NAME$5, 'autoHideDelay');
+      return getComponentConfig(NAME$4, 'autoHideDelay');
     }
   },
   noCloseButton: {
@@ -5139,19 +4756,19 @@ var props$4 = {
   toastClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$5, 'toastClass');
+      return getComponentConfig(NAME$4, 'toastClass');
     }
   },
   headerClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$5, 'headerClass');
+      return getComponentConfig(NAME$4, 'headerClass');
     }
   },
   bodyClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$5, 'bodyClass');
+      return getComponentConfig(NAME$4, 'bodyClass');
     }
   },
   href: {
@@ -5166,22 +4783,12 @@ var props$4 = {
     // Render the toast in place, rather than in a portal-target
     type: Boolean,
     default: false
-  } // Transition props defaults
-
-};
-var DEFAULT_TRANSITION_PROPS = {
-  name: '',
-  enterClass: '',
-  enterActiveClass: '',
-  enterToClass: '',
-  leaveClass: 'show',
-  leaveActiveClass: '',
-  leaveToClass: '' // @vue/component
+  } // @vue/component
 
 };
 var BToast = Vue.extend({
-  name: NAME$5,
-  mixins: [listenOnRootMixin, normalizeSlotMixin],
+  name: NAME$4,
+  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
   inheritAttrs: false,
   model: {
     prop: 'visible',
@@ -5193,8 +4800,8 @@ var BToast = Vue.extend({
       isMounted: false,
       doRender: false,
       localShow: false,
-      showClass: false,
       isTransitioning: false,
+      isHiding: false,
       order: 0,
       timer: null,
       dismissStarted: 0,
@@ -5202,12 +4809,6 @@ var BToast = Vue.extend({
     };
   },
   computed: {
-    toastClasses: function toastClasses() {
-      return [this.toastClass, {
-        show: this.showClass,
-        fade: !this.noFade
-      }];
-    },
     bToastClasses: function bToastClasses() {
       return _defineProperty({
         'b-toast-solid': this.solid,
@@ -5278,13 +4879,13 @@ var BToast = Vue.extend({
     }); // Listen for global $root show events
 
     this.listenOnRoot('bv::show::toast', function (id) {
-      if (id === _this2.id) {
+      if (id === _this2.safeId()) {
         _this2.show();
       }
     }); // Listen for global $root hide events
 
     this.listenOnRoot('bv::hide::toast', function (id) {
-      if (!id || id === _this2.id) {
+      if (!id || id === _this2.safeId()) {
         _this2.hide();
       }
     }); // Make sure we hide when toaster is destroyed
@@ -5310,32 +4911,41 @@ var BToast = Vue.extend({
         this.emitEvent(showEvt);
         this.dismissStarted = this.resumeDismiss = 0;
         this.order = Date.now() * (this.appendToast ? 1 : -1);
+        this.isHiding = false;
         this.doRender = true;
         this.$nextTick(function () {
-          // we show the toast after we have rendered the portal
-          _this3.localShow = true;
+          // We show the toast after we have rendered the portal and b-toast wrapper
+          // so that screen readers will properly announce the toast
+          requestAF(function () {
+            _this3.localShow = true;
+          });
         });
       }
     },
     hide: function hide() {
+      var _this4 = this;
+
       if (this.localShow) {
         var hideEvt = this.buildEvent('hide');
         this.emitEvent(hideEvt);
         this.setHoverHandler(false);
         this.dismissStarted = this.resumeDismiss = 0;
         this.clearDismissTimer();
-        this.localShow = false;
+        this.isHiding = true;
+        requestAF(function () {
+          _this4.localShow = false;
+        });
       }
     },
     buildEvent: function buildEvent(type) {
       var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       return new BvEvent(type, _objectSpread({
         cancelable: false,
-        target: this.$el,
+        target: this.$el || null,
         relatedTarget: null
       }, opts, {
         vueTarget: this,
-        componentId: this.id || null
+        componentId: this.safeId()
       }));
     },
     emitEvent: function emitEvent(bvEvt) {
@@ -5348,7 +4958,7 @@ var BToast = Vue.extend({
         return;
       }
 
-      if (!wormhole.hasTarget(this.computedToaster)) {
+      if (!portalVue.Wormhole.hasTarget(this.computedToaster)) {
         var div = document.createElement('div');
         document.body.appendChild(div);
         var toaster = new BToaster({
@@ -5375,14 +4985,8 @@ var BToast = Vue.extend({
     },
     setHoverHandler: function setHoverHandler(on) {
       var method = on ? eventOn : eventOff;
-      method(this.$refs.btoast, 'mouseenter', this.onPause, {
-        passive: true,
-        capture: false
-      });
-      method(this.$refs.btoast, 'mouseleave', this.onUnPause, {
-        passive: true,
-        capture: false
-      });
+      method(this.$refs.btoast, 'mouseenter', this.onPause, EVENT_OPTIONS);
+      method(this.$refs.btoast, 'mouseleave', this.onUnPause, EVENT_OPTIONS);
     },
     onPause: function onPause(evt) {
       // Determine time remaining, and then pause timer
@@ -5398,7 +5002,7 @@ var BToast = Vue.extend({
       }
     },
     onUnPause: function onUnPause(evt) {
-      // Restart with max of time remaining or 1 second
+      // Restart timer with max of time remaining or 1 second
       if (this.noAutoHide || this.noHoverPause || !this.resumeDismiss) {
         this.resumeDismiss = this.dismissStarted = 0;
         return;
@@ -5407,23 +5011,18 @@ var BToast = Vue.extend({
       this.startDismissTimer();
     },
     onLinkClick: function onLinkClick() {
-      var _this4 = this;
+      var _this5 = this;
 
       // We delay the close to allow time for the
       // browser to process the link click
       this.$nextTick(function () {
         requestAF(function () {
-          _this4.hide();
+          _this5.hide();
         });
       });
     },
     onBeforeEnter: function onBeforeEnter() {
-      var _this5 = this;
-
       this.isTransitioning = true;
-      requestAF(function () {
-        _this5.showClass = true;
-      });
     },
     onAfterEnter: function onAfterEnter() {
       this.isTransitioning = false;
@@ -5433,12 +5032,7 @@ var BToast = Vue.extend({
       this.setHoverHandler(true);
     },
     onBeforeLeave: function onBeforeLeave() {
-      var _this6 = this;
-
       this.isTransitioning = true;
-      requestAF(function () {
-        _this6.showClass = false;
-      });
     },
     onAfterLeave: function onAfterLeave() {
       this.isTransitioning = false;
@@ -5449,7 +5043,7 @@ var BToast = Vue.extend({
       this.doRender = false;
     },
     makeToast: function makeToast(h) {
-      var _this7 = this;
+      var _this6 = this;
 
       // Render helper for generating the toast
       // Assemble the header content
@@ -5469,7 +5063,7 @@ var BToast = Vue.extend({
           staticClass: 'ml-auto mb-1',
           on: {
             click: function click(evt) {
-              _this7.hide();
+              _this6.hide();
             }
           }
         }));
@@ -5500,16 +5094,13 @@ var BToast = Vue.extend({
       }, [this.normalizeSlot('default', this.slotScope) || h(false)]); // Build the toast
 
       var $toast = h('div', {
-        key: 'toast',
+        key: "toast-".concat(this._uid),
         ref: 'toast',
         staticClass: 'toast',
-        class: this.toastClasses,
+        class: this.toastClass,
         attrs: _objectSpread({}, this.$attrs, {
-          id: this.id || null,
-          tabindex: '-1',
-          role: this.isStatus ? 'status' : 'alert',
-          'aria-live': this.isStatus ? 'polite' : 'assertive',
-          'aria-atomic': 'true'
+          tabindex: '0',
+          id: this.safeId()
         })
       }, [$header, $body]);
       return $toast;
@@ -5521,7 +5112,7 @@ var BToast = Vue.extend({
     }
 
     var name = "b-toast-".concat(this._uid);
-    return h(Portal, {
+    return h(portalVue.Portal, {
       props: {
         name: name,
         to: this.computedToaster,
@@ -5533,11 +5124,19 @@ var BToast = Vue.extend({
       key: name,
       ref: 'btoast',
       staticClass: 'b-toast',
-      class: this.bToastClasses
-    }, [h('transition', {
-      props: DEFAULT_TRANSITION_PROPS,
+      class: this.bToastClasses,
+      attrs: {
+        id: this.safeId('_toast_outer'),
+        role: this.isHiding ? null : this.isStatus ? 'status' : 'alert',
+        'aria-live': this.isHiding ? null : this.isStatus ? 'polite' : 'assertive',
+        'aria-atomic': this.isHiding ? null : 'true'
+      }
+    }, [h(BVTransition, {
+      props: {
+        noFade: this.noFade
+      },
       on: this.transitionHandlers
-    }, [this.localShow ? this.makeToast(h) : null])])]);
+    }, [this.localShow ? this.makeToast(h) : h(false)])])]);
   }
 });
 
@@ -5564,164 +5163,12 @@ var filterOptions$1 = function filterOptions(options) {
 
     return memo;
   }, {});
-}; // Create a private sub-component that extends BToast
-// which self-destructs after hidden
-// @vue/component
+}; // Method to install `$bvToast` VM injection
 
 
-var BToastPop = Vue.extend({
-  name: 'BToastPop',
-  extends: BToast,
-  destroyed: function destroyed() {
-    // Make sure we not in document any more
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-  },
-  mounted: function mounted() {
-    // Self destruct handler
-    var self = this;
+var install$1 = function install(Vue) {
+  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    var handleDestroy = function handleDestroy() {
-      // Ensure the toast has been force hidden
-      self.localShow = false;
-      self.doRender = false;
-      self.$nextTick(function () {
-        self.$nextTick(function () {
-          // In a `requestAF()` to release control back to application
-          // and to allow the portal-target time to remove the content
-          requestAF(function () {
-            self.$destroy();
-          });
-        });
-      });
-    }; // Self destruct if parent destroyed
-
-
-    this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
-
-    this.$once('hidden', handleDestroy); // Self destruct when toaster is destroyed
-
-    this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
-      /* istanbul ignore next: hard to test */
-      if (toaster === self.toaster) {
-        handleDestroy();
-      }
-    });
-  }
-}); // Method to generate the on-demand toast
-
-var makeToast = function makeToast(props, $parent) {
-  if (warnNotClient(PROP_NAME$1)) {
-    // Should this throw an error?
-
-    /* istanbul ignore next */
-    return;
-  } // Create an instance of `BToast` component
-
-
-  var toast = new BToastPop({
-    // We set parent as the local VM so these toasts can emit events on
-    // the app `$root`
-    // And it helps to ensure `BToast` is destroyed when parent is destroyed
-    parent: $parent,
-    // Preset the prop values
-    propsData: _objectSpread({}, filterOptions$1(getComponentConfig('BToast') || {}), omit(props, ['toastContent']), {
-      // Props that can't be overridden
-      static: false,
-      visible: true
-    })
-  }); // Convert certain props to slots
-
-  keys(propsToSlots$1).forEach(function (prop) {
-    var value = props[prop];
-
-    if (!isUndefined(value)) {
-      // Can be a string, or array of VNodes
-      // Alternatively, user can use HTML version of prop to pass an HTML string
-      if (prop === 'title' && isString(value)) {
-        // Special case for title if it is a string, we wrap in a <strong>
-        value = [$parent.$createElement('strong', {
-          class: 'mr-2'
-        }, value)];
-      } // Make sure slot value is an array for Vue 2.5.x compatability
-
-
-      toast.$slots[propsToSlots$1[prop]] = concat(value);
-    }
-  }); // Create a mount point (a DIV)
-  // TODO: this needs to target a portal-target
-  // But we still need to place in document to portal-vue can
-  // transfer the content
-
-  var div = document.createElement('div');
-  document.body.appendChild(div); // Mount the toast to trigger it to show
-
-  toast.$mount(div);
-}; // BvToast instance property class
-
-
-var BvToast =
-/*#__PURE__*/
-function () {
-  function BvToast(vm) {
-    _classCallCheck(this, BvToast);
-
-    // Assign the new properties to this instance
-    assign$1(this, {
-      _vm: vm,
-      _root: vm.$root
-    }); // Set these properties as read-only and non-enumerable
-
-    defineProperties(this, {
-      _vm: readonlyDescriptor(),
-      _root: readonlyDescriptor()
-    });
-  } // --- Instance methods ---
-  // Opens a user defined toast and returns immediately
-
-
-  _createClass(BvToast, [{
-    key: "toast",
-    value: function toast(content) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      if (!content || warnNotClient(PROP_NAME$1)) {
-        // Should this throw an error?
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      var props = _objectSpread({}, filterOptions$1(options), {
-        toastContent: content
-      });
-
-      makeToast(props, this._vm);
-    } // shows a `<b-toast>` component with the specified ID
-
-  }, {
-    key: "show",
-    value: function show(id) {
-      if (id) {
-        this._root.$emit('bv::show::toast', id);
-      }
-    } // Hide a toast with specified ID, or if not ID all toasts
-
-  }, {
-    key: "hide",
-    value: function hide() {
-      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      this._root.$emit('bv::hide::toast', id);
-    }
-  }]);
-
-  return BvToast;
-}(); // Method to install `$bvToast` VM injection
-
-
-var install$1 = function install(_Vue) {
   if (install.installed) {
     // Only install once
 
@@ -5729,9 +5176,149 @@ var install$1 = function install(_Vue) {
     return;
   }
 
-  install.installed = true; // Add our instance mixin
+  install.installed = true;
+  setConfig(config); // Create a private sub-component constructor that
+  // extends BToast and self-destructs after hidden
+  // @vue/component
 
-  _Vue.mixin({
+  var BToastPop = Vue.extend({
+    name: 'BToastPop',
+    extends: BToast,
+    destroyed: function destroyed() {
+      // Make sure we not in document any more
+      if (this.$el && this.$el.parentNode) {
+        this.$el.parentNode.removeChild(this.$el);
+      }
+    },
+    mounted: function mounted() {
+      var self = this; // Self destruct handler
+
+      var handleDestroy = function handleDestroy() {
+        // Ensure the toast has been force hidden
+        self.localShow = false;
+        self.doRender = false;
+        self.$nextTick(function () {
+          self.$nextTick(function () {
+            // In a `requestAF()` to release control back to application
+            // and to allow the portal-target time to remove the content
+            requestAF(function () {
+              self.$destroy();
+            });
+          });
+        });
+      }; // Self destruct if parent destroyed
+
+
+      this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+
+      this.$once('hidden', handleDestroy); // Self destruct when toaster is destroyed
+
+      this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
+        /* istanbul ignore next: hard to test */
+        if (toaster === self.toaster) {
+          handleDestroy();
+        }
+      });
+    }
+  }); // Private method to generate the on-demand toast
+
+  var makeToast = function makeToast(props, $parent) {
+    if (warnNotClient(PROP_NAME$1)) {
+      /* istanbul ignore next */
+      return;
+    } // Create an instance of `BToastPop` component
+
+
+    var toast = new BToastPop({
+      // We set parent as the local VM so these toasts can emit events on the
+      // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
+      parent: $parent,
+      propsData: _objectSpread({}, filterOptions$1(getComponentConfig('BToast') || {}), omit(props, ['toastContent']), {
+        // Props that can't be overridden
+        static: false,
+        visible: true
+      })
+    }); // Convert certain props to slots
+
+    keys(propsToSlots$1).forEach(function (prop) {
+      var value = props[prop];
+
+      if (!isUndefined(value)) {
+        // Can be a string, or array of VNodes
+        if (prop === 'title' && isString(value)) {
+          // Special case for title if it is a string, we wrap in a <strong>
+          value = [$parent.$createElement('strong', {
+            class: 'mr-2'
+          }, value)];
+        }
+
+        toast.$slots[propsToSlots$1[prop]] = concat(value);
+      }
+    }); // Create a mount point (a DIV) and mount it (which triggers the show)
+
+    var div = document.createElement('div');
+    document.body.appendChild(div);
+    toast.$mount(div);
+  }; // Declare BvToast instance property class
+
+
+  var BvToast =
+  /*#__PURE__*/
+  function () {
+    function BvToast(vm) {
+      _classCallCheck(this, BvToast);
+
+      // Assign the new properties to this instance
+      assign$1(this, {
+        _vm: vm,
+        _root: vm.$root
+      }); // Set these properties as read-only and non-enumerable
+
+      defineProperties(this, {
+        _vm: readonlyDescriptor(),
+        _root: readonlyDescriptor()
+      });
+    } // --- Public Instance methods ---
+    // Opens a user defined toast and returns immediately
+
+
+    _createClass(BvToast, [{
+      key: "toast",
+      value: function toast(content) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        if (!content || warnNotClient(PROP_NAME$1)) {
+          /* istanbul ignore next */
+          return;
+        }
+
+        makeToast(_objectSpread({}, filterOptions$1(options), {
+          toastContent: content
+        }), this._vm);
+      } // shows a `<b-toast>` component with the specified ID
+
+    }, {
+      key: "show",
+      value: function show(id) {
+        if (id) {
+          this._root.$emit('bv::show::toast', id);
+        }
+      } // Hide a toast with specified ID, or if not ID all toasts
+
+    }, {
+      key: "hide",
+      value: function hide() {
+        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+        this._root.$emit('bv::hide::toast', id);
+      }
+    }]);
+
+    return BvToast;
+  }(); // Add our instance mixin
+
+
+  Vue.mixin({
     beforeCreate: function beforeCreate() {
       // Because we need access to `$root` for `$emits`, and VM for parenting,
       // we have to create a fresh instance of `BvToast` for each VM
@@ -5740,9 +5327,8 @@ var install$1 = function install(_Vue) {
   }); // Define our read-only `$bvToast` instance property
   // Placed in an if just in case in HMR mode
 
-
-  if (!_Vue.prototype.hasOwnProperty(PROP_NAME$1)) {
-    defineProperty(_Vue.prototype, PROP_NAME$1, {
+  if (!Vue.prototype.hasOwnProperty(PROP_NAME$1)) {
+    defineProperty(Vue.prototype, PROP_NAME$1, {
       get: function get() {
         /* istanbul ignore next */
         if (!this || !this[PROP_NAME_PRIV$1]) {
@@ -5755,12 +5341,13 @@ var install$1 = function install(_Vue) {
   }
 };
 
-install$1.installed = false;
+install$1.installed = false; // Default export is the Plugin
+
 var BVToastPlugin = {
   install: install$1
 };
 
-var NAME$6 = 'BAlert'; // Convert `show` value to a number
+var NAME$5 = 'BAlert'; // Convert `show` value to a number
 
 var parseCountDown = function parseCountDown(show) {
   if (show === '' || isBoolean(show)) {
@@ -5792,7 +5379,7 @@ var isNumericLike = function isNumericLike(value) {
 
 
 var BAlert = Vue.extend({
-  name: NAME$6,
+  name: NAME$5,
   mixins: [normalizeSlotMixin],
   model: {
     prop: 'show',
@@ -5802,7 +5389,7 @@ var BAlert = Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$6, 'variant');
+        return getComponentConfig(NAME$5, 'variant');
       }
     },
     dismissible: {
@@ -5812,7 +5399,7 @@ var BAlert = Vue.extend({
     dismissLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$6, 'dismissLabel');
+        return getComponentConfig(NAME$5, 'dismissLabel');
       }
     },
     show: {
@@ -5829,8 +5416,7 @@ var BAlert = Vue.extend({
       countDownTimerId: null,
       countDown: 0,
       // If initially shown, we need to set these for SSR
-      localShow: parseShow(this.show),
-      showClass: this.fade && this.show
+      localShow: parseShow(this.show)
     };
   },
   watch: {
@@ -5842,25 +5428,29 @@ var BAlert = Vue.extend({
       var _this = this;
 
       this.clearTimer();
-      this.$emit('dismiss-count-down', newVal);
 
-      if (this.show !== newVal) {
-        // Update the v-model if needed
-        this.$emit('input', newVal);
-      }
+      if (isNumericLike(this.show)) {
+        // Ignore if this.show transitions to a boolean value.
+        this.$emit('dismiss-count-down', newVal);
 
-      if (newVal > 0) {
-        this.localShow = true;
-        this.countDownTimerId = setTimeout(function () {
-          _this.countDown--;
-        }, 1000);
-      } else {
-        // Slightly delay the hide to allow any UI updates
-        this.$nextTick(function () {
-          requestAF(function () {
-            _this.localShow = false;
+        if (this.show !== newVal) {
+          // Update the v-model if needed
+          this.$emit('input', newVal);
+        }
+
+        if (newVal > 0) {
+          this.localShow = true;
+          this.countDownTimerId = setTimeout(function () {
+            _this.countDown--;
+          }, 1000);
+        } else {
+          // Slightly delay the hide to allow any UI updates
+          this.$nextTick(function () {
+            requestAF(function () {
+              _this.localShow = false;
+            });
           });
-        });
+        }
       }
     },
     localShow: function localShow(newVal) {
@@ -5897,20 +5487,6 @@ var BAlert = Vue.extend({
         clearInterval(this.countDownTimerId);
         this.countDownTimerId = null;
       }
-    },
-    onBeforeEnter: function onBeforeEnter() {
-      var _this2 = this;
-
-      if (this.fade) {
-        requestAF(function () {
-          _this2.showClass = true;
-        });
-      }
-    },
-    onBeforeLeave: function onBeforeLeave()
-    /* istanbul ignore next: does not appear to be called in vue-test-utils */
-    {
-      this.showClass = false;
     }
   },
   render: function render(h) {
@@ -5932,10 +5508,9 @@ var BAlert = Vue.extend({
       }
 
       $alert = h('div', {
+        key: this._uid,
         staticClass: 'alert',
         class: _defineProperty({
-          fade: this.fade,
-          show: this.showClass,
           'alert-dismissible': this.dismissible
         }, "alert-".concat(this.variant), this.variant),
         attrs: {
@@ -5947,18 +5522,9 @@ var BAlert = Vue.extend({
       $alert = [$alert];
     }
 
-    return h('transition', {
+    return h(BVTransition, {
       props: {
-        'enter-class': '',
-        'enter-active-class': '',
-        'enter-to-class': '',
-        'leave-class': 'show',
-        'leave-active-class': '',
-        'leave-to-class': ''
-      },
-      on: {
-        beforeEnter: this.onBeforeEnter,
-        beforeLeave: this.onBeforeLeave
+        noFade: !this.fade
       }
     }, $alert);
   }
@@ -5973,7 +5539,7 @@ var index = {
   })
 };
 
-var NAME$7 = 'BBadge';
+var NAME$6 = 'BBadge';
 var linkProps$1 = propsFactory();
 delete linkProps$1.href.default;
 delete linkProps$1.to.default;
@@ -5985,7 +5551,7 @@ var props$5 = _objectSpread({}, linkProps$1, {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$7, 'variant');
+      return getComponentConfig(NAME$6, 'variant');
     }
   },
   pill: {
@@ -5995,7 +5561,7 @@ var props$5 = _objectSpread({}, linkProps$1, {
 
 });
 var BBadge = Vue.extend({
-  name: NAME$7,
+  name: NAME$6,
   functional: true,
   props: props$5,
   render: function render(h, _ref) {
@@ -6012,7 +5578,7 @@ var BBadge = Vue.extend({
       }],
       props: pluckProps(linkProps$1, props)
     };
-    return h(tag, mergeData(data, componentData), children);
+    return h(tag, vueFunctionalDataMerge.mergeData(data, componentData), children);
   }
 });
 
@@ -6063,7 +5629,7 @@ var BBreadcrumbLink = Vue.extend({
       componentData.domProps = htmlOrText(suppliedProps.html, suppliedProps.text);
     }
 
-    return h(tag, mergeData(data, componentData), children);
+    return h(tag, vueFunctionalDataMerge.mergeData(data, componentData), children);
   }
 });
 
@@ -6075,7 +5641,7 @@ var BBreadcrumbItem = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h('li', mergeData(data, {
+    return h('li', vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'breadcrumb-item',
       class: {
         active: props.active
@@ -6132,7 +5698,7 @@ var BBreadcrumb = Vue.extend({
       });
     }
 
-    return h('ol', mergeData(data, {
+    return h('ol', vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'breadcrumb'
     }), childNodes);
   }
@@ -6188,7 +5754,7 @@ var BButtonGroup = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: _defineProperty({
         'btn-group': !props.vertical,
         'btn-group-vertical': props.vertical
@@ -6343,7 +5909,7 @@ var BInputGroupText = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'input-group-text'
     }), children);
   }
@@ -6377,7 +5943,7 @@ var BInputGroupAddon = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: {
         'input-group-append': props.append,
         'input-group-prepend': !props.append
@@ -6398,7 +5964,7 @@ var BInputGroupPrepend = Vue.extend({
         data = _ref.data,
         children = _ref.children;
     // pass all our props/attrs down to child, and set`append` to false
-    return h(BInputGroupAddon, mergeData(data, {
+    return h(BInputGroupAddon, vueFunctionalDataMerge.mergeData(data, {
       props: _objectSpread({}, props, {
         append: false
       })
@@ -6415,7 +5981,7 @@ var BInputGroupAppend = Vue.extend({
         data = _ref.data,
         children = _ref.children;
     // pass all our props/attrs down to child, and set`append` to true
-    return h(BInputGroupAddon, mergeData(data, {
+    return h(BInputGroupAddon, vueFunctionalDataMerge.mergeData(data, {
       props: _objectSpread({}, props, {
         append: true
       })
@@ -6459,19 +6025,14 @@ var BInputGroup = Vue.extend({
         scopedSlots = _ref.scopedSlots;
     var $slots = slots();
     var $scopedSlots = scopedSlots || {};
-    var childNodes = []; // Prepend prop
+    var childNodes = []; // Prepend prop/slot
 
-    if (props.prepend) {
-      childNodes.push(h(BInputGroupPrepend, [h(BInputGroupText, {
+    if (props.prepend || props.prependHTML || hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
+      childNodes.push(h(BInputGroupPrepend, [// Prop
+      props.prepend || props.prependHTML ? h(BInputGroupText, {
         domProps: htmlOrText(props.prependHTML, props.prepend)
-      })]));
-    } else {
-      childNodes.push(h(false));
-    } // Prepend slot
-
-
-    if (hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
-      childNodes.push(h(BInputGroupPrepend, normalizeSlot('prepend', {}, $scopedSlots, $slots)));
+      }) : h(false), // Slot
+      normalizeSlot('prepend', {}, $scopedSlots, $slots) || h(false)]));
     } else {
       childNodes.push(h(false));
     } // Default slot
@@ -6484,22 +6045,17 @@ var BInputGroup = Vue.extend({
     } // Append prop
 
 
-    if (props.append) {
-      childNodes.push(h(BInputGroupAppend, [h(BInputGroupText, {
+    if (props.append || props.appendHTML || hasNormalizedSlot('append', $scopedSlots, $slots)) {
+      childNodes.push(h(BInputGroupAppend, [// prop
+      props.append || props.appendHTML ? h(BInputGroupText, {
         domProps: htmlOrText(props.appendHTML, props.append)
-      })]));
-    } else {
-      childNodes.push(h(false));
-    } // Append slot
-
-
-    if (hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
-      childNodes.push(h(BInputGroupAppend, normalizeSlot('append', {}, $scopedSlots, $slots)));
+      }) : h(false), // Slot
+      normalizeSlot('append', {}, $scopedSlots, $slots) || h(false)]));
     } else {
       childNodes.push(h(false));
     }
 
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'input-group',
       class: _defineProperty({}, "input-group-".concat(props.size), Boolean(props.size)),
       attrs: {
@@ -6635,13 +6191,13 @@ var BCardTitle = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.titleTag, mergeData(data, {
+    return h(props.titleTag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card-title'
     }), children || props.title);
   }
 });
 
-var NAME$8 = 'BCardSubTitle';
+var NAME$7 = 'BCardSubTitle';
 var props$c = {
   subTitle: {
     type: String,
@@ -6654,20 +6210,20 @@ var props$c = {
   subTitleTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$8, 'subTitleTextVariant');
+      return getComponentConfig(NAME$7, 'subTitleTextVariant');
     }
   } // @vue/component
 
 };
 var BCardSubTitle = Vue.extend({
-  name: NAME$8,
+  name: NAME$7,
   functional: true,
   props: props$c,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.subTitleTag, mergeData(data, {
+    return h(props.subTitleTag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card-subtitle',
       class: [props.subTitleTextVariant ? "text-".concat(props.subTitleTextVariant) : null]
     }), children || props.subTitle);
@@ -6713,7 +6269,7 @@ var BCardBody = Vue.extend({
       });
     }
 
-    return h(props.bodyTag, mergeData(data, {
+    return h(props.bodyTag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card-body',
       class: [(_ref2 = {
         'card-img-overlay': props.overlay
@@ -6747,7 +6303,7 @@ var BCardHeader = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.headerTag, mergeData(data, {
+    return h(props.headerTag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card-header',
       class: [props.headerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.headerBgVariant), Boolean(props.headerBgVariant)), _defineProperty(_ref2, "border-".concat(props.headerBorderVariant), Boolean(props.headerBorderVariant)), _defineProperty(_ref2, "text-".concat(props.headerTextVariant), Boolean(props.headerTextVariant)), _ref2)]
     }), children || [h('div', {
@@ -6781,7 +6337,7 @@ var BCardFooter = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.footerTag, mergeData(data, {
+    return h(props.footerTag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card-footer',
       class: [props.footerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.footerBgVariant), Boolean(props.footerBgVariant)), _defineProperty(_ref2, "border-".concat(props.footerBorderVariant), Boolean(props.footerBorderVariant)), _defineProperty(_ref2, "text-".concat(props.footerTextVariant), Boolean(props.footerTextVariant)), _ref2)]
     }), children || [h('div', {
@@ -6855,7 +6411,7 @@ var BCardImg = Vue.extend({
       baseClass += '-left';
     }
 
-    return h('img', mergeData(data, {
+    return h('img', vueFunctionalDataMerge.mergeData(data, {
       class: [baseClass],
       attrs: {
         src: props.src,
@@ -6934,7 +6490,7 @@ var BCard = Vue.extend({
       }, normalizeSlot('footer', {}, $scopedSlots, $slots));
     }
 
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card',
       class: (_class = {
         'flex-row': props.imgLeft || props.imgStart,
@@ -6944,7 +6500,7 @@ var BCard = Vue.extend({
   }
 });
 
-var NAME$9 = 'BImg'; // Blank image with fill template
+var NAME$8 = 'BImg'; // Blank image with fill template
 
 var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>';
 var props$i = {
@@ -7013,7 +6569,7 @@ var props$i = {
   blankColor: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$9, 'blankColor');
+      return getComponentConfig(NAME$8, 'blankColor');
     }
   } // --- Helper methods ---
 
@@ -7065,7 +6621,7 @@ var BImg = Vue.extend({
       block = true;
     }
 
-    return h('img', mergeData(data, {
+    return h('img', vueFunctionalDataMerge.mergeData(data, {
       attrs: {
         src: src,
         alt: props.alt,
@@ -7082,9 +6638,9 @@ var BImg = Vue.extend({
   }
 });
 
-var NAME$a = 'BImgLazy';
+var NAME$9 = 'BImgLazy';
 var THROTTLE = 100;
-var EventOptions = {
+var EVENT_OPTIONS$1 = {
   passive: true,
   capture: false
 };
@@ -7114,7 +6670,7 @@ var props$j = {
   blankColor: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$a, 'blankColor');
+      return getComponentConfig(NAME$9, 'blankColor');
     }
   },
   blankWidth: {
@@ -7172,12 +6728,13 @@ var props$j = {
 
 };
 var BImgLazy = Vue.extend({
-  name: NAME$a,
+  name: NAME$9,
   props: props$j,
   data: function data() {
     return {
       isShown: false,
-      scrollTimeout: null
+      scrollTimeout: null,
+      observer: null
     };
   },
   computed: {
@@ -7220,7 +6777,6 @@ var BImgLazy = Vue.extend({
       this.setListeners(false);
     } else {
       this.setListeners(true);
-      this.$nextTick(this.checkView);
     }
   },
   activated: function activated()
@@ -7228,7 +6784,6 @@ var BImgLazy = Vue.extend({
   {
     if (!this.isShown) {
       this.setListeners(true);
-      this.$nextTick(this.checkView);
     }
   },
   deactivated: function deactivated()
@@ -7241,29 +6796,59 @@ var BImgLazy = Vue.extend({
   },
   methods: {
     setListeners: function setListeners(on) {
+      var _this = this;
+
       if (this.scrollTimeout) {
         clearTimeout(this.scrollTimeout);
         this.scrollTimeout = null;
       }
+      /* istanbul ignore next: JSDOM doen't support IntersectionObserver */
 
-      var root = window;
+
+      if (this.observer) {
+        this.observer.unobserve(this.$el);
+        this.observer.disconnect();
+        this.observer = null;
+      }
+
+      var winEvts = ['scroll', 'resize', 'orientationchange'];
+      winEvts.forEach(function (evt) {
+        return eventOff(window, evt, _this.onScroll, EVENT_OPTIONS$1);
+      });
+      eventOff(this.$el, 'load', this.checkView, EVENT_OPTIONS$1);
+      eventOff(document, 'transitionend', this.onScroll, EVENT_OPTIONS$1);
 
       if (on) {
-        eventOn(this.$el, 'load', this.checkView);
-        eventOn(root, 'scroll', this.onScroll, EventOptions);
-        eventOn(root, 'resize', this.onScroll, EventOptions);
-        eventOn(root, 'orientationchange', this.onScroll, EventOptions);
-        eventOn(document, 'transitionend', this.onScroll, EventOptions);
-      } else {
-        eventOff(this.$el, 'load', this.checkView);
-        eventOff(root, 'scroll', this.onScroll, EventOptions);
-        eventOff(root, 'resize', this.onScroll, EventOptions);
-        eventOff(root, 'orientationchange', this.onScroll, EventOptions);
-        eventOff(document, 'transitionend', this.onScroll, EventOptions);
+        /* istanbul ignore if: JSDOM doen't support IntersectionObserver */
+        if (hasIntersectionObserverSupport) {
+          this.observer = new IntersectionObserver(this.doShow, {
+            root: null,
+            // viewport
+            rootMargin: "".concat(parseInt(this.offset, 10) || 0, "px"),
+            threshold: 0 // percent intersection
+
+          });
+          this.observer.observe(this.$el);
+        } else {
+          // Fallback to scroll/etc events
+          winEvts.forEach(function (evt) {
+            return eventOn(window, evt, _this.onScroll, EVENT_OPTIONS$1);
+          });
+          eventOn(this.$el, 'load', this.checkView, EVENT_OPTIONS$1);
+          eventOn(document, 'transitionend', this.onScroll, EVENT_OPTIONS$1);
+        }
+      }
+    },
+    doShow: function doShow(entries) {
+      if (entries && (entries[0].isIntersecting || entries[0].intersectionRatio > 0.0)) {
+        this.isShown = true;
+        this.setListeners(false);
       }
     },
     checkView: function checkView() {
       // check bounding box + offset to see if we should show
+
+      /* istanbul ignore next: should rarely occur */
       if (this.isShown) {
         this.setListeners(false);
         return;
@@ -7275,20 +6860,20 @@ var BImgLazy = Vue.extend({
         l: 0 - offset,
         t: 0 - offset,
         b: docElement.clientHeight + offset,
-        r: docElement.clientWidth + offset
-        /* istanbul ignore next */
+        r: docElement.clientWidth + offset // JSDOM Doesn't support BCR, but we fake it in the tests
 
       };
       var box = getBCR(this.$el);
-      /* istanbul ignore next: can't test getBoundingClientRect in JSDOM */
 
       if (box.right >= view.l && box.bottom >= view.t && box.left <= view.r && box.top <= view.b) {
         // image is in view (or about to be in view)
-        this.isShown = true;
-        this.setListeners(false);
+        this.doShow([{
+          isIntersecting: true
+        }]);
       }
     },
     onScroll: function onScroll() {
+      /* istanbul ignore if: should rarely occur */
       if (this.isShown) {
         this.setListeners(false);
       } else {
@@ -7300,12 +6885,14 @@ var BImgLazy = Vue.extend({
   render: function render(h) {
     return h(BImg, {
       props: {
+        // Computed value props
         src: this.computedSrc,
-        alt: this.alt,
         blank: this.computedBlank,
-        blankColor: this.blankColor,
         width: this.computedWidth,
         height: this.computedHeight,
+        // Passthough props
+        alt: this.alt,
+        blankColor: this.blankColor,
         fluid: this.fluid,
         fluidGrow: this.fluidGrow,
         block: this.block,
@@ -7377,7 +6964,7 @@ var BCardImgLazy = Vue.extend({
       center: false
     });
 
-    return h(BImgLazy, mergeData(data, {
+    return h(BImgLazy, vueFunctionalDataMerge.mergeData(data, {
       class: [baseClass],
       props: lazyProps
     }));
@@ -7399,7 +6986,7 @@ var BCardText = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.textTag, mergeData(data, {
+    return h(props.textTag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card-text'
     }), children);
   }
@@ -7436,7 +7023,7 @@ var BCardGroup = Vue.extend({
       baseClass = 'card-columns';
     }
 
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: baseClass
     }), children);
   }
@@ -7462,7 +7049,7 @@ var index$7 = {
 
 var noop = function noop() {};
 
-var NAME$b = 'BCarousel'; // Slide directional classes
+var NAME$a = 'BCarousel'; // Slide directional classes
 
 var DIRECTION = {
   next: {
@@ -7492,7 +7079,7 @@ var TransitionEndEvents = {
   OTransition: 'otransitionend oTransitionEnd',
   transition: 'transitionend'
 };
-var EventOptions$1 = {
+var EventOptions = {
   passive: true,
   capture: false // Return the browser specific transitionEnd event name
 
@@ -7528,25 +7115,25 @@ var BCarousel = Vue.extend({
     labelPrev: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'labelPrev');
+        return getComponentConfig(NAME$a, 'labelPrev');
       }
     },
     labelNext: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'labelNext');
+        return getComponentConfig(NAME$a, 'labelNext');
       }
     },
     labelGotoSlide: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'labelGotoSlide');
+        return getComponentConfig(NAME$a, 'labelGotoSlide');
       }
     },
     labelIndicators: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'labelIndicators');
+        return getComponentConfig(NAME$a, 'labelIndicators');
       }
     },
     interval: {
@@ -7815,7 +7402,7 @@ var BCarousel = Vue.extend({
             var events = _this2.transitionEndEvent.split(/\s+/);
 
             events.forEach(function (evt) {
-              return eventOff(currentSlide, evt, onceTransEnd, EventOptions$1);
+              return eventOff(currentSlide, evt, onceTransEnd, EventOptions);
             });
           }
 
@@ -7844,7 +7431,7 @@ var BCarousel = Vue.extend({
         if (this.transitionEndEvent) {
           var events = this.transitionEndEvent.split(/\s+/);
           events.forEach(function (event) {
-            return eventOn(currentSlide, event, onceTransEnd, EventOptions$1);
+            return eventOn(currentSlide, event, onceTransEnd, EventOptions);
           });
         } // Fallback to setTimeout()
 
@@ -8296,7 +7883,7 @@ var Container = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: {
         container: !props.fluid,
         'container-fluid': props.fluid
@@ -8348,7 +7935,7 @@ var BRow = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'row',
       class: (_class = {
         'no-gutters': props.noGutters
@@ -8356,6 +7943,18 @@ var BRow = Vue.extend({
     }), children);
   }
 });
+
+var memoize = function memoize(fn) {
+  var cache = create(null);
+  return function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    var argsKey = JSON.stringify(args);
+    return cache[argsKey] = cache[argsKey] || fn.apply(null, args);
+  };
+};
 
 /**
  * Suffix can be a falsey value so nothing is appended to string.
@@ -8524,7 +8123,7 @@ var BCol = {
       // Default to .col if no other col-{bp}-* classes generated nor `cols` specified.
       col: props.col || !hasColClasses && !props.cols
     }, _defineProperty(_classList$push, "col-".concat(props.cols), props.cols), _defineProperty(_classList$push, "offset-".concat(props.offset), props.offset), _defineProperty(_classList$push, "order-".concat(props.order), props.order), _defineProperty(_classList$push, "align-self-".concat(props.alignSelf), props.alignSelf), _classList$push));
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: classList
     }), children);
   }
@@ -8545,7 +8144,7 @@ var BFormRow = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'form-row'
     }), children);
   }
@@ -8573,7 +8172,7 @@ var EVENT_STATE_SYNC = 'bv::collapse::sync::state'; // Events we listen to on `$
 var EVENT_TOGGLE = 'bv::toggle::collapse';
 var EVENT_STATE_REQUEST = 'bv::request::collapse::state'; // Event listener options
 
-var EventOptions$2 = {
+var EventOptions$1 = {
   passive: true,
   capture: false // @vue/component
 
@@ -8695,8 +8294,8 @@ var BCollapse = Vue.extend({
   methods: {
     setWindowEvents: function setWindowEvents(on) {
       var method = on ? eventOn : eventOff;
-      method(window, 'resize', this.handleResize, EventOptions$2);
-      method(window, 'orientationchange', this.handleResize, EventOptions$2);
+      method(window, 'resize', this.handleResize, EventOptions$1);
+      method(window, 'orientationchange', this.handleResize, EventOptions$1);
     },
     toggle: function toggle() {
       this.show = !this.show;
@@ -9116,2614 +8715,6 @@ var CollapsePlugin = {
   })
 };
 
-/**
- * SSR safe types
- */
-var w$1 = hasWindowSupport ? window : {};
-var HTMLElement = w$1.HTMLElement || Object;
-
-/**!
- * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.15.0
- * @license
- * Copyright (c) 2016 Federico Zivolo and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-var isBrowser$1 = typeof window !== 'undefined' && typeof document !== 'undefined';
-
-var longerTimeoutBrowsers = ['Edge', 'Trident', 'Firefox'];
-var timeoutDuration = 0;
-for (var i = 0; i < longerTimeoutBrowsers.length; i += 1) {
-  if (isBrowser$1 && navigator.userAgent.indexOf(longerTimeoutBrowsers[i]) >= 0) {
-    timeoutDuration = 1;
-    break;
-  }
-}
-
-function microtaskDebounce(fn) {
-  var called = false;
-  return function () {
-    if (called) {
-      return;
-    }
-    called = true;
-    window.Promise.resolve().then(function () {
-      called = false;
-      fn();
-    });
-  };
-}
-
-function taskDebounce(fn) {
-  var scheduled = false;
-  return function () {
-    if (!scheduled) {
-      scheduled = true;
-      setTimeout(function () {
-        scheduled = false;
-        fn();
-      }, timeoutDuration);
-    }
-  };
-}
-
-var supportsMicroTasks = isBrowser$1 && window.Promise;
-
-/**
-* Create a debounced version of a method, that's asynchronously deferred
-* but called in the minimum time possible.
-*
-* @method
-* @memberof Popper.Utils
-* @argument {Function} fn
-* @returns {Function}
-*/
-var debounce = supportsMicroTasks ? microtaskDebounce : taskDebounce;
-
-/**
- * Check if the given variable is a function
- * @method
- * @memberof Popper.Utils
- * @argument {Any} functionToCheck - variable to check
- * @returns {Boolean} answer to: is a function?
- */
-function isFunction$1(functionToCheck) {
-  var getType = {};
-  return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
-}
-
-/**
- * Get CSS computed property of the given element
- * @method
- * @memberof Popper.Utils
- * @argument {Eement} element
- * @argument {String} property
- */
-function getStyleComputedProperty(element, property) {
-  if (element.nodeType !== 1) {
-    return [];
-  }
-  // NOTE: 1 DOM access here
-  var window = element.ownerDocument.defaultView;
-  var css = window.getComputedStyle(element, null);
-  return property ? css[property] : css;
-}
-
-/**
- * Returns the parentNode or the host of the element
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element
- * @returns {Element} parent
- */
-function getParentNode(element) {
-  if (element.nodeName === 'HTML') {
-    return element;
-  }
-  return element.parentNode || element.host;
-}
-
-/**
- * Returns the scrolling parent of the given element
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element
- * @returns {Element} scroll parent
- */
-function getScrollParent(element) {
-  // Return body, `getScroll` will take care to get the correct `scrollTop` from it
-  if (!element) {
-    return document.body;
-  }
-
-  switch (element.nodeName) {
-    case 'HTML':
-    case 'BODY':
-      return element.ownerDocument.body;
-    case '#document':
-      return element.body;
-  }
-
-  // Firefox want us to check `-x` and `-y` variations as well
-
-  var _getStyleComputedProp = getStyleComputedProperty(element),
-      overflow = _getStyleComputedProp.overflow,
-      overflowX = _getStyleComputedProp.overflowX,
-      overflowY = _getStyleComputedProp.overflowY;
-
-  if (/(auto|scroll|overlay)/.test(overflow + overflowY + overflowX)) {
-    return element;
-  }
-
-  return getScrollParent(getParentNode(element));
-}
-
-var isIE11 = isBrowser$1 && !!(window.MSInputMethodContext && document.documentMode);
-var isIE10 = isBrowser$1 && /MSIE 10/.test(navigator.userAgent);
-
-/**
- * Determines if the browser is Internet Explorer
- * @method
- * @memberof Popper.Utils
- * @param {Number} version to check
- * @returns {Boolean} isIE
- */
-function isIE(version) {
-  if (version === 11) {
-    return isIE11;
-  }
-  if (version === 10) {
-    return isIE10;
-  }
-  return isIE11 || isIE10;
-}
-
-/**
- * Returns the offset parent of the given element
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element
- * @returns {Element} offset parent
- */
-function getOffsetParent(element) {
-  if (!element) {
-    return document.documentElement;
-  }
-
-  var noOffsetParent = isIE(10) ? document.body : null;
-
-  // NOTE: 1 DOM access here
-  var offsetParent = element.offsetParent || null;
-  // Skip hidden elements which don't have an offsetParent
-  while (offsetParent === noOffsetParent && element.nextElementSibling) {
-    offsetParent = (element = element.nextElementSibling).offsetParent;
-  }
-
-  var nodeName = offsetParent && offsetParent.nodeName;
-
-  if (!nodeName || nodeName === 'BODY' || nodeName === 'HTML') {
-    return element ? element.ownerDocument.documentElement : document.documentElement;
-  }
-
-  // .offsetParent will return the closest TH, TD or TABLE in case
-  // no offsetParent is present, I hate this job...
-  if (['TH', 'TD', 'TABLE'].indexOf(offsetParent.nodeName) !== -1 && getStyleComputedProperty(offsetParent, 'position') === 'static') {
-    return getOffsetParent(offsetParent);
-  }
-
-  return offsetParent;
-}
-
-function isOffsetContainer(element) {
-  var nodeName = element.nodeName;
-
-  if (nodeName === 'BODY') {
-    return false;
-  }
-  return nodeName === 'HTML' || getOffsetParent(element.firstElementChild) === element;
-}
-
-/**
- * Finds the root node (document, shadowDOM root) of the given element
- * @method
- * @memberof Popper.Utils
- * @argument {Element} node
- * @returns {Element} root node
- */
-function getRoot(node) {
-  if (node.parentNode !== null) {
-    return getRoot(node.parentNode);
-  }
-
-  return node;
-}
-
-/**
- * Finds the offset parent common to the two provided nodes
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element1
- * @argument {Element} element2
- * @returns {Element} common offset parent
- */
-function findCommonOffsetParent(element1, element2) {
-  // This check is needed to avoid errors in case one of the elements isn't defined for any reason
-  if (!element1 || !element1.nodeType || !element2 || !element2.nodeType) {
-    return document.documentElement;
-  }
-
-  // Here we make sure to give as "start" the element that comes first in the DOM
-  var order = element1.compareDocumentPosition(element2) & Node.DOCUMENT_POSITION_FOLLOWING;
-  var start = order ? element1 : element2;
-  var end = order ? element2 : element1;
-
-  // Get common ancestor container
-  var range = document.createRange();
-  range.setStart(start, 0);
-  range.setEnd(end, 0);
-  var commonAncestorContainer = range.commonAncestorContainer;
-
-  // Both nodes are inside #document
-
-  if (element1 !== commonAncestorContainer && element2 !== commonAncestorContainer || start.contains(end)) {
-    if (isOffsetContainer(commonAncestorContainer)) {
-      return commonAncestorContainer;
-    }
-
-    return getOffsetParent(commonAncestorContainer);
-  }
-
-  // one of the nodes is inside shadowDOM, find which one
-  var element1root = getRoot(element1);
-  if (element1root.host) {
-    return findCommonOffsetParent(element1root.host, element2);
-  } else {
-    return findCommonOffsetParent(element1, getRoot(element2).host);
-  }
-}
-
-/**
- * Gets the scroll value of the given element in the given side (top and left)
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element
- * @argument {String} side `top` or `left`
- * @returns {number} amount of scrolled pixels
- */
-function getScroll(element) {
-  var side = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'top';
-
-  var upperSide = side === 'top' ? 'scrollTop' : 'scrollLeft';
-  var nodeName = element.nodeName;
-
-  if (nodeName === 'BODY' || nodeName === 'HTML') {
-    var html = element.ownerDocument.documentElement;
-    var scrollingElement = element.ownerDocument.scrollingElement || html;
-    return scrollingElement[upperSide];
-  }
-
-  return element[upperSide];
-}
-
-/*
- * Sum or subtract the element scroll values (left and top) from a given rect object
- * @method
- * @memberof Popper.Utils
- * @param {Object} rect - Rect object you want to change
- * @param {HTMLElement} element - The element from the function reads the scroll values
- * @param {Boolean} subtract - set to true if you want to subtract the scroll values
- * @return {Object} rect - The modifier rect object
- */
-function includeScroll(rect, element) {
-  var subtract = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-  var scrollTop = getScroll(element, 'top');
-  var scrollLeft = getScroll(element, 'left');
-  var modifier = subtract ? -1 : 1;
-  rect.top += scrollTop * modifier;
-  rect.bottom += scrollTop * modifier;
-  rect.left += scrollLeft * modifier;
-  rect.right += scrollLeft * modifier;
-  return rect;
-}
-
-/*
- * Helper to detect borders of a given element
- * @method
- * @memberof Popper.Utils
- * @param {CSSStyleDeclaration} styles
- * Result of `getStyleComputedProperty` on the given element
- * @param {String} axis - `x` or `y`
- * @return {number} borders - The borders size of the given axis
- */
-
-function getBordersSize(styles, axis) {
-  var sideA = axis === 'x' ? 'Left' : 'Top';
-  var sideB = sideA === 'Left' ? 'Right' : 'Bottom';
-
-  return parseFloat(styles['border' + sideA + 'Width'], 10) + parseFloat(styles['border' + sideB + 'Width'], 10);
-}
-
-function getSize(axis, body, html, computedStyle) {
-  return Math.max(body['offset' + axis], body['scroll' + axis], html['client' + axis], html['offset' + axis], html['scroll' + axis], isIE(10) ? parseInt(html['offset' + axis]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Top' : 'Left')]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Bottom' : 'Right')]) : 0);
-}
-
-function getWindowSizes(document) {
-  var body = document.body;
-  var html = document.documentElement;
-  var computedStyle = isIE(10) && getComputedStyle(html);
-
-  return {
-    height: getSize('Height', body, html, computedStyle),
-    width: getSize('Width', body, html, computedStyle)
-  };
-}
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-var defineProperty$1 = function (obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
-
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-};
-
-/**
- * Given element offsets, generate an output similar to getBoundingClientRect
- * @method
- * @memberof Popper.Utils
- * @argument {Object} offsets
- * @returns {Object} ClientRect like output
- */
-function getClientRect(offsets) {
-  return _extends({}, offsets, {
-    right: offsets.left + offsets.width,
-    bottom: offsets.top + offsets.height
-  });
-}
-
-/**
- * Get bounding client rect of given element
- * @method
- * @memberof Popper.Utils
- * @param {HTMLElement} element
- * @return {Object} client rect
- */
-function getBoundingClientRect(element) {
-  var rect = {};
-
-  // IE10 10 FIX: Please, don't ask, the element isn't
-  // considered in DOM in some circumstances...
-  // This isn't reproducible in IE10 compatibility mode of IE11
-  try {
-    if (isIE(10)) {
-      rect = element.getBoundingClientRect();
-      var scrollTop = getScroll(element, 'top');
-      var scrollLeft = getScroll(element, 'left');
-      rect.top += scrollTop;
-      rect.left += scrollLeft;
-      rect.bottom += scrollTop;
-      rect.right += scrollLeft;
-    } else {
-      rect = element.getBoundingClientRect();
-    }
-  } catch (e) {}
-
-  var result = {
-    left: rect.left,
-    top: rect.top,
-    width: rect.right - rect.left,
-    height: rect.bottom - rect.top
-  };
-
-  // subtract scrollbar size from sizes
-  var sizes = element.nodeName === 'HTML' ? getWindowSizes(element.ownerDocument) : {};
-  var width = sizes.width || element.clientWidth || result.right - result.left;
-  var height = sizes.height || element.clientHeight || result.bottom - result.top;
-
-  var horizScrollbar = element.offsetWidth - width;
-  var vertScrollbar = element.offsetHeight - height;
-
-  // if an hypothetical scrollbar is detected, we must be sure it's not a `border`
-  // we make this check conditional for performance reasons
-  if (horizScrollbar || vertScrollbar) {
-    var styles = getStyleComputedProperty(element);
-    horizScrollbar -= getBordersSize(styles, 'x');
-    vertScrollbar -= getBordersSize(styles, 'y');
-
-    result.width -= horizScrollbar;
-    result.height -= vertScrollbar;
-  }
-
-  return getClientRect(result);
-}
-
-function getOffsetRectRelativeToArbitraryNode(children, parent) {
-  var fixedPosition = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-  var isIE10 = isIE(10);
-  var isHTML = parent.nodeName === 'HTML';
-  var childrenRect = getBoundingClientRect(children);
-  var parentRect = getBoundingClientRect(parent);
-  var scrollParent = getScrollParent(children);
-
-  var styles = getStyleComputedProperty(parent);
-  var borderTopWidth = parseFloat(styles.borderTopWidth, 10);
-  var borderLeftWidth = parseFloat(styles.borderLeftWidth, 10);
-
-  // In cases where the parent is fixed, we must ignore negative scroll in offset calc
-  if (fixedPosition && isHTML) {
-    parentRect.top = Math.max(parentRect.top, 0);
-    parentRect.left = Math.max(parentRect.left, 0);
-  }
-  var offsets = getClientRect({
-    top: childrenRect.top - parentRect.top - borderTopWidth,
-    left: childrenRect.left - parentRect.left - borderLeftWidth,
-    width: childrenRect.width,
-    height: childrenRect.height
-  });
-  offsets.marginTop = 0;
-  offsets.marginLeft = 0;
-
-  // Subtract margins of documentElement in case it's being used as parent
-  // we do this only on HTML because it's the only element that behaves
-  // differently when margins are applied to it. The margins are included in
-  // the box of the documentElement, in the other cases not.
-  if (!isIE10 && isHTML) {
-    var marginTop = parseFloat(styles.marginTop, 10);
-    var marginLeft = parseFloat(styles.marginLeft, 10);
-
-    offsets.top -= borderTopWidth - marginTop;
-    offsets.bottom -= borderTopWidth - marginTop;
-    offsets.left -= borderLeftWidth - marginLeft;
-    offsets.right -= borderLeftWidth - marginLeft;
-
-    // Attach marginTop and marginLeft because in some circumstances we may need them
-    offsets.marginTop = marginTop;
-    offsets.marginLeft = marginLeft;
-  }
-
-  if (isIE10 && !fixedPosition ? parent.contains(scrollParent) : parent === scrollParent && scrollParent.nodeName !== 'BODY') {
-    offsets = includeScroll(offsets, parent);
-  }
-
-  return offsets;
-}
-
-function getViewportOffsetRectRelativeToArtbitraryNode(element) {
-  var excludeScroll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-  var html = element.ownerDocument.documentElement;
-  var relativeOffset = getOffsetRectRelativeToArbitraryNode(element, html);
-  var width = Math.max(html.clientWidth, window.innerWidth || 0);
-  var height = Math.max(html.clientHeight, window.innerHeight || 0);
-
-  var scrollTop = !excludeScroll ? getScroll(html) : 0;
-  var scrollLeft = !excludeScroll ? getScroll(html, 'left') : 0;
-
-  var offset = {
-    top: scrollTop - relativeOffset.top + relativeOffset.marginTop,
-    left: scrollLeft - relativeOffset.left + relativeOffset.marginLeft,
-    width: width,
-    height: height
-  };
-
-  return getClientRect(offset);
-}
-
-/**
- * Check if the given element is fixed or is inside a fixed parent
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element
- * @argument {Element} customContainer
- * @returns {Boolean} answer to "isFixed?"
- */
-function isFixed(element) {
-  var nodeName = element.nodeName;
-  if (nodeName === 'BODY' || nodeName === 'HTML') {
-    return false;
-  }
-  if (getStyleComputedProperty(element, 'position') === 'fixed') {
-    return true;
-  }
-  var parentNode = getParentNode(element);
-  if (!parentNode) {
-    return false;
-  }
-  return isFixed(parentNode);
-}
-
-/**
- * Finds the first parent of an element that has a transformed property defined
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element
- * @returns {Element} first transformed parent or documentElement
- */
-
-function getFixedPositionOffsetParent(element) {
-  // This check is needed to avoid errors in case one of the elements isn't defined for any reason
-  if (!element || !element.parentElement || isIE()) {
-    return document.documentElement;
-  }
-  var el = element.parentElement;
-  while (el && getStyleComputedProperty(el, 'transform') === 'none') {
-    el = el.parentElement;
-  }
-  return el || document.documentElement;
-}
-
-/**
- * Computed the boundaries limits and return them
- * @method
- * @memberof Popper.Utils
- * @param {HTMLElement} popper
- * @param {HTMLElement} reference
- * @param {number} padding
- * @param {HTMLElement} boundariesElement - Element used to define the boundaries
- * @param {Boolean} fixedPosition - Is in fixed position mode
- * @returns {Object} Coordinates of the boundaries
- */
-function getBoundaries(popper, reference, padding, boundariesElement) {
-  var fixedPosition = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-
-  // NOTE: 1 DOM access here
-
-  var boundaries = { top: 0, left: 0 };
-  var offsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, reference);
-
-  // Handle viewport case
-  if (boundariesElement === 'viewport') {
-    boundaries = getViewportOffsetRectRelativeToArtbitraryNode(offsetParent, fixedPosition);
-  } else {
-    // Handle other cases based on DOM element used as boundaries
-    var boundariesNode = void 0;
-    if (boundariesElement === 'scrollParent') {
-      boundariesNode = getScrollParent(getParentNode(reference));
-      if (boundariesNode.nodeName === 'BODY') {
-        boundariesNode = popper.ownerDocument.documentElement;
-      }
-    } else if (boundariesElement === 'window') {
-      boundariesNode = popper.ownerDocument.documentElement;
-    } else {
-      boundariesNode = boundariesElement;
-    }
-
-    var offsets = getOffsetRectRelativeToArbitraryNode(boundariesNode, offsetParent, fixedPosition);
-
-    // In case of HTML, we need a different computation
-    if (boundariesNode.nodeName === 'HTML' && !isFixed(offsetParent)) {
-      var _getWindowSizes = getWindowSizes(popper.ownerDocument),
-          height = _getWindowSizes.height,
-          width = _getWindowSizes.width;
-
-      boundaries.top += offsets.top - offsets.marginTop;
-      boundaries.bottom = height + offsets.top;
-      boundaries.left += offsets.left - offsets.marginLeft;
-      boundaries.right = width + offsets.left;
-    } else {
-      // for all the other DOM elements, this one is good
-      boundaries = offsets;
-    }
-  }
-
-  // Add paddings
-  padding = padding || 0;
-  var isPaddingNumber = typeof padding === 'number';
-  boundaries.left += isPaddingNumber ? padding : padding.left || 0;
-  boundaries.top += isPaddingNumber ? padding : padding.top || 0;
-  boundaries.right -= isPaddingNumber ? padding : padding.right || 0;
-  boundaries.bottom -= isPaddingNumber ? padding : padding.bottom || 0;
-
-  return boundaries;
-}
-
-function getArea(_ref) {
-  var width = _ref.width,
-      height = _ref.height;
-
-  return width * height;
-}
-
-/**
- * Utility used to transform the `auto` placement to the placement with more
- * available space.
- * @method
- * @memberof Popper.Utils
- * @argument {Object} data - The data object generated by update method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function computeAutoPlacement(placement, refRect, popper, reference, boundariesElement) {
-  var padding = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
-
-  if (placement.indexOf('auto') === -1) {
-    return placement;
-  }
-
-  var boundaries = getBoundaries(popper, reference, padding, boundariesElement);
-
-  var rects = {
-    top: {
-      width: boundaries.width,
-      height: refRect.top - boundaries.top
-    },
-    right: {
-      width: boundaries.right - refRect.right,
-      height: boundaries.height
-    },
-    bottom: {
-      width: boundaries.width,
-      height: boundaries.bottom - refRect.bottom
-    },
-    left: {
-      width: refRect.left - boundaries.left,
-      height: boundaries.height
-    }
-  };
-
-  var sortedAreas = Object.keys(rects).map(function (key) {
-    return _extends({
-      key: key
-    }, rects[key], {
-      area: getArea(rects[key])
-    });
-  }).sort(function (a, b) {
-    return b.area - a.area;
-  });
-
-  var filteredAreas = sortedAreas.filter(function (_ref2) {
-    var width = _ref2.width,
-        height = _ref2.height;
-    return width >= popper.clientWidth && height >= popper.clientHeight;
-  });
-
-  var computedPlacement = filteredAreas.length > 0 ? filteredAreas[0].key : sortedAreas[0].key;
-
-  var variation = placement.split('-')[1];
-
-  return computedPlacement + (variation ? '-' + variation : '');
-}
-
-/**
- * Get offsets to the reference element
- * @method
- * @memberof Popper.Utils
- * @param {Object} state
- * @param {Element} popper - the popper element
- * @param {Element} reference - the reference element (the popper will be relative to this)
- * @param {Element} fixedPosition - is in fixed position mode
- * @returns {Object} An object containing the offsets which will be applied to the popper
- */
-function getReferenceOffsets(state, popper, reference) {
-  var fixedPosition = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-
-  var commonOffsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, reference);
-  return getOffsetRectRelativeToArbitraryNode(reference, commonOffsetParent, fixedPosition);
-}
-
-/**
- * Get the outer sizes of the given element (offset size + margins)
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element
- * @returns {Object} object containing width and height properties
- */
-function getOuterSizes(element) {
-  var window = element.ownerDocument.defaultView;
-  var styles = window.getComputedStyle(element);
-  var x = parseFloat(styles.marginTop || 0) + parseFloat(styles.marginBottom || 0);
-  var y = parseFloat(styles.marginLeft || 0) + parseFloat(styles.marginRight || 0);
-  var result = {
-    width: element.offsetWidth + y,
-    height: element.offsetHeight + x
-  };
-  return result;
-}
-
-/**
- * Get the opposite placement of the given one
- * @method
- * @memberof Popper.Utils
- * @argument {String} placement
- * @returns {String} flipped placement
- */
-function getOppositePlacement(placement) {
-  var hash = { left: 'right', right: 'left', bottom: 'top', top: 'bottom' };
-  return placement.replace(/left|right|bottom|top/g, function (matched) {
-    return hash[matched];
-  });
-}
-
-/**
- * Get offsets to the popper
- * @method
- * @memberof Popper.Utils
- * @param {Object} position - CSS position the Popper will get applied
- * @param {HTMLElement} popper - the popper element
- * @param {Object} referenceOffsets - the reference offsets (the popper will be relative to this)
- * @param {String} placement - one of the valid placement options
- * @returns {Object} popperOffsets - An object containing the offsets which will be applied to the popper
- */
-function getPopperOffsets(popper, referenceOffsets, placement) {
-  placement = placement.split('-')[0];
-
-  // Get popper node sizes
-  var popperRect = getOuterSizes(popper);
-
-  // Add position, width and height to our offsets object
-  var popperOffsets = {
-    width: popperRect.width,
-    height: popperRect.height
-  };
-
-  // depending by the popper placement we have to compute its offsets slightly differently
-  var isHoriz = ['right', 'left'].indexOf(placement) !== -1;
-  var mainSide = isHoriz ? 'top' : 'left';
-  var secondarySide = isHoriz ? 'left' : 'top';
-  var measurement = isHoriz ? 'height' : 'width';
-  var secondaryMeasurement = !isHoriz ? 'height' : 'width';
-
-  popperOffsets[mainSide] = referenceOffsets[mainSide] + referenceOffsets[measurement] / 2 - popperRect[measurement] / 2;
-  if (placement === secondarySide) {
-    popperOffsets[secondarySide] = referenceOffsets[secondarySide] - popperRect[secondaryMeasurement];
-  } else {
-    popperOffsets[secondarySide] = referenceOffsets[getOppositePlacement(secondarySide)];
-  }
-
-  return popperOffsets;
-}
-
-/**
- * Mimics the `find` method of Array
- * @method
- * @memberof Popper.Utils
- * @argument {Array} arr
- * @argument prop
- * @argument value
- * @returns index or -1
- */
-function find(arr, check) {
-  // use native find if supported
-  if (Array.prototype.find) {
-    return arr.find(check);
-  }
-
-  // use `filter` to obtain the same behavior of `find`
-  return arr.filter(check)[0];
-}
-
-/**
- * Return the index of the matching object
- * @method
- * @memberof Popper.Utils
- * @argument {Array} arr
- * @argument prop
- * @argument value
- * @returns index or -1
- */
-function findIndex(arr, prop, value) {
-  // use native findIndex if supported
-  if (Array.prototype.findIndex) {
-    return arr.findIndex(function (cur) {
-      return cur[prop] === value;
-    });
-  }
-
-  // use `find` + `indexOf` if `findIndex` isn't supported
-  var match = find(arr, function (obj) {
-    return obj[prop] === value;
-  });
-  return arr.indexOf(match);
-}
-
-/**
- * Loop trough the list of modifiers and run them in order,
- * each of them will then edit the data object.
- * @method
- * @memberof Popper.Utils
- * @param {dataObject} data
- * @param {Array} modifiers
- * @param {String} ends - Optional modifier name used as stopper
- * @returns {dataObject}
- */
-function runModifiers(modifiers, data, ends) {
-  var modifiersToRun = ends === undefined ? modifiers : modifiers.slice(0, findIndex(modifiers, 'name', ends));
-
-  modifiersToRun.forEach(function (modifier) {
-    if (modifier['function']) {
-      // eslint-disable-line dot-notation
-      console.warn('`modifier.function` is deprecated, use `modifier.fn`!');
-    }
-    var fn = modifier['function'] || modifier.fn; // eslint-disable-line dot-notation
-    if (modifier.enabled && isFunction$1(fn)) {
-      // Add properties to offsets to make them a complete clientRect object
-      // we do this before each modifier to make sure the previous one doesn't
-      // mess with these values
-      data.offsets.popper = getClientRect(data.offsets.popper);
-      data.offsets.reference = getClientRect(data.offsets.reference);
-
-      data = fn(data, modifier);
-    }
-  });
-
-  return data;
-}
-
-/**
- * Updates the position of the popper, computing the new offsets and applying
- * the new style.<br />
- * Prefer `scheduleUpdate` over `update` because of performance reasons.
- * @method
- * @memberof Popper
- */
-function update() {
-  // if popper is destroyed, don't perform any further update
-  if (this.state.isDestroyed) {
-    return;
-  }
-
-  var data = {
-    instance: this,
-    styles: {},
-    arrowStyles: {},
-    attributes: {},
-    flipped: false,
-    offsets: {}
-  };
-
-  // compute reference element offsets
-  data.offsets.reference = getReferenceOffsets(this.state, this.popper, this.reference, this.options.positionFixed);
-
-  // compute auto placement, store placement inside the data object,
-  // modifiers will be able to edit `placement` if needed
-  // and refer to originalPlacement to know the original value
-  data.placement = computeAutoPlacement(this.options.placement, data.offsets.reference, this.popper, this.reference, this.options.modifiers.flip.boundariesElement, this.options.modifiers.flip.padding);
-
-  // store the computed placement inside `originalPlacement`
-  data.originalPlacement = data.placement;
-
-  data.positionFixed = this.options.positionFixed;
-
-  // compute the popper offsets
-  data.offsets.popper = getPopperOffsets(this.popper, data.offsets.reference, data.placement);
-
-  data.offsets.popper.position = this.options.positionFixed ? 'fixed' : 'absolute';
-
-  // run the modifiers
-  data = runModifiers(this.modifiers, data);
-
-  // the first `update` will call `onCreate` callback
-  // the other ones will call `onUpdate` callback
-  if (!this.state.isCreated) {
-    this.state.isCreated = true;
-    this.options.onCreate(data);
-  } else {
-    this.options.onUpdate(data);
-  }
-}
-
-/**
- * Helper used to know if the given modifier is enabled.
- * @method
- * @memberof Popper.Utils
- * @returns {Boolean}
- */
-function isModifierEnabled(modifiers, modifierName) {
-  return modifiers.some(function (_ref) {
-    var name = _ref.name,
-        enabled = _ref.enabled;
-    return enabled && name === modifierName;
-  });
-}
-
-/**
- * Get the prefixed supported property name
- * @method
- * @memberof Popper.Utils
- * @argument {String} property (camelCase)
- * @returns {String} prefixed property (camelCase or PascalCase, depending on the vendor prefix)
- */
-function getSupportedPropertyName(property) {
-  var prefixes = [false, 'ms', 'Webkit', 'Moz', 'O'];
-  var upperProp = property.charAt(0).toUpperCase() + property.slice(1);
-
-  for (var i = 0; i < prefixes.length; i++) {
-    var prefix = prefixes[i];
-    var toCheck = prefix ? '' + prefix + upperProp : property;
-    if (typeof document.body.style[toCheck] !== 'undefined') {
-      return toCheck;
-    }
-  }
-  return null;
-}
-
-/**
- * Destroys the popper.
- * @method
- * @memberof Popper
- */
-function destroy() {
-  this.state.isDestroyed = true;
-
-  // touch DOM only if `applyStyle` modifier is enabled
-  if (isModifierEnabled(this.modifiers, 'applyStyle')) {
-    this.popper.removeAttribute('x-placement');
-    this.popper.style.position = '';
-    this.popper.style.top = '';
-    this.popper.style.left = '';
-    this.popper.style.right = '';
-    this.popper.style.bottom = '';
-    this.popper.style.willChange = '';
-    this.popper.style[getSupportedPropertyName('transform')] = '';
-  }
-
-  this.disableEventListeners();
-
-  // remove the popper if user explicity asked for the deletion on destroy
-  // do not use `remove` because IE11 doesn't support it
-  if (this.options.removeOnDestroy) {
-    this.popper.parentNode.removeChild(this.popper);
-  }
-  return this;
-}
-
-/**
- * Get the window associated with the element
- * @argument {Element} element
- * @returns {Window}
- */
-function getWindow(element) {
-  var ownerDocument = element.ownerDocument;
-  return ownerDocument ? ownerDocument.defaultView : window;
-}
-
-function attachToScrollParents(scrollParent, event, callback, scrollParents) {
-  var isBody = scrollParent.nodeName === 'BODY';
-  var target = isBody ? scrollParent.ownerDocument.defaultView : scrollParent;
-  target.addEventListener(event, callback, { passive: true });
-
-  if (!isBody) {
-    attachToScrollParents(getScrollParent(target.parentNode), event, callback, scrollParents);
-  }
-  scrollParents.push(target);
-}
-
-/**
- * Setup needed event listeners used to update the popper position
- * @method
- * @memberof Popper.Utils
- * @private
- */
-function setupEventListeners(reference, options, state, updateBound) {
-  // Resize event listener on window
-  state.updateBound = updateBound;
-  getWindow(reference).addEventListener('resize', state.updateBound, { passive: true });
-
-  // Scroll event listener on scroll parents
-  var scrollElement = getScrollParent(reference);
-  attachToScrollParents(scrollElement, 'scroll', state.updateBound, state.scrollParents);
-  state.scrollElement = scrollElement;
-  state.eventsEnabled = true;
-
-  return state;
-}
-
-/**
- * It will add resize/scroll events and start recalculating
- * position of the popper element when they are triggered.
- * @method
- * @memberof Popper
- */
-function enableEventListeners() {
-  if (!this.state.eventsEnabled) {
-    this.state = setupEventListeners(this.reference, this.options, this.state, this.scheduleUpdate);
-  }
-}
-
-/**
- * Remove event listeners used to update the popper position
- * @method
- * @memberof Popper.Utils
- * @private
- */
-function removeEventListeners(reference, state) {
-  // Remove resize event listener on window
-  getWindow(reference).removeEventListener('resize', state.updateBound);
-
-  // Remove scroll event listener on scroll parents
-  state.scrollParents.forEach(function (target) {
-    target.removeEventListener('scroll', state.updateBound);
-  });
-
-  // Reset state
-  state.updateBound = null;
-  state.scrollParents = [];
-  state.scrollElement = null;
-  state.eventsEnabled = false;
-  return state;
-}
-
-/**
- * It will remove resize/scroll events and won't recalculate popper position
- * when they are triggered. It also won't trigger `onUpdate` callback anymore,
- * unless you call `update` method manually.
- * @method
- * @memberof Popper
- */
-function disableEventListeners() {
-  if (this.state.eventsEnabled) {
-    cancelAnimationFrame(this.scheduleUpdate);
-    this.state = removeEventListeners(this.reference, this.state);
-  }
-}
-
-/**
- * Tells if a given input is a number
- * @method
- * @memberof Popper.Utils
- * @param {*} input to check
- * @return {Boolean}
- */
-function isNumeric(n) {
-  return n !== '' && !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-/**
- * Set the style to the given popper
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element - Element to apply the style to
- * @argument {Object} styles
- * Object with a list of properties and values which will be applied to the element
- */
-function setStyles(element, styles) {
-  Object.keys(styles).forEach(function (prop) {
-    var unit = '';
-    // add unit if the value is numeric and is one of the following
-    if (['width', 'height', 'top', 'right', 'bottom', 'left'].indexOf(prop) !== -1 && isNumeric(styles[prop])) {
-      unit = 'px';
-    }
-    element.style[prop] = styles[prop] + unit;
-  });
-}
-
-/**
- * Set the attributes to the given popper
- * @method
- * @memberof Popper.Utils
- * @argument {Element} element - Element to apply the attributes to
- * @argument {Object} styles
- * Object with a list of properties and values which will be applied to the element
- */
-function setAttributes(element, attributes) {
-  Object.keys(attributes).forEach(function (prop) {
-    var value = attributes[prop];
-    if (value !== false) {
-      element.setAttribute(prop, attributes[prop]);
-    } else {
-      element.removeAttribute(prop);
-    }
-  });
-}
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by `update` method
- * @argument {Object} data.styles - List of style properties - values to apply to popper element
- * @argument {Object} data.attributes - List of attribute properties - values to apply to popper element
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The same data object
- */
-function applyStyle(data) {
-  // any property present in `data.styles` will be applied to the popper,
-  // in this way we can make the 3rd party modifiers add custom styles to it
-  // Be aware, modifiers could override the properties defined in the previous
-  // lines of this modifier!
-  setStyles(data.instance.popper, data.styles);
-
-  // any property present in `data.attributes` will be applied to the popper,
-  // they will be set as HTML attributes of the element
-  setAttributes(data.instance.popper, data.attributes);
-
-  // if arrowElement is defined and arrowStyles has some properties
-  if (data.arrowElement && Object.keys(data.arrowStyles).length) {
-    setStyles(data.arrowElement, data.arrowStyles);
-  }
-
-  return data;
-}
-
-/**
- * Set the x-placement attribute before everything else because it could be used
- * to add margins to the popper margins needs to be calculated to get the
- * correct popper offsets.
- * @method
- * @memberof Popper.modifiers
- * @param {HTMLElement} reference - The reference element used to position the popper
- * @param {HTMLElement} popper - The HTML element used as popper
- * @param {Object} options - Popper.js options
- */
-function applyStyleOnLoad(reference, popper, options, modifierOptions, state) {
-  // compute reference element offsets
-  var referenceOffsets = getReferenceOffsets(state, popper, reference, options.positionFixed);
-
-  // compute auto placement, store placement inside the data object,
-  // modifiers will be able to edit `placement` if needed
-  // and refer to originalPlacement to know the original value
-  var placement = computeAutoPlacement(options.placement, referenceOffsets, popper, reference, options.modifiers.flip.boundariesElement, options.modifiers.flip.padding);
-
-  popper.setAttribute('x-placement', placement);
-
-  // Apply `position` to popper before anything else because
-  // without the position applied we can't guarantee correct computations
-  setStyles(popper, { position: options.positionFixed ? 'fixed' : 'absolute' });
-
-  return options;
-}
-
-/**
- * @function
- * @memberof Popper.Utils
- * @argument {Object} data - The data object generated by `update` method
- * @argument {Boolean} shouldRound - If the offsets should be rounded at all
- * @returns {Object} The popper's position offsets rounded
- *
- * The tale of pixel-perfect positioning. It's still not 100% perfect, but as
- * good as it can be within reason.
- * Discussion here: https://github.com/FezVrasta/popper.js/pull/715
- *
- * Low DPI screens cause a popper to be blurry if not using full pixels (Safari
- * as well on High DPI screens).
- *
- * Firefox prefers no rounding for positioning and does not have blurriness on
- * high DPI screens.
- *
- * Only horizontal placement and left/right values need to be considered.
- */
-function getRoundedOffsets(data, shouldRound) {
-  var _data$offsets = data.offsets,
-      popper = _data$offsets.popper,
-      reference = _data$offsets.reference;
-  var round = Math.round,
-      floor = Math.floor;
-
-  var noRound = function noRound(v) {
-    return v;
-  };
-
-  var referenceWidth = round(reference.width);
-  var popperWidth = round(popper.width);
-
-  var isVertical = ['left', 'right'].indexOf(data.placement) !== -1;
-  var isVariation = data.placement.indexOf('-') !== -1;
-  var sameWidthParity = referenceWidth % 2 === popperWidth % 2;
-  var bothOddWidth = referenceWidth % 2 === 1 && popperWidth % 2 === 1;
-
-  var horizontalToInteger = !shouldRound ? noRound : isVertical || isVariation || sameWidthParity ? round : floor;
-  var verticalToInteger = !shouldRound ? noRound : round;
-
-  return {
-    left: horizontalToInteger(bothOddWidth && !isVariation && shouldRound ? popper.left - 1 : popper.left),
-    top: verticalToInteger(popper.top),
-    bottom: verticalToInteger(popper.bottom),
-    right: horizontalToInteger(popper.right)
-  };
-}
-
-var isFirefox = isBrowser$1 && /Firefox/i.test(navigator.userAgent);
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by `update` method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function computeStyle(data, options) {
-  var x = options.x,
-      y = options.y;
-  var popper = data.offsets.popper;
-
-  // Remove this legacy support in Popper.js v2
-
-  var legacyGpuAccelerationOption = find(data.instance.modifiers, function (modifier) {
-    return modifier.name === 'applyStyle';
-  }).gpuAcceleration;
-  if (legacyGpuAccelerationOption !== undefined) {
-    console.warn('WARNING: `gpuAcceleration` option moved to `computeStyle` modifier and will not be supported in future versions of Popper.js!');
-  }
-  var gpuAcceleration = legacyGpuAccelerationOption !== undefined ? legacyGpuAccelerationOption : options.gpuAcceleration;
-
-  var offsetParent = getOffsetParent(data.instance.popper);
-  var offsetParentRect = getBoundingClientRect(offsetParent);
-
-  // Styles
-  var styles = {
-    position: popper.position
-  };
-
-  var offsets = getRoundedOffsets(data, window.devicePixelRatio < 2 || !isFirefox);
-
-  var sideA = x === 'bottom' ? 'top' : 'bottom';
-  var sideB = y === 'right' ? 'left' : 'right';
-
-  // if gpuAcceleration is set to `true` and transform is supported,
-  //  we use `translate3d` to apply the position to the popper we
-  // automatically use the supported prefixed version if needed
-  var prefixedProperty = getSupportedPropertyName('transform');
-
-  // now, let's make a step back and look at this code closely (wtf?)
-  // If the content of the popper grows once it's been positioned, it
-  // may happen that the popper gets misplaced because of the new content
-  // overflowing its reference element
-  // To avoid this problem, we provide two options (x and y), which allow
-  // the consumer to define the offset origin.
-  // If we position a popper on top of a reference element, we can set
-  // `x` to `top` to make the popper grow towards its top instead of
-  // its bottom.
-  var left = void 0,
-      top = void 0;
-  if (sideA === 'bottom') {
-    // when offsetParent is <html> the positioning is relative to the bottom of the screen (excluding the scrollbar)
-    // and not the bottom of the html element
-    if (offsetParent.nodeName === 'HTML') {
-      top = -offsetParent.clientHeight + offsets.bottom;
-    } else {
-      top = -offsetParentRect.height + offsets.bottom;
-    }
-  } else {
-    top = offsets.top;
-  }
-  if (sideB === 'right') {
-    if (offsetParent.nodeName === 'HTML') {
-      left = -offsetParent.clientWidth + offsets.right;
-    } else {
-      left = -offsetParentRect.width + offsets.right;
-    }
-  } else {
-    left = offsets.left;
-  }
-  if (gpuAcceleration && prefixedProperty) {
-    styles[prefixedProperty] = 'translate3d(' + left + 'px, ' + top + 'px, 0)';
-    styles[sideA] = 0;
-    styles[sideB] = 0;
-    styles.willChange = 'transform';
-  } else {
-    // othwerise, we use the standard `top`, `left`, `bottom` and `right` properties
-    var invertTop = sideA === 'bottom' ? -1 : 1;
-    var invertLeft = sideB === 'right' ? -1 : 1;
-    styles[sideA] = top * invertTop;
-    styles[sideB] = left * invertLeft;
-    styles.willChange = sideA + ', ' + sideB;
-  }
-
-  // Attributes
-  var attributes = {
-    'x-placement': data.placement
-  };
-
-  // Update `data` attributes, styles and arrowStyles
-  data.attributes = _extends({}, attributes, data.attributes);
-  data.styles = _extends({}, styles, data.styles);
-  data.arrowStyles = _extends({}, data.offsets.arrow, data.arrowStyles);
-
-  return data;
-}
-
-/**
- * Helper used to know if the given modifier depends from another one.<br />
- * It checks if the needed modifier is listed and enabled.
- * @method
- * @memberof Popper.Utils
- * @param {Array} modifiers - list of modifiers
- * @param {String} requestingName - name of requesting modifier
- * @param {String} requestedName - name of requested modifier
- * @returns {Boolean}
- */
-function isModifierRequired(modifiers, requestingName, requestedName) {
-  var requesting = find(modifiers, function (_ref) {
-    var name = _ref.name;
-    return name === requestingName;
-  });
-
-  var isRequired = !!requesting && modifiers.some(function (modifier) {
-    return modifier.name === requestedName && modifier.enabled && modifier.order < requesting.order;
-  });
-
-  if (!isRequired) {
-    var _requesting = '`' + requestingName + '`';
-    var requested = '`' + requestedName + '`';
-    console.warn(requested + ' modifier is required by ' + _requesting + ' modifier in order to work, be sure to include it before ' + _requesting + '!');
-  }
-  return isRequired;
-}
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by update method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function arrow(data, options) {
-  var _data$offsets$arrow;
-
-  // arrow depends on keepTogether in order to work
-  if (!isModifierRequired(data.instance.modifiers, 'arrow', 'keepTogether')) {
-    return data;
-  }
-
-  var arrowElement = options.element;
-
-  // if arrowElement is a string, suppose it's a CSS selector
-  if (typeof arrowElement === 'string') {
-    arrowElement = data.instance.popper.querySelector(arrowElement);
-
-    // if arrowElement is not found, don't run the modifier
-    if (!arrowElement) {
-      return data;
-    }
-  } else {
-    // if the arrowElement isn't a query selector we must check that the
-    // provided DOM node is child of its popper node
-    if (!data.instance.popper.contains(arrowElement)) {
-      console.warn('WARNING: `arrow.element` must be child of its popper element!');
-      return data;
-    }
-  }
-
-  var placement = data.placement.split('-')[0];
-  var _data$offsets = data.offsets,
-      popper = _data$offsets.popper,
-      reference = _data$offsets.reference;
-
-  var isVertical = ['left', 'right'].indexOf(placement) !== -1;
-
-  var len = isVertical ? 'height' : 'width';
-  var sideCapitalized = isVertical ? 'Top' : 'Left';
-  var side = sideCapitalized.toLowerCase();
-  var altSide = isVertical ? 'left' : 'top';
-  var opSide = isVertical ? 'bottom' : 'right';
-  var arrowElementSize = getOuterSizes(arrowElement)[len];
-
-  //
-  // extends keepTogether behavior making sure the popper and its
-  // reference have enough pixels in conjunction
-  //
-
-  // top/left side
-  if (reference[opSide] - arrowElementSize < popper[side]) {
-    data.offsets.popper[side] -= popper[side] - (reference[opSide] - arrowElementSize);
-  }
-  // bottom/right side
-  if (reference[side] + arrowElementSize > popper[opSide]) {
-    data.offsets.popper[side] += reference[side] + arrowElementSize - popper[opSide];
-  }
-  data.offsets.popper = getClientRect(data.offsets.popper);
-
-  // compute center of the popper
-  var center = reference[side] + reference[len] / 2 - arrowElementSize / 2;
-
-  // Compute the sideValue using the updated popper offsets
-  // take popper margin in account because we don't have this info available
-  var css = getStyleComputedProperty(data.instance.popper);
-  var popperMarginSide = parseFloat(css['margin' + sideCapitalized], 10);
-  var popperBorderSide = parseFloat(css['border' + sideCapitalized + 'Width'], 10);
-  var sideValue = center - data.offsets.popper[side] - popperMarginSide - popperBorderSide;
-
-  // prevent arrowElement from being placed not contiguously to its popper
-  sideValue = Math.max(Math.min(popper[len] - arrowElementSize, sideValue), 0);
-
-  data.arrowElement = arrowElement;
-  data.offsets.arrow = (_data$offsets$arrow = {}, defineProperty$1(_data$offsets$arrow, side, Math.round(sideValue)), defineProperty$1(_data$offsets$arrow, altSide, ''), _data$offsets$arrow);
-
-  return data;
-}
-
-/**
- * Get the opposite placement variation of the given one
- * @method
- * @memberof Popper.Utils
- * @argument {String} placement variation
- * @returns {String} flipped placement variation
- */
-function getOppositeVariation(variation) {
-  if (variation === 'end') {
-    return 'start';
-  } else if (variation === 'start') {
-    return 'end';
-  }
-  return variation;
-}
-
-/**
- * List of accepted placements to use as values of the `placement` option.<br />
- * Valid placements are:
- * - `auto`
- * - `top`
- * - `right`
- * - `bottom`
- * - `left`
- *
- * Each placement can have a variation from this list:
- * - `-start`
- * - `-end`
- *
- * Variations are interpreted easily if you think of them as the left to right
- * written languages. Horizontally (`top` and `bottom`), `start` is left and `end`
- * is right.<br />
- * Vertically (`left` and `right`), `start` is top and `end` is bottom.
- *
- * Some valid examples are:
- * - `top-end` (on top of reference, right aligned)
- * - `right-start` (on right of reference, top aligned)
- * - `bottom` (on bottom, centered)
- * - `auto-end` (on the side with more space available, alignment depends by placement)
- *
- * @static
- * @type {Array}
- * @enum {String}
- * @readonly
- * @method placements
- * @memberof Popper
- */
-var placements = ['auto-start', 'auto', 'auto-end', 'top-start', 'top', 'top-end', 'right-start', 'right', 'right-end', 'bottom-end', 'bottom', 'bottom-start', 'left-end', 'left', 'left-start'];
-
-// Get rid of `auto` `auto-start` and `auto-end`
-var validPlacements = placements.slice(3);
-
-/**
- * Given an initial placement, returns all the subsequent placements
- * clockwise (or counter-clockwise).
- *
- * @method
- * @memberof Popper.Utils
- * @argument {String} placement - A valid placement (it accepts variations)
- * @argument {Boolean} counter - Set to true to walk the placements counterclockwise
- * @returns {Array} placements including their variations
- */
-function clockwise(placement) {
-  var counter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-  var index = validPlacements.indexOf(placement);
-  var arr = validPlacements.slice(index + 1).concat(validPlacements.slice(0, index));
-  return counter ? arr.reverse() : arr;
-}
-
-var BEHAVIORS = {
-  FLIP: 'flip',
-  CLOCKWISE: 'clockwise',
-  COUNTERCLOCKWISE: 'counterclockwise'
-};
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by update method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function flip(data, options) {
-  // if `inner` modifier is enabled, we can't use the `flip` modifier
-  if (isModifierEnabled(data.instance.modifiers, 'inner')) {
-    return data;
-  }
-
-  if (data.flipped && data.placement === data.originalPlacement) {
-    // seems like flip is trying to loop, probably there's not enough space on any of the flippable sides
-    return data;
-  }
-
-  var boundaries = getBoundaries(data.instance.popper, data.instance.reference, options.padding, options.boundariesElement, data.positionFixed);
-
-  var placement = data.placement.split('-')[0];
-  var placementOpposite = getOppositePlacement(placement);
-  var variation = data.placement.split('-')[1] || '';
-
-  var flipOrder = [];
-
-  switch (options.behavior) {
-    case BEHAVIORS.FLIP:
-      flipOrder = [placement, placementOpposite];
-      break;
-    case BEHAVIORS.CLOCKWISE:
-      flipOrder = clockwise(placement);
-      break;
-    case BEHAVIORS.COUNTERCLOCKWISE:
-      flipOrder = clockwise(placement, true);
-      break;
-    default:
-      flipOrder = options.behavior;
-  }
-
-  flipOrder.forEach(function (step, index) {
-    if (placement !== step || flipOrder.length === index + 1) {
-      return data;
-    }
-
-    placement = data.placement.split('-')[0];
-    placementOpposite = getOppositePlacement(placement);
-
-    var popperOffsets = data.offsets.popper;
-    var refOffsets = data.offsets.reference;
-
-    // using floor because the reference offsets may contain decimals we are not going to consider here
-    var floor = Math.floor;
-    var overlapsRef = placement === 'left' && floor(popperOffsets.right) > floor(refOffsets.left) || placement === 'right' && floor(popperOffsets.left) < floor(refOffsets.right) || placement === 'top' && floor(popperOffsets.bottom) > floor(refOffsets.top) || placement === 'bottom' && floor(popperOffsets.top) < floor(refOffsets.bottom);
-
-    var overflowsLeft = floor(popperOffsets.left) < floor(boundaries.left);
-    var overflowsRight = floor(popperOffsets.right) > floor(boundaries.right);
-    var overflowsTop = floor(popperOffsets.top) < floor(boundaries.top);
-    var overflowsBottom = floor(popperOffsets.bottom) > floor(boundaries.bottom);
-
-    var overflowsBoundaries = placement === 'left' && overflowsLeft || placement === 'right' && overflowsRight || placement === 'top' && overflowsTop || placement === 'bottom' && overflowsBottom;
-
-    // flip the variation if required
-    var isVertical = ['top', 'bottom'].indexOf(placement) !== -1;
-
-    // flips variation if reference element overflows boundaries
-    var flippedVariationByRef = !!options.flipVariations && (isVertical && variation === 'start' && overflowsLeft || isVertical && variation === 'end' && overflowsRight || !isVertical && variation === 'start' && overflowsTop || !isVertical && variation === 'end' && overflowsBottom);
-
-    // flips variation if popper content overflows boundaries
-    var flippedVariationByContent = !!options.flipVariationsByContent && (isVertical && variation === 'start' && overflowsRight || isVertical && variation === 'end' && overflowsLeft || !isVertical && variation === 'start' && overflowsBottom || !isVertical && variation === 'end' && overflowsTop);
-
-    var flippedVariation = flippedVariationByRef || flippedVariationByContent;
-
-    if (overlapsRef || overflowsBoundaries || flippedVariation) {
-      // this boolean to detect any flip loop
-      data.flipped = true;
-
-      if (overlapsRef || overflowsBoundaries) {
-        placement = flipOrder[index + 1];
-      }
-
-      if (flippedVariation) {
-        variation = getOppositeVariation(variation);
-      }
-
-      data.placement = placement + (variation ? '-' + variation : '');
-
-      // this object contains `position`, we want to preserve it along with
-      // any additional property we may add in the future
-      data.offsets.popper = _extends({}, data.offsets.popper, getPopperOffsets(data.instance.popper, data.offsets.reference, data.placement));
-
-      data = runModifiers(data.instance.modifiers, data, 'flip');
-    }
-  });
-  return data;
-}
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by update method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function keepTogether(data) {
-  var _data$offsets = data.offsets,
-      popper = _data$offsets.popper,
-      reference = _data$offsets.reference;
-
-  var placement = data.placement.split('-')[0];
-  var floor = Math.floor;
-  var isVertical = ['top', 'bottom'].indexOf(placement) !== -1;
-  var side = isVertical ? 'right' : 'bottom';
-  var opSide = isVertical ? 'left' : 'top';
-  var measurement = isVertical ? 'width' : 'height';
-
-  if (popper[side] < floor(reference[opSide])) {
-    data.offsets.popper[opSide] = floor(reference[opSide]) - popper[measurement];
-  }
-  if (popper[opSide] > floor(reference[side])) {
-    data.offsets.popper[opSide] = floor(reference[side]);
-  }
-
-  return data;
-}
-
-/**
- * Converts a string containing value + unit into a px value number
- * @function
- * @memberof {modifiers~offset}
- * @private
- * @argument {String} str - Value + unit string
- * @argument {String} measurement - `height` or `width`
- * @argument {Object} popperOffsets
- * @argument {Object} referenceOffsets
- * @returns {Number|String}
- * Value in pixels, or original string if no values were extracted
- */
-function toValue(str, measurement, popperOffsets, referenceOffsets) {
-  // separate value from unit
-  var split = str.match(/((?:\-|\+)?\d*\.?\d*)(.*)/);
-  var value = +split[1];
-  var unit = split[2];
-
-  // If it's not a number it's an operator, I guess
-  if (!value) {
-    return str;
-  }
-
-  if (unit.indexOf('%') === 0) {
-    var element = void 0;
-    switch (unit) {
-      case '%p':
-        element = popperOffsets;
-        break;
-      case '%':
-      case '%r':
-      default:
-        element = referenceOffsets;
-    }
-
-    var rect = getClientRect(element);
-    return rect[measurement] / 100 * value;
-  } else if (unit === 'vh' || unit === 'vw') {
-    // if is a vh or vw, we calculate the size based on the viewport
-    var size = void 0;
-    if (unit === 'vh') {
-      size = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    } else {
-      size = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-    }
-    return size / 100 * value;
-  } else {
-    // if is an explicit pixel unit, we get rid of the unit and keep the value
-    // if is an implicit unit, it's px, and we return just the value
-    return value;
-  }
-}
-
-/**
- * Parse an `offset` string to extrapolate `x` and `y` numeric offsets.
- * @function
- * @memberof {modifiers~offset}
- * @private
- * @argument {String} offset
- * @argument {Object} popperOffsets
- * @argument {Object} referenceOffsets
- * @argument {String} basePlacement
- * @returns {Array} a two cells array with x and y offsets in numbers
- */
-function parseOffset(offset, popperOffsets, referenceOffsets, basePlacement) {
-  var offsets = [0, 0];
-
-  // Use height if placement is left or right and index is 0 otherwise use width
-  // in this way the first offset will use an axis and the second one
-  // will use the other one
-  var useHeight = ['right', 'left'].indexOf(basePlacement) !== -1;
-
-  // Split the offset string to obtain a list of values and operands
-  // The regex addresses values with the plus or minus sign in front (+10, -20, etc)
-  var fragments = offset.split(/(\+|\-)/).map(function (frag) {
-    return frag.trim();
-  });
-
-  // Detect if the offset string contains a pair of values or a single one
-  // they could be separated by comma or space
-  var divider = fragments.indexOf(find(fragments, function (frag) {
-    return frag.search(/,|\s/) !== -1;
-  }));
-
-  if (fragments[divider] && fragments[divider].indexOf(',') === -1) {
-    console.warn('Offsets separated by white space(s) are deprecated, use a comma (,) instead.');
-  }
-
-  // If divider is found, we divide the list of values and operands to divide
-  // them by ofset X and Y.
-  var splitRegex = /\s*,\s*|\s+/;
-  var ops = divider !== -1 ? [fragments.slice(0, divider).concat([fragments[divider].split(splitRegex)[0]]), [fragments[divider].split(splitRegex)[1]].concat(fragments.slice(divider + 1))] : [fragments];
-
-  // Convert the values with units to absolute pixels to allow our computations
-  ops = ops.map(function (op, index) {
-    // Most of the units rely on the orientation of the popper
-    var measurement = (index === 1 ? !useHeight : useHeight) ? 'height' : 'width';
-    var mergeWithPrevious = false;
-    return op
-    // This aggregates any `+` or `-` sign that aren't considered operators
-    // e.g.: 10 + +5 => [10, +, +5]
-    .reduce(function (a, b) {
-      if (a[a.length - 1] === '' && ['+', '-'].indexOf(b) !== -1) {
-        a[a.length - 1] = b;
-        mergeWithPrevious = true;
-        return a;
-      } else if (mergeWithPrevious) {
-        a[a.length - 1] += b;
-        mergeWithPrevious = false;
-        return a;
-      } else {
-        return a.concat(b);
-      }
-    }, [])
-    // Here we convert the string values into number values (in px)
-    .map(function (str) {
-      return toValue(str, measurement, popperOffsets, referenceOffsets);
-    });
-  });
-
-  // Loop trough the offsets arrays and execute the operations
-  ops.forEach(function (op, index) {
-    op.forEach(function (frag, index2) {
-      if (isNumeric(frag)) {
-        offsets[index] += frag * (op[index2 - 1] === '-' ? -1 : 1);
-      }
-    });
-  });
-  return offsets;
-}
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by update method
- * @argument {Object} options - Modifiers configuration and options
- * @argument {Number|String} options.offset=0
- * The offset value as described in the modifier description
- * @returns {Object} The data object, properly modified
- */
-function offset$1(data, _ref) {
-  var offset = _ref.offset;
-  var placement = data.placement,
-      _data$offsets = data.offsets,
-      popper = _data$offsets.popper,
-      reference = _data$offsets.reference;
-
-  var basePlacement = placement.split('-')[0];
-
-  var offsets = void 0;
-  if (isNumeric(+offset)) {
-    offsets = [+offset, 0];
-  } else {
-    offsets = parseOffset(offset, popper, reference, basePlacement);
-  }
-
-  if (basePlacement === 'left') {
-    popper.top += offsets[0];
-    popper.left -= offsets[1];
-  } else if (basePlacement === 'right') {
-    popper.top += offsets[0];
-    popper.left += offsets[1];
-  } else if (basePlacement === 'top') {
-    popper.left += offsets[0];
-    popper.top -= offsets[1];
-  } else if (basePlacement === 'bottom') {
-    popper.left += offsets[0];
-    popper.top += offsets[1];
-  }
-
-  data.popper = popper;
-  return data;
-}
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by `update` method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function preventOverflow(data, options) {
-  var boundariesElement = options.boundariesElement || getOffsetParent(data.instance.popper);
-
-  // If offsetParent is the reference element, we really want to
-  // go one step up and use the next offsetParent as reference to
-  // avoid to make this modifier completely useless and look like broken
-  if (data.instance.reference === boundariesElement) {
-    boundariesElement = getOffsetParent(boundariesElement);
-  }
-
-  // NOTE: DOM access here
-  // resets the popper's position so that the document size can be calculated excluding
-  // the size of the popper element itself
-  var transformProp = getSupportedPropertyName('transform');
-  var popperStyles = data.instance.popper.style; // assignment to help minification
-  var top = popperStyles.top,
-      left = popperStyles.left,
-      transform = popperStyles[transformProp];
-
-  popperStyles.top = '';
-  popperStyles.left = '';
-  popperStyles[transformProp] = '';
-
-  var boundaries = getBoundaries(data.instance.popper, data.instance.reference, options.padding, boundariesElement, data.positionFixed);
-
-  // NOTE: DOM access here
-  // restores the original style properties after the offsets have been computed
-  popperStyles.top = top;
-  popperStyles.left = left;
-  popperStyles[transformProp] = transform;
-
-  options.boundaries = boundaries;
-
-  var order = options.priority;
-  var popper = data.offsets.popper;
-
-  var check = {
-    primary: function primary(placement) {
-      var value = popper[placement];
-      if (popper[placement] < boundaries[placement] && !options.escapeWithReference) {
-        value = Math.max(popper[placement], boundaries[placement]);
-      }
-      return defineProperty$1({}, placement, value);
-    },
-    secondary: function secondary(placement) {
-      var mainSide = placement === 'right' ? 'left' : 'top';
-      var value = popper[mainSide];
-      if (popper[placement] > boundaries[placement] && !options.escapeWithReference) {
-        value = Math.min(popper[mainSide], boundaries[placement] - (placement === 'right' ? popper.width : popper.height));
-      }
-      return defineProperty$1({}, mainSide, value);
-    }
-  };
-
-  order.forEach(function (placement) {
-    var side = ['left', 'top'].indexOf(placement) !== -1 ? 'primary' : 'secondary';
-    popper = _extends({}, popper, check[side](placement));
-  });
-
-  data.offsets.popper = popper;
-
-  return data;
-}
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by `update` method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function shift(data) {
-  var placement = data.placement;
-  var basePlacement = placement.split('-')[0];
-  var shiftvariation = placement.split('-')[1];
-
-  // if shift shiftvariation is specified, run the modifier
-  if (shiftvariation) {
-    var _data$offsets = data.offsets,
-        reference = _data$offsets.reference,
-        popper = _data$offsets.popper;
-
-    var isVertical = ['bottom', 'top'].indexOf(basePlacement) !== -1;
-    var side = isVertical ? 'left' : 'top';
-    var measurement = isVertical ? 'width' : 'height';
-
-    var shiftOffsets = {
-      start: defineProperty$1({}, side, reference[side]),
-      end: defineProperty$1({}, side, reference[side] + reference[measurement] - popper[measurement])
-    };
-
-    data.offsets.popper = _extends({}, popper, shiftOffsets[shiftvariation]);
-  }
-
-  return data;
-}
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by update method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function hide(data) {
-  if (!isModifierRequired(data.instance.modifiers, 'hide', 'preventOverflow')) {
-    return data;
-  }
-
-  var refRect = data.offsets.reference;
-  var bound = find(data.instance.modifiers, function (modifier) {
-    return modifier.name === 'preventOverflow';
-  }).boundaries;
-
-  if (refRect.bottom < bound.top || refRect.left > bound.right || refRect.top > bound.bottom || refRect.right < bound.left) {
-    // Avoid unnecessary DOM access if visibility hasn't changed
-    if (data.hide === true) {
-      return data;
-    }
-
-    data.hide = true;
-    data.attributes['x-out-of-boundaries'] = '';
-  } else {
-    // Avoid unnecessary DOM access if visibility hasn't changed
-    if (data.hide === false) {
-      return data;
-    }
-
-    data.hide = false;
-    data.attributes['x-out-of-boundaries'] = false;
-  }
-
-  return data;
-}
-
-/**
- * @function
- * @memberof Modifiers
- * @argument {Object} data - The data object generated by `update` method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {Object} The data object, properly modified
- */
-function inner(data) {
-  var placement = data.placement;
-  var basePlacement = placement.split('-')[0];
-  var _data$offsets = data.offsets,
-      popper = _data$offsets.popper,
-      reference = _data$offsets.reference;
-
-  var isHoriz = ['left', 'right'].indexOf(basePlacement) !== -1;
-
-  var subtractLength = ['top', 'left'].indexOf(basePlacement) === -1;
-
-  popper[isHoriz ? 'left' : 'top'] = reference[basePlacement] - (subtractLength ? popper[isHoriz ? 'width' : 'height'] : 0);
-
-  data.placement = getOppositePlacement(placement);
-  data.offsets.popper = getClientRect(popper);
-
-  return data;
-}
-
-/**
- * Modifier function, each modifier can have a function of this type assigned
- * to its `fn` property.<br />
- * These functions will be called on each update, this means that you must
- * make sure they are performant enough to avoid performance bottlenecks.
- *
- * @function ModifierFn
- * @argument {dataObject} data - The data object generated by `update` method
- * @argument {Object} options - Modifiers configuration and options
- * @returns {dataObject} The data object, properly modified
- */
-
-/**
- * Modifiers are plugins used to alter the behavior of your poppers.<br />
- * Popper.js uses a set of 9 modifiers to provide all the basic functionalities
- * needed by the library.
- *
- * Usually you don't want to override the `order`, `fn` and `onLoad` props.
- * All the other properties are configurations that could be tweaked.
- * @namespace modifiers
- */
-var modifiers = {
-  /**
-   * Modifier used to shift the popper on the start or end of its reference
-   * element.<br />
-   * It will read the variation of the `placement` property.<br />
-   * It can be one either `-end` or `-start`.
-   * @memberof modifiers
-   * @inner
-   */
-  shift: {
-    /** @prop {number} order=100 - Index used to define the order of execution */
-    order: 100,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: shift
-  },
-
-  /**
-   * The `offset` modifier can shift your popper on both its axis.
-   *
-   * It accepts the following units:
-   * - `px` or unit-less, interpreted as pixels
-   * - `%` or `%r`, percentage relative to the length of the reference element
-   * - `%p`, percentage relative to the length of the popper element
-   * - `vw`, CSS viewport width unit
-   * - `vh`, CSS viewport height unit
-   *
-   * For length is intended the main axis relative to the placement of the popper.<br />
-   * This means that if the placement is `top` or `bottom`, the length will be the
-   * `width`. In case of `left` or `right`, it will be the `height`.
-   *
-   * You can provide a single value (as `Number` or `String`), or a pair of values
-   * as `String` divided by a comma or one (or more) white spaces.<br />
-   * The latter is a deprecated method because it leads to confusion and will be
-   * removed in v2.<br />
-   * Additionally, it accepts additions and subtractions between different units.
-   * Note that multiplications and divisions aren't supported.
-   *
-   * Valid examples are:
-   * ```
-   * 10
-   * '10%'
-   * '10, 10'
-   * '10%, 10'
-   * '10 + 10%'
-   * '10 - 5vh + 3%'
-   * '-10px + 5vh, 5px - 6%'
-   * ```
-   * > **NB**: If you desire to apply offsets to your poppers in a way that may make them overlap
-   * > with their reference element, unfortunately, you will have to disable the `flip` modifier.
-   * > You can read more on this at this [issue](https://github.com/FezVrasta/popper.js/issues/373).
-   *
-   * @memberof modifiers
-   * @inner
-   */
-  offset: {
-    /** @prop {number} order=200 - Index used to define the order of execution */
-    order: 200,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: offset$1,
-    /** @prop {Number|String} offset=0
-     * The offset value as described in the modifier description
-     */
-    offset: 0
-  },
-
-  /**
-   * Modifier used to prevent the popper from being positioned outside the boundary.
-   *
-   * A scenario exists where the reference itself is not within the boundaries.<br />
-   * We can say it has "escaped the boundaries" — or just "escaped".<br />
-   * In this case we need to decide whether the popper should either:
-   *
-   * - detach from the reference and remain "trapped" in the boundaries, or
-   * - if it should ignore the boundary and "escape with its reference"
-   *
-   * When `escapeWithReference` is set to`true` and reference is completely
-   * outside its boundaries, the popper will overflow (or completely leave)
-   * the boundaries in order to remain attached to the edge of the reference.
-   *
-   * @memberof modifiers
-   * @inner
-   */
-  preventOverflow: {
-    /** @prop {number} order=300 - Index used to define the order of execution */
-    order: 300,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: preventOverflow,
-    /**
-     * @prop {Array} [priority=['left','right','top','bottom']]
-     * Popper will try to prevent overflow following these priorities by default,
-     * then, it could overflow on the left and on top of the `boundariesElement`
-     */
-    priority: ['left', 'right', 'top', 'bottom'],
-    /**
-     * @prop {number} padding=5
-     * Amount of pixel used to define a minimum distance between the boundaries
-     * and the popper. This makes sure the popper always has a little padding
-     * between the edges of its container
-     */
-    padding: 5,
-    /**
-     * @prop {String|HTMLElement} boundariesElement='scrollParent'
-     * Boundaries used by the modifier. Can be `scrollParent`, `window`,
-     * `viewport` or any DOM element.
-     */
-    boundariesElement: 'scrollParent'
-  },
-
-  /**
-   * Modifier used to make sure the reference and its popper stay near each other
-   * without leaving any gap between the two. Especially useful when the arrow is
-   * enabled and you want to ensure that it points to its reference element.
-   * It cares only about the first axis. You can still have poppers with margin
-   * between the popper and its reference element.
-   * @memberof modifiers
-   * @inner
-   */
-  keepTogether: {
-    /** @prop {number} order=400 - Index used to define the order of execution */
-    order: 400,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: keepTogether
-  },
-
-  /**
-   * This modifier is used to move the `arrowElement` of the popper to make
-   * sure it is positioned between the reference element and its popper element.
-   * It will read the outer size of the `arrowElement` node to detect how many
-   * pixels of conjunction are needed.
-   *
-   * It has no effect if no `arrowElement` is provided.
-   * @memberof modifiers
-   * @inner
-   */
-  arrow: {
-    /** @prop {number} order=500 - Index used to define the order of execution */
-    order: 500,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: arrow,
-    /** @prop {String|HTMLElement} element='[x-arrow]' - Selector or node used as arrow */
-    element: '[x-arrow]'
-  },
-
-  /**
-   * Modifier used to flip the popper's placement when it starts to overlap its
-   * reference element.
-   *
-   * Requires the `preventOverflow` modifier before it in order to work.
-   *
-   * **NOTE:** this modifier will interrupt the current update cycle and will
-   * restart it if it detects the need to flip the placement.
-   * @memberof modifiers
-   * @inner
-   */
-  flip: {
-    /** @prop {number} order=600 - Index used to define the order of execution */
-    order: 600,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: flip,
-    /**
-     * @prop {String|Array} behavior='flip'
-     * The behavior used to change the popper's placement. It can be one of
-     * `flip`, `clockwise`, `counterclockwise` or an array with a list of valid
-     * placements (with optional variations)
-     */
-    behavior: 'flip',
-    /**
-     * @prop {number} padding=5
-     * The popper will flip if it hits the edges of the `boundariesElement`
-     */
-    padding: 5,
-    /**
-     * @prop {String|HTMLElement} boundariesElement='viewport'
-     * The element which will define the boundaries of the popper position.
-     * The popper will never be placed outside of the defined boundaries
-     * (except if `keepTogether` is enabled)
-     */
-    boundariesElement: 'viewport',
-    /**
-     * @prop {Boolean} flipVariations=false
-     * The popper will switch placement variation between `-start` and `-end` when
-     * the reference element overlaps its boundaries.
-     *
-     * The original placement should have a set variation.
-     */
-    flipVariations: false,
-    /**
-     * @prop {Boolean} flipVariationsByContent=false
-     * The popper will switch placement variation between `-start` and `-end` when
-     * the popper element overlaps its reference boundaries.
-     *
-     * The original placement should have a set variation.
-     */
-    flipVariationsByContent: false
-  },
-
-  /**
-   * Modifier used to make the popper flow toward the inner of the reference element.
-   * By default, when this modifier is disabled, the popper will be placed outside
-   * the reference element.
-   * @memberof modifiers
-   * @inner
-   */
-  inner: {
-    /** @prop {number} order=700 - Index used to define the order of execution */
-    order: 700,
-    /** @prop {Boolean} enabled=false - Whether the modifier is enabled or not */
-    enabled: false,
-    /** @prop {ModifierFn} */
-    fn: inner
-  },
-
-  /**
-   * Modifier used to hide the popper when its reference element is outside of the
-   * popper boundaries. It will set a `x-out-of-boundaries` attribute which can
-   * be used to hide with a CSS selector the popper when its reference is
-   * out of boundaries.
-   *
-   * Requires the `preventOverflow` modifier before it in order to work.
-   * @memberof modifiers
-   * @inner
-   */
-  hide: {
-    /** @prop {number} order=800 - Index used to define the order of execution */
-    order: 800,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: hide
-  },
-
-  /**
-   * Computes the style that will be applied to the popper element to gets
-   * properly positioned.
-   *
-   * Note that this modifier will not touch the DOM, it just prepares the styles
-   * so that `applyStyle` modifier can apply it. This separation is useful
-   * in case you need to replace `applyStyle` with a custom implementation.
-   *
-   * This modifier has `850` as `order` value to maintain backward compatibility
-   * with previous versions of Popper.js. Expect the modifiers ordering method
-   * to change in future major versions of the library.
-   *
-   * @memberof modifiers
-   * @inner
-   */
-  computeStyle: {
-    /** @prop {number} order=850 - Index used to define the order of execution */
-    order: 850,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: computeStyle,
-    /**
-     * @prop {Boolean} gpuAcceleration=true
-     * If true, it uses the CSS 3D transformation to position the popper.
-     * Otherwise, it will use the `top` and `left` properties
-     */
-    gpuAcceleration: true,
-    /**
-     * @prop {string} [x='bottom']
-     * Where to anchor the X axis (`bottom` or `top`). AKA X offset origin.
-     * Change this if your popper should grow in a direction different from `bottom`
-     */
-    x: 'bottom',
-    /**
-     * @prop {string} [x='left']
-     * Where to anchor the Y axis (`left` or `right`). AKA Y offset origin.
-     * Change this if your popper should grow in a direction different from `right`
-     */
-    y: 'right'
-  },
-
-  /**
-   * Applies the computed styles to the popper element.
-   *
-   * All the DOM manipulations are limited to this modifier. This is useful in case
-   * you want to integrate Popper.js inside a framework or view library and you
-   * want to delegate all the DOM manipulations to it.
-   *
-   * Note that if you disable this modifier, you must make sure the popper element
-   * has its position set to `absolute` before Popper.js can do its work!
-   *
-   * Just disable this modifier and define your own to achieve the desired effect.
-   *
-   * @memberof modifiers
-   * @inner
-   */
-  applyStyle: {
-    /** @prop {number} order=900 - Index used to define the order of execution */
-    order: 900,
-    /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
-    enabled: true,
-    /** @prop {ModifierFn} */
-    fn: applyStyle,
-    /** @prop {Function} */
-    onLoad: applyStyleOnLoad,
-    /**
-     * @deprecated since version 1.10.0, the property moved to `computeStyle` modifier
-     * @prop {Boolean} gpuAcceleration=true
-     * If true, it uses the CSS 3D transformation to position the popper.
-     * Otherwise, it will use the `top` and `left` properties
-     */
-    gpuAcceleration: undefined
-  }
-};
-
-/**
- * The `dataObject` is an object containing all the information used by Popper.js.
- * This object is passed to modifiers and to the `onCreate` and `onUpdate` callbacks.
- * @name dataObject
- * @property {Object} data.instance The Popper.js instance
- * @property {String} data.placement Placement applied to popper
- * @property {String} data.originalPlacement Placement originally defined on init
- * @property {Boolean} data.flipped True if popper has been flipped by flip modifier
- * @property {Boolean} data.hide True if the reference element is out of boundaries, useful to know when to hide the popper
- * @property {HTMLElement} data.arrowElement Node used as arrow by arrow modifier
- * @property {Object} data.styles Any CSS property defined here will be applied to the popper. It expects the JavaScript nomenclature (eg. `marginBottom`)
- * @property {Object} data.arrowStyles Any CSS property defined here will be applied to the popper arrow. It expects the JavaScript nomenclature (eg. `marginBottom`)
- * @property {Object} data.boundaries Offsets of the popper boundaries
- * @property {Object} data.offsets The measurements of popper, reference and arrow elements
- * @property {Object} data.offsets.popper `top`, `left`, `width`, `height` values
- * @property {Object} data.offsets.reference `top`, `left`, `width`, `height` values
- * @property {Object} data.offsets.arrow] `top` and `left` offsets, only one of them will be different from 0
- */
-
-/**
- * Default options provided to Popper.js constructor.<br />
- * These can be overridden using the `options` argument of Popper.js.<br />
- * To override an option, simply pass an object with the same
- * structure of the `options` object, as the 3rd argument. For example:
- * ```
- * new Popper(ref, pop, {
- *   modifiers: {
- *     preventOverflow: { enabled: false }
- *   }
- * })
- * ```
- * @type {Object}
- * @static
- * @memberof Popper
- */
-var Defaults = {
-  /**
-   * Popper's placement.
-   * @prop {Popper.placements} placement='bottom'
-   */
-  placement: 'bottom',
-
-  /**
-   * Set this to true if you want popper to position it self in 'fixed' mode
-   * @prop {Boolean} positionFixed=false
-   */
-  positionFixed: false,
-
-  /**
-   * Whether events (resize, scroll) are initially enabled.
-   * @prop {Boolean} eventsEnabled=true
-   */
-  eventsEnabled: true,
-
-  /**
-   * Set to true if you want to automatically remove the popper when
-   * you call the `destroy` method.
-   * @prop {Boolean} removeOnDestroy=false
-   */
-  removeOnDestroy: false,
-
-  /**
-   * Callback called when the popper is created.<br />
-   * By default, it is set to no-op.<br />
-   * Access Popper.js instance with `data.instance`.
-   * @prop {onCreate}
-   */
-  onCreate: function onCreate() {},
-
-  /**
-   * Callback called when the popper is updated. This callback is not called
-   * on the initialization/creation of the popper, but only on subsequent
-   * updates.<br />
-   * By default, it is set to no-op.<br />
-   * Access Popper.js instance with `data.instance`.
-   * @prop {onUpdate}
-   */
-  onUpdate: function onUpdate() {},
-
-  /**
-   * List of modifiers used to modify the offsets before they are applied to the popper.
-   * They provide most of the functionalities of Popper.js.
-   * @prop {modifiers}
-   */
-  modifiers: modifiers
-};
-
-/**
- * @callback onCreate
- * @param {dataObject} data
- */
-
-/**
- * @callback onUpdate
- * @param {dataObject} data
- */
-
-// Utils
-// Methods
-var Popper = function () {
-  /**
-   * Creates a new Popper.js instance.
-   * @class Popper
-   * @param {Element|referenceObject} reference - The reference element used to position the popper
-   * @param {Element} popper - The HTML / XML element used as the popper
-   * @param {Object} options - Your custom options to override the ones defined in [Defaults](#defaults)
-   * @return {Object} instance - The generated Popper.js instance
-   */
-  function Popper(reference, popper) {
-    var _this = this;
-
-    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    classCallCheck(this, Popper);
-
-    this.scheduleUpdate = function () {
-      return requestAnimationFrame(_this.update);
-    };
-
-    // make update() debounced, so that it only runs at most once-per-tick
-    this.update = debounce(this.update.bind(this));
-
-    // with {} we create a new object with the options inside it
-    this.options = _extends({}, Popper.Defaults, options);
-
-    // init state
-    this.state = {
-      isDestroyed: false,
-      isCreated: false,
-      scrollParents: []
-    };
-
-    // get reference and popper elements (allow jQuery wrappers)
-    this.reference = reference && reference.jquery ? reference[0] : reference;
-    this.popper = popper && popper.jquery ? popper[0] : popper;
-
-    // Deep merge modifiers options
-    this.options.modifiers = {};
-    Object.keys(_extends({}, Popper.Defaults.modifiers, options.modifiers)).forEach(function (name) {
-      _this.options.modifiers[name] = _extends({}, Popper.Defaults.modifiers[name] || {}, options.modifiers ? options.modifiers[name] : {});
-    });
-
-    // Refactoring modifiers' list (Object => Array)
-    this.modifiers = Object.keys(this.options.modifiers).map(function (name) {
-      return _extends({
-        name: name
-      }, _this.options.modifiers[name]);
-    })
-    // sort the modifiers by order
-    .sort(function (a, b) {
-      return a.order - b.order;
-    });
-
-    // modifiers have the ability to execute arbitrary code when Popper.js get inited
-    // such code is executed in the same order of its modifier
-    // they could add new properties to their options configuration
-    // BE AWARE: don't add options to `options.modifiers.name` but to `modifierOptions`!
-    this.modifiers.forEach(function (modifierOptions) {
-      if (modifierOptions.enabled && isFunction$1(modifierOptions.onLoad)) {
-        modifierOptions.onLoad(_this.reference, _this.popper, _this.options, modifierOptions, _this.state);
-      }
-    });
-
-    // fire the first update to position the popper in the right place
-    this.update();
-
-    var eventsEnabled = this.options.eventsEnabled;
-    if (eventsEnabled) {
-      // setup event listeners, they will take care of update the position in specific situations
-      this.enableEventListeners();
-    }
-
-    this.state.eventsEnabled = eventsEnabled;
-  }
-
-  // We can't use class properties because they don't get listed in the
-  // class prototype and break stuff like Sinon stubs
-
-
-  createClass(Popper, [{
-    key: 'update',
-    value: function update$$1() {
-      return update.call(this);
-    }
-  }, {
-    key: 'destroy',
-    value: function destroy$$1() {
-      return destroy.call(this);
-    }
-  }, {
-    key: 'enableEventListeners',
-    value: function enableEventListeners$$1() {
-      return enableEventListeners.call(this);
-    }
-  }, {
-    key: 'disableEventListeners',
-    value: function disableEventListeners$$1() {
-      return disableEventListeners.call(this);
-    }
-
-    /**
-     * Schedules an update. It will run on the next UI update available.
-     * @method scheduleUpdate
-     * @memberof Popper
-     */
-
-
-    /**
-     * Collection of utilities useful when writing custom modifiers.
-     * Starting from version 1.7, this method is available only if you
-     * include `popper-utils.js` before `popper.js`.
-     *
-     * **DEPRECATION**: This way to access PopperUtils is deprecated
-     * and will be removed in v2! Use the PopperUtils module directly instead.
-     * Due to the high instability of the methods contained in Utils, we can't
-     * guarantee them to follow semver. Use them at your own risk!
-     * @static
-     * @private
-     * @type {Object}
-     * @deprecated since version 1.8
-     * @member Utils
-     * @memberof Popper
-     */
-
-  }]);
-  return Popper;
-}();
-
-/**
- * The `referenceObject` is an object that provides an interface compatible with Popper.js
- * and lets you use it as replacement of a real DOM node.<br />
- * You can use this method to position a popper relatively to a set of coordinates
- * in case you don't have a DOM node to use as reference.
- *
- * ```
- * new Popper(referenceObject, popperNode);
- * ```
- *
- * NB: This feature isn't supported in Internet Explorer 10.
- * @name referenceObject
- * @property {Function} data.getBoundingClientRect
- * A function that returns a set of coordinates compatible with the native `getBoundingClientRect` method.
- * @property {number} data.clientWidth
- * An ES6 getter that will return the width of the virtual reference element.
- * @property {number} data.clientHeight
- * An ES6 getter that will return the height of the virtual reference element.
- */
-
-
-Popper.Utils = (typeof window !== 'undefined' ? window : global).PopperUtils;
-Popper.placements = placements;
-Popper.Defaults = Defaults;
-
 var clickOutMixin = {
   data: function data() {
     return {
@@ -12110,12 +9101,18 @@ var dropdownMixin = {
       }
     },
     show: function show() {
+      var _this2 = this;
+
       // Public method to show dropdown
       if (this.disabled) {
         return;
-      }
+      } // Wrap in a requestAnimationFrame to allow any previous
+      // click handling to occur first
 
-      this.visible = true;
+
+      requestAF(function () {
+        _this2.visible = true;
+      });
     },
     hide: function hide() {
       var refocus = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -12217,7 +9214,7 @@ var dropdownMixin = {
     },
     // Keyboard nav
     focusNext: function focusNext(evt, up) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!this.visible || evt && closest(Selector$1.FORM_CHILD, evt.target)) {
         // Ignore key up/down on form elements
@@ -12229,7 +9226,7 @@ var dropdownMixin = {
       evt.preventDefault();
       evt.stopPropagation();
       this.$nextTick(function () {
-        var items = _this2.getItems();
+        var items = _this3.getItems();
 
         if (items.length < 1) {
           /* istanbul ignore next: should never happen */
@@ -12249,7 +9246,7 @@ var dropdownMixin = {
           index = 0;
         }
 
-        _this2.focusItem(index, items);
+        _this3.focusItem(index, items);
       });
     },
     focusItem: function focusItem(idx, items) {
@@ -12278,13 +9275,13 @@ var dropdownMixin = {
   }
 };
 
-var NAME$c = 'BDropdown';
+var NAME$b = 'BDropdown';
 var props$r = {
   toggleText: {
     // This really should be toggleLabel
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$c, 'toggleText');
+      return getComponentConfig(NAME$b, 'toggleText');
     }
   },
   size: {
@@ -12294,7 +9291,7 @@ var props$r = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$c, 'variant');
+      return getComponentConfig(NAME$b, 'variant');
     }
   },
   menuClass: {
@@ -12328,7 +9325,7 @@ var props$r = {
   splitVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$c, 'splitVariant');
+      return getComponentConfig(NAME$b, 'splitVariant');
     }
   },
   role: {
@@ -12344,7 +9341,7 @@ var props$r = {
 
 };
 var BDropdown = Vue.extend({
-  name: NAME$c,
+  name: NAME$b,
   mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
   props: props$r,
   computed: {
@@ -12584,7 +9581,7 @@ var BDropdownHeader = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h('li', [h(props.tag, mergeData(data, {
+    return h('li', [h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'dropdown-header',
       class: _defineProperty({}, "text-".concat(props.variant), props.variant),
       attrs: {
@@ -12611,7 +9608,7 @@ var BDropdownDivider = Vue.extend({
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data;
-    return h('li', [h(props.tag, mergeData(data, {
+    return h('li', [h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'dropdown-divider',
       attrs: {
         role: 'separator',
@@ -12649,7 +9646,7 @@ var BForm = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h('form', mergeData(data, {
+    return h('form', vueFunctionalDataMerge.mergeData(data, {
       class: {
         'form-inline': props.inline,
         'was-validated': props.validated
@@ -12676,7 +9673,7 @@ var BDropdownForm = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h('li', [h(BForm, mergeData(data, {
+    return h('li', [h(BForm, vueFunctionalDataMerge.mergeData(data, {
       ref: 'form',
       staticClass: 'b-dropdown-form',
       class: {
@@ -12710,7 +9707,7 @@ var BDropdownText = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h('li', [h(props.tag, mergeData(data, {
+    return h('li', [h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'b-dropdown-text',
       class: _defineProperty({}, "text-".concat(props.variant), props.variant),
       props: props,
@@ -12774,7 +9771,7 @@ var BDropdownGroup = Vue.extend({
     }
 
     var adb = [headerId, props.ariaDescribedBy].filter(Boolean).join(' ').trim();
-    return h('li', [header || h(false), h('ul', mergeData(data, {
+    return h('li', [header || h(false), h('ul', vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'list-unstyled',
       attrs: {
         id: props.id || null,
@@ -12840,7 +9837,7 @@ var BEmbed = Vue.extend({
       ref: data.ref,
       staticClass: 'embed-responsive',
       class: _defineProperty({}, "embed-responsive-".concat(props.aspect), Boolean(props.aspect))
-    }, [h(props.type, mergeData(data, {
+    }, [h(props.type, vueFunctionalDataMerge.mergeData(data, {
       ref: '',
       staticClass: 'embed-responsive-item'
     }), children)]);
@@ -12967,7 +9964,7 @@ var BFormDatalist = Vue.extend({
   }
 });
 
-var NAME$d = 'BFormText';
+var NAME$c = 'BFormText';
 var props$z = {
   id: {
     type: String,
@@ -12980,7 +9977,7 @@ var props$z = {
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$d, 'textVariant');
+      return getComponentConfig(NAME$c, 'textVariant');
     }
   },
   inline: {
@@ -12990,14 +9987,14 @@ var props$z = {
 
 };
 var BFormText = Vue.extend({
-  name: NAME$d,
+  name: NAME$c,
   functional: true,
   props: props$z,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: _defineProperty({
         'form-text': !props.inline
       }, "text-".concat(props.textVariant), Boolean(props.textVariant)),
@@ -13048,7 +10045,7 @@ var BFormInvalidFeedback = Vue.extend({
         data = _ref.data,
         children = _ref.children;
     var show = props.forceShow === true || props.state === false || props.state === 'invalid';
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: {
         'invalid-feedback': !props.tooltip,
         'invalid-tooltip': props.tooltip,
@@ -13104,7 +10101,7 @@ var BFormValidFeedback = Vue.extend({
         data = _ref.data,
         children = _ref.children;
     var show = props.forceShow === true || props.state === true || props.state === 'valid';
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: {
         'valid-feedback': !props.tooltip,
         'valid-tooltip': props.tooltip,
@@ -13184,7 +10181,7 @@ var formStateMixin = {
   }
 };
 
-var NAME$e = 'BFormGroup'; // Selector for finding first input in the form-group
+var NAME$d = 'BFormGroup'; // Selector for finding first input in the form-group
 
 var SELECTOR = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])';
 var DEPRECATED_MSG = 'Props "horizontal" and "breakpoint" are deprecated. Use "label-cols(-{breakpoint})" props instead.'; // Render helper functions (here rather than polluting the instance with more methods)
@@ -13406,7 +10403,7 @@ var generateProps$1 = function generateProps() {
 
 
 var BFormGroup = {
-  name: NAME$e,
+  name: NAME$d,
   mixins: [idMixin, formStateMixin, normalizeSlotMixin],
 
   get props() {
@@ -13645,7 +10642,8 @@ var looseIndexOf = function looseIndexOf(arr, val) {
   return -1;
 };
 
-// @vue/component
+var SELECTOR$1 = 'input, textarea, select'; // @vue/component
+
 var formMixin = {
   props: {
     name: {
@@ -13666,6 +10664,37 @@ var formMixin = {
     form: {
       type: String,
       default: null
+    },
+    autofocus: {
+      type: Boolean,
+      default: false
+    }
+  },
+  mounted: function mounted() {
+    this.handleAutofocus();
+  },
+  activated: function activated()
+  /* istanbul ignore next */
+  {
+    this.handleAutofocus();
+  },
+  methods: {
+    handleAutofocus: function handleAutofocus() {
+      var _this = this;
+
+      this.$nextTick(function () {
+        requestAF(function () {
+          var el = _this.$el;
+
+          if (_this.autofocus && isVisible(el)) {
+            if (!matches(el, SELECTOR$1)) {
+              el = select(SELECTOR$1, el);
+            }
+
+            el && el.focus && el.focus();
+          }
+        });
+      });
     }
   }
 };
@@ -13716,72 +10745,72 @@ var formRadioCheckMixin = {
   },
   data: function data() {
     return {
-      localChecked: this.is_Group ? this.bvGroup.checked : this.checked,
+      localChecked: this.isGroup ? this.bvGroup.checked : this.checked,
       hasFocus: false
     };
   },
   computed: {
     computedLocalChecked: {
       get: function get() {
-        return this.is_Group ? this.bvGroup.localChecked : this.localChecked;
+        return this.isGroup ? this.bvGroup.localChecked : this.localChecked;
       },
       set: function set(val) {
-        if (this.is_Group) {
+        if (this.isGroup) {
           this.bvGroup.localChecked = val;
         } else {
           this.localChecked = val;
         }
       }
     },
-    is_Group: function is_Group() {
+    isGroup: function isGroup() {
       // Is this check/radio a child of check-group or radio-group?
       return Boolean(this.bvGroup);
     },
-    is_BtnMode: function is_BtnMode() {
+    isBtnMode: function isBtnMode() {
       // Support button style in single input mode
-      return this.is_Group ? this.bvGroup.buttons : this.button;
+      return this.isGroup ? this.bvGroup.buttons : this.button;
     },
-    is_Plain: function is_Plain() {
-      return this.is_BtnMode ? false : this.is_Group ? this.bvGroup.plain : this.plain;
+    isPlain: function isPlain() {
+      return this.isBtnMode ? false : this.isGroup ? this.bvGroup.plain : this.plain;
     },
-    is_Custom: function is_Custom() {
-      return this.is_BtnMode ? false : !this.is_Plain;
+    isCustom: function isCustom() {
+      return this.isBtnMode ? false : !this.isPlain;
     },
-    is_Switch: function is_Switch() {
+    isSwitch: function isSwitch() {
       // Custom switch styling (checkboxes only)
-      return this.is_BtnMode || this.is_Radio || this.is_Plain ? false : this.is_Group ? this.bvGroup.switches : this.switch;
+      return this.isBtnMode || this.isRadio || this.isPlain ? false : this.isGroup ? this.bvGroup.switches : this.switch;
     },
-    is_Inline: function is_Inline() {
-      return this.is_Group ? this.bvGroup.inline : this.inline;
+    isInline: function isInline() {
+      return this.isGroup ? this.bvGroup.inline : this.inline;
     },
-    is_Disabled: function is_Disabled() {
+    isDisabled: function isDisabled() {
       // Child can be disabled while parent isn't, but is always disabled if group is
-      return this.is_Group ? this.bvGroup.disabled || this.disabled : this.disabled;
+      return this.isGroup ? this.bvGroup.disabled || this.disabled : this.disabled;
     },
-    is_Required: function is_Required() {
+    isRequired: function isRequired() {
       // Required only works when a name is provided for the input(s)
       // Child can only be required when parent is
       // Groups will always have a name (either user supplied or auto generated)
-      return Boolean(this.get_Name && (this.is_Group ? this.bvGroup.required : this.required));
+      return Boolean(this.getName && (this.isGroup ? this.bvGroup.required : this.required));
     },
-    get_Name: function get_Name() {
+    getName: function getName() {
       // Group name preferred over local name
-      return (this.is_Group ? this.bvGroup.groupName : this.name) || null;
+      return (this.isGroup ? this.bvGroup.groupName : this.name) || null;
     },
-    get_Form: function get_Form() {
-      return (this.is_Group ? this.bvGroup.form : this.form) || null;
+    getForm: function getForm() {
+      return (this.isGroup ? this.bvGroup.form : this.form) || null;
     },
-    get_Size: function get_Size() {
-      return (this.is_Group ? this.bvGroup.size : this.size) || '';
+    getSize: function getSize() {
+      return (this.isGroup ? this.bvGroup.size : this.size) || '';
     },
-    get_State: function get_State() {
-      return this.is_Group ? this.bvGroup.computedState : this.computedState;
+    getState: function getState() {
+      return this.isGroup ? this.bvGroup.computedState : this.computedState;
     },
-    get_ButtonVariant: function get_ButtonVariant() {
+    getButtonVariant: function getButtonVariant() {
       // Local variant preferred over group variant
       if (this.buttonVariant) {
         return this.buttonVariant;
-      } else if (this.is_Group && this.bvGroup.buttonVariant) {
+      } else if (this.isGroup && this.bvGroup.buttonVariant) {
         return this.bvGroup.buttonVariant;
       } // default variant
 
@@ -13790,9 +10819,9 @@ var formRadioCheckMixin = {
     },
     buttonClasses: function buttonClasses() {
       // Same for radio & check
-      return ['btn', "btn-".concat(this.get_ButtonVariant), this.get_Size ? "btn-".concat(this.get_Size) : '', // 'disabled' class makes "button" look disabled
-      this.is_Disabled ? 'disabled' : '', // 'active' class makes "button" look pressed
-      this.is_Checked ? 'active' : '', // Focus class makes button look focused
+      return ['btn', "btn-".concat(this.getButtonVariant), this.getSize ? "btn-".concat(this.getSize) : '', // 'disabled' class makes "button" look disabled
+      this.isDisabled ? 'disabled' : '', // 'active' class makes "button" look pressed
+      this.isChecked ? 'active' : '', // Focus class makes button look focused
       this.hasFocus ? 'focus' : ''];
     }
   },
@@ -13815,12 +10844,12 @@ var formRadioCheckMixin = {
     },
     // Convenience methods for focusing the input
     focus: function focus() {
-      if (!this.is_Disabled && this.$refs.input && this.$refs.input.focus) {
+      if (!this.isDisabled && this.$refs.input && this.$refs.input.focus) {
         this.$refs.input.focus();
       }
     },
     blur: function blur() {
-      if (!this.is_Disabled && this.$refs.input && this.$refs.input.blur) {
+      if (!this.isDisabled && this.$refs.input && this.$refs.input.blur) {
         this.$refs.input.blur();
       }
     }
@@ -13832,7 +10861,7 @@ var formRadioCheckMixin = {
       change: this.handleChange
     };
 
-    if (this.is_BtnMode) {
+    if (this.isBtnMode) {
       // Handlers for focus styling when in button mode
       on.focus = on.blur = this.handleFocus;
     }
@@ -13842,12 +10871,12 @@ var formRadioCheckMixin = {
       key: 'input',
       on: on,
       class: {
-        'form-check-input': this.is_Plain,
-        'custom-control-input': this.is_Custom,
-        'is-valid': this.get_State === true && !this.is_BtnMode,
-        'is-invalid': this.get_State === false && !this.is_BtnMode,
+        'form-check-input': this.isPlain,
+        'custom-control-input': this.isCustom,
+        'is-valid': this.getState === true && !this.isBtnMode,
+        'is-invalid': this.getState === false && !this.isBtnMode,
         // https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
-        'position-static': this.is_Plain && !defaultSlot
+        'position-static': this.isPlain && !defaultSlot
       },
       directives: [{
         name: 'model',
@@ -13857,29 +10886,29 @@ var formRadioCheckMixin = {
       }],
       attrs: {
         id: this.safeId(),
-        type: this.is_Radio ? 'radio' : 'checkbox',
-        name: this.get_Name,
-        form: this.get_Form,
-        disabled: this.is_Disabled,
-        required: this.is_Required,
+        type: this.isRadio ? 'radio' : 'checkbox',
+        name: this.getName,
+        form: this.getForm,
+        disabled: this.isDisabled,
+        required: this.isRequired,
         autocomplete: 'off',
-        'aria-required': this.is_Required || null,
+        'aria-required': this.isRequired || null,
         'aria-label': this.ariaLabel || null,
         'aria-labelledby': this.ariaLabelledby || null
       },
       domProps: {
         value: this.value,
-        checked: this.is_Checked
+        checked: this.isChecked
       }
     });
 
-    if (this.is_BtnMode) {
+    if (this.isBtnMode) {
       // Button mode
       var button = h('label', {
         class: this.buttonClasses
       }, [input, defaultSlot]);
 
-      if (!this.is_Group) {
+      if (!this.isGroup) {
         // Standalone button mode, so wrap in 'btn-group-toggle'
         // and flag it as inline-block to mimic regular buttons
         button = h('div', {
@@ -13893,11 +10922,11 @@ var formRadioCheckMixin = {
       var label = h(false); // If no label content in plain mode we dont render the label
       // https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
 
-      if (!(this.is_Plain && !defaultSlot)) {
+      if (!(this.isPlain && !defaultSlot)) {
         label = h('label', {
           class: {
-            'form-check-label': this.is_Plain,
-            'custom-control-label': this.is_Custom
+            'form-check-label': this.isPlain,
+            'custom-control-label': this.isCustom
           },
           attrs: {
             for: this.safeId()
@@ -13908,14 +10937,14 @@ var formRadioCheckMixin = {
 
       return h('div', {
         class: _defineProperty({
-          'form-check': this.is_Plain,
-          'form-check-inline': this.is_Plain && this.is_Inline,
-          'custom-control': this.is_Custom,
-          'custom-control-inline': this.is_Custom && this.is_Inline,
-          'custom-checkbox': this.is_Custom && this.is_Check && !this.is_Switch,
-          'custom-switch': this.is_Switch,
-          'custom-radio': this.is_Custom && this.is_Radio
-        }, "form-control-".concat(this.get_Size), Boolean(this.get_Size && !this.is_BtnMode))
+          'form-check': this.isPlain,
+          'form-check-inline': this.isPlain && this.isInline,
+          'custom-control': this.isCustom,
+          'custom-control-inline': this.isCustom && this.isInline,
+          'custom-checkbox': this.isCustom && this.isCheck && !this.isSwitch,
+          'custom-switch': this.isSwitch,
+          'custom-radio': this.isCustom && this.isRadio
+        }, "form-control-".concat(this.getSize), Boolean(this.getSize && !this.isBtnMode))
       }, [input, label]);
     }
   }
@@ -13978,7 +11007,7 @@ var BFormCheckbox = Vue.extend({
     }
   },
   computed: {
-    is_Checked: function is_Checked() {
+    isChecked: function isChecked() {
       var checked = this.computedLocalChecked;
       var value = this.value;
 
@@ -13988,10 +11017,10 @@ var BFormCheckbox = Vue.extend({
         return looseEqual(checked, value);
       }
     },
-    is_Radio: function is_Radio() {
+    isRadio: function isRadio() {
       return false;
     },
-    is_Check: function is_Check() {
+    isCheck: function isCheck() {
       return true;
     }
   },
@@ -14039,7 +11068,7 @@ var BFormCheckbox = Vue.extend({
 
       this.$emit('change', checked ? value : uncheckedValue); // If this is a child of form-checkbox-group, we emit a change event on it as well
 
-      if (this.is_Group) {
+      if (this.isGroup) {
         this.bvGroup.$emit('change', localChecked);
       }
 
@@ -14079,14 +11108,14 @@ var BFormRadio = Vue.extend({
   },
   computed: {
     // Radio Groups can only have a single value, so determining if checked is simple
-    is_Checked: function is_Checked() {
+    isChecked: function isChecked() {
       return looseEqual(this.value, this.computedLocalChecked);
     },
     // Flags for form-radio-check mixin
-    is_Radio: function is_Radio() {
+    isRadio: function isRadio() {
       return true;
     },
-    is_Check: function is_Check() {
+    isCheck: function isCheck() {
       return false;
     }
   },
@@ -14104,7 +11133,7 @@ var BFormRadio = Vue.extend({
 
       this.$emit('change', checked ? value : null); // If this is a child of form-radio-group, we emit a change event on it as well
 
-      if (this.is_Group) {
+      if (this.isGroup) {
         this.bvGroup.$emit('change', checked ? value : null);
       }
     }
@@ -14184,7 +11213,7 @@ var formRadioCheckGroupMixin = {
 
     var inputs = this.formOptions.map(function (option, idx) {
       var uid = "_BV_option_".concat(idx, "_");
-      return h(_this.is_RadioGroup ? BFormRadio : BFormCheckbox, {
+      return h(_this.isRadioGroup ? BFormRadio : BFormCheckbox, {
         key: uid,
         props: {
           id: _this.safeId(uid),
@@ -14204,7 +11233,7 @@ var formRadioCheckGroupMixin = {
       class: this.groupClasses,
       attrs: {
         id: this.safeId(),
-        role: this.is_RadioGroup ? 'radiogroup' : 'group',
+        role: this.isRadioGroup ? 'radiogroup' : 'group',
         // Tabindex to allow group to be focused if needed
         tabindex: '-1',
         'aria-required': this.required ? 'true' : null,
@@ -14242,7 +11271,7 @@ var BFormCheckboxGroup = Vue.extend({
     };
   },
   computed: {
-    is_RadioGroup: function is_RadioGroup() {
+    isRadioGroup: function isRadioGroup() {
       return false;
     }
   }
@@ -14285,7 +11314,7 @@ var BFormRadioGroup = Vue.extend({
     };
   },
   computed: {
-    is_RadioGroup: function is_RadioGroup() {
+    isRadioGroup: function isRadioGroup() {
       return true;
     }
   }
@@ -15005,10 +12034,10 @@ var formCustomMixin = {
   }
 };
 
-var NAME$f = 'BFormFile'; // @vue/component
+var NAME$e = 'BFormFile'; // @vue/component
 
 var BFormFile = Vue.extend({
-  name: NAME$f,
+  name: NAME$e,
   mixins: [idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
   model: {
     prop: 'value',
@@ -15031,19 +12060,19 @@ var BFormFile = Vue.extend({
     placeholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'placeholder');
+        return getComponentConfig(NAME$e, 'placeholder');
       }
     },
     browseText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'browseText');
+        return getComponentConfig(NAME$e, 'browseText');
       }
     },
     dropPlaceholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'dropPlaceholder');
+        return getComponentConfig(NAME$e, 'dropPlaceholder');
       }
     },
     multiple: {
@@ -15484,7 +12513,7 @@ var index$j = {
   })
 };
 
-var NAME$g = 'BJumbotron';
+var NAME$f = 'BJumbotron';
 var props$E = {
   fluid: {
     type: Boolean,
@@ -15529,25 +12558,25 @@ var props$E = {
   bgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'bgVariant');
+      return getComponentConfig(NAME$f, 'bgVariant');
     }
   },
   borderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'borderVariant');
+      return getComponentConfig(NAME$f, 'borderVariant');
     }
   },
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'textVariant');
+      return getComponentConfig(NAME$f, 'textVariant');
     }
   } // @vue/component
 
 };
 var BJumbotron = Vue.extend({
-  name: NAME$g,
+  name: NAME$f,
   functional: true,
   props: props$E,
   render: function render(h, _ref) {
@@ -15592,7 +12621,7 @@ var BJumbotron = Vue.extend({
     } // Return the jumbotron
 
 
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'jumbotron',
       class: (_class2 = {
         'jumbotron-fluid': props.fluid
@@ -15651,11 +12680,11 @@ var BListGroup = Vue.extend({
         'list-group-horizontal': horizontal === true
       }, "list-group-horizontal-".concat(horizontal), isString(horizontal))
     };
-    return h(props.tag, mergeData(data, componentData), children);
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, componentData), children);
   }
 });
 
-var NAME$h = 'BListGroupItem';
+var NAME$g = 'BListGroupItem';
 var actionTags = ['a', 'router-link', 'button', 'b-link'];
 var linkProps$2 = propsFactory();
 delete linkProps$2.href.default;
@@ -15676,13 +12705,13 @@ var props$G = _objectSpread({
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$h, 'variant');
+      return getComponentConfig(NAME$g, 'variant');
     }
   }
 }, linkProps$2); // @vue/component
 
 var BListGroupItem = Vue.extend({
-  name: NAME$h,
+  name: NAME$g,
   functional: true,
   props: props$G,
   render: function render(h, _ref) {
@@ -15716,7 +12745,7 @@ var BListGroupItem = Vue.extend({
       staticClass: 'list-group-item',
       class: (_class = {}, _defineProperty(_class, "list-group-item-".concat(props.variant), Boolean(props.variant)), _defineProperty(_class, 'list-group-item-action', isAction), _defineProperty(_class, "active", props.active), _defineProperty(_class, "disabled", props.disabled), _class)
     };
-    return h(tag, mergeData(data, componentData), children);
+    return h(tag, vueFunctionalDataMerge.mergeData(data, componentData), children);
   }
 });
 
@@ -15744,7 +12773,7 @@ var BMediaBody = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'media-body'
     }), children);
   }
@@ -15769,7 +12798,7 @@ var BMediaAside = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'd-flex',
       class: _defineProperty({}, "align-self-".concat(props.verticalAlign), props.verticalAlign)
     }), children);
@@ -15834,7 +12863,7 @@ var BMedia = Vue.extend({
       }
     }
 
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'media'
     }), childNodes);
   }
@@ -15970,7 +12999,7 @@ var BNav = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       class: (_class = {
         nav: !props.isNavBar,
         'navbar-nav': props.isNavBar,
@@ -16008,7 +13037,7 @@ var BNavItem = Vue.extend({
         children = _ref.children;
     // We transfer the listeners to the link
     delete data.on;
-    return h('li', mergeData(data, {
+    return h('li', vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'nav-item'
     }), [h(BLink, {
       staticClass: 'nav-link',
@@ -16035,7 +13064,7 @@ var BNavText = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'navbar-text'
     }), children);
   }
@@ -16051,7 +13080,7 @@ var BNavForm = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(BForm, mergeData(data, {
+    return h(BForm, vueFunctionalDataMerge.mergeData(data, {
       props: _objectSpread({}, props, {
         inline: true
       })
@@ -16172,7 +13201,7 @@ var NavPlugin = {
   })
 };
 
-var NAME$i = 'BNavbar';
+var NAME$h = 'BNavbar';
 var props$P = {
   tag: {
     type: String,
@@ -16185,7 +13214,7 @@ var props$P = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$i, 'variant');
+      return getComponentConfig(NAME$h, 'variant');
     }
   },
   toggleable: {
@@ -16206,7 +13235,7 @@ var props$P = {
 
 };
 var BNavbar = Vue.extend({
-  name: NAME$i,
+  name: NAME$h,
   functional: true,
   props: props$P,
   render: function render(h, _ref) {
@@ -16224,7 +13253,7 @@ var BNavbar = Vue.extend({
       breakpoint = 'navbar-expand';
     }
 
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'navbar',
       class: (_class = {
         'd-print': props.print,
@@ -16256,7 +13285,7 @@ var BNavbarNav = Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'navbar-nav',
       class: (_class = {
         'nav-fill': props.fill,
@@ -16286,14 +13315,14 @@ var BNavbarBrand = Vue.extend({
         children = _ref.children;
     var isLink = Boolean(props.to || props.href);
     var tag = isLink ? BLink : props.tag;
-    return h(tag, mergeData(data, {
+    return h(tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'navbar-brand',
       props: isLink ? pluckProps(linkProps$3, props) : {}
     }), children);
   }
 });
 
-var NAME$j = 'BNavbarToggle'; // Events we emit on $root
+var NAME$i = 'BNavbarToggle'; // Events we emit on $root
 
 var EVENT_TOGGLE$2 = 'bv::toggle::collapse'; // Events we listen to on $root
 
@@ -16302,13 +13331,13 @@ var EVENT_STATE$2 = 'bv::collapse::state'; // This private event is NOT to be do
 var EVENT_STATE_SYNC$2 = 'bv::collapse::sync::state'; // @vue/component
 
 var BNavbarToggle = Vue.extend({
-  name: NAME$j,
+  name: NAME$i,
   mixins: [listenOnRootMixin, normalizeSlotMixin],
   props: {
     label: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$j, 'label');
+        return getComponentConfig(NAME$i, 'label');
       }
     },
     target: {
@@ -17420,7 +14449,7 @@ var index$r = {
   })
 };
 
-var NAME$k = 'tooltip';
+var NAME$j = 'tooltip';
 var CLASS_PREFIX = 'bs-tooltip';
 var BS_CLASS_PREFIX_REGEX = new RegExp("\\b".concat(CLASS_PREFIX, "\\S+"), 'g');
 var TRANSITION_DURATION = 150; // Modal $root hidden event
@@ -17471,7 +14500,7 @@ var Selector$2 = {
   TOOLTIP_INNER: '.tooltip-inner',
   ARROW: '.arrow'
 };
-var Defaults$1 = {
+var Defaults = {
   animation: true,
   template: '<div class="tooltip" role="tooltip">' + '<div class="arrow"></div>' + '<div class="tooltip-inner"></div>' + '</div>',
   trigger: 'hover focus',
@@ -18560,24 +15589,24 @@ function () {
   }, {
     key: "Default",
     get: function get() {
-      return Defaults$1;
+      return Defaults;
     } // NOTE: Overridden by PopOver class
 
   }, {
     key: "NAME",
     get: function get() {
-      return NAME$k;
+      return NAME$j;
     }
   }]);
 
   return ToolTip;
 }();
 
-var NAME$l = 'popover';
+var NAME$k = 'popover';
 var CLASS_PREFIX$1 = 'bs-popover';
 var BS_CLASS_PREFIX_REGEX$1 = new RegExp("\\b".concat(CLASS_PREFIX$1, "\\S+"), 'g');
 
-var Defaults$2 = _objectSpread({}, ToolTip.Default, {
+var Defaults$1 = _objectSpread({}, ToolTip.Default, {
   placement: 'right',
   trigger: 'click',
   content: '',
@@ -18707,12 +15736,12 @@ function (_ToolTip) {
     key: "Default",
     // --- Getter overrides ---
     get: function get() {
-      return Defaults$2;
+      return Defaults$1;
     }
   }, {
     key: "NAME",
     get: function get() {
-      return NAME$l;
+      return NAME$k;
     }
   }]);
 
@@ -18748,10 +15777,6 @@ var toolpopMixin = {
       // String ID of element, or element/component reference
       type: [String, Object, HTMLElement, Function] // default: undefined
 
-    },
-    delay: {
-      type: [Number, Object, String],
-      default: 0
     },
     offset: {
       type: [Number, String],
@@ -18792,6 +15817,8 @@ var toolpopMixin = {
         content: (this.content || '').trim() || '',
         // Tooltip/Popover placement
         placement: PLACEMENTS[this.placement] || 'auto',
+        // Tooltip/popover fallback placemenet
+        fallbackPlacement: this.fallbackPlacement || 'flip',
         // Container currently needs to be an ID with '#' prepended, if null then body is used
         container: cont ? /^#/.test(cont) ? cont : "#".concat(cont) : false,
         // boundariesElement passed to popper
@@ -19076,7 +16103,7 @@ var toolpopMixin = {
   }
 };
 
-var NAME$m = 'BPopover';
+var NAME$l = 'BPopover';
 var props$V = {
   title: {
     type: String,
@@ -19094,24 +16121,37 @@ var props$V = {
     type: String,
     default: 'right'
   },
+  fallbackPlacement: {
+    type: [String, Array],
+    default: 'flip',
+    validator: function validator(value) {
+      return isArray$1(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+    }
+  },
+  delay: {
+    type: [Number, Object, String],
+    default: function _default() {
+      return getComponentConfig(NAME$l, 'delay');
+    }
+  },
   boundary: {
     // String: scrollParent, window, or viewport
     // Element: element reference
     type: [String, HTMLElement],
     default: function _default() {
-      return getComponentConfig(NAME$m, 'boundary');
+      return getComponentConfig(NAME$l, 'boundary');
     }
   },
   boundaryPadding: {
     type: Number,
     default: function _default() {
-      return getComponentConfig(NAME$m, 'boundaryPadding');
+      return getComponentConfig(NAME$l, 'boundaryPadding');
     }
   } // @vue/component
 
 };
 var BPopover = Vue.extend({
-  name: NAME$m,
+  name: NAME$l,
   mixins: [toolpopMixin, normalizeSlotMixin],
   props: props$V,
   data: function data() {
@@ -19167,9 +16207,11 @@ var parseBindings = function parseBindings(bindings)
 /* istanbul ignore next: not easy to test */
 {
   // We start out with a basic config
+  var NAME = 'BPopover';
   var config = {
-    boundary: String(getComponentConfig('BPopover', 'boundary')),
-    boundaryPadding: parseInt(getComponentConfig('BPopover', 'boundaryPadding'), 10) || 0 // Process bindings.value
+    delay: getComponentConfig(NAME, 'delay'),
+    boundary: String(getComponentConfig(NAME, 'boundary')),
+    boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0 // Process bindings.value
 
   };
 
@@ -19330,10 +16372,10 @@ var index$s = {
   })
 };
 
-var NAME$n = 'BProgressBar'; // @vue/component
+var NAME$m = 'BProgressBar'; // @vue/component
 
 var BProgressBar = Vue.extend({
-  name: NAME$n,
+  name: NAME$m,
   mixins: [normalizeSlotMixin],
   inject: {
     bvProgress: {
@@ -19369,7 +16411,7 @@ var BProgressBar = Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'variant');
+        return getComponentConfig(NAME$m, 'variant');
       }
     },
     striped: {
@@ -19460,10 +16502,10 @@ var BProgressBar = Vue.extend({
   }
 });
 
-var NAME$o = 'BProgress'; // @vue/component
+var NAME$n = 'BProgress'; // @vue/component
 
 var BProgress = Vue.extend({
-  name: NAME$o,
+  name: NAME$n,
   mixins: [normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -19475,7 +16517,7 @@ var BProgress = Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$o, 'variant');
+        return getComponentConfig(NAME$n, 'variant');
       }
     },
     striped: {
@@ -19554,10 +16596,10 @@ var index$t = {
   })
 };
 
-var NAME$p = 'BSpinner'; // @vue/component
+var NAME$o = 'BSpinner'; // @vue/component
 
 var BSpinner = Vue.extend({
-  name: NAME$p,
+  name: NAME$o,
   functional: true,
   props: {
     type: {
@@ -19572,7 +16614,7 @@ var BSpinner = Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$p, 'variant');
+        return getComponentConfig(NAME$o, 'variant');
       }
     },
     small: {
@@ -19605,7 +16647,7 @@ var BSpinner = Vue.extend({
       }, label);
     }
 
-    return h(props.tag, mergeData(data, {
+    return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       attrs: {
         role: label ? props.role || 'status' : null,
         'aria-hidden': label ? null : 'true'
@@ -20094,7 +17136,7 @@ var filteringMixin = {
  * @param {function} sort compare function
  * @return {array}
  */
-var stableSort$1 = function stableSort(array, compareFn) {
+var stableSort = function stableSort(array, compareFn) {
   // Using `.bind(compareFn)` on the wrapped anonymous function improves
   // performance by avoiding the function call setup. We don't use an arrow
   // function here as it binds `this` to the `stableSort` context rather than
@@ -20216,7 +17258,7 @@ var sortingMixin = {
 
       if (sortBy && localSorting) {
         // stableSort returns a new array, and leaves the original array intact
-        return stableSort$1(items, function (a, b) {
+        return stableSort(items, function (a, b) {
           var result = null;
 
           if (isFunction(sortCompare)) {
@@ -22140,8 +19182,12 @@ var BTabs = Vue.extend({
     return {
       // Index of current tab
       currentTab: tabIdx,
-      // Array of direct child <b-tab> instances
-      tabs: []
+      // Array of direct child <b-tab> instances, in DOM order
+      tabs: [],
+      // Array of child instances registered (for triggering reactive updates)
+      registeredTabs: [],
+      // Flag to know if we are mounted or not
+      isMounted: false
     };
   },
   computed: {
@@ -22199,79 +19245,114 @@ var BTabs = Vue.extend({
           }
         }
       }
+    },
+    registeredTabs: function registeredTabs(newVal, oldVal) {
+      var _this = this;
+
+      // Each b-tab will register/unregister itself.
+      // We use this to detect when tabs are added/removed
+      // to trigger the update of the tabs.
+      this.$nextTick(function () {
+        requestAF(function () {
+          _this.updateTabs();
+        });
+      });
+    },
+    isMounted: function isMounted(newVal, oldVal) {
+      var _this2 = this;
+
+      // Trigger an update after mounted.  Needed
+      // for tabs inside lazy modals.
+      if (newVal) {
+        requestAF(function () {
+          _this2.updateTabs();
+        });
+      }
     }
   },
   created: function created() {
-    var _this = this;
+    var _this3 = this;
 
     var tabIdx = parseInt(this.value, 10);
-    this.currentTab = isNaN(tabIdx) ? -1 : tabIdx; // Create private non-reactive prop
-
-    this._bvObserver = null; // For SSR and to make sure only a single tab is shown on mount
+    this.currentTab = isNaN(tabIdx) ? -1 : tabIdx; // For SSR and to make sure only a single tab is shown on mount
     // We wrap this in a `$nextTick()` to ensure the child tabs have been created
 
     this.$nextTick(function () {
-      _this.updateTabs();
+      _this3.updateTabs();
     });
   },
   mounted: function mounted() {
-    var _this2 = this;
+    var _this4 = this;
 
+    // Call `updateTabs()` just in case...
+    this.updateTabs();
     this.$nextTick(function () {
-      // Call `updateTabs()` just in case...
-      _this2.updateTabs(); // Observe child changes so we can update list of tabs
-
-
-      _this2.setObserver(true);
+      // Flag we are now mounted and to switch to DOM for tab probing.
+      // As this.$slots.default appears to lie about component instances
+      // after b-tabs is destroyed and re-instantiated.
+      // And this.$children does not respect DOM order.
+      _this4.isMounted = true;
     });
   },
   deactivated: function deactivated()
   /* istanbul ignore next */
   {
-    this.setObserver(false);
+    this.isMounted = false;
   },
   activated: function activated()
   /* istanbul ignore next */
   {
-    var _this3 = this;
+    var _this5 = this;
 
     var tabIdx = parseInt(this.value, 10);
     this.currentTab = isNaN(tabIdx) ? -1 : tabIdx;
     this.$nextTick(function () {
-      _this3.updateTabs();
+      _this5.updateTabs();
 
-      _this3.setObserver(true);
+      _this5.isMounted = true;
     });
   },
-  beforeDestroy: function beforeDestroy()
-  /* istanbul ignore next */
-  {
-    this.setObserver(false);
+  destroyed: function destroyed() {
+    // Ensure no references to child instances exist
+    this.tabs = [];
   },
   methods: {
-    setObserver: function setObserver(on) {
-      if (on) {
-        // Make sure no existing observer running
-        this.setObserver(false); // Watch for changes to <b-tab> sub components
+    registerTab: function registerTab(tab) {
+      var _this6 = this;
 
-        this._bvObserver = observeDom(this.$refs.tabsContainer, this.updateTabs.bind(this), {
-          childList: true,
-          subtree: false,
-          attributes: true,
-          attributeFilter: ['style', 'class']
+      if (!arrayIncludes(this.registeredTabs, tab)) {
+        this.registeredTabs.push(tab);
+        tab.$once('hook:destroyed', function () {
+          _this6.unregisterTab(tab);
         });
-      } else {
-        if (this._bvObserver && this._bvObserver.disconnect) {
-          this._bvObserver.disconnect();
-        }
-
-        this._bvObserver = null;
       }
     },
+    unregisterTab: function unregisterTab(tab) {
+      this.registeredTabs = this.registeredTabs.slice().filter(function (t) {
+        return t !== tab;
+      });
+    },
     getTabs: function getTabs() {
-      return (this.normalizeSlot('default') || []).map(function (vnode) {
-        return vnode.componentInstance;
-      }).filter(function (tab) {
+      var tabs = [];
+
+      if (!this.isMounted) {
+        tabs = (this.normalizeSlot('default') || []).map(function (vnode) {
+          return vnode.componentInstance;
+        });
+      } else {
+        // We rely on the DOM when mounted to get the list of tabs,
+        // as this.$slots.default appears to lie about current tab vm instances, after being
+        // destroyed and then re-intantiated (cached vNodes which don't reflect correct vm)
+        // Fix for https://github.com/bootstrap-vue/bootstrap-vue/issues/3361
+        tabs = selectAll("#".concat(this.safeId('_BV_tab_container_'), " > .tab-pane"), this.$el).map(function (el) {
+          return el.__vue__;
+        }).filter(Boolean) // The VM attached to the element is `transition` so we need the $parent to get tab
+        .map(function (vm) {
+          return vm.$parent;
+        });
+      }
+
+      return tabs.filter(function (tab) {
         return tab && tab._isTab;
       });
     },
@@ -22374,11 +19455,11 @@ var BTabs = Vue.extend({
     },
     // Focus a tab button given it's <b-tab> instance
     focusButton: function focusButton(tab) {
-      var _this4 = this;
+      var _this7 = this;
 
       // Wrap in `$nextTick()` to ensure DOM has completed rendering/updating before focusing
       this.$nextTick(function () {
-        var button = _this4.getButtonForTab(tab);
+        var button = _this7.getButtonForTab(tab);
 
         if (button && button.focus) {
           button.focus();
@@ -22436,7 +19517,7 @@ var BTabs = Vue.extend({
     }
   },
   render: function render(h) {
-    var _this5 = this;
+    var _this8 = this;
 
     var tabs = this.tabs; // Currently active tab
 
@@ -22451,7 +19532,7 @@ var BTabs = Vue.extend({
     var buttons = tabs.map(function (tab, index) {
       var tabIndex = null; // Ensure at least one tab button is focusable when keynav enabled (if possible)
 
-      if (!_this5.noKeyNav) {
+      if (!_this8.noKeyNav) {
         // Buttons are not in tab index unless active, or a fallback tab
         tabIndex = -1;
 
@@ -22469,21 +19550,21 @@ var BTabs = Vue.extend({
         props: {
           tab: tab,
           tabs: tabs,
-          id: tab.controlledBy || (_this5.tab && _this5.tab.safeId ? _this5.tab.safeId("_BV_tab_button_") : null),
-          controls: _this5.tab && _this5.tab.safeId ? _this5.tab.safeId() : null,
+          id: tab.controlledBy || (_this8.tab && _this8.tab.safeId ? _this8.tab.safeId("_BV_tab_button_") : null),
+          controls: _this8.tab && _this8.tab.safeId ? _this8.tab.safeId() : null,
           tabIndex: tabIndex,
           setSize: tabs.length,
           posInSet: index + 1,
-          noKeyNav: _this5.noKeyNav
+          noKeyNav: _this8.noKeyNav
         },
         on: {
           click: function click(evt) {
-            _this5.clickTab(tab, evt);
+            _this8.clickTab(tab, evt);
           },
-          first: _this5.firstTab,
-          prev: _this5.previousTab,
-          next: _this5.nextTab,
-          last: _this5.lastTab
+          first: _this8.firstTab,
+          prev: _this8.previousTab,
+          next: _this8.nextTab,
+          last: _this8.lastTab
         }
       });
     }); // Nav
@@ -22517,13 +19598,12 @@ var BTabs = Vue.extend({
 
     if (!tabs || tabs.length === 0) {
       empty = h('div', {
-        key: 'empty-tab',
+        key: 'bv-empty-tab',
         class: ['tab-pane', 'active', {
           'card-body': this.card
         }]
       }, this.normalizeSlot('empty'));
     } // Main content section
-    // TODO: This container should be a helper component
 
 
     var content = h('div', {
@@ -22536,7 +19616,7 @@ var BTabs = Vue.extend({
       attrs: {
         id: this.safeId('_BV_tab_container_')
       }
-    }, [this.normalizeSlot('default'), empty]); // Render final output
+    }, concat(this.normalizeSlot('default'), empty)); // Render final output
 
     return h(this.tag, {
       staticClass: 'tabs',
@@ -22630,9 +19710,7 @@ var BTab = Vue.extend({
   computed: {
     tabClasses: function tabClasses() {
       return [{
-        show: this.show,
         active: this.localActive,
-        fade: this.computedFade,
         disabled: this.disabled,
         'card-body': this.bvTabs.card && !this.noBody
       }, // Apply <b-tabs> `activeTabClass` styles when this tab is active
@@ -22641,8 +19719,8 @@ var BTab = Vue.extend({
     controlledBy: function controlledBy() {
       return this.buttonId || this.safeId('__BV_tab_button__');
     },
-    computedFade: function computedFade() {
-      return this.bvTabs.fade || false;
+    computedNoFade: function computedNoFade() {
+      return !(this.bvTabs.fade || false);
     },
     computedLazy: function computedLazy() {
       return this.bvTabs.lazy || this.lazy;
@@ -22681,7 +19759,9 @@ var BTab = Vue.extend({
     }
   },
   mounted: function mounted() {
-    // Initially show on mount if active and not disabled
+    // Inform b-tabs of our presence
+    this.registerTab(); // Initially show on mount if active and not disabled
+
     this.show = this.localActive; // Deprecate use of `href` prop
 
     if (this.href && this.href !== '#') {
@@ -22696,20 +19776,19 @@ var BTab = Vue.extend({
       this.bvTabs.updateButton(this);
     }
   },
+  destroyed: function destroyed() {
+    // inform b-tabs of our departure
+    this.unregisterTab();
+  },
   methods: {
-    // Transition handlers
-    beforeEnter: function beforeEnter() {
-      var _this = this;
-
-      // Change opacity (add 'show' class) 1 frame after display,
-      // otherwise CSS transition won't happen
-      requestAF(function () {
-        _this.show = true;
-      });
+    // Private methods
+    registerTab: function registerTab() {
+      // Inform `b-tabs` of our presence
+      this.bvTabs.registerTab && this.bvTabs.registerTab(this);
     },
-    beforeLeave: function beforeLeave() {
-      // Remove the 'show' class
-      this.show = false;
+    unregisterTab: function unregisterTab() {
+      // Inform `b-tabs` of our departure
+      this.bvTabs.unregisterTab && this.bvTabs.unregisterTab(this);
     },
     // Public methods
     activate: function activate() {
@@ -22734,8 +19813,7 @@ var BTab = Vue.extend({
       ref: 'panel',
       staticClass: 'tab-pane',
       class: this.tabClasses,
-      directives: [// TODO: Convert to style object in render
-      {
+      directives: [{
         name: 'show',
         rawName: 'v-show',
         value: this.localActive,
@@ -22744,26 +19822,16 @@ var BTab = Vue.extend({
       attrs: {
         role: 'tabpanel',
         id: this.safeId(),
-        tabindex: this.localActive && !this.bvTabs.noKeyNav ? '0' : null,
+        tabindex: this.localActive && !this.bvTabs.noKeyNav ? '-1' : null,
         'aria-hidden': this.localActive ? 'false' : 'true',
         'aria-labelledby': this.controlledBy || null
       }
     }, // Render content lazily if requested
     [this.localActive || !this.computedLazy ? this.normalizeSlot('default') : h(false)]);
-    return h('transition', {
+    return h(BVTransition, {
       props: {
         mode: 'out-in',
-        // Disable use of built-in transition classes
-        'enter-class': '',
-        'enter-active-class': '',
-        'enter-to-class': '',
-        'leave-class': '',
-        'leave-active-class': '',
-        'leave-to-class': ''
-      },
-      on: {
-        beforeEnter: this.beforeEnter,
-        beforeLeave: this.beforeLeave
+        noFade: this.computedNoFade
       }
     }, [content]);
   }
@@ -22794,10 +19862,10 @@ var index$x = {
   })
 };
 
-var NAME$q = 'BTooltip'; // @vue/component
+var NAME$p = 'BTooltip'; // @vue/component
 
 var BTooltip = Vue.extend({
-  name: NAME$q,
+  name: NAME$p,
   mixins: [toolpopMixin, normalizeSlotMixin],
   props: {
     title: {
@@ -22812,18 +19880,31 @@ var BTooltip = Vue.extend({
       type: String,
       default: 'top'
     },
+    fallbackPlacement: {
+      type: [String, Array],
+      default: 'flip',
+      validator: function validator(value) {
+        return isArray$1(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+      }
+    },
+    delay: {
+      type: [Number, Object, String],
+      default: function _default() {
+        return getComponentConfig(NAME$p, 'delay');
+      }
+    },
     boundary: {
       // String: scrollParent, window, or viewport
       // Element: element reference
       type: [String, HTMLElement],
       default: function _default() {
-        return getComponentConfig(NAME$q, 'boundary');
+        return getComponentConfig(NAME$p, 'boundary');
       }
     },
     boundaryPadding: {
       type: Number,
       default: function _default() {
-        return getComponentConfig(NAME$q, 'boundaryPadding');
+        return getComponentConfig(NAME$p, 'boundaryPadding');
       }
     }
   },
@@ -22878,9 +19959,11 @@ var parseBindings$1 = function parseBindings(bindings)
 /* istanbul ignore next: not easy to test */
 {
   // We start out with a basic config
+  var NAME = 'BTooltip';
   var config = {
-    boundary: String(getComponentConfig('BTooltip', 'boundary')),
-    boundaryPadding: parseInt(getComponentConfig('BTooltip', 'boundaryPadding'), 10) || 0 // Process bindings.value
+    delay: getComponentConfig(NAME, 'delay'),
+    boundary: String(getComponentConfig(NAME, 'boundary')),
+    boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0 // Process bindings.value
 
   };
 
@@ -23087,8 +20170,7 @@ var componentPlugins = /*#__PURE__*/Object.freeze({
   TooltipPlugin: index$y
 });
 
-// Legacy Component group plugin names
-
+// Index file used for the main builds, which does not include legacy plugin names
 var componentsPlugin = {
   install: installFactory({
     plugins: componentPlugins
@@ -23117,7 +20199,7 @@ var index$A = {
  * Constants / Defaults
  */
 
-var NAME$r = 'v-b-scrollspy';
+var NAME$q = 'v-b-scrollspy';
 var ACTIVATE_EVENT = 'bv::scrollspy::activate';
 var Default = {
   element: 'body',
@@ -23156,7 +20238,7 @@ var HREF_REGEX = /^.*(#[^#]+)$/; // Transition Events
 
 var TransitionEndEvents$2 = ['webkitTransitionEnd', 'transitionend', 'otransitionend', 'oTransitionEnd']; // Options for events
 
-var EventOptions$3 = {
+var EventOptions$2 = {
   passive: true,
   capture: false
   /*
@@ -23274,14 +20356,14 @@ function () {
       var scroller = this.getScroller();
 
       if (scroller && scroller.tagName !== 'BODY') {
-        eventOn(scroller, 'scroll', this, EventOptions$3);
+        eventOn(scroller, 'scroll', this, EventOptions$2);
       }
 
-      eventOn(window, 'scroll', this, EventOptions$3);
-      eventOn(window, 'resize', this, EventOptions$3);
-      eventOn(window, 'orientationchange', this, EventOptions$3);
+      eventOn(window, 'scroll', this, EventOptions$2);
+      eventOn(window, 'resize', this, EventOptions$2);
+      eventOn(window, 'orientationchange', this, EventOptions$2);
       TransitionEndEvents$2.forEach(function (evtName) {
-        eventOn(window, evtName, _this, EventOptions$3);
+        eventOn(window, evtName, _this, EventOptions$2);
       });
       this.setObservers(true); // Schedule a refresh
 
@@ -23296,14 +20378,14 @@ function () {
       this.setObservers(false);
 
       if (scroller && scroller.tagName !== 'BODY') {
-        eventOff(scroller, 'scroll', this, EventOptions$3);
+        eventOff(scroller, 'scroll', this, EventOptions$2);
       }
 
-      eventOff(window, 'scroll', this, EventOptions$3);
-      eventOff(window, 'resize', this, EventOptions$3);
-      eventOff(window, 'orientationchange', this, EventOptions$3);
+      eventOff(window, 'scroll', this, EventOptions$2);
+      eventOff(window, 'resize', this, EventOptions$2);
+      eventOff(window, 'orientationchange', this, EventOptions$2);
       TransitionEndEvents$2.forEach(function (evtName) {
-        eventOff(window, evtName, _this2, EventOptions$3);
+        eventOff(window, evtName, _this2, EventOptions$2);
       });
     }
   }, {
@@ -23601,7 +20683,7 @@ function () {
   }], [{
     key: "Name",
     get: function get() {
-      return NAME$r;
+      return NAME$q;
     }
   }, {
     key: "Default",
@@ -23768,38 +20850,175 @@ var directivePlugins = /*#__PURE__*/Object.freeze({
   VBPopoverPlugin: index$D
 });
 
-// Legacy directive plugin names
-
+// Index file used for the main builds, which does not include legacy plugin names
 var directivesPlugin = {
   install: installFactory({
     plugins: directivePlugins
   })
 };
 
-var install$2 = function install(Vue) {
-  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  if (install.installed) {
-    /* istanbul ignore next */
-    return;
+//
+var BVConfigPlugin = {
+  install: function install(Vue) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    setConfig(config);
   }
-
-  install.installed = true; // Configure BootstrapVue
-
-  setConfig(config); // Install all component plugins
-
-  Vue.use(componentsPlugin); // Install all directive plugins
-
-  Vue.use(directivesPlugin);
 };
 
-install$2.installed = false;
+var install$2 = installFactory({
+  plugins: {
+    componentsPlugin: componentsPlugin,
+    directivesPlugin: directivesPlugin
+  }
+}); // BootstrapVue plugin
+
 var BootstrapVue = {
   install: install$2,
-  setConfig: setConfig // Auto installation only occurs if window.Vue exists
+  setConfig: setConfig // Named exports for BvConfigPlugin and BootstrapVue
 
 };
-vueUse(BootstrapVue);
 
-module.exports = BootstrapVue;
+exports.AlertPlugin = index;
+exports.BAlert = BAlert;
+exports.BBadge = BBadge;
+exports.BBreadcrumb = BBreadcrumb;
+exports.BBreadcrumbItem = BBreadcrumbItem;
+exports.BBreadcrumbLink = BBreadcrumbLink;
+exports.BButton = BButton;
+exports.BButtonClose = BButtonClose;
+exports.BButtonGroup = BButtonGroup;
+exports.BButtonToolbar = BButtonToolbar;
+exports.BCard = BCard;
+exports.BCardBody = BCardBody;
+exports.BCardFooter = BCardFooter;
+exports.BCardGroup = BCardGroup;
+exports.BCardHeader = BCardHeader;
+exports.BCardImg = BCardImg;
+exports.BCardImgLazy = BCardImgLazy;
+exports.BCardSubTitle = BCardSubTitle;
+exports.BCardText = BCardText;
+exports.BCardTitle = BCardTitle;
+exports.BCarousel = BCarousel;
+exports.BCarouselSlide = BCarouselSlide;
+exports.BCol = BCol;
+exports.BCollapse = BCollapse;
+exports.BContainer = Container;
+exports.BDropdown = BDropdown;
+exports.BDropdownDivider = BDropdownDivider;
+exports.BDropdownForm = BDropdownForm;
+exports.BDropdownGroup = BDropdownGroup;
+exports.BDropdownHeader = BDropdownHeader;
+exports.BDropdownItem = BDropdownItem;
+exports.BDropdownItemButton = BDropdownItemButton;
+exports.BDropdownText = BDropdownText;
+exports.BEmbed = BEmbed;
+exports.BForm = BForm;
+exports.BFormCheckbox = BFormCheckbox;
+exports.BFormCheckboxGroup = BFormCheckboxGroup;
+exports.BFormDatalist = BFormDatalist;
+exports.BFormFile = BFormFile;
+exports.BFormGroup = BFormGroup;
+exports.BFormInput = BFormInput;
+exports.BFormInvalidFeedback = BFormInvalidFeedback;
+exports.BFormRadio = BFormRadio;
+exports.BFormRadioGroup = BFormRadioGroup;
+exports.BFormRow = BFormRow;
+exports.BFormSelect = BFormSelect;
+exports.BFormText = BFormText;
+exports.BFormTextarea = BFormTextarea;
+exports.BFormValidFeedback = BFormValidFeedback;
+exports.BImg = BImg;
+exports.BImgLazy = BImgLazy;
+exports.BInputGroup = BInputGroup;
+exports.BInputGroupAddon = BInputGroupAddon;
+exports.BInputGroupAppend = BInputGroupAppend;
+exports.BInputGroupPrepend = BInputGroupPrepend;
+exports.BInputGroupText = BInputGroupText;
+exports.BJumbotron = BJumbotron;
+exports.BLink = BLink;
+exports.BListGroup = BListGroup;
+exports.BListGroupItem = BListGroupItem;
+exports.BMedia = BMedia;
+exports.BMediaAside = BMediaAside;
+exports.BMediaBody = BMediaBody;
+exports.BModal = BModal;
+exports.BNav = BNav;
+exports.BNavForm = BNavForm;
+exports.BNavItem = BNavItem;
+exports.BNavItemDropdown = BNavItemDropdown;
+exports.BNavText = BNavText;
+exports.BNavbar = BNavbar;
+exports.BNavbarBrand = BNavbarBrand;
+exports.BNavbarNav = BNavbarNav;
+exports.BNavbarToggle = BNavbarToggle;
+exports.BPagination = BPagination;
+exports.BPaginationNav = BPaginationNav;
+exports.BPopover = BPopover;
+exports.BProgress = BProgress;
+exports.BProgressBar = BProgressBar;
+exports.BRow = BRow;
+exports.BSpinner = BSpinner;
+exports.BTab = BTab;
+exports.BTable = BTable;
+exports.BTabs = BTabs;
+exports.BToast = BToast;
+exports.BToaster = BToaster;
+exports.BTooltip = BTooltip;
+exports.BVConfig = BVConfigPlugin;
+exports.BVConfigPlugin = BVConfigPlugin;
+exports.BVModalPlugin = BVModalPlugin;
+exports.BVToastPlugin = BVToastPlugin;
+exports.BadgePlugin = index$1;
+exports.BootstrapVue = BootstrapVue;
+exports.BreadcrumbPlugin = index$2;
+exports.ButtonGroupPlugin = index$4;
+exports.ButtonPlugin = index$3;
+exports.ButtonToolbarPlugin = index$5;
+exports.CardPlugin = index$7;
+exports.CarouselPlugin = index$8;
+exports.CollapsePlugin = CollapsePlugin;
+exports.DropdownPlugin = DropdownPlugin;
+exports.EmbedPlugin = index$a;
+exports.FormCheckboxPlugin = index$d;
+exports.FormFilePlugin = index$h;
+exports.FormGroupPlugin = index$c;
+exports.FormInputPlugin = index$f;
+exports.FormPlugin = index$b;
+exports.FormRadioPlugin = index$e;
+exports.FormSelectPlugin = index$i;
+exports.FormTextareaPlugin = index$g;
+exports.ImagePlugin = index$j;
+exports.InputGroupPlugin = index$6;
+exports.JumbotronPlugin = index$k;
+exports.LayoutPlugin = index$9;
+exports.LinkPlugin = index$l;
+exports.ListGroupPlugin = index$m;
+exports.MediaPlugin = index$n;
+exports.ModalPlugin = index$o;
+exports.NavPlugin = NavPlugin;
+exports.NavbarPlugin = index$p;
+exports.PaginationNavPlugin = index$r;
+exports.PaginationPlugin = index$q;
+exports.PopoverPlugin = index$s;
+exports.ProgressPlugin = index$t;
+exports.SpinnerPlugin = index$u;
+exports.TablePlugin = index$v;
+exports.TabsPlugin = index$w;
+exports.ToastPlugin = index$x;
+exports.TooltipPlugin = index$y;
+exports.VBModal = VBModal;
+exports.VBModalPlugin = index$A;
+exports.VBPopover = VBPopover;
+exports.VBPopoverPlugin = index$D;
+exports.VBScrollspy = VBScrollspy;
+exports.VBScrollspyPlugin = index$B;
+exports.VBToggle = VBToggle;
+exports.VBTogglePlugin = index$z;
+exports.VBTooltip = VBTooltip;
+exports.VBTooltipPlugin = index$C;
+exports.componentsPlugin = componentsPlugin;
+exports.default = BootstrapVue;
+exports.directivesPlugin = directivesPlugin;
+exports.install = install$2;
+exports.setConfig = setConfig;
 //# sourceMappingURL=bootstrap-vue.common.js.map

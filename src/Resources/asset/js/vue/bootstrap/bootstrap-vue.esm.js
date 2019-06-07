@@ -1,5 +1,5 @@
 /*!
- * BoostrapVue 2.0.0-rc.20
+ * BoostrapVue 2.0.0-rc.22
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -8,10 +8,12 @@
  * https://github.com/bootstrap-vue/bootstrap-vue/blob/master/LICENSE
  */
 
-import OurVue from 'vue';
-import { Wormhole, PortalTarget, Portal } from 'portal-vue';
+import Vue from 'vue';
 import { mergeData } from 'vue-functional-data-merge';
+import { Wormhole, PortalTarget, Portal } from 'portal-vue';
 import Popper from 'popper.js';
+
+//
 
 /**
  * Utilities to get information about the current environment
@@ -22,7 +24,11 @@ var hasDocumentSupport = typeof document !== 'undefined';
 var hasNavigatorSupport = typeof navigator !== 'undefined';
 var hasPromiseSupport = typeof Promise !== 'undefined';
 var hasMutationObserverSupport = typeof MutationObserver !== 'undefined' || typeof WebKitMutationObserver !== 'undefined' || typeof MozMutationObserver !== 'undefined';
-var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Determine if the browser supports the option passive for events
+var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Browser type sniffing
+
+var userAgent = isBrowser ? window.navigator.userAgent.toLowerCase() : '';
+var isJSDOM = userAgent.indexOf('jsdom') > 0;
+var isIE = /msie|trident/.test(userAgent); // Determine if the browser supports the option passive for events
 
 var hasPassiveEventSupport = function () {
   var passiveEventSupported = false;
@@ -50,7 +56,11 @@ var hasPassiveEventSupport = function () {
   return passiveEventSupported;
 }();
 var hasTouchSupport = isBrowser && ('ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0);
-var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent); // --- Getters ---
+var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent);
+var hasIntersectionObserverSupport = isBrowser && 'IntersectionObserver' in window && 'IntersectionObserverEntry' in window && // Edge 15 and UC Browser lack support for `isIntersecting`
+// but we an use intersectionRatio > 0 instead
+// 'isIntersecting' in window.IntersectionObserverEntry.prototype &&
+'intersectionRatio' in window.IntersectionObserverEntry.prototype; // --- Getters ---
 
 var getEnv = function getEnv(key) {
   var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -1138,18 +1148,6 @@ var get = function get(obj, path) {
   }) ? obj : defaultValue;
 };
 
-var memoize = function memoize(fn) {
-  var cache = create(null);
-  return function () {
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    var argsKey = JSON.stringify(args);
-    return cache[argsKey] = cache[argsKey] || fn.apply(null, args);
-  };
-};
-
 //
 // BREAKPOINT DEFINITIONS
 //
@@ -1282,25 +1280,159 @@ var DEFAULTS = {
     solid: false
   },
   BToaster: {
-    ariaLive: 'polite',
-    ariaAtomic: 'true',
+    ariaLive: null,
+    ariaAtomic: null,
     role: null
   },
   BTooltip: {
+    delay: 0,
     boundary: 'scrollParent',
     boundaryPadding: 5
   },
   BPopover: {
+    delay: 0,
     boundary: 'scrollParent',
     boundaryPadding: 5
-  } // This contains user defined configuration
-
+  }
 };
-var CONFIG = {}; // Method to get a deep clone (immutable) copy of the defaults
+var BvConfig = Vue.extend({
+  created: function created() {
+    // Non reactive private properties
+    this.$_config = {};
+    this.$_cachedBreakpoints = null;
+  },
+  methods: {
+    getDefaults: function getDefaults() {
+      // Returns a copy of the defaults
+      return cloneDeep(DEFAULTS);
+    },
+    getConfig: function getConfig() {
+      // Returns a copy of the user config
+      return cloneDeep(this.$_config);
+    },
+    resetConfig: function resetConfig() {
+      // Clear the config. For testing purposes only
+      this.$_config = {};
+    },
+    getConfigValue: function getConfigValue(key) {
+      // First we try the user config, and if key not found we fall back to default value
+      // NOTE: If we deep clone DEFAULTS into config, then we can skip the fallback for get
+      return cloneDeep(get(this.$_config, key, get(DEFAULTS, key)));
+    },
+    getComponentConfig: function getComponentConfig(cmpName) {
+      var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      // Return the particular config value for key for if specified,
+      // otherwise we return the full config
+      return key ? this.getConfigValue("".concat(cmpName, ".").concat(key)) : this.getConfigValue(cmpName) || {};
+    },
+    getBreakpoints: function getBreakpoints() {
+      // Convenience method for getting all breakpoint names
+      return this.getConfigValue('breakpoints');
+    },
+    getBreakpointsCached: function getBreakpointsCached() {
+      // Convenience method for getting all breakpoint names
+      // Caches the results after first access
+      if (!this.$_cachedBreakpoints) {
+        this.$_cachedBreakpoints = this.getBreakpoints();
+      }
 
-var getDefaults = function getDefaults() {
-  return cloneDeep(DEFAULTS);
-}; // Method to set the config
+      return cloneDeep(this.$_cachedBreakpoints);
+    },
+    getBreakpointsUp: function getBreakpointsUp() {
+      // Convenience method for getting breakpoints with
+      // the smallest breakpoint set as ''
+      // Useful for components that create breakpoint specific props
+      var breakpoints = this.getBreakpoints();
+      breakpoints[0] = '';
+      return breakpoints;
+    },
+    getBreakpointsUpCached: function getBreakpointsUpCached() {
+      // Convenience method for getting breakpoints with
+      // the smallest breakpoint set as ''
+      // Useful for components that create breakpoint specific props
+      // Caches the results after first access
+      var breakpoints = this.getBreakpointsCached();
+      breakpoints[0] = '';
+      return breakpoints;
+    },
+    getBreakpointsDown: function getBreakpointsDown() {
+      // Convenience method for getting breakpoints with
+      // the largest breakpoint set as ''
+      // Useful for components that create breakpoint specific props
+      var breakpoints = this.getBreakpoints();
+      breakpoints[breakpoints.length - 1] = '';
+      return breakpoints;
+    },
+    getBreakpointsDownCached: function getBreakpointsDownCached()
+    /* istanbul ignore next: we don't use this method anywhere, yet */
+    {
+      // Convenience method for getting breakpoints with
+      // the largest breakpoint set as ''
+      // Useful for components that create breakpoint specific props
+      // Caches the results after first access
+      var breakpoints = this.getBreakpointsCached();
+      breakpoints[breakpoints.length - 1] = '';
+      return breakpoints;
+    },
+    setConfig: function setConfig() {
+      var _this = this;
+
+      var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      if (!isObject(config)) {
+        /* istanbul ignore next */
+        return;
+      }
+
+      keys(config).filter(function (cmpName) {
+        return config.hasOwnProperty(cmpName);
+      }).forEach(function (cmpName) {
+        if (!DEFAULTS.hasOwnProperty(cmpName)) {
+          /* istanbul ignore next */
+          warn("config: unknown config property \"".concat(cmpName, "\""));
+          /* istanbul ignore next */
+
+          return;
+        }
+
+        var cmpConfig = config[cmpName];
+
+        if (cmpName === 'breakpoints') {
+          // Special case for breakpoints
+          var breakpoints = config.breakpoints;
+
+          if (!isArray$1(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
+            return !isString(b) || b.length === 0;
+          })) {
+            /* istanbul ignore next */
+            warn('config: "breakpoints" must be an array of at least 2 breakpoint names');
+          } else {
+            _this.$_config.breakpoints = cloneDeep(breakpoints);
+          }
+        } else if (isObject(cmpConfig)) {
+          keys(cmpConfig).filter(function (key) {
+            return cmpConfig.hasOwnProperty(key);
+          }).forEach(function (key) {
+            if (!DEFAULTS[cmpName].hasOwnProperty(key)) {
+              /* istanbul ignore next */
+              warn("config: unknown config property \"".concat(cmpName, ".{$key}\""));
+            } else {
+              // If we pre-populate the config with defaults, we can skip this line
+              _this.$_config[cmpName] = _this.$_config[cmpName] || {};
+
+              if (!isUndefined(cmpConfig[key])) {
+                _this.$_config[cmpName][key] = cloneDeep(cmpConfig[key]);
+              }
+            }
+          });
+        }
+      });
+    }
+  }
+}); // This contains user defined configuration manager object.
+// This object should be treated as private!
+
+Vue.prototype.$bvConfig = Vue.prototype.$bvConfig || new BvConfig(); // Method to get a deep clone (immutable) copy of the defaults
 // Merges in only known top-level and sub-level keys
 //   Vue.use(BootstrapVue, config)
 // or
@@ -1310,64 +1442,8 @@ var getDefaults = function getDefaults() {
 
 var setConfig = function setConfig() {
   var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  if (!isObject(config)) {
-    /* istanbul ignore next */
-    return;
-  }
-
-  keys(config).filter(function (cmpName) {
-    return config.hasOwnProperty(cmpName);
-  }).forEach(function (cmpName) {
-    if (!DEFAULTS.hasOwnProperty(cmpName)) {
-      /* istanbul ignore next */
-      warn("config: unknown config property \"".concat(cmpName, "\""));
-      /* istanbul ignore next */
-
-      return;
-    }
-
-    var cmpConfig = config[cmpName];
-
-    if (cmpName === 'breakpoints') {
-      // Special case for breakpoints
-      var breakpoints = config.breakpoints;
-
-      if (!isArray$1(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
-        return !isString(b) || b.length === 0;
-      })) {
-        /* istanbul ignore next */
-        warn('config: "breakpoints" must be an array of at least 2 breakpoint names');
-      } else {
-        CONFIG.breakpoints = cloneDeep(breakpoints);
-      }
-    } else if (isObject(cmpConfig)) {
-      keys(cmpConfig).filter(function (key) {
-        return cmpConfig.hasOwnProperty(key);
-      }).forEach(function (key) {
-        if (!DEFAULTS[cmpName].hasOwnProperty(key)) {
-          /* istanbul ignore next */
-          warn("config: unknown config property \"".concat(cmpName, ".{$key}\""));
-        } else {
-          // If we pre-populate the config with defaults, we can skip this line
-          CONFIG[cmpName] = CONFIG[cmpName] || {};
-
-          if (!isUndefined(cmpConfig[key])) {
-            CONFIG[cmpName][key] = cloneDeep(cmpConfig[key]);
-          }
-        }
-      });
-    }
-  });
+  Vue.prototype.$bvConfig.setConfig(config);
 }; // Reset the user config to default
-// Returns a deep clone (immutable) copy
-
-
-var getConfigValue = function getConfigValue(key) {
-  // First we try the user config, and if key not found we fall back to default value
-  // NOTE: If we deep clone DEFAULTS into config, then we can skip the fallback for get
-  return cloneDeep(get(CONFIG, key, get(getDefaults(), key)));
-}; // Method to grab a config value for a particular component.
 // Returns a deep clone (immutable) copy
 
 
@@ -1375,44 +1451,39 @@ var getComponentConfig = function getComponentConfig(cmpName) {
   var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   // Return the particular config value for key for if specified,
   // otherwise we return the full config
-  return key ? getConfigValue("".concat(cmpName, ".").concat(key)) : getConfigValue(cmpName) || {};
+  return Vue.prototype.$bvConfig.getComponentConfig(cmpName, key);
 }; // Convenience method for getting all breakpoint names
 
 
 var getBreakpoints = function getBreakpoints() {
-  return getConfigValue('breakpoints');
+  return Vue.prototype.$bvConfig.getBreakpoints();
 }; // Convenience method for getting all breakpoint names
-// Caches the results after first access
-
-
-var getBreakpointsCached = memoize(function () {
-  return getConfigValue('breakpoints');
-}); // Convenience method for getting breakpoints with
 // the smallest breakpoint set as ''
 // Useful for components that create breakpoint specific props
 // Caches the results after first access
 
 
-var getBreakpointsUpCached = memoize(function () {
-  var breakpoints = getBreakpointsCached().slice();
-  breakpoints[0] = '';
-  return breakpoints;
-}); // Convenience method for getting breakpoints with
+var getBreakpointsUpCached = function getBreakpointsUpCached() {
+  return Vue.prototype.$bvConfig.getBreakpointsUpCached();
+}; // Convenience method for getting breakpoints with
 
-var MULTIPLE_VUE_WARNING = "Multiple instances of Vue detected!\nSee: https://bootstrap-vue.js.org/docs#using-module-bundlers";
-var checkMultipleVueWarned = false;
 /**
- * Checks if there are multiple instances of Vue, and warns (once) about issues.
+ * Checks if there are multiple instances of Vue, and warns (once) about possible issues.
  * @param {object} Vue
  */
 
-var checkMultipleVue = function checkMultipleVue(Vue) {
-  /* istanbul ignore next */
-  if (!checkMultipleVueWarned && OurVue !== Vue) {
-    warn(MULTIPLE_VUE_WARNING);
+var checkMultipleVue = function () {
+  var checkMultipleVueWarned = false;
+  var MULTIPLE_VUE_WARNING = ['Multiple instances of Vue detected!', 'You may need to set up an alias for Vue in your bundler config.', 'See: https://bootstrap-vue.js.org/docs#using-module-bundlers'].join('\n');
+  return function (Vue$1) {
+    /* istanbul ignore next */
+    if (!checkMultipleVueWarned && Vue !== Vue$1 && !isJSDOM) {
+      warn(MULTIPLE_VUE_WARNING);
+    }
+
     checkMultipleVueWarned = true;
-  }
-};
+  };
+}();
 /**
  * Plugin install factory function.
  * @param {object} { components, directives }
@@ -1510,19 +1581,6 @@ var registerDirectives = function registerDirectives(Vue) {
     registerDirective(Vue, directive, directives[directive]);
   }
 };
-/**
- * Install plugin if window.Vue available
- * @param {object} Plugin definition
- */
-
-var vueUse = function vueUse(VuePlugin) {
-  /* istanbul ignore next */
-  if (hasWindowSupport && window.Vue) {
-    window.Vue.use(VuePlugin);
-  }
-};
-
-//
 
 var w = hasWindowSupport ? window : {};
 var d = hasDocumentSupport ? document : {};
@@ -1566,14 +1624,15 @@ var MutationObs = w.MutationObserver || w.WebKitMutationObserver || w.MozMutatio
 // Exported only for testing purposes
 
 var parseEventOptions = function parseEventOptions(options) {
-  if (!hasPassiveEventSupport) {
+  /* istanbul ignore else: can't test in JSDOM, as it supports passive */
+  if (hasPassiveEventSupport) {
+    return isObject(options) ? options : {
+      useCapture: Boolean(options || false)
+    };
+  } else {
     // Need to translate to actual Boolean value
     return Boolean(isObject(options) ? options.useCapture : options);
   }
-
-  return isObject(options) ? options : {
-    useCapture: Boolean(options || false)
-  };
 }; // Attach an event listener to an element
 
 var eventOn = function eventOn(el, evtName, handler, options) {
@@ -1792,62 +1851,6 @@ var position = function position(el)
   };
 };
 
-var NAME = 'BModalTarget';
-var modalTargetName = "BV-".concat(NAME); // Pivate internal component used by ModalManager.
-// Not to be used directly by humans.
-// @vue/component
-
-var BModalTarget = OurVue.extend({
-  name: NAME,
-  data: function data() {
-    return {
-      doRender: false
-    };
-  },
-  destroyed: function destroyed()
-  /* istanbul ignore next */
-  {
-    // Ensure we get removed from DOM when destroyed
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-  },
-  beforeMount: function beforeMount() {
-    var self = this; // There can be only one modal target in the document
-
-    /* istanbul ignore if */
-
-    if (Wormhole.hasTarget(modalTargetName)) {
-      this.$once('hook:mounted', function () {
-        self.$nextTick(function () {
-          requestAF(function () {
-            self.$destroy();
-          });
-        });
-      });
-    } else {
-      this.doRender = true;
-    }
-  },
-  render: function render(h) {
-    /* istanbul ignore else */
-    if (this.doRender) {
-      return h(PortalTarget, {
-        staticClass: 'b-modal-target',
-        props: {
-          tag: 'div',
-          name: modalTargetName,
-          multiple: true,
-          transition: null,
-          slim: false
-        }
-      });
-    } else {
-      return h('div');
-    }
-  }
-});
-
 /**
  * Private ModalManager helper
  * Handles controlling modal stacking zIndexes and body adjustments/classes
@@ -1862,7 +1865,7 @@ var Selector = {
   NAVBAR_TOGGLER: '.navbar-toggler' // @vue/component
 
 };
-var ModalManager = OurVue.extend({
+var ModalManager = Vue.extend({
   data: function data() {
     return {
       modals: [],
@@ -1877,9 +1880,6 @@ var ModalManager = OurVue.extend({
     },
     modalsAreOpen: function modalsAreOpen() {
       return this.modalCount > 0;
-    },
-    modalTargetName: function modalTargetName$1() {
-      return modalTargetName;
     }
   },
   watch: {
@@ -1915,12 +1915,7 @@ var ModalManager = OurVue.extend({
     registerModal: function registerModal(modal) {
       var _this2 = this;
 
-      // Make sure the modal target exists
-      if (!modal.static) {
-        this.ensureTarget(modal);
-      } // Register the modal if not already registered
-
-
+      // Register the modal if not already registered
       if (modal && this.modals.indexOf(modal) === -1) {
         // Add modal to modals array
         this.modals.push(modal);
@@ -1967,31 +1962,8 @@ var ModalManager = OurVue.extend({
       return this.scrollbarWidth || 0;
     },
     // Private methods
-    ensureTarget: function ensureTarget(modal) {
-      var _this3 = this;
-
-      if (isBrowser && !Wormhole.hasTarget(this.modalTargetName)) {
-        var div = document.createElement('div');
-        document.body.appendChild(div);
-        var target = new BModalTarget({
-          // Set parent/root to the modal's $root
-          parent: modal.$root
-        });
-        target.$mount(div);
-        target.$once('hook:beforeDestroy', function () {
-          _this3.modals.forEach(function (modal) {
-            // Hide any modals that may be in the target, if
-            // target is destroyed, using the 'FORCE' trigger
-            // which makes the hide event non-cancelable
-            if (!modal.static) {
-              modal.hide('FORCED');
-            }
-          });
-        });
-      }
-    },
     updateModals: function updateModals(modals) {
-      var _this4 = this;
+      var _this3 = this;
 
       var baseZIndex = this.getBaseZIndex();
       var scrollbarWidth = this.getScrollbarWidth();
@@ -1999,8 +1971,8 @@ var ModalManager = OurVue.extend({
         // We update data values on each modal
         modal.zIndex = baseZIndex + index;
         modal.scrollbarWidth = scrollbarWidth;
-        modal.isTop = index === _this4.modals.length - 1;
-        modal.isBodyOverflowing = _this4.isBodyOverflowing;
+        modal.isTop = index === _this3.modals.length - 1;
+        modal.isBodyOverflowing = _this3.isBodyOverflowing;
       });
     },
     resetModal: function resetModal(modal) {
@@ -2510,7 +2482,7 @@ var clickHandlerFactory = function clickHandlerFactory(_ref) {
 }; // @vue/component
 
 
-var BLink = OurVue.extend({
+var BLink = Vue.extend({
   name: 'BLink',
   functional: true,
   props: propsFactory(),
@@ -2564,7 +2536,7 @@ var BLink = OurVue.extend({
   }
 });
 
-var NAME$1 = 'BButton';
+var NAME = 'BButton';
 var btnProps = {
   block: {
     type: Boolean,
@@ -2581,7 +2553,7 @@ var btnProps = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$1, 'variant');
+      return getComponentConfig(NAME, 'variant');
     }
   },
   type: {
@@ -2593,6 +2565,10 @@ var btnProps = {
     default: 'button'
   },
   pill: {
+    type: Boolean,
+    default: false
+  },
+  squared: {
     type: Boolean,
     default: false
   },
@@ -2649,7 +2625,7 @@ var isNonStandardTag = function isNonStandardTag(props) {
 var computeClass = function computeClass(props) {
   var _ref;
 
-  return ["btn-".concat(props.variant || getComponentConfig(NAME$1, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), Boolean(props.size)), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
+  return ["btn-".concat(props.variant || getComponentConfig(NAME, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), Boolean(props.size)), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
 }; // Compute the link props to pass to b-link (if required)
 
 
@@ -2694,8 +2670,8 @@ var computeAttrs = function computeAttrs(props, data) {
 }; // @vue/component
 
 
-var BButton = OurVue.extend({
-  name: NAME$1,
+var BButton = Vue.extend({
+  name: NAME,
   functional: true,
   props: props,
   render: function render(h, _ref2) {
@@ -2779,7 +2755,7 @@ var normalizeSlot = function normalizeSlot(name) {
   return isFunction(slot) ? slot(scope) : slot;
 }; // Named exports
 
-var NAME$2 = 'BButtonClose';
+var NAME$1 = 'BButtonClose';
 var props$1 = {
   disabled: {
     type: Boolean,
@@ -2788,19 +2764,19 @@ var props$1 = {
   ariaLabel: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$2, 'ariaLabel');
+      return getComponentConfig(NAME$1, 'ariaLabel');
     }
   },
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$2, 'textVariant');
+      return getComponentConfig(NAME$1, 'textVariant');
     }
   } // @vue/component
 
 };
-var BButtonClose = OurVue.extend({
-  name: NAME$2,
+var BButtonClose = Vue.extend({
+  name: NAME$1,
   functional: true,
   props: props$1,
   render: function render(h, _ref) {
@@ -2991,6 +2967,92 @@ var normalizeSlotMixin = {
   }
 };
 
+var NO_FADE_PROPS = {
+  name: '',
+  enterClass: '',
+  enterActiveClass: '',
+  enterToClass: 'show',
+  leaveClass: 'show',
+  leaveActiveClass: '',
+  leaveToClass: ''
+};
+
+var FADE_PROPS = _objectSpread({}, NO_FADE_PROPS, {
+  enterActiveClass: 'fade',
+  leaveActiveClass: 'fade'
+});
+
+var BVTransition = Vue.extend({
+  name: 'BVTransition',
+  functional: true,
+  props: {
+    noFade: {
+      // Only applicable to the built in transition
+      // Has no effect if `trans-props` provided
+      type: Boolean,
+      default: false
+    },
+    mode: {
+      type: String // default: undefined
+
+    },
+    // For user supplied transitions (if needed)
+    transProps: {
+      type: Object,
+      default: null
+    }
+  },
+  render: function render(h, _ref) {
+    var children = _ref.children,
+        data = _ref.data,
+        listeners = _ref.listeners,
+        props = _ref.props;
+    var transProps = props.transProps;
+
+    if (!isPlainObject(transProps)) {
+      transProps = props.noFade ? NO_FADE_PROPS : FADE_PROPS;
+    }
+
+    transProps = _objectSpread({
+      mode: props.mode
+    }, transProps, {
+      // We always need `css` true
+      css: true
+    });
+    return h('transition', // Any listeners will get merged here
+    mergeData(data, {
+      props: transProps
+    }), children);
+  }
+});
+
+/*
+ * Key Codes (events)
+ */
+var KEY_CODES = {
+  SPACE: 32,
+  ENTER: 13,
+  ESC: 27,
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  PAGEUP: 33,
+  PAGEDOWN: 34,
+  HOME: 36,
+  END: 35,
+  TAB: 9,
+  SHIFT: 16,
+  CTRL: 17,
+  BACKSPACE: 8,
+  ALT: 18,
+  PAUSE: 19,
+  BREAK: 19,
+  INSERT: 45,
+  INS: 45,
+  DELETE: 46
+};
+
 /**
  * Observe a DOM element changes, falls back to eventListener mode
  * @param {Element} el The DOM element to observe
@@ -3061,32 +3123,184 @@ var observeDom = function observeDom(el, callback, opts)
   return obs;
 };
 
-/*
- * Key Codes (events)
+/**
+ * SSR safe types
  */
-var KEY_CODES = {
-  SPACE: 32,
-  ENTER: 13,
-  ESC: 27,
-  LEFT: 37,
-  UP: 38,
-  RIGHT: 39,
-  DOWN: 40,
-  PAGEUP: 33,
-  PAGEDOWN: 34,
-  HOME: 36,
-  END: 35,
-  TAB: 9,
-  SHIFT: 16,
-  CTRL: 17,
-  BACKSPACE: 8,
-  ALT: 18,
-  PAUSE: 19,
-  BREAK: 19,
-  INSERT: 45,
-  INS: 45,
-  DELETE: 46
-};
+var w$1 = hasWindowSupport ? window : {};
+var HTMLElement = w$1.HTMLElement || Object;
+
+//
+// Single root node portaling of content, which retains parent/child hierarchy,
+// Unlike Portal-Vue where portaled content is no longer a descendent of
+// it's inteden parent components
+//
+// Private components for use by Tooltips, Popovers and Modals
+//
+// Based on vue-simple-portal
+// https://github.com/LinusBorg/vue-simple-portal
+// Tranporter target used by BTransporterSingle
+// Supports only a single root element.
+// @vue/component
+
+var BTransporterTargetSingle = Vue.extend({
+  // as an abstract component, it doesn't appear in the $parent chain of
+  // components, which means the next parent of any component rendered inside
+  // of this one will be the parent from which is was portal'd
+  abstract: true,
+  name: 'BTransporterTargetSingle',
+  props: {
+    nodes: {
+      // Even though we only support a single root element,
+      // vNodes are always passed as an array
+      type: [Array, Function] // default: undefined
+
+    }
+  },
+  data: function data(vm) {
+    return {
+      updatedNodes: vm.nodes
+    };
+  },
+  destroyed: function destroyed() {
+    var el = this.$el;
+    el && el.parentNode && el.parentNode.removeChild(el);
+  },
+  render: function render(h) {
+    var nodes = isFunction(this.updatedNodes) ? this.updatedNodes({}) : this.updatedNodes;
+    nodes = concat(nodes).filter(Boolean);
+    /* istanbul ignore else */
+
+    if (nodes && nodes.length > 0 && !nodes[0].text) {
+      return nodes[0];
+    } else {
+      return h(false);
+    }
+  }
+}); // This omponent has no root element, so only a single VNode is allowed
+// @vue/component
+
+var BTransporterSingle = Vue.extend({
+  name: 'BTransporterSingle',
+  mixins: [normalizeSlotMixin],
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    container: {
+      // String: CSS selector,
+      // HTMLElement: Element reference
+      // Mainly needed for tooltips/popovers inside modals
+      type: [String, HTMLElement],
+      default: 'body'
+    },
+    tag: {
+      // This should be set to match the root element type
+      type: String,
+      default: 'div'
+    }
+  },
+  watch: {
+    disabled: {
+      immediate: true,
+      handler: function handler(disabled) {
+        disabled ? this.unmountTarget() : this.$nextTick(this.mountTarget);
+      }
+    }
+  },
+  created: function created() {
+    this._bv_defaultFn = null;
+    this._bv_target = null;
+  },
+  beforeMount: function beforeMount() {
+    this.mountTarget();
+  },
+  updated: function updated() {
+    var _this = this;
+
+    // Placed in a nextTick to ensure that children have completed
+    // updating before rendering in the target
+    this.$nextTick(function () {
+      _this.updateTarget();
+    });
+  },
+  beforeDestroy: function beforeDestroy() {
+    this.unmountTarget();
+    this._bv_defaultFn = null;
+  },
+  methods: {
+    // Get the element which the target should be appended to
+    getContainer: function getContainer() {
+      /* istanbul ignore else */
+      if (isBrowser) {
+        var container = this.container;
+        return isString(container) ? select(container) : container;
+      } else {
+        return null;
+      }
+    },
+    // Mount the target
+    mountTarget: function mountTarget() {
+      if (!this._bv_target) {
+        var container = this.getContainer();
+
+        if (container) {
+          var el = document.createElement('div');
+          container.appendChild(el);
+          this._bv_target = new BTransporterTargetSingle({
+            el: el,
+            parent: this,
+            propsData: {
+              // Initial nodes to be rendered
+              nodes: concat(this.normalizeSlot('default', {}))
+            }
+          });
+        }
+      }
+    },
+    // Update the content of the target
+    updateTarget: function updateTarget() {
+      if (isBrowser && this._bv_target) {
+        var defaultFn = this.$scopedSlots.default;
+
+        if (!this.disabled) {
+          /* istanbul ignore else: only applicable in Vue 2.5.x */
+          if (defaultFn && this._bv_defaultFn !== defaultFn) {
+            // We only update the target component if the scoped slot
+            // function is a fresh one. The new slot syntax (since Vue 2.6)
+            // can cache unchanged slot functions and we want to respect that here.
+            this._bv_target.updatedNodes = defaultFn;
+          } else if (!defaultFn) {
+            // We also need to be back compatable with non-scoped default slot (i.e. 2.5.x)
+            this._bv_target.updatedNodes = this.$slots.default;
+          }
+        } // Update the scoped slot function cache
+
+
+        this._bv_defaultFn = defaultFn;
+      }
+    },
+    // Unmount the target
+    unmountTarget: function unmountTarget() {
+      if (this._bv_target) {
+        this._bv_target.$destroy();
+
+        this._bv_target = null;
+      }
+    }
+  },
+  render: function render(h) {
+    if (this.disabled) {
+      var nodes = concat(this.normalizeSlot('default', {})).filter(Boolean);
+
+      if (nodes.length > 0 && !nodes[0].text) {
+        return nodes[0];
+      }
+    }
+
+    return h(false);
+  }
+});
 
 var stripTagsRegex = /(<([^>]+)>)/gi; // Removes any thing that looks like an HTML tag from the supplied string
 
@@ -3103,7 +3317,7 @@ var htmlOrText = function htmlOrText(innerHTML, textContent) {
   } : {};
 };
 
-var NAME$3 = 'BModal'; // ObserveDom config to detect changes in modal content
+var NAME$2 = 'BModal'; // ObserveDom config to detect changes in modal content
 // so that we can adjust the modal padding if needed
 
 var OBSERVER_CONFIG = {
@@ -3129,13 +3343,13 @@ var props$2 = {
   titleTag: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'titleTag');
+      return getComponentConfig(NAME$2, 'titleTag');
     }
   },
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'size');
+      return getComponentConfig(NAME$2, 'size');
     }
   },
   centered: {
@@ -3173,25 +3387,25 @@ var props$2 = {
   headerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerBgVariant');
+      return getComponentConfig(NAME$2, 'headerBgVariant');
     }
   },
   headerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerBorderVariant');
+      return getComponentConfig(NAME$2, 'headerBorderVariant');
     }
   },
   headerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerTextVariant');
+      return getComponentConfig(NAME$2, 'headerTextVariant');
     }
   },
   headerCloseVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerCloseVariant');
+      return getComponentConfig(NAME$2, 'headerCloseVariant');
     }
   },
   headerClass: {
@@ -3201,13 +3415,13 @@ var props$2 = {
   bodyBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'bodyBgVariant');
+      return getComponentConfig(NAME$2, 'bodyBgVariant');
     }
   },
   bodyTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'bodyTextVariant');
+      return getComponentConfig(NAME$2, 'bodyTextVariant');
     }
   },
   modalClass: {
@@ -3229,19 +3443,19 @@ var props$2 = {
   footerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'footerBgVariant');
+      return getComponentConfig(NAME$2, 'footerBgVariant');
     }
   },
   footerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'footerBorderVariant');
+      return getComponentConfig(NAME$2, 'footerBorderVariant');
     }
   },
   footerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'footerTextVariant');
+      return getComponentConfig(NAME$2, 'footerTextVariant');
     }
   },
   footerClass: {
@@ -3287,13 +3501,13 @@ var props$2 = {
   headerCloseLabel: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'headerCloseLabel');
+      return getComponentConfig(NAME$2, 'headerCloseLabel');
     }
   },
   cancelTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'cancelTitle');
+      return getComponentConfig(NAME$2, 'cancelTitle');
     }
   },
   cancelTitleHtml: {
@@ -3302,7 +3516,7 @@ var props$2 = {
   okTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'okTitle');
+      return getComponentConfig(NAME$2, 'okTitle');
     }
   },
   okTitleHtml: {
@@ -3311,13 +3525,13 @@ var props$2 = {
   cancelVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'cancelVariant');
+      return getComponentConfig(NAME$2, 'cancelVariant');
     }
   },
   okVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'okVariant');
+      return getComponentConfig(NAME$2, 'okVariant');
     }
   },
   lazy: {
@@ -3334,8 +3548,8 @@ var props$2 = {
   } // @vue/component
 
 };
-var BModal = OurVue.extend({
-  name: NAME$3,
+var BModal = Vue.extend({
+  name: NAME$2,
   mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
   model: {
     prop: 'visible',
@@ -3344,19 +3558,19 @@ var BModal = OurVue.extend({
   props: props$2,
   data: function data() {
     return {
-      is_hidden: true,
-      // If should not be in document
-      is_visible: false,
+      isHidden: true,
+      // If modal should not be in document
+      isVisible: false,
       // Controls modal visible state
-      is_transitioning: false,
+      isTransitioning: false,
       // Used for style control
-      is_show: false,
+      isShow: false,
       // Used for style control
-      is_block: false,
+      isBlock: false,
       // Used for style control
-      is_opening: false,
+      isOpening: false,
       // To signal that the modal is in the process of opening
-      is_closing: false,
+      isClosing: false,
       // To signal that the modal is in the process of closing
       ignoreBackdropClick: false,
       // Used to signify if click out listener should ignore the click
@@ -3373,8 +3587,8 @@ var BModal = OurVue.extend({
     modalClasses: function modalClasses() {
       return [{
         fade: !this.noFade,
-        show: this.is_show,
-        'd-block': this.is_block
+        show: this.isShow,
+        'd-block': this.isBlock
       }, this.modalClass];
     },
     modalStyles: function modalStyles() {
@@ -3388,12 +3602,6 @@ var BModal = OurVue.extend({
       var _ref;
 
       return [(_ref = {}, _defineProperty(_ref, "modal-".concat(this.size), Boolean(this.size)), _defineProperty(_ref, 'modal-dialog-centered', this.centered), _defineProperty(_ref, 'modal-dialog-scrollable', this.scrollable), _ref), this.dialogClass];
-    },
-    backdropClasses: function backdropClasses() {
-      return {
-        fade: !this.noFade,
-        show: this.is_show || this.noFade
-      };
     },
     headerClasses: function headerClasses() {
       var _ref2;
@@ -3423,7 +3631,7 @@ var BModal = OurVue.extend({
         cancel: this.onCancel,
         close: this.onClose,
         hide: this.hide,
-        visible: this.is_visible
+        visible: this.isVisible
       };
     }
   },
@@ -3451,7 +3659,7 @@ var BModal = OurVue.extend({
     this.listenOnRoot('bv::modal::show', this.modalListener); // Initially show modal?
 
     if (this.visible === true) {
-      this.show();
+      this.$nextTick(this.show);
     }
   },
   beforeDestroy: function beforeDestroy() {
@@ -3465,28 +3673,44 @@ var BModal = OurVue.extend({
     this.setEnforceFocus(false);
     this.setResizeEvent(false);
 
-    if (this.is_visible) {
-      this.is_visible = false;
-      this.is_show = false;
-      this.is_transitioning = false;
+    if (this.isVisible) {
+      this.isVisible = false;
+      this.isShow = false;
+      this.isTransitioning = false;
     }
   },
   methods: {
+    // Private method to update the v-model
     updateModel: function updateModel(val) {
       if (val !== this.visible) {
         this.$emit('change', val);
       }
     },
-    // Public Methods
+    // Private method to create a BvModalEvent object
+    buildEvent: function buildEvent(type) {
+      var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      return new BvModalEvent(type, _objectSpread({
+        // Default options
+        cancelable: false,
+        target: this.$refs.modal || this.$el || null,
+        relatedTarget: null,
+        trigger: null
+      }, opts, {
+        // Options that can't be overridden
+        vueTarget: this,
+        componentId: this.safeId()
+      }));
+    },
+    // Public method to show modal
     show: function show() {
-      if (this.is_visible || this.is_opening) {
+      if (this.isVisible || this.isOpening) {
         // If already open, on in the process of opening, do nothing
 
         /* istanbul ignore next */
         return;
       }
 
-      if (this.is_closing) {
+      if (this.isClosing) {
         // If we are in the process of closing, wait until hidden before re-opening
 
         /* istanbul ignore next: very difficult to test */
@@ -3496,20 +3720,16 @@ var BModal = OurVue.extend({
         return;
       }
 
-      this.is_opening = true; // Set the element to return focus to when closed
+      this.isOpening = true; // Set the element to return focus to when closed
 
       this.return_focus = this.return_focus || this.getActiveElement();
-      var showEvt = new BvModalEvent('show', {
-        cancelable: true,
-        vueTarget: this,
-        target: this.$refs.modal,
-        relatedTarget: null,
-        componentId: this.safeId()
+      var showEvt = this.buildEvent('show', {
+        cancelable: true
       });
       this.emitEvent(showEvt); // Don't show if canceled
 
-      if (showEvt.defaultPrevented || this.is_visible) {
-        this.is_opening = false; // Ensure the v-model reflects the current state
+      if (showEvt.defaultPrevented || this.isVisible) {
+        this.isOpening = false; // Ensure the v-model reflects the current state
 
         this.updateModel(false);
         return;
@@ -3518,19 +3738,18 @@ var BModal = OurVue.extend({
 
       this.doShow();
     },
-    hide: function hide(trigger) {
-      if (!this.is_visible || this.is_closing) {
+    // Public method to hide modal
+    hide: function hide() {
+      var trigger = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+      if (!this.isVisible || this.isClosing) {
         /* istanbul ignore next */
         return;
       }
 
-      this.is_closing = true;
-      var hideEvt = new BvModalEvent('hide', {
+      this.isClosing = true;
+      var hideEvt = this.buildEvent('hide', {
         cancelable: trigger !== 'FORCE',
-        vueTarget: this,
-        target: this.$refs.modal,
-        relatedTarget: null,
-        componentId: this.safeId(),
         trigger: trigger || null
       }); // We emit specific event for one of the three built-in buttons
 
@@ -3544,8 +3763,8 @@ var BModal = OurVue.extend({
 
       this.emitEvent(hideEvt); // Hide if not canceled
 
-      if (hideEvt.defaultPrevented || !this.is_visible) {
-        this.is_closing = false; // Ensure v-model reflects current state
+      if (hideEvt.defaultPrevented || !this.isVisible) {
+        this.isClosing = false; // Ensure v-model reflects current state
 
         this.updateModel(true);
         return;
@@ -3559,7 +3778,7 @@ var BModal = OurVue.extend({
       } // Trigger the hide transition
 
 
-      this.is_visible = false; // Update the v-model
+      this.isVisible = false; // Update the v-model
 
       this.updateModel(false);
     },
@@ -3569,7 +3788,7 @@ var BModal = OurVue.extend({
         this.return_focus = triggerEl;
       }
 
-      if (this.is_visible) {
+      if (this.isVisible) {
         this.hide('toggle');
       } else {
         this.show();
@@ -3578,8 +3797,8 @@ var BModal = OurVue.extend({
     // Private method to get the current document active element
     getActiveElement: function getActiveElement() {
       if (isBrowser) {
-        var activeElement = document.activeElement; // Note: On IE11, `document.activeElement` may be null. So we test it for
-        // truthyness first.
+        var activeElement = document.activeElement; // Note: On IE11, `document.activeElement` may be null.
+        // So we test it for truthiness first.
         // https://github.com/bootstrap-vue/bootstrap-vue/issues/3206
         // Returning focus to document.body may cause unwanted scrolls, so we
         // exclude setting focus on body
@@ -3608,43 +3827,38 @@ var BModal = OurVue.extend({
 
       modalManager.registerModal(this); // Place modal in DOM
 
-      this.is_hidden = false;
+      this.isHidden = false;
       this.$nextTick(function () {
         // We do this in `$nextTick()` to ensure the modal is in DOM first
         // before we show it
-        _this.is_visible = true;
-        _this.is_opening = false; // Update the v-model
+        _this.isVisible = true;
+        _this.isOpening = false; // Update the v-model
 
-        _this.updateModel(true); // Observe changes in modal content and adjust if necessary
+        _this.updateModel(true);
 
-
-        _this._observer = observeDom(_this.$refs.content, _this.checkModalOverflow.bind(_this), OBSERVER_CONFIG);
+        _this.$nextTick(function () {
+          // In a nextTick in case modal content is lazy
+          // Observe changes in modal content and adjust if necessary
+          _this._observer = observeDom(_this.$refs.content, _this.checkModalOverflow.bind(_this), OBSERVER_CONFIG);
+        });
       });
     },
     // Transition handlers
     onBeforeEnter: function onBeforeEnter() {
-      this.is_transitioning = true;
+      this.isTransitioning = true;
       this.setResizeEvent(true);
     },
     onEnter: function onEnter() {
-      this.is_block = true;
+      this.isBlock = true;
     },
     onAfterEnter: function onAfterEnter() {
       var _this2 = this;
 
       this.checkModalOverflow();
-      this.is_show = true;
-      this.is_transitioning = false;
+      this.isShow = true;
+      this.isTransitioning = false;
       this.$nextTick(function () {
-        var shownEvt = new BvModalEvent('shown', {
-          cancelable: false,
-          vueTarget: _this2,
-          target: _this2.$refs.modal,
-          relatedTarget: null,
-          componentId: _this2.safeId()
-        });
-
-        _this2.emitEvent(shownEvt);
+        _this2.emitEvent(_this2.buildEvent('shown'));
 
         _this2.focusFirst();
 
@@ -3652,39 +3866,30 @@ var BModal = OurVue.extend({
       });
     },
     onBeforeLeave: function onBeforeLeave() {
-      this.is_transitioning = true;
+      this.isTransitioning = true;
       this.setResizeEvent(false);
     },
     onLeave: function onLeave() {
       // Remove the 'show' class
-      this.is_show = false;
+      this.isShow = false;
     },
     onAfterLeave: function onAfterLeave() {
       var _this3 = this;
 
-      this.is_block = false;
-      this.is_transitioning = false;
+      this.isBlock = false;
+      this.isTransitioning = false;
       this.setEnforceFocus(false);
       this.isModalOverflowing = false;
-      this.is_hidden = true;
+      this.isHidden = true;
       this.$nextTick(function () {
         _this3.returnFocusTo();
 
-        _this3.is_closing = false;
-        _this3.return_focus = null; // TODO: Need to find a way to pass the `trigger` property
+        _this3.isClosing = false;
+        _this3.return_focus = null;
+        modalManager.unregisterModal(_this3); // TODO: Need to find a way to pass the `trigger` property
         //       to the `hidden` event, not just only the `hide` event
 
-        var hiddenEvt = new BvModalEvent('hidden', {
-          cancelable: false,
-          vueTarget: _this3,
-          target: _this3.$el,
-          relatedTarget: null,
-          componentId: _this3.safeId()
-        });
-
-        _this3.emitEvent(hiddenEvt);
-
-        modalManager.unregisterModal(_this3);
+        _this3.emitEvent(_this3.buildEvent('hidden'));
       });
     },
     // Event emitter
@@ -3716,7 +3921,7 @@ var BModal = OurVue.extend({
     onClickOut: function onClickOut(evt) {
       // Do nothing if not visible, backdrop click disabled, or element
       // that generated click event is no longer in document body
-      if (!this.is_visible || this.noCloseOnBackdrop || !contains(document.body, evt.target)) {
+      if (!this.isVisible || this.noCloseOnBackdrop || !contains(document.body, evt.target)) {
         return;
       }
 
@@ -3743,7 +3948,7 @@ var BModal = OurVue.extend({
     },
     onEsc: function onEsc(evt) {
       // If ESC pressed, hide modal
-      if (evt.keyCode === KEY_CODES.ESC && this.is_visible && !this.noCloseOnEsc) {
+      if (evt.keyCode === KEY_CODES.ESC && this.isVisible && !this.noCloseOnEsc) {
         this.hide('esc');
       }
     },
@@ -3752,7 +3957,7 @@ var BModal = OurVue.extend({
       // If focus leaves modal, bring it back
       var modal = this.$refs.modal;
 
-      if (!this.noEnforceFocus && this.isTop && this.is_visible && modal && document !== evt.target && !contains(modal, evt.target)) {
+      if (!this.noEnforceFocus && this.isTop && this.isVisible && modal && document !== evt.target && !contains(modal, evt.target)) {
         modal.focus({
           preventScroll: true
         });
@@ -3773,18 +3978,18 @@ var BModal = OurVue.extend({
     },
     // Root listener handlers
     showHandler: function showHandler(id, triggerEl) {
-      if (id === this.id) {
+      if (id === this.safeId()) {
         this.return_focus = triggerEl || this.getActiveElement();
         this.show();
       }
     },
     hideHandler: function hideHandler(id) {
-      if (id === this.id) {
+      if (id === this.safeId()) {
         this.hide('event');
       }
     },
     toggleHandler: function toggleHandler(id, triggerEl) {
-      if (id === this.id) {
+      if (id === this.safeId()) {
         this.toggle(triggerEl);
       }
     },
@@ -3796,8 +4001,6 @@ var BModal = OurVue.extend({
     },
     // Focus control handlers
     focusFirst: function focusFirst() {
-      // TODO: Add support for finding input element with 'autofocus'
-      //       attribute set and focus that element
       // Don't try and focus if we are SSR
       if (isBrowser) {
         var modal = this.$refs.modal;
@@ -3830,14 +4033,12 @@ var BModal = OurVue.extend({
       }
     },
     checkModalOverflow: function checkModalOverflow() {
-      if (this.is_visible) {
+      if (this.isVisible) {
         var modal = this.$refs.modal;
         this.isModalOverflowing = modal.scrollHeight > document.documentElement.clientHeight;
       }
     },
     makeModal: function makeModal(h) {
-      var _this5 = this;
-
       // Modal header
       var header = h(false);
 
@@ -3850,14 +4051,12 @@ var BModal = OurVue.extend({
           if (!this.hideHeaderClose) {
             closeButton = h(BButtonClose, {
               props: {
-                disabled: this.is_transitioning,
+                disabled: this.isTransitioning,
                 ariaLabel: this.headerCloseLabel,
                 textVariant: this.headerCloseVariant || this.headerTextVariant
               },
               on: {
-                click: function click(evt) {
-                  _this5.onClose();
-                }
+                click: this.onClose
               }
             }, [this.normalizeSlot('modal-header-close', {})]);
           }
@@ -3900,12 +4099,10 @@ var BModal = OurVue.extend({
               props: {
                 variant: this.cancelVariant,
                 size: this.buttonSize,
-                disabled: this.cancelDisabled || this.busy || this.is_transitioning
+                disabled: this.cancelDisabled || this.busy || this.isTransitioning
               },
               on: {
-                click: function click(evt) {
-                  _this5.onCancel();
-                }
+                click: this.onCancel
               }
             }, [this.normalizeSlot('modal-cancel', {}) || this.cancelTitleHtml || stripTags(this.cancelTitle)]);
           }
@@ -3914,12 +4111,10 @@ var BModal = OurVue.extend({
             props: {
               variant: this.okVariant,
               size: this.buttonSize,
-              disabled: this.okDisabled || this.busy || this.is_transitioning
+              disabled: this.okDisabled || this.busy || this.isTransitioning
             },
             on: {
-              click: function click(evt) {
-                _this5.onOk();
-              }
+              click: this.onOk
             }
           }, [this.normalizeSlot('modal-ok', {}) || this.okTitleHtml || stripTags(this.okTitle)]);
           modalFooter = [cancelButton, okButton];
@@ -3964,21 +4159,24 @@ var BModal = OurVue.extend({
         directives: [{
           name: 'show',
           rawName: 'v-show',
-          value: this.is_visible,
-          expression: 'is_visible'
+          value: this.isVisible,
+          expression: 'isVisible'
         }],
         attrs: {
           id: this.safeId(),
           role: 'dialog',
           tabindex: '-1',
-          'aria-hidden': this.is_visible ? null : 'true',
-          'aria-modal': this.is_visible ? 'true' : null
+          'aria-hidden': this.isVisible ? null : 'true',
+          'aria-modal': this.isVisible ? 'true' : null
         },
         on: {
           keydown: this.onEsc,
           click: this.onClickOut
         }
       }, [modalDialog]); // Wrap modal in transition
+      // Sadly, we can't use BVTransition here due to the differences in
+      // transition durations for .modal and .modal-dialog. Not until
+      // issue https://github.com/vuejs/vue/issues/9986 is resolved
 
       modal = h('transition', {
         props: {
@@ -3990,32 +4188,36 @@ var BModal = OurVue.extend({
           leaveToClass: ''
         },
         on: {
-          'before-enter': this.onBeforeEnter,
+          beforeEnter: this.onBeforeEnter,
           enter: this.onEnter,
-          'after-enter': this.onAfterEnter,
-          'before-leave': this.onBeforeLeave,
+          afterEnter: this.onAfterEnter,
+          beforeLeave: this.onBeforeLeave,
           leave: this.onLeave,
-          'after-leave': this.onAfterLeave
+          afterLeave: this.onAfterLeave
         }
       }, [modal]); // Modal backdrop
 
       var backdrop = h(false);
 
-      if (!this.hideBackdrop && (this.is_visible || this.is_transitioning || this.is_block)) {
+      if (!this.hideBackdrop && this.isVisible) {
         backdrop = h('div', {
           staticClass: 'modal-backdrop',
-          class: this.backdropClasses,
           attrs: {
             id: this.safeId('__BV_modal_backdrop_')
           }
         }, [this.normalizeSlot('modal-backdrop', {})]);
-      } // Tab trap to prevent page from scrolling to next element in
-      // tab index during enforce focus tab cycle
+      }
 
+      backdrop = h(BVTransition, {
+        props: {
+          noFade: this.noFade
+        }
+      }, [backdrop]); // Tab trap to prevent page from scrolling to next element in
+      // tab index during enforce focus tab cycle
 
       var tabTrap = h(false);
 
-      if (this.is_visible && this.isTop && !this.noEnforceFocus) {
+      if (this.isVisible && this.isTop && !this.noEnforceFocus) {
         tabTrap = h('div', {
           attrs: {
             tabindex: '0'
@@ -4034,15 +4236,11 @@ var BModal = OurVue.extend({
     }
   },
   render: function render(h) {
-    // Wrap in a portal
-    return h(Portal, {
-      props: {
-        name: "b-modal-".concat(this._uid),
-        to: modalManager.modalTargetName,
-        slim: true,
-        disabled: this.static
-      }
-    }, [!this.is_hidden || this.static && !this.lazy ? this.makeModal(h) : h(false)]);
+    if (this.static) {
+      return this.lazy && this.isHidden ? h(false) : this.makeModal(h);
+    } else {
+      return this.isHidden ? h(false) : h(BTransporterSingle, {}, [this.makeModal(h)]);
+    }
   }
 });
 
@@ -4074,243 +4272,12 @@ var filterOptions = function filterOptions(options) {
 
     return memo;
   }, {});
-}; // Create a private sub-component that extends BModal
-// which self-destructs after hidden
-// @vue/component
+}; // Method to install `$bvModal` VM injection
 
 
-var MsgBox = OurVue.extend({
-  name: 'BMsgBox',
-  extends: BModal,
-  destroyed: function destroyed() {
-    // Make sure we not in document any more
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-  },
-  mounted: function mounted() {
-    var _this = this;
+var install = function install(Vue) {
+  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    // Self destruct handler
-    var handleDestroy = function handleDestroy() {
-      var self = _this;
-
-      _this.$nextTick(function () {
-        // In a `setTimeout()` to release control back to application
-        setTimeout(function () {
-          return self.$destroy();
-        }, 0);
-      });
-    }; // Self destruct if parent destroyed
-
-
-    this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
-
-    this.$once('hidden', handleDestroy); // Self destruct on route change
-
-    /* istanbul ignore if */
-
-    if (this.$router && this.$route) {
-      var unwatch = this.$watch('$router', handleDestroy);
-      this.$once('hook:beforeDestroy', unwatch);
-    } // Should we also self destruct on parent deactivation?
-    // Show the `MsgBox`
-
-
-    this.show();
-  }
-}); // Method to generate the on-demand modal message box
-// Returns a promise that resolves to a value returned by the resolve
-
-var asyncMsgBox = function asyncMsgBox(props, $parent) {
-  var resolver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultResolver;
-
-  if (warnNotClient(PROP_NAME) || warnNoPromiseSupport(PROP_NAME)) {
-    // Should this throw an error?
-
-    /* istanbul ignore next */
-    return;
-  } // Create an instance of `MsgBox` component
-
-
-  var msgBox = new MsgBox({
-    // We set parent as the local VM so these modals can emit events on
-    // the app `$root`, as needed by things like tooltips and popovers
-    // And it helps to ensure `MsgBox` is destroyed when parent is destroyed
-    parent: $parent,
-    // Preset the prop values
-    propsData: _objectSpread({}, filterOptions(getComponentConfig('BModal') || {}), {
-      // Defaults that user can override
-      hideHeaderClose: true,
-      hideHeader: !(props.title || props.titleHtml)
-    }, omit(props, ['msgBoxContent']), {
-      // Props that can't be overridden
-      lazy: false,
-      busy: false,
-      visible: false,
-      noStacking: false,
-      noEnforceFocus: false
-    })
-  }); // Convert certain props to scoped slots
-
-  keys(propsToSlots).forEach(function (prop) {
-    if (!isUndefined(props[prop])) {
-      // Can be a string, or array of VNodes.
-      // Alternatively, user can use HTML version of prop to pass an HTML string.
-      msgBox.$slots[propsToSlots[prop]] = concat(props[prop]);
-    }
-  }); // Create a mount point (a DIV)
-
-  var div = document.createElement('div');
-  document.body.appendChild(div); // Return a promise that resolves when hidden, or rejects on destroyed
-
-  return new Promise(function (resolve, reject) {
-    var resolved = false;
-    msgBox.$once('hook:destroyed', function () {
-      if (!resolved) {
-        /* istanbul ignore next */
-        reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
-      }
-    });
-    msgBox.$on('hide', function (bvModalEvt) {
-      if (!bvModalEvt.defaultPrevented) {
-        var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
-
-        if (!bvModalEvt.defaultPrevented) {
-          resolved = true;
-          resolve(result);
-        }
-      }
-    }); // Mount the `MsgBox`, which will auto-trigger it to show
-
-    msgBox.$mount(div);
-  });
-}; // BvModal instance property class
-
-
-var BvModal =
-/*#__PURE__*/
-function () {
-  function BvModal(vm) {
-    _classCallCheck(this, BvModal);
-
-    // Assign the new properties to this instance
-    assign$1(this, {
-      _vm: vm,
-      _root: vm.$root
-    }); // Set these properties as read-only and non-enumerable
-
-    defineProperties(this, {
-      _vm: readonlyDescriptor(),
-      _root: readonlyDescriptor()
-    });
-  } // --- Instance methods ---
-  // Show modal with the specified ID args are for future use
-
-
-  _createClass(BvModal, [{
-    key: "show",
-    value: function show(id) {
-      if (id && this._root) {
-        var _this$_root;
-
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        (_this$_root = this._root).$emit.apply(_this$_root, ['bv::show::modal', id].concat(args));
-      }
-    } // Hide modal with the specified ID args are for future use
-
-  }, {
-    key: "hide",
-    value: function hide(id) {
-      if (id && this._root) {
-        var _this$_root2;
-
-        for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-          args[_key2 - 1] = arguments[_key2];
-        }
-
-        (_this$_root2 = this._root).$emit.apply(_this$_root2, ['bv::hide::modal', id].concat(args));
-      }
-    } // TODO: Could make Promise versions of above that first checks
-    //       if modal is in document (by ID) and if not found reject
-    //       the Promise. Otherwise waits for hide/hidden event and
-    //       then resolves returning the `BvModalEvent` object
-    //       (which contains the details)
-    // The following methods require Promise support!
-    // IE 11 and others do not support Promise natively, so users
-    // should have a Polyfill loaded (which they need anyways for IE 11 support)
-    // Opens a user defined message box and returns a promise
-
-  }, {
-    key: "msgBox",
-    value: function msgBox(content) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var resolver = arguments.length > 2 ? arguments[2] : undefined;
-
-      if (!content || warnNoPromiseSupport(PROP_NAME) || warnNotClient(PROP_NAME) || !isFunction(resolver)) {
-        // Should this throw an error?
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      var props = _objectSpread({}, filterOptions(options), {
-        msgBoxContent: content
-      });
-
-      return asyncMsgBox(props, this._vm, resolver);
-    } // Open a message box with OK button only and returns a promise
-
-  }, {
-    key: "msgBoxOk",
-    value: function msgBoxOk(message) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      // Pick the modal props we support from options
-      var props = _objectSpread({}, options, {
-        // Add in overrides and our content prop
-        okOnly: true,
-        okDisabled: false,
-        hideFooter: false,
-        msgBoxContent: message
-      });
-
-      return this.msgBox(message, props, function (bvModalEvt) {
-        // Always resolve to true for OK
-        return true;
-      });
-    } // Open a message box modal with OK and CANCEL buttons
-    // and returns a promise
-
-  }, {
-    key: "msgBoxConfirm",
-    value: function msgBoxConfirm(message) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      // Set the modal props we support from options
-      var props = _objectSpread({}, options, {
-        // Add in overrides and our content prop
-        okOnly: false,
-        okDisabled: false,
-        cancelDisabled: false,
-        hideFooter: false
-      });
-
-      return this.msgBox(message, props, function (bvModalEvt) {
-        var trigger = bvModalEvt.trigger;
-        return trigger === 'ok' ? true : trigger === 'cancel' ? false : null;
-      });
-    }
-  }]);
-
-  return BvModal;
-}(); // Method to install `$bvModal` VM injection
-
-
-var install = function install(_Vue) {
   if (install.installed) {
     // Only install once
 
@@ -4318,9 +4285,231 @@ var install = function install(_Vue) {
     return;
   }
 
-  install.installed = true; // Add our instance mixin
+  install.installed = true;
+  setConfig(config); // Create a private sub-component that extends BModal
+  // which self-destructs after hidden
+  // @vue/component
 
-  _Vue.mixin({
+  var BMsgBox = Vue.extend({
+    name: 'BMsgBox',
+    extends: BModal,
+    destroyed: function destroyed() {
+      // Make sure we not in document any more
+      if (this.$el && this.$el.parentNode) {
+        this.$el.parentNode.removeChild(this.$el);
+      }
+    },
+    mounted: function mounted() {
+      var _this = this;
+
+      // Self destruct handler
+      var handleDestroy = function handleDestroy() {
+        var self = _this;
+
+        _this.$nextTick(function () {
+          // In a `setTimeout()` to release control back to application
+          setTimeout(function () {
+            return self.$destroy();
+          }, 0);
+        });
+      }; // Self destruct if parent destroyed
+
+
+      this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+
+      this.$once('hidden', handleDestroy); // Self destruct on route change
+
+      /* istanbul ignore if */
+
+      if (this.$router && this.$route) {
+        var unwatch = this.$watch('$router', handleDestroy);
+        this.$once('hook:beforeDestroy', unwatch);
+      } // Show the `BMsgBox`
+
+
+      this.show();
+    }
+  }); // Method to generate the on-demand modal message box
+  // Returns a promise that resolves to a value returned by the resolve
+
+  var asyncMsgBox = function asyncMsgBox(props, $parent) {
+    var resolver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultResolver;
+
+    if (warnNotClient(PROP_NAME) || warnNoPromiseSupport(PROP_NAME)) {
+      /* istanbul ignore next */
+      return;
+    } // Create an instance of `BMsgBox` component
+
+
+    var msgBox = new BMsgBox({
+      // We set parent as the local VM so these modals can emit events on
+      // the app `$root`, as needed by things like tooltips and popovers
+      // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
+      parent: $parent,
+      // Preset the prop values
+      propsData: _objectSpread({}, filterOptions(getComponentConfig('BModal') || {}), {
+        // Defaults that user can override
+        hideHeaderClose: true,
+        hideHeader: !(props.title || props.titleHtml)
+      }, omit(props, ['msgBoxContent']), {
+        // Props that can't be overridden
+        lazy: false,
+        busy: false,
+        visible: false,
+        noStacking: false,
+        noEnforceFocus: false
+      })
+    }); // Convert certain props to scoped slots
+
+    keys(propsToSlots).forEach(function (prop) {
+      if (!isUndefined(props[prop])) {
+        // Can be a string, or array of VNodes.
+        // Alternatively, user can use HTML version of prop to pass an HTML string.
+        msgBox.$slots[propsToSlots[prop]] = concat(props[prop]);
+      }
+    }); // Return a promise that resolves when hidden, or rejects on destroyed
+
+    return new Promise(function (resolve, reject) {
+      var resolved = false;
+      msgBox.$once('hook:destroyed', function () {
+        if (!resolved) {
+          /* istanbul ignore next */
+          reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
+        }
+      });
+      msgBox.$on('hide', function (bvModalEvt) {
+        if (!bvModalEvt.defaultPrevented) {
+          var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
+
+          if (!bvModalEvt.defaultPrevented) {
+            resolved = true;
+            resolve(result);
+          }
+        }
+      }); // Create a mount point (a DIV) and mount the msgBo which will trigger it to show
+
+      var div = document.createElement('div');
+      document.body.appendChild(div);
+      msgBox.$mount(div);
+    });
+  }; // BvModal instance class
+
+
+  var BvModal =
+  /*#__PURE__*/
+  function () {
+    function BvModal(vm) {
+      _classCallCheck(this, BvModal);
+
+      // Assign the new properties to this instance
+      assign$1(this, {
+        _vm: vm,
+        _root: vm.$root
+      }); // Set these properties as read-only and non-enumerable
+
+      defineProperties(this, {
+        _vm: readonlyDescriptor(),
+        _root: readonlyDescriptor()
+      });
+    } // --- Instance methods ---
+    // Show modal with the specified ID args are for future use
+
+
+    _createClass(BvModal, [{
+      key: "show",
+      value: function show(id) {
+        if (id && this._root) {
+          var _this$_root;
+
+          for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+          }
+
+          (_this$_root = this._root).$emit.apply(_this$_root, ['bv::show::modal', id].concat(args));
+        }
+      } // Hide modal with the specified ID args are for future use
+
+    }, {
+      key: "hide",
+      value: function hide(id) {
+        if (id && this._root) {
+          var _this$_root2;
+
+          for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+            args[_key2 - 1] = arguments[_key2];
+          }
+
+          (_this$_root2 = this._root).$emit.apply(_this$_root2, ['bv::hide::modal', id].concat(args));
+        }
+      } // The following methods require Promise support!
+      // IE 11 and others do not support Promise natively, so users
+      // should have a Polyfill loaded (which they need anyways for IE 11 support)
+      // Opens a user defined message box and returns a promise
+      // Not yet documented
+
+    }, {
+      key: "msgBox",
+      value: function msgBox(content) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var resolver = arguments.length > 2 ? arguments[2] : undefined;
+
+        if (!content || warnNoPromiseSupport(PROP_NAME) || warnNotClient(PROP_NAME) || !isFunction(resolver)) {
+          /* istanbul ignore next */
+          return;
+        }
+
+        return asyncMsgBox(_objectSpread({}, filterOptions(options), {
+          msgBoxContent: content
+        }), this._vm, resolver);
+      } // Open a message box with OK button only and returns a promise
+
+    }, {
+      key: "msgBoxOk",
+      value: function msgBoxOk(message) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        // Pick the modal props we support from options
+        var props = _objectSpread({}, options, {
+          // Add in overrides and our content prop
+          okOnly: true,
+          okDisabled: false,
+          hideFooter: false,
+          msgBoxContent: message
+        });
+
+        return this.msgBox(message, props, function (bvModalEvt) {
+          // Always resolve to true for OK
+          return true;
+        });
+      } // Open a message box modal with OK and CANCEL buttons
+      // and returns a promise
+
+    }, {
+      key: "msgBoxConfirm",
+      value: function msgBoxConfirm(message) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        // Set the modal props we support from options
+        var props = _objectSpread({}, options, {
+          // Add in overrides and our content prop
+          okOnly: false,
+          okDisabled: false,
+          cancelDisabled: false,
+          hideFooter: false
+        });
+
+        return this.msgBox(message, props, function (bvModalEvt) {
+          var trigger = bvModalEvt.trigger;
+          return trigger === 'ok' ? true : trigger === 'cancel' ? false : null;
+        });
+      }
+    }]);
+
+    return BvModal;
+  }(); // Add our instance mixin
+
+
+  Vue.mixin({
     beforeCreate: function beforeCreate() {
       // Because we need access to `$root` for `$emits`, and VM for parenting,
       // we have to create a fresh instance of `BvModal` for each VM
@@ -4329,9 +4518,8 @@ var install = function install(_Vue) {
   }); // Define our read-only `$bvModal` instance property
   // Placed in an if just in case in HMR mode
 
-
-  if (!_Vue.prototype.hasOwnProperty(PROP_NAME)) {
-    defineProperty(_Vue.prototype, PROP_NAME, {
+  if (!Vue.prototype.hasOwnProperty(PROP_NAME)) {
+    defineProperty(Vue.prototype, PROP_NAME, {
       get: function get() {
         /* istanbul ignore next */
         if (!this || !this[PROP_NAME_PRIV]) {
@@ -4349,7 +4537,7 @@ var BVModalPlugin = {
   install: install
 };
 
-var NAME$4 = 'BToaster';
+var NAME$3 = 'BToaster';
 var props$3 = {
   name: {
     type: String,
@@ -4358,21 +4546,21 @@ var props$3 = {
   ariaLive: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$4, 'ariaLive');
+      return getComponentConfig(NAME$3, 'ariaLive');
     }
   },
   ariaAtomic: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$4, 'ariaAtomic');
-    } // Allowed: 'true' or 'false'
+      return getComponentConfig(NAME$3, 'ariaAtomic');
+    } // Allowed: 'true' or 'false' or null
 
   },
   role: {
     // Aria role
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$4, 'role');
+      return getComponentConfig(NAME$3, 'role');
     }
     /*
     transition: {
@@ -4384,7 +4572,7 @@ var props$3 = {
   } // @vue/component
 
 };
-var DefaultTransition = OurVue.extend({
+var DefaultTransition = Vue.extend({
   data: function data() {
     return {
       // Transition classes base name
@@ -4416,8 +4604,8 @@ var DefaultTransition = OurVue.extend({
   }
 }); // @vue/component
 
-var BToaster = OurVue.extend({
-  name: NAME$4,
+var BToaster = Vue.extend({
+  name: NAME$3,
   props: props$3,
   data: function data() {
     return {
@@ -4464,12 +4652,6 @@ var BToaster = OurVue.extend({
     if (this.doRender) {
       var $target = h(PortalTarget, {
         staticClass: 'b-toaster-slot',
-        attrs: {
-          role: this.role || null,
-          // fallback to null to make sure attribute doesn't exist
-          'aria-live': this.ariaLive,
-          'aria-atomic': this.ariaAtomic
-        },
         props: {
           name: this.staticName,
           multiple: true,
@@ -4483,7 +4665,11 @@ var BToaster = OurVue.extend({
         staticClass: 'b-toaster',
         class: [this.staticName],
         attrs: {
-          id: this.staticName
+          id: this.staticName,
+          role: this.role || null,
+          // Fallback to null to make sure attribute doesn't exist
+          'aria-live': this.ariaLive,
+          'aria-atomic': this.ariaAtomic
         }
       }, [$target]);
     }
@@ -4492,16 +4678,19 @@ var BToaster = OurVue.extend({
   }
 });
 
-var NAME$5 = 'BToast';
+var NAME$4 = 'BToast';
 var MIN_DURATION = 1000;
+var EVENT_OPTIONS = {
+  passive: true,
+  capture: false // --- Props ---
+
+};
 var props$4 = {
   id: {
+    // Even though the ID prop is provided by idMixin, we
+    // add it here for $bvToast props filtering
     type: String,
     default: null
-  },
-  visible: {
-    type: Boolean,
-    default: false
   },
   title: {
     type: String,
@@ -4510,13 +4699,17 @@ var props$4 = {
   toaster: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$5, 'toaster');
+      return getComponentConfig(NAME$4, 'toaster');
     }
+  },
+  visible: {
+    type: Boolean,
+    default: false
   },
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$5, 'variant');
+      return getComponentConfig(NAME$4, 'variant');
     }
   },
   isStatus: {
@@ -4535,7 +4728,7 @@ var props$4 = {
   autoHideDelay: {
     type: [Number, String],
     default: function _default() {
-      return getComponentConfig(NAME$5, 'autoHideDelay');
+      return getComponentConfig(NAME$4, 'autoHideDelay');
     }
   },
   noCloseButton: {
@@ -4557,19 +4750,19 @@ var props$4 = {
   toastClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$5, 'toastClass');
+      return getComponentConfig(NAME$4, 'toastClass');
     }
   },
   headerClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$5, 'headerClass');
+      return getComponentConfig(NAME$4, 'headerClass');
     }
   },
   bodyClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$5, 'bodyClass');
+      return getComponentConfig(NAME$4, 'bodyClass');
     }
   },
   href: {
@@ -4584,22 +4777,12 @@ var props$4 = {
     // Render the toast in place, rather than in a portal-target
     type: Boolean,
     default: false
-  } // Transition props defaults
+  } // @vue/component
 
 };
-var DEFAULT_TRANSITION_PROPS = {
-  name: '',
-  enterClass: '',
-  enterActiveClass: '',
-  enterToClass: '',
-  leaveClass: 'show',
-  leaveActiveClass: '',
-  leaveToClass: '' // @vue/component
-
-};
-var BToast = OurVue.extend({
-  name: NAME$5,
-  mixins: [listenOnRootMixin, normalizeSlotMixin],
+var BToast = Vue.extend({
+  name: NAME$4,
+  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
   inheritAttrs: false,
   model: {
     prop: 'visible',
@@ -4611,8 +4794,8 @@ var BToast = OurVue.extend({
       isMounted: false,
       doRender: false,
       localShow: false,
-      showClass: false,
       isTransitioning: false,
+      isHiding: false,
       order: 0,
       timer: null,
       dismissStarted: 0,
@@ -4620,12 +4803,6 @@ var BToast = OurVue.extend({
     };
   },
   computed: {
-    toastClasses: function toastClasses() {
-      return [this.toastClass, {
-        show: this.showClass,
-        fade: !this.noFade
-      }];
-    },
     bToastClasses: function bToastClasses() {
       return _defineProperty({
         'b-toast-solid': this.solid,
@@ -4696,13 +4873,13 @@ var BToast = OurVue.extend({
     }); // Listen for global $root show events
 
     this.listenOnRoot('bv::show::toast', function (id) {
-      if (id === _this2.id) {
+      if (id === _this2.safeId()) {
         _this2.show();
       }
     }); // Listen for global $root hide events
 
     this.listenOnRoot('bv::hide::toast', function (id) {
-      if (!id || id === _this2.id) {
+      if (!id || id === _this2.safeId()) {
         _this2.hide();
       }
     }); // Make sure we hide when toaster is destroyed
@@ -4728,32 +4905,41 @@ var BToast = OurVue.extend({
         this.emitEvent(showEvt);
         this.dismissStarted = this.resumeDismiss = 0;
         this.order = Date.now() * (this.appendToast ? 1 : -1);
+        this.isHiding = false;
         this.doRender = true;
         this.$nextTick(function () {
-          // we show the toast after we have rendered the portal
-          _this3.localShow = true;
+          // We show the toast after we have rendered the portal and b-toast wrapper
+          // so that screen readers will properly announce the toast
+          requestAF(function () {
+            _this3.localShow = true;
+          });
         });
       }
     },
     hide: function hide() {
+      var _this4 = this;
+
       if (this.localShow) {
         var hideEvt = this.buildEvent('hide');
         this.emitEvent(hideEvt);
         this.setHoverHandler(false);
         this.dismissStarted = this.resumeDismiss = 0;
         this.clearDismissTimer();
-        this.localShow = false;
+        this.isHiding = true;
+        requestAF(function () {
+          _this4.localShow = false;
+        });
       }
     },
     buildEvent: function buildEvent(type) {
       var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       return new BvEvent(type, _objectSpread({
         cancelable: false,
-        target: this.$el,
+        target: this.$el || null,
         relatedTarget: null
       }, opts, {
         vueTarget: this,
-        componentId: this.id || null
+        componentId: this.safeId()
       }));
     },
     emitEvent: function emitEvent(bvEvt) {
@@ -4793,14 +4979,8 @@ var BToast = OurVue.extend({
     },
     setHoverHandler: function setHoverHandler(on) {
       var method = on ? eventOn : eventOff;
-      method(this.$refs.btoast, 'mouseenter', this.onPause, {
-        passive: true,
-        capture: false
-      });
-      method(this.$refs.btoast, 'mouseleave', this.onUnPause, {
-        passive: true,
-        capture: false
-      });
+      method(this.$refs.btoast, 'mouseenter', this.onPause, EVENT_OPTIONS);
+      method(this.$refs.btoast, 'mouseleave', this.onUnPause, EVENT_OPTIONS);
     },
     onPause: function onPause(evt) {
       // Determine time remaining, and then pause timer
@@ -4816,7 +4996,7 @@ var BToast = OurVue.extend({
       }
     },
     onUnPause: function onUnPause(evt) {
-      // Restart with max of time remaining or 1 second
+      // Restart timer with max of time remaining or 1 second
       if (this.noAutoHide || this.noHoverPause || !this.resumeDismiss) {
         this.resumeDismiss = this.dismissStarted = 0;
         return;
@@ -4825,23 +5005,18 @@ var BToast = OurVue.extend({
       this.startDismissTimer();
     },
     onLinkClick: function onLinkClick() {
-      var _this4 = this;
+      var _this5 = this;
 
       // We delay the close to allow time for the
       // browser to process the link click
       this.$nextTick(function () {
         requestAF(function () {
-          _this4.hide();
+          _this5.hide();
         });
       });
     },
     onBeforeEnter: function onBeforeEnter() {
-      var _this5 = this;
-
       this.isTransitioning = true;
-      requestAF(function () {
-        _this5.showClass = true;
-      });
     },
     onAfterEnter: function onAfterEnter() {
       this.isTransitioning = false;
@@ -4851,12 +5026,7 @@ var BToast = OurVue.extend({
       this.setHoverHandler(true);
     },
     onBeforeLeave: function onBeforeLeave() {
-      var _this6 = this;
-
       this.isTransitioning = true;
-      requestAF(function () {
-        _this6.showClass = false;
-      });
     },
     onAfterLeave: function onAfterLeave() {
       this.isTransitioning = false;
@@ -4867,7 +5037,7 @@ var BToast = OurVue.extend({
       this.doRender = false;
     },
     makeToast: function makeToast(h) {
-      var _this7 = this;
+      var _this6 = this;
 
       // Render helper for generating the toast
       // Assemble the header content
@@ -4887,7 +5057,7 @@ var BToast = OurVue.extend({
           staticClass: 'ml-auto mb-1',
           on: {
             click: function click(evt) {
-              _this7.hide();
+              _this6.hide();
             }
           }
         }));
@@ -4918,16 +5088,13 @@ var BToast = OurVue.extend({
       }, [this.normalizeSlot('default', this.slotScope) || h(false)]); // Build the toast
 
       var $toast = h('div', {
-        key: 'toast',
+        key: "toast-".concat(this._uid),
         ref: 'toast',
         staticClass: 'toast',
-        class: this.toastClasses,
+        class: this.toastClass,
         attrs: _objectSpread({}, this.$attrs, {
-          id: this.id || null,
-          tabindex: '-1',
-          role: this.isStatus ? 'status' : 'alert',
-          'aria-live': this.isStatus ? 'polite' : 'assertive',
-          'aria-atomic': 'true'
+          tabindex: '0',
+          id: this.safeId()
         })
       }, [$header, $body]);
       return $toast;
@@ -4951,11 +5118,19 @@ var BToast = OurVue.extend({
       key: name,
       ref: 'btoast',
       staticClass: 'b-toast',
-      class: this.bToastClasses
-    }, [h('transition', {
-      props: DEFAULT_TRANSITION_PROPS,
+      class: this.bToastClasses,
+      attrs: {
+        id: this.safeId('_toast_outer'),
+        role: this.isHiding ? null : this.isStatus ? 'status' : 'alert',
+        'aria-live': this.isHiding ? null : this.isStatus ? 'polite' : 'assertive',
+        'aria-atomic': this.isHiding ? null : 'true'
+      }
+    }, [h(BVTransition, {
+      props: {
+        noFade: this.noFade
+      },
       on: this.transitionHandlers
-    }, [this.localShow ? this.makeToast(h) : null])])]);
+    }, [this.localShow ? this.makeToast(h) : h(false)])])]);
   }
 });
 
@@ -4982,164 +5157,12 @@ var filterOptions$1 = function filterOptions(options) {
 
     return memo;
   }, {});
-}; // Create a private sub-component that extends BToast
-// which self-destructs after hidden
-// @vue/component
+}; // Method to install `$bvToast` VM injection
 
 
-var BToastPop = OurVue.extend({
-  name: 'BToastPop',
-  extends: BToast,
-  destroyed: function destroyed() {
-    // Make sure we not in document any more
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-  },
-  mounted: function mounted() {
-    // Self destruct handler
-    var self = this;
+var install$1 = function install(Vue) {
+  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    var handleDestroy = function handleDestroy() {
-      // Ensure the toast has been force hidden
-      self.localShow = false;
-      self.doRender = false;
-      self.$nextTick(function () {
-        self.$nextTick(function () {
-          // In a `requestAF()` to release control back to application
-          // and to allow the portal-target time to remove the content
-          requestAF(function () {
-            self.$destroy();
-          });
-        });
-      });
-    }; // Self destruct if parent destroyed
-
-
-    this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
-
-    this.$once('hidden', handleDestroy); // Self destruct when toaster is destroyed
-
-    this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
-      /* istanbul ignore next: hard to test */
-      if (toaster === self.toaster) {
-        handleDestroy();
-      }
-    });
-  }
-}); // Method to generate the on-demand toast
-
-var makeToast = function makeToast(props, $parent) {
-  if (warnNotClient(PROP_NAME$1)) {
-    // Should this throw an error?
-
-    /* istanbul ignore next */
-    return;
-  } // Create an instance of `BToast` component
-
-
-  var toast = new BToastPop({
-    // We set parent as the local VM so these toasts can emit events on
-    // the app `$root`
-    // And it helps to ensure `BToast` is destroyed when parent is destroyed
-    parent: $parent,
-    // Preset the prop values
-    propsData: _objectSpread({}, filterOptions$1(getComponentConfig('BToast') || {}), omit(props, ['toastContent']), {
-      // Props that can't be overridden
-      static: false,
-      visible: true
-    })
-  }); // Convert certain props to slots
-
-  keys(propsToSlots$1).forEach(function (prop) {
-    var value = props[prop];
-
-    if (!isUndefined(value)) {
-      // Can be a string, or array of VNodes
-      // Alternatively, user can use HTML version of prop to pass an HTML string
-      if (prop === 'title' && isString(value)) {
-        // Special case for title if it is a string, we wrap in a <strong>
-        value = [$parent.$createElement('strong', {
-          class: 'mr-2'
-        }, value)];
-      } // Make sure slot value is an array for Vue 2.5.x compatability
-
-
-      toast.$slots[propsToSlots$1[prop]] = concat(value);
-    }
-  }); // Create a mount point (a DIV)
-  // TODO: this needs to target a portal-target
-  // But we still need to place in document to portal-vue can
-  // transfer the content
-
-  var div = document.createElement('div');
-  document.body.appendChild(div); // Mount the toast to trigger it to show
-
-  toast.$mount(div);
-}; // BvToast instance property class
-
-
-var BvToast =
-/*#__PURE__*/
-function () {
-  function BvToast(vm) {
-    _classCallCheck(this, BvToast);
-
-    // Assign the new properties to this instance
-    assign$1(this, {
-      _vm: vm,
-      _root: vm.$root
-    }); // Set these properties as read-only and non-enumerable
-
-    defineProperties(this, {
-      _vm: readonlyDescriptor(),
-      _root: readonlyDescriptor()
-    });
-  } // --- Instance methods ---
-  // Opens a user defined toast and returns immediately
-
-
-  _createClass(BvToast, [{
-    key: "toast",
-    value: function toast(content) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      if (!content || warnNotClient(PROP_NAME$1)) {
-        // Should this throw an error?
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      var props = _objectSpread({}, filterOptions$1(options), {
-        toastContent: content
-      });
-
-      makeToast(props, this._vm);
-    } // shows a `<b-toast>` component with the specified ID
-
-  }, {
-    key: "show",
-    value: function show(id) {
-      if (id) {
-        this._root.$emit('bv::show::toast', id);
-      }
-    } // Hide a toast with specified ID, or if not ID all toasts
-
-  }, {
-    key: "hide",
-    value: function hide() {
-      var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      this._root.$emit('bv::hide::toast', id);
-    }
-  }]);
-
-  return BvToast;
-}(); // Method to install `$bvToast` VM injection
-
-
-var install$1 = function install(_Vue) {
   if (install.installed) {
     // Only install once
 
@@ -5147,9 +5170,149 @@ var install$1 = function install(_Vue) {
     return;
   }
 
-  install.installed = true; // Add our instance mixin
+  install.installed = true;
+  setConfig(config); // Create a private sub-component constructor that
+  // extends BToast and self-destructs after hidden
+  // @vue/component
 
-  _Vue.mixin({
+  var BToastPop = Vue.extend({
+    name: 'BToastPop',
+    extends: BToast,
+    destroyed: function destroyed() {
+      // Make sure we not in document any more
+      if (this.$el && this.$el.parentNode) {
+        this.$el.parentNode.removeChild(this.$el);
+      }
+    },
+    mounted: function mounted() {
+      var self = this; // Self destruct handler
+
+      var handleDestroy = function handleDestroy() {
+        // Ensure the toast has been force hidden
+        self.localShow = false;
+        self.doRender = false;
+        self.$nextTick(function () {
+          self.$nextTick(function () {
+            // In a `requestAF()` to release control back to application
+            // and to allow the portal-target time to remove the content
+            requestAF(function () {
+              self.$destroy();
+            });
+          });
+        });
+      }; // Self destruct if parent destroyed
+
+
+      this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+
+      this.$once('hidden', handleDestroy); // Self destruct when toaster is destroyed
+
+      this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
+        /* istanbul ignore next: hard to test */
+        if (toaster === self.toaster) {
+          handleDestroy();
+        }
+      });
+    }
+  }); // Private method to generate the on-demand toast
+
+  var makeToast = function makeToast(props, $parent) {
+    if (warnNotClient(PROP_NAME$1)) {
+      /* istanbul ignore next */
+      return;
+    } // Create an instance of `BToastPop` component
+
+
+    var toast = new BToastPop({
+      // We set parent as the local VM so these toasts can emit events on the
+      // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
+      parent: $parent,
+      propsData: _objectSpread({}, filterOptions$1(getComponentConfig('BToast') || {}), omit(props, ['toastContent']), {
+        // Props that can't be overridden
+        static: false,
+        visible: true
+      })
+    }); // Convert certain props to slots
+
+    keys(propsToSlots$1).forEach(function (prop) {
+      var value = props[prop];
+
+      if (!isUndefined(value)) {
+        // Can be a string, or array of VNodes
+        if (prop === 'title' && isString(value)) {
+          // Special case for title if it is a string, we wrap in a <strong>
+          value = [$parent.$createElement('strong', {
+            class: 'mr-2'
+          }, value)];
+        }
+
+        toast.$slots[propsToSlots$1[prop]] = concat(value);
+      }
+    }); // Create a mount point (a DIV) and mount it (which triggers the show)
+
+    var div = document.createElement('div');
+    document.body.appendChild(div);
+    toast.$mount(div);
+  }; // Declare BvToast instance property class
+
+
+  var BvToast =
+  /*#__PURE__*/
+  function () {
+    function BvToast(vm) {
+      _classCallCheck(this, BvToast);
+
+      // Assign the new properties to this instance
+      assign$1(this, {
+        _vm: vm,
+        _root: vm.$root
+      }); // Set these properties as read-only and non-enumerable
+
+      defineProperties(this, {
+        _vm: readonlyDescriptor(),
+        _root: readonlyDescriptor()
+      });
+    } // --- Public Instance methods ---
+    // Opens a user defined toast and returns immediately
+
+
+    _createClass(BvToast, [{
+      key: "toast",
+      value: function toast(content) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        if (!content || warnNotClient(PROP_NAME$1)) {
+          /* istanbul ignore next */
+          return;
+        }
+
+        makeToast(_objectSpread({}, filterOptions$1(options), {
+          toastContent: content
+        }), this._vm);
+      } // shows a `<b-toast>` component with the specified ID
+
+    }, {
+      key: "show",
+      value: function show(id) {
+        if (id) {
+          this._root.$emit('bv::show::toast', id);
+        }
+      } // Hide a toast with specified ID, or if not ID all toasts
+
+    }, {
+      key: "hide",
+      value: function hide() {
+        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+        this._root.$emit('bv::hide::toast', id);
+      }
+    }]);
+
+    return BvToast;
+  }(); // Add our instance mixin
+
+
+  Vue.mixin({
     beforeCreate: function beforeCreate() {
       // Because we need access to `$root` for `$emits`, and VM for parenting,
       // we have to create a fresh instance of `BvToast` for each VM
@@ -5158,9 +5321,8 @@ var install$1 = function install(_Vue) {
   }); // Define our read-only `$bvToast` instance property
   // Placed in an if just in case in HMR mode
 
-
-  if (!_Vue.prototype.hasOwnProperty(PROP_NAME$1)) {
-    defineProperty(_Vue.prototype, PROP_NAME$1, {
+  if (!Vue.prototype.hasOwnProperty(PROP_NAME$1)) {
+    defineProperty(Vue.prototype, PROP_NAME$1, {
       get: function get() {
         /* istanbul ignore next */
         if (!this || !this[PROP_NAME_PRIV$1]) {
@@ -5173,12 +5335,13 @@ var install$1 = function install(_Vue) {
   }
 };
 
-install$1.installed = false;
+install$1.installed = false; // Default export is the Plugin
+
 var BVToastPlugin = {
   install: install$1
 };
 
-var NAME$6 = 'BAlert'; // Convert `show` value to a number
+var NAME$5 = 'BAlert'; // Convert `show` value to a number
 
 var parseCountDown = function parseCountDown(show) {
   if (show === '' || isBoolean(show)) {
@@ -5209,8 +5372,8 @@ var isNumericLike = function isNumericLike(value) {
 }; // @vue/component
 
 
-var BAlert = OurVue.extend({
-  name: NAME$6,
+var BAlert = Vue.extend({
+  name: NAME$5,
   mixins: [normalizeSlotMixin],
   model: {
     prop: 'show',
@@ -5220,7 +5383,7 @@ var BAlert = OurVue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$6, 'variant');
+        return getComponentConfig(NAME$5, 'variant');
       }
     },
     dismissible: {
@@ -5230,7 +5393,7 @@ var BAlert = OurVue.extend({
     dismissLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$6, 'dismissLabel');
+        return getComponentConfig(NAME$5, 'dismissLabel');
       }
     },
     show: {
@@ -5247,8 +5410,7 @@ var BAlert = OurVue.extend({
       countDownTimerId: null,
       countDown: 0,
       // If initially shown, we need to set these for SSR
-      localShow: parseShow(this.show),
-      showClass: this.fade && this.show
+      localShow: parseShow(this.show)
     };
   },
   watch: {
@@ -5260,25 +5422,29 @@ var BAlert = OurVue.extend({
       var _this = this;
 
       this.clearTimer();
-      this.$emit('dismiss-count-down', newVal);
 
-      if (this.show !== newVal) {
-        // Update the v-model if needed
-        this.$emit('input', newVal);
-      }
+      if (isNumericLike(this.show)) {
+        // Ignore if this.show transitions to a boolean value.
+        this.$emit('dismiss-count-down', newVal);
 
-      if (newVal > 0) {
-        this.localShow = true;
-        this.countDownTimerId = setTimeout(function () {
-          _this.countDown--;
-        }, 1000);
-      } else {
-        // Slightly delay the hide to allow any UI updates
-        this.$nextTick(function () {
-          requestAF(function () {
-            _this.localShow = false;
+        if (this.show !== newVal) {
+          // Update the v-model if needed
+          this.$emit('input', newVal);
+        }
+
+        if (newVal > 0) {
+          this.localShow = true;
+          this.countDownTimerId = setTimeout(function () {
+            _this.countDown--;
+          }, 1000);
+        } else {
+          // Slightly delay the hide to allow any UI updates
+          this.$nextTick(function () {
+            requestAF(function () {
+              _this.localShow = false;
+            });
           });
-        });
+        }
       }
     },
     localShow: function localShow(newVal) {
@@ -5315,20 +5481,6 @@ var BAlert = OurVue.extend({
         clearInterval(this.countDownTimerId);
         this.countDownTimerId = null;
       }
-    },
-    onBeforeEnter: function onBeforeEnter() {
-      var _this2 = this;
-
-      if (this.fade) {
-        requestAF(function () {
-          _this2.showClass = true;
-        });
-      }
-    },
-    onBeforeLeave: function onBeforeLeave()
-    /* istanbul ignore next: does not appear to be called in vue-test-utils */
-    {
-      this.showClass = false;
     }
   },
   render: function render(h) {
@@ -5350,10 +5502,9 @@ var BAlert = OurVue.extend({
       }
 
       $alert = h('div', {
+        key: this._uid,
         staticClass: 'alert',
         class: _defineProperty({
-          fade: this.fade,
-          show: this.showClass,
           'alert-dismissible': this.dismissible
         }, "alert-".concat(this.variant), this.variant),
         attrs: {
@@ -5365,18 +5516,9 @@ var BAlert = OurVue.extend({
       $alert = [$alert];
     }
 
-    return h('transition', {
+    return h(BVTransition, {
       props: {
-        'enter-class': '',
-        'enter-active-class': '',
-        'enter-to-class': '',
-        'leave-class': 'show',
-        'leave-active-class': '',
-        'leave-to-class': ''
-      },
-      on: {
-        beforeEnter: this.onBeforeEnter,
-        beforeLeave: this.onBeforeLeave
+        noFade: !this.fade
       }
     }, $alert);
   }
@@ -5391,7 +5533,7 @@ var index = {
   })
 };
 
-var NAME$7 = 'BBadge';
+var NAME$6 = 'BBadge';
 var linkProps$1 = propsFactory();
 delete linkProps$1.href.default;
 delete linkProps$1.to.default;
@@ -5403,7 +5545,7 @@ var props$5 = _objectSpread({}, linkProps$1, {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$7, 'variant');
+      return getComponentConfig(NAME$6, 'variant');
     }
   },
   pill: {
@@ -5412,8 +5554,8 @@ var props$5 = _objectSpread({}, linkProps$1, {
   } // @vue/component
 
 });
-var BBadge = OurVue.extend({
-  name: NAME$7,
+var BBadge = Vue.extend({
+  name: NAME$6,
   functional: true,
   props: props$5,
   render: function render(h, _ref) {
@@ -5458,7 +5600,7 @@ var props$6 = _objectSpread({}, propsFactory(), {
   } // @vue/component
 
 });
-var BBreadcrumbLink = OurVue.extend({
+var BBreadcrumbLink = Vue.extend({
   name: 'BBreadcrumbLink',
   functional: true,
   props: props$6,
@@ -5485,7 +5627,7 @@ var BBreadcrumbLink = OurVue.extend({
   }
 });
 
-var BBreadcrumbItem = OurVue.extend({
+var BBreadcrumbItem = Vue.extend({
   name: 'BBreadcrumbItem',
   functional: true,
   props: props$6,
@@ -5511,7 +5653,7 @@ var props$7 = {
   } // @vue/component
 
 };
-var BBreadcrumb = OurVue.extend({
+var BBreadcrumb = Vue.extend({
   name: 'BBreadcrumb',
   functional: true,
   props: props$7,
@@ -5598,7 +5740,7 @@ var props$8 = {
   } // @vue/component
 
 };
-var BButtonGroup = OurVue.extend({
+var BButtonGroup = Vue.extend({
   name: 'BButtonGroup',
   functional: true,
   props: props$8,
@@ -5630,7 +5772,7 @@ var index$4 = {
 
 var ITEM_SELECTOR = ['.btn:not(.disabled):not([disabled]):not(.dropdown-item)', '.form-control:not(.disabled):not([disabled])', 'select:not(.disabled):not([disabled])', 'input[type="checkbox"]:not(.disabled)', 'input[type="radio"]:not(.disabled)'].join(','); // @vue/component
 
-var BButtonToolbar = OurVue.extend({
+var BButtonToolbar = Vue.extend({
   name: 'BButtonToolbar',
   mixins: [normalizeSlotMixin],
   props: {
@@ -5753,7 +5895,7 @@ var props$9 = {
   } // @vue/component
 
 };
-var BInputGroupText = OurVue.extend({
+var BInputGroupText = Vue.extend({
   name: 'BInputGroupText',
   functional: true,
   props: props$9,
@@ -5782,7 +5924,7 @@ var commonProps = {
   } // @vue/component
 
 };
-var BInputGroupAddon = OurVue.extend({
+var BInputGroupAddon = Vue.extend({
   name: 'BInputGroupAddon',
   functional: true,
   props: _objectSpread({}, commonProps, {
@@ -5807,7 +5949,7 @@ var BInputGroupAddon = OurVue.extend({
   }
 });
 
-var BInputGroupPrepend = OurVue.extend({
+var BInputGroupPrepend = Vue.extend({
   name: 'BInputGroupPrepend',
   functional: true,
   props: commonProps,
@@ -5824,7 +5966,7 @@ var BInputGroupPrepend = OurVue.extend({
   }
 });
 
-var BInputGroupAppend = OurVue.extend({
+var BInputGroupAppend = Vue.extend({
   name: 'BInputGroupAppend',
   functional: true,
   props: commonProps,
@@ -5866,7 +6008,7 @@ var props$a = {
   } // @vue/component
 
 };
-var BInputGroup = OurVue.extend({
+var BInputGroup = Vue.extend({
   name: 'BInputGroup',
   functional: true,
   props: props$a,
@@ -5877,19 +6019,14 @@ var BInputGroup = OurVue.extend({
         scopedSlots = _ref.scopedSlots;
     var $slots = slots();
     var $scopedSlots = scopedSlots || {};
-    var childNodes = []; // Prepend prop
+    var childNodes = []; // Prepend prop/slot
 
-    if (props.prepend) {
-      childNodes.push(h(BInputGroupPrepend, [h(BInputGroupText, {
+    if (props.prepend || props.prependHTML || hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
+      childNodes.push(h(BInputGroupPrepend, [// Prop
+      props.prepend || props.prependHTML ? h(BInputGroupText, {
         domProps: htmlOrText(props.prependHTML, props.prepend)
-      })]));
-    } else {
-      childNodes.push(h(false));
-    } // Prepend slot
-
-
-    if (hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
-      childNodes.push(h(BInputGroupPrepend, normalizeSlot('prepend', {}, $scopedSlots, $slots)));
+      }) : h(false), // Slot
+      normalizeSlot('prepend', {}, $scopedSlots, $slots) || h(false)]));
     } else {
       childNodes.push(h(false));
     } // Default slot
@@ -5902,17 +6039,12 @@ var BInputGroup = OurVue.extend({
     } // Append prop
 
 
-    if (props.append) {
-      childNodes.push(h(BInputGroupAppend, [h(BInputGroupText, {
+    if (props.append || props.appendHTML || hasNormalizedSlot('append', $scopedSlots, $slots)) {
+      childNodes.push(h(BInputGroupAppend, [// prop
+      props.append || props.appendHTML ? h(BInputGroupText, {
         domProps: htmlOrText(props.appendHTML, props.append)
-      })]));
-    } else {
-      childNodes.push(h(false));
-    } // Append slot
-
-
-    if (hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
-      childNodes.push(h(BInputGroupAppend, normalizeSlot('append', {}, $scopedSlots, $slots)));
+      }) : h(false), // Slot
+      normalizeSlot('append', {}, $scopedSlots, $slots) || h(false)]));
     } else {
       childNodes.push(h(false));
     }
@@ -6045,7 +6177,7 @@ var props$b = {
   } // @vue/component
 
 };
-var BCardTitle = OurVue.extend({
+var BCardTitle = Vue.extend({
   name: 'BCardTitle',
   functional: true,
   props: props$b,
@@ -6059,7 +6191,7 @@ var BCardTitle = OurVue.extend({
   }
 });
 
-var NAME$8 = 'BCardSubTitle';
+var NAME$7 = 'BCardSubTitle';
 var props$c = {
   subTitle: {
     type: String,
@@ -6072,13 +6204,13 @@ var props$c = {
   subTitleTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$8, 'subTitleTextVariant');
+      return getComponentConfig(NAME$7, 'subTitleTextVariant');
     }
   } // @vue/component
 
 };
-var BCardSubTitle = OurVue.extend({
-  name: NAME$8,
+var BCardSubTitle = Vue.extend({
+  name: NAME$7,
   functional: true,
   props: props$c,
   render: function render(h, _ref) {
@@ -6104,7 +6236,7 @@ var props$d = _objectSpread({}, copyProps(cardMixin.props, prefixPropName.bind(n
   } // @vue/component
 
 });
-var BCardBody = OurVue.extend({
+var BCardBody = Vue.extend({
   name: 'BCardBody',
   functional: true,
   props: props$d,
@@ -6155,7 +6287,7 @@ var props$e = _objectSpread({}, copyProps(cardMixin.props, prefixPropName.bind(n
   } // @vue/component
 
 });
-var BCardHeader = OurVue.extend({
+var BCardHeader = Vue.extend({
   name: 'BCardHeader',
   functional: true,
   props: props$e,
@@ -6189,7 +6321,7 @@ var props$f = _objectSpread({}, copyProps(cardMixin.props, prefixPropName.bind(n
   } // @vue/component
 
 });
-var BCardFooter = OurVue.extend({
+var BCardFooter = Vue.extend({
   name: 'BCardFooter',
   functional: true,
   props: props$f,
@@ -6254,7 +6386,7 @@ var props$g = {
   } // @vue/component
 
 };
-var BCardImg = OurVue.extend({
+var BCardImg = Vue.extend({
   name: 'BCardImg',
   functional: true,
   props: props$g,
@@ -6298,7 +6430,7 @@ var props$h = _objectSpread({}, props$d, props$e, props$f, cardImgProps, copyPro
   } // @vue/component
 
 });
-var BCard = OurVue.extend({
+var BCard = Vue.extend({
   name: 'BCard',
   functional: true,
   props: props$h,
@@ -6362,7 +6494,7 @@ var BCard = OurVue.extend({
   }
 });
 
-var NAME$9 = 'BImg'; // Blank image with fill template
+var NAME$8 = 'BImg'; // Blank image with fill template
 
 var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>';
 var props$i = {
@@ -6431,7 +6563,7 @@ var props$i = {
   blankColor: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$9, 'blankColor');
+      return getComponentConfig(NAME$8, 'blankColor');
     }
   } // --- Helper methods ---
 
@@ -6443,7 +6575,7 @@ function makeBlankImgSrc(width, height, color) {
 } // @vue/component
 
 
-var BImg = OurVue.extend({
+var BImg = Vue.extend({
   name: 'BImg',
   functional: true,
   props: props$i,
@@ -6500,9 +6632,9 @@ var BImg = OurVue.extend({
   }
 });
 
-var NAME$a = 'BImgLazy';
+var NAME$9 = 'BImgLazy';
 var THROTTLE = 100;
-var EventOptions = {
+var EVENT_OPTIONS$1 = {
   passive: true,
   capture: false
 };
@@ -6532,7 +6664,7 @@ var props$j = {
   blankColor: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$a, 'blankColor');
+      return getComponentConfig(NAME$9, 'blankColor');
     }
   },
   blankWidth: {
@@ -6589,13 +6721,14 @@ var props$j = {
   } // @vue/component
 
 };
-var BImgLazy = OurVue.extend({
-  name: NAME$a,
+var BImgLazy = Vue.extend({
+  name: NAME$9,
   props: props$j,
   data: function data() {
     return {
       isShown: false,
-      scrollTimeout: null
+      scrollTimeout: null,
+      observer: null
     };
   },
   computed: {
@@ -6638,7 +6771,6 @@ var BImgLazy = OurVue.extend({
       this.setListeners(false);
     } else {
       this.setListeners(true);
-      this.$nextTick(this.checkView);
     }
   },
   activated: function activated()
@@ -6646,7 +6778,6 @@ var BImgLazy = OurVue.extend({
   {
     if (!this.isShown) {
       this.setListeners(true);
-      this.$nextTick(this.checkView);
     }
   },
   deactivated: function deactivated()
@@ -6659,29 +6790,59 @@ var BImgLazy = OurVue.extend({
   },
   methods: {
     setListeners: function setListeners(on) {
+      var _this = this;
+
       if (this.scrollTimeout) {
         clearTimeout(this.scrollTimeout);
         this.scrollTimeout = null;
       }
+      /* istanbul ignore next: JSDOM doen't support IntersectionObserver */
 
-      var root = window;
+
+      if (this.observer) {
+        this.observer.unobserve(this.$el);
+        this.observer.disconnect();
+        this.observer = null;
+      }
+
+      var winEvts = ['scroll', 'resize', 'orientationchange'];
+      winEvts.forEach(function (evt) {
+        return eventOff(window, evt, _this.onScroll, EVENT_OPTIONS$1);
+      });
+      eventOff(this.$el, 'load', this.checkView, EVENT_OPTIONS$1);
+      eventOff(document, 'transitionend', this.onScroll, EVENT_OPTIONS$1);
 
       if (on) {
-        eventOn(this.$el, 'load', this.checkView);
-        eventOn(root, 'scroll', this.onScroll, EventOptions);
-        eventOn(root, 'resize', this.onScroll, EventOptions);
-        eventOn(root, 'orientationchange', this.onScroll, EventOptions);
-        eventOn(document, 'transitionend', this.onScroll, EventOptions);
-      } else {
-        eventOff(this.$el, 'load', this.checkView);
-        eventOff(root, 'scroll', this.onScroll, EventOptions);
-        eventOff(root, 'resize', this.onScroll, EventOptions);
-        eventOff(root, 'orientationchange', this.onScroll, EventOptions);
-        eventOff(document, 'transitionend', this.onScroll, EventOptions);
+        /* istanbul ignore if: JSDOM doen't support IntersectionObserver */
+        if (hasIntersectionObserverSupport) {
+          this.observer = new IntersectionObserver(this.doShow, {
+            root: null,
+            // viewport
+            rootMargin: "".concat(parseInt(this.offset, 10) || 0, "px"),
+            threshold: 0 // percent intersection
+
+          });
+          this.observer.observe(this.$el);
+        } else {
+          // Fallback to scroll/etc events
+          winEvts.forEach(function (evt) {
+            return eventOn(window, evt, _this.onScroll, EVENT_OPTIONS$1);
+          });
+          eventOn(this.$el, 'load', this.checkView, EVENT_OPTIONS$1);
+          eventOn(document, 'transitionend', this.onScroll, EVENT_OPTIONS$1);
+        }
+      }
+    },
+    doShow: function doShow(entries) {
+      if (entries && (entries[0].isIntersecting || entries[0].intersectionRatio > 0.0)) {
+        this.isShown = true;
+        this.setListeners(false);
       }
     },
     checkView: function checkView() {
       // check bounding box + offset to see if we should show
+
+      /* istanbul ignore next: should rarely occur */
       if (this.isShown) {
         this.setListeners(false);
         return;
@@ -6693,20 +6854,20 @@ var BImgLazy = OurVue.extend({
         l: 0 - offset,
         t: 0 - offset,
         b: docElement.clientHeight + offset,
-        r: docElement.clientWidth + offset
-        /* istanbul ignore next */
+        r: docElement.clientWidth + offset // JSDOM Doesn't support BCR, but we fake it in the tests
 
       };
       var box = getBCR(this.$el);
-      /* istanbul ignore next: can't test getBoundingClientRect in JSDOM */
 
       if (box.right >= view.l && box.bottom >= view.t && box.left <= view.r && box.top <= view.b) {
         // image is in view (or about to be in view)
-        this.isShown = true;
-        this.setListeners(false);
+        this.doShow([{
+          isIntersecting: true
+        }]);
       }
     },
     onScroll: function onScroll() {
+      /* istanbul ignore if: should rarely occur */
       if (this.isShown) {
         this.setListeners(false);
       } else {
@@ -6718,12 +6879,14 @@ var BImgLazy = OurVue.extend({
   render: function render(h) {
     return h(BImg, {
       props: {
+        // Computed value props
         src: this.computedSrc,
-        alt: this.alt,
         blank: this.computedBlank,
-        blankColor: this.blankColor,
         width: this.computedWidth,
         height: this.computedHeight,
+        // Passthough props
+        alt: this.alt,
+        blankColor: this.blankColor,
         fluid: this.fluid,
         fluidGrow: this.fluidGrow,
         block: this.block,
@@ -6769,7 +6932,7 @@ var props$k = _objectSpread({}, lazyProps, {
   } // @vue/component
 
 });
-var BCardImgLazy = OurVue.extend({
+var BCardImgLazy = Vue.extend({
   name: 'BCardImgLazy',
   functional: true,
   props: props$k,
@@ -6809,7 +6972,7 @@ var props$l = {
   } // @vue/component
 
 };
-var BCardText = OurVue.extend({
+var BCardText = Vue.extend({
   name: 'BCardText',
   functional: true,
   props: props$l,
@@ -6838,7 +7001,7 @@ var props$m = {
   } // @vue/component
 
 };
-var BCardGroup = OurVue.extend({
+var BCardGroup = Vue.extend({
   name: 'BCardGroup',
   functional: true,
   props: props$m,
@@ -6880,7 +7043,7 @@ var index$7 = {
 
 var noop = function noop() {};
 
-var NAME$b = 'BCarousel'; // Slide directional classes
+var NAME$a = 'BCarousel'; // Slide directional classes
 
 var DIRECTION = {
   next: {
@@ -6910,7 +7073,7 @@ var TransitionEndEvents = {
   OTransition: 'otransitionend oTransitionEnd',
   transition: 'transitionend'
 };
-var EventOptions$1 = {
+var EventOptions = {
   passive: true,
   capture: false // Return the browser specific transitionEnd event name
 
@@ -6930,7 +7093,7 @@ function getTransitionEndEvent(el) {
 } // @vue/component
 
 
-var BCarousel = OurVue.extend({
+var BCarousel = Vue.extend({
   name: 'BCarousel',
   mixins: [idMixin, normalizeSlotMixin],
   provide: function provide() {
@@ -6946,25 +7109,25 @@ var BCarousel = OurVue.extend({
     labelPrev: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'labelPrev');
+        return getComponentConfig(NAME$a, 'labelPrev');
       }
     },
     labelNext: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'labelNext');
+        return getComponentConfig(NAME$a, 'labelNext');
       }
     },
     labelGotoSlide: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'labelGotoSlide');
+        return getComponentConfig(NAME$a, 'labelGotoSlide');
       }
     },
     labelIndicators: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'labelIndicators');
+        return getComponentConfig(NAME$a, 'labelIndicators');
       }
     },
     interval: {
@@ -7233,7 +7396,7 @@ var BCarousel = OurVue.extend({
             var events = _this2.transitionEndEvent.split(/\s+/);
 
             events.forEach(function (evt) {
-              return eventOff(currentSlide, evt, onceTransEnd, EventOptions$1);
+              return eventOff(currentSlide, evt, onceTransEnd, EventOptions);
             });
           }
 
@@ -7262,7 +7425,7 @@ var BCarousel = OurVue.extend({
         if (this.transitionEndEvent) {
           var events = this.transitionEndEvent.split(/\s+/);
           events.forEach(function (event) {
-            return eventOn(currentSlide, event, onceTransEnd, EventOptions$1);
+            return eventOn(currentSlide, event, onceTransEnd, EventOptions);
           });
         } // Fallback to setTimeout()
 
@@ -7604,7 +7767,7 @@ var props$n = {
   } // @vue/component
 
 };
-var BCarouselSlide = OurVue.extend({
+var BCarouselSlide = Vue.extend({
   name: 'BCarouselSlide',
   mixins: [idMixin, normalizeSlotMixin],
   inject: {
@@ -7706,7 +7869,7 @@ var props$o = {
   } // @vue/component
 
 };
-var Container = OurVue.extend({
+var Container = Vue.extend({
   name: 'BContainer',
   functional: true,
   props: props$o,
@@ -7756,7 +7919,7 @@ var props$p = {
   } // @vue/component
 
 };
-var BRow = OurVue.extend({
+var BRow = Vue.extend({
   name: 'BRow',
   functional: true,
   props: props$p,
@@ -7774,6 +7937,18 @@ var BRow = OurVue.extend({
     }), children);
   }
 });
+
+var memoize = function memoize(fn) {
+  var cache = create(null);
+  return function () {
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    var argsKey = JSON.stringify(args);
+    return cache[argsKey] = cache[argsKey] || fn.apply(null, args);
+  };
+};
 
 /**
  * Suffix can be a falsey value so nothing is appended to string.
@@ -7955,7 +8130,7 @@ var props$q = {
   } // @vue/component
 
 };
-var BFormRow = OurVue.extend({
+var BFormRow = Vue.extend({
   name: 'BFormRow',
   functional: true,
   props: props$q,
@@ -7991,12 +8166,12 @@ var EVENT_STATE_SYNC = 'bv::collapse::sync::state'; // Events we listen to on `$
 var EVENT_TOGGLE = 'bv::toggle::collapse';
 var EVENT_STATE_REQUEST = 'bv::request::collapse::state'; // Event listener options
 
-var EventOptions$2 = {
+var EventOptions$1 = {
   passive: true,
   capture: false // @vue/component
 
 };
-var BCollapse = OurVue.extend({
+var BCollapse = Vue.extend({
   name: 'BCollapse',
   mixins: [listenOnRootMixin, normalizeSlotMixin],
   model: {
@@ -8113,8 +8288,8 @@ var BCollapse = OurVue.extend({
   methods: {
     setWindowEvents: function setWindowEvents(on) {
       var method = on ? eventOn : eventOff;
-      method(window, 'resize', this.handleResize, EventOptions$2);
-      method(window, 'orientationchange', this.handleResize, EventOptions$2);
+      method(window, 'resize', this.handleResize, EventOptions$1);
+      method(window, 'orientationchange', this.handleResize, EventOptions$1);
     },
     toggle: function toggle() {
       this.show = !this.show;
@@ -8534,12 +8709,6 @@ var CollapsePlugin = {
   })
 };
 
-/**
- * SSR safe types
- */
-var w$1 = hasWindowSupport ? window : {};
-var HTMLElement = w$1.HTMLElement || Object;
-
 var clickOutMixin = {
   data: function data() {
     return {
@@ -8926,12 +9095,18 @@ var dropdownMixin = {
       }
     },
     show: function show() {
+      var _this2 = this;
+
       // Public method to show dropdown
       if (this.disabled) {
         return;
-      }
+      } // Wrap in a requestAnimationFrame to allow any previous
+      // click handling to occur first
 
-      this.visible = true;
+
+      requestAF(function () {
+        _this2.visible = true;
+      });
     },
     hide: function hide() {
       var refocus = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -9033,7 +9208,7 @@ var dropdownMixin = {
     },
     // Keyboard nav
     focusNext: function focusNext(evt, up) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!this.visible || evt && closest(Selector$1.FORM_CHILD, evt.target)) {
         // Ignore key up/down on form elements
@@ -9045,7 +9220,7 @@ var dropdownMixin = {
       evt.preventDefault();
       evt.stopPropagation();
       this.$nextTick(function () {
-        var items = _this2.getItems();
+        var items = _this3.getItems();
 
         if (items.length < 1) {
           /* istanbul ignore next: should never happen */
@@ -9065,7 +9240,7 @@ var dropdownMixin = {
           index = 0;
         }
 
-        _this2.focusItem(index, items);
+        _this3.focusItem(index, items);
       });
     },
     focusItem: function focusItem(idx, items) {
@@ -9094,13 +9269,13 @@ var dropdownMixin = {
   }
 };
 
-var NAME$c = 'BDropdown';
+var NAME$b = 'BDropdown';
 var props$r = {
   toggleText: {
     // This really should be toggleLabel
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$c, 'toggleText');
+      return getComponentConfig(NAME$b, 'toggleText');
     }
   },
   size: {
@@ -9110,7 +9285,7 @@ var props$r = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$c, 'variant');
+      return getComponentConfig(NAME$b, 'variant');
     }
   },
   menuClass: {
@@ -9144,7 +9319,7 @@ var props$r = {
   splitVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$c, 'splitVariant');
+      return getComponentConfig(NAME$b, 'splitVariant');
     }
   },
   role: {
@@ -9159,8 +9334,8 @@ var props$r = {
   } // @vue/component
 
 };
-var BDropdown = OurVue.extend({
-  name: NAME$c,
+var BDropdown = Vue.extend({
+  name: NAME$b,
   mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
   props: props$r,
   computed: {
@@ -9270,7 +9445,7 @@ var BDropdown = OurVue.extend({
 
 var props$s = propsFactory(); // @vue/component
 
-var BDropdownItem = OurVue.extend({
+var BDropdownItem = Vue.extend({
   name: 'BDropdownItem',
   mixins: [normalizeSlotMixin],
   inheritAttrs: false,
@@ -9336,7 +9511,7 @@ var props$t = {
   } // @vue/component
 
 };
-var BDropdownItemButton = OurVue.extend({
+var BDropdownItemButton = Vue.extend({
   name: 'BDropdownItemButton',
   mixins: [normalizeSlotMixin],
   inheritAttrs: false,
@@ -9391,7 +9566,7 @@ var props$u = {
   } // @vue/component
 
 };
-var BDropdownHeader = OurVue.extend({
+var BDropdownHeader = Vue.extend({
   name: 'BDropdownHeader',
   functional: true,
   inheritAttrs: false,
@@ -9419,7 +9594,7 @@ var props$v = {
   } // @vue/component
 
 };
-var BDropdownDivider = OurVue.extend({
+var BDropdownDivider = Vue.extend({
   name: 'BDropdownDivider',
   functional: true,
   inheritAttrs: false,
@@ -9457,7 +9632,7 @@ var props$w = {
   } // @vue/component
 
 };
-var BForm = OurVue.extend({
+var BForm = Vue.extend({
   name: 'BForm',
   functional: true,
   props: props$w,
@@ -9478,7 +9653,7 @@ var BForm = OurVue.extend({
   }
 });
 
-var BDropdownForm = OurVue.extend({
+var BDropdownForm = Vue.extend({
   name: 'BDropdownForm',
   functional: true,
   inheritAttrs: false,
@@ -9508,7 +9683,7 @@ var BDropdownForm = OurVue.extend({
   }
 });
 
-var BDropdownText = OurVue.extend({
+var BDropdownText = Vue.extend({
   name: 'BDropdownText',
   functional: true,
   inheritAttrs: false,
@@ -9562,7 +9737,7 @@ var props$x = {
   } // @vue/component
 
 };
-var BDropdownGroup = OurVue.extend({
+var BDropdownGroup = Vue.extend({
   name: 'BDropdownGroup',
   functional: true,
   inheritAttrs: false,
@@ -9644,7 +9819,7 @@ var props$y = {
   } // @vue/component
 
 };
-var BEmbed = OurVue.extend({
+var BEmbed = Vue.extend({
   name: 'BEmbed',
   functional: true,
   props: props$y,
@@ -9753,7 +9928,7 @@ var formOptionsMixin = {
   }
 };
 
-var BFormDatalist = OurVue.extend({
+var BFormDatalist = Vue.extend({
   name: 'BFormDatalist',
   mixins: [formOptionsMixin, normalizeSlotMixin],
   props: {
@@ -9783,7 +9958,7 @@ var BFormDatalist = OurVue.extend({
   }
 });
 
-var NAME$d = 'BFormText';
+var NAME$c = 'BFormText';
 var props$z = {
   id: {
     type: String,
@@ -9796,7 +9971,7 @@ var props$z = {
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$d, 'textVariant');
+      return getComponentConfig(NAME$c, 'textVariant');
     }
   },
   inline: {
@@ -9805,8 +9980,8 @@ var props$z = {
   } // @vue/component
 
 };
-var BFormText = OurVue.extend({
-  name: NAME$d,
+var BFormText = Vue.extend({
+  name: NAME$c,
   functional: true,
   props: props$z,
   render: function render(h, _ref) {
@@ -9855,7 +10030,7 @@ var props$A = {
   } // @vue/component
 
 };
-var BFormInvalidFeedback = OurVue.extend({
+var BFormInvalidFeedback = Vue.extend({
   name: 'BFormInvalidFeedback',
   functional: true,
   props: props$A,
@@ -9911,7 +10086,7 @@ var props$B = {
   } // @vue/component
 
 };
-var BFormValidFeedback = OurVue.extend({
+var BFormValidFeedback = Vue.extend({
   name: 'BFormValidFeedback',
   functional: true,
   props: props$B,
@@ -10000,7 +10175,7 @@ var formStateMixin = {
   }
 };
 
-var NAME$e = 'BFormGroup'; // Selector for finding first input in the form-group
+var NAME$d = 'BFormGroup'; // Selector for finding first input in the form-group
 
 var SELECTOR = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])';
 var DEPRECATED_MSG = 'Props "horizontal" and "breakpoint" are deprecated. Use "label-cols(-{breakpoint})" props instead.'; // Render helper functions (here rather than polluting the instance with more methods)
@@ -10222,7 +10397,7 @@ var generateProps$1 = function generateProps() {
 
 
 var BFormGroup = {
-  name: NAME$e,
+  name: NAME$d,
   mixins: [idMixin, formStateMixin, normalizeSlotMixin],
 
   get props() {
@@ -10461,7 +10636,8 @@ var looseIndexOf = function looseIndexOf(arr, val) {
   return -1;
 };
 
-// @vue/component
+var SELECTOR$1 = 'input, textarea, select'; // @vue/component
+
 var formMixin = {
   props: {
     name: {
@@ -10482,6 +10658,37 @@ var formMixin = {
     form: {
       type: String,
       default: null
+    },
+    autofocus: {
+      type: Boolean,
+      default: false
+    }
+  },
+  mounted: function mounted() {
+    this.handleAutofocus();
+  },
+  activated: function activated()
+  /* istanbul ignore next */
+  {
+    this.handleAutofocus();
+  },
+  methods: {
+    handleAutofocus: function handleAutofocus() {
+      var _this = this;
+
+      this.$nextTick(function () {
+        requestAF(function () {
+          var el = _this.$el;
+
+          if (_this.autofocus && isVisible(el)) {
+            if (!matches(el, SELECTOR$1)) {
+              el = select(SELECTOR$1, el);
+            }
+
+            el && el.focus && el.focus();
+          }
+        });
+      });
     }
   }
 };
@@ -10532,72 +10739,72 @@ var formRadioCheckMixin = {
   },
   data: function data() {
     return {
-      localChecked: this.is_Group ? this.bvGroup.checked : this.checked,
+      localChecked: this.isGroup ? this.bvGroup.checked : this.checked,
       hasFocus: false
     };
   },
   computed: {
     computedLocalChecked: {
       get: function get() {
-        return this.is_Group ? this.bvGroup.localChecked : this.localChecked;
+        return this.isGroup ? this.bvGroup.localChecked : this.localChecked;
       },
       set: function set(val) {
-        if (this.is_Group) {
+        if (this.isGroup) {
           this.bvGroup.localChecked = val;
         } else {
           this.localChecked = val;
         }
       }
     },
-    is_Group: function is_Group() {
+    isGroup: function isGroup() {
       // Is this check/radio a child of check-group or radio-group?
       return Boolean(this.bvGroup);
     },
-    is_BtnMode: function is_BtnMode() {
+    isBtnMode: function isBtnMode() {
       // Support button style in single input mode
-      return this.is_Group ? this.bvGroup.buttons : this.button;
+      return this.isGroup ? this.bvGroup.buttons : this.button;
     },
-    is_Plain: function is_Plain() {
-      return this.is_BtnMode ? false : this.is_Group ? this.bvGroup.plain : this.plain;
+    isPlain: function isPlain() {
+      return this.isBtnMode ? false : this.isGroup ? this.bvGroup.plain : this.plain;
     },
-    is_Custom: function is_Custom() {
-      return this.is_BtnMode ? false : !this.is_Plain;
+    isCustom: function isCustom() {
+      return this.isBtnMode ? false : !this.isPlain;
     },
-    is_Switch: function is_Switch() {
+    isSwitch: function isSwitch() {
       // Custom switch styling (checkboxes only)
-      return this.is_BtnMode || this.is_Radio || this.is_Plain ? false : this.is_Group ? this.bvGroup.switches : this.switch;
+      return this.isBtnMode || this.isRadio || this.isPlain ? false : this.isGroup ? this.bvGroup.switches : this.switch;
     },
-    is_Inline: function is_Inline() {
-      return this.is_Group ? this.bvGroup.inline : this.inline;
+    isInline: function isInline() {
+      return this.isGroup ? this.bvGroup.inline : this.inline;
     },
-    is_Disabled: function is_Disabled() {
+    isDisabled: function isDisabled() {
       // Child can be disabled while parent isn't, but is always disabled if group is
-      return this.is_Group ? this.bvGroup.disabled || this.disabled : this.disabled;
+      return this.isGroup ? this.bvGroup.disabled || this.disabled : this.disabled;
     },
-    is_Required: function is_Required() {
+    isRequired: function isRequired() {
       // Required only works when a name is provided for the input(s)
       // Child can only be required when parent is
       // Groups will always have a name (either user supplied or auto generated)
-      return Boolean(this.get_Name && (this.is_Group ? this.bvGroup.required : this.required));
+      return Boolean(this.getName && (this.isGroup ? this.bvGroup.required : this.required));
     },
-    get_Name: function get_Name() {
+    getName: function getName() {
       // Group name preferred over local name
-      return (this.is_Group ? this.bvGroup.groupName : this.name) || null;
+      return (this.isGroup ? this.bvGroup.groupName : this.name) || null;
     },
-    get_Form: function get_Form() {
-      return (this.is_Group ? this.bvGroup.form : this.form) || null;
+    getForm: function getForm() {
+      return (this.isGroup ? this.bvGroup.form : this.form) || null;
     },
-    get_Size: function get_Size() {
-      return (this.is_Group ? this.bvGroup.size : this.size) || '';
+    getSize: function getSize() {
+      return (this.isGroup ? this.bvGroup.size : this.size) || '';
     },
-    get_State: function get_State() {
-      return this.is_Group ? this.bvGroup.computedState : this.computedState;
+    getState: function getState() {
+      return this.isGroup ? this.bvGroup.computedState : this.computedState;
     },
-    get_ButtonVariant: function get_ButtonVariant() {
+    getButtonVariant: function getButtonVariant() {
       // Local variant preferred over group variant
       if (this.buttonVariant) {
         return this.buttonVariant;
-      } else if (this.is_Group && this.bvGroup.buttonVariant) {
+      } else if (this.isGroup && this.bvGroup.buttonVariant) {
         return this.bvGroup.buttonVariant;
       } // default variant
 
@@ -10606,9 +10813,9 @@ var formRadioCheckMixin = {
     },
     buttonClasses: function buttonClasses() {
       // Same for radio & check
-      return ['btn', "btn-".concat(this.get_ButtonVariant), this.get_Size ? "btn-".concat(this.get_Size) : '', // 'disabled' class makes "button" look disabled
-      this.is_Disabled ? 'disabled' : '', // 'active' class makes "button" look pressed
-      this.is_Checked ? 'active' : '', // Focus class makes button look focused
+      return ['btn', "btn-".concat(this.getButtonVariant), this.getSize ? "btn-".concat(this.getSize) : '', // 'disabled' class makes "button" look disabled
+      this.isDisabled ? 'disabled' : '', // 'active' class makes "button" look pressed
+      this.isChecked ? 'active' : '', // Focus class makes button look focused
       this.hasFocus ? 'focus' : ''];
     }
   },
@@ -10631,12 +10838,12 @@ var formRadioCheckMixin = {
     },
     // Convenience methods for focusing the input
     focus: function focus() {
-      if (!this.is_Disabled && this.$refs.input && this.$refs.input.focus) {
+      if (!this.isDisabled && this.$refs.input && this.$refs.input.focus) {
         this.$refs.input.focus();
       }
     },
     blur: function blur() {
-      if (!this.is_Disabled && this.$refs.input && this.$refs.input.blur) {
+      if (!this.isDisabled && this.$refs.input && this.$refs.input.blur) {
         this.$refs.input.blur();
       }
     }
@@ -10648,7 +10855,7 @@ var formRadioCheckMixin = {
       change: this.handleChange
     };
 
-    if (this.is_BtnMode) {
+    if (this.isBtnMode) {
       // Handlers for focus styling when in button mode
       on.focus = on.blur = this.handleFocus;
     }
@@ -10658,12 +10865,12 @@ var formRadioCheckMixin = {
       key: 'input',
       on: on,
       class: {
-        'form-check-input': this.is_Plain,
-        'custom-control-input': this.is_Custom,
-        'is-valid': this.get_State === true && !this.is_BtnMode,
-        'is-invalid': this.get_State === false && !this.is_BtnMode,
+        'form-check-input': this.isPlain,
+        'custom-control-input': this.isCustom,
+        'is-valid': this.getState === true && !this.isBtnMode,
+        'is-invalid': this.getState === false && !this.isBtnMode,
         // https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
-        'position-static': this.is_Plain && !defaultSlot
+        'position-static': this.isPlain && !defaultSlot
       },
       directives: [{
         name: 'model',
@@ -10673,29 +10880,29 @@ var formRadioCheckMixin = {
       }],
       attrs: {
         id: this.safeId(),
-        type: this.is_Radio ? 'radio' : 'checkbox',
-        name: this.get_Name,
-        form: this.get_Form,
-        disabled: this.is_Disabled,
-        required: this.is_Required,
+        type: this.isRadio ? 'radio' : 'checkbox',
+        name: this.getName,
+        form: this.getForm,
+        disabled: this.isDisabled,
+        required: this.isRequired,
         autocomplete: 'off',
-        'aria-required': this.is_Required || null,
+        'aria-required': this.isRequired || null,
         'aria-label': this.ariaLabel || null,
         'aria-labelledby': this.ariaLabelledby || null
       },
       domProps: {
         value: this.value,
-        checked: this.is_Checked
+        checked: this.isChecked
       }
     });
 
-    if (this.is_BtnMode) {
+    if (this.isBtnMode) {
       // Button mode
       var button = h('label', {
         class: this.buttonClasses
       }, [input, defaultSlot]);
 
-      if (!this.is_Group) {
+      if (!this.isGroup) {
         // Standalone button mode, so wrap in 'btn-group-toggle'
         // and flag it as inline-block to mimic regular buttons
         button = h('div', {
@@ -10709,11 +10916,11 @@ var formRadioCheckMixin = {
       var label = h(false); // If no label content in plain mode we dont render the label
       // https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
 
-      if (!(this.is_Plain && !defaultSlot)) {
+      if (!(this.isPlain && !defaultSlot)) {
         label = h('label', {
           class: {
-            'form-check-label': this.is_Plain,
-            'custom-control-label': this.is_Custom
+            'form-check-label': this.isPlain,
+            'custom-control-label': this.isCustom
           },
           attrs: {
             for: this.safeId()
@@ -10724,14 +10931,14 @@ var formRadioCheckMixin = {
 
       return h('div', {
         class: _defineProperty({
-          'form-check': this.is_Plain,
-          'form-check-inline': this.is_Plain && this.is_Inline,
-          'custom-control': this.is_Custom,
-          'custom-control-inline': this.is_Custom && this.is_Inline,
-          'custom-checkbox': this.is_Custom && this.is_Check && !this.is_Switch,
-          'custom-switch': this.is_Switch,
-          'custom-radio': this.is_Custom && this.is_Radio
-        }, "form-control-".concat(this.get_Size), Boolean(this.get_Size && !this.is_BtnMode))
+          'form-check': this.isPlain,
+          'form-check-inline': this.isPlain && this.isInline,
+          'custom-control': this.isCustom,
+          'custom-control-inline': this.isCustom && this.isInline,
+          'custom-checkbox': this.isCustom && this.isCheck && !this.isSwitch,
+          'custom-switch': this.isSwitch,
+          'custom-radio': this.isCustom && this.isRadio
+        }, "form-control-".concat(this.getSize), Boolean(this.getSize && !this.isBtnMode))
       }, [input, label]);
     }
   }
@@ -10757,7 +10964,7 @@ var formSizeMixin = {
   }
 };
 
-var BFormCheckbox = OurVue.extend({
+var BFormCheckbox = Vue.extend({
   name: 'BFormCheckbox',
   mixins: [formRadioCheckMixin, // Includes shared render function
   idMixin, formMixin, formSizeMixin, formStateMixin],
@@ -10794,7 +11001,7 @@ var BFormCheckbox = OurVue.extend({
     }
   },
   computed: {
-    is_Checked: function is_Checked() {
+    isChecked: function isChecked() {
       var checked = this.computedLocalChecked;
       var value = this.value;
 
@@ -10804,10 +11011,10 @@ var BFormCheckbox = OurVue.extend({
         return looseEqual(checked, value);
       }
     },
-    is_Radio: function is_Radio() {
+    isRadio: function isRadio() {
       return false;
     },
-    is_Check: function is_Check() {
+    isCheck: function isCheck() {
       return true;
     }
   },
@@ -10855,7 +11062,7 @@ var BFormCheckbox = OurVue.extend({
 
       this.$emit('change', checked ? value : uncheckedValue); // If this is a child of form-checkbox-group, we emit a change event on it as well
 
-      if (this.is_Group) {
+      if (this.isGroup) {
         this.bvGroup.$emit('change', localChecked);
       }
 
@@ -10876,7 +11083,7 @@ var BFormCheckbox = OurVue.extend({
   }
 });
 
-var BFormRadio = OurVue.extend({
+var BFormRadio = Vue.extend({
   name: 'BFormRadio',
   mixins: [idMixin, formRadioCheckMixin, // Includes shared render function
   formMixin, formSizeMixin, formStateMixin],
@@ -10895,14 +11102,14 @@ var BFormRadio = OurVue.extend({
   },
   computed: {
     // Radio Groups can only have a single value, so determining if checked is simple
-    is_Checked: function is_Checked() {
+    isChecked: function isChecked() {
       return looseEqual(this.value, this.computedLocalChecked);
     },
     // Flags for form-radio-check mixin
-    is_Radio: function is_Radio() {
+    isRadio: function isRadio() {
       return true;
     },
-    is_Check: function is_Check() {
+    isCheck: function isCheck() {
       return false;
     }
   },
@@ -10920,7 +11127,7 @@ var BFormRadio = OurVue.extend({
 
       this.$emit('change', checked ? value : null); // If this is a child of form-radio-group, we emit a change event on it as well
 
-      if (this.is_Group) {
+      if (this.isGroup) {
         this.bvGroup.$emit('change', checked ? value : null);
       }
     }
@@ -11000,7 +11207,7 @@ var formRadioCheckGroupMixin = {
 
     var inputs = this.formOptions.map(function (option, idx) {
       var uid = "_BV_option_".concat(idx, "_");
-      return h(_this.is_RadioGroup ? BFormRadio : BFormCheckbox, {
+      return h(_this.isRadioGroup ? BFormRadio : BFormCheckbox, {
         key: uid,
         props: {
           id: _this.safeId(uid),
@@ -11020,7 +11227,7 @@ var formRadioCheckGroupMixin = {
       class: this.groupClasses,
       attrs: {
         id: this.safeId(),
-        role: this.is_RadioGroup ? 'radiogroup' : 'group',
+        role: this.isRadioGroup ? 'radiogroup' : 'group',
         // Tabindex to allow group to be focused if needed
         tabindex: '-1',
         'aria-required': this.required ? 'true' : null,
@@ -11042,7 +11249,7 @@ var props$C = {
   } // @vue/component
 
 };
-var BFormCheckboxGroup = OurVue.extend({
+var BFormCheckboxGroup = Vue.extend({
   name: 'BFormCheckboxGroup',
   mixins: [idMixin, formMixin, formRadioCheckGroupMixin, // Includes render function
   formOptionsMixin, formSizeMixin, formStateMixin],
@@ -11058,7 +11265,7 @@ var BFormCheckboxGroup = OurVue.extend({
     };
   },
   computed: {
-    is_RadioGroup: function is_RadioGroup() {
+    isRadioGroup: function isRadioGroup() {
       return false;
     }
   }
@@ -11085,7 +11292,7 @@ var props$D = {
   } // @vue/component
 
 };
-var BFormRadioGroup = OurVue.extend({
+var BFormRadioGroup = Vue.extend({
   name: 'BFormRadioGroup',
   mixins: [idMixin, formMixin, formRadioCheckGroupMixin, // Includes render function
   formOptionsMixin, formSizeMixin, formStateMixin],
@@ -11101,7 +11308,7 @@ var BFormRadioGroup = OurVue.extend({
     };
   },
   computed: {
-    is_RadioGroup: function is_RadioGroup() {
+    isRadioGroup: function isRadioGroup() {
       return true;
     }
   }
@@ -11459,7 +11666,7 @@ var formValidityMixin = {
 
 var TYPES = ['text', 'password', 'email', 'number', 'url', 'tel', 'search', 'range', 'color', 'date', 'time', 'datetime', 'datetime-local', 'month', 'week']; // @vue/component
 
-var BFormInput = OurVue.extend({
+var BFormInput = Vue.extend({
   name: 'BFormInput',
   mixins: [idMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
   props: {
@@ -11598,7 +11805,7 @@ var index$f = {
   })
 };
 
-var BFormTextarea = OurVue.extend({
+var BFormTextarea = Vue.extend({
   name: 'BFormTextarea',
   mixins: [idMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
   props: {
@@ -11821,10 +12028,10 @@ var formCustomMixin = {
   }
 };
 
-var NAME$f = 'BFormFile'; // @vue/component
+var NAME$e = 'BFormFile'; // @vue/component
 
-var BFormFile = OurVue.extend({
-  name: NAME$f,
+var BFormFile = Vue.extend({
+  name: NAME$e,
   mixins: [idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
   model: {
     prop: 'value',
@@ -11847,19 +12054,19 @@ var BFormFile = OurVue.extend({
     placeholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'placeholder');
+        return getComponentConfig(NAME$e, 'placeholder');
       }
     },
     browseText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'browseText');
+        return getComponentConfig(NAME$e, 'browseText');
       }
     },
     dropPlaceholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'dropPlaceholder');
+        return getComponentConfig(NAME$e, 'dropPlaceholder');
       }
     },
     multiple: {
@@ -12163,7 +12370,7 @@ var index$h = {
   })
 };
 
-var BFormSelect = OurVue.extend({
+var BFormSelect = Vue.extend({
   name: 'BFormSelect',
   mixins: [idMixin, normalizeSlotMixin, formMixin, formSizeMixin, formStateMixin, formCustomMixin, formOptionsMixin],
   model: {
@@ -12300,7 +12507,7 @@ var index$j = {
   })
 };
 
-var NAME$g = 'BJumbotron';
+var NAME$f = 'BJumbotron';
 var props$E = {
   fluid: {
     type: Boolean,
@@ -12345,25 +12552,25 @@ var props$E = {
   bgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'bgVariant');
+      return getComponentConfig(NAME$f, 'bgVariant');
     }
   },
   borderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'borderVariant');
+      return getComponentConfig(NAME$f, 'borderVariant');
     }
   },
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'textVariant');
+      return getComponentConfig(NAME$f, 'textVariant');
     }
   } // @vue/component
 
 };
-var BJumbotron = OurVue.extend({
-  name: NAME$g,
+var BJumbotron = Vue.extend({
+  name: NAME$f,
   functional: true,
   props: props$E,
   render: function render(h, _ref) {
@@ -12450,7 +12657,7 @@ var props$F = {
   } // @vue/component
 
 };
-var BListGroup = OurVue.extend({
+var BListGroup = Vue.extend({
   name: 'BListGroup',
   functional: true,
   props: props$F,
@@ -12471,7 +12678,7 @@ var BListGroup = OurVue.extend({
   }
 });
 
-var NAME$h = 'BListGroupItem';
+var NAME$g = 'BListGroupItem';
 var actionTags = ['a', 'router-link', 'button', 'b-link'];
 var linkProps$2 = propsFactory();
 delete linkProps$2.href.default;
@@ -12492,13 +12699,13 @@ var props$G = _objectSpread({
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$h, 'variant');
+      return getComponentConfig(NAME$g, 'variant');
     }
   }
 }, linkProps$2); // @vue/component
 
-var BListGroupItem = OurVue.extend({
-  name: NAME$h,
+var BListGroupItem = Vue.extend({
+  name: NAME$g,
   functional: true,
   props: props$G,
   render: function render(h, _ref) {
@@ -12552,7 +12759,7 @@ var props$H = {
     default: 'div'
   }
 };
-var BMediaBody = OurVue.extend({
+var BMediaBody = Vue.extend({
   name: 'BMediaBody',
   functional: true,
   props: props$H,
@@ -12577,7 +12784,7 @@ var props$I = {
   } // @vue/component
 
 };
-var BMediaAside = OurVue.extend({
+var BMediaAside = Vue.extend({
   name: 'BMediaAside',
   functional: true,
   props: props$I,
@@ -12611,7 +12818,7 @@ var props$J = {
   } // @vue/component
 
 };
-var BMedia = OurVue.extend({
+var BMedia = Vue.extend({
   name: 'BMedia',
   functional: true,
   props: props$J,
@@ -12776,7 +12983,7 @@ var computeJustifyContent = function computeJustifyContent(value) {
 }; // @vue/component
 
 
-var BNav = OurVue.extend({
+var BNav = Vue.extend({
   name: 'BNav',
   functional: true,
   props: props$K,
@@ -12802,7 +13009,7 @@ var BNav = OurVue.extend({
 
 var props$L = propsFactory(); // @vue/component
 
-var BNavItem = OurVue.extend({
+var BNavItem = Vue.extend({
   name: 'BNavItem',
   functional: true,
   props: _objectSpread({}, props$L, {
@@ -12843,7 +13050,7 @@ var props$M = {
   } // @vue/component
 
 };
-var BNavText = OurVue.extend({
+var BNavText = Vue.extend({
   name: 'BNavText',
   functional: true,
   props: props$M,
@@ -12859,7 +13066,7 @@ var BNavText = OurVue.extend({
 
 var props$N = omit(props$w, ['inline']); // @vue/component
 
-var BNavForm = OurVue.extend({
+var BNavForm = Vue.extend({
   name: 'BNavForm',
   functional: true,
   props: props$N,
@@ -12892,7 +13099,7 @@ var props$O = _objectSpread({}, pluckProps(['menuClass', 'toggleClass', 'noCaret
   } // @vue/component
 
 });
-var BNavItemDropdown = OurVue.extend({
+var BNavItemDropdown = Vue.extend({
   name: 'BNavItemDropdown',
   mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
   props: props$O,
@@ -12988,7 +13195,7 @@ var NavPlugin = {
   })
 };
 
-var NAME$i = 'BNavbar';
+var NAME$h = 'BNavbar';
 var props$P = {
   tag: {
     type: String,
@@ -13001,7 +13208,7 @@ var props$P = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$i, 'variant');
+      return getComponentConfig(NAME$h, 'variant');
     }
   },
   toggleable: {
@@ -13021,8 +13228,8 @@ var props$P = {
   } // @vue/component
 
 };
-var BNavbar = OurVue.extend({
-  name: NAME$i,
+var BNavbar = Vue.extend({
+  name: NAME$h,
   functional: true,
   props: props$P,
   render: function render(h, _ref) {
@@ -13062,7 +13269,7 @@ var computeJustifyContent$1 = function computeJustifyContent(value) {
 }; // @vue/component
 
 
-var BNavbarNav = OurVue.extend({
+var BNavbarNav = Vue.extend({
   name: 'BNavbarNav',
   functional: true,
   props: props$Q,
@@ -13092,7 +13299,7 @@ var props$R = _objectSpread({}, linkProps$3, {
   } // @vue/component
 
 });
-var BNavbarBrand = OurVue.extend({
+var BNavbarBrand = Vue.extend({
   name: 'BNavbarBrand',
   functional: true,
   props: props$R,
@@ -13109,7 +13316,7 @@ var BNavbarBrand = OurVue.extend({
   }
 });
 
-var NAME$j = 'BNavbarToggle'; // Events we emit on $root
+var NAME$i = 'BNavbarToggle'; // Events we emit on $root
 
 var EVENT_TOGGLE$2 = 'bv::toggle::collapse'; // Events we listen to on $root
 
@@ -13117,14 +13324,14 @@ var EVENT_STATE$2 = 'bv::collapse::state'; // This private event is NOT to be do
 
 var EVENT_STATE_SYNC$2 = 'bv::collapse::sync::state'; // @vue/component
 
-var BNavbarToggle = OurVue.extend({
-  name: NAME$j,
+var BNavbarToggle = Vue.extend({
+  name: NAME$i,
   mixins: [listenOnRootMixin, normalizeSlotMixin],
   props: {
     label: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$j, 'label');
+        return getComponentConfig(NAME$i, 'label');
       }
     },
     target: {
@@ -13796,7 +14003,7 @@ var props$T = {
   // @vue/component
 
 };
-var BPagination = OurVue.extend({
+var BPagination = Vue.extend({
   name: 'BPagination',
   mixins: [paginationMixin],
   props: props$T,
@@ -13961,7 +14168,7 @@ var sanitizeNumPages = function sanitizeNumPages(value) {
 // @vue/component
 
 
-var BPaginationNav = OurVue.extend({
+var BPaginationNav = Vue.extend({
   name: 'BPaginationNav',
   mixins: [paginationMixin],
   props: props$U,
@@ -14236,7 +14443,7 @@ var index$r = {
   })
 };
 
-var NAME$k = 'tooltip';
+var NAME$j = 'tooltip';
 var CLASS_PREFIX = 'bs-tooltip';
 var BS_CLASS_PREFIX_REGEX = new RegExp("\\b".concat(CLASS_PREFIX, "\\S+"), 'g');
 var TRANSITION_DURATION = 150; // Modal $root hidden event
@@ -15382,14 +15589,14 @@ function () {
   }, {
     key: "NAME",
     get: function get() {
-      return NAME$k;
+      return NAME$j;
     }
   }]);
 
   return ToolTip;
 }();
 
-var NAME$l = 'popover';
+var NAME$k = 'popover';
 var CLASS_PREFIX$1 = 'bs-popover';
 var BS_CLASS_PREFIX_REGEX$1 = new RegExp("\\b".concat(CLASS_PREFIX$1, "\\S+"), 'g');
 
@@ -15528,7 +15735,7 @@ function (_ToolTip) {
   }, {
     key: "NAME",
     get: function get() {
-      return NAME$l;
+      return NAME$k;
     }
   }]);
 
@@ -15564,10 +15771,6 @@ var toolpopMixin = {
       // String ID of element, or element/component reference
       type: [String, Object, HTMLElement, Function] // default: undefined
 
-    },
-    delay: {
-      type: [Number, Object, String],
-      default: 0
     },
     offset: {
       type: [Number, String],
@@ -15608,6 +15811,8 @@ var toolpopMixin = {
         content: (this.content || '').trim() || '',
         // Tooltip/Popover placement
         placement: PLACEMENTS[this.placement] || 'auto',
+        // Tooltip/popover fallback placemenet
+        fallbackPlacement: this.fallbackPlacement || 'flip',
         // Container currently needs to be an ID with '#' prepended, if null then body is used
         container: cont ? /^#/.test(cont) ? cont : "#".concat(cont) : false,
         // boundariesElement passed to popper
@@ -15892,7 +16097,7 @@ var toolpopMixin = {
   }
 };
 
-var NAME$m = 'BPopover';
+var NAME$l = 'BPopover';
 var props$V = {
   title: {
     type: String,
@@ -15910,24 +16115,37 @@ var props$V = {
     type: String,
     default: 'right'
   },
+  fallbackPlacement: {
+    type: [String, Array],
+    default: 'flip',
+    validator: function validator(value) {
+      return isArray$1(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+    }
+  },
+  delay: {
+    type: [Number, Object, String],
+    default: function _default() {
+      return getComponentConfig(NAME$l, 'delay');
+    }
+  },
   boundary: {
     // String: scrollParent, window, or viewport
     // Element: element reference
     type: [String, HTMLElement],
     default: function _default() {
-      return getComponentConfig(NAME$m, 'boundary');
+      return getComponentConfig(NAME$l, 'boundary');
     }
   },
   boundaryPadding: {
     type: Number,
     default: function _default() {
-      return getComponentConfig(NAME$m, 'boundaryPadding');
+      return getComponentConfig(NAME$l, 'boundaryPadding');
     }
   } // @vue/component
 
 };
-var BPopover = OurVue.extend({
-  name: NAME$m,
+var BPopover = Vue.extend({
+  name: NAME$l,
   mixins: [toolpopMixin, normalizeSlotMixin],
   props: props$V,
   data: function data() {
@@ -15983,9 +16201,11 @@ var parseBindings = function parseBindings(bindings)
 /* istanbul ignore next: not easy to test */
 {
   // We start out with a basic config
+  var NAME = 'BPopover';
   var config = {
-    boundary: String(getComponentConfig('BPopover', 'boundary')),
-    boundaryPadding: parseInt(getComponentConfig('BPopover', 'boundaryPadding'), 10) || 0 // Process bindings.value
+    delay: getComponentConfig(NAME, 'delay'),
+    boundary: String(getComponentConfig(NAME, 'boundary')),
+    boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0 // Process bindings.value
 
   };
 
@@ -16146,10 +16366,10 @@ var index$s = {
   })
 };
 
-var NAME$n = 'BProgressBar'; // @vue/component
+var NAME$m = 'BProgressBar'; // @vue/component
 
-var BProgressBar = OurVue.extend({
-  name: NAME$n,
+var BProgressBar = Vue.extend({
+  name: NAME$m,
   mixins: [normalizeSlotMixin],
   inject: {
     bvProgress: {
@@ -16185,7 +16405,7 @@ var BProgressBar = OurVue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'variant');
+        return getComponentConfig(NAME$m, 'variant');
       }
     },
     striped: {
@@ -16276,10 +16496,10 @@ var BProgressBar = OurVue.extend({
   }
 });
 
-var NAME$o = 'BProgress'; // @vue/component
+var NAME$n = 'BProgress'; // @vue/component
 
-var BProgress = OurVue.extend({
-  name: NAME$o,
+var BProgress = Vue.extend({
+  name: NAME$n,
   mixins: [normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -16291,7 +16511,7 @@ var BProgress = OurVue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$o, 'variant');
+        return getComponentConfig(NAME$n, 'variant');
       }
     },
     striped: {
@@ -16370,10 +16590,10 @@ var index$t = {
   })
 };
 
-var NAME$p = 'BSpinner'; // @vue/component
+var NAME$o = 'BSpinner'; // @vue/component
 
-var BSpinner = OurVue.extend({
-  name: NAME$p,
+var BSpinner = Vue.extend({
+  name: NAME$o,
   functional: true,
   props: {
     type: {
@@ -16388,7 +16608,7 @@ var BSpinner = OurVue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$p, 'variant');
+        return getComponentConfig(NAME$o, 'variant');
       }
     },
     small: {
@@ -18551,7 +18771,7 @@ var providerMixin = {
 
 // @vue/component
 
-var BTable = OurVue.extend({
+var BTable = Vue.extend({
   name: 'BTable',
   // Order of mixins is important.
   // They are merged from left to fight, followed by this component.
@@ -18736,7 +18956,7 @@ var notDisabled = function notDisabled(tab) {
 // @vue/component
 
 
-var BTabButtonHelper = OurVue.extend({
+var BTabButtonHelper = Vue.extend({
   name: 'BTabButtonHelper',
   inject: {
     bvTabs: {
@@ -18874,7 +19094,7 @@ var BTabButtonHelper = OurVue.extend({
   }
 }); // @vue/component
 
-var BTabs = OurVue.extend({
+var BTabs = Vue.extend({
   name: 'BTabs',
   mixins: [idMixin, normalizeSlotMixin],
   provide: function provide() {
@@ -18956,8 +19176,12 @@ var BTabs = OurVue.extend({
     return {
       // Index of current tab
       currentTab: tabIdx,
-      // Array of direct child <b-tab> instances
-      tabs: []
+      // Array of direct child <b-tab> instances, in DOM order
+      tabs: [],
+      // Array of child instances registered (for triggering reactive updates)
+      registeredTabs: [],
+      // Flag to know if we are mounted or not
+      isMounted: false
     };
   },
   computed: {
@@ -19015,79 +19239,114 @@ var BTabs = OurVue.extend({
           }
         }
       }
+    },
+    registeredTabs: function registeredTabs(newVal, oldVal) {
+      var _this = this;
+
+      // Each b-tab will register/unregister itself.
+      // We use this to detect when tabs are added/removed
+      // to trigger the update of the tabs.
+      this.$nextTick(function () {
+        requestAF(function () {
+          _this.updateTabs();
+        });
+      });
+    },
+    isMounted: function isMounted(newVal, oldVal) {
+      var _this2 = this;
+
+      // Trigger an update after mounted.  Needed
+      // for tabs inside lazy modals.
+      if (newVal) {
+        requestAF(function () {
+          _this2.updateTabs();
+        });
+      }
     }
   },
   created: function created() {
-    var _this = this;
+    var _this3 = this;
 
     var tabIdx = parseInt(this.value, 10);
-    this.currentTab = isNaN(tabIdx) ? -1 : tabIdx; // Create private non-reactive prop
-
-    this._bvObserver = null; // For SSR and to make sure only a single tab is shown on mount
+    this.currentTab = isNaN(tabIdx) ? -1 : tabIdx; // For SSR and to make sure only a single tab is shown on mount
     // We wrap this in a `$nextTick()` to ensure the child tabs have been created
 
     this.$nextTick(function () {
-      _this.updateTabs();
+      _this3.updateTabs();
     });
   },
   mounted: function mounted() {
-    var _this2 = this;
+    var _this4 = this;
 
+    // Call `updateTabs()` just in case...
+    this.updateTabs();
     this.$nextTick(function () {
-      // Call `updateTabs()` just in case...
-      _this2.updateTabs(); // Observe child changes so we can update list of tabs
-
-
-      _this2.setObserver(true);
+      // Flag we are now mounted and to switch to DOM for tab probing.
+      // As this.$slots.default appears to lie about component instances
+      // after b-tabs is destroyed and re-instantiated.
+      // And this.$children does not respect DOM order.
+      _this4.isMounted = true;
     });
   },
   deactivated: function deactivated()
   /* istanbul ignore next */
   {
-    this.setObserver(false);
+    this.isMounted = false;
   },
   activated: function activated()
   /* istanbul ignore next */
   {
-    var _this3 = this;
+    var _this5 = this;
 
     var tabIdx = parseInt(this.value, 10);
     this.currentTab = isNaN(tabIdx) ? -1 : tabIdx;
     this.$nextTick(function () {
-      _this3.updateTabs();
+      _this5.updateTabs();
 
-      _this3.setObserver(true);
+      _this5.isMounted = true;
     });
   },
-  beforeDestroy: function beforeDestroy()
-  /* istanbul ignore next */
-  {
-    this.setObserver(false);
+  destroyed: function destroyed() {
+    // Ensure no references to child instances exist
+    this.tabs = [];
   },
   methods: {
-    setObserver: function setObserver(on) {
-      if (on) {
-        // Make sure no existing observer running
-        this.setObserver(false); // Watch for changes to <b-tab> sub components
+    registerTab: function registerTab(tab) {
+      var _this6 = this;
 
-        this._bvObserver = observeDom(this.$refs.tabsContainer, this.updateTabs.bind(this), {
-          childList: true,
-          subtree: false,
-          attributes: true,
-          attributeFilter: ['style', 'class']
+      if (!arrayIncludes(this.registeredTabs, tab)) {
+        this.registeredTabs.push(tab);
+        tab.$once('hook:destroyed', function () {
+          _this6.unregisterTab(tab);
         });
-      } else {
-        if (this._bvObserver && this._bvObserver.disconnect) {
-          this._bvObserver.disconnect();
-        }
-
-        this._bvObserver = null;
       }
     },
+    unregisterTab: function unregisterTab(tab) {
+      this.registeredTabs = this.registeredTabs.slice().filter(function (t) {
+        return t !== tab;
+      });
+    },
     getTabs: function getTabs() {
-      return (this.normalizeSlot('default') || []).map(function (vnode) {
-        return vnode.componentInstance;
-      }).filter(function (tab) {
+      var tabs = [];
+
+      if (!this.isMounted) {
+        tabs = (this.normalizeSlot('default') || []).map(function (vnode) {
+          return vnode.componentInstance;
+        });
+      } else {
+        // We rely on the DOM when mounted to get the list of tabs,
+        // as this.$slots.default appears to lie about current tab vm instances, after being
+        // destroyed and then re-intantiated (cached vNodes which don't reflect correct vm)
+        // Fix for https://github.com/bootstrap-vue/bootstrap-vue/issues/3361
+        tabs = selectAll("#".concat(this.safeId('_BV_tab_container_'), " > .tab-pane"), this.$el).map(function (el) {
+          return el.__vue__;
+        }).filter(Boolean) // The VM attached to the element is `transition` so we need the $parent to get tab
+        .map(function (vm) {
+          return vm.$parent;
+        });
+      }
+
+      return tabs.filter(function (tab) {
         return tab && tab._isTab;
       });
     },
@@ -19190,11 +19449,11 @@ var BTabs = OurVue.extend({
     },
     // Focus a tab button given it's <b-tab> instance
     focusButton: function focusButton(tab) {
-      var _this4 = this;
+      var _this7 = this;
 
       // Wrap in `$nextTick()` to ensure DOM has completed rendering/updating before focusing
       this.$nextTick(function () {
-        var button = _this4.getButtonForTab(tab);
+        var button = _this7.getButtonForTab(tab);
 
         if (button && button.focus) {
           button.focus();
@@ -19252,7 +19511,7 @@ var BTabs = OurVue.extend({
     }
   },
   render: function render(h) {
-    var _this5 = this;
+    var _this8 = this;
 
     var tabs = this.tabs; // Currently active tab
 
@@ -19267,7 +19526,7 @@ var BTabs = OurVue.extend({
     var buttons = tabs.map(function (tab, index) {
       var tabIndex = null; // Ensure at least one tab button is focusable when keynav enabled (if possible)
 
-      if (!_this5.noKeyNav) {
+      if (!_this8.noKeyNav) {
         // Buttons are not in tab index unless active, or a fallback tab
         tabIndex = -1;
 
@@ -19285,21 +19544,21 @@ var BTabs = OurVue.extend({
         props: {
           tab: tab,
           tabs: tabs,
-          id: tab.controlledBy || (_this5.tab && _this5.tab.safeId ? _this5.tab.safeId("_BV_tab_button_") : null),
-          controls: _this5.tab && _this5.tab.safeId ? _this5.tab.safeId() : null,
+          id: tab.controlledBy || (_this8.tab && _this8.tab.safeId ? _this8.tab.safeId("_BV_tab_button_") : null),
+          controls: _this8.tab && _this8.tab.safeId ? _this8.tab.safeId() : null,
           tabIndex: tabIndex,
           setSize: tabs.length,
           posInSet: index + 1,
-          noKeyNav: _this5.noKeyNav
+          noKeyNav: _this8.noKeyNav
         },
         on: {
           click: function click(evt) {
-            _this5.clickTab(tab, evt);
+            _this8.clickTab(tab, evt);
           },
-          first: _this5.firstTab,
-          prev: _this5.previousTab,
-          next: _this5.nextTab,
-          last: _this5.lastTab
+          first: _this8.firstTab,
+          prev: _this8.previousTab,
+          next: _this8.nextTab,
+          last: _this8.lastTab
         }
       });
     }); // Nav
@@ -19333,13 +19592,12 @@ var BTabs = OurVue.extend({
 
     if (!tabs || tabs.length === 0) {
       empty = h('div', {
-        key: 'empty-tab',
+        key: 'bv-empty-tab',
         class: ['tab-pane', 'active', {
           'card-body': this.card
         }]
       }, this.normalizeSlot('empty'));
     } // Main content section
-    // TODO: This container should be a helper component
 
 
     var content = h('div', {
@@ -19352,7 +19610,7 @@ var BTabs = OurVue.extend({
       attrs: {
         id: this.safeId('_BV_tab_container_')
       }
-    }, [this.normalizeSlot('default'), empty]); // Render final output
+    }, concat(this.normalizeSlot('default'), empty)); // Render final output
 
     return h(this.tag, {
       staticClass: 'tabs',
@@ -19369,7 +19627,7 @@ var BTabs = OurVue.extend({
 
 var DEPRECATED_MSG$2 = 'Setting prop "href" is deprecated. Use the <b-nav> component instead.'; // @vue/component
 
-var BTab = OurVue.extend({
+var BTab = Vue.extend({
   name: 'BTab',
   mixins: [idMixin, normalizeSlotMixin],
   inject: {
@@ -19446,9 +19704,7 @@ var BTab = OurVue.extend({
   computed: {
     tabClasses: function tabClasses() {
       return [{
-        show: this.show,
         active: this.localActive,
-        fade: this.computedFade,
         disabled: this.disabled,
         'card-body': this.bvTabs.card && !this.noBody
       }, // Apply <b-tabs> `activeTabClass` styles when this tab is active
@@ -19457,8 +19713,8 @@ var BTab = OurVue.extend({
     controlledBy: function controlledBy() {
       return this.buttonId || this.safeId('__BV_tab_button__');
     },
-    computedFade: function computedFade() {
-      return this.bvTabs.fade || false;
+    computedNoFade: function computedNoFade() {
+      return !(this.bvTabs.fade || false);
     },
     computedLazy: function computedLazy() {
       return this.bvTabs.lazy || this.lazy;
@@ -19497,7 +19753,9 @@ var BTab = OurVue.extend({
     }
   },
   mounted: function mounted() {
-    // Initially show on mount if active and not disabled
+    // Inform b-tabs of our presence
+    this.registerTab(); // Initially show on mount if active and not disabled
+
     this.show = this.localActive; // Deprecate use of `href` prop
 
     if (this.href && this.href !== '#') {
@@ -19512,20 +19770,19 @@ var BTab = OurVue.extend({
       this.bvTabs.updateButton(this);
     }
   },
+  destroyed: function destroyed() {
+    // inform b-tabs of our departure
+    this.unregisterTab();
+  },
   methods: {
-    // Transition handlers
-    beforeEnter: function beforeEnter() {
-      var _this = this;
-
-      // Change opacity (add 'show' class) 1 frame after display,
-      // otherwise CSS transition won't happen
-      requestAF(function () {
-        _this.show = true;
-      });
+    // Private methods
+    registerTab: function registerTab() {
+      // Inform `b-tabs` of our presence
+      this.bvTabs.registerTab && this.bvTabs.registerTab(this);
     },
-    beforeLeave: function beforeLeave() {
-      // Remove the 'show' class
-      this.show = false;
+    unregisterTab: function unregisterTab() {
+      // Inform `b-tabs` of our departure
+      this.bvTabs.unregisterTab && this.bvTabs.unregisterTab(this);
     },
     // Public methods
     activate: function activate() {
@@ -19550,8 +19807,7 @@ var BTab = OurVue.extend({
       ref: 'panel',
       staticClass: 'tab-pane',
       class: this.tabClasses,
-      directives: [// TODO: Convert to style object in render
-      {
+      directives: [{
         name: 'show',
         rawName: 'v-show',
         value: this.localActive,
@@ -19560,26 +19816,16 @@ var BTab = OurVue.extend({
       attrs: {
         role: 'tabpanel',
         id: this.safeId(),
-        tabindex: this.localActive && !this.bvTabs.noKeyNav ? '0' : null,
+        tabindex: this.localActive && !this.bvTabs.noKeyNav ? '-1' : null,
         'aria-hidden': this.localActive ? 'false' : 'true',
         'aria-labelledby': this.controlledBy || null
       }
     }, // Render content lazily if requested
     [this.localActive || !this.computedLazy ? this.normalizeSlot('default') : h(false)]);
-    return h('transition', {
+    return h(BVTransition, {
       props: {
         mode: 'out-in',
-        // Disable use of built-in transition classes
-        'enter-class': '',
-        'enter-active-class': '',
-        'enter-to-class': '',
-        'leave-class': '',
-        'leave-active-class': '',
-        'leave-to-class': ''
-      },
-      on: {
-        beforeEnter: this.beforeEnter,
-        beforeLeave: this.beforeLeave
+        noFade: this.computedNoFade
       }
     }, [content]);
   }
@@ -19610,10 +19856,10 @@ var index$x = {
   })
 };
 
-var NAME$q = 'BTooltip'; // @vue/component
+var NAME$p = 'BTooltip'; // @vue/component
 
-var BTooltip = OurVue.extend({
-  name: NAME$q,
+var BTooltip = Vue.extend({
+  name: NAME$p,
   mixins: [toolpopMixin, normalizeSlotMixin],
   props: {
     title: {
@@ -19628,18 +19874,31 @@ var BTooltip = OurVue.extend({
       type: String,
       default: 'top'
     },
+    fallbackPlacement: {
+      type: [String, Array],
+      default: 'flip',
+      validator: function validator(value) {
+        return isArray$1(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+      }
+    },
+    delay: {
+      type: [Number, Object, String],
+      default: function _default() {
+        return getComponentConfig(NAME$p, 'delay');
+      }
+    },
     boundary: {
       // String: scrollParent, window, or viewport
       // Element: element reference
       type: [String, HTMLElement],
       default: function _default() {
-        return getComponentConfig(NAME$q, 'boundary');
+        return getComponentConfig(NAME$p, 'boundary');
       }
     },
     boundaryPadding: {
       type: Number,
       default: function _default() {
-        return getComponentConfig(NAME$q, 'boundaryPadding');
+        return getComponentConfig(NAME$p, 'boundaryPadding');
       }
     }
   },
@@ -19694,9 +19953,11 @@ var parseBindings$1 = function parseBindings(bindings)
 /* istanbul ignore next: not easy to test */
 {
   // We start out with a basic config
+  var NAME = 'BTooltip';
   var config = {
-    boundary: String(getComponentConfig('BTooltip', 'boundary')),
-    boundaryPadding: parseInt(getComponentConfig('BTooltip', 'boundaryPadding'), 10) || 0 // Process bindings.value
+    delay: getComponentConfig(NAME, 'delay'),
+    boundary: String(getComponentConfig(NAME, 'boundary')),
+    boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0 // Process bindings.value
 
   };
 
@@ -19903,8 +20164,7 @@ var componentPlugins = /*#__PURE__*/Object.freeze({
   TooltipPlugin: index$y
 });
 
-// Legacy Component group plugin names
-
+// Index file used for the main builds, which does not include legacy plugin names
 var componentsPlugin = {
   install: installFactory({
     plugins: componentPlugins
@@ -19933,7 +20193,7 @@ var index$A = {
  * Constants / Defaults
  */
 
-var NAME$r = 'v-b-scrollspy';
+var NAME$q = 'v-b-scrollspy';
 var ACTIVATE_EVENT = 'bv::scrollspy::activate';
 var Default = {
   element: 'body',
@@ -19972,7 +20232,7 @@ var HREF_REGEX = /^.*(#[^#]+)$/; // Transition Events
 
 var TransitionEndEvents$2 = ['webkitTransitionEnd', 'transitionend', 'otransitionend', 'oTransitionEnd']; // Options for events
 
-var EventOptions$3 = {
+var EventOptions$2 = {
   passive: true,
   capture: false
   /*
@@ -20090,14 +20350,14 @@ function () {
       var scroller = this.getScroller();
 
       if (scroller && scroller.tagName !== 'BODY') {
-        eventOn(scroller, 'scroll', this, EventOptions$3);
+        eventOn(scroller, 'scroll', this, EventOptions$2);
       }
 
-      eventOn(window, 'scroll', this, EventOptions$3);
-      eventOn(window, 'resize', this, EventOptions$3);
-      eventOn(window, 'orientationchange', this, EventOptions$3);
+      eventOn(window, 'scroll', this, EventOptions$2);
+      eventOn(window, 'resize', this, EventOptions$2);
+      eventOn(window, 'orientationchange', this, EventOptions$2);
       TransitionEndEvents$2.forEach(function (evtName) {
-        eventOn(window, evtName, _this, EventOptions$3);
+        eventOn(window, evtName, _this, EventOptions$2);
       });
       this.setObservers(true); // Schedule a refresh
 
@@ -20112,14 +20372,14 @@ function () {
       this.setObservers(false);
 
       if (scroller && scroller.tagName !== 'BODY') {
-        eventOff(scroller, 'scroll', this, EventOptions$3);
+        eventOff(scroller, 'scroll', this, EventOptions$2);
       }
 
-      eventOff(window, 'scroll', this, EventOptions$3);
-      eventOff(window, 'resize', this, EventOptions$3);
-      eventOff(window, 'orientationchange', this, EventOptions$3);
+      eventOff(window, 'scroll', this, EventOptions$2);
+      eventOff(window, 'resize', this, EventOptions$2);
+      eventOff(window, 'orientationchange', this, EventOptions$2);
       TransitionEndEvents$2.forEach(function (evtName) {
-        eventOff(window, evtName, _this2, EventOptions$3);
+        eventOff(window, evtName, _this2, EventOptions$2);
       });
     }
   }, {
@@ -20417,7 +20677,7 @@ function () {
   }], [{
     key: "Name",
     get: function get() {
-      return NAME$r;
+      return NAME$q;
     }
   }, {
     key: "Default",
@@ -20584,38 +20844,34 @@ var directivePlugins = /*#__PURE__*/Object.freeze({
   VBPopoverPlugin: index$D
 });
 
-// Legacy directive plugin names
-
+// Index file used for the main builds, which does not include legacy plugin names
 var directivesPlugin = {
   install: installFactory({
     plugins: directivePlugins
   })
 };
 
-var install$2 = function install(Vue) {
-  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  if (install.installed) {
-    /* istanbul ignore next */
-    return;
+//
+var BVConfigPlugin = {
+  install: function install(Vue) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    setConfig(config);
   }
-
-  install.installed = true; // Configure BootstrapVue
-
-  setConfig(config); // Install all component plugins
-
-  Vue.use(componentsPlugin); // Install all directive plugins
-
-  Vue.use(directivesPlugin);
 };
 
-install$2.installed = false;
+var install$2 = installFactory({
+  plugins: {
+    componentsPlugin: componentsPlugin,
+    directivesPlugin: directivesPlugin
+  }
+}); // BootstrapVue plugin
+
 var BootstrapVue = {
   install: install$2,
-  setConfig: setConfig // Auto installation only occurs if window.Vue exists
+  setConfig: setConfig // Named exports for BvConfigPlugin and BootstrapVue
 
 };
-vueUse(BootstrapVue);
 
 export default BootstrapVue;
+export { index as AlertPlugin, BAlert, BBadge, BBreadcrumb, BBreadcrumbItem, BBreadcrumbLink, BButton, BButtonClose, BButtonGroup, BButtonToolbar, BCard, BCardBody, BCardFooter, BCardGroup, BCardHeader, BCardImg, BCardImgLazy, BCardSubTitle, BCardText, BCardTitle, BCarousel, BCarouselSlide, BCol, BCollapse, Container as BContainer, BDropdown, BDropdownDivider, BDropdownForm, BDropdownGroup, BDropdownHeader, BDropdownItem, BDropdownItemButton, BDropdownText, BEmbed, BForm, BFormCheckbox, BFormCheckboxGroup, BFormDatalist, BFormFile, BFormGroup, BFormInput, BFormInvalidFeedback, BFormRadio, BFormRadioGroup, BFormRow, BFormSelect, BFormText, BFormTextarea, BFormValidFeedback, BImg, BImgLazy, BInputGroup, BInputGroupAddon, BInputGroupAppend, BInputGroupPrepend, BInputGroupText, BJumbotron, BLink, BListGroup, BListGroupItem, BMedia, BMediaAside, BMediaBody, BModal, BNav, BNavForm, BNavItem, BNavItemDropdown, BNavText, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BPagination, BPaginationNav, BPopover, BProgress, BProgressBar, BRow, BSpinner, BTab, BTable, BTabs, BToast, BToaster, BTooltip, BVConfigPlugin as BVConfig, BVConfigPlugin, BVModalPlugin, BVToastPlugin, index$1 as BadgePlugin, BootstrapVue, index$2 as BreadcrumbPlugin, index$4 as ButtonGroupPlugin, index$3 as ButtonPlugin, index$5 as ButtonToolbarPlugin, index$7 as CardPlugin, index$8 as CarouselPlugin, CollapsePlugin, DropdownPlugin, index$a as EmbedPlugin, index$d as FormCheckboxPlugin, index$h as FormFilePlugin, index$c as FormGroupPlugin, index$f as FormInputPlugin, index$b as FormPlugin, index$e as FormRadioPlugin, index$i as FormSelectPlugin, index$g as FormTextareaPlugin, index$j as ImagePlugin, index$6 as InputGroupPlugin, index$k as JumbotronPlugin, index$9 as LayoutPlugin, index$l as LinkPlugin, index$m as ListGroupPlugin, index$n as MediaPlugin, index$o as ModalPlugin, NavPlugin, index$p as NavbarPlugin, index$r as PaginationNavPlugin, index$q as PaginationPlugin, index$s as PopoverPlugin, index$t as ProgressPlugin, index$u as SpinnerPlugin, index$v as TablePlugin, index$w as TabsPlugin, index$x as ToastPlugin, index$y as TooltipPlugin, VBModal, index$A as VBModalPlugin, VBPopover, index$D as VBPopoverPlugin, VBScrollspy, index$B as VBScrollspyPlugin, VBToggle, index$z as VBTogglePlugin, VBTooltip, index$C as VBTooltipPlugin, componentsPlugin, directivesPlugin, install$2 as install, setConfig };
 //# sourceMappingURL=bootstrap-vue.esm.js.map

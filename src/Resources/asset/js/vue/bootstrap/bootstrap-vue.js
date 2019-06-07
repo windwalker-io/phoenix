@@ -1,5 +1,5 @@
 /*!
- * BoostrapVue 2.0.0-rc.20
+ * BoostrapVue 2.0.0-rc.22
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -16,6 +16,8 @@
 
   Vue = Vue && Vue.hasOwnProperty('default') ? Vue['default'] : Vue;
 
+  //
+
   /**
    * Utilities to get information about the current environment
    */
@@ -25,7 +27,11 @@
   var hasNavigatorSupport = typeof navigator !== 'undefined';
   var hasPromiseSupport = typeof Promise !== 'undefined';
   var hasMutationObserverSupport = typeof MutationObserver !== 'undefined' || typeof WebKitMutationObserver !== 'undefined' || typeof MozMutationObserver !== 'undefined';
-  var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Determine if the browser supports the option passive for events
+  var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Browser type sniffing
+
+  var userAgent = isBrowser ? window.navigator.userAgent.toLowerCase() : '';
+  var isJSDOM = userAgent.indexOf('jsdom') > 0;
+  var isIE = /msie|trident/.test(userAgent); // Determine if the browser supports the option passive for events
 
   var hasPassiveEventSupport = function () {
     var passiveEventSupported = false;
@@ -53,7 +59,11 @@
     return passiveEventSupported;
   }();
   var hasTouchSupport = isBrowser && ('ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0);
-  var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent); // --- Getters ---
+  var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent);
+  var hasIntersectionObserverSupport = isBrowser && 'IntersectionObserver' in window && 'IntersectionObserverEntry' in window && // Edge 15 and UC Browser lack support for `isIntersecting`
+  // but we an use intersectionRatio > 0 instead
+  // 'isIntersecting' in window.IntersectionObserverEntry.prototype &&
+  'intersectionRatio' in window.IntersectionObserverEntry.prototype; // --- Getters ---
 
   var getEnv = function getEnv(key) {
     var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -1141,18 +1151,6 @@
     }) ? obj : defaultValue;
   };
 
-  var memoize = function memoize(fn) {
-    var cache = create(null);
-    return function () {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      var argsKey = JSON.stringify(args);
-      return cache[argsKey] = cache[argsKey] || fn.apply(null, args);
-    };
-  };
-
   //
   // BREAKPOINT DEFINITIONS
   //
@@ -1285,25 +1283,159 @@
       solid: false
     },
     BToaster: {
-      ariaLive: 'polite',
-      ariaAtomic: 'true',
+      ariaLive: null,
+      ariaAtomic: null,
       role: null
     },
     BTooltip: {
+      delay: 0,
       boundary: 'scrollParent',
       boundaryPadding: 5
     },
     BPopover: {
+      delay: 0,
       boundary: 'scrollParent',
       boundaryPadding: 5
-    } // This contains user defined configuration
-
+    }
   };
-  var CONFIG = {}; // Method to get a deep clone (immutable) copy of the defaults
+  var BvConfig = Vue.extend({
+    created: function created() {
+      // Non reactive private properties
+      this.$_config = {};
+      this.$_cachedBreakpoints = null;
+    },
+    methods: {
+      getDefaults: function getDefaults() {
+        // Returns a copy of the defaults
+        return cloneDeep(DEFAULTS);
+      },
+      getConfig: function getConfig() {
+        // Returns a copy of the user config
+        return cloneDeep(this.$_config);
+      },
+      resetConfig: function resetConfig() {
+        // Clear the config. For testing purposes only
+        this.$_config = {};
+      },
+      getConfigValue: function getConfigValue(key) {
+        // First we try the user config, and if key not found we fall back to default value
+        // NOTE: If we deep clone DEFAULTS into config, then we can skip the fallback for get
+        return cloneDeep(get(this.$_config, key, get(DEFAULTS, key)));
+      },
+      getComponentConfig: function getComponentConfig(cmpName) {
+        var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        // Return the particular config value for key for if specified,
+        // otherwise we return the full config
+        return key ? this.getConfigValue("".concat(cmpName, ".").concat(key)) : this.getConfigValue(cmpName) || {};
+      },
+      getBreakpoints: function getBreakpoints() {
+        // Convenience method for getting all breakpoint names
+        return this.getConfigValue('breakpoints');
+      },
+      getBreakpointsCached: function getBreakpointsCached() {
+        // Convenience method for getting all breakpoint names
+        // Caches the results after first access
+        if (!this.$_cachedBreakpoints) {
+          this.$_cachedBreakpoints = this.getBreakpoints();
+        }
 
-  var getDefaults = function getDefaults() {
-    return cloneDeep(DEFAULTS);
-  }; // Method to set the config
+        return cloneDeep(this.$_cachedBreakpoints);
+      },
+      getBreakpointsUp: function getBreakpointsUp() {
+        // Convenience method for getting breakpoints with
+        // the smallest breakpoint set as ''
+        // Useful for components that create breakpoint specific props
+        var breakpoints = this.getBreakpoints();
+        breakpoints[0] = '';
+        return breakpoints;
+      },
+      getBreakpointsUpCached: function getBreakpointsUpCached() {
+        // Convenience method for getting breakpoints with
+        // the smallest breakpoint set as ''
+        // Useful for components that create breakpoint specific props
+        // Caches the results after first access
+        var breakpoints = this.getBreakpointsCached();
+        breakpoints[0] = '';
+        return breakpoints;
+      },
+      getBreakpointsDown: function getBreakpointsDown() {
+        // Convenience method for getting breakpoints with
+        // the largest breakpoint set as ''
+        // Useful for components that create breakpoint specific props
+        var breakpoints = this.getBreakpoints();
+        breakpoints[breakpoints.length - 1] = '';
+        return breakpoints;
+      },
+      getBreakpointsDownCached: function getBreakpointsDownCached()
+      /* istanbul ignore next: we don't use this method anywhere, yet */
+      {
+        // Convenience method for getting breakpoints with
+        // the largest breakpoint set as ''
+        // Useful for components that create breakpoint specific props
+        // Caches the results after first access
+        var breakpoints = this.getBreakpointsCached();
+        breakpoints[breakpoints.length - 1] = '';
+        return breakpoints;
+      },
+      setConfig: function setConfig() {
+        var _this = this;
+
+        var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+        if (!isObject(config)) {
+          /* istanbul ignore next */
+          return;
+        }
+
+        keys(config).filter(function (cmpName) {
+          return config.hasOwnProperty(cmpName);
+        }).forEach(function (cmpName) {
+          if (!DEFAULTS.hasOwnProperty(cmpName)) {
+            /* istanbul ignore next */
+            warn("config: unknown config property \"".concat(cmpName, "\""));
+            /* istanbul ignore next */
+
+            return;
+          }
+
+          var cmpConfig = config[cmpName];
+
+          if (cmpName === 'breakpoints') {
+            // Special case for breakpoints
+            var breakpoints = config.breakpoints;
+
+            if (!isArray$1(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
+              return !isString(b) || b.length === 0;
+            })) {
+              /* istanbul ignore next */
+              warn('config: "breakpoints" must be an array of at least 2 breakpoint names');
+            } else {
+              _this.$_config.breakpoints = cloneDeep(breakpoints);
+            }
+          } else if (isObject(cmpConfig)) {
+            keys(cmpConfig).filter(function (key) {
+              return cmpConfig.hasOwnProperty(key);
+            }).forEach(function (key) {
+              if (!DEFAULTS[cmpName].hasOwnProperty(key)) {
+                /* istanbul ignore next */
+                warn("config: unknown config property \"".concat(cmpName, ".{$key}\""));
+              } else {
+                // If we pre-populate the config with defaults, we can skip this line
+                _this.$_config[cmpName] = _this.$_config[cmpName] || {};
+
+                if (!isUndefined(cmpConfig[key])) {
+                  _this.$_config[cmpName][key] = cloneDeep(cmpConfig[key]);
+                }
+              }
+            });
+          }
+        });
+      }
+    }
+  }); // This contains user defined configuration manager object.
+  // This object should be treated as private!
+
+  Vue.prototype.$bvConfig = Vue.prototype.$bvConfig || new BvConfig(); // Method to get a deep clone (immutable) copy of the defaults
   // Merges in only known top-level and sub-level keys
   //   Vue.use(BootstrapVue, config)
   // or
@@ -1313,64 +1445,8 @@
 
   var setConfig = function setConfig() {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    if (!isObject(config)) {
-      /* istanbul ignore next */
-      return;
-    }
-
-    keys(config).filter(function (cmpName) {
-      return config.hasOwnProperty(cmpName);
-    }).forEach(function (cmpName) {
-      if (!DEFAULTS.hasOwnProperty(cmpName)) {
-        /* istanbul ignore next */
-        warn("config: unknown config property \"".concat(cmpName, "\""));
-        /* istanbul ignore next */
-
-        return;
-      }
-
-      var cmpConfig = config[cmpName];
-
-      if (cmpName === 'breakpoints') {
-        // Special case for breakpoints
-        var breakpoints = config.breakpoints;
-
-        if (!isArray$1(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
-          return !isString(b) || b.length === 0;
-        })) {
-          /* istanbul ignore next */
-          warn('config: "breakpoints" must be an array of at least 2 breakpoint names');
-        } else {
-          CONFIG.breakpoints = cloneDeep(breakpoints);
-        }
-      } else if (isObject(cmpConfig)) {
-        keys(cmpConfig).filter(function (key) {
-          return cmpConfig.hasOwnProperty(key);
-        }).forEach(function (key) {
-          if (!DEFAULTS[cmpName].hasOwnProperty(key)) {
-            /* istanbul ignore next */
-            warn("config: unknown config property \"".concat(cmpName, ".{$key}\""));
-          } else {
-            // If we pre-populate the config with defaults, we can skip this line
-            CONFIG[cmpName] = CONFIG[cmpName] || {};
-
-            if (!isUndefined(cmpConfig[key])) {
-              CONFIG[cmpName][key] = cloneDeep(cmpConfig[key]);
-            }
-          }
-        });
-      }
-    });
+    Vue.prototype.$bvConfig.setConfig(config);
   }; // Reset the user config to default
-  // Returns a deep clone (immutable) copy
-
-
-  var getConfigValue = function getConfigValue(key) {
-    // First we try the user config, and if key not found we fall back to default value
-    // NOTE: If we deep clone DEFAULTS into config, then we can skip the fallback for get
-    return cloneDeep(get(CONFIG, key, get(getDefaults(), key)));
-  }; // Method to grab a config value for a particular component.
   // Returns a deep clone (immutable) copy
 
 
@@ -1378,44 +1454,39 @@
     var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     // Return the particular config value for key for if specified,
     // otherwise we return the full config
-    return key ? getConfigValue("".concat(cmpName, ".").concat(key)) : getConfigValue(cmpName) || {};
+    return Vue.prototype.$bvConfig.getComponentConfig(cmpName, key);
   }; // Convenience method for getting all breakpoint names
 
 
   var getBreakpoints = function getBreakpoints() {
-    return getConfigValue('breakpoints');
+    return Vue.prototype.$bvConfig.getBreakpoints();
   }; // Convenience method for getting all breakpoint names
-  // Caches the results after first access
-
-
-  var getBreakpointsCached = memoize(function () {
-    return getConfigValue('breakpoints');
-  }); // Convenience method for getting breakpoints with
   // the smallest breakpoint set as ''
   // Useful for components that create breakpoint specific props
   // Caches the results after first access
 
 
-  var getBreakpointsUpCached = memoize(function () {
-    var breakpoints = getBreakpointsCached().slice();
-    breakpoints[0] = '';
-    return breakpoints;
-  }); // Convenience method for getting breakpoints with
+  var getBreakpointsUpCached = function getBreakpointsUpCached() {
+    return Vue.prototype.$bvConfig.getBreakpointsUpCached();
+  }; // Convenience method for getting breakpoints with
 
-  var MULTIPLE_VUE_WARNING = "Multiple instances of Vue detected!\nSee: https://bootstrap-vue.js.org/docs#using-module-bundlers";
-  var checkMultipleVueWarned = false;
   /**
-   * Checks if there are multiple instances of Vue, and warns (once) about issues.
+   * Checks if there are multiple instances of Vue, and warns (once) about possible issues.
    * @param {object} Vue
    */
 
-  var checkMultipleVue = function checkMultipleVue(Vue$1) {
-    /* istanbul ignore next */
-    if (!checkMultipleVueWarned && Vue !== Vue$1) {
-      warn(MULTIPLE_VUE_WARNING);
+  var checkMultipleVue = function () {
+    var checkMultipleVueWarned = false;
+    var MULTIPLE_VUE_WARNING = ['Multiple instances of Vue detected!', 'You may need to set up an alias for Vue in your bundler config.', 'See: https://bootstrap-vue.js.org/docs#using-module-bundlers'].join('\n');
+    return function (Vue$1) {
+      /* istanbul ignore next */
+      if (!checkMultipleVueWarned && Vue !== Vue$1 && !isJSDOM) {
+        warn(MULTIPLE_VUE_WARNING);
+      }
+
       checkMultipleVueWarned = true;
-    }
-  };
+    };
+  }();
   /**
    * Plugin install factory function.
    * @param {object} { components, directives }
@@ -1525,7 +1596,2962 @@
     }
   };
 
+  var w = hasWindowSupport ? window : {};
+  var d = hasDocumentSupport ? document : {};
+  var elProto = typeof Element !== 'undefined' ? Element.prototype : {}; // --- Normalization utils ---
+  // See: https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
+
+  /* istanbul ignore next */
+
+  var matchesEl = elProto.matches || elProto.msMatchesSelector || elProto.webkitMatchesSelector; // See: https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+
+  /* istanbul ignore next */
+
+  var closestEl = elProto.closest || function (sel)
+  /* istanbul ignore next */
+  {
+    var el = this;
+
+    do {
+      // Use our "patched" matches function
+      if (matches(el, sel)) {
+        return el;
+      }
+
+      el = el.parentElement || el.parentNode;
+    } while (!isNull(el) && el.nodeType === Node.ELEMENT_NODE);
+
+    return null;
+  }; // `requestAnimationFrame()` convenience method
+  // We don't have a version for cancelAnimationFrame, but we don't call it anywhere
+
+  var requestAF = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.mozRequestAnimationFrame || w.msRequestAnimationFrame || w.oRequestAnimationFrame || function (cb) {
+    // Fallback, but not a true polyfill
+    // All browsers we support (other than Opera Mini) support
+    // `requestAnimationFrame()` without a polyfill
+
+    /* istanbul ignore next */
+    return setTimeout(cb, 16);
+  };
+  var MutationObs = w.MutationObserver || w.WebKitMutationObserver || w.MozMutationObserver || null; // --- Utils ---
+  // Normalize event options based on support of passive option
+  // Exported only for testing purposes
+
+  var parseEventOptions = function parseEventOptions(options) {
+    /* istanbul ignore else: can't test in JSDOM, as it supports passive */
+    if (hasPassiveEventSupport) {
+      return isObject(options) ? options : {
+        useCapture: Boolean(options || false)
+      };
+    } else {
+      // Need to translate to actual Boolean value
+      return Boolean(isObject(options) ? options.useCapture : options);
+    }
+  }; // Attach an event listener to an element
+
+  var eventOn = function eventOn(el, evtName, handler, options) {
+    if (el && el.addEventListener) {
+      el.addEventListener(evtName, handler, parseEventOptions(options));
+    }
+  }; // Remove an event listener from an element
+
+  var eventOff = function eventOff(el, evtName, handler, options) {
+    if (el && el.removeEventListener) {
+      el.removeEventListener(evtName, handler, parseEventOptions(options));
+    }
+  }; // Determine if an element is an HTML Element
+
+  var isElement = function isElement(el) {
+    return Boolean(el && el.nodeType === Node.ELEMENT_NODE);
+  }; // Determine if an HTML element is visible - Faster than CSS check
+
+  var isVisible = function isVisible(el) {
+    if (!isElement(el) || !contains(d.body, el)) {
+      return false;
+    }
+
+    if (el.style.display === 'none') {
+      // We do this check to help with vue-test-utils when using v-show
+
+      /* istanbul ignore next */
+      return false;
+    } // All browsers support getBoundingClientRect(), except JSDOM as it returns all 0's for values :(
+    // So any tests that need isVisible will fail in JSDOM
+    // Except when we override the getBCR prototype in some tests
+
+
+    var bcr = getBCR(el);
+    return Boolean(bcr && bcr.height > 0 && bcr.width > 0);
+  }; // Determine if an element is disabled
+
+  var isDisabled = function isDisabled(el) {
+    return !isElement(el) || el.disabled || Boolean(getAttr(el, 'disabled')) || hasClass(el, 'disabled');
+  }; // Cause/wait-for an element to reflow it's content (adjusting it's height/width)
+
+  var reflow = function reflow(el) {
+    // Requesting an elements offsetHight will trigger a reflow of the element content
+
+    /* istanbul ignore next: reflow doesn't happen in JSDOM */
+    return isElement(el) && el.offsetHeight;
+  }; // Select all elements matching selector. Returns `[]` if none found
+
+  var selectAll = function selectAll(selector, root) {
+    return from((isElement(root) ? root : d).querySelectorAll(selector));
+  }; // Select a single element, returns `null` if not found
+
+  var select = function select(selector, root) {
+    return (isElement(root) ? root : d).querySelector(selector) || null;
+  }; // Determine if an element matches a selector
+
+  var matches = function matches(el, selector) {
+    if (!isElement(el)) {
+      return false;
+    }
+
+    return matchesEl.call(el, selector);
+  }; // Finds closest element matching selector. Returns `null` if not found
+
+  var closest = function closest(selector, root) {
+    if (!isElement(root)) {
+      return null;
+    }
+
+    var el = closestEl.call(root, selector); // Emulate jQuery closest and return `null` if match is the passed in element (root)
+
+    return el === root ? null : el;
+  }; // Returns true if the parent element contains the child element
+
+  var contains = function contains(parent, child) {
+    if (!parent || !isFunction(parent.contains)) {
+      return false;
+    }
+
+    return parent.contains(child);
+  }; // Get an element given an ID
+
+  var getById = function getById(id) {
+    return d.getElementById(/^#/.test(id) ? id.slice(1) : id) || null;
+  }; // Add a class to an element
+
+  var addClass = function addClass(el, className) {
+    // We are checking for `el.classList` existence here since IE 11
+    // returns `undefined` for some elements (e.g. SVG elements)
+    // See https://github.com/bootstrap-vue/bootstrap-vue/issues/2713
+    if (className && isElement(el) && el.classList) {
+      el.classList.add(className);
+    }
+  }; // Remove a class from an element
+
+  var removeClass = function removeClass(el, className) {
+    // We are checking for `el.classList` existence here since IE 11
+    // returns `undefined` for some elements (e.g. SVG elements)
+    // See https://github.com/bootstrap-vue/bootstrap-vue/issues/2713
+    if (className && isElement(el) && el.classList) {
+      el.classList.remove(className);
+    }
+  }; // Test if an element has a class
+
+  var hasClass = function hasClass(el, className) {
+    // We are checking for `el.classList` existence here since IE 11
+    // returns `undefined` for some elements (e.g. SVG elements)
+    // See https://github.com/bootstrap-vue/bootstrap-vue/issues/2713
+    if (className && isElement(el) && el.classList) {
+      return el.classList.contains(className);
+    }
+
+    return false;
+  }; // Set an attribute on an element
+
+  var setAttr = function setAttr(el, attr, value) {
+    if (attr && isElement(el)) {
+      el.setAttribute(attr, value);
+    }
+  }; // Remove an attribute from an element
+
+  var removeAttr = function removeAttr(el, attr) {
+    if (attr && isElement(el)) {
+      el.removeAttribute(attr);
+    }
+  }; // Get an attribute value from an element
+  // Returns `null` if not found
+
+  var getAttr = function getAttr(el, attr) {
+    return attr && isElement(el) ? el.getAttribute(attr) : null;
+  }; // Determine if an attribute exists on an element
+  // Returns `true` or `false`, or `null` if element not found
+
+  var hasAttr = function hasAttr(el, attr) {
+    return attr && isElement(el) ? el.hasAttribute(attr) : null;
+  }; // Return the Bounding Client Rect of an element
+  // Returns `null` if not an element
+
+  /* istanbul ignore next: getBoundingClientRect() doesn't work in JSDOM */
+
+  var getBCR = function getBCR(el) {
+    return isElement(el) ? el.getBoundingClientRect() : null;
+  }; // Get computed style object for an element
+
+  /* istanbul ignore next: getComputedStyle() doesn't work in JSDOM */
+
+  var getCS = function getCS(el) {
+    return hasWindowSupport && isElement(el) ? w.getComputedStyle(el) : {};
+  }; // Return an element's offset with respect to document element
+  // https://j11y.io/jquery/#v=git&fn=jQuery.fn.offset
+
+  var offset = function offset(el)
+  /* istanbul ignore next: getBoundingClientRect(), getClientRects() doesn't work in JSDOM */
+  {
+    var _offset = {
+      top: 0,
+      left: 0
+    };
+
+    if (!isElement(el) || el.getClientRects().length === 0) {
+      return _offset;
+    }
+
+    var bcr = getBCR(el);
+
+    if (bcr) {
+      var win = el.ownerDocument.defaultView;
+      _offset.top = bcr.top + win.pageYOffset;
+      _offset.left = bcr.left + win.pageXOffset;
+    }
+
+    return _offset;
+  }; // Return an element's offset with respect to to it's offsetParent
+  // https://j11y.io/jquery/#v=git&fn=jQuery.fn.position
+
+  var position = function position(el)
+  /* istanbul ignore next: getBoundingClientRect() doesn't work in JSDOM */
+  {
+    var _offset = {
+      top: 0,
+      left: 0
+    };
+
+    if (!isElement(el)) {
+      return _offset;
+    }
+
+    var parentOffset = {
+      top: 0,
+      left: 0
+    };
+    var elStyles = getCS(el);
+
+    if (elStyles.position === 'fixed') {
+      _offset = getBCR(el) || _offset;
+    } else {
+      _offset = offset(el);
+      var doc = el.ownerDocument;
+      var offsetParent = el.offsetParent || doc.documentElement;
+
+      while (offsetParent && (offsetParent === doc.body || offsetParent === doc.documentElement) && getCS(offsetParent).position === 'static') {
+        offsetParent = offsetParent.parentNode;
+      }
+
+      if (offsetParent && offsetParent !== el && offsetParent.nodeType === Node.ELEMENT_NODE) {
+        parentOffset = offset(offsetParent);
+        var offsetParentStyles = getCS(offsetParent);
+        parentOffset.top += parseFloat(offsetParentStyles.borderTopWidth);
+        parentOffset.left += parseFloat(offsetParentStyles.borderLeftWidth);
+      }
+    }
+
+    return {
+      top: _offset.top - parentOffset.top - parseFloat(elStyles.marginTop),
+      left: _offset.left - parentOffset.left - parseFloat(elStyles.marginLeft)
+    };
+  };
+
+  /**
+   * Private ModalManager helper
+   * Handles controlling modal stacking zIndexes and body adjustments/classes
+   */
+  // Default modal backdrop z-index
+
+  var DEFAULT_ZINDEX = 1040; // Selectors for padding/margin adjustments
+
+  var Selector = {
+    FIXED_CONTENT: '.fixed-top, .fixed-bottom, .is-fixed, .sticky-top',
+    STICKY_CONTENT: '.sticky-top',
+    NAVBAR_TOGGLER: '.navbar-toggler' // @vue/component
+
+  };
+  var ModalManager = Vue.extend({
+    data: function data() {
+      return {
+        modals: [],
+        baseZIndex: null,
+        scrollbarWidth: null,
+        isBodyOverflowing: false
+      };
+    },
+    computed: {
+      modalCount: function modalCount() {
+        return this.modals.length;
+      },
+      modalsAreOpen: function modalsAreOpen() {
+        return this.modalCount > 0;
+      }
+    },
+    watch: {
+      modalCount: function modalCount(newCount, oldCount) {
+        if (isBrowser) {
+          this.getScrollbarWidth();
+
+          if (newCount > 0 && oldCount === 0) {
+            // Transitioning to modal(s) open
+            this.checkScrollbar();
+            this.setScrollbar();
+            addClass(document.body, 'modal-open');
+          } else if (newCount === 0 && oldCount > 0) {
+            // Transitioning to modal(s) closed
+            this.resetScrollbar();
+            removeClass(document.body, 'modal-open');
+          }
+
+          setAttr(document.body, 'data-modal-open-count', String(newCount));
+        }
+      },
+      modals: function modals(newVal, oldVal) {
+        var _this = this;
+
+        this.checkScrollbar();
+        requestAF(function () {
+          _this.updateModals(newVal || []);
+        });
+      }
+    },
+    methods: {
+      // Public methods
+      registerModal: function registerModal(modal) {
+        var _this2 = this;
+
+        // Register the modal if not already registered
+        if (modal && this.modals.indexOf(modal) === -1) {
+          // Add modal to modals array
+          this.modals.push(modal);
+          modal.$once('hook:beforeDestroy', function () {
+            _this2.unregisterModal(modal);
+          });
+        }
+      },
+      unregisterModal: function unregisterModal(modal) {
+        var index = this.modals.indexOf(modal);
+
+        if (index > -1) {
+          // Remove modal from modals array
+          this.modals.splice(index, 1); // Reset the modal's data
+
+          if (!(modal._isBeingDestroyed || modal._isDestroyed)) {
+            this.resetModal(modal);
+          }
+        }
+      },
+      getBaseZIndex: function getBaseZIndex() {
+        if (isNull(this.baseZIndex) && isBrowser) {
+          // Create a temporary `div.modal-backdrop` to get computed z-index
+          var div = document.createElement('div');
+          div.className = 'modal-backdrop d-none';
+          div.style.display = 'none';
+          document.body.appendChild(div);
+          this.baseZIndex = parseInt(getCS(div).zIndex || DEFAULT_ZINDEX, 10);
+          document.body.removeChild(div);
+        }
+
+        return this.baseZIndex || DEFAULT_ZINDEX;
+      },
+      getScrollbarWidth: function getScrollbarWidth() {
+        if (isNull(this.scrollbarWidth) && isBrowser) {
+          // Create a temporary `div.measure-scrollbar` to get computed z-index
+          var div = document.createElement('div');
+          div.className = 'modal-scrollbar-measure';
+          document.body.appendChild(div);
+          this.scrollbarWidth = getBCR(div).width - div.clientWidth;
+          document.body.removeChild(div);
+        }
+
+        return this.scrollbarWidth || 0;
+      },
+      // Private methods
+      updateModals: function updateModals(modals) {
+        var _this3 = this;
+
+        var baseZIndex = this.getBaseZIndex();
+        var scrollbarWidth = this.getScrollbarWidth();
+        modals.forEach(function (modal, index) {
+          // We update data values on each modal
+          modal.zIndex = baseZIndex + index;
+          modal.scrollbarWidth = scrollbarWidth;
+          modal.isTop = index === _this3.modals.length - 1;
+          modal.isBodyOverflowing = _this3.isBodyOverflowing;
+        });
+      },
+      resetModal: function resetModal(modal) {
+        if (modal) {
+          modal.zIndex = this.getBaseZIndex();
+          modal.isTop = true;
+          modal.isBodyOverflowing = false;
+        }
+      },
+      checkScrollbar: function checkScrollbar() {
+        // Determine if the body element is overflowing
+        var _getBCR = getBCR(document.body),
+            left = _getBCR.left,
+            right = _getBCR.right;
+
+        this.isBodyOverflowing = left + right < window.innerWidth;
+      },
+      setScrollbar: function setScrollbar() {
+        var body = document.body; // Storage place to cache changes to margins and padding
+        // Note: This assumes the following element types are not added to the
+        // document after the modal has opened.
+
+        body._paddingChangedForModal = body._paddingChangedForModal || [];
+        body._marginChangedForModal = body._marginChangedForModal || [];
+
+        if (this.isBodyOverflowing) {
+          var scrollbarWidth = this.scrollbarWidth; // Adjust fixed content padding
+
+          /* istanbul ignore next: difficult to test in JSDOM */
+
+          selectAll(Selector.FIXED_CONTENT).forEach(function (el) {
+            var actualPadding = el.style.paddingRight;
+            var calculatedPadding = getCS(el).paddingRight || 0;
+            setAttr(el, 'data-padding-right', actualPadding);
+            el.style.paddingRight = "".concat(parseFloat(calculatedPadding) + scrollbarWidth, "px");
+
+            body._paddingChangedForModal.push(el);
+          }); // Adjust sticky content margin
+
+          /* istanbul ignore next: difficult to test in JSDOM */
+
+          selectAll(Selector.STICKY_CONTENT).forEach(function (el) {
+            var actualMargin = el.style.marginRight;
+            var calculatedMargin = getCS(el).marginRight || 0;
+            setAttr(el, 'data-margin-right', actualMargin);
+            el.style.marginRight = "".concat(parseFloat(calculatedMargin) - scrollbarWidth, "px");
+
+            body._marginChangedForModal.push(el);
+          }); // Adjust <b-navbar-toggler> margin
+
+          /* istanbul ignore next: difficult to test in JSDOM */
+
+          selectAll(Selector.NAVBAR_TOGGLER).forEach(function (el) {
+            var actualMargin = el.style.marginRight;
+            var calculatedMargin = getCS(el).marginRight || 0;
+            setAttr(el, 'data-margin-right', actualMargin);
+            el.style.marginRight = "".concat(parseFloat(calculatedMargin) + scrollbarWidth, "px");
+
+            body._marginChangedForModal.push(el);
+          }); // Adjust body padding
+
+          var actualPadding = body.style.paddingRight;
+          var calculatedPadding = getCS(body).paddingRight;
+          setAttr(body, 'data-padding-right', actualPadding);
+          body.style.paddingRight = "".concat(parseFloat(calculatedPadding) + scrollbarWidth, "px");
+        }
+      },
+      resetScrollbar: function resetScrollbar() {
+        var body = document.body;
+
+        if (body._paddingChangedForModal) {
+          // Restore fixed content padding
+          body._paddingChangedForModal.forEach(function (el) {
+            /* istanbul ignore next: difficult to test in JSDOM */
+            if (hasAttr(el, 'data-padding-right')) {
+              el.style.paddingRight = getAttr(el, 'data-padding-right') || '';
+              removeAttr(el, 'data-padding-right');
+            }
+          });
+        }
+
+        if (body._marginChangedForModal) {
+          // Restore sticky content and navbar-toggler margin
+          body._marginChangedForModal.forEach(function (el) {
+            /* istanbul ignore next: difficult to test in JSDOM */
+            if (hasAttr(el, 'data-margin-right')) {
+              el.style.marginRight = getAttr(el, 'data-margin-right') || '';
+              removeAttr(el, 'data-margin-right');
+            }
+          });
+        }
+
+        body._paddingChangedForModal = null;
+        body._marginChangedForModal = null; // Restore body padding
+
+        if (hasAttr(body, 'data-padding-right')) {
+          body.style.paddingRight = getAttr(body, 'data-padding-right') || '';
+          removeAttr(body, 'data-padding-right');
+        }
+      }
+    }
+  }); // Export our ModalManager
+
+  var modalManager = new ModalManager();
+
+  var BvEvent =
+  /*#__PURE__*/
+  function () {
+    function BvEvent(type) {
+      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      _classCallCheck(this, BvEvent);
+
+      // Start by emulating native Event constructor.
+      if (!type) {
+        /* istanbul ignore next */
+        throw new TypeError("Failed to construct '".concat(this.constructor.name, "'. 1 argument required, ").concat(arguments.length, " given."));
+      } // Assign defaults first, the eventInit,
+      // and the type last so it can't be overwritten.
+
+
+      assign$1(this, BvEvent.Defaults, this.constructor.Defaults, eventInit, {
+        type: type
+      }); // Freeze some props as readonly, but leave them enumerable.
+
+      defineProperties(this, {
+        type: readonlyDescriptor(),
+        cancelable: readonlyDescriptor(),
+        nativeEvent: readonlyDescriptor(),
+        target: readonlyDescriptor(),
+        relatedTarget: readonlyDescriptor(),
+        vueTarget: readonlyDescriptor(),
+        componentId: readonlyDescriptor()
+      }); // Create a private variable using closure scoping.
+
+      var defaultPrevented = false; // Recreate preventDefault method. One way setter.
+
+      this.preventDefault = function preventDefault() {
+        if (this.cancelable) {
+          defaultPrevented = true;
+        }
+      }; // Create 'defaultPrevented' publicly accessible prop
+      // that can only be altered by the preventDefault method.
+
+
+      defineProperty(this, 'defaultPrevented', {
+        enumerable: true,
+        get: function get() {
+          return defaultPrevented;
+        }
+      });
+    }
+
+    _createClass(BvEvent, null, [{
+      key: "Defaults",
+      get: function get() {
+        return {
+          type: '',
+          cancelable: true,
+          nativeEvent: null,
+          target: null,
+          relatedTarget: null,
+          vueTarget: null,
+          componentId: null
+        };
+      }
+    }]);
+
+    return BvEvent;
+  }(); // Named Exports
+
+  var BvModalEvent =
+  /*#__PURE__*/
+  function (_BvEvent) {
+    _inherits(BvModalEvent, _BvEvent);
+
+    function BvModalEvent(type) {
+      var _this;
+
+      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      _classCallCheck(this, BvModalEvent);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(BvModalEvent).call(this, type, eventInit)); // Freeze our new props as readonly, but leave them enumerable
+
+      defineProperties(_assertThisInitialized(_this), {
+        trigger: readonlyDescriptor()
+      });
+      return _this;
+    }
+
+    _createClass(BvModalEvent, [{
+      key: "cancel",
+      value: function cancel()
+      /* istanbul ignore next */
+      {
+        // Backwards compatibility for BootstrapVue 1.x
+        warn('b-modal: evt.cancel() is deprecated. Please use evt.preventDefault().');
+        this.preventDefault();
+      }
+    }, {
+      key: "modalId",
+      get: function get()
+      /* istanbul ignore next */
+      {
+        // Backwards compatability <= 2.0.0-rc.19
+        warn('b-modal: evt.modalId is deprecated. Please use evt.componentId.');
+        return this.componentId;
+      }
+    }], [{
+      key: "Defaults",
+      get: function get() {
+        return _objectSpread({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this), {
+          trigger: null
+        });
+      }
+    }]);
+
+    return BvModalEvent;
+  }(BvEvent); // Named exports
+
+  var __assign=function(){return (__assign=Object.assign||function(e){for(var a,s=1,t=arguments.length;s<t;s++)for(var r in a=arguments[s])Object.prototype.hasOwnProperty.call(a,r)&&(e[r]=a[r]);return e}).apply(this,arguments)};function mergeData(){for(var e,a,s={},t=arguments.length;t--;)for(var r=0,c=Object.keys(arguments[t]);r<c.length;r++)switch(e=c[r]){case"class":case"style":case"directives":Array.isArray(s[e])||(s[e]=[]),s[e]=s[e].concat(arguments[t][e]);break;case"staticClass":if(!arguments[t][e])break;void 0===s[e]&&(s[e]=""),s[e]&&(s[e]+=" "),s[e]+=arguments[t][e].trim();break;case"on":case"nativeOn":s[e]||(s[e]={});for(var n=0,o=Object.keys(arguments[t][e]||{});n<o.length;n++)a=o[n],s[e][a]?s[e][a]=[].concat(s[e][a],arguments[t][e][a]):s[e][a]=arguments[t][e][a];break;case"attrs":case"props":case"domProps":case"scopedSlots":case"staticStyle":case"hook":case"transition":s[e]||(s[e]={}),s[e]=__assign({},arguments[t][e],s[e]);break;case"slot":case"key":case"ref":case"tag":case"show":case"keepAlive":default:s[e]||(s[e]=arguments[t][e]);}return s}
+
+  var identity = function identity(x) {
+    return x;
+  };
+
+  /**
+   * Given an array of properties or an object of property keys,
+   * plucks all the values off the target object, returning a new object
+   * that has props that reference the original prop values
+   *
+   * @param {{}|string[]} keysToPluck
+   * @param {{}} objToPluck
+   * @param {Function} transformFn
+   * @return {{}}
+   */
+
+  var pluckProps = function pluckProps(keysToPluck, objToPluck) {
+    var transformFn = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : identity;
+    return (isArray$1(keysToPluck) ? keysToPluck.slice() : keys(keysToPluck)).reduce(function (memo, prop) {
+      memo[transformFn(prop)] = objToPluck[prop];
+      return memo;
+    }, {});
+  };
+
+  /**
+   * Convert a value to a string that can be rendered.
+   */
+
+  var toString$1 = function toString(val) {
+    var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+    return isUndefined(val) || isNull(val) ? '' : isArray$1(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
+  };
+
+  var ANCHOR_TAG = 'a'; // Precompile RegExp
+
+  var commaRE = /%2C/g;
+  var encodeReserveRE = /[!'()*]/g; // Method to replace reserved chars
+
+  var encodeReserveReplacer = function encodeReserveReplacer(c) {
+    return '%' + c.charCodeAt(0).toString(16);
+  }; // Fixed encodeURIComponent which is more conformant to RFC3986:
+  // - escapes [!'()*]
+  // - preserve commas
+
+
+  var encode = function encode(str) {
+    return encodeURIComponent(toString$1(str)).replace(encodeReserveRE, encodeReserveReplacer).replace(commaRE, ',');
+  };
+
+  var decode = decodeURIComponent; // Stringifies an object of query parameters
+  // See: https://github.com/vuejs/vue-router/blob/dev/src/util/query.js
+
+  var stringifyQueryObj = function stringifyQueryObj(obj) {
+    if (!isPlainObject(obj)) {
+      return '';
+    }
+
+    var query = keys(obj).map(function (key) {
+      var val = obj[key];
+
+      if (isUndefined(val)) {
+        return '';
+      } else if (isNull(val)) {
+        return encode(key);
+      } else if (isArray$1(val)) {
+        return val.reduce(function (results, val2) {
+          if (isNull(val2)) {
+            results.push(encode(key));
+          } else if (!isUndefined(val2)) {
+            // Faster than string interpolation
+            results.push(encode(key) + '=' + encode(val2));
+          }
+
+          return results;
+        }, []).join('&');
+      } // Faster than string interpolation
+
+
+      return encode(key) + '=' + encode(val);
+    })
+    /* must check for length, as we only want to filter empty strings, not things that look falsey! */
+    .filter(function (x) {
+      return x.length > 0;
+    }).join('&');
+    return query ? "?".concat(query) : '';
+  };
+  var parseQuery = function parseQuery(query) {
+    var parsed = {};
+    query = toString$1(query).trim().replace(/^(\?|#|&)/, '');
+
+    if (!query) {
+      return parsed;
+    }
+
+    query.split('&').forEach(function (param) {
+      var parts = param.replace(/\+/g, ' ').split('=');
+      var key = decode(parts.shift());
+      var val = parts.length > 0 ? decode(parts.join('=')) : null;
+
+      if (isUndefined(parsed[key])) {
+        parsed[key] = val;
+      } else if (isArray$1(parsed[key])) {
+        parsed[key].push(val);
+      } else {
+        parsed[key] = [parsed[key], val];
+      }
+    });
+    return parsed;
+  };
+  var isRouterLink = function isRouterLink(tag) {
+    return tag !== ANCHOR_TAG;
+  };
+  var computeTag = function computeTag() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        to = _ref.to,
+        disabled = _ref.disabled;
+
+    var thisOrParent = arguments.length > 1 ? arguments[1] : undefined;
+    return thisOrParent.$router && to && !disabled ? thisOrParent.$nuxt ? 'nuxt-link' : 'router-link' : ANCHOR_TAG;
+  };
+  var computeRel = function computeRel() {
+    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        target = _ref2.target,
+        rel = _ref2.rel;
+
+    if (target === '_blank' && isNull(rel)) {
+      return 'noopener';
+    }
+
+    return rel || null;
+  };
+  var computeHref = function computeHref() {
+    var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        href = _ref3.href,
+        to = _ref3.to;
+
+    var tag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ANCHOR_TAG;
+    var fallback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '#';
+    var toFallback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '/';
+
+    // We've already checked the $router in computeTag(), so isRouterLink() indicates a live router.
+    // When deferring to Vue Router's router-link, don't use the href attribute at all.
+    // We return null, and then remove href from the attributes passed to router-link
+    if (isRouterLink(tag)) {
+      return null;
+    } // Return `href` when explicitly provided
+
+
+    if (href) {
+      return href;
+    } // Reconstruct `href` when `to` used, but no router
+
+
+    if (to) {
+      // Fallback to `to` prop (if `to` is a string)
+      if (isString(to)) {
+        return to || toFallback;
+      } // Fallback to `to.path + to.query + to.hash` prop (if `to` is an object)
+
+
+      if (isPlainObject(to) && (to.path || to.query || to.hash)) {
+        var path = toString$1(to.path);
+        var query = stringifyQueryObj(to.query);
+        var hash = toString$1(to.hash);
+        hash = !hash || hash.charAt(0) === '#' ? hash : "#".concat(hash);
+        return "".concat(path).concat(query).concat(hash) || toFallback;
+      }
+    } // If nothing is provided return the fallback
+
+
+    return fallback;
+  };
+
+  /**
+   * The Link component is used in many other BV components.
+   * As such, sharing its props makes supporting all its features easier.
+   * However, some components need to modify the defaults for their own purpose.
+   * Prefer sharing a fresh copy of the props to ensure mutations
+   * do not affect other component references to the props.
+   *
+   * https://github.com/vuejs/vue-router/blob/dev/src/components/link.js
+   * @return {{}}
+   */
+
+  var propsFactory = function propsFactory() {
+    return {
+      href: {
+        type: String,
+        default: null
+      },
+      rel: {
+        type: String,
+        default: null
+      },
+      target: {
+        type: String,
+        default: '_self'
+      },
+      active: {
+        type: Boolean,
+        default: false
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      // router-link specific props
+      to: {
+        type: [String, Object],
+        default: null
+      },
+      append: {
+        type: Boolean,
+        default: false
+      },
+      replace: {
+        type: Boolean,
+        default: false
+      },
+      event: {
+        type: [String, Array],
+        default: 'click'
+      },
+      activeClass: {
+        type: String // default: undefined
+
+      },
+      exact: {
+        type: Boolean,
+        default: false
+      },
+      exactActiveClass: {
+        type: String // default: undefined
+
+      },
+      routerTag: {
+        type: String,
+        default: 'a'
+      },
+      // nuxt-link specific prop(s)
+      noPrefetch: {
+        type: Boolean,
+        default: false
+      }
+    };
+  };
+
+  var clickHandlerFactory = function clickHandlerFactory(_ref) {
+    var disabled = _ref.disabled,
+        tag = _ref.tag,
+        href = _ref.href,
+        suppliedHandler = _ref.suppliedHandler,
+        parent = _ref.parent;
+    return function onClick(evt) {
+      var _arguments = arguments;
+
+      if (disabled && evt instanceof Event) {
+        // Stop event from bubbling up.
+        evt.stopPropagation(); // Kill the event loop attached to this specific EventTarget.
+        // Needed to prevent vue-router for doing its thing
+
+        evt.stopImmediatePropagation();
+      } else {
+        if (isRouterLink(tag) && evt.target.__vue__) {
+          // Router links do not emit instance 'click' events, so we
+          // add in an $emit('click', evt) on it's vue instance
+
+          /* istanbul ignore next: difficult to test, but we know it works */
+          evt.target.__vue__.$emit('click', evt);
+        } // Call the suppliedHandler(s), if any provided
+
+
+        concat(suppliedHandler).filter(function (h) {
+          return isFunction(h);
+        }).forEach(function (handler) {
+          handler.apply(void 0, _toConsumableArray(_arguments));
+        });
+        parent.$root.$emit('clicked::link', evt);
+      }
+
+      if (!isRouterLink(tag) && href === '#' || disabled) {
+        // Stop scroll-to-top behavior or navigation on regular links
+        // when href is just '#'
+        evt.preventDefault();
+      }
+    };
+  }; // @vue/component
+
+
+  var BLink = Vue.extend({
+    name: 'BLink',
+    functional: true,
+    props: propsFactory(),
+    render: function render(h, _ref2) {
+      var props = _ref2.props,
+          data = _ref2.data,
+          parent = _ref2.parent,
+          children = _ref2.children;
+      var tag = computeTag(props, parent);
+      var rel = computeRel(props);
+      var href = computeHref(props, tag);
+      var eventType = isRouterLink(tag) ? 'nativeOn' : 'on';
+      var suppliedHandler = (data[eventType] || {}).click;
+      var handlers = {
+        click: clickHandlerFactory({
+          tag: tag,
+          href: href,
+          disabled: props.disabled,
+          suppliedHandler: suppliedHandler,
+          parent: parent
+        })
+      };
+      var componentData = mergeData(data, {
+        class: {
+          active: props.active,
+          disabled: props.disabled
+        },
+        attrs: {
+          rel: rel,
+          target: props.target,
+          tabindex: props.disabled ? '-1' : data.attrs ? data.attrs.tabindex : null,
+          'aria-disabled': props.disabled ? 'true' : null
+        },
+        props: _objectSpread({}, props, {
+          tag: props.routerTag
+        })
+      }); // If href attribute exists on router-link (even undefined or null) it fails working on SSR
+      // So we explicitly add it here if needed (i.e. if computeHref() is truthy)
+
+      if (href) {
+        componentData.attrs.href = href;
+      } else {
+        // Ensure the prop HREF does not exist for router links
+        delete componentData.props.href;
+      } // We want to overwrite any click handler since our callback
+      // will invoke the user supplied handler if !props.disabled
+
+
+      componentData[eventType] = _objectSpread({}, componentData[eventType] || {}, handlers);
+      return h(tag, componentData, children);
+    }
+  });
+
+  var NAME = 'BButton';
+  var btnProps = {
+    block: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    size: {
+      type: String,
+      default: null
+    },
+    variant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME, 'variant');
+      }
+    },
+    type: {
+      type: String,
+      default: 'button'
+    },
+    tag: {
+      type: String,
+      default: 'button'
+    },
+    pill: {
+      type: Boolean,
+      default: false
+    },
+    squared: {
+      type: Boolean,
+      default: false
+    },
+    pressed: {
+      // tri-state prop: true, false or null
+      // => on, off, not a toggle
+      type: Boolean,
+      default: null
+    }
+  };
+  var linkProps = propsFactory();
+  delete linkProps.href.default;
+  delete linkProps.to.default;
+  var linkPropKeys = keys(linkProps);
+  var props = _objectSpread({}, linkProps, btnProps); // --- Helper methods ---
+  // Focus handler for toggle buttons.  Needs class of 'focus' when focused.
+
+  var handleFocus = function handleFocus(evt) {
+    if (evt.type === 'focusin') {
+      addClass(evt.target, 'focus');
+    } else if (evt.type === 'focusout') {
+      removeClass(evt.target, 'focus');
+    }
+  }; // Is the requested button a link?
+
+
+  var isLink = function isLink(props) {
+    // If tag prop is set to `a`, we use a b-link to get proper disabled handling
+    return Boolean(props.href || props.to || props.tag && String(props.tag).toLowerCase() === 'a');
+  }; // Is the button to be a toggle button?
+
+
+  var isToggle = function isToggle(props) {
+    return isBoolean(props.pressed);
+  }; // Is the button "really" a button?
+
+
+  var isButton = function isButton(props) {
+    if (isLink(props)) {
+      return false;
+    } else if (props.tag && String(props.tag).toLowerCase() !== 'button') {
+      return false;
+    }
+
+    return true;
+  }; // Is the requested tag not a button or link?
+
+
+  var isNonStandardTag = function isNonStandardTag(props) {
+    return !isLink(props) && !isButton(props);
+  }; // Compute required classes (non static classes)
+
+
+  var computeClass = function computeClass(props) {
+    var _ref;
+
+    return ["btn-".concat(props.variant || getComponentConfig(NAME, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), Boolean(props.size)), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
+  }; // Compute the link props to pass to b-link (if required)
+
+
+  var computeLinkProps = function computeLinkProps(props) {
+    return isLink(props) ? pluckProps(linkPropKeys, props) : null;
+  }; // Compute the attributes for a button
+
+
+  var computeAttrs = function computeAttrs(props, data) {
+    var button = isButton(props);
+    var link = isLink(props);
+    var toggle = isToggle(props);
+    var nonStdTag = isNonStandardTag(props);
+    var role = data.attrs && data.attrs['role'] ? data.attrs['role'] : null;
+    var tabindex = data.attrs ? data.attrs['tabindex'] : null;
+
+    if (nonStdTag) {
+      tabindex = '0';
+    }
+
+    return {
+      // Type only used for "real" buttons
+      type: button && !link ? props.type : null,
+      // Disabled only set on "real" buttons
+      disabled: button ? props.disabled : null,
+      // We add a role of button when the tag is not a link or button for ARIA.
+      // Don't bork any role provided in data.attrs when isLink or isButton
+      role: nonStdTag ? 'button' : role,
+      // We set the aria-disabled state for non-standard tags
+      'aria-disabled': nonStdTag ? String(props.disabled) : null,
+      // For toggles, we need to set the pressed state for ARIA
+      'aria-pressed': toggle ? String(props.pressed) : null,
+      // autocomplete off is needed in toggle mode to prevent some browsers from
+      // remembering the previous setting when using the back button.
+      autocomplete: toggle ? 'off' : null,
+      // Tab index is used when the component is not a button.
+      // Links are tabbable, but don't allow disabled, while non buttons or links
+      // are not tabbable, so we mimic that functionality by disabling tabbing
+      // when disabled, and adding a tabindex of '0' to non buttons or non links.
+      tabindex: props.disabled && !button ? '-1' : tabindex
+    };
+  }; // @vue/component
+
+
+  var BButton = Vue.extend({
+    name: NAME,
+    functional: true,
+    props: props,
+    render: function render(h, _ref2) {
+      var props = _ref2.props,
+          data = _ref2.data,
+          listeners = _ref2.listeners,
+          children = _ref2.children;
+      var toggle = isToggle(props);
+      var link = isLink(props);
+      var on = {
+        click: function click(e) {
+          /* istanbul ignore if: blink/button disabled should handle this */
+          if (props.disabled && e instanceof Event) {
+            e.stopPropagation();
+            e.preventDefault();
+          } else if (toggle && listeners && listeners['update:pressed']) {
+            // Send .sync updates to any "pressed" prop (if .sync listeners)
+            // Concat will normalize the value to an array
+            // without double wrapping an array value in an array.
+            concat(listeners['update:pressed']).forEach(function (fn) {
+              if (isFunction(fn)) {
+                fn(!props.pressed);
+              }
+            });
+          }
+        }
+      };
+
+      if (toggle) {
+        on.focusin = handleFocus;
+        on.focusout = handleFocus;
+      }
+
+      var componentData = {
+        staticClass: 'btn',
+        class: computeClass(props),
+        props: computeLinkProps(props),
+        attrs: computeAttrs(props, data),
+        on: on
+      };
+      return h(link ? BLink : props.tag, mergeData(data, componentData), children);
+    }
+  });
+
+  // In functional components, `slots` is a function so it must be called
+  // first before passing to the below methods. `scopedSlots` is always an
+  // object and may be undefined (for Vue < 2.6.x)
+
+  /**
+   * Returns true if either scoped or unscoped named slot eists
+   *
+   * @param {String} name
+   * @param {Object} scopedSlots
+   * @param {Object} slots
+   * @returns {Array|undefined} vNodes
+   */
+
+  var hasNormalizedSlot = function hasNormalizedSlot(name) {
+    var $scopedSlots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var $slots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    // Returns true if the either a $scopedSlot or $slot exists with the specified name
+    return Boolean($scopedSlots[name] || $slots[name]);
+  };
+  /**
+   * Returns vNodes for named slot either scoped or unscoped
+   *
+   * @param {String} name
+   * @param {String} scope
+   * @param {Object} scopedSlots
+   * @param {Object} slots
+   * @returns {Array|undefined} vNodes
+   */
+
+
+  var normalizeSlot = function normalizeSlot(name) {
+    var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var $scopedSlots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    var $slots = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+    // Note: in Vue 2.6.x, all names slots are also scoped slots
+    var slot = $scopedSlots[name] || $slots[name];
+    return isFunction(slot) ? slot(scope) : slot;
+  }; // Named exports
+
+  var NAME$1 = 'BButtonClose';
+  var props$1 = {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    ariaLabel: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$1, 'ariaLabel');
+      }
+    },
+    textVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$1, 'textVariant');
+      }
+    } // @vue/component
+
+  };
+  var BButtonClose = Vue.extend({
+    name: NAME$1,
+    functional: true,
+    props: props$1,
+    render: function render(h, _ref) {
+      var props = _ref.props,
+          data = _ref.data,
+          listeners = _ref.listeners,
+          slots = _ref.slots,
+          scopedSlots = _ref.scopedSlots;
+      var $slots = slots();
+      var $scopedSlots = scopedSlots || {};
+      var componentData = {
+        staticClass: 'close',
+        class: _defineProperty({}, "text-".concat(props.textVariant), props.textVariant),
+        attrs: {
+          type: 'button',
+          disabled: props.disabled,
+          'aria-label': props.ariaLabel ? String(props.ariaLabel) : null
+        },
+        on: {
+          click: function click(e) {
+            // Ensure click on button HTML content is also disabled
+
+            /* istanbul ignore if: bug in JSDOM still emits click on inner element */
+            if (props.disabled && e instanceof Event) {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          }
+        } // Careful not to override the default slot with innerHTML
+
+      };
+
+      if (!hasNormalizedSlot('default', $scopedSlots, $slots)) {
+        componentData.domProps = {
+          innerHTML: '&times;'
+        };
+      }
+
+      return h('button', mergeData(data, componentData), normalizeSlot('default', {}, $scopedSlots, $slots));
+    }
+  });
+
+  /*
+   * SSR Safe Client Side ID attribute generation
+   * id's can only be generated client side, after mount.
+   * this._uid is not synched between server and client.
+   */
+  // @vue/component
+  var idMixin = {
+    props: {
+      id: {
+        type: String,
+        default: null
+      }
+    },
+    data: function data() {
+      return {
+        localId_: null
+      };
+    },
+    computed: {
+      safeId: function safeId() {
+        // Computed property that returns a dynamic function for creating the ID.
+        // Reacts to changes in both .id and .localId_ And regens a new function
+        var id = this.id || this.localId_; // We return a function that accepts an optional suffix string
+        // So this computed prop looks and works like a method!!!
+        // But benefits from Vue's Computed prop caching
+
+        var fn = function fn(suffix) {
+          if (!id) {
+            return null;
+          }
+
+          suffix = String(suffix || '').replace(/\s+/g, '_');
+          return suffix ? id + '_' + suffix : id;
+        };
+
+        return fn;
+      }
+    },
+    mounted: function mounted() {
+      var _this = this;
+
+      // mounted only occurs client side
+      this.$nextTick(function () {
+        // Update dom with auto ID after dom loaded to prevent
+        // SSR hydration errors.
+        _this.localId_ = "__BVID__".concat(_this._uid);
+      });
+    }
+  };
+
+  /**
+   * Issue #569: collapse::toggle::state triggered too many times
+   * @link https://github.com/bootstrap-vue/bootstrap-vue/issues/569
+   */
+  // @vue/component
+  var listenOnRootMixin = {
+    methods: {
+      /**
+       * Safely register event listeners on the root Vue node.
+       * While Vue automatically removes listeners for individual components,
+       * when a component registers a listener on root and is destroyed,
+       * this orphans a callback because the node is gone,
+       * but the root does not clear the callback.
+       *
+       * When registering a $root listener, it also registers a listener on
+       * the component's `beforeDestroy` hook to automatically remove the
+       * event listener from the $root instance.
+       *
+       * @param {string} event
+       * @param {function} callback
+       * @chainable
+       */
+      listenOnRoot: function listenOnRoot(event, callback) {
+        var _this = this;
+
+        this.$root.$on(event, callback);
+        this.$on('hook:beforeDestroy', function () {
+          _this.$root.$off(event, callback);
+        }); // Return this for easy chaining
+
+        return this;
+      },
+
+      /**
+       * Safely register a $once event listener on the root Vue node.
+       * While Vue automatically removes listeners for individual components,
+       * when a component registers a listener on root and is destroyed,
+       * this orphans a callback because the node is gone,
+       * but the root does not clear the callback.
+       *
+       * When registering a $root listener, it also registers a listener on
+       * the component's `beforeDestroy` hook to automatically remove the
+       * event listener from the $root instance.
+       *
+       * @param {string} event
+       * @param {function} callback
+       * @chainable
+       */
+      listenOnRootOnce: function listenOnRootOnce(event, callback) {
+        var _this2 = this;
+
+        this.$root.$once(event, callback);
+        this.$on('hook:beforeDestroy', function () {
+          _this2.$root.$off(event, callback);
+        }); // Return this for easy chaining
+
+        return this;
+      },
+
+      /**
+       * Convenience method for calling vm.$emit on vm.$root.
+       * @param {string} event
+       * @param {*} args
+       * @chainable
+       */
+      emitOnRoot: function emitOnRoot(event) {
+        var _this$$root;
+
+        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        (_this$$root = this.$root).$emit.apply(_this$$root, [event].concat(args)); // Return this for easy chaining
+
+
+        return this;
+      }
+    }
+  };
+
+  var normalizeSlotMixin = {
+    methods: {
+      hasNormalizedSlot: function hasNormalizedSlot$1(name) {
+        // Returns true if the either a $scopedSlot or $slot exists with the specified name
+        return hasNormalizedSlot(name, this.$scopedSlots, this.$slots);
+      },
+      normalizeSlot: function normalizeSlot$1(name) {
+        var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        // Returns an array of rendered vNodes if slot found.
+        // Returns undefined if not found.
+        var vNodes = normalizeSlot(name, scope, this.$scopedSlots, this.$slots);
+
+        return vNodes ? concat(vNodes) : vNodes;
+      }
+    }
+  };
+
+  var NO_FADE_PROPS = {
+    name: '',
+    enterClass: '',
+    enterActiveClass: '',
+    enterToClass: 'show',
+    leaveClass: 'show',
+    leaveActiveClass: '',
+    leaveToClass: ''
+  };
+
+  var FADE_PROPS = _objectSpread({}, NO_FADE_PROPS, {
+    enterActiveClass: 'fade',
+    leaveActiveClass: 'fade'
+  });
+
+  var BVTransition = Vue.extend({
+    name: 'BVTransition',
+    functional: true,
+    props: {
+      noFade: {
+        // Only applicable to the built in transition
+        // Has no effect if `trans-props` provided
+        type: Boolean,
+        default: false
+      },
+      mode: {
+        type: String // default: undefined
+
+      },
+      // For user supplied transitions (if needed)
+      transProps: {
+        type: Object,
+        default: null
+      }
+    },
+    render: function render(h, _ref) {
+      var children = _ref.children,
+          data = _ref.data,
+          listeners = _ref.listeners,
+          props = _ref.props;
+      var transProps = props.transProps;
+
+      if (!isPlainObject(transProps)) {
+        transProps = props.noFade ? NO_FADE_PROPS : FADE_PROPS;
+      }
+
+      transProps = _objectSpread({
+        mode: props.mode
+      }, transProps, {
+        // We always need `css` true
+        css: true
+      });
+      return h('transition', // Any listeners will get merged here
+      mergeData(data, {
+        props: transProps
+      }), children);
+    }
+  });
+
+  /*
+   * Key Codes (events)
+   */
+  var KEY_CODES = {
+    SPACE: 32,
+    ENTER: 13,
+    ESC: 27,
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    PAGEUP: 33,
+    PAGEDOWN: 34,
+    HOME: 36,
+    END: 35,
+    TAB: 9,
+    SHIFT: 16,
+    CTRL: 17,
+    BACKSPACE: 8,
+    ALT: 18,
+    PAUSE: 19,
+    BREAK: 19,
+    INSERT: 45,
+    INS: 45,
+    DELETE: 46
+  };
+
+  /**
+   * Observe a DOM element changes, falls back to eventListener mode
+   * @param {Element} el The DOM element to observe
+   * @param {Function} callback callback to be called on change
+   * @param {object} [opts={childList: true, subtree: true}] observe options
+   * @see http://stackoverflow.com/questions/3219758
+   */
+
+  var observeDom = function observeDom(el, callback, opts)
+  /* istanbul ignore next: difficult to test in JSDOM */
+  {
+    // Handle cases where we might be passed a Vue instance
+    el = el ? el.$el || el : null; // Early exit when we have no element
+
+    /* istanbul ignore next: difficult to test in JSDOM */
+
+    if (!isElement(el)) {
+      return null;
+    } // Exit and throw a warning when `MutationObserver` isn't available
+
+
+    if (warnNoMutationObserverSupport('observeDom')) {
+      return null;
+    } // Define a new observer
+
+
+    var obs = new MutationObs(function (mutations) {
+      var changed = false; // A mutation can contain several change records, so we loop
+      // through them to see what has changed
+      // We break out of the loop early if any "significant" change
+      // has been detected
+
+      for (var i = 0; i < mutations.length && !changed; i++) {
+        // The mutation record
+        var mutation = mutations[i]; // Mutation type
+
+        var type = mutation.type; // DOM node (could be any DOM node type - HTMLElement, Text, comment, etc.)
+
+        var target = mutation.target; // Detect whether a change happened based on type and target
+
+        if (type === 'characterData' && target.nodeType === Node.TEXT_NODE) {
+          // We ignore nodes that are not TEXT (i.e. comments, etc)
+          // as they don't change layout
+          changed = true;
+        } else if (type === 'attributes') {
+          changed = true;
+        } else if (type === 'childList' && (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)) {
+          // This includes HTMLElement and text nodes being
+          // added/removed/re-arranged
+          changed = true;
+        }
+      } // We only call the callback if a change that could affect
+      // layout/size truely happened
+
+
+      if (changed) {
+        callback();
+      }
+    }); // Have the observer observe foo for changes in children, etc
+
+    obs.observe(el, _objectSpread({
+      childList: true,
+      subtree: true
+    }, opts)); // We return a reference to the observer so that `obs.disconnect()`
+    // can be called if necessary
+    // To reduce overhead when the root element is hidden
+
+    return obs;
+  };
+
+  /**
+   * SSR safe types
+   */
+  var w$1 = hasWindowSupport ? window : {};
+  var HTMLElement = w$1.HTMLElement || Object;
+
   //
+  // Single root node portaling of content, which retains parent/child hierarchy,
+  // Unlike Portal-Vue where portaled content is no longer a descendent of
+  // it's inteden parent components
+  //
+  // Private components for use by Tooltips, Popovers and Modals
+  //
+  // Based on vue-simple-portal
+  // https://github.com/LinusBorg/vue-simple-portal
+  // Tranporter target used by BTransporterSingle
+  // Supports only a single root element.
+  // @vue/component
+
+  var BTransporterTargetSingle = Vue.extend({
+    // as an abstract component, it doesn't appear in the $parent chain of
+    // components, which means the next parent of any component rendered inside
+    // of this one will be the parent from which is was portal'd
+    abstract: true,
+    name: 'BTransporterTargetSingle',
+    props: {
+      nodes: {
+        // Even though we only support a single root element,
+        // vNodes are always passed as an array
+        type: [Array, Function] // default: undefined
+
+      }
+    },
+    data: function data(vm) {
+      return {
+        updatedNodes: vm.nodes
+      };
+    },
+    destroyed: function destroyed() {
+      var el = this.$el;
+      el && el.parentNode && el.parentNode.removeChild(el);
+    },
+    render: function render(h) {
+      var nodes = isFunction(this.updatedNodes) ? this.updatedNodes({}) : this.updatedNodes;
+      nodes = concat(nodes).filter(Boolean);
+      /* istanbul ignore else */
+
+      if (nodes && nodes.length > 0 && !nodes[0].text) {
+        return nodes[0];
+      } else {
+        return h(false);
+      }
+    }
+  }); // This omponent has no root element, so only a single VNode is allowed
+  // @vue/component
+
+  var BTransporterSingle = Vue.extend({
+    name: 'BTransporterSingle',
+    mixins: [normalizeSlotMixin],
+    props: {
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      container: {
+        // String: CSS selector,
+        // HTMLElement: Element reference
+        // Mainly needed for tooltips/popovers inside modals
+        type: [String, HTMLElement],
+        default: 'body'
+      },
+      tag: {
+        // This should be set to match the root element type
+        type: String,
+        default: 'div'
+      }
+    },
+    watch: {
+      disabled: {
+        immediate: true,
+        handler: function handler(disabled) {
+          disabled ? this.unmountTarget() : this.$nextTick(this.mountTarget);
+        }
+      }
+    },
+    created: function created() {
+      this._bv_defaultFn = null;
+      this._bv_target = null;
+    },
+    beforeMount: function beforeMount() {
+      this.mountTarget();
+    },
+    updated: function updated() {
+      var _this = this;
+
+      // Placed in a nextTick to ensure that children have completed
+      // updating before rendering in the target
+      this.$nextTick(function () {
+        _this.updateTarget();
+      });
+    },
+    beforeDestroy: function beforeDestroy() {
+      this.unmountTarget();
+      this._bv_defaultFn = null;
+    },
+    methods: {
+      // Get the element which the target should be appended to
+      getContainer: function getContainer() {
+        /* istanbul ignore else */
+        if (isBrowser) {
+          var container = this.container;
+          return isString(container) ? select(container) : container;
+        } else {
+          return null;
+        }
+      },
+      // Mount the target
+      mountTarget: function mountTarget() {
+        if (!this._bv_target) {
+          var container = this.getContainer();
+
+          if (container) {
+            var el = document.createElement('div');
+            container.appendChild(el);
+            this._bv_target = new BTransporterTargetSingle({
+              el: el,
+              parent: this,
+              propsData: {
+                // Initial nodes to be rendered
+                nodes: concat(this.normalizeSlot('default', {}))
+              }
+            });
+          }
+        }
+      },
+      // Update the content of the target
+      updateTarget: function updateTarget() {
+        if (isBrowser && this._bv_target) {
+          var defaultFn = this.$scopedSlots.default;
+
+          if (!this.disabled) {
+            /* istanbul ignore else: only applicable in Vue 2.5.x */
+            if (defaultFn && this._bv_defaultFn !== defaultFn) {
+              // We only update the target component if the scoped slot
+              // function is a fresh one. The new slot syntax (since Vue 2.6)
+              // can cache unchanged slot functions and we want to respect that here.
+              this._bv_target.updatedNodes = defaultFn;
+            } else if (!defaultFn) {
+              // We also need to be back compatable with non-scoped default slot (i.e. 2.5.x)
+              this._bv_target.updatedNodes = this.$slots.default;
+            }
+          } // Update the scoped slot function cache
+
+
+          this._bv_defaultFn = defaultFn;
+        }
+      },
+      // Unmount the target
+      unmountTarget: function unmountTarget() {
+        if (this._bv_target) {
+          this._bv_target.$destroy();
+
+          this._bv_target = null;
+        }
+      }
+    },
+    render: function render(h) {
+      if (this.disabled) {
+        var nodes = concat(this.normalizeSlot('default', {})).filter(Boolean);
+
+        if (nodes.length > 0 && !nodes[0].text) {
+          return nodes[0];
+        }
+      }
+
+      return h(false);
+    }
+  });
+
+  var stripTagsRegex = /(<([^>]+)>)/gi; // Removes any thing that looks like an HTML tag from the supplied string
+
+  var stripTags = function stripTags() {
+    var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    return String(text).replace(stripTagsRegex, '');
+  }; // Generate a domProps object for either innerHTML, textContent or nothing
+
+  var htmlOrText = function htmlOrText(innerHTML, textContent) {
+    return innerHTML ? {
+      innerHTML: innerHTML
+    } : textContent ? {
+      textContent: textContent
+    } : {};
+  };
+
+  var NAME$2 = 'BModal'; // ObserveDom config to detect changes in modal content
+  // so that we can adjust the modal padding if needed
+
+  var OBSERVER_CONFIG = {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ['style', 'class'] // Options for DOM event listeners
+
+  };
+  var EVT_OPTIONS = {
+    passive: true,
+    capture: false
+  };
+  var props$2 = {
+    title: {
+      type: String,
+      default: ''
+    },
+    titleHtml: {
+      type: String
+    },
+    titleTag: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'titleTag');
+      }
+    },
+    size: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'size');
+      }
+    },
+    centered: {
+      type: Boolean,
+      default: false
+    },
+    scrollable: {
+      type: Boolean,
+      default: false
+    },
+    buttonSize: {
+      type: String,
+      default: ''
+    },
+    noStacking: {
+      type: Boolean,
+      default: false
+    },
+    noFade: {
+      type: Boolean,
+      default: false
+    },
+    noCloseOnBackdrop: {
+      type: Boolean,
+      default: false
+    },
+    noCloseOnEsc: {
+      type: Boolean,
+      default: false
+    },
+    noEnforceFocus: {
+      type: Boolean,
+      default: false
+    },
+    headerBgVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'headerBgVariant');
+      }
+    },
+    headerBorderVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'headerBorderVariant');
+      }
+    },
+    headerTextVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'headerTextVariant');
+      }
+    },
+    headerCloseVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'headerCloseVariant');
+      }
+    },
+    headerClass: {
+      type: [String, Array],
+      default: null
+    },
+    bodyBgVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'bodyBgVariant');
+      }
+    },
+    bodyTextVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'bodyTextVariant');
+      }
+    },
+    modalClass: {
+      type: [String, Array],
+      default: null
+    },
+    dialogClass: {
+      type: [String, Array],
+      default: null
+    },
+    contentClass: {
+      type: [String, Array],
+      default: null
+    },
+    bodyClass: {
+      type: [String, Array],
+      default: null
+    },
+    footerBgVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'footerBgVariant');
+      }
+    },
+    footerBorderVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'footerBorderVariant');
+      }
+    },
+    footerTextVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'footerTextVariant');
+      }
+    },
+    footerClass: {
+      type: [String, Array],
+      default: null
+    },
+    hideHeader: {
+      type: Boolean,
+      default: false
+    },
+    hideFooter: {
+      type: Boolean,
+      default: false
+    },
+    hideHeaderClose: {
+      type: Boolean,
+      default: false
+    },
+    hideBackdrop: {
+      type: Boolean,
+      default: false
+    },
+    okOnly: {
+      type: Boolean,
+      default: false
+    },
+    okDisabled: {
+      type: Boolean,
+      default: false
+    },
+    cancelDisabled: {
+      type: Boolean,
+      default: false
+    },
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    returnFocus: {
+      // type: Object,
+      default: null
+    },
+    headerCloseLabel: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'headerCloseLabel');
+      }
+    },
+    cancelTitle: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'cancelTitle');
+      }
+    },
+    cancelTitleHtml: {
+      type: String
+    },
+    okTitle: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'okTitle');
+      }
+    },
+    okTitleHtml: {
+      type: String
+    },
+    cancelVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'cancelVariant');
+      }
+    },
+    okVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$2, 'okVariant');
+      }
+    },
+    lazy: {
+      type: Boolean,
+      default: false
+    },
+    busy: {
+      type: Boolean,
+      default: false
+    },
+    static: {
+      type: Boolean,
+      default: false
+    } // @vue/component
+
+  };
+  var BModal = Vue.extend({
+    name: NAME$2,
+    mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
+    model: {
+      prop: 'visible',
+      event: 'change'
+    },
+    props: props$2,
+    data: function data() {
+      return {
+        isHidden: true,
+        // If modal should not be in document
+        isVisible: false,
+        // Controls modal visible state
+        isTransitioning: false,
+        // Used for style control
+        isShow: false,
+        // Used for style control
+        isBlock: false,
+        // Used for style control
+        isOpening: false,
+        // To signal that the modal is in the process of opening
+        isClosing: false,
+        // To signal that the modal is in the process of closing
+        ignoreBackdropClick: false,
+        // Used to signify if click out listener should ignore the click
+        isModalOverflowing: false,
+        return_focus: this.returnFocus || null,
+        // The following items are controlled by the modalManager instance
+        scrollbarWidth: 0,
+        zIndex: modalManager.getBaseZIndex(),
+        isTop: true,
+        isBodyOverflowing: false
+      };
+    },
+    computed: {
+      modalClasses: function modalClasses() {
+        return [{
+          fade: !this.noFade,
+          show: this.isShow,
+          'd-block': this.isBlock
+        }, this.modalClass];
+      },
+      modalStyles: function modalStyles() {
+        var sbWidth = "".concat(this.scrollbarWidth, "px");
+        return {
+          paddingLeft: !this.isBodyOverflowing && this.isModalOverflowing ? sbWidth : '',
+          paddingRight: this.isBodyOverflowing && !this.isModalOverflowing ? sbWidth : ''
+        };
+      },
+      dialogClasses: function dialogClasses() {
+        var _ref;
+
+        return [(_ref = {}, _defineProperty(_ref, "modal-".concat(this.size), Boolean(this.size)), _defineProperty(_ref, 'modal-dialog-centered', this.centered), _defineProperty(_ref, 'modal-dialog-scrollable', this.scrollable), _ref), this.dialogClass];
+      },
+      headerClasses: function headerClasses() {
+        var _ref2;
+
+        return [(_ref2 = {}, _defineProperty(_ref2, "bg-".concat(this.headerBgVariant), Boolean(this.headerBgVariant)), _defineProperty(_ref2, "text-".concat(this.headerTextVariant), Boolean(this.headerTextVariant)), _defineProperty(_ref2, "border-".concat(this.headerBorderVariant), Boolean(this.headerBorderVariant)), _ref2), this.headerClass];
+      },
+      bodyClasses: function bodyClasses() {
+        var _ref3;
+
+        return [(_ref3 = {}, _defineProperty(_ref3, "bg-".concat(this.bodyBgVariant), Boolean(this.bodyBgVariant)), _defineProperty(_ref3, "text-".concat(this.bodyTextVariant), Boolean(this.bodyTextVariant)), _ref3), this.bodyClass];
+      },
+      footerClasses: function footerClasses() {
+        var _ref4;
+
+        return [(_ref4 = {}, _defineProperty(_ref4, "bg-".concat(this.footerBgVariant), Boolean(this.footerBgVariant)), _defineProperty(_ref4, "text-".concat(this.footerTextVariant), Boolean(this.footerTextVariant)), _defineProperty(_ref4, "border-".concat(this.footerBorderVariant), Boolean(this.footerBorderVariant)), _ref4), this.footerClass];
+      },
+      modalOuterStyle: function modalOuterStyle() {
+        // Styles needed for proper stacking of modals
+        return {
+          position: 'absolute',
+          zIndex: this.zIndex
+        };
+      },
+      slotScope: function slotScope() {
+        return {
+          ok: this.onOk,
+          cancel: this.onCancel,
+          close: this.onClose,
+          hide: this.hide,
+          visible: this.isVisible
+        };
+      }
+    },
+    watch: {
+      visible: function visible(newVal, oldVal) {
+        if (newVal !== oldVal) {
+          this[newVal ? 'show' : 'hide']();
+        }
+      }
+    },
+    created: function created() {
+      // Define non-reactive properties
+      this._observer = null;
+    },
+    mounted: function mounted() {
+      // Set initial z-index as queried from the DOM
+      this.zIndex = modalManager.getBaseZIndex(); // Listen for events from others to either open or close ourselves
+      // and listen to all modals to enable/disable enforce focus
+
+      this.listenOnRoot('bv::show::modal', this.showHandler);
+      this.listenOnRoot('bv::hide::modal', this.hideHandler);
+      this.listenOnRoot('bv::toggle::modal', this.toggleHandler); // Listen for `bv:modal::show events`, and close ourselves if the
+      // opening modal not us
+
+      this.listenOnRoot('bv::modal::show', this.modalListener); // Initially show modal?
+
+      if (this.visible === true) {
+        this.$nextTick(this.show);
+      }
+    },
+    beforeDestroy: function beforeDestroy() {
+      // Ensure everything is back to normal
+      if (this._observer) {
+        this._observer.disconnect();
+
+        this._observer = null;
+      }
+
+      this.setEnforceFocus(false);
+      this.setResizeEvent(false);
+
+      if (this.isVisible) {
+        this.isVisible = false;
+        this.isShow = false;
+        this.isTransitioning = false;
+      }
+    },
+    methods: {
+      // Private method to update the v-model
+      updateModel: function updateModel(val) {
+        if (val !== this.visible) {
+          this.$emit('change', val);
+        }
+      },
+      // Private method to create a BvModalEvent object
+      buildEvent: function buildEvent(type) {
+        var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        return new BvModalEvent(type, _objectSpread({
+          // Default options
+          cancelable: false,
+          target: this.$refs.modal || this.$el || null,
+          relatedTarget: null,
+          trigger: null
+        }, opts, {
+          // Options that can't be overridden
+          vueTarget: this,
+          componentId: this.safeId()
+        }));
+      },
+      // Public method to show modal
+      show: function show() {
+        if (this.isVisible || this.isOpening) {
+          // If already open, on in the process of opening, do nothing
+
+          /* istanbul ignore next */
+          return;
+        }
+
+        if (this.isClosing) {
+          // If we are in the process of closing, wait until hidden before re-opening
+
+          /* istanbul ignore next: very difficult to test */
+          this.$once('hidden', this.show);
+          /* istanbul ignore next */
+
+          return;
+        }
+
+        this.isOpening = true; // Set the element to return focus to when closed
+
+        this.return_focus = this.return_focus || this.getActiveElement();
+        var showEvt = this.buildEvent('show', {
+          cancelable: true
+        });
+        this.emitEvent(showEvt); // Don't show if canceled
+
+        if (showEvt.defaultPrevented || this.isVisible) {
+          this.isOpening = false; // Ensure the v-model reflects the current state
+
+          this.updateModel(false);
+          return;
+        } // Show the modal
+
+
+        this.doShow();
+      },
+      // Public method to hide modal
+      hide: function hide() {
+        var trigger = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+        if (!this.isVisible || this.isClosing) {
+          /* istanbul ignore next */
+          return;
+        }
+
+        this.isClosing = true;
+        var hideEvt = this.buildEvent('hide', {
+          cancelable: trigger !== 'FORCE',
+          trigger: trigger || null
+        }); // We emit specific event for one of the three built-in buttons
+
+        if (trigger === 'ok') {
+          this.$emit('ok', hideEvt);
+        } else if (trigger === 'cancel') {
+          this.$emit('cancel', hideEvt);
+        } else if (trigger === 'headerclose') {
+          this.$emit('close', hideEvt);
+        }
+
+        this.emitEvent(hideEvt); // Hide if not canceled
+
+        if (hideEvt.defaultPrevented || !this.isVisible) {
+          this.isClosing = false; // Ensure v-model reflects current state
+
+          this.updateModel(true);
+          return;
+        } // Stop observing for content changes
+
+
+        if (this._observer) {
+          this._observer.disconnect();
+
+          this._observer = null;
+        } // Trigger the hide transition
+
+
+        this.isVisible = false; // Update the v-model
+
+        this.updateModel(false);
+      },
+      // Public method to toggle modal visibility
+      toggle: function toggle(triggerEl) {
+        if (triggerEl) {
+          this.return_focus = triggerEl;
+        }
+
+        if (this.isVisible) {
+          this.hide('toggle');
+        } else {
+          this.show();
+        }
+      },
+      // Private method to get the current document active element
+      getActiveElement: function getActiveElement() {
+        if (isBrowser) {
+          var activeElement = document.activeElement; // Note: On IE11, `document.activeElement` may be null.
+          // So we test it for truthiness first.
+          // https://github.com/bootstrap-vue/bootstrap-vue/issues/3206
+          // Returning focus to document.body may cause unwanted scrolls, so we
+          // exclude setting focus on body
+
+          if (activeElement && activeElement !== document.body && activeElement.focus) {
+            // Preset the fallback return focus value if it is not set
+            // `document.activeElement` should be the trigger element that was clicked or
+            // in the case of using the v-model, which ever element has current focus
+            // Will be overridden by some commands such as toggle, etc.
+            return activeElement;
+          }
+        }
+
+        return null;
+      },
+      // Private method to finish showing modal
+      doShow: function doShow() {
+        var _this = this;
+
+        /* istanbul ignore next: commenting out for now until we can test stacking */
+        if (modalManager.modalsAreOpen && this.noStacking) {
+          // If another modal(s) is already open, wait for it(them) to close
+          this.listenOnRootOnce('bv::modal::hidden', this.doShow);
+          return;
+        }
+
+        modalManager.registerModal(this); // Place modal in DOM
+
+        this.isHidden = false;
+        this.$nextTick(function () {
+          // We do this in `$nextTick()` to ensure the modal is in DOM first
+          // before we show it
+          _this.isVisible = true;
+          _this.isOpening = false; // Update the v-model
+
+          _this.updateModel(true);
+
+          _this.$nextTick(function () {
+            // In a nextTick in case modal content is lazy
+            // Observe changes in modal content and adjust if necessary
+            _this._observer = observeDom(_this.$refs.content, _this.checkModalOverflow.bind(_this), OBSERVER_CONFIG);
+          });
+        });
+      },
+      // Transition handlers
+      onBeforeEnter: function onBeforeEnter() {
+        this.isTransitioning = true;
+        this.setResizeEvent(true);
+      },
+      onEnter: function onEnter() {
+        this.isBlock = true;
+      },
+      onAfterEnter: function onAfterEnter() {
+        var _this2 = this;
+
+        this.checkModalOverflow();
+        this.isShow = true;
+        this.isTransitioning = false;
+        this.$nextTick(function () {
+          _this2.emitEvent(_this2.buildEvent('shown'));
+
+          _this2.focusFirst();
+
+          _this2.setEnforceFocus(true);
+        });
+      },
+      onBeforeLeave: function onBeforeLeave() {
+        this.isTransitioning = true;
+        this.setResizeEvent(false);
+      },
+      onLeave: function onLeave() {
+        // Remove the 'show' class
+        this.isShow = false;
+      },
+      onAfterLeave: function onAfterLeave() {
+        var _this3 = this;
+
+        this.isBlock = false;
+        this.isTransitioning = false;
+        this.setEnforceFocus(false);
+        this.isModalOverflowing = false;
+        this.isHidden = true;
+        this.$nextTick(function () {
+          _this3.returnFocusTo();
+
+          _this3.isClosing = false;
+          _this3.return_focus = null;
+          modalManager.unregisterModal(_this3); // TODO: Need to find a way to pass the `trigger` property
+          //       to the `hidden` event, not just only the `hide` event
+
+          _this3.emitEvent(_this3.buildEvent('hidden'));
+        });
+      },
+      // Event emitter
+      emitEvent: function emitEvent(bvModalEvt) {
+        var type = bvModalEvt.type; // We emit on root first incase a global listener wants to cancel
+        // the event first before the instance emits it's event
+
+        this.emitOnRoot("bv::modal::".concat(type), bvModalEvt, bvModalEvt.componentId);
+        this.$emit(type, bvModalEvt);
+      },
+      // UI event handlers
+      onDialogMousedown: function onDialogMousedown() {
+        var _this4 = this;
+
+        // Watch to see if the matching mouseup event occurs outside the dialog
+        // And if it does, cancel the clickOut handler
+        var modal = this.$refs.modal;
+
+        var onceModalMouseup = function onceModalMouseup(evt) {
+          eventOff(modal, 'mouseup', onceModalMouseup, EVT_OPTIONS);
+
+          if (evt.target === modal) {
+            _this4.ignoreBackdropClick = true;
+          }
+        };
+
+        eventOn(modal, 'mouseup', onceModalMouseup, EVT_OPTIONS);
+      },
+      onClickOut: function onClickOut(evt) {
+        // Do nothing if not visible, backdrop click disabled, or element
+        // that generated click event is no longer in document body
+        if (!this.isVisible || this.noCloseOnBackdrop || !contains(document.body, evt.target)) {
+          return;
+        }
+
+        if (this.ignoreBackdropClick) {
+          // Click was initiated inside the modal content, but finished outside
+          // Set by the above onDialogMousedown handler
+          this.ignoreBackdropClick = false;
+          return;
+        } // If backdrop clicked, hide modal
+
+
+        if (!contains(this.$refs.content, evt.target)) {
+          this.hide('backdrop');
+        }
+      },
+      onOk: function onOk() {
+        this.hide('ok');
+      },
+      onCancel: function onCancel() {
+        this.hide('cancel');
+      },
+      onClose: function onClose() {
+        this.hide('headerclose');
+      },
+      onEsc: function onEsc(evt) {
+        // If ESC pressed, hide modal
+        if (evt.keyCode === KEY_CODES.ESC && this.isVisible && !this.noCloseOnEsc) {
+          this.hide('esc');
+        }
+      },
+      // Document focusin listener
+      focusHandler: function focusHandler(evt) {
+        // If focus leaves modal, bring it back
+        var modal = this.$refs.modal;
+
+        if (!this.noEnforceFocus && this.isTop && this.isVisible && modal && document !== evt.target && !contains(modal, evt.target)) {
+          modal.focus({
+            preventScroll: true
+          });
+        }
+      },
+      // Turn on/off focusin listener
+      setEnforceFocus: function setEnforceFocus(on) {
+        var method = on ? eventOn : eventOff;
+        method(document, 'focusin', this.focusHandler, EVT_OPTIONS);
+      },
+      // Resize listener
+      setResizeEvent: function setResizeEvent(on) {
+        var method = on ? eventOn : eventOff; // These events should probably also check if
+        // body is overflowing
+
+        method(window, 'resize', this.checkModalOverflow, EVT_OPTIONS);
+        method(window, 'orientationchange', this.checkModalOverflow, EVT_OPTIONS);
+      },
+      // Root listener handlers
+      showHandler: function showHandler(id, triggerEl) {
+        if (id === this.safeId()) {
+          this.return_focus = triggerEl || this.getActiveElement();
+          this.show();
+        }
+      },
+      hideHandler: function hideHandler(id) {
+        if (id === this.safeId()) {
+          this.hide('event');
+        }
+      },
+      toggleHandler: function toggleHandler(id, triggerEl) {
+        if (id === this.safeId()) {
+          this.toggle(triggerEl);
+        }
+      },
+      modalListener: function modalListener(bvEvt) {
+        // If another modal opens, close this one if stacking not permitted
+        if (this.noStacking && bvEvt.vueTarget !== this) {
+          this.hide();
+        }
+      },
+      // Focus control handlers
+      focusFirst: function focusFirst() {
+        // Don't try and focus if we are SSR
+        if (isBrowser) {
+          var modal = this.$refs.modal;
+          var activeElement = this.getActiveElement(); // If the modal contains the activeElement, we don't do anything
+
+          if (modal && !(activeElement && contains(modal, activeElement))) {
+            // Make sure top of modal is showing (if longer than the viewport)
+            // and focus the modal content wrapper
+            this.$nextTick(function () {
+              modal.scrollTop = 0;
+              modal.focus();
+            });
+          }
+        }
+      },
+      returnFocusTo: function returnFocusTo() {
+        // Prefer `returnFocus` prop over event specified
+        // `return_focus` value
+        var el = this.returnFocus || this.return_focus || null; // Is el a string CSS selector?
+
+        el = isString(el) ? select(el) : el;
+
+        if (el) {
+          // Possibly could be a component reference
+          el = el.$el || el;
+
+          if (isVisible(el) && el.focus) {
+            el.focus();
+          }
+        }
+      },
+      checkModalOverflow: function checkModalOverflow() {
+        if (this.isVisible) {
+          var modal = this.$refs.modal;
+          this.isModalOverflowing = modal.scrollHeight > document.documentElement.clientHeight;
+        }
+      },
+      makeModal: function makeModal(h) {
+        // Modal header
+        var header = h(false);
+
+        if (!this.hideHeader) {
+          var modalHeader = this.normalizeSlot('modal-header', this.slotScope);
+
+          if (!modalHeader) {
+            var closeButton = h(false);
+
+            if (!this.hideHeaderClose) {
+              closeButton = h(BButtonClose, {
+                props: {
+                  disabled: this.isTransitioning,
+                  ariaLabel: this.headerCloseLabel,
+                  textVariant: this.headerCloseVariant || this.headerTextVariant
+                },
+                on: {
+                  click: this.onClose
+                }
+              }, [this.normalizeSlot('modal-header-close', {})]);
+            }
+
+            modalHeader = [h(this.titleTag, {
+              class: ['modal-title']
+            }, [this.normalizeSlot('modal-title', this.slotScope) || this.titleHtml || stripTags(this.title)]), closeButton];
+          }
+
+          header = h('header', {
+            ref: 'header',
+            staticClass: 'modal-header',
+            class: this.headerClasses,
+            attrs: {
+              id: this.safeId('__BV_modal_header_')
+            }
+          }, [modalHeader]);
+        } // Modal body
+
+
+        var body = h('div', {
+          ref: 'body',
+          staticClass: 'modal-body',
+          class: this.bodyClasses,
+          attrs: {
+            id: this.safeId('__BV_modal_body_')
+          }
+        }, this.normalizeSlot('default', this.slotScope)); // Modal footer
+
+        var footer = h(false);
+
+        if (!this.hideFooter) {
+          var modalFooter = this.normalizeSlot('modal-footer', this.slotScope);
+
+          if (!modalFooter) {
+            var cancelButton = h(false);
+
+            if (!this.okOnly) {
+              cancelButton = h(BButton, {
+                props: {
+                  variant: this.cancelVariant,
+                  size: this.buttonSize,
+                  disabled: this.cancelDisabled || this.busy || this.isTransitioning
+                },
+                on: {
+                  click: this.onCancel
+                }
+              }, [this.normalizeSlot('modal-cancel', {}) || this.cancelTitleHtml || stripTags(this.cancelTitle)]);
+            }
+
+            var okButton = h(BButton, {
+              props: {
+                variant: this.okVariant,
+                size: this.buttonSize,
+                disabled: this.okDisabled || this.busy || this.isTransitioning
+              },
+              on: {
+                click: this.onOk
+              }
+            }, [this.normalizeSlot('modal-ok', {}) || this.okTitleHtml || stripTags(this.okTitle)]);
+            modalFooter = [cancelButton, okButton];
+          }
+
+          footer = h('footer', {
+            ref: 'footer',
+            staticClass: 'modal-footer',
+            class: this.footerClasses,
+            attrs: {
+              id: this.safeId('__BV_modal_footer_')
+            }
+          }, [modalFooter]);
+        } // Assemble modal content
+
+
+        var modalContent = h('div', {
+          ref: 'content',
+          staticClass: 'modal-content',
+          class: this.contentClass,
+          attrs: {
+            role: 'document',
+            id: this.safeId('__BV_modal_content_'),
+            'aria-labelledby': this.hideHeader ? null : this.safeId('__BV_modal_header_'),
+            'aria-describedby': this.safeId('__BV_modal_body_')
+          }
+        }, [header, body, footer]); // Modal dialog wrapper
+
+        var modalDialog = h('div', {
+          staticClass: 'modal-dialog',
+          class: this.dialogClasses,
+          on: {
+            mousedown: this.onDialogMousedown
+          }
+        }, [modalContent]); // Modal
+
+        var modal = h('div', {
+          ref: 'modal',
+          staticClass: 'modal',
+          class: this.modalClasses,
+          style: this.modalStyles,
+          directives: [{
+            name: 'show',
+            rawName: 'v-show',
+            value: this.isVisible,
+            expression: 'isVisible'
+          }],
+          attrs: {
+            id: this.safeId(),
+            role: 'dialog',
+            tabindex: '-1',
+            'aria-hidden': this.isVisible ? null : 'true',
+            'aria-modal': this.isVisible ? 'true' : null
+          },
+          on: {
+            keydown: this.onEsc,
+            click: this.onClickOut
+          }
+        }, [modalDialog]); // Wrap modal in transition
+        // Sadly, we can't use BVTransition here due to the differences in
+        // transition durations for .modal and .modal-dialog. Not until
+        // issue https://github.com/vuejs/vue/issues/9986 is resolved
+
+        modal = h('transition', {
+          props: {
+            enterClass: '',
+            enterToClass: '',
+            enterActiveClass: '',
+            leaveClass: '',
+            leaveActiveClass: '',
+            leaveToClass: ''
+          },
+          on: {
+            beforeEnter: this.onBeforeEnter,
+            enter: this.onEnter,
+            afterEnter: this.onAfterEnter,
+            beforeLeave: this.onBeforeLeave,
+            leave: this.onLeave,
+            afterLeave: this.onAfterLeave
+          }
+        }, [modal]); // Modal backdrop
+
+        var backdrop = h(false);
+
+        if (!this.hideBackdrop && this.isVisible) {
+          backdrop = h('div', {
+            staticClass: 'modal-backdrop',
+            attrs: {
+              id: this.safeId('__BV_modal_backdrop_')
+            }
+          }, [this.normalizeSlot('modal-backdrop', {})]);
+        }
+
+        backdrop = h(BVTransition, {
+          props: {
+            noFade: this.noFade
+          }
+        }, [backdrop]); // Tab trap to prevent page from scrolling to next element in
+        // tab index during enforce focus tab cycle
+
+        var tabTrap = h(false);
+
+        if (this.isVisible && this.isTop && !this.noEnforceFocus) {
+          tabTrap = h('div', {
+            attrs: {
+              tabindex: '0'
+            }
+          });
+        } // Assemble modal and backdrop in an outer <div>
+
+
+        return h('div', {
+          key: "modal-outer-".concat(this._uid),
+          style: this.modalOuterStyle,
+          attrs: {
+            id: this.safeId('__BV_modal_outer_')
+          }
+        }, [modal, tabTrap, backdrop]);
+      }
+    },
+    render: function render(h) {
+      if (this.static) {
+        return this.lazy && this.isHidden ? h(false) : this.makeModal(h);
+      } else {
+        return this.isHidden ? h(false) : h(BTransporterSingle, {}, [this.makeModal(h)]);
+      }
+    }
+  });
+
+  var PROP_NAME = '$bvModal';
+  var PROP_NAME_PRIV = '_bv__modal'; // Base modal props that are allowed
+  // Some may be ignored or overridden on some message boxes
+  // Prop ID is allowed, but really only should be used for testing
+  // We need to add it in explicitly as it comes from the `idMixin`
+
+  var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$2, ['busy', 'lazy', 'noStacking', "static", 'visible'])))); // Fallback event resolver (returns undefined)
+
+  var defaultResolver = function defaultResolver(bvModalEvt) {}; // Map prop names to modal slot names
+
+
+  var propsToSlots = {
+    msgBoxContent: 'default',
+    title: 'modal-title',
+    okTitle: 'modal-ok',
+    cancelTitle: 'modal-cancel' // --- Utility methods ---
+    // Method to filter only recognized props that are not undefined
+
+  };
+
+  var filterOptions = function filterOptions(options) {
+    return BASE_PROPS.reduce(function (memo, key) {
+      if (!isUndefined(options[key])) {
+        memo[key] = options[key];
+      }
+
+      return memo;
+    }, {});
+  }; // Method to install `$bvModal` VM injection
+
+
+  var install = function install(Vue) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (install.installed) {
+      // Only install once
+
+      /* istanbul ignore next */
+      return;
+    }
+
+    install.installed = true;
+    setConfig(config); // Create a private sub-component that extends BModal
+    // which self-destructs after hidden
+    // @vue/component
+
+    var BMsgBox = Vue.extend({
+      name: 'BMsgBox',
+      extends: BModal,
+      destroyed: function destroyed() {
+        // Make sure we not in document any more
+        if (this.$el && this.$el.parentNode) {
+          this.$el.parentNode.removeChild(this.$el);
+        }
+      },
+      mounted: function mounted() {
+        var _this = this;
+
+        // Self destruct handler
+        var handleDestroy = function handleDestroy() {
+          var self = _this;
+
+          _this.$nextTick(function () {
+            // In a `setTimeout()` to release control back to application
+            setTimeout(function () {
+              return self.$destroy();
+            }, 0);
+          });
+        }; // Self destruct if parent destroyed
+
+
+        this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+
+        this.$once('hidden', handleDestroy); // Self destruct on route change
+
+        /* istanbul ignore if */
+
+        if (this.$router && this.$route) {
+          var unwatch = this.$watch('$router', handleDestroy);
+          this.$once('hook:beforeDestroy', unwatch);
+        } // Show the `BMsgBox`
+
+
+        this.show();
+      }
+    }); // Method to generate the on-demand modal message box
+    // Returns a promise that resolves to a value returned by the resolve
+
+    var asyncMsgBox = function asyncMsgBox(props, $parent) {
+      var resolver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultResolver;
+
+      if (warnNotClient(PROP_NAME) || warnNoPromiseSupport(PROP_NAME)) {
+        /* istanbul ignore next */
+        return;
+      } // Create an instance of `BMsgBox` component
+
+
+      var msgBox = new BMsgBox({
+        // We set parent as the local VM so these modals can emit events on
+        // the app `$root`, as needed by things like tooltips and popovers
+        // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
+        parent: $parent,
+        // Preset the prop values
+        propsData: _objectSpread({}, filterOptions(getComponentConfig('BModal') || {}), {
+          // Defaults that user can override
+          hideHeaderClose: true,
+          hideHeader: !(props.title || props.titleHtml)
+        }, omit(props, ['msgBoxContent']), {
+          // Props that can't be overridden
+          lazy: false,
+          busy: false,
+          visible: false,
+          noStacking: false,
+          noEnforceFocus: false
+        })
+      }); // Convert certain props to scoped slots
+
+      keys(propsToSlots).forEach(function (prop) {
+        if (!isUndefined(props[prop])) {
+          // Can be a string, or array of VNodes.
+          // Alternatively, user can use HTML version of prop to pass an HTML string.
+          msgBox.$slots[propsToSlots[prop]] = concat(props[prop]);
+        }
+      }); // Return a promise that resolves when hidden, or rejects on destroyed
+
+      return new Promise(function (resolve, reject) {
+        var resolved = false;
+        msgBox.$once('hook:destroyed', function () {
+          if (!resolved) {
+            /* istanbul ignore next */
+            reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
+          }
+        });
+        msgBox.$on('hide', function (bvModalEvt) {
+          if (!bvModalEvt.defaultPrevented) {
+            var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
+
+            if (!bvModalEvt.defaultPrevented) {
+              resolved = true;
+              resolve(result);
+            }
+          }
+        }); // Create a mount point (a DIV) and mount the msgBo which will trigger it to show
+
+        var div = document.createElement('div');
+        document.body.appendChild(div);
+        msgBox.$mount(div);
+      });
+    }; // BvModal instance class
+
+
+    var BvModal =
+    /*#__PURE__*/
+    function () {
+      function BvModal(vm) {
+        _classCallCheck(this, BvModal);
+
+        // Assign the new properties to this instance
+        assign$1(this, {
+          _vm: vm,
+          _root: vm.$root
+        }); // Set these properties as read-only and non-enumerable
+
+        defineProperties(this, {
+          _vm: readonlyDescriptor(),
+          _root: readonlyDescriptor()
+        });
+      } // --- Instance methods ---
+      // Show modal with the specified ID args are for future use
+
+
+      _createClass(BvModal, [{
+        key: "show",
+        value: function show(id) {
+          if (id && this._root) {
+            var _this$_root;
+
+            for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+              args[_key - 1] = arguments[_key];
+            }
+
+            (_this$_root = this._root).$emit.apply(_this$_root, ['bv::show::modal', id].concat(args));
+          }
+        } // Hide modal with the specified ID args are for future use
+
+      }, {
+        key: "hide",
+        value: function hide(id) {
+          if (id && this._root) {
+            var _this$_root2;
+
+            for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+              args[_key2 - 1] = arguments[_key2];
+            }
+
+            (_this$_root2 = this._root).$emit.apply(_this$_root2, ['bv::hide::modal', id].concat(args));
+          }
+        } // The following methods require Promise support!
+        // IE 11 and others do not support Promise natively, so users
+        // should have a Polyfill loaded (which they need anyways for IE 11 support)
+        // Opens a user defined message box and returns a promise
+        // Not yet documented
+
+      }, {
+        key: "msgBox",
+        value: function msgBox(content) {
+          var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+          var resolver = arguments.length > 2 ? arguments[2] : undefined;
+
+          if (!content || warnNoPromiseSupport(PROP_NAME) || warnNotClient(PROP_NAME) || !isFunction(resolver)) {
+            /* istanbul ignore next */
+            return;
+          }
+
+          return asyncMsgBox(_objectSpread({}, filterOptions(options), {
+            msgBoxContent: content
+          }), this._vm, resolver);
+        } // Open a message box with OK button only and returns a promise
+
+      }, {
+        key: "msgBoxOk",
+        value: function msgBoxOk(message) {
+          var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+          // Pick the modal props we support from options
+          var props = _objectSpread({}, options, {
+            // Add in overrides and our content prop
+            okOnly: true,
+            okDisabled: false,
+            hideFooter: false,
+            msgBoxContent: message
+          });
+
+          return this.msgBox(message, props, function (bvModalEvt) {
+            // Always resolve to true for OK
+            return true;
+          });
+        } // Open a message box modal with OK and CANCEL buttons
+        // and returns a promise
+
+      }, {
+        key: "msgBoxConfirm",
+        value: function msgBoxConfirm(message) {
+          var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+          // Set the modal props we support from options
+          var props = _objectSpread({}, options, {
+            // Add in overrides and our content prop
+            okOnly: false,
+            okDisabled: false,
+            cancelDisabled: false,
+            hideFooter: false
+          });
+
+          return this.msgBox(message, props, function (bvModalEvt) {
+            var trigger = bvModalEvt.trigger;
+            return trigger === 'ok' ? true : trigger === 'cancel' ? false : null;
+          });
+        }
+      }]);
+
+      return BvModal;
+    }(); // Add our instance mixin
+
+
+    Vue.mixin({
+      beforeCreate: function beforeCreate() {
+        // Because we need access to `$root` for `$emits`, and VM for parenting,
+        // we have to create a fresh instance of `BvModal` for each VM
+        this[PROP_NAME_PRIV] = new BvModal(this);
+      }
+    }); // Define our read-only `$bvModal` instance property
+    // Placed in an if just in case in HMR mode
+
+    if (!Vue.prototype.hasOwnProperty(PROP_NAME)) {
+      defineProperty(Vue.prototype, PROP_NAME, {
+        get: function get() {
+          /* istanbul ignore next */
+          if (!this || !this[PROP_NAME_PRIV]) {
+            warn("'".concat(PROP_NAME, "' must be accessed from a Vue instance 'this' context"));
+          }
+
+          return this[PROP_NAME_PRIV];
+        }
+      });
+    }
+  };
+
+  install.installed = false;
+  var BVModalPlugin = {
+    install: install
+  };
 
   function _typeof$1(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -2106,2834 +5132,7 @@
     }
   });
 
-  var w = hasWindowSupport ? window : {};
-  var d = hasDocumentSupport ? document : {};
-  var elProto = typeof Element !== 'undefined' ? Element.prototype : {}; // --- Normalization utils ---
-  // See: https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
-
-  /* istanbul ignore next */
-
-  var matchesEl = elProto.matches || elProto.msMatchesSelector || elProto.webkitMatchesSelector; // See: https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
-
-  /* istanbul ignore next */
-
-  var closestEl = elProto.closest || function (sel)
-  /* istanbul ignore next */
-  {
-    var el = this;
-
-    do {
-      // Use our "patched" matches function
-      if (matches(el, sel)) {
-        return el;
-      }
-
-      el = el.parentElement || el.parentNode;
-    } while (!isNull(el) && el.nodeType === Node.ELEMENT_NODE);
-
-    return null;
-  }; // `requestAnimationFrame()` convenience method
-  // We don't have a version for cancelAnimationFrame, but we don't call it anywhere
-
-  var requestAF = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.mozRequestAnimationFrame || w.msRequestAnimationFrame || w.oRequestAnimationFrame || function (cb) {
-    // Fallback, but not a true polyfill
-    // All browsers we support (other than Opera Mini) support
-    // `requestAnimationFrame()` without a polyfill
-
-    /* istanbul ignore next */
-    return setTimeout(cb, 16);
-  };
-  var MutationObs = w.MutationObserver || w.WebKitMutationObserver || w.MozMutationObserver || null; // --- Utils ---
-  // Normalize event options based on support of passive option
-  // Exported only for testing purposes
-
-  var parseEventOptions = function parseEventOptions(options) {
-    if (!hasPassiveEventSupport) {
-      // Need to translate to actual Boolean value
-      return Boolean(isObject(options) ? options.useCapture : options);
-    }
-
-    return isObject(options) ? options : {
-      useCapture: Boolean(options || false)
-    };
-  }; // Attach an event listener to an element
-
-  var eventOn = function eventOn(el, evtName, handler, options) {
-    if (el && el.addEventListener) {
-      el.addEventListener(evtName, handler, parseEventOptions(options));
-    }
-  }; // Remove an event listener from an element
-
-  var eventOff = function eventOff(el, evtName, handler, options) {
-    if (el && el.removeEventListener) {
-      el.removeEventListener(evtName, handler, parseEventOptions(options));
-    }
-  }; // Determine if an element is an HTML Element
-
-  var isElement = function isElement(el) {
-    return Boolean(el && el.nodeType === Node.ELEMENT_NODE);
-  }; // Determine if an HTML element is visible - Faster than CSS check
-
-  var isVisible = function isVisible(el) {
-    if (!isElement(el) || !contains(d.body, el)) {
-      return false;
-    }
-
-    if (el.style.display === 'none') {
-      // We do this check to help with vue-test-utils when using v-show
-
-      /* istanbul ignore next */
-      return false;
-    } // All browsers support getBoundingClientRect(), except JSDOM as it returns all 0's for values :(
-    // So any tests that need isVisible will fail in JSDOM
-    // Except when we override the getBCR prototype in some tests
-
-
-    var bcr = getBCR(el);
-    return Boolean(bcr && bcr.height > 0 && bcr.width > 0);
-  }; // Determine if an element is disabled
-
-  var isDisabled = function isDisabled(el) {
-    return !isElement(el) || el.disabled || Boolean(getAttr(el, 'disabled')) || hasClass(el, 'disabled');
-  }; // Cause/wait-for an element to reflow it's content (adjusting it's height/width)
-
-  var reflow = function reflow(el) {
-    // Requesting an elements offsetHight will trigger a reflow of the element content
-
-    /* istanbul ignore next: reflow doesn't happen in JSDOM */
-    return isElement(el) && el.offsetHeight;
-  }; // Select all elements matching selector. Returns `[]` if none found
-
-  var selectAll = function selectAll(selector, root) {
-    return from((isElement(root) ? root : d).querySelectorAll(selector));
-  }; // Select a single element, returns `null` if not found
-
-  var select = function select(selector, root) {
-    return (isElement(root) ? root : d).querySelector(selector) || null;
-  }; // Determine if an element matches a selector
-
-  var matches = function matches(el, selector) {
-    if (!isElement(el)) {
-      return false;
-    }
-
-    return matchesEl.call(el, selector);
-  }; // Finds closest element matching selector. Returns `null` if not found
-
-  var closest = function closest(selector, root) {
-    if (!isElement(root)) {
-      return null;
-    }
-
-    var el = closestEl.call(root, selector); // Emulate jQuery closest and return `null` if match is the passed in element (root)
-
-    return el === root ? null : el;
-  }; // Returns true if the parent element contains the child element
-
-  var contains = function contains(parent, child) {
-    if (!parent || !isFunction(parent.contains)) {
-      return false;
-    }
-
-    return parent.contains(child);
-  }; // Get an element given an ID
-
-  var getById = function getById(id) {
-    return d.getElementById(/^#/.test(id) ? id.slice(1) : id) || null;
-  }; // Add a class to an element
-
-  var addClass = function addClass(el, className) {
-    // We are checking for `el.classList` existence here since IE 11
-    // returns `undefined` for some elements (e.g. SVG elements)
-    // See https://github.com/bootstrap-vue/bootstrap-vue/issues/2713
-    if (className && isElement(el) && el.classList) {
-      el.classList.add(className);
-    }
-  }; // Remove a class from an element
-
-  var removeClass = function removeClass(el, className) {
-    // We are checking for `el.classList` existence here since IE 11
-    // returns `undefined` for some elements (e.g. SVG elements)
-    // See https://github.com/bootstrap-vue/bootstrap-vue/issues/2713
-    if (className && isElement(el) && el.classList) {
-      el.classList.remove(className);
-    }
-  }; // Test if an element has a class
-
-  var hasClass = function hasClass(el, className) {
-    // We are checking for `el.classList` existence here since IE 11
-    // returns `undefined` for some elements (e.g. SVG elements)
-    // See https://github.com/bootstrap-vue/bootstrap-vue/issues/2713
-    if (className && isElement(el) && el.classList) {
-      return el.classList.contains(className);
-    }
-
-    return false;
-  }; // Set an attribute on an element
-
-  var setAttr = function setAttr(el, attr, value) {
-    if (attr && isElement(el)) {
-      el.setAttribute(attr, value);
-    }
-  }; // Remove an attribute from an element
-
-  var removeAttr = function removeAttr(el, attr) {
-    if (attr && isElement(el)) {
-      el.removeAttribute(attr);
-    }
-  }; // Get an attribute value from an element
-  // Returns `null` if not found
-
-  var getAttr = function getAttr(el, attr) {
-    return attr && isElement(el) ? el.getAttribute(attr) : null;
-  }; // Determine if an attribute exists on an element
-  // Returns `true` or `false`, or `null` if element not found
-
-  var hasAttr = function hasAttr(el, attr) {
-    return attr && isElement(el) ? el.hasAttribute(attr) : null;
-  }; // Return the Bounding Client Rect of an element
-  // Returns `null` if not an element
-
-  /* istanbul ignore next: getBoundingClientRect() doesn't work in JSDOM */
-
-  var getBCR = function getBCR(el) {
-    return isElement(el) ? el.getBoundingClientRect() : null;
-  }; // Get computed style object for an element
-
-  /* istanbul ignore next: getComputedStyle() doesn't work in JSDOM */
-
-  var getCS = function getCS(el) {
-    return hasWindowSupport && isElement(el) ? w.getComputedStyle(el) : {};
-  }; // Return an element's offset with respect to document element
-  // https://j11y.io/jquery/#v=git&fn=jQuery.fn.offset
-
-  var offset = function offset(el)
-  /* istanbul ignore next: getBoundingClientRect(), getClientRects() doesn't work in JSDOM */
-  {
-    var _offset = {
-      top: 0,
-      left: 0
-    };
-
-    if (!isElement(el) || el.getClientRects().length === 0) {
-      return _offset;
-    }
-
-    var bcr = getBCR(el);
-
-    if (bcr) {
-      var win = el.ownerDocument.defaultView;
-      _offset.top = bcr.top + win.pageYOffset;
-      _offset.left = bcr.left + win.pageXOffset;
-    }
-
-    return _offset;
-  }; // Return an element's offset with respect to to it's offsetParent
-  // https://j11y.io/jquery/#v=git&fn=jQuery.fn.position
-
-  var position = function position(el)
-  /* istanbul ignore next: getBoundingClientRect() doesn't work in JSDOM */
-  {
-    var _offset = {
-      top: 0,
-      left: 0
-    };
-
-    if (!isElement(el)) {
-      return _offset;
-    }
-
-    var parentOffset = {
-      top: 0,
-      left: 0
-    };
-    var elStyles = getCS(el);
-
-    if (elStyles.position === 'fixed') {
-      _offset = getBCR(el) || _offset;
-    } else {
-      _offset = offset(el);
-      var doc = el.ownerDocument;
-      var offsetParent = el.offsetParent || doc.documentElement;
-
-      while (offsetParent && (offsetParent === doc.body || offsetParent === doc.documentElement) && getCS(offsetParent).position === 'static') {
-        offsetParent = offsetParent.parentNode;
-      }
-
-      if (offsetParent && offsetParent !== el && offsetParent.nodeType === Node.ELEMENT_NODE) {
-        parentOffset = offset(offsetParent);
-        var offsetParentStyles = getCS(offsetParent);
-        parentOffset.top += parseFloat(offsetParentStyles.borderTopWidth);
-        parentOffset.left += parseFloat(offsetParentStyles.borderLeftWidth);
-      }
-    }
-
-    return {
-      top: _offset.top - parentOffset.top - parseFloat(elStyles.marginTop),
-      left: _offset.left - parentOffset.left - parseFloat(elStyles.marginLeft)
-    };
-  };
-
-  var NAME = 'BModalTarget';
-  var modalTargetName = "BV-".concat(NAME); // Pivate internal component used by ModalManager.
-  // Not to be used directly by humans.
-  // @vue/component
-
-  var BModalTarget = Vue.extend({
-    name: NAME,
-    data: function data() {
-      return {
-        doRender: false
-      };
-    },
-    destroyed: function destroyed()
-    /* istanbul ignore next */
-    {
-      // Ensure we get removed from DOM when destroyed
-      if (this.$el && this.$el.parentNode) {
-        this.$el.parentNode.removeChild(this.$el);
-      }
-    },
-    beforeMount: function beforeMount() {
-      var self = this; // There can be only one modal target in the document
-
-      /* istanbul ignore if */
-
-      if (wormhole.hasTarget(modalTargetName)) {
-        this.$once('hook:mounted', function () {
-          self.$nextTick(function () {
-            requestAF(function () {
-              self.$destroy();
-            });
-          });
-        });
-      } else {
-        this.doRender = true;
-      }
-    },
-    render: function render(h) {
-      /* istanbul ignore else */
-      if (this.doRender) {
-        return h(PortalTarget, {
-          staticClass: 'b-modal-target',
-          props: {
-            tag: 'div',
-            name: modalTargetName,
-            multiple: true,
-            transition: null,
-            slim: false
-          }
-        });
-      } else {
-        return h('div');
-      }
-    }
-  });
-
-  /**
-   * Private ModalManager helper
-   * Handles controlling modal stacking zIndexes and body adjustments/classes
-   */
-  // Default modal backdrop z-index
-
-  var DEFAULT_ZINDEX = 1040; // Selectors for padding/margin adjustments
-
-  var Selector = {
-    FIXED_CONTENT: '.fixed-top, .fixed-bottom, .is-fixed, .sticky-top',
-    STICKY_CONTENT: '.sticky-top',
-    NAVBAR_TOGGLER: '.navbar-toggler' // @vue/component
-
-  };
-  var ModalManager = Vue.extend({
-    data: function data() {
-      return {
-        modals: [],
-        baseZIndex: null,
-        scrollbarWidth: null,
-        isBodyOverflowing: false
-      };
-    },
-    computed: {
-      modalCount: function modalCount() {
-        return this.modals.length;
-      },
-      modalsAreOpen: function modalsAreOpen() {
-        return this.modalCount > 0;
-      },
-      modalTargetName: function modalTargetName$1() {
-        return modalTargetName;
-      }
-    },
-    watch: {
-      modalCount: function modalCount(newCount, oldCount) {
-        if (isBrowser) {
-          this.getScrollbarWidth();
-
-          if (newCount > 0 && oldCount === 0) {
-            // Transitioning to modal(s) open
-            this.checkScrollbar();
-            this.setScrollbar();
-            addClass(document.body, 'modal-open');
-          } else if (newCount === 0 && oldCount > 0) {
-            // Transitioning to modal(s) closed
-            this.resetScrollbar();
-            removeClass(document.body, 'modal-open');
-          }
-
-          setAttr(document.body, 'data-modal-open-count', String(newCount));
-        }
-      },
-      modals: function modals(newVal, oldVal) {
-        var _this = this;
-
-        this.checkScrollbar();
-        requestAF(function () {
-          _this.updateModals(newVal || []);
-        });
-      }
-    },
-    methods: {
-      // Public methods
-      registerModal: function registerModal(modal) {
-        var _this2 = this;
-
-        // Make sure the modal target exists
-        if (!modal.static) {
-          this.ensureTarget(modal);
-        } // Register the modal if not already registered
-
-
-        if (modal && this.modals.indexOf(modal) === -1) {
-          // Add modal to modals array
-          this.modals.push(modal);
-          modal.$once('hook:beforeDestroy', function () {
-            _this2.unregisterModal(modal);
-          });
-        }
-      },
-      unregisterModal: function unregisterModal(modal) {
-        var index = this.modals.indexOf(modal);
-
-        if (index > -1) {
-          // Remove modal from modals array
-          this.modals.splice(index, 1); // Reset the modal's data
-
-          if (!(modal._isBeingDestroyed || modal._isDestroyed)) {
-            this.resetModal(modal);
-          }
-        }
-      },
-      getBaseZIndex: function getBaseZIndex() {
-        if (isNull(this.baseZIndex) && isBrowser) {
-          // Create a temporary `div.modal-backdrop` to get computed z-index
-          var div = document.createElement('div');
-          div.className = 'modal-backdrop d-none';
-          div.style.display = 'none';
-          document.body.appendChild(div);
-          this.baseZIndex = parseInt(getCS(div).zIndex || DEFAULT_ZINDEX, 10);
-          document.body.removeChild(div);
-        }
-
-        return this.baseZIndex || DEFAULT_ZINDEX;
-      },
-      getScrollbarWidth: function getScrollbarWidth() {
-        if (isNull(this.scrollbarWidth) && isBrowser) {
-          // Create a temporary `div.measure-scrollbar` to get computed z-index
-          var div = document.createElement('div');
-          div.className = 'modal-scrollbar-measure';
-          document.body.appendChild(div);
-          this.scrollbarWidth = getBCR(div).width - div.clientWidth;
-          document.body.removeChild(div);
-        }
-
-        return this.scrollbarWidth || 0;
-      },
-      // Private methods
-      ensureTarget: function ensureTarget(modal) {
-        var _this3 = this;
-
-        if (isBrowser && !wormhole.hasTarget(this.modalTargetName)) {
-          var div = document.createElement('div');
-          document.body.appendChild(div);
-          var target = new BModalTarget({
-            // Set parent/root to the modal's $root
-            parent: modal.$root
-          });
-          target.$mount(div);
-          target.$once('hook:beforeDestroy', function () {
-            _this3.modals.forEach(function (modal) {
-              // Hide any modals that may be in the target, if
-              // target is destroyed, using the 'FORCE' trigger
-              // which makes the hide event non-cancelable
-              if (!modal.static) {
-                modal.hide('FORCED');
-              }
-            });
-          });
-        }
-      },
-      updateModals: function updateModals(modals) {
-        var _this4 = this;
-
-        var baseZIndex = this.getBaseZIndex();
-        var scrollbarWidth = this.getScrollbarWidth();
-        modals.forEach(function (modal, index) {
-          // We update data values on each modal
-          modal.zIndex = baseZIndex + index;
-          modal.scrollbarWidth = scrollbarWidth;
-          modal.isTop = index === _this4.modals.length - 1;
-          modal.isBodyOverflowing = _this4.isBodyOverflowing;
-        });
-      },
-      resetModal: function resetModal(modal) {
-        if (modal) {
-          modal.zIndex = this.getBaseZIndex();
-          modal.isTop = true;
-          modal.isBodyOverflowing = false;
-        }
-      },
-      checkScrollbar: function checkScrollbar() {
-        // Determine if the body element is overflowing
-        var _getBCR = getBCR(document.body),
-            left = _getBCR.left,
-            right = _getBCR.right;
-
-        this.isBodyOverflowing = left + right < window.innerWidth;
-      },
-      setScrollbar: function setScrollbar() {
-        var body = document.body; // Storage place to cache changes to margins and padding
-        // Note: This assumes the following element types are not added to the
-        // document after the modal has opened.
-
-        body._paddingChangedForModal = body._paddingChangedForModal || [];
-        body._marginChangedForModal = body._marginChangedForModal || [];
-
-        if (this.isBodyOverflowing) {
-          var scrollbarWidth = this.scrollbarWidth; // Adjust fixed content padding
-
-          /* istanbul ignore next: difficult to test in JSDOM */
-
-          selectAll(Selector.FIXED_CONTENT).forEach(function (el) {
-            var actualPadding = el.style.paddingRight;
-            var calculatedPadding = getCS(el).paddingRight || 0;
-            setAttr(el, 'data-padding-right', actualPadding);
-            el.style.paddingRight = "".concat(parseFloat(calculatedPadding) + scrollbarWidth, "px");
-
-            body._paddingChangedForModal.push(el);
-          }); // Adjust sticky content margin
-
-          /* istanbul ignore next: difficult to test in JSDOM */
-
-          selectAll(Selector.STICKY_CONTENT).forEach(function (el) {
-            var actualMargin = el.style.marginRight;
-            var calculatedMargin = getCS(el).marginRight || 0;
-            setAttr(el, 'data-margin-right', actualMargin);
-            el.style.marginRight = "".concat(parseFloat(calculatedMargin) - scrollbarWidth, "px");
-
-            body._marginChangedForModal.push(el);
-          }); // Adjust <b-navbar-toggler> margin
-
-          /* istanbul ignore next: difficult to test in JSDOM */
-
-          selectAll(Selector.NAVBAR_TOGGLER).forEach(function (el) {
-            var actualMargin = el.style.marginRight;
-            var calculatedMargin = getCS(el).marginRight || 0;
-            setAttr(el, 'data-margin-right', actualMargin);
-            el.style.marginRight = "".concat(parseFloat(calculatedMargin) + scrollbarWidth, "px");
-
-            body._marginChangedForModal.push(el);
-          }); // Adjust body padding
-
-          var actualPadding = body.style.paddingRight;
-          var calculatedPadding = getCS(body).paddingRight;
-          setAttr(body, 'data-padding-right', actualPadding);
-          body.style.paddingRight = "".concat(parseFloat(calculatedPadding) + scrollbarWidth, "px");
-        }
-      },
-      resetScrollbar: function resetScrollbar() {
-        var body = document.body;
-
-        if (body._paddingChangedForModal) {
-          // Restore fixed content padding
-          body._paddingChangedForModal.forEach(function (el) {
-            /* istanbul ignore next: difficult to test in JSDOM */
-            if (hasAttr(el, 'data-padding-right')) {
-              el.style.paddingRight = getAttr(el, 'data-padding-right') || '';
-              removeAttr(el, 'data-padding-right');
-            }
-          });
-        }
-
-        if (body._marginChangedForModal) {
-          // Restore sticky content and navbar-toggler margin
-          body._marginChangedForModal.forEach(function (el) {
-            /* istanbul ignore next: difficult to test in JSDOM */
-            if (hasAttr(el, 'data-margin-right')) {
-              el.style.marginRight = getAttr(el, 'data-margin-right') || '';
-              removeAttr(el, 'data-margin-right');
-            }
-          });
-        }
-
-        body._paddingChangedForModal = null;
-        body._marginChangedForModal = null; // Restore body padding
-
-        if (hasAttr(body, 'data-padding-right')) {
-          body.style.paddingRight = getAttr(body, 'data-padding-right') || '';
-          removeAttr(body, 'data-padding-right');
-        }
-      }
-    }
-  }); // Export our ModalManager
-
-  var modalManager = new ModalManager();
-
-  var BvEvent =
-  /*#__PURE__*/
-  function () {
-    function BvEvent(type) {
-      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      _classCallCheck(this, BvEvent);
-
-      // Start by emulating native Event constructor.
-      if (!type) {
-        /* istanbul ignore next */
-        throw new TypeError("Failed to construct '".concat(this.constructor.name, "'. 1 argument required, ").concat(arguments.length, " given."));
-      } // Assign defaults first, the eventInit,
-      // and the type last so it can't be overwritten.
-
-
-      assign$1(this, BvEvent.Defaults, this.constructor.Defaults, eventInit, {
-        type: type
-      }); // Freeze some props as readonly, but leave them enumerable.
-
-      defineProperties(this, {
-        type: readonlyDescriptor(),
-        cancelable: readonlyDescriptor(),
-        nativeEvent: readonlyDescriptor(),
-        target: readonlyDescriptor(),
-        relatedTarget: readonlyDescriptor(),
-        vueTarget: readonlyDescriptor(),
-        componentId: readonlyDescriptor()
-      }); // Create a private variable using closure scoping.
-
-      var defaultPrevented = false; // Recreate preventDefault method. One way setter.
-
-      this.preventDefault = function preventDefault() {
-        if (this.cancelable) {
-          defaultPrevented = true;
-        }
-      }; // Create 'defaultPrevented' publicly accessible prop
-      // that can only be altered by the preventDefault method.
-
-
-      defineProperty(this, 'defaultPrevented', {
-        enumerable: true,
-        get: function get() {
-          return defaultPrevented;
-        }
-      });
-    }
-
-    _createClass(BvEvent, null, [{
-      key: "Defaults",
-      get: function get() {
-        return {
-          type: '',
-          cancelable: true,
-          nativeEvent: null,
-          target: null,
-          relatedTarget: null,
-          vueTarget: null,
-          componentId: null
-        };
-      }
-    }]);
-
-    return BvEvent;
-  }(); // Named Exports
-
-  var BvModalEvent =
-  /*#__PURE__*/
-  function (_BvEvent) {
-    _inherits(BvModalEvent, _BvEvent);
-
-    function BvModalEvent(type) {
-      var _this;
-
-      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      _classCallCheck(this, BvModalEvent);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(BvModalEvent).call(this, type, eventInit)); // Freeze our new props as readonly, but leave them enumerable
-
-      defineProperties(_assertThisInitialized(_this), {
-        trigger: readonlyDescriptor()
-      });
-      return _this;
-    }
-
-    _createClass(BvModalEvent, [{
-      key: "cancel",
-      value: function cancel()
-      /* istanbul ignore next */
-      {
-        // Backwards compatibility for BootstrapVue 1.x
-        warn('b-modal: evt.cancel() is deprecated. Please use evt.preventDefault().');
-        this.preventDefault();
-      }
-    }, {
-      key: "modalId",
-      get: function get()
-      /* istanbul ignore next */
-      {
-        // Backwards compatability <= 2.0.0-rc.19
-        warn('b-modal: evt.modalId is deprecated. Please use evt.componentId.');
-        return this.componentId;
-      }
-    }], [{
-      key: "Defaults",
-      get: function get() {
-        return _objectSpread({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this), {
-          trigger: null
-        });
-      }
-    }]);
-
-    return BvModalEvent;
-  }(BvEvent); // Named exports
-
-  var __assign=function(){return (__assign=Object.assign||function(e){for(var a,s=1,t=arguments.length;s<t;s++)for(var r in a=arguments[s])Object.prototype.hasOwnProperty.call(a,r)&&(e[r]=a[r]);return e}).apply(this,arguments)};function mergeData(){for(var e,a,s={},t=arguments.length;t--;)for(var r=0,c=Object.keys(arguments[t]);r<c.length;r++)switch(e=c[r]){case"class":case"style":case"directives":Array.isArray(s[e])||(s[e]=[]),s[e]=s[e].concat(arguments[t][e]);break;case"staticClass":if(!arguments[t][e])break;void 0===s[e]&&(s[e]=""),s[e]&&(s[e]+=" "),s[e]+=arguments[t][e].trim();break;case"on":case"nativeOn":s[e]||(s[e]={});for(var n=0,o=Object.keys(arguments[t][e]||{});n<o.length;n++)a=o[n],s[e][a]?s[e][a]=[].concat(s[e][a],arguments[t][e][a]):s[e][a]=arguments[t][e][a];break;case"attrs":case"props":case"domProps":case"scopedSlots":case"staticStyle":case"hook":case"transition":s[e]||(s[e]={}),s[e]=__assign({},arguments[t][e],s[e]);break;case"slot":case"key":case"ref":case"tag":case"show":case"keepAlive":default:s[e]||(s[e]=arguments[t][e]);}return s}
-
-  var identity = function identity(x) {
-    return x;
-  };
-
-  /**
-   * Given an array of properties or an object of property keys,
-   * plucks all the values off the target object, returning a new object
-   * that has props that reference the original prop values
-   *
-   * @param {{}|string[]} keysToPluck
-   * @param {{}} objToPluck
-   * @param {Function} transformFn
-   * @return {{}}
-   */
-
-  var pluckProps = function pluckProps(keysToPluck, objToPluck) {
-    var transformFn = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : identity;
-    return (isArray$1(keysToPluck) ? keysToPluck.slice() : keys(keysToPluck)).reduce(function (memo, prop) {
-      memo[transformFn(prop)] = objToPluck[prop];
-      return memo;
-    }, {});
-  };
-
-  /**
-   * Convert a value to a string that can be rendered.
-   */
-
-  var toString$1 = function toString(val) {
-    var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-    return isUndefined(val) || isNull(val) ? '' : isArray$1(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
-  };
-
-  var ANCHOR_TAG = 'a'; // Precompile RegExp
-
-  var commaRE = /%2C/g;
-  var encodeReserveRE = /[!'()*]/g; // Method to replace reserved chars
-
-  var encodeReserveReplacer = function encodeReserveReplacer(c) {
-    return '%' + c.charCodeAt(0).toString(16);
-  }; // Fixed encodeURIComponent which is more conformant to RFC3986:
-  // - escapes [!'()*]
-  // - preserve commas
-
-
-  var encode = function encode(str) {
-    return encodeURIComponent(toString$1(str)).replace(encodeReserveRE, encodeReserveReplacer).replace(commaRE, ',');
-  };
-
-  var decode = decodeURIComponent; // Stringifies an object of query parameters
-  // See: https://github.com/vuejs/vue-router/blob/dev/src/util/query.js
-
-  var stringifyQueryObj = function stringifyQueryObj(obj) {
-    if (!isPlainObject(obj)) {
-      return '';
-    }
-
-    var query = keys(obj).map(function (key) {
-      var val = obj[key];
-
-      if (isUndefined(val)) {
-        return '';
-      } else if (isNull(val)) {
-        return encode(key);
-      } else if (isArray$1(val)) {
-        return val.reduce(function (results, val2) {
-          if (isNull(val2)) {
-            results.push(encode(key));
-          } else if (!isUndefined(val2)) {
-            // Faster than string interpolation
-            results.push(encode(key) + '=' + encode(val2));
-          }
-
-          return results;
-        }, []).join('&');
-      } // Faster than string interpolation
-
-
-      return encode(key) + '=' + encode(val);
-    })
-    /* must check for length, as we only want to filter empty strings, not things that look falsey! */
-    .filter(function (x) {
-      return x.length > 0;
-    }).join('&');
-    return query ? "?".concat(query) : '';
-  };
-  var parseQuery = function parseQuery(query) {
-    var parsed = {};
-    query = toString$1(query).trim().replace(/^(\?|#|&)/, '');
-
-    if (!query) {
-      return parsed;
-    }
-
-    query.split('&').forEach(function (param) {
-      var parts = param.replace(/\+/g, ' ').split('=');
-      var key = decode(parts.shift());
-      var val = parts.length > 0 ? decode(parts.join('=')) : null;
-
-      if (isUndefined(parsed[key])) {
-        parsed[key] = val;
-      } else if (isArray$1(parsed[key])) {
-        parsed[key].push(val);
-      } else {
-        parsed[key] = [parsed[key], val];
-      }
-    });
-    return parsed;
-  };
-  var isRouterLink = function isRouterLink(tag) {
-    return tag !== ANCHOR_TAG;
-  };
-  var computeTag = function computeTag() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        to = _ref.to,
-        disabled = _ref.disabled;
-
-    var thisOrParent = arguments.length > 1 ? arguments[1] : undefined;
-    return thisOrParent.$router && to && !disabled ? thisOrParent.$nuxt ? 'nuxt-link' : 'router-link' : ANCHOR_TAG;
-  };
-  var computeRel = function computeRel() {
-    var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        target = _ref2.target,
-        rel = _ref2.rel;
-
-    if (target === '_blank' && isNull(rel)) {
-      return 'noopener';
-    }
-
-    return rel || null;
-  };
-  var computeHref = function computeHref() {
-    var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        href = _ref3.href,
-        to = _ref3.to;
-
-    var tag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ANCHOR_TAG;
-    var fallback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '#';
-    var toFallback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '/';
-
-    // We've already checked the $router in computeTag(), so isRouterLink() indicates a live router.
-    // When deferring to Vue Router's router-link, don't use the href attribute at all.
-    // We return null, and then remove href from the attributes passed to router-link
-    if (isRouterLink(tag)) {
-      return null;
-    } // Return `href` when explicitly provided
-
-
-    if (href) {
-      return href;
-    } // Reconstruct `href` when `to` used, but no router
-
-
-    if (to) {
-      // Fallback to `to` prop (if `to` is a string)
-      if (isString(to)) {
-        return to || toFallback;
-      } // Fallback to `to.path + to.query + to.hash` prop (if `to` is an object)
-
-
-      if (isPlainObject(to) && (to.path || to.query || to.hash)) {
-        var path = toString$1(to.path);
-        var query = stringifyQueryObj(to.query);
-        var hash = toString$1(to.hash);
-        hash = !hash || hash.charAt(0) === '#' ? hash : "#".concat(hash);
-        return "".concat(path).concat(query).concat(hash) || toFallback;
-      }
-    } // If nothing is provided return the fallback
-
-
-    return fallback;
-  };
-
-  /**
-   * The Link component is used in many other BV components.
-   * As such, sharing its props makes supporting all its features easier.
-   * However, some components need to modify the defaults for their own purpose.
-   * Prefer sharing a fresh copy of the props to ensure mutations
-   * do not affect other component references to the props.
-   *
-   * https://github.com/vuejs/vue-router/blob/dev/src/components/link.js
-   * @return {{}}
-   */
-
-  var propsFactory = function propsFactory() {
-    return {
-      href: {
-        type: String,
-        default: null
-      },
-      rel: {
-        type: String,
-        default: null
-      },
-      target: {
-        type: String,
-        default: '_self'
-      },
-      active: {
-        type: Boolean,
-        default: false
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      // router-link specific props
-      to: {
-        type: [String, Object],
-        default: null
-      },
-      append: {
-        type: Boolean,
-        default: false
-      },
-      replace: {
-        type: Boolean,
-        default: false
-      },
-      event: {
-        type: [String, Array],
-        default: 'click'
-      },
-      activeClass: {
-        type: String // default: undefined
-
-      },
-      exact: {
-        type: Boolean,
-        default: false
-      },
-      exactActiveClass: {
-        type: String // default: undefined
-
-      },
-      routerTag: {
-        type: String,
-        default: 'a'
-      },
-      // nuxt-link specific prop(s)
-      noPrefetch: {
-        type: Boolean,
-        default: false
-      }
-    };
-  };
-
-  var clickHandlerFactory = function clickHandlerFactory(_ref) {
-    var disabled = _ref.disabled,
-        tag = _ref.tag,
-        href = _ref.href,
-        suppliedHandler = _ref.suppliedHandler,
-        parent = _ref.parent;
-    return function onClick(evt) {
-      var _arguments = arguments;
-
-      if (disabled && evt instanceof Event) {
-        // Stop event from bubbling up.
-        evt.stopPropagation(); // Kill the event loop attached to this specific EventTarget.
-        // Needed to prevent vue-router for doing its thing
-
-        evt.stopImmediatePropagation();
-      } else {
-        if (isRouterLink(tag) && evt.target.__vue__) {
-          // Router links do not emit instance 'click' events, so we
-          // add in an $emit('click', evt) on it's vue instance
-
-          /* istanbul ignore next: difficult to test, but we know it works */
-          evt.target.__vue__.$emit('click', evt);
-        } // Call the suppliedHandler(s), if any provided
-
-
-        concat(suppliedHandler).filter(function (h) {
-          return isFunction(h);
-        }).forEach(function (handler) {
-          handler.apply(void 0, _toConsumableArray(_arguments));
-        });
-        parent.$root.$emit('clicked::link', evt);
-      }
-
-      if (!isRouterLink(tag) && href === '#' || disabled) {
-        // Stop scroll-to-top behavior or navigation on regular links
-        // when href is just '#'
-        evt.preventDefault();
-      }
-    };
-  }; // @vue/component
-
-
-  var BLink = Vue.extend({
-    name: 'BLink',
-    functional: true,
-    props: propsFactory(),
-    render: function render(h, _ref2) {
-      var props = _ref2.props,
-          data = _ref2.data,
-          parent = _ref2.parent,
-          children = _ref2.children;
-      var tag = computeTag(props, parent);
-      var rel = computeRel(props);
-      var href = computeHref(props, tag);
-      var eventType = isRouterLink(tag) ? 'nativeOn' : 'on';
-      var suppliedHandler = (data[eventType] || {}).click;
-      var handlers = {
-        click: clickHandlerFactory({
-          tag: tag,
-          href: href,
-          disabled: props.disabled,
-          suppliedHandler: suppliedHandler,
-          parent: parent
-        })
-      };
-      var componentData = mergeData(data, {
-        class: {
-          active: props.active,
-          disabled: props.disabled
-        },
-        attrs: {
-          rel: rel,
-          target: props.target,
-          tabindex: props.disabled ? '-1' : data.attrs ? data.attrs.tabindex : null,
-          'aria-disabled': props.disabled ? 'true' : null
-        },
-        props: _objectSpread({}, props, {
-          tag: props.routerTag
-        })
-      }); // If href attribute exists on router-link (even undefined or null) it fails working on SSR
-      // So we explicitly add it here if needed (i.e. if computeHref() is truthy)
-
-      if (href) {
-        componentData.attrs.href = href;
-      } else {
-        // Ensure the prop HREF does not exist for router links
-        delete componentData.props.href;
-      } // We want to overwrite any click handler since our callback
-      // will invoke the user supplied handler if !props.disabled
-
-
-      componentData[eventType] = _objectSpread({}, componentData[eventType] || {}, handlers);
-      return h(tag, componentData, children);
-    }
-  });
-
-  var NAME$1 = 'BButton';
-  var btnProps = {
-    block: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: null
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$1, 'variant');
-      }
-    },
-    type: {
-      type: String,
-      default: 'button'
-    },
-    tag: {
-      type: String,
-      default: 'button'
-    },
-    pill: {
-      type: Boolean,
-      default: false
-    },
-    pressed: {
-      // tri-state prop: true, false or null
-      // => on, off, not a toggle
-      type: Boolean,
-      default: null
-    }
-  };
-  var linkProps = propsFactory();
-  delete linkProps.href.default;
-  delete linkProps.to.default;
-  var linkPropKeys = keys(linkProps);
-  var props = _objectSpread({}, linkProps, btnProps); // --- Helper methods ---
-  // Focus handler for toggle buttons.  Needs class of 'focus' when focused.
-
-  var handleFocus = function handleFocus(evt) {
-    if (evt.type === 'focusin') {
-      addClass(evt.target, 'focus');
-    } else if (evt.type === 'focusout') {
-      removeClass(evt.target, 'focus');
-    }
-  }; // Is the requested button a link?
-
-
-  var isLink = function isLink(props) {
-    // If tag prop is set to `a`, we use a b-link to get proper disabled handling
-    return Boolean(props.href || props.to || props.tag && String(props.tag).toLowerCase() === 'a');
-  }; // Is the button to be a toggle button?
-
-
-  var isToggle = function isToggle(props) {
-    return isBoolean(props.pressed);
-  }; // Is the button "really" a button?
-
-
-  var isButton = function isButton(props) {
-    if (isLink(props)) {
-      return false;
-    } else if (props.tag && String(props.tag).toLowerCase() !== 'button') {
-      return false;
-    }
-
-    return true;
-  }; // Is the requested tag not a button or link?
-
-
-  var isNonStandardTag = function isNonStandardTag(props) {
-    return !isLink(props) && !isButton(props);
-  }; // Compute required classes (non static classes)
-
-
-  var computeClass = function computeClass(props) {
-    var _ref;
-
-    return ["btn-".concat(props.variant || getComponentConfig(NAME$1, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), Boolean(props.size)), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
-  }; // Compute the link props to pass to b-link (if required)
-
-
-  var computeLinkProps = function computeLinkProps(props) {
-    return isLink(props) ? pluckProps(linkPropKeys, props) : null;
-  }; // Compute the attributes for a button
-
-
-  var computeAttrs = function computeAttrs(props, data) {
-    var button = isButton(props);
-    var link = isLink(props);
-    var toggle = isToggle(props);
-    var nonStdTag = isNonStandardTag(props);
-    var role = data.attrs && data.attrs['role'] ? data.attrs['role'] : null;
-    var tabindex = data.attrs ? data.attrs['tabindex'] : null;
-
-    if (nonStdTag) {
-      tabindex = '0';
-    }
-
-    return {
-      // Type only used for "real" buttons
-      type: button && !link ? props.type : null,
-      // Disabled only set on "real" buttons
-      disabled: button ? props.disabled : null,
-      // We add a role of button when the tag is not a link or button for ARIA.
-      // Don't bork any role provided in data.attrs when isLink or isButton
-      role: nonStdTag ? 'button' : role,
-      // We set the aria-disabled state for non-standard tags
-      'aria-disabled': nonStdTag ? String(props.disabled) : null,
-      // For toggles, we need to set the pressed state for ARIA
-      'aria-pressed': toggle ? String(props.pressed) : null,
-      // autocomplete off is needed in toggle mode to prevent some browsers from
-      // remembering the previous setting when using the back button.
-      autocomplete: toggle ? 'off' : null,
-      // Tab index is used when the component is not a button.
-      // Links are tabbable, but don't allow disabled, while non buttons or links
-      // are not tabbable, so we mimic that functionality by disabling tabbing
-      // when disabled, and adding a tabindex of '0' to non buttons or non links.
-      tabindex: props.disabled && !button ? '-1' : tabindex
-    };
-  }; // @vue/component
-
-
-  var BButton = Vue.extend({
-    name: NAME$1,
-    functional: true,
-    props: props,
-    render: function render(h, _ref2) {
-      var props = _ref2.props,
-          data = _ref2.data,
-          listeners = _ref2.listeners,
-          children = _ref2.children;
-      var toggle = isToggle(props);
-      var link = isLink(props);
-      var on = {
-        click: function click(e) {
-          /* istanbul ignore if: blink/button disabled should handle this */
-          if (props.disabled && e instanceof Event) {
-            e.stopPropagation();
-            e.preventDefault();
-          } else if (toggle && listeners && listeners['update:pressed']) {
-            // Send .sync updates to any "pressed" prop (if .sync listeners)
-            // Concat will normalize the value to an array
-            // without double wrapping an array value in an array.
-            concat(listeners['update:pressed']).forEach(function (fn) {
-              if (isFunction(fn)) {
-                fn(!props.pressed);
-              }
-            });
-          }
-        }
-      };
-
-      if (toggle) {
-        on.focusin = handleFocus;
-        on.focusout = handleFocus;
-      }
-
-      var componentData = {
-        staticClass: 'btn',
-        class: computeClass(props),
-        props: computeLinkProps(props),
-        attrs: computeAttrs(props, data),
-        on: on
-      };
-      return h(link ? BLink : props.tag, mergeData(data, componentData), children);
-    }
-  });
-
-  // In functional components, `slots` is a function so it must be called
-  // first before passing to the below methods. `scopedSlots` is always an
-  // object and may be undefined (for Vue < 2.6.x)
-
-  /**
-   * Returns true if either scoped or unscoped named slot eists
-   *
-   * @param {String} name
-   * @param {Object} scopedSlots
-   * @param {Object} slots
-   * @returns {Array|undefined} vNodes
-   */
-
-  var hasNormalizedSlot = function hasNormalizedSlot(name) {
-    var $scopedSlots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var $slots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    // Returns true if the either a $scopedSlot or $slot exists with the specified name
-    return Boolean($scopedSlots[name] || $slots[name]);
-  };
-  /**
-   * Returns vNodes for named slot either scoped or unscoped
-   *
-   * @param {String} name
-   * @param {String} scope
-   * @param {Object} scopedSlots
-   * @param {Object} slots
-   * @returns {Array|undefined} vNodes
-   */
-
-
-  var normalizeSlot = function normalizeSlot(name) {
-    var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var $scopedSlots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    var $slots = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-    // Note: in Vue 2.6.x, all names slots are also scoped slots
-    var slot = $scopedSlots[name] || $slots[name];
-    return isFunction(slot) ? slot(scope) : slot;
-  }; // Named exports
-
-  var NAME$2 = 'BButtonClose';
-  var props$1 = {
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    ariaLabel: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$2, 'ariaLabel');
-      }
-    },
-    textVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$2, 'textVariant');
-      }
-    } // @vue/component
-
-  };
-  var BButtonClose = Vue.extend({
-    name: NAME$2,
-    functional: true,
-    props: props$1,
-    render: function render(h, _ref) {
-      var props = _ref.props,
-          data = _ref.data,
-          listeners = _ref.listeners,
-          slots = _ref.slots,
-          scopedSlots = _ref.scopedSlots;
-      var $slots = slots();
-      var $scopedSlots = scopedSlots || {};
-      var componentData = {
-        staticClass: 'close',
-        class: _defineProperty({}, "text-".concat(props.textVariant), props.textVariant),
-        attrs: {
-          type: 'button',
-          disabled: props.disabled,
-          'aria-label': props.ariaLabel ? String(props.ariaLabel) : null
-        },
-        on: {
-          click: function click(e) {
-            // Ensure click on button HTML content is also disabled
-
-            /* istanbul ignore if: bug in JSDOM still emits click on inner element */
-            if (props.disabled && e instanceof Event) {
-              e.stopPropagation();
-              e.preventDefault();
-            }
-          }
-        } // Careful not to override the default slot with innerHTML
-
-      };
-
-      if (!hasNormalizedSlot('default', $scopedSlots, $slots)) {
-        componentData.domProps = {
-          innerHTML: '&times;'
-        };
-      }
-
-      return h('button', mergeData(data, componentData), normalizeSlot('default', {}, $scopedSlots, $slots));
-    }
-  });
-
-  /*
-   * SSR Safe Client Side ID attribute generation
-   * id's can only be generated client side, after mount.
-   * this._uid is not synched between server and client.
-   */
-  // @vue/component
-  var idMixin = {
-    props: {
-      id: {
-        type: String,
-        default: null
-      }
-    },
-    data: function data() {
-      return {
-        localId_: null
-      };
-    },
-    computed: {
-      safeId: function safeId() {
-        // Computed property that returns a dynamic function for creating the ID.
-        // Reacts to changes in both .id and .localId_ And regens a new function
-        var id = this.id || this.localId_; // We return a function that accepts an optional suffix string
-        // So this computed prop looks and works like a method!!!
-        // But benefits from Vue's Computed prop caching
-
-        var fn = function fn(suffix) {
-          if (!id) {
-            return null;
-          }
-
-          suffix = String(suffix || '').replace(/\s+/g, '_');
-          return suffix ? id + '_' + suffix : id;
-        };
-
-        return fn;
-      }
-    },
-    mounted: function mounted() {
-      var _this = this;
-
-      // mounted only occurs client side
-      this.$nextTick(function () {
-        // Update dom with auto ID after dom loaded to prevent
-        // SSR hydration errors.
-        _this.localId_ = "__BVID__".concat(_this._uid);
-      });
-    }
-  };
-
-  /**
-   * Issue #569: collapse::toggle::state triggered too many times
-   * @link https://github.com/bootstrap-vue/bootstrap-vue/issues/569
-   */
-  // @vue/component
-  var listenOnRootMixin = {
-    methods: {
-      /**
-       * Safely register event listeners on the root Vue node.
-       * While Vue automatically removes listeners for individual components,
-       * when a component registers a listener on root and is destroyed,
-       * this orphans a callback because the node is gone,
-       * but the root does not clear the callback.
-       *
-       * When registering a $root listener, it also registers a listener on
-       * the component's `beforeDestroy` hook to automatically remove the
-       * event listener from the $root instance.
-       *
-       * @param {string} event
-       * @param {function} callback
-       * @chainable
-       */
-      listenOnRoot: function listenOnRoot(event, callback) {
-        var _this = this;
-
-        this.$root.$on(event, callback);
-        this.$on('hook:beforeDestroy', function () {
-          _this.$root.$off(event, callback);
-        }); // Return this for easy chaining
-
-        return this;
-      },
-
-      /**
-       * Safely register a $once event listener on the root Vue node.
-       * While Vue automatically removes listeners for individual components,
-       * when a component registers a listener on root and is destroyed,
-       * this orphans a callback because the node is gone,
-       * but the root does not clear the callback.
-       *
-       * When registering a $root listener, it also registers a listener on
-       * the component's `beforeDestroy` hook to automatically remove the
-       * event listener from the $root instance.
-       *
-       * @param {string} event
-       * @param {function} callback
-       * @chainable
-       */
-      listenOnRootOnce: function listenOnRootOnce(event, callback) {
-        var _this2 = this;
-
-        this.$root.$once(event, callback);
-        this.$on('hook:beforeDestroy', function () {
-          _this2.$root.$off(event, callback);
-        }); // Return this for easy chaining
-
-        return this;
-      },
-
-      /**
-       * Convenience method for calling vm.$emit on vm.$root.
-       * @param {string} event
-       * @param {*} args
-       * @chainable
-       */
-      emitOnRoot: function emitOnRoot(event) {
-        var _this$$root;
-
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        (_this$$root = this.$root).$emit.apply(_this$$root, [event].concat(args)); // Return this for easy chaining
-
-
-        return this;
-      }
-    }
-  };
-
-  var normalizeSlotMixin = {
-    methods: {
-      hasNormalizedSlot: function hasNormalizedSlot$1(name) {
-        // Returns true if the either a $scopedSlot or $slot exists with the specified name
-        return hasNormalizedSlot(name, this.$scopedSlots, this.$slots);
-      },
-      normalizeSlot: function normalizeSlot$1(name) {
-        var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        // Returns an array of rendered vNodes if slot found.
-        // Returns undefined if not found.
-        var vNodes = normalizeSlot(name, scope, this.$scopedSlots, this.$slots);
-
-        return vNodes ? concat(vNodes) : vNodes;
-      }
-    }
-  };
-
-  /**
-   * Observe a DOM element changes, falls back to eventListener mode
-   * @param {Element} el The DOM element to observe
-   * @param {Function} callback callback to be called on change
-   * @param {object} [opts={childList: true, subtree: true}] observe options
-   * @see http://stackoverflow.com/questions/3219758
-   */
-
-  var observeDom = function observeDom(el, callback, opts)
-  /* istanbul ignore next: difficult to test in JSDOM */
-  {
-    // Handle cases where we might be passed a Vue instance
-    el = el ? el.$el || el : null; // Early exit when we have no element
-
-    /* istanbul ignore next: difficult to test in JSDOM */
-
-    if (!isElement(el)) {
-      return null;
-    } // Exit and throw a warning when `MutationObserver` isn't available
-
-
-    if (warnNoMutationObserverSupport('observeDom')) {
-      return null;
-    } // Define a new observer
-
-
-    var obs = new MutationObs(function (mutations) {
-      var changed = false; // A mutation can contain several change records, so we loop
-      // through them to see what has changed
-      // We break out of the loop early if any "significant" change
-      // has been detected
-
-      for (var i = 0; i < mutations.length && !changed; i++) {
-        // The mutation record
-        var mutation = mutations[i]; // Mutation type
-
-        var type = mutation.type; // DOM node (could be any DOM node type - HTMLElement, Text, comment, etc.)
-
-        var target = mutation.target; // Detect whether a change happened based on type and target
-
-        if (type === 'characterData' && target.nodeType === Node.TEXT_NODE) {
-          // We ignore nodes that are not TEXT (i.e. comments, etc)
-          // as they don't change layout
-          changed = true;
-        } else if (type === 'attributes') {
-          changed = true;
-        } else if (type === 'childList' && (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)) {
-          // This includes HTMLElement and text nodes being
-          // added/removed/re-arranged
-          changed = true;
-        }
-      } // We only call the callback if a change that could affect
-      // layout/size truely happened
-
-
-      if (changed) {
-        callback();
-      }
-    }); // Have the observer observe foo for changes in children, etc
-
-    obs.observe(el, _objectSpread({
-      childList: true,
-      subtree: true
-    }, opts)); // We return a reference to the observer so that `obs.disconnect()`
-    // can be called if necessary
-    // To reduce overhead when the root element is hidden
-
-    return obs;
-  };
-
-  /*
-   * Key Codes (events)
-   */
-  var KEY_CODES = {
-    SPACE: 32,
-    ENTER: 13,
-    ESC: 27,
-    LEFT: 37,
-    UP: 38,
-    RIGHT: 39,
-    DOWN: 40,
-    PAGEUP: 33,
-    PAGEDOWN: 34,
-    HOME: 36,
-    END: 35,
-    TAB: 9,
-    SHIFT: 16,
-    CTRL: 17,
-    BACKSPACE: 8,
-    ALT: 18,
-    PAUSE: 19,
-    BREAK: 19,
-    INSERT: 45,
-    INS: 45,
-    DELETE: 46
-  };
-
-  var stripTagsRegex = /(<([^>]+)>)/gi; // Removes any thing that looks like an HTML tag from the supplied string
-
-  var stripTags = function stripTags() {
-    var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    return String(text).replace(stripTagsRegex, '');
-  }; // Generate a domProps object for either innerHTML, textContent or nothing
-
-  var htmlOrText = function htmlOrText(innerHTML, textContent) {
-    return innerHTML ? {
-      innerHTML: innerHTML
-    } : textContent ? {
-      textContent: textContent
-    } : {};
-  };
-
-  var NAME$3 = 'BModal'; // ObserveDom config to detect changes in modal content
-  // so that we can adjust the modal padding if needed
-
-  var OBSERVER_CONFIG = {
-    subtree: true,
-    childList: true,
-    characterData: true,
-    attributes: true,
-    attributeFilter: ['style', 'class'] // Options for DOM event listeners
-
-  };
-  var EVT_OPTIONS = {
-    passive: true,
-    capture: false
-  };
-  var props$2 = {
-    title: {
-      type: String,
-      default: ''
-    },
-    titleHtml: {
-      type: String
-    },
-    titleTag: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'titleTag');
-      }
-    },
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'size');
-      }
-    },
-    centered: {
-      type: Boolean,
-      default: false
-    },
-    scrollable: {
-      type: Boolean,
-      default: false
-    },
-    buttonSize: {
-      type: String,
-      default: ''
-    },
-    noStacking: {
-      type: Boolean,
-      default: false
-    },
-    noFade: {
-      type: Boolean,
-      default: false
-    },
-    noCloseOnBackdrop: {
-      type: Boolean,
-      default: false
-    },
-    noCloseOnEsc: {
-      type: Boolean,
-      default: false
-    },
-    noEnforceFocus: {
-      type: Boolean,
-      default: false
-    },
-    headerBgVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'headerBgVariant');
-      }
-    },
-    headerBorderVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'headerBorderVariant');
-      }
-    },
-    headerTextVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'headerTextVariant');
-      }
-    },
-    headerCloseVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'headerCloseVariant');
-      }
-    },
-    headerClass: {
-      type: [String, Array],
-      default: null
-    },
-    bodyBgVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'bodyBgVariant');
-      }
-    },
-    bodyTextVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'bodyTextVariant');
-      }
-    },
-    modalClass: {
-      type: [String, Array],
-      default: null
-    },
-    dialogClass: {
-      type: [String, Array],
-      default: null
-    },
-    contentClass: {
-      type: [String, Array],
-      default: null
-    },
-    bodyClass: {
-      type: [String, Array],
-      default: null
-    },
-    footerBgVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'footerBgVariant');
-      }
-    },
-    footerBorderVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'footerBorderVariant');
-      }
-    },
-    footerTextVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'footerTextVariant');
-      }
-    },
-    footerClass: {
-      type: [String, Array],
-      default: null
-    },
-    hideHeader: {
-      type: Boolean,
-      default: false
-    },
-    hideFooter: {
-      type: Boolean,
-      default: false
-    },
-    hideHeaderClose: {
-      type: Boolean,
-      default: false
-    },
-    hideBackdrop: {
-      type: Boolean,
-      default: false
-    },
-    okOnly: {
-      type: Boolean,
-      default: false
-    },
-    okDisabled: {
-      type: Boolean,
-      default: false
-    },
-    cancelDisabled: {
-      type: Boolean,
-      default: false
-    },
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    returnFocus: {
-      // type: Object,
-      default: null
-    },
-    headerCloseLabel: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'headerCloseLabel');
-      }
-    },
-    cancelTitle: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'cancelTitle');
-      }
-    },
-    cancelTitleHtml: {
-      type: String
-    },
-    okTitle: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'okTitle');
-      }
-    },
-    okTitleHtml: {
-      type: String
-    },
-    cancelVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'cancelVariant');
-      }
-    },
-    okVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$3, 'okVariant');
-      }
-    },
-    lazy: {
-      type: Boolean,
-      default: false
-    },
-    busy: {
-      type: Boolean,
-      default: false
-    },
-    static: {
-      type: Boolean,
-      default: false
-    } // @vue/component
-
-  };
-  var BModal = Vue.extend({
-    name: NAME$3,
-    mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
-    model: {
-      prop: 'visible',
-      event: 'change'
-    },
-    props: props$2,
-    data: function data() {
-      return {
-        is_hidden: true,
-        // If should not be in document
-        is_visible: false,
-        // Controls modal visible state
-        is_transitioning: false,
-        // Used for style control
-        is_show: false,
-        // Used for style control
-        is_block: false,
-        // Used for style control
-        is_opening: false,
-        // To signal that the modal is in the process of opening
-        is_closing: false,
-        // To signal that the modal is in the process of closing
-        ignoreBackdropClick: false,
-        // Used to signify if click out listener should ignore the click
-        isModalOverflowing: false,
-        return_focus: this.returnFocus || null,
-        // The following items are controlled by the modalManager instance
-        scrollbarWidth: 0,
-        zIndex: modalManager.getBaseZIndex(),
-        isTop: true,
-        isBodyOverflowing: false
-      };
-    },
-    computed: {
-      modalClasses: function modalClasses() {
-        return [{
-          fade: !this.noFade,
-          show: this.is_show,
-          'd-block': this.is_block
-        }, this.modalClass];
-      },
-      modalStyles: function modalStyles() {
-        var sbWidth = "".concat(this.scrollbarWidth, "px");
-        return {
-          paddingLeft: !this.isBodyOverflowing && this.isModalOverflowing ? sbWidth : '',
-          paddingRight: this.isBodyOverflowing && !this.isModalOverflowing ? sbWidth : ''
-        };
-      },
-      dialogClasses: function dialogClasses() {
-        var _ref;
-
-        return [(_ref = {}, _defineProperty(_ref, "modal-".concat(this.size), Boolean(this.size)), _defineProperty(_ref, 'modal-dialog-centered', this.centered), _defineProperty(_ref, 'modal-dialog-scrollable', this.scrollable), _ref), this.dialogClass];
-      },
-      backdropClasses: function backdropClasses() {
-        return {
-          fade: !this.noFade,
-          show: this.is_show || this.noFade
-        };
-      },
-      headerClasses: function headerClasses() {
-        var _ref2;
-
-        return [(_ref2 = {}, _defineProperty(_ref2, "bg-".concat(this.headerBgVariant), Boolean(this.headerBgVariant)), _defineProperty(_ref2, "text-".concat(this.headerTextVariant), Boolean(this.headerTextVariant)), _defineProperty(_ref2, "border-".concat(this.headerBorderVariant), Boolean(this.headerBorderVariant)), _ref2), this.headerClass];
-      },
-      bodyClasses: function bodyClasses() {
-        var _ref3;
-
-        return [(_ref3 = {}, _defineProperty(_ref3, "bg-".concat(this.bodyBgVariant), Boolean(this.bodyBgVariant)), _defineProperty(_ref3, "text-".concat(this.bodyTextVariant), Boolean(this.bodyTextVariant)), _ref3), this.bodyClass];
-      },
-      footerClasses: function footerClasses() {
-        var _ref4;
-
-        return [(_ref4 = {}, _defineProperty(_ref4, "bg-".concat(this.footerBgVariant), Boolean(this.footerBgVariant)), _defineProperty(_ref4, "text-".concat(this.footerTextVariant), Boolean(this.footerTextVariant)), _defineProperty(_ref4, "border-".concat(this.footerBorderVariant), Boolean(this.footerBorderVariant)), _ref4), this.footerClass];
-      },
-      modalOuterStyle: function modalOuterStyle() {
-        // Styles needed for proper stacking of modals
-        return {
-          position: 'absolute',
-          zIndex: this.zIndex
-        };
-      },
-      slotScope: function slotScope() {
-        return {
-          ok: this.onOk,
-          cancel: this.onCancel,
-          close: this.onClose,
-          hide: this.hide,
-          visible: this.is_visible
-        };
-      }
-    },
-    watch: {
-      visible: function visible(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this[newVal ? 'show' : 'hide']();
-        }
-      }
-    },
-    created: function created() {
-      // Define non-reactive properties
-      this._observer = null;
-    },
-    mounted: function mounted() {
-      // Set initial z-index as queried from the DOM
-      this.zIndex = modalManager.getBaseZIndex(); // Listen for events from others to either open or close ourselves
-      // and listen to all modals to enable/disable enforce focus
-
-      this.listenOnRoot('bv::show::modal', this.showHandler);
-      this.listenOnRoot('bv::hide::modal', this.hideHandler);
-      this.listenOnRoot('bv::toggle::modal', this.toggleHandler); // Listen for `bv:modal::show events`, and close ourselves if the
-      // opening modal not us
-
-      this.listenOnRoot('bv::modal::show', this.modalListener); // Initially show modal?
-
-      if (this.visible === true) {
-        this.show();
-      }
-    },
-    beforeDestroy: function beforeDestroy() {
-      // Ensure everything is back to normal
-      if (this._observer) {
-        this._observer.disconnect();
-
-        this._observer = null;
-      }
-
-      this.setEnforceFocus(false);
-      this.setResizeEvent(false);
-
-      if (this.is_visible) {
-        this.is_visible = false;
-        this.is_show = false;
-        this.is_transitioning = false;
-      }
-    },
-    methods: {
-      updateModel: function updateModel(val) {
-        if (val !== this.visible) {
-          this.$emit('change', val);
-        }
-      },
-      // Public Methods
-      show: function show() {
-        if (this.is_visible || this.is_opening) {
-          // If already open, on in the process of opening, do nothing
-
-          /* istanbul ignore next */
-          return;
-        }
-
-        if (this.is_closing) {
-          // If we are in the process of closing, wait until hidden before re-opening
-
-          /* istanbul ignore next: very difficult to test */
-          this.$once('hidden', this.show);
-          /* istanbul ignore next */
-
-          return;
-        }
-
-        this.is_opening = true; // Set the element to return focus to when closed
-
-        this.return_focus = this.return_focus || this.getActiveElement();
-        var showEvt = new BvModalEvent('show', {
-          cancelable: true,
-          vueTarget: this,
-          target: this.$refs.modal,
-          relatedTarget: null,
-          componentId: this.safeId()
-        });
-        this.emitEvent(showEvt); // Don't show if canceled
-
-        if (showEvt.defaultPrevented || this.is_visible) {
-          this.is_opening = false; // Ensure the v-model reflects the current state
-
-          this.updateModel(false);
-          return;
-        } // Show the modal
-
-
-        this.doShow();
-      },
-      hide: function hide(trigger) {
-        if (!this.is_visible || this.is_closing) {
-          /* istanbul ignore next */
-          return;
-        }
-
-        this.is_closing = true;
-        var hideEvt = new BvModalEvent('hide', {
-          cancelable: trigger !== 'FORCE',
-          vueTarget: this,
-          target: this.$refs.modal,
-          relatedTarget: null,
-          componentId: this.safeId(),
-          trigger: trigger || null
-        }); // We emit specific event for one of the three built-in buttons
-
-        if (trigger === 'ok') {
-          this.$emit('ok', hideEvt);
-        } else if (trigger === 'cancel') {
-          this.$emit('cancel', hideEvt);
-        } else if (trigger === 'headerclose') {
-          this.$emit('close', hideEvt);
-        }
-
-        this.emitEvent(hideEvt); // Hide if not canceled
-
-        if (hideEvt.defaultPrevented || !this.is_visible) {
-          this.is_closing = false; // Ensure v-model reflects current state
-
-          this.updateModel(true);
-          return;
-        } // Stop observing for content changes
-
-
-        if (this._observer) {
-          this._observer.disconnect();
-
-          this._observer = null;
-        } // Trigger the hide transition
-
-
-        this.is_visible = false; // Update the v-model
-
-        this.updateModel(false);
-      },
-      // Public method to toggle modal visibility
-      toggle: function toggle(triggerEl) {
-        if (triggerEl) {
-          this.return_focus = triggerEl;
-        }
-
-        if (this.is_visible) {
-          this.hide('toggle');
-        } else {
-          this.show();
-        }
-      },
-      // Private method to get the current document active element
-      getActiveElement: function getActiveElement() {
-        if (isBrowser) {
-          var activeElement = document.activeElement; // Note: On IE11, `document.activeElement` may be null. So we test it for
-          // truthyness first.
-          // https://github.com/bootstrap-vue/bootstrap-vue/issues/3206
-          // Returning focus to document.body may cause unwanted scrolls, so we
-          // exclude setting focus on body
-
-          if (activeElement && activeElement !== document.body && activeElement.focus) {
-            // Preset the fallback return focus value if it is not set
-            // `document.activeElement` should be the trigger element that was clicked or
-            // in the case of using the v-model, which ever element has current focus
-            // Will be overridden by some commands such as toggle, etc.
-            return activeElement;
-          }
-        }
-
-        return null;
-      },
-      // Private method to finish showing modal
-      doShow: function doShow() {
-        var _this = this;
-
-        /* istanbul ignore next: commenting out for now until we can test stacking */
-        if (modalManager.modalsAreOpen && this.noStacking) {
-          // If another modal(s) is already open, wait for it(them) to close
-          this.listenOnRootOnce('bv::modal::hidden', this.doShow);
-          return;
-        }
-
-        modalManager.registerModal(this); // Place modal in DOM
-
-        this.is_hidden = false;
-        this.$nextTick(function () {
-          // We do this in `$nextTick()` to ensure the modal is in DOM first
-          // before we show it
-          _this.is_visible = true;
-          _this.is_opening = false; // Update the v-model
-
-          _this.updateModel(true); // Observe changes in modal content and adjust if necessary
-
-
-          _this._observer = observeDom(_this.$refs.content, _this.checkModalOverflow.bind(_this), OBSERVER_CONFIG);
-        });
-      },
-      // Transition handlers
-      onBeforeEnter: function onBeforeEnter() {
-        this.is_transitioning = true;
-        this.setResizeEvent(true);
-      },
-      onEnter: function onEnter() {
-        this.is_block = true;
-      },
-      onAfterEnter: function onAfterEnter() {
-        var _this2 = this;
-
-        this.checkModalOverflow();
-        this.is_show = true;
-        this.is_transitioning = false;
-        this.$nextTick(function () {
-          var shownEvt = new BvModalEvent('shown', {
-            cancelable: false,
-            vueTarget: _this2,
-            target: _this2.$refs.modal,
-            relatedTarget: null,
-            componentId: _this2.safeId()
-          });
-
-          _this2.emitEvent(shownEvt);
-
-          _this2.focusFirst();
-
-          _this2.setEnforceFocus(true);
-        });
-      },
-      onBeforeLeave: function onBeforeLeave() {
-        this.is_transitioning = true;
-        this.setResizeEvent(false);
-      },
-      onLeave: function onLeave() {
-        // Remove the 'show' class
-        this.is_show = false;
-      },
-      onAfterLeave: function onAfterLeave() {
-        var _this3 = this;
-
-        this.is_block = false;
-        this.is_transitioning = false;
-        this.setEnforceFocus(false);
-        this.isModalOverflowing = false;
-        this.is_hidden = true;
-        this.$nextTick(function () {
-          _this3.returnFocusTo();
-
-          _this3.is_closing = false;
-          _this3.return_focus = null; // TODO: Need to find a way to pass the `trigger` property
-          //       to the `hidden` event, not just only the `hide` event
-
-          var hiddenEvt = new BvModalEvent('hidden', {
-            cancelable: false,
-            vueTarget: _this3,
-            target: _this3.$el,
-            relatedTarget: null,
-            componentId: _this3.safeId()
-          });
-
-          _this3.emitEvent(hiddenEvt);
-
-          modalManager.unregisterModal(_this3);
-        });
-      },
-      // Event emitter
-      emitEvent: function emitEvent(bvModalEvt) {
-        var type = bvModalEvt.type; // We emit on root first incase a global listener wants to cancel
-        // the event first before the instance emits it's event
-
-        this.emitOnRoot("bv::modal::".concat(type), bvModalEvt, bvModalEvt.componentId);
-        this.$emit(type, bvModalEvt);
-      },
-      // UI event handlers
-      onDialogMousedown: function onDialogMousedown() {
-        var _this4 = this;
-
-        // Watch to see if the matching mouseup event occurs outside the dialog
-        // And if it does, cancel the clickOut handler
-        var modal = this.$refs.modal;
-
-        var onceModalMouseup = function onceModalMouseup(evt) {
-          eventOff(modal, 'mouseup', onceModalMouseup, EVT_OPTIONS);
-
-          if (evt.target === modal) {
-            _this4.ignoreBackdropClick = true;
-          }
-        };
-
-        eventOn(modal, 'mouseup', onceModalMouseup, EVT_OPTIONS);
-      },
-      onClickOut: function onClickOut(evt) {
-        // Do nothing if not visible, backdrop click disabled, or element
-        // that generated click event is no longer in document body
-        if (!this.is_visible || this.noCloseOnBackdrop || !contains(document.body, evt.target)) {
-          return;
-        }
-
-        if (this.ignoreBackdropClick) {
-          // Click was initiated inside the modal content, but finished outside
-          // Set by the above onDialogMousedown handler
-          this.ignoreBackdropClick = false;
-          return;
-        } // If backdrop clicked, hide modal
-
-
-        if (!contains(this.$refs.content, evt.target)) {
-          this.hide('backdrop');
-        }
-      },
-      onOk: function onOk() {
-        this.hide('ok');
-      },
-      onCancel: function onCancel() {
-        this.hide('cancel');
-      },
-      onClose: function onClose() {
-        this.hide('headerclose');
-      },
-      onEsc: function onEsc(evt) {
-        // If ESC pressed, hide modal
-        if (evt.keyCode === KEY_CODES.ESC && this.is_visible && !this.noCloseOnEsc) {
-          this.hide('esc');
-        }
-      },
-      // Document focusin listener
-      focusHandler: function focusHandler(evt) {
-        // If focus leaves modal, bring it back
-        var modal = this.$refs.modal;
-
-        if (!this.noEnforceFocus && this.isTop && this.is_visible && modal && document !== evt.target && !contains(modal, evt.target)) {
-          modal.focus({
-            preventScroll: true
-          });
-        }
-      },
-      // Turn on/off focusin listener
-      setEnforceFocus: function setEnforceFocus(on) {
-        var method = on ? eventOn : eventOff;
-        method(document, 'focusin', this.focusHandler, EVT_OPTIONS);
-      },
-      // Resize listener
-      setResizeEvent: function setResizeEvent(on) {
-        var method = on ? eventOn : eventOff; // These events should probably also check if
-        // body is overflowing
-
-        method(window, 'resize', this.checkModalOverflow, EVT_OPTIONS);
-        method(window, 'orientationchange', this.checkModalOverflow, EVT_OPTIONS);
-      },
-      // Root listener handlers
-      showHandler: function showHandler(id, triggerEl) {
-        if (id === this.id) {
-          this.return_focus = triggerEl || this.getActiveElement();
-          this.show();
-        }
-      },
-      hideHandler: function hideHandler(id) {
-        if (id === this.id) {
-          this.hide('event');
-        }
-      },
-      toggleHandler: function toggleHandler(id, triggerEl) {
-        if (id === this.id) {
-          this.toggle(triggerEl);
-        }
-      },
-      modalListener: function modalListener(bvEvt) {
-        // If another modal opens, close this one if stacking not permitted
-        if (this.noStacking && bvEvt.vueTarget !== this) {
-          this.hide();
-        }
-      },
-      // Focus control handlers
-      focusFirst: function focusFirst() {
-        // TODO: Add support for finding input element with 'autofocus'
-        //       attribute set and focus that element
-        // Don't try and focus if we are SSR
-        if (isBrowser) {
-          var modal = this.$refs.modal;
-          var activeElement = this.getActiveElement(); // If the modal contains the activeElement, we don't do anything
-
-          if (modal && !(activeElement && contains(modal, activeElement))) {
-            // Make sure top of modal is showing (if longer than the viewport)
-            // and focus the modal content wrapper
-            this.$nextTick(function () {
-              modal.scrollTop = 0;
-              modal.focus();
-            });
-          }
-        }
-      },
-      returnFocusTo: function returnFocusTo() {
-        // Prefer `returnFocus` prop over event specified
-        // `return_focus` value
-        var el = this.returnFocus || this.return_focus || null; // Is el a string CSS selector?
-
-        el = isString(el) ? select(el) : el;
-
-        if (el) {
-          // Possibly could be a component reference
-          el = el.$el || el;
-
-          if (isVisible(el) && el.focus) {
-            el.focus();
-          }
-        }
-      },
-      checkModalOverflow: function checkModalOverflow() {
-        if (this.is_visible) {
-          var modal = this.$refs.modal;
-          this.isModalOverflowing = modal.scrollHeight > document.documentElement.clientHeight;
-        }
-      },
-      makeModal: function makeModal(h) {
-        var _this5 = this;
-
-        // Modal header
-        var header = h(false);
-
-        if (!this.hideHeader) {
-          var modalHeader = this.normalizeSlot('modal-header', this.slotScope);
-
-          if (!modalHeader) {
-            var closeButton = h(false);
-
-            if (!this.hideHeaderClose) {
-              closeButton = h(BButtonClose, {
-                props: {
-                  disabled: this.is_transitioning,
-                  ariaLabel: this.headerCloseLabel,
-                  textVariant: this.headerCloseVariant || this.headerTextVariant
-                },
-                on: {
-                  click: function click(evt) {
-                    _this5.onClose();
-                  }
-                }
-              }, [this.normalizeSlot('modal-header-close', {})]);
-            }
-
-            modalHeader = [h(this.titleTag, {
-              class: ['modal-title']
-            }, [this.normalizeSlot('modal-title', this.slotScope) || this.titleHtml || stripTags(this.title)]), closeButton];
-          }
-
-          header = h('header', {
-            ref: 'header',
-            staticClass: 'modal-header',
-            class: this.headerClasses,
-            attrs: {
-              id: this.safeId('__BV_modal_header_')
-            }
-          }, [modalHeader]);
-        } // Modal body
-
-
-        var body = h('div', {
-          ref: 'body',
-          staticClass: 'modal-body',
-          class: this.bodyClasses,
-          attrs: {
-            id: this.safeId('__BV_modal_body_')
-          }
-        }, this.normalizeSlot('default', this.slotScope)); // Modal footer
-
-        var footer = h(false);
-
-        if (!this.hideFooter) {
-          var modalFooter = this.normalizeSlot('modal-footer', this.slotScope);
-
-          if (!modalFooter) {
-            var cancelButton = h(false);
-
-            if (!this.okOnly) {
-              cancelButton = h(BButton, {
-                props: {
-                  variant: this.cancelVariant,
-                  size: this.buttonSize,
-                  disabled: this.cancelDisabled || this.busy || this.is_transitioning
-                },
-                on: {
-                  click: function click(evt) {
-                    _this5.onCancel();
-                  }
-                }
-              }, [this.normalizeSlot('modal-cancel', {}) || this.cancelTitleHtml || stripTags(this.cancelTitle)]);
-            }
-
-            var okButton = h(BButton, {
-              props: {
-                variant: this.okVariant,
-                size: this.buttonSize,
-                disabled: this.okDisabled || this.busy || this.is_transitioning
-              },
-              on: {
-                click: function click(evt) {
-                  _this5.onOk();
-                }
-              }
-            }, [this.normalizeSlot('modal-ok', {}) || this.okTitleHtml || stripTags(this.okTitle)]);
-            modalFooter = [cancelButton, okButton];
-          }
-
-          footer = h('footer', {
-            ref: 'footer',
-            staticClass: 'modal-footer',
-            class: this.footerClasses,
-            attrs: {
-              id: this.safeId('__BV_modal_footer_')
-            }
-          }, [modalFooter]);
-        } // Assemble modal content
-
-
-        var modalContent = h('div', {
-          ref: 'content',
-          staticClass: 'modal-content',
-          class: this.contentClass,
-          attrs: {
-            role: 'document',
-            id: this.safeId('__BV_modal_content_'),
-            'aria-labelledby': this.hideHeader ? null : this.safeId('__BV_modal_header_'),
-            'aria-describedby': this.safeId('__BV_modal_body_')
-          }
-        }, [header, body, footer]); // Modal dialog wrapper
-
-        var modalDialog = h('div', {
-          staticClass: 'modal-dialog',
-          class: this.dialogClasses,
-          on: {
-            mousedown: this.onDialogMousedown
-          }
-        }, [modalContent]); // Modal
-
-        var modal = h('div', {
-          ref: 'modal',
-          staticClass: 'modal',
-          class: this.modalClasses,
-          style: this.modalStyles,
-          directives: [{
-            name: 'show',
-            rawName: 'v-show',
-            value: this.is_visible,
-            expression: 'is_visible'
-          }],
-          attrs: {
-            id: this.safeId(),
-            role: 'dialog',
-            tabindex: '-1',
-            'aria-hidden': this.is_visible ? null : 'true',
-            'aria-modal': this.is_visible ? 'true' : null
-          },
-          on: {
-            keydown: this.onEsc,
-            click: this.onClickOut
-          }
-        }, [modalDialog]); // Wrap modal in transition
-
-        modal = h('transition', {
-          props: {
-            enterClass: '',
-            enterToClass: '',
-            enterActiveClass: '',
-            leaveClass: '',
-            leaveActiveClass: '',
-            leaveToClass: ''
-          },
-          on: {
-            'before-enter': this.onBeforeEnter,
-            enter: this.onEnter,
-            'after-enter': this.onAfterEnter,
-            'before-leave': this.onBeforeLeave,
-            leave: this.onLeave,
-            'after-leave': this.onAfterLeave
-          }
-        }, [modal]); // Modal backdrop
-
-        var backdrop = h(false);
-
-        if (!this.hideBackdrop && (this.is_visible || this.is_transitioning || this.is_block)) {
-          backdrop = h('div', {
-            staticClass: 'modal-backdrop',
-            class: this.backdropClasses,
-            attrs: {
-              id: this.safeId('__BV_modal_backdrop_')
-            }
-          }, [this.normalizeSlot('modal-backdrop', {})]);
-        } // Tab trap to prevent page from scrolling to next element in
-        // tab index during enforce focus tab cycle
-
-
-        var tabTrap = h(false);
-
-        if (this.is_visible && this.isTop && !this.noEnforceFocus) {
-          tabTrap = h('div', {
-            attrs: {
-              tabindex: '0'
-            }
-          });
-        } // Assemble modal and backdrop in an outer <div>
-
-
-        return h('div', {
-          key: "modal-outer-".concat(this._uid),
-          style: this.modalOuterStyle,
-          attrs: {
-            id: this.safeId('__BV_modal_outer_')
-          }
-        }, [modal, tabTrap, backdrop]);
-      }
-    },
-    render: function render(h) {
-      // Wrap in a portal
-      return h(Portal, {
-        props: {
-          name: "b-modal-".concat(this._uid),
-          to: modalManager.modalTargetName,
-          slim: true,
-          disabled: this.static
-        }
-      }, [!this.is_hidden || this.static && !this.lazy ? this.makeModal(h) : h(false)]);
-    }
-  });
-
-  var PROP_NAME = '$bvModal';
-  var PROP_NAME_PRIV = '_bv__modal'; // Base modal props that are allowed
-  // Some may be ignored or overridden on some message boxes
-  // Prop ID is allowed, but really only should be used for testing
-  // We need to add it in explicitly as it comes from the `idMixin`
-
-  var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$2, ['busy', 'lazy', 'noStacking', "static", 'visible'])))); // Fallback event resolver (returns undefined)
-
-  var defaultResolver = function defaultResolver(bvModalEvt) {}; // Map prop names to modal slot names
-
-
-  var propsToSlots = {
-    msgBoxContent: 'default',
-    title: 'modal-title',
-    okTitle: 'modal-ok',
-    cancelTitle: 'modal-cancel' // --- Utility methods ---
-    // Method to filter only recognized props that are not undefined
-
-  };
-
-  var filterOptions = function filterOptions(options) {
-    return BASE_PROPS.reduce(function (memo, key) {
-      if (!isUndefined(options[key])) {
-        memo[key] = options[key];
-      }
-
-      return memo;
-    }, {});
-  }; // Create a private sub-component that extends BModal
-  // which self-destructs after hidden
-  // @vue/component
-
-
-  var MsgBox = Vue.extend({
-    name: 'BMsgBox',
-    extends: BModal,
-    destroyed: function destroyed() {
-      // Make sure we not in document any more
-      if (this.$el && this.$el.parentNode) {
-        this.$el.parentNode.removeChild(this.$el);
-      }
-    },
-    mounted: function mounted() {
-      var _this = this;
-
-      // Self destruct handler
-      var handleDestroy = function handleDestroy() {
-        var self = _this;
-
-        _this.$nextTick(function () {
-          // In a `setTimeout()` to release control back to application
-          setTimeout(function () {
-            return self.$destroy();
-          }, 0);
-        });
-      }; // Self destruct if parent destroyed
-
-
-      this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
-
-      this.$once('hidden', handleDestroy); // Self destruct on route change
-
-      /* istanbul ignore if */
-
-      if (this.$router && this.$route) {
-        var unwatch = this.$watch('$router', handleDestroy);
-        this.$once('hook:beforeDestroy', unwatch);
-      } // Should we also self destruct on parent deactivation?
-      // Show the `MsgBox`
-
-
-      this.show();
-    }
-  }); // Method to generate the on-demand modal message box
-  // Returns a promise that resolves to a value returned by the resolve
-
-  var asyncMsgBox = function asyncMsgBox(props, $parent) {
-    var resolver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultResolver;
-
-    if (warnNotClient(PROP_NAME) || warnNoPromiseSupport(PROP_NAME)) {
-      // Should this throw an error?
-
-      /* istanbul ignore next */
-      return;
-    } // Create an instance of `MsgBox` component
-
-
-    var msgBox = new MsgBox({
-      // We set parent as the local VM so these modals can emit events on
-      // the app `$root`, as needed by things like tooltips and popovers
-      // And it helps to ensure `MsgBox` is destroyed when parent is destroyed
-      parent: $parent,
-      // Preset the prop values
-      propsData: _objectSpread({}, filterOptions(getComponentConfig('BModal') || {}), {
-        // Defaults that user can override
-        hideHeaderClose: true,
-        hideHeader: !(props.title || props.titleHtml)
-      }, omit(props, ['msgBoxContent']), {
-        // Props that can't be overridden
-        lazy: false,
-        busy: false,
-        visible: false,
-        noStacking: false,
-        noEnforceFocus: false
-      })
-    }); // Convert certain props to scoped slots
-
-    keys(propsToSlots).forEach(function (prop) {
-      if (!isUndefined(props[prop])) {
-        // Can be a string, or array of VNodes.
-        // Alternatively, user can use HTML version of prop to pass an HTML string.
-        msgBox.$slots[propsToSlots[prop]] = concat(props[prop]);
-      }
-    }); // Create a mount point (a DIV)
-
-    var div = document.createElement('div');
-    document.body.appendChild(div); // Return a promise that resolves when hidden, or rejects on destroyed
-
-    return new Promise(function (resolve, reject) {
-      var resolved = false;
-      msgBox.$once('hook:destroyed', function () {
-        if (!resolved) {
-          /* istanbul ignore next */
-          reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
-        }
-      });
-      msgBox.$on('hide', function (bvModalEvt) {
-        if (!bvModalEvt.defaultPrevented) {
-          var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
-
-          if (!bvModalEvt.defaultPrevented) {
-            resolved = true;
-            resolve(result);
-          }
-        }
-      }); // Mount the `MsgBox`, which will auto-trigger it to show
-
-      msgBox.$mount(div);
-    });
-  }; // BvModal instance property class
-
-
-  var BvModal =
-  /*#__PURE__*/
-  function () {
-    function BvModal(vm) {
-      _classCallCheck(this, BvModal);
-
-      // Assign the new properties to this instance
-      assign$1(this, {
-        _vm: vm,
-        _root: vm.$root
-      }); // Set these properties as read-only and non-enumerable
-
-      defineProperties(this, {
-        _vm: readonlyDescriptor(),
-        _root: readonlyDescriptor()
-      });
-    } // --- Instance methods ---
-    // Show modal with the specified ID args are for future use
-
-
-    _createClass(BvModal, [{
-      key: "show",
-      value: function show(id) {
-        if (id && this._root) {
-          var _this$_root;
-
-          for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-            args[_key - 1] = arguments[_key];
-          }
-
-          (_this$_root = this._root).$emit.apply(_this$_root, ['bv::show::modal', id].concat(args));
-        }
-      } // Hide modal with the specified ID args are for future use
-
-    }, {
-      key: "hide",
-      value: function hide(id) {
-        if (id && this._root) {
-          var _this$_root2;
-
-          for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-            args[_key2 - 1] = arguments[_key2];
-          }
-
-          (_this$_root2 = this._root).$emit.apply(_this$_root2, ['bv::hide::modal', id].concat(args));
-        }
-      } // TODO: Could make Promise versions of above that first checks
-      //       if modal is in document (by ID) and if not found reject
-      //       the Promise. Otherwise waits for hide/hidden event and
-      //       then resolves returning the `BvModalEvent` object
-      //       (which contains the details)
-      // The following methods require Promise support!
-      // IE 11 and others do not support Promise natively, so users
-      // should have a Polyfill loaded (which they need anyways for IE 11 support)
-      // Opens a user defined message box and returns a promise
-
-    }, {
-      key: "msgBox",
-      value: function msgBox(content) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        var resolver = arguments.length > 2 ? arguments[2] : undefined;
-
-        if (!content || warnNoPromiseSupport(PROP_NAME) || warnNotClient(PROP_NAME) || !isFunction(resolver)) {
-          // Should this throw an error?
-
-          /* istanbul ignore next */
-          return;
-        }
-
-        var props = _objectSpread({}, filterOptions(options), {
-          msgBoxContent: content
-        });
-
-        return asyncMsgBox(props, this._vm, resolver);
-      } // Open a message box with OK button only and returns a promise
-
-    }, {
-      key: "msgBoxOk",
-      value: function msgBoxOk(message) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        // Pick the modal props we support from options
-        var props = _objectSpread({}, options, {
-          // Add in overrides and our content prop
-          okOnly: true,
-          okDisabled: false,
-          hideFooter: false,
-          msgBoxContent: message
-        });
-
-        return this.msgBox(message, props, function (bvModalEvt) {
-          // Always resolve to true for OK
-          return true;
-        });
-      } // Open a message box modal with OK and CANCEL buttons
-      // and returns a promise
-
-    }, {
-      key: "msgBoxConfirm",
-      value: function msgBoxConfirm(message) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        // Set the modal props we support from options
-        var props = _objectSpread({}, options, {
-          // Add in overrides and our content prop
-          okOnly: false,
-          okDisabled: false,
-          cancelDisabled: false,
-          hideFooter: false
-        });
-
-        return this.msgBox(message, props, function (bvModalEvt) {
-          var trigger = bvModalEvt.trigger;
-          return trigger === 'ok' ? true : trigger === 'cancel' ? false : null;
-        });
-      }
-    }]);
-
-    return BvModal;
-  }(); // Method to install `$bvModal` VM injection
-
-
-  var install = function install(_Vue) {
-    if (install.installed) {
-      // Only install once
-
-      /* istanbul ignore next */
-      return;
-    }
-
-    install.installed = true; // Add our instance mixin
-
-    _Vue.mixin({
-      beforeCreate: function beforeCreate() {
-        // Because we need access to `$root` for `$emits`, and VM for parenting,
-        // we have to create a fresh instance of `BvModal` for each VM
-        this[PROP_NAME_PRIV] = new BvModal(this);
-      }
-    }); // Define our read-only `$bvModal` instance property
-    // Placed in an if just in case in HMR mode
-
-
-    if (!_Vue.prototype.hasOwnProperty(PROP_NAME)) {
-      defineProperty(_Vue.prototype, PROP_NAME, {
-        get: function get() {
-          /* istanbul ignore next */
-          if (!this || !this[PROP_NAME_PRIV]) {
-            warn("'".concat(PROP_NAME, "' must be accessed from a Vue instance 'this' context"));
-          }
-
-          return this[PROP_NAME_PRIV];
-        }
-      });
-    }
-  };
-
-  install.installed = false;
-  var BVModalPlugin = {
-    install: install
-  };
-
-  var NAME$4 = 'BToaster';
+  var NAME$3 = 'BToaster';
   var props$3 = {
     name: {
       type: String,
@@ -4942,21 +5141,21 @@
     ariaLive: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$4, 'ariaLive');
+        return getComponentConfig(NAME$3, 'ariaLive');
       }
     },
     ariaAtomic: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$4, 'ariaAtomic');
-      } // Allowed: 'true' or 'false'
+        return getComponentConfig(NAME$3, 'ariaAtomic');
+      } // Allowed: 'true' or 'false' or null
 
     },
     role: {
       // Aria role
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$4, 'role');
+        return getComponentConfig(NAME$3, 'role');
       }
       /*
       transition: {
@@ -5001,7 +5200,7 @@
   }); // @vue/component
 
   var BToaster = Vue.extend({
-    name: NAME$4,
+    name: NAME$3,
     props: props$3,
     data: function data() {
       return {
@@ -5048,12 +5247,6 @@
       if (this.doRender) {
         var $target = h(PortalTarget, {
           staticClass: 'b-toaster-slot',
-          attrs: {
-            role: this.role || null,
-            // fallback to null to make sure attribute doesn't exist
-            'aria-live': this.ariaLive,
-            'aria-atomic': this.ariaAtomic
-          },
           props: {
             name: this.staticName,
             multiple: true,
@@ -5067,7 +5260,11 @@
           staticClass: 'b-toaster',
           class: [this.staticName],
           attrs: {
-            id: this.staticName
+            id: this.staticName,
+            role: this.role || null,
+            // Fallback to null to make sure attribute doesn't exist
+            'aria-live': this.ariaLive,
+            'aria-atomic': this.ariaAtomic
           }
         }, [$target]);
       }
@@ -5076,16 +5273,19 @@
     }
   });
 
-  var NAME$5 = 'BToast';
+  var NAME$4 = 'BToast';
   var MIN_DURATION = 1000;
+  var EVENT_OPTIONS = {
+    passive: true,
+    capture: false // --- Props ---
+
+  };
   var props$4 = {
     id: {
+      // Even though the ID prop is provided by idMixin, we
+      // add it here for $bvToast props filtering
       type: String,
       default: null
-    },
-    visible: {
-      type: Boolean,
-      default: false
     },
     title: {
       type: String,
@@ -5094,13 +5294,17 @@
     toaster: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$5, 'toaster');
+        return getComponentConfig(NAME$4, 'toaster');
       }
+    },
+    visible: {
+      type: Boolean,
+      default: false
     },
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$5, 'variant');
+        return getComponentConfig(NAME$4, 'variant');
       }
     },
     isStatus: {
@@ -5119,7 +5323,7 @@
     autoHideDelay: {
       type: [Number, String],
       default: function _default() {
-        return getComponentConfig(NAME$5, 'autoHideDelay');
+        return getComponentConfig(NAME$4, 'autoHideDelay');
       }
     },
     noCloseButton: {
@@ -5141,19 +5345,19 @@
     toastClass: {
       type: [String, Object, Array],
       default: function _default() {
-        return getComponentConfig(NAME$5, 'toastClass');
+        return getComponentConfig(NAME$4, 'toastClass');
       }
     },
     headerClass: {
       type: [String, Object, Array],
       default: function _default() {
-        return getComponentConfig(NAME$5, 'headerClass');
+        return getComponentConfig(NAME$4, 'headerClass');
       }
     },
     bodyClass: {
       type: [String, Object, Array],
       default: function _default() {
-        return getComponentConfig(NAME$5, 'bodyClass');
+        return getComponentConfig(NAME$4, 'bodyClass');
       }
     },
     href: {
@@ -5168,22 +5372,12 @@
       // Render the toast in place, rather than in a portal-target
       type: Boolean,
       default: false
-    } // Transition props defaults
-
-  };
-  var DEFAULT_TRANSITION_PROPS = {
-    name: '',
-    enterClass: '',
-    enterActiveClass: '',
-    enterToClass: '',
-    leaveClass: 'show',
-    leaveActiveClass: '',
-    leaveToClass: '' // @vue/component
+    } // @vue/component
 
   };
   var BToast = Vue.extend({
-    name: NAME$5,
-    mixins: [listenOnRootMixin, normalizeSlotMixin],
+    name: NAME$4,
+    mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
     inheritAttrs: false,
     model: {
       prop: 'visible',
@@ -5195,8 +5389,8 @@
         isMounted: false,
         doRender: false,
         localShow: false,
-        showClass: false,
         isTransitioning: false,
+        isHiding: false,
         order: 0,
         timer: null,
         dismissStarted: 0,
@@ -5204,12 +5398,6 @@
       };
     },
     computed: {
-      toastClasses: function toastClasses() {
-        return [this.toastClass, {
-          show: this.showClass,
-          fade: !this.noFade
-        }];
-      },
       bToastClasses: function bToastClasses() {
         return _defineProperty({
           'b-toast-solid': this.solid,
@@ -5280,13 +5468,13 @@
       }); // Listen for global $root show events
 
       this.listenOnRoot('bv::show::toast', function (id) {
-        if (id === _this2.id) {
+        if (id === _this2.safeId()) {
           _this2.show();
         }
       }); // Listen for global $root hide events
 
       this.listenOnRoot('bv::hide::toast', function (id) {
-        if (!id || id === _this2.id) {
+        if (!id || id === _this2.safeId()) {
           _this2.hide();
         }
       }); // Make sure we hide when toaster is destroyed
@@ -5312,32 +5500,41 @@
           this.emitEvent(showEvt);
           this.dismissStarted = this.resumeDismiss = 0;
           this.order = Date.now() * (this.appendToast ? 1 : -1);
+          this.isHiding = false;
           this.doRender = true;
           this.$nextTick(function () {
-            // we show the toast after we have rendered the portal
-            _this3.localShow = true;
+            // We show the toast after we have rendered the portal and b-toast wrapper
+            // so that screen readers will properly announce the toast
+            requestAF(function () {
+              _this3.localShow = true;
+            });
           });
         }
       },
       hide: function hide() {
+        var _this4 = this;
+
         if (this.localShow) {
           var hideEvt = this.buildEvent('hide');
           this.emitEvent(hideEvt);
           this.setHoverHandler(false);
           this.dismissStarted = this.resumeDismiss = 0;
           this.clearDismissTimer();
-          this.localShow = false;
+          this.isHiding = true;
+          requestAF(function () {
+            _this4.localShow = false;
+          });
         }
       },
       buildEvent: function buildEvent(type) {
         var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         return new BvEvent(type, _objectSpread({
           cancelable: false,
-          target: this.$el,
+          target: this.$el || null,
           relatedTarget: null
         }, opts, {
           vueTarget: this,
-          componentId: this.id || null
+          componentId: this.safeId()
         }));
       },
       emitEvent: function emitEvent(bvEvt) {
@@ -5377,14 +5574,8 @@
       },
       setHoverHandler: function setHoverHandler(on) {
         var method = on ? eventOn : eventOff;
-        method(this.$refs.btoast, 'mouseenter', this.onPause, {
-          passive: true,
-          capture: false
-        });
-        method(this.$refs.btoast, 'mouseleave', this.onUnPause, {
-          passive: true,
-          capture: false
-        });
+        method(this.$refs.btoast, 'mouseenter', this.onPause, EVENT_OPTIONS);
+        method(this.$refs.btoast, 'mouseleave', this.onUnPause, EVENT_OPTIONS);
       },
       onPause: function onPause(evt) {
         // Determine time remaining, and then pause timer
@@ -5400,7 +5591,7 @@
         }
       },
       onUnPause: function onUnPause(evt) {
-        // Restart with max of time remaining or 1 second
+        // Restart timer with max of time remaining or 1 second
         if (this.noAutoHide || this.noHoverPause || !this.resumeDismiss) {
           this.resumeDismiss = this.dismissStarted = 0;
           return;
@@ -5409,23 +5600,18 @@
         this.startDismissTimer();
       },
       onLinkClick: function onLinkClick() {
-        var _this4 = this;
+        var _this5 = this;
 
         // We delay the close to allow time for the
         // browser to process the link click
         this.$nextTick(function () {
           requestAF(function () {
-            _this4.hide();
+            _this5.hide();
           });
         });
       },
       onBeforeEnter: function onBeforeEnter() {
-        var _this5 = this;
-
         this.isTransitioning = true;
-        requestAF(function () {
-          _this5.showClass = true;
-        });
       },
       onAfterEnter: function onAfterEnter() {
         this.isTransitioning = false;
@@ -5435,12 +5621,7 @@
         this.setHoverHandler(true);
       },
       onBeforeLeave: function onBeforeLeave() {
-        var _this6 = this;
-
         this.isTransitioning = true;
-        requestAF(function () {
-          _this6.showClass = false;
-        });
       },
       onAfterLeave: function onAfterLeave() {
         this.isTransitioning = false;
@@ -5451,7 +5632,7 @@
         this.doRender = false;
       },
       makeToast: function makeToast(h) {
-        var _this7 = this;
+        var _this6 = this;
 
         // Render helper for generating the toast
         // Assemble the header content
@@ -5471,7 +5652,7 @@
             staticClass: 'ml-auto mb-1',
             on: {
               click: function click(evt) {
-                _this7.hide();
+                _this6.hide();
               }
             }
           }));
@@ -5502,16 +5683,13 @@
         }, [this.normalizeSlot('default', this.slotScope) || h(false)]); // Build the toast
 
         var $toast = h('div', {
-          key: 'toast',
+          key: "toast-".concat(this._uid),
           ref: 'toast',
           staticClass: 'toast',
-          class: this.toastClasses,
+          class: this.toastClass,
           attrs: _objectSpread({}, this.$attrs, {
-            id: this.id || null,
-            tabindex: '-1',
-            role: this.isStatus ? 'status' : 'alert',
-            'aria-live': this.isStatus ? 'polite' : 'assertive',
-            'aria-atomic': 'true'
+            tabindex: '0',
+            id: this.safeId()
           })
         }, [$header, $body]);
         return $toast;
@@ -5535,11 +5713,19 @@
         key: name,
         ref: 'btoast',
         staticClass: 'b-toast',
-        class: this.bToastClasses
-      }, [h('transition', {
-        props: DEFAULT_TRANSITION_PROPS,
+        class: this.bToastClasses,
+        attrs: {
+          id: this.safeId('_toast_outer'),
+          role: this.isHiding ? null : this.isStatus ? 'status' : 'alert',
+          'aria-live': this.isHiding ? null : this.isStatus ? 'polite' : 'assertive',
+          'aria-atomic': this.isHiding ? null : 'true'
+        }
+      }, [h(BVTransition, {
+        props: {
+          noFade: this.noFade
+        },
         on: this.transitionHandlers
-      }, [this.localShow ? this.makeToast(h) : null])])]);
+      }, [this.localShow ? this.makeToast(h) : h(false)])])]);
     }
   });
 
@@ -5566,164 +5752,12 @@
 
       return memo;
     }, {});
-  }; // Create a private sub-component that extends BToast
-  // which self-destructs after hidden
-  // @vue/component
+  }; // Method to install `$bvToast` VM injection
 
 
-  var BToastPop = Vue.extend({
-    name: 'BToastPop',
-    extends: BToast,
-    destroyed: function destroyed() {
-      // Make sure we not in document any more
-      if (this.$el && this.$el.parentNode) {
-        this.$el.parentNode.removeChild(this.$el);
-      }
-    },
-    mounted: function mounted() {
-      // Self destruct handler
-      var self = this;
+  var install$1 = function install(Vue) {
+    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      var handleDestroy = function handleDestroy() {
-        // Ensure the toast has been force hidden
-        self.localShow = false;
-        self.doRender = false;
-        self.$nextTick(function () {
-          self.$nextTick(function () {
-            // In a `requestAF()` to release control back to application
-            // and to allow the portal-target time to remove the content
-            requestAF(function () {
-              self.$destroy();
-            });
-          });
-        });
-      }; // Self destruct if parent destroyed
-
-
-      this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
-
-      this.$once('hidden', handleDestroy); // Self destruct when toaster is destroyed
-
-      this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
-        /* istanbul ignore next: hard to test */
-        if (toaster === self.toaster) {
-          handleDestroy();
-        }
-      });
-    }
-  }); // Method to generate the on-demand toast
-
-  var makeToast = function makeToast(props, $parent) {
-    if (warnNotClient(PROP_NAME$1)) {
-      // Should this throw an error?
-
-      /* istanbul ignore next */
-      return;
-    } // Create an instance of `BToast` component
-
-
-    var toast = new BToastPop({
-      // We set parent as the local VM so these toasts can emit events on
-      // the app `$root`
-      // And it helps to ensure `BToast` is destroyed when parent is destroyed
-      parent: $parent,
-      // Preset the prop values
-      propsData: _objectSpread({}, filterOptions$1(getComponentConfig('BToast') || {}), omit(props, ['toastContent']), {
-        // Props that can't be overridden
-        static: false,
-        visible: true
-      })
-    }); // Convert certain props to slots
-
-    keys(propsToSlots$1).forEach(function (prop) {
-      var value = props[prop];
-
-      if (!isUndefined(value)) {
-        // Can be a string, or array of VNodes
-        // Alternatively, user can use HTML version of prop to pass an HTML string
-        if (prop === 'title' && isString(value)) {
-          // Special case for title if it is a string, we wrap in a <strong>
-          value = [$parent.$createElement('strong', {
-            class: 'mr-2'
-          }, value)];
-        } // Make sure slot value is an array for Vue 2.5.x compatability
-
-
-        toast.$slots[propsToSlots$1[prop]] = concat(value);
-      }
-    }); // Create a mount point (a DIV)
-    // TODO: this needs to target a portal-target
-    // But we still need to place in document to portal-vue can
-    // transfer the content
-
-    var div = document.createElement('div');
-    document.body.appendChild(div); // Mount the toast to trigger it to show
-
-    toast.$mount(div);
-  }; // BvToast instance property class
-
-
-  var BvToast =
-  /*#__PURE__*/
-  function () {
-    function BvToast(vm) {
-      _classCallCheck(this, BvToast);
-
-      // Assign the new properties to this instance
-      assign$1(this, {
-        _vm: vm,
-        _root: vm.$root
-      }); // Set these properties as read-only and non-enumerable
-
-      defineProperties(this, {
-        _vm: readonlyDescriptor(),
-        _root: readonlyDescriptor()
-      });
-    } // --- Instance methods ---
-    // Opens a user defined toast and returns immediately
-
-
-    _createClass(BvToast, [{
-      key: "toast",
-      value: function toast(content) {
-        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        if (!content || warnNotClient(PROP_NAME$1)) {
-          // Should this throw an error?
-
-          /* istanbul ignore next */
-          return;
-        }
-
-        var props = _objectSpread({}, filterOptions$1(options), {
-          toastContent: content
-        });
-
-        makeToast(props, this._vm);
-      } // shows a `<b-toast>` component with the specified ID
-
-    }, {
-      key: "show",
-      value: function show(id) {
-        if (id) {
-          this._root.$emit('bv::show::toast', id);
-        }
-      } // Hide a toast with specified ID, or if not ID all toasts
-
-    }, {
-      key: "hide",
-      value: function hide() {
-        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-        this._root.$emit('bv::hide::toast', id);
-      }
-    }]);
-
-    return BvToast;
-  }(); // Method to install `$bvToast` VM injection
-
-
-  var install$1 = function install(_Vue) {
     if (install.installed) {
       // Only install once
 
@@ -5731,9 +5765,149 @@
       return;
     }
 
-    install.installed = true; // Add our instance mixin
+    install.installed = true;
+    setConfig(config); // Create a private sub-component constructor that
+    // extends BToast and self-destructs after hidden
+    // @vue/component
 
-    _Vue.mixin({
+    var BToastPop = Vue.extend({
+      name: 'BToastPop',
+      extends: BToast,
+      destroyed: function destroyed() {
+        // Make sure we not in document any more
+        if (this.$el && this.$el.parentNode) {
+          this.$el.parentNode.removeChild(this.$el);
+        }
+      },
+      mounted: function mounted() {
+        var self = this; // Self destruct handler
+
+        var handleDestroy = function handleDestroy() {
+          // Ensure the toast has been force hidden
+          self.localShow = false;
+          self.doRender = false;
+          self.$nextTick(function () {
+            self.$nextTick(function () {
+              // In a `requestAF()` to release control back to application
+              // and to allow the portal-target time to remove the content
+              requestAF(function () {
+                self.$destroy();
+              });
+            });
+          });
+        }; // Self destruct if parent destroyed
+
+
+        this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+
+        this.$once('hidden', handleDestroy); // Self destruct when toaster is destroyed
+
+        this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
+          /* istanbul ignore next: hard to test */
+          if (toaster === self.toaster) {
+            handleDestroy();
+          }
+        });
+      }
+    }); // Private method to generate the on-demand toast
+
+    var makeToast = function makeToast(props, $parent) {
+      if (warnNotClient(PROP_NAME$1)) {
+        /* istanbul ignore next */
+        return;
+      } // Create an instance of `BToastPop` component
+
+
+      var toast = new BToastPop({
+        // We set parent as the local VM so these toasts can emit events on the
+        // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
+        parent: $parent,
+        propsData: _objectSpread({}, filterOptions$1(getComponentConfig('BToast') || {}), omit(props, ['toastContent']), {
+          // Props that can't be overridden
+          static: false,
+          visible: true
+        })
+      }); // Convert certain props to slots
+
+      keys(propsToSlots$1).forEach(function (prop) {
+        var value = props[prop];
+
+        if (!isUndefined(value)) {
+          // Can be a string, or array of VNodes
+          if (prop === 'title' && isString(value)) {
+            // Special case for title if it is a string, we wrap in a <strong>
+            value = [$parent.$createElement('strong', {
+              class: 'mr-2'
+            }, value)];
+          }
+
+          toast.$slots[propsToSlots$1[prop]] = concat(value);
+        }
+      }); // Create a mount point (a DIV) and mount it (which triggers the show)
+
+      var div = document.createElement('div');
+      document.body.appendChild(div);
+      toast.$mount(div);
+    }; // Declare BvToast instance property class
+
+
+    var BvToast =
+    /*#__PURE__*/
+    function () {
+      function BvToast(vm) {
+        _classCallCheck(this, BvToast);
+
+        // Assign the new properties to this instance
+        assign$1(this, {
+          _vm: vm,
+          _root: vm.$root
+        }); // Set these properties as read-only and non-enumerable
+
+        defineProperties(this, {
+          _vm: readonlyDescriptor(),
+          _root: readonlyDescriptor()
+        });
+      } // --- Public Instance methods ---
+      // Opens a user defined toast and returns immediately
+
+
+      _createClass(BvToast, [{
+        key: "toast",
+        value: function toast(content) {
+          var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+          if (!content || warnNotClient(PROP_NAME$1)) {
+            /* istanbul ignore next */
+            return;
+          }
+
+          makeToast(_objectSpread({}, filterOptions$1(options), {
+            toastContent: content
+          }), this._vm);
+        } // shows a `<b-toast>` component with the specified ID
+
+      }, {
+        key: "show",
+        value: function show(id) {
+          if (id) {
+            this._root.$emit('bv::show::toast', id);
+          }
+        } // Hide a toast with specified ID, or if not ID all toasts
+
+      }, {
+        key: "hide",
+        value: function hide() {
+          var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+          this._root.$emit('bv::hide::toast', id);
+        }
+      }]);
+
+      return BvToast;
+    }(); // Add our instance mixin
+
+
+    Vue.mixin({
       beforeCreate: function beforeCreate() {
         // Because we need access to `$root` for `$emits`, and VM for parenting,
         // we have to create a fresh instance of `BvToast` for each VM
@@ -5742,9 +5916,8 @@
     }); // Define our read-only `$bvToast` instance property
     // Placed in an if just in case in HMR mode
 
-
-    if (!_Vue.prototype.hasOwnProperty(PROP_NAME$1)) {
-      defineProperty(_Vue.prototype, PROP_NAME$1, {
+    if (!Vue.prototype.hasOwnProperty(PROP_NAME$1)) {
+      defineProperty(Vue.prototype, PROP_NAME$1, {
         get: function get() {
           /* istanbul ignore next */
           if (!this || !this[PROP_NAME_PRIV$1]) {
@@ -5757,12 +5930,13 @@
     }
   };
 
-  install$1.installed = false;
+  install$1.installed = false; // Default export is the Plugin
+
   var BVToastPlugin = {
     install: install$1
   };
 
-  var NAME$6 = 'BAlert'; // Convert `show` value to a number
+  var NAME$5 = 'BAlert'; // Convert `show` value to a number
 
   var parseCountDown = function parseCountDown(show) {
     if (show === '' || isBoolean(show)) {
@@ -5794,7 +5968,7 @@
 
 
   var BAlert = Vue.extend({
-    name: NAME$6,
+    name: NAME$5,
     mixins: [normalizeSlotMixin],
     model: {
       prop: 'show',
@@ -5804,7 +5978,7 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$6, 'variant');
+          return getComponentConfig(NAME$5, 'variant');
         }
       },
       dismissible: {
@@ -5814,7 +5988,7 @@
       dismissLabel: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$6, 'dismissLabel');
+          return getComponentConfig(NAME$5, 'dismissLabel');
         }
       },
       show: {
@@ -5831,8 +6005,7 @@
         countDownTimerId: null,
         countDown: 0,
         // If initially shown, we need to set these for SSR
-        localShow: parseShow(this.show),
-        showClass: this.fade && this.show
+        localShow: parseShow(this.show)
       };
     },
     watch: {
@@ -5844,25 +6017,29 @@
         var _this = this;
 
         this.clearTimer();
-        this.$emit('dismiss-count-down', newVal);
 
-        if (this.show !== newVal) {
-          // Update the v-model if needed
-          this.$emit('input', newVal);
-        }
+        if (isNumericLike(this.show)) {
+          // Ignore if this.show transitions to a boolean value.
+          this.$emit('dismiss-count-down', newVal);
 
-        if (newVal > 0) {
-          this.localShow = true;
-          this.countDownTimerId = setTimeout(function () {
-            _this.countDown--;
-          }, 1000);
-        } else {
-          // Slightly delay the hide to allow any UI updates
-          this.$nextTick(function () {
-            requestAF(function () {
-              _this.localShow = false;
+          if (this.show !== newVal) {
+            // Update the v-model if needed
+            this.$emit('input', newVal);
+          }
+
+          if (newVal > 0) {
+            this.localShow = true;
+            this.countDownTimerId = setTimeout(function () {
+              _this.countDown--;
+            }, 1000);
+          } else {
+            // Slightly delay the hide to allow any UI updates
+            this.$nextTick(function () {
+              requestAF(function () {
+                _this.localShow = false;
+              });
             });
-          });
+          }
         }
       },
       localShow: function localShow(newVal) {
@@ -5899,20 +6076,6 @@
           clearInterval(this.countDownTimerId);
           this.countDownTimerId = null;
         }
-      },
-      onBeforeEnter: function onBeforeEnter() {
-        var _this2 = this;
-
-        if (this.fade) {
-          requestAF(function () {
-            _this2.showClass = true;
-          });
-        }
-      },
-      onBeforeLeave: function onBeforeLeave()
-      /* istanbul ignore next: does not appear to be called in vue-test-utils */
-      {
-        this.showClass = false;
       }
     },
     render: function render(h) {
@@ -5934,10 +6097,9 @@
         }
 
         $alert = h('div', {
+          key: this._uid,
           staticClass: 'alert',
           class: _defineProperty({
-            fade: this.fade,
-            show: this.showClass,
             'alert-dismissible': this.dismissible
           }, "alert-".concat(this.variant), this.variant),
           attrs: {
@@ -5949,18 +6111,9 @@
         $alert = [$alert];
       }
 
-      return h('transition', {
+      return h(BVTransition, {
         props: {
-          'enter-class': '',
-          'enter-active-class': '',
-          'enter-to-class': '',
-          'leave-class': 'show',
-          'leave-active-class': '',
-          'leave-to-class': ''
-        },
-        on: {
-          beforeEnter: this.onBeforeEnter,
-          beforeLeave: this.onBeforeLeave
+          noFade: !this.fade
         }
       }, $alert);
     }
@@ -5975,7 +6128,7 @@
     })
   };
 
-  var NAME$7 = 'BBadge';
+  var NAME$6 = 'BBadge';
   var linkProps$1 = propsFactory();
   delete linkProps$1.href.default;
   delete linkProps$1.to.default;
@@ -5987,7 +6140,7 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$7, 'variant');
+        return getComponentConfig(NAME$6, 'variant');
       }
     },
     pill: {
@@ -5997,7 +6150,7 @@
 
   });
   var BBadge = Vue.extend({
-    name: NAME$7,
+    name: NAME$6,
     functional: true,
     props: props$5,
     render: function render(h, _ref) {
@@ -6461,19 +6614,14 @@
           scopedSlots = _ref.scopedSlots;
       var $slots = slots();
       var $scopedSlots = scopedSlots || {};
-      var childNodes = []; // Prepend prop
+      var childNodes = []; // Prepend prop/slot
 
-      if (props.prepend) {
-        childNodes.push(h(BInputGroupPrepend, [h(BInputGroupText, {
+      if (props.prepend || props.prependHTML || hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
+        childNodes.push(h(BInputGroupPrepend, [// Prop
+        props.prepend || props.prependHTML ? h(BInputGroupText, {
           domProps: htmlOrText(props.prependHTML, props.prepend)
-        })]));
-      } else {
-        childNodes.push(h(false));
-      } // Prepend slot
-
-
-      if (hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
-        childNodes.push(h(BInputGroupPrepend, normalizeSlot('prepend', {}, $scopedSlots, $slots)));
+        }) : h(false), // Slot
+        normalizeSlot('prepend', {}, $scopedSlots, $slots) || h(false)]));
       } else {
         childNodes.push(h(false));
       } // Default slot
@@ -6486,17 +6634,12 @@
       } // Append prop
 
 
-      if (props.append) {
-        childNodes.push(h(BInputGroupAppend, [h(BInputGroupText, {
+      if (props.append || props.appendHTML || hasNormalizedSlot('append', $scopedSlots, $slots)) {
+        childNodes.push(h(BInputGroupAppend, [// prop
+        props.append || props.appendHTML ? h(BInputGroupText, {
           domProps: htmlOrText(props.appendHTML, props.append)
-        })]));
-      } else {
-        childNodes.push(h(false));
-      } // Append slot
-
-
-      if (hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
-        childNodes.push(h(BInputGroupAppend, normalizeSlot('append', {}, $scopedSlots, $slots)));
+        }) : h(false), // Slot
+        normalizeSlot('append', {}, $scopedSlots, $slots) || h(false)]));
       } else {
         childNodes.push(h(false));
       }
@@ -6643,7 +6786,7 @@
     }
   });
 
-  var NAME$8 = 'BCardSubTitle';
+  var NAME$7 = 'BCardSubTitle';
   var props$c = {
     subTitle: {
       type: String,
@@ -6656,13 +6799,13 @@
     subTitleTextVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'subTitleTextVariant');
+        return getComponentConfig(NAME$7, 'subTitleTextVariant');
       }
     } // @vue/component
 
   };
   var BCardSubTitle = Vue.extend({
-    name: NAME$8,
+    name: NAME$7,
     functional: true,
     props: props$c,
     render: function render(h, _ref) {
@@ -6946,7 +7089,7 @@
     }
   });
 
-  var NAME$9 = 'BImg'; // Blank image with fill template
+  var NAME$8 = 'BImg'; // Blank image with fill template
 
   var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>';
   var props$i = {
@@ -7015,7 +7158,7 @@
     blankColor: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$9, 'blankColor');
+        return getComponentConfig(NAME$8, 'blankColor');
       }
     } // --- Helper methods ---
 
@@ -7084,9 +7227,9 @@
     }
   });
 
-  var NAME$a = 'BImgLazy';
+  var NAME$9 = 'BImgLazy';
   var THROTTLE = 100;
-  var EventOptions = {
+  var EVENT_OPTIONS$1 = {
     passive: true,
     capture: false
   };
@@ -7116,7 +7259,7 @@
     blankColor: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$a, 'blankColor');
+        return getComponentConfig(NAME$9, 'blankColor');
       }
     },
     blankWidth: {
@@ -7174,12 +7317,13 @@
 
   };
   var BImgLazy = Vue.extend({
-    name: NAME$a,
+    name: NAME$9,
     props: props$j,
     data: function data() {
       return {
         isShown: false,
-        scrollTimeout: null
+        scrollTimeout: null,
+        observer: null
       };
     },
     computed: {
@@ -7222,7 +7366,6 @@
         this.setListeners(false);
       } else {
         this.setListeners(true);
-        this.$nextTick(this.checkView);
       }
     },
     activated: function activated()
@@ -7230,7 +7373,6 @@
     {
       if (!this.isShown) {
         this.setListeners(true);
-        this.$nextTick(this.checkView);
       }
     },
     deactivated: function deactivated()
@@ -7243,29 +7385,59 @@
     },
     methods: {
       setListeners: function setListeners(on) {
+        var _this = this;
+
         if (this.scrollTimeout) {
           clearTimeout(this.scrollTimeout);
           this.scrollTimeout = null;
         }
+        /* istanbul ignore next: JSDOM doen't support IntersectionObserver */
 
-        var root = window;
+
+        if (this.observer) {
+          this.observer.unobserve(this.$el);
+          this.observer.disconnect();
+          this.observer = null;
+        }
+
+        var winEvts = ['scroll', 'resize', 'orientationchange'];
+        winEvts.forEach(function (evt) {
+          return eventOff(window, evt, _this.onScroll, EVENT_OPTIONS$1);
+        });
+        eventOff(this.$el, 'load', this.checkView, EVENT_OPTIONS$1);
+        eventOff(document, 'transitionend', this.onScroll, EVENT_OPTIONS$1);
 
         if (on) {
-          eventOn(this.$el, 'load', this.checkView);
-          eventOn(root, 'scroll', this.onScroll, EventOptions);
-          eventOn(root, 'resize', this.onScroll, EventOptions);
-          eventOn(root, 'orientationchange', this.onScroll, EventOptions);
-          eventOn(document, 'transitionend', this.onScroll, EventOptions);
-        } else {
-          eventOff(this.$el, 'load', this.checkView);
-          eventOff(root, 'scroll', this.onScroll, EventOptions);
-          eventOff(root, 'resize', this.onScroll, EventOptions);
-          eventOff(root, 'orientationchange', this.onScroll, EventOptions);
-          eventOff(document, 'transitionend', this.onScroll, EventOptions);
+          /* istanbul ignore if: JSDOM doen't support IntersectionObserver */
+          if (hasIntersectionObserverSupport) {
+            this.observer = new IntersectionObserver(this.doShow, {
+              root: null,
+              // viewport
+              rootMargin: "".concat(parseInt(this.offset, 10) || 0, "px"),
+              threshold: 0 // percent intersection
+
+            });
+            this.observer.observe(this.$el);
+          } else {
+            // Fallback to scroll/etc events
+            winEvts.forEach(function (evt) {
+              return eventOn(window, evt, _this.onScroll, EVENT_OPTIONS$1);
+            });
+            eventOn(this.$el, 'load', this.checkView, EVENT_OPTIONS$1);
+            eventOn(document, 'transitionend', this.onScroll, EVENT_OPTIONS$1);
+          }
+        }
+      },
+      doShow: function doShow(entries) {
+        if (entries && (entries[0].isIntersecting || entries[0].intersectionRatio > 0.0)) {
+          this.isShown = true;
+          this.setListeners(false);
         }
       },
       checkView: function checkView() {
         // check bounding box + offset to see if we should show
+
+        /* istanbul ignore next: should rarely occur */
         if (this.isShown) {
           this.setListeners(false);
           return;
@@ -7277,20 +7449,20 @@
           l: 0 - offset,
           t: 0 - offset,
           b: docElement.clientHeight + offset,
-          r: docElement.clientWidth + offset
-          /* istanbul ignore next */
+          r: docElement.clientWidth + offset // JSDOM Doesn't support BCR, but we fake it in the tests
 
         };
         var box = getBCR(this.$el);
-        /* istanbul ignore next: can't test getBoundingClientRect in JSDOM */
 
         if (box.right >= view.l && box.bottom >= view.t && box.left <= view.r && box.top <= view.b) {
           // image is in view (or about to be in view)
-          this.isShown = true;
-          this.setListeners(false);
+          this.doShow([{
+            isIntersecting: true
+          }]);
         }
       },
       onScroll: function onScroll() {
+        /* istanbul ignore if: should rarely occur */
         if (this.isShown) {
           this.setListeners(false);
         } else {
@@ -7302,12 +7474,14 @@
     render: function render(h) {
       return h(BImg, {
         props: {
+          // Computed value props
           src: this.computedSrc,
-          alt: this.alt,
           blank: this.computedBlank,
-          blankColor: this.blankColor,
           width: this.computedWidth,
           height: this.computedHeight,
+          // Passthough props
+          alt: this.alt,
+          blankColor: this.blankColor,
           fluid: this.fluid,
           fluidGrow: this.fluidGrow,
           block: this.block,
@@ -7464,7 +7638,7 @@
 
   var noop = function noop() {};
 
-  var NAME$b = 'BCarousel'; // Slide directional classes
+  var NAME$a = 'BCarousel'; // Slide directional classes
 
   var DIRECTION = {
     next: {
@@ -7494,7 +7668,7 @@
     OTransition: 'otransitionend oTransitionEnd',
     transition: 'transitionend'
   };
-  var EventOptions$1 = {
+  var EventOptions = {
     passive: true,
     capture: false // Return the browser specific transitionEnd event name
 
@@ -7530,25 +7704,25 @@
       labelPrev: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$b, 'labelPrev');
+          return getComponentConfig(NAME$a, 'labelPrev');
         }
       },
       labelNext: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$b, 'labelNext');
+          return getComponentConfig(NAME$a, 'labelNext');
         }
       },
       labelGotoSlide: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$b, 'labelGotoSlide');
+          return getComponentConfig(NAME$a, 'labelGotoSlide');
         }
       },
       labelIndicators: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$b, 'labelIndicators');
+          return getComponentConfig(NAME$a, 'labelIndicators');
         }
       },
       interval: {
@@ -7817,7 +7991,7 @@
               var events = _this2.transitionEndEvent.split(/\s+/);
 
               events.forEach(function (evt) {
-                return eventOff(currentSlide, evt, onceTransEnd, EventOptions$1);
+                return eventOff(currentSlide, evt, onceTransEnd, EventOptions);
               });
             }
 
@@ -7846,7 +8020,7 @@
           if (this.transitionEndEvent) {
             var events = this.transitionEndEvent.split(/\s+/);
             events.forEach(function (event) {
-              return eventOn(currentSlide, event, onceTransEnd, EventOptions$1);
+              return eventOn(currentSlide, event, onceTransEnd, EventOptions);
             });
           } // Fallback to setTimeout()
 
@@ -8359,6 +8533,18 @@
     }
   });
 
+  var memoize = function memoize(fn) {
+    var cache = create(null);
+    return function () {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      var argsKey = JSON.stringify(args);
+      return cache[argsKey] = cache[argsKey] || fn.apply(null, args);
+    };
+  };
+
   /**
    * Suffix can be a falsey value so nothing is appended to string.
    * (helps when looping over props & some shouldn't change)
@@ -8575,7 +8761,7 @@
   var EVENT_TOGGLE = 'bv::toggle::collapse';
   var EVENT_STATE_REQUEST = 'bv::request::collapse::state'; // Event listener options
 
-  var EventOptions$2 = {
+  var EventOptions$1 = {
     passive: true,
     capture: false // @vue/component
 
@@ -8697,8 +8883,8 @@
     methods: {
       setWindowEvents: function setWindowEvents(on) {
         var method = on ? eventOn : eventOff;
-        method(window, 'resize', this.handleResize, EventOptions$2);
-        method(window, 'orientationchange', this.handleResize, EventOptions$2);
+        method(window, 'resize', this.handleResize, EventOptions$1);
+        method(window, 'orientationchange', this.handleResize, EventOptions$1);
       },
       toggle: function toggle() {
         this.show = !this.show;
@@ -9118,12 +9304,6 @@
     })
   };
 
-  /**
-   * SSR safe types
-   */
-  var w$1 = hasWindowSupport ? window : {};
-  var HTMLElement = w$1.HTMLElement || Object;
-
   /**!
    * @fileOverview Kickass library to create and place poppers near their reference elements.
    * @version 1.15.0
@@ -9287,7 +9467,7 @@
    * @param {Number} version to check
    * @returns {Boolean} isIE
    */
-  function isIE(version) {
+  function isIE$1(version) {
     if (version === 11) {
       return isIE11;
     }
@@ -9309,7 +9489,7 @@
       return document.documentElement;
     }
 
-    var noOffsetParent = isIE(10) ? document.body : null;
+    var noOffsetParent = isIE$1(10) ? document.body : null;
 
     // NOTE: 1 DOM access here
     var offsetParent = element.offsetParent || null;
@@ -9464,13 +9644,13 @@
   }
 
   function getSize(axis, body, html, computedStyle) {
-    return Math.max(body['offset' + axis], body['scroll' + axis], html['client' + axis], html['offset' + axis], html['scroll' + axis], isIE(10) ? parseInt(html['offset' + axis]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Top' : 'Left')]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Bottom' : 'Right')]) : 0);
+    return Math.max(body['offset' + axis], body['scroll' + axis], html['client' + axis], html['offset' + axis], html['scroll' + axis], isIE$1(10) ? parseInt(html['offset' + axis]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Top' : 'Left')]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Bottom' : 'Right')]) : 0);
   }
 
   function getWindowSizes(document) {
     var body = document.body;
     var html = document.documentElement;
-    var computedStyle = isIE(10) && getComputedStyle(html);
+    var computedStyle = isIE$1(10) && getComputedStyle(html);
 
     return {
       height: getSize('Height', body, html, computedStyle),
@@ -9563,7 +9743,7 @@
     // considered in DOM in some circumstances...
     // This isn't reproducible in IE10 compatibility mode of IE11
     try {
-      if (isIE(10)) {
+      if (isIE$1(10)) {
         rect = element.getBoundingClientRect();
         var scrollTop = getScroll(element, 'top');
         var scrollLeft = getScroll(element, 'left');
@@ -9608,7 +9788,7 @@
   function getOffsetRectRelativeToArbitraryNode(children, parent) {
     var fixedPosition = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-    var isIE10 = isIE(10);
+    var isIE10 = isIE$1(10);
     var isHTML = parent.nodeName === 'HTML';
     var childrenRect = getBoundingClientRect(children);
     var parentRect = getBoundingClientRect(parent);
@@ -9711,7 +9891,7 @@
 
   function getFixedPositionOffsetParent(element) {
     // This check is needed to avoid errors in case one of the elements isn't defined for any reason
-    if (!element || !element.parentElement || isIE()) {
+    if (!element || !element.parentElement || isIE$1()) {
       return document.documentElement;
     }
     var el = element.parentElement;
@@ -12112,12 +12292,18 @@
         }
       },
       show: function show() {
+        var _this2 = this;
+
         // Public method to show dropdown
         if (this.disabled) {
           return;
-        }
+        } // Wrap in a requestAnimationFrame to allow any previous
+        // click handling to occur first
 
-        this.visible = true;
+
+        requestAF(function () {
+          _this2.visible = true;
+        });
       },
       hide: function hide() {
         var refocus = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -12219,7 +12405,7 @@
       },
       // Keyboard nav
       focusNext: function focusNext(evt, up) {
-        var _this2 = this;
+        var _this3 = this;
 
         if (!this.visible || evt && closest(Selector$1.FORM_CHILD, evt.target)) {
           // Ignore key up/down on form elements
@@ -12231,7 +12417,7 @@
         evt.preventDefault();
         evt.stopPropagation();
         this.$nextTick(function () {
-          var items = _this2.getItems();
+          var items = _this3.getItems();
 
           if (items.length < 1) {
             /* istanbul ignore next: should never happen */
@@ -12251,7 +12437,7 @@
             index = 0;
           }
 
-          _this2.focusItem(index, items);
+          _this3.focusItem(index, items);
         });
       },
       focusItem: function focusItem(idx, items) {
@@ -12280,13 +12466,13 @@
     }
   };
 
-  var NAME$c = 'BDropdown';
+  var NAME$b = 'BDropdown';
   var props$r = {
     toggleText: {
       // This really should be toggleLabel
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'toggleText');
+        return getComponentConfig(NAME$b, 'toggleText');
       }
     },
     size: {
@@ -12296,7 +12482,7 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'variant');
+        return getComponentConfig(NAME$b, 'variant');
       }
     },
     menuClass: {
@@ -12330,7 +12516,7 @@
     splitVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'splitVariant');
+        return getComponentConfig(NAME$b, 'splitVariant');
       }
     },
     role: {
@@ -12346,7 +12532,7 @@
 
   };
   var BDropdown = Vue.extend({
-    name: NAME$c,
+    name: NAME$b,
     mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
     props: props$r,
     computed: {
@@ -12969,7 +13155,7 @@
     }
   });
 
-  var NAME$d = 'BFormText';
+  var NAME$c = 'BFormText';
   var props$z = {
     id: {
       type: String,
@@ -12982,7 +13168,7 @@
     textVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'textVariant');
+        return getComponentConfig(NAME$c, 'textVariant');
       }
     },
     inline: {
@@ -12992,7 +13178,7 @@
 
   };
   var BFormText = Vue.extend({
-    name: NAME$d,
+    name: NAME$c,
     functional: true,
     props: props$z,
     render: function render(h, _ref) {
@@ -13186,7 +13372,7 @@
     }
   };
 
-  var NAME$e = 'BFormGroup'; // Selector for finding first input in the form-group
+  var NAME$d = 'BFormGroup'; // Selector for finding first input in the form-group
 
   var SELECTOR = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])';
   var DEPRECATED_MSG = 'Props "horizontal" and "breakpoint" are deprecated. Use "label-cols(-{breakpoint})" props instead.'; // Render helper functions (here rather than polluting the instance with more methods)
@@ -13408,7 +13594,7 @@
 
 
   var BFormGroup = {
-    name: NAME$e,
+    name: NAME$d,
     mixins: [idMixin, formStateMixin, normalizeSlotMixin],
 
     get props() {
@@ -13647,7 +13833,8 @@
     return -1;
   };
 
-  // @vue/component
+  var SELECTOR$1 = 'input, textarea, select'; // @vue/component
+
   var formMixin = {
     props: {
       name: {
@@ -13668,6 +13855,37 @@
       form: {
         type: String,
         default: null
+      },
+      autofocus: {
+        type: Boolean,
+        default: false
+      }
+    },
+    mounted: function mounted() {
+      this.handleAutofocus();
+    },
+    activated: function activated()
+    /* istanbul ignore next */
+    {
+      this.handleAutofocus();
+    },
+    methods: {
+      handleAutofocus: function handleAutofocus() {
+        var _this = this;
+
+        this.$nextTick(function () {
+          requestAF(function () {
+            var el = _this.$el;
+
+            if (_this.autofocus && isVisible(el)) {
+              if (!matches(el, SELECTOR$1)) {
+                el = select(SELECTOR$1, el);
+              }
+
+              el && el.focus && el.focus();
+            }
+          });
+        });
       }
     }
   };
@@ -13718,72 +13936,72 @@
     },
     data: function data() {
       return {
-        localChecked: this.is_Group ? this.bvGroup.checked : this.checked,
+        localChecked: this.isGroup ? this.bvGroup.checked : this.checked,
         hasFocus: false
       };
     },
     computed: {
       computedLocalChecked: {
         get: function get() {
-          return this.is_Group ? this.bvGroup.localChecked : this.localChecked;
+          return this.isGroup ? this.bvGroup.localChecked : this.localChecked;
         },
         set: function set(val) {
-          if (this.is_Group) {
+          if (this.isGroup) {
             this.bvGroup.localChecked = val;
           } else {
             this.localChecked = val;
           }
         }
       },
-      is_Group: function is_Group() {
+      isGroup: function isGroup() {
         // Is this check/radio a child of check-group or radio-group?
         return Boolean(this.bvGroup);
       },
-      is_BtnMode: function is_BtnMode() {
+      isBtnMode: function isBtnMode() {
         // Support button style in single input mode
-        return this.is_Group ? this.bvGroup.buttons : this.button;
+        return this.isGroup ? this.bvGroup.buttons : this.button;
       },
-      is_Plain: function is_Plain() {
-        return this.is_BtnMode ? false : this.is_Group ? this.bvGroup.plain : this.plain;
+      isPlain: function isPlain() {
+        return this.isBtnMode ? false : this.isGroup ? this.bvGroup.plain : this.plain;
       },
-      is_Custom: function is_Custom() {
-        return this.is_BtnMode ? false : !this.is_Plain;
+      isCustom: function isCustom() {
+        return this.isBtnMode ? false : !this.isPlain;
       },
-      is_Switch: function is_Switch() {
+      isSwitch: function isSwitch() {
         // Custom switch styling (checkboxes only)
-        return this.is_BtnMode || this.is_Radio || this.is_Plain ? false : this.is_Group ? this.bvGroup.switches : this.switch;
+        return this.isBtnMode || this.isRadio || this.isPlain ? false : this.isGroup ? this.bvGroup.switches : this.switch;
       },
-      is_Inline: function is_Inline() {
-        return this.is_Group ? this.bvGroup.inline : this.inline;
+      isInline: function isInline() {
+        return this.isGroup ? this.bvGroup.inline : this.inline;
       },
-      is_Disabled: function is_Disabled() {
+      isDisabled: function isDisabled() {
         // Child can be disabled while parent isn't, but is always disabled if group is
-        return this.is_Group ? this.bvGroup.disabled || this.disabled : this.disabled;
+        return this.isGroup ? this.bvGroup.disabled || this.disabled : this.disabled;
       },
-      is_Required: function is_Required() {
+      isRequired: function isRequired() {
         // Required only works when a name is provided for the input(s)
         // Child can only be required when parent is
         // Groups will always have a name (either user supplied or auto generated)
-        return Boolean(this.get_Name && (this.is_Group ? this.bvGroup.required : this.required));
+        return Boolean(this.getName && (this.isGroup ? this.bvGroup.required : this.required));
       },
-      get_Name: function get_Name() {
+      getName: function getName() {
         // Group name preferred over local name
-        return (this.is_Group ? this.bvGroup.groupName : this.name) || null;
+        return (this.isGroup ? this.bvGroup.groupName : this.name) || null;
       },
-      get_Form: function get_Form() {
-        return (this.is_Group ? this.bvGroup.form : this.form) || null;
+      getForm: function getForm() {
+        return (this.isGroup ? this.bvGroup.form : this.form) || null;
       },
-      get_Size: function get_Size() {
-        return (this.is_Group ? this.bvGroup.size : this.size) || '';
+      getSize: function getSize() {
+        return (this.isGroup ? this.bvGroup.size : this.size) || '';
       },
-      get_State: function get_State() {
-        return this.is_Group ? this.bvGroup.computedState : this.computedState;
+      getState: function getState() {
+        return this.isGroup ? this.bvGroup.computedState : this.computedState;
       },
-      get_ButtonVariant: function get_ButtonVariant() {
+      getButtonVariant: function getButtonVariant() {
         // Local variant preferred over group variant
         if (this.buttonVariant) {
           return this.buttonVariant;
-        } else if (this.is_Group && this.bvGroup.buttonVariant) {
+        } else if (this.isGroup && this.bvGroup.buttonVariant) {
           return this.bvGroup.buttonVariant;
         } // default variant
 
@@ -13792,9 +14010,9 @@
       },
       buttonClasses: function buttonClasses() {
         // Same for radio & check
-        return ['btn', "btn-".concat(this.get_ButtonVariant), this.get_Size ? "btn-".concat(this.get_Size) : '', // 'disabled' class makes "button" look disabled
-        this.is_Disabled ? 'disabled' : '', // 'active' class makes "button" look pressed
-        this.is_Checked ? 'active' : '', // Focus class makes button look focused
+        return ['btn', "btn-".concat(this.getButtonVariant), this.getSize ? "btn-".concat(this.getSize) : '', // 'disabled' class makes "button" look disabled
+        this.isDisabled ? 'disabled' : '', // 'active' class makes "button" look pressed
+        this.isChecked ? 'active' : '', // Focus class makes button look focused
         this.hasFocus ? 'focus' : ''];
       }
     },
@@ -13817,12 +14035,12 @@
       },
       // Convenience methods for focusing the input
       focus: function focus() {
-        if (!this.is_Disabled && this.$refs.input && this.$refs.input.focus) {
+        if (!this.isDisabled && this.$refs.input && this.$refs.input.focus) {
           this.$refs.input.focus();
         }
       },
       blur: function blur() {
-        if (!this.is_Disabled && this.$refs.input && this.$refs.input.blur) {
+        if (!this.isDisabled && this.$refs.input && this.$refs.input.blur) {
           this.$refs.input.blur();
         }
       }
@@ -13834,7 +14052,7 @@
         change: this.handleChange
       };
 
-      if (this.is_BtnMode) {
+      if (this.isBtnMode) {
         // Handlers for focus styling when in button mode
         on.focus = on.blur = this.handleFocus;
       }
@@ -13844,12 +14062,12 @@
         key: 'input',
         on: on,
         class: {
-          'form-check-input': this.is_Plain,
-          'custom-control-input': this.is_Custom,
-          'is-valid': this.get_State === true && !this.is_BtnMode,
-          'is-invalid': this.get_State === false && !this.is_BtnMode,
+          'form-check-input': this.isPlain,
+          'custom-control-input': this.isCustom,
+          'is-valid': this.getState === true && !this.isBtnMode,
+          'is-invalid': this.getState === false && !this.isBtnMode,
           // https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
-          'position-static': this.is_Plain && !defaultSlot
+          'position-static': this.isPlain && !defaultSlot
         },
         directives: [{
           name: 'model',
@@ -13859,29 +14077,29 @@
         }],
         attrs: {
           id: this.safeId(),
-          type: this.is_Radio ? 'radio' : 'checkbox',
-          name: this.get_Name,
-          form: this.get_Form,
-          disabled: this.is_Disabled,
-          required: this.is_Required,
+          type: this.isRadio ? 'radio' : 'checkbox',
+          name: this.getName,
+          form: this.getForm,
+          disabled: this.isDisabled,
+          required: this.isRequired,
           autocomplete: 'off',
-          'aria-required': this.is_Required || null,
+          'aria-required': this.isRequired || null,
           'aria-label': this.ariaLabel || null,
           'aria-labelledby': this.ariaLabelledby || null
         },
         domProps: {
           value: this.value,
-          checked: this.is_Checked
+          checked: this.isChecked
         }
       });
 
-      if (this.is_BtnMode) {
+      if (this.isBtnMode) {
         // Button mode
         var button = h('label', {
           class: this.buttonClasses
         }, [input, defaultSlot]);
 
-        if (!this.is_Group) {
+        if (!this.isGroup) {
           // Standalone button mode, so wrap in 'btn-group-toggle'
           // and flag it as inline-block to mimic regular buttons
           button = h('div', {
@@ -13895,11 +14113,11 @@
         var label = h(false); // If no label content in plain mode we dont render the label
         // https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
 
-        if (!(this.is_Plain && !defaultSlot)) {
+        if (!(this.isPlain && !defaultSlot)) {
           label = h('label', {
             class: {
-              'form-check-label': this.is_Plain,
-              'custom-control-label': this.is_Custom
+              'form-check-label': this.isPlain,
+              'custom-control-label': this.isCustom
             },
             attrs: {
               for: this.safeId()
@@ -13910,14 +14128,14 @@
 
         return h('div', {
           class: _defineProperty({
-            'form-check': this.is_Plain,
-            'form-check-inline': this.is_Plain && this.is_Inline,
-            'custom-control': this.is_Custom,
-            'custom-control-inline': this.is_Custom && this.is_Inline,
-            'custom-checkbox': this.is_Custom && this.is_Check && !this.is_Switch,
-            'custom-switch': this.is_Switch,
-            'custom-radio': this.is_Custom && this.is_Radio
-          }, "form-control-".concat(this.get_Size), Boolean(this.get_Size && !this.is_BtnMode))
+            'form-check': this.isPlain,
+            'form-check-inline': this.isPlain && this.isInline,
+            'custom-control': this.isCustom,
+            'custom-control-inline': this.isCustom && this.isInline,
+            'custom-checkbox': this.isCustom && this.isCheck && !this.isSwitch,
+            'custom-switch': this.isSwitch,
+            'custom-radio': this.isCustom && this.isRadio
+          }, "form-control-".concat(this.getSize), Boolean(this.getSize && !this.isBtnMode))
         }, [input, label]);
       }
     }
@@ -13980,7 +14198,7 @@
       }
     },
     computed: {
-      is_Checked: function is_Checked() {
+      isChecked: function isChecked() {
         var checked = this.computedLocalChecked;
         var value = this.value;
 
@@ -13990,10 +14208,10 @@
           return looseEqual(checked, value);
         }
       },
-      is_Radio: function is_Radio() {
+      isRadio: function isRadio() {
         return false;
       },
-      is_Check: function is_Check() {
+      isCheck: function isCheck() {
         return true;
       }
     },
@@ -14041,7 +14259,7 @@
 
         this.$emit('change', checked ? value : uncheckedValue); // If this is a child of form-checkbox-group, we emit a change event on it as well
 
-        if (this.is_Group) {
+        if (this.isGroup) {
           this.bvGroup.$emit('change', localChecked);
         }
 
@@ -14081,14 +14299,14 @@
     },
     computed: {
       // Radio Groups can only have a single value, so determining if checked is simple
-      is_Checked: function is_Checked() {
+      isChecked: function isChecked() {
         return looseEqual(this.value, this.computedLocalChecked);
       },
       // Flags for form-radio-check mixin
-      is_Radio: function is_Radio() {
+      isRadio: function isRadio() {
         return true;
       },
-      is_Check: function is_Check() {
+      isCheck: function isCheck() {
         return false;
       }
     },
@@ -14106,7 +14324,7 @@
 
         this.$emit('change', checked ? value : null); // If this is a child of form-radio-group, we emit a change event on it as well
 
-        if (this.is_Group) {
+        if (this.isGroup) {
           this.bvGroup.$emit('change', checked ? value : null);
         }
       }
@@ -14186,7 +14404,7 @@
 
       var inputs = this.formOptions.map(function (option, idx) {
         var uid = "_BV_option_".concat(idx, "_");
-        return h(_this.is_RadioGroup ? BFormRadio : BFormCheckbox, {
+        return h(_this.isRadioGroup ? BFormRadio : BFormCheckbox, {
           key: uid,
           props: {
             id: _this.safeId(uid),
@@ -14206,7 +14424,7 @@
         class: this.groupClasses,
         attrs: {
           id: this.safeId(),
-          role: this.is_RadioGroup ? 'radiogroup' : 'group',
+          role: this.isRadioGroup ? 'radiogroup' : 'group',
           // Tabindex to allow group to be focused if needed
           tabindex: '-1',
           'aria-required': this.required ? 'true' : null,
@@ -14244,7 +14462,7 @@
       };
     },
     computed: {
-      is_RadioGroup: function is_RadioGroup() {
+      isRadioGroup: function isRadioGroup() {
         return false;
       }
     }
@@ -14287,7 +14505,7 @@
       };
     },
     computed: {
-      is_RadioGroup: function is_RadioGroup() {
+      isRadioGroup: function isRadioGroup() {
         return true;
       }
     }
@@ -15007,10 +15225,10 @@
     }
   };
 
-  var NAME$f = 'BFormFile'; // @vue/component
+  var NAME$e = 'BFormFile'; // @vue/component
 
   var BFormFile = Vue.extend({
-    name: NAME$f,
+    name: NAME$e,
     mixins: [idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
     model: {
       prop: 'value',
@@ -15033,19 +15251,19 @@
       placeholder: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$f, 'placeholder');
+          return getComponentConfig(NAME$e, 'placeholder');
         }
       },
       browseText: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$f, 'browseText');
+          return getComponentConfig(NAME$e, 'browseText');
         }
       },
       dropPlaceholder: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$f, 'dropPlaceholder');
+          return getComponentConfig(NAME$e, 'dropPlaceholder');
         }
       },
       multiple: {
@@ -15486,7 +15704,7 @@
     })
   };
 
-  var NAME$g = 'BJumbotron';
+  var NAME$f = 'BJumbotron';
   var props$E = {
     fluid: {
       type: Boolean,
@@ -15531,25 +15749,25 @@
     bgVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$g, 'bgVariant');
+        return getComponentConfig(NAME$f, 'bgVariant');
       }
     },
     borderVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$g, 'borderVariant');
+        return getComponentConfig(NAME$f, 'borderVariant');
       }
     },
     textVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$g, 'textVariant');
+        return getComponentConfig(NAME$f, 'textVariant');
       }
     } // @vue/component
 
   };
   var BJumbotron = Vue.extend({
-    name: NAME$g,
+    name: NAME$f,
     functional: true,
     props: props$E,
     render: function render(h, _ref) {
@@ -15657,7 +15875,7 @@
     }
   });
 
-  var NAME$h = 'BListGroupItem';
+  var NAME$g = 'BListGroupItem';
   var actionTags = ['a', 'router-link', 'button', 'b-link'];
   var linkProps$2 = propsFactory();
   delete linkProps$2.href.default;
@@ -15678,13 +15896,13 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$h, 'variant');
+        return getComponentConfig(NAME$g, 'variant');
       }
     }
   }, linkProps$2); // @vue/component
 
   var BListGroupItem = Vue.extend({
-    name: NAME$h,
+    name: NAME$g,
     functional: true,
     props: props$G,
     render: function render(h, _ref) {
@@ -16174,7 +16392,7 @@
     })
   };
 
-  var NAME$i = 'BNavbar';
+  var NAME$h = 'BNavbar';
   var props$P = {
     tag: {
       type: String,
@@ -16187,7 +16405,7 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$i, 'variant');
+        return getComponentConfig(NAME$h, 'variant');
       }
     },
     toggleable: {
@@ -16208,7 +16426,7 @@
 
   };
   var BNavbar = Vue.extend({
-    name: NAME$i,
+    name: NAME$h,
     functional: true,
     props: props$P,
     render: function render(h, _ref) {
@@ -16295,7 +16513,7 @@
     }
   });
 
-  var NAME$j = 'BNavbarToggle'; // Events we emit on $root
+  var NAME$i = 'BNavbarToggle'; // Events we emit on $root
 
   var EVENT_TOGGLE$2 = 'bv::toggle::collapse'; // Events we listen to on $root
 
@@ -16304,13 +16522,13 @@
   var EVENT_STATE_SYNC$2 = 'bv::collapse::sync::state'; // @vue/component
 
   var BNavbarToggle = Vue.extend({
-    name: NAME$j,
+    name: NAME$i,
     mixins: [listenOnRootMixin, normalizeSlotMixin],
     props: {
       label: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$j, 'label');
+          return getComponentConfig(NAME$i, 'label');
         }
       },
       target: {
@@ -17422,7 +17640,7 @@
     })
   };
 
-  var NAME$k = 'tooltip';
+  var NAME$j = 'tooltip';
   var CLASS_PREFIX = 'bs-tooltip';
   var BS_CLASS_PREFIX_REGEX = new RegExp("\\b".concat(CLASS_PREFIX, "\\S+"), 'g');
   var TRANSITION_DURATION = 150; // Modal $root hidden event
@@ -18568,14 +18786,14 @@
     }, {
       key: "NAME",
       get: function get() {
-        return NAME$k;
+        return NAME$j;
       }
     }]);
 
     return ToolTip;
   }();
 
-  var NAME$l = 'popover';
+  var NAME$k = 'popover';
   var CLASS_PREFIX$1 = 'bs-popover';
   var BS_CLASS_PREFIX_REGEX$1 = new RegExp("\\b".concat(CLASS_PREFIX$1, "\\S+"), 'g');
 
@@ -18714,7 +18932,7 @@
     }, {
       key: "NAME",
       get: function get() {
-        return NAME$l;
+        return NAME$k;
       }
     }]);
 
@@ -18750,10 +18968,6 @@
         // String ID of element, or element/component reference
         type: [String, Object, HTMLElement, Function] // default: undefined
 
-      },
-      delay: {
-        type: [Number, Object, String],
-        default: 0
       },
       offset: {
         type: [Number, String],
@@ -18794,6 +19008,8 @@
           content: (this.content || '').trim() || '',
           // Tooltip/Popover placement
           placement: PLACEMENTS[this.placement] || 'auto',
+          // Tooltip/popover fallback placemenet
+          fallbackPlacement: this.fallbackPlacement || 'flip',
           // Container currently needs to be an ID with '#' prepended, if null then body is used
           container: cont ? /^#/.test(cont) ? cont : "#".concat(cont) : false,
           // boundariesElement passed to popper
@@ -19078,7 +19294,7 @@
     }
   };
 
-  var NAME$m = 'BPopover';
+  var NAME$l = 'BPopover';
   var props$V = {
     title: {
       type: String,
@@ -19096,24 +19312,37 @@
       type: String,
       default: 'right'
     },
+    fallbackPlacement: {
+      type: [String, Array],
+      default: 'flip',
+      validator: function validator(value) {
+        return isArray$1(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+      }
+    },
+    delay: {
+      type: [Number, Object, String],
+      default: function _default() {
+        return getComponentConfig(NAME$l, 'delay');
+      }
+    },
     boundary: {
       // String: scrollParent, window, or viewport
       // Element: element reference
       type: [String, HTMLElement],
       default: function _default() {
-        return getComponentConfig(NAME$m, 'boundary');
+        return getComponentConfig(NAME$l, 'boundary');
       }
     },
     boundaryPadding: {
       type: Number,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'boundaryPadding');
+        return getComponentConfig(NAME$l, 'boundaryPadding');
       }
     } // @vue/component
 
   };
   var BPopover = Vue.extend({
-    name: NAME$m,
+    name: NAME$l,
     mixins: [toolpopMixin, normalizeSlotMixin],
     props: props$V,
     data: function data() {
@@ -19169,9 +19398,11 @@
   /* istanbul ignore next: not easy to test */
   {
     // We start out with a basic config
+    var NAME = 'BPopover';
     var config = {
-      boundary: String(getComponentConfig('BPopover', 'boundary')),
-      boundaryPadding: parseInt(getComponentConfig('BPopover', 'boundaryPadding'), 10) || 0 // Process bindings.value
+      delay: getComponentConfig(NAME, 'delay'),
+      boundary: String(getComponentConfig(NAME, 'boundary')),
+      boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0 // Process bindings.value
 
     };
 
@@ -19332,10 +19563,10 @@
     })
   };
 
-  var NAME$n = 'BProgressBar'; // @vue/component
+  var NAME$m = 'BProgressBar'; // @vue/component
 
   var BProgressBar = Vue.extend({
-    name: NAME$n,
+    name: NAME$m,
     mixins: [normalizeSlotMixin],
     inject: {
       bvProgress: {
@@ -19371,7 +19602,7 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'variant');
+          return getComponentConfig(NAME$m, 'variant');
         }
       },
       striped: {
@@ -19462,10 +19693,10 @@
     }
   });
 
-  var NAME$o = 'BProgress'; // @vue/component
+  var NAME$n = 'BProgress'; // @vue/component
 
   var BProgress = Vue.extend({
-    name: NAME$o,
+    name: NAME$n,
     mixins: [normalizeSlotMixin],
     provide: function provide() {
       return {
@@ -19477,7 +19708,7 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$o, 'variant');
+          return getComponentConfig(NAME$n, 'variant');
         }
       },
       striped: {
@@ -19556,10 +19787,10 @@
     })
   };
 
-  var NAME$p = 'BSpinner'; // @vue/component
+  var NAME$o = 'BSpinner'; // @vue/component
 
   var BSpinner = Vue.extend({
-    name: NAME$p,
+    name: NAME$o,
     functional: true,
     props: {
       type: {
@@ -19574,7 +19805,7 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$p, 'variant');
+          return getComponentConfig(NAME$o, 'variant');
         }
       },
       small: {
@@ -22142,8 +22373,12 @@
       return {
         // Index of current tab
         currentTab: tabIdx,
-        // Array of direct child <b-tab> instances
-        tabs: []
+        // Array of direct child <b-tab> instances, in DOM order
+        tabs: [],
+        // Array of child instances registered (for triggering reactive updates)
+        registeredTabs: [],
+        // Flag to know if we are mounted or not
+        isMounted: false
       };
     },
     computed: {
@@ -22201,79 +22436,114 @@
             }
           }
         }
+      },
+      registeredTabs: function registeredTabs(newVal, oldVal) {
+        var _this = this;
+
+        // Each b-tab will register/unregister itself.
+        // We use this to detect when tabs are added/removed
+        // to trigger the update of the tabs.
+        this.$nextTick(function () {
+          requestAF(function () {
+            _this.updateTabs();
+          });
+        });
+      },
+      isMounted: function isMounted(newVal, oldVal) {
+        var _this2 = this;
+
+        // Trigger an update after mounted.  Needed
+        // for tabs inside lazy modals.
+        if (newVal) {
+          requestAF(function () {
+            _this2.updateTabs();
+          });
+        }
       }
     },
     created: function created() {
-      var _this = this;
+      var _this3 = this;
 
       var tabIdx = parseInt(this.value, 10);
-      this.currentTab = isNaN(tabIdx) ? -1 : tabIdx; // Create private non-reactive prop
-
-      this._bvObserver = null; // For SSR and to make sure only a single tab is shown on mount
+      this.currentTab = isNaN(tabIdx) ? -1 : tabIdx; // For SSR and to make sure only a single tab is shown on mount
       // We wrap this in a `$nextTick()` to ensure the child tabs have been created
 
       this.$nextTick(function () {
-        _this.updateTabs();
+        _this3.updateTabs();
       });
     },
     mounted: function mounted() {
-      var _this2 = this;
+      var _this4 = this;
 
+      // Call `updateTabs()` just in case...
+      this.updateTabs();
       this.$nextTick(function () {
-        // Call `updateTabs()` just in case...
-        _this2.updateTabs(); // Observe child changes so we can update list of tabs
-
-
-        _this2.setObserver(true);
+        // Flag we are now mounted and to switch to DOM for tab probing.
+        // As this.$slots.default appears to lie about component instances
+        // after b-tabs is destroyed and re-instantiated.
+        // And this.$children does not respect DOM order.
+        _this4.isMounted = true;
       });
     },
     deactivated: function deactivated()
     /* istanbul ignore next */
     {
-      this.setObserver(false);
+      this.isMounted = false;
     },
     activated: function activated()
     /* istanbul ignore next */
     {
-      var _this3 = this;
+      var _this5 = this;
 
       var tabIdx = parseInt(this.value, 10);
       this.currentTab = isNaN(tabIdx) ? -1 : tabIdx;
       this.$nextTick(function () {
-        _this3.updateTabs();
+        _this5.updateTabs();
 
-        _this3.setObserver(true);
+        _this5.isMounted = true;
       });
     },
-    beforeDestroy: function beforeDestroy()
-    /* istanbul ignore next */
-    {
-      this.setObserver(false);
+    destroyed: function destroyed() {
+      // Ensure no references to child instances exist
+      this.tabs = [];
     },
     methods: {
-      setObserver: function setObserver(on) {
-        if (on) {
-          // Make sure no existing observer running
-          this.setObserver(false); // Watch for changes to <b-tab> sub components
+      registerTab: function registerTab(tab) {
+        var _this6 = this;
 
-          this._bvObserver = observeDom(this.$refs.tabsContainer, this.updateTabs.bind(this), {
-            childList: true,
-            subtree: false,
-            attributes: true,
-            attributeFilter: ['style', 'class']
+        if (!arrayIncludes(this.registeredTabs, tab)) {
+          this.registeredTabs.push(tab);
+          tab.$once('hook:destroyed', function () {
+            _this6.unregisterTab(tab);
           });
-        } else {
-          if (this._bvObserver && this._bvObserver.disconnect) {
-            this._bvObserver.disconnect();
-          }
-
-          this._bvObserver = null;
         }
       },
+      unregisterTab: function unregisterTab(tab) {
+        this.registeredTabs = this.registeredTabs.slice().filter(function (t) {
+          return t !== tab;
+        });
+      },
       getTabs: function getTabs() {
-        return (this.normalizeSlot('default') || []).map(function (vnode) {
-          return vnode.componentInstance;
-        }).filter(function (tab) {
+        var tabs = [];
+
+        if (!this.isMounted) {
+          tabs = (this.normalizeSlot('default') || []).map(function (vnode) {
+            return vnode.componentInstance;
+          });
+        } else {
+          // We rely on the DOM when mounted to get the list of tabs,
+          // as this.$slots.default appears to lie about current tab vm instances, after being
+          // destroyed and then re-intantiated (cached vNodes which don't reflect correct vm)
+          // Fix for https://github.com/bootstrap-vue/bootstrap-vue/issues/3361
+          tabs = selectAll("#".concat(this.safeId('_BV_tab_container_'), " > .tab-pane"), this.$el).map(function (el) {
+            return el.__vue__;
+          }).filter(Boolean) // The VM attached to the element is `transition` so we need the $parent to get tab
+          .map(function (vm) {
+            return vm.$parent;
+          });
+        }
+
+        return tabs.filter(function (tab) {
           return tab && tab._isTab;
         });
       },
@@ -22376,11 +22646,11 @@
       },
       // Focus a tab button given it's <b-tab> instance
       focusButton: function focusButton(tab) {
-        var _this4 = this;
+        var _this7 = this;
 
         // Wrap in `$nextTick()` to ensure DOM has completed rendering/updating before focusing
         this.$nextTick(function () {
-          var button = _this4.getButtonForTab(tab);
+          var button = _this7.getButtonForTab(tab);
 
           if (button && button.focus) {
             button.focus();
@@ -22438,7 +22708,7 @@
       }
     },
     render: function render(h) {
-      var _this5 = this;
+      var _this8 = this;
 
       var tabs = this.tabs; // Currently active tab
 
@@ -22453,7 +22723,7 @@
       var buttons = tabs.map(function (tab, index) {
         var tabIndex = null; // Ensure at least one tab button is focusable when keynav enabled (if possible)
 
-        if (!_this5.noKeyNav) {
+        if (!_this8.noKeyNav) {
           // Buttons are not in tab index unless active, or a fallback tab
           tabIndex = -1;
 
@@ -22471,21 +22741,21 @@
           props: {
             tab: tab,
             tabs: tabs,
-            id: tab.controlledBy || (_this5.tab && _this5.tab.safeId ? _this5.tab.safeId("_BV_tab_button_") : null),
-            controls: _this5.tab && _this5.tab.safeId ? _this5.tab.safeId() : null,
+            id: tab.controlledBy || (_this8.tab && _this8.tab.safeId ? _this8.tab.safeId("_BV_tab_button_") : null),
+            controls: _this8.tab && _this8.tab.safeId ? _this8.tab.safeId() : null,
             tabIndex: tabIndex,
             setSize: tabs.length,
             posInSet: index + 1,
-            noKeyNav: _this5.noKeyNav
+            noKeyNav: _this8.noKeyNav
           },
           on: {
             click: function click(evt) {
-              _this5.clickTab(tab, evt);
+              _this8.clickTab(tab, evt);
             },
-            first: _this5.firstTab,
-            prev: _this5.previousTab,
-            next: _this5.nextTab,
-            last: _this5.lastTab
+            first: _this8.firstTab,
+            prev: _this8.previousTab,
+            next: _this8.nextTab,
+            last: _this8.lastTab
           }
         });
       }); // Nav
@@ -22519,13 +22789,12 @@
 
       if (!tabs || tabs.length === 0) {
         empty = h('div', {
-          key: 'empty-tab',
+          key: 'bv-empty-tab',
           class: ['tab-pane', 'active', {
             'card-body': this.card
           }]
         }, this.normalizeSlot('empty'));
       } // Main content section
-      // TODO: This container should be a helper component
 
 
       var content = h('div', {
@@ -22538,7 +22807,7 @@
         attrs: {
           id: this.safeId('_BV_tab_container_')
         }
-      }, [this.normalizeSlot('default'), empty]); // Render final output
+      }, concat(this.normalizeSlot('default'), empty)); // Render final output
 
       return h(this.tag, {
         staticClass: 'tabs',
@@ -22632,9 +22901,7 @@
     computed: {
       tabClasses: function tabClasses() {
         return [{
-          show: this.show,
           active: this.localActive,
-          fade: this.computedFade,
           disabled: this.disabled,
           'card-body': this.bvTabs.card && !this.noBody
         }, // Apply <b-tabs> `activeTabClass` styles when this tab is active
@@ -22643,8 +22910,8 @@
       controlledBy: function controlledBy() {
         return this.buttonId || this.safeId('__BV_tab_button__');
       },
-      computedFade: function computedFade() {
-        return this.bvTabs.fade || false;
+      computedNoFade: function computedNoFade() {
+        return !(this.bvTabs.fade || false);
       },
       computedLazy: function computedLazy() {
         return this.bvTabs.lazy || this.lazy;
@@ -22683,7 +22950,9 @@
       }
     },
     mounted: function mounted() {
-      // Initially show on mount if active and not disabled
+      // Inform b-tabs of our presence
+      this.registerTab(); // Initially show on mount if active and not disabled
+
       this.show = this.localActive; // Deprecate use of `href` prop
 
       if (this.href && this.href !== '#') {
@@ -22698,20 +22967,19 @@
         this.bvTabs.updateButton(this);
       }
     },
+    destroyed: function destroyed() {
+      // inform b-tabs of our departure
+      this.unregisterTab();
+    },
     methods: {
-      // Transition handlers
-      beforeEnter: function beforeEnter() {
-        var _this = this;
-
-        // Change opacity (add 'show' class) 1 frame after display,
-        // otherwise CSS transition won't happen
-        requestAF(function () {
-          _this.show = true;
-        });
+      // Private methods
+      registerTab: function registerTab() {
+        // Inform `b-tabs` of our presence
+        this.bvTabs.registerTab && this.bvTabs.registerTab(this);
       },
-      beforeLeave: function beforeLeave() {
-        // Remove the 'show' class
-        this.show = false;
+      unregisterTab: function unregisterTab() {
+        // Inform `b-tabs` of our departure
+        this.bvTabs.unregisterTab && this.bvTabs.unregisterTab(this);
       },
       // Public methods
       activate: function activate() {
@@ -22736,8 +23004,7 @@
         ref: 'panel',
         staticClass: 'tab-pane',
         class: this.tabClasses,
-        directives: [// TODO: Convert to style object in render
-        {
+        directives: [{
           name: 'show',
           rawName: 'v-show',
           value: this.localActive,
@@ -22746,26 +23013,16 @@
         attrs: {
           role: 'tabpanel',
           id: this.safeId(),
-          tabindex: this.localActive && !this.bvTabs.noKeyNav ? '0' : null,
+          tabindex: this.localActive && !this.bvTabs.noKeyNav ? '-1' : null,
           'aria-hidden': this.localActive ? 'false' : 'true',
           'aria-labelledby': this.controlledBy || null
         }
       }, // Render content lazily if requested
       [this.localActive || !this.computedLazy ? this.normalizeSlot('default') : h(false)]);
-      return h('transition', {
+      return h(BVTransition, {
         props: {
           mode: 'out-in',
-          // Disable use of built-in transition classes
-          'enter-class': '',
-          'enter-active-class': '',
-          'enter-to-class': '',
-          'leave-class': '',
-          'leave-active-class': '',
-          'leave-to-class': ''
-        },
-        on: {
-          beforeEnter: this.beforeEnter,
-          beforeLeave: this.beforeLeave
+          noFade: this.computedNoFade
         }
       }, [content]);
     }
@@ -22796,10 +23053,10 @@
     })
   };
 
-  var NAME$q = 'BTooltip'; // @vue/component
+  var NAME$p = 'BTooltip'; // @vue/component
 
   var BTooltip = Vue.extend({
-    name: NAME$q,
+    name: NAME$p,
     mixins: [toolpopMixin, normalizeSlotMixin],
     props: {
       title: {
@@ -22814,18 +23071,31 @@
         type: String,
         default: 'top'
       },
+      fallbackPlacement: {
+        type: [String, Array],
+        default: 'flip',
+        validator: function validator(value) {
+          return isArray$1(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+        }
+      },
+      delay: {
+        type: [Number, Object, String],
+        default: function _default() {
+          return getComponentConfig(NAME$p, 'delay');
+        }
+      },
       boundary: {
         // String: scrollParent, window, or viewport
         // Element: element reference
         type: [String, HTMLElement],
         default: function _default() {
-          return getComponentConfig(NAME$q, 'boundary');
+          return getComponentConfig(NAME$p, 'boundary');
         }
       },
       boundaryPadding: {
         type: Number,
         default: function _default() {
-          return getComponentConfig(NAME$q, 'boundaryPadding');
+          return getComponentConfig(NAME$p, 'boundaryPadding');
         }
       }
     },
@@ -22880,9 +23150,11 @@
   /* istanbul ignore next: not easy to test */
   {
     // We start out with a basic config
+    var NAME = 'BTooltip';
     var config = {
-      boundary: String(getComponentConfig('BTooltip', 'boundary')),
-      boundaryPadding: parseInt(getComponentConfig('BTooltip', 'boundaryPadding'), 10) || 0 // Process bindings.value
+      delay: getComponentConfig(NAME, 'delay'),
+      boundary: String(getComponentConfig(NAME, 'boundary')),
+      boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0 // Process bindings.value
 
     };
 
@@ -23089,8 +23361,7 @@
     TooltipPlugin: index$y
   });
 
-  // Legacy Component group plugin names
-
+  // Index file used for the main builds, which does not include legacy plugin names
   var componentsPlugin = {
     install: installFactory({
       plugins: componentPlugins
@@ -23119,7 +23390,7 @@
    * Constants / Defaults
    */
 
-  var NAME$r = 'v-b-scrollspy';
+  var NAME$q = 'v-b-scrollspy';
   var ACTIVATE_EVENT = 'bv::scrollspy::activate';
   var Default = {
     element: 'body',
@@ -23158,7 +23429,7 @@
 
   var TransitionEndEvents$2 = ['webkitTransitionEnd', 'transitionend', 'otransitionend', 'oTransitionEnd']; // Options for events
 
-  var EventOptions$3 = {
+  var EventOptions$2 = {
     passive: true,
     capture: false
     /*
@@ -23276,14 +23547,14 @@
         var scroller = this.getScroller();
 
         if (scroller && scroller.tagName !== 'BODY') {
-          eventOn(scroller, 'scroll', this, EventOptions$3);
+          eventOn(scroller, 'scroll', this, EventOptions$2);
         }
 
-        eventOn(window, 'scroll', this, EventOptions$3);
-        eventOn(window, 'resize', this, EventOptions$3);
-        eventOn(window, 'orientationchange', this, EventOptions$3);
+        eventOn(window, 'scroll', this, EventOptions$2);
+        eventOn(window, 'resize', this, EventOptions$2);
+        eventOn(window, 'orientationchange', this, EventOptions$2);
         TransitionEndEvents$2.forEach(function (evtName) {
-          eventOn(window, evtName, _this, EventOptions$3);
+          eventOn(window, evtName, _this, EventOptions$2);
         });
         this.setObservers(true); // Schedule a refresh
 
@@ -23298,14 +23569,14 @@
         this.setObservers(false);
 
         if (scroller && scroller.tagName !== 'BODY') {
-          eventOff(scroller, 'scroll', this, EventOptions$3);
+          eventOff(scroller, 'scroll', this, EventOptions$2);
         }
 
-        eventOff(window, 'scroll', this, EventOptions$3);
-        eventOff(window, 'resize', this, EventOptions$3);
-        eventOff(window, 'orientationchange', this, EventOptions$3);
+        eventOff(window, 'scroll', this, EventOptions$2);
+        eventOff(window, 'resize', this, EventOptions$2);
+        eventOff(window, 'orientationchange', this, EventOptions$2);
         TransitionEndEvents$2.forEach(function (evtName) {
-          eventOff(window, evtName, _this2, EventOptions$3);
+          eventOff(window, evtName, _this2, EventOptions$2);
         });
       }
     }, {
@@ -23603,7 +23874,7 @@
     }], [{
       key: "Name",
       get: function get() {
-        return NAME$r;
+        return NAME$q;
       }
     }, {
       key: "Default",
@@ -23770,37 +24041,30 @@
     VBPopoverPlugin: index$D
   });
 
-  // Legacy directive plugin names
-
+  // Index file used for the main builds, which does not include legacy plugin names
   var directivesPlugin = {
     install: installFactory({
       plugins: directivePlugins
     })
   };
 
-  var install$2 = function install(Vue) {
-    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  //
 
-    if (install.installed) {
-      /* istanbul ignore next */
-      return;
+  var install$2 = installFactory({
+    plugins: {
+      componentsPlugin: componentsPlugin,
+      directivesPlugin: directivesPlugin
     }
+  }); // BootstrapVue plugin
 
-    install.installed = true; // Configure BootstrapVue
-
-    setConfig(config); // Install all component plugins
-
-    Vue.use(componentsPlugin); // Install all directive plugins
-
-    Vue.use(directivesPlugin);
-  };
-
-  install$2.installed = false;
   var BootstrapVue = {
     install: install$2,
-    setConfig: setConfig // Auto installation only occurs if window.Vue exists
+    setConfig: setConfig // Named exports for BvConfigPlugin and BootstrapVue
 
   };
+
+  // Main entry point for the browser build
+
   vueUse(BootstrapVue);
 
   return BootstrapVue;
