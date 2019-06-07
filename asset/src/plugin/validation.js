@@ -126,6 +126,10 @@
       const self = this, inValid = [];
       let scroll = self.options.scroll.enabled;
 
+      if (this.form.length) {
+        this.form.addClass('was-validated');
+      }
+
       this.inputs.each((i, input) => {
         const result = this.validate(input);
 
@@ -167,10 +171,6 @@
       let $input = $(input);
       let help;
       let result = true;
-
-      if (this.form.length) {
-        this.form.addClass('was-validated');
-      }
 
       // Clear state
       this.showResponse(this.STATE_NONE, $input);

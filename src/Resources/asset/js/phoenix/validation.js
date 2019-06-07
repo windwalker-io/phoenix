@@ -184,6 +184,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
         var self = this,
             inValid = [];
         var scroll = self.options.scroll.enabled;
+
+        if (this.form.length) {
+          this.form.addClass('was-validated');
+        }
+
         this.inputs.each(function (i, input) {
           var result = _this.validate(input);
 
@@ -223,12 +228,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
         var $input = $(input);
         var help;
-        var result = true;
-
-        if (this.form.length) {
-          this.form.addClass('was-validated');
-        } // Clear state
-
+        var result = true; // Clear state
 
         this.showResponse(this.STATE_NONE, $input);
         input.setCustomValidity(''); // Check custom validity

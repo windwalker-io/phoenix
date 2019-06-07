@@ -57,8 +57,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
         var $form = $input.parents('form');
         var self = this; // Add class to form
 
-        if (!$form.hasClass('was-validated')) {
-          $form.addClass('was-validated');
+        if (!$form.hasClass('was-validated')) {// $form.addClass('was-validated');
         }
 
         this.removeValidateResponse($control);

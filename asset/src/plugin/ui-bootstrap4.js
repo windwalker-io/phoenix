@@ -34,7 +34,7 @@
 
       // Add class to form
       if (!$form.hasClass('was-validated')) {
-        $form.addClass('was-validated');
+        // $form.addClass('was-validated');
       }
 
       this.removeValidateResponse($control);
