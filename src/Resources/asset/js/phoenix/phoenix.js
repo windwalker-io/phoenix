@@ -2647,7 +2647,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         }
 
         var translated = this.find(key);
-        return translated !== null ? this.wrapDebug(translated, true) : this.wrapDebug(text, false);
+        return translated !== null ? translated : this.wrapDebug(text, false);
       }
       /**
        * Sptintf language string.

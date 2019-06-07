@@ -42,9 +42,9 @@
         return this.sprintf(text, ...args);
       }
 
-      const translated =  this.find(key);
+      const translated = this.find(key);
 
-      return translated !== null ? this.wrapDebug(translated, true) : this.wrapDebug(text, false);
+      return translated !== null ? translated : this.wrapDebug(text, false);
     }
 
     /**
