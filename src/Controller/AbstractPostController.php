@@ -136,7 +136,11 @@ abstract class AbstractPostController extends AbstractPhoenixController
 
         $entity = $this->getDataObject();
 
-        $this->addMessage($this->getSuccessMessage($entity), Bootstrap::MSG_SUCCESS);
+        $message = $this->getSuccessMessage($entity);
+
+        if ($message) {
+            $this->addMessage($message, Bootstrap::MSG_SUCCESS);
+        }
 
         $this->setRedirect($this->getSuccessRedirect($entity));
 
@@ -158,7 +162,9 @@ abstract class AbstractPostController extends AbstractPhoenixController
     {
         $this->setUserState($this->getContext('edit.data'), $this->data);
 
-        $this->addMessage($e->getMessage(), Bootstrap::MSG_WARNING);
+        if ($msg = $e->getMessage()) {
+            $this->addMessage($msg, Bootstrap::MSG_WARNING);
+        }
 
         $this->setRedirect($this->getFailRedirect($this->getDataObject()));
 
