@@ -12,6 +12,7 @@ use Phoenix\Breadcrumb\BreadcrumbManager;
 use Phoenix\Html\HtmlHeaderManager;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Renderer\RendererManager;
+use Windwalker\Core\Security\CsrfGuard;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Utilities\Queue\PriorityQueue;
@@ -70,10 +71,16 @@ class PhoenixProvider implements ServiceProviderInterface
         $container->prepareSharedObject(BreadcrumbManager::class)
             ->alias('breadcrumb', BreadcrumbManager::class);
 
-        $container->extend(RendererManager::class, function (RendererManager $manager, Container $container) {
+        $container->extend(RendererManager::class, static function (RendererManager $manager, Container $container) {
             $manager->addGlobalPath(PHOENIX_SOURCE . '/Resources/templates', PriorityQueue::LOW - 25);
 
             return $manager;
+        });
+
+        $container->extend(CsrfGuard::class, static function (CsrfGuard $guard) {
+            $guard->setMessage(__('phoenix.message.invalid.token'));
+
+            return $guard;
         });
     }
 

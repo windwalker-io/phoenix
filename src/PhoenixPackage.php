@@ -11,7 +11,6 @@ namespace Phoenix;
 use Phoenix\Listener\JsCommandListener;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Security\CsrfProtection;
 
 define('PHOENIX_ROOT', dirname(__DIR__));
 define('PHOENIX_SOURCE', PHOENIX_ROOT . '/src');
@@ -38,8 +37,6 @@ class PhoenixPackage extends AbstractPackage
         Translator::loadFile('phoenix', 'ini', $this);
 
         if ($this->app->isWeb()) {
-            CsrfProtection::setMessage(__('phoenix.message.invalid.token'));
-
             $this->getDispatcher()->addListener(new JsCommandListener());
         }
     }
