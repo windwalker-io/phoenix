@@ -29,7 +29,7 @@
     <div class="container {$controller.item.name.lower$}-item">
         <h1>{$controller.item.name.cap$} Item</h1>
         <p>
-            <a class="btn btn-default btn-outline-secondary" href="{{ $router->route('{$controller.list.name.lower$}') }}">
+            <a class="btn btn-default btn-outline-secondary" href="{{ $router->to('{$controller.list.name.lower$}') }}">
                 <span class="fa fa-chevron-left"></span>
                 Back to List
             </a>

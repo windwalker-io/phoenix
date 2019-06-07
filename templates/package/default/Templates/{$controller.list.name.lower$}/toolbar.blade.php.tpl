@@ -15,7 +15,7 @@
 ?>
 
 <a role="button" class="btn btn-primary btn-sm btn-wide phoenix-btn-new"
-    href="{{ $router->route('{$controller.item.name.lower$}', ['new' => true]) }}">
+    href="{{ $router->to('{$controller.item.name.lower$}', ['new' => true]) }}">
     <span class="fa fa-plus"></span>
     @lang('phoenix.toolbar.new')
 </a>
