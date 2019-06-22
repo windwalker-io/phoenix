@@ -1,8 +1,8 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of earth project.
  *
- * @copyright  Copyright (C) 2017 ${ORGANIZATION}.
+ * @copyright  Copyright (C) 2019 .
  * @license    __LICENSE__
  */
 
@@ -13,15 +13,7 @@ namespace Phoenix\Form\Filter;
  *
  * @since  1.4
  */
-class UtcFilter extends TimezoneFilter
+class UtcFilter extends ServerTZFilter
 {
-    /**
-     * TimezoneFilter constructor.
-     *
-     * @param string $from
-     */
-    public function __construct($from = null)
-    {
-        parent::__construct($from, 'UTC');
-    }
+    //
 }

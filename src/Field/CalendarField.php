@@ -29,7 +29,7 @@ class CalendarField extends TextField
     /**
      * @const string
      */
-    const EMPTY_DATETIME = '0000-00-00 00:00:00';
+    public const EMPTY_DATETIME = '0000-00-00 00:00:00';
 
     /**
      * prepare
@@ -49,12 +49,15 @@ class CalendarField extends TextField
      * @param array $attrs
      *
      * @return  string
+     * @throws \Exception
      */
     public function buildInput($attrs)
     {
         // Convert timezone
-        $from     = $this->get('from', 'UTC');
-        $to       = $this->get('to', Ioc::getConfig()->get('system.timezone', 'UTC'));
+        $config = Ioc::getConfig();
+
+        $from     = $this->get('from', Chronos::getServerDefaultTimezone());
+        $to       = $this->get('to', $config->get('system.timezone', 'UTC'));
         $nullDate = Chronos::getNullDate();
 
         if ($attrs['value'] && !in_array($attrs['value'], [static::EMPTY_DATETIME, $nullDate], true)) {
