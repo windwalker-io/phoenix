@@ -8,6 +8,7 @@
 
 namespace Phoenix\Repository;
 
+use Phoenix\Utilities\SlugHelper;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\User\User;
 use Windwalker\Data\Data;
@@ -55,15 +56,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
 
         // Alias
         if ($data->hasField('alias')) {
-            if (!$data->alias) {
-                $data->alias = $this->handleAlias(trim($data->title));
-            } else {
-                $data->alias = $this->handleAlias(trim($data->alias));
-            }
-
-            if (!$data->alias) {
-                $data->alias = OutputFilter::stringURLSafe(trim($date->toSql()));
-            }
+            $data->alias = $this->slugify($data->alias, $data->title);
         }
 
         // Created date
@@ -123,10 +116,29 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      * @param   string $alias
      *
      * @return  string
+     *
+     * @deprecated Use slugify() instead.
      */
     public function handleAlias($alias)
     {
         return (new MaxLengthFilter(255))->clean(OutputFilter::stringURLSafe($alias));
+    }
+
+    /**
+     * slugify
+     *
+     * @param string      $alias
+     * @param string|null $default
+     *
+     * @return  string
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function slugify(string $alias, ?string $default = null): string
+    {
+        return SlugHelper::safe($alias, false, $default, 8);
     }
 
     /**
