@@ -69,7 +69,7 @@ class MenuHelper
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.8
      */
     public function isActive(bool $result, ?string $activeString = null): string
     {
