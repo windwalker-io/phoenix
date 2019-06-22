@@ -83,11 +83,32 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
   function () {
     /**
      * Constructor.
-     * @param {jQuery} $form
-     * @param {Object} options
+     * @param {jQuery}      $form
+     * @param {Object}      options
+     * @param {PhoenixCore} phoenix
      */
-    function PhoenixFormElement($form, options) {
+    function PhoenixFormElement($form, options, phoenix) {
       _classCallCheck(this, PhoenixFormElement);
+
+      // If form not found, create one
+      if ($form.length === 0) {
+        $form = $('<form>');
+
+        if (options.mainSelector.indexOf('#') === 0) {
+          $form.attr('id', options.mainSelector.substr(1));
+          $form.attr('name', options.mainSelector.substr(1));
+        }
+
+        $form.attr('action', 'post');
+        $form.attr('enctype', 'multipart/form-data');
+        $form.attr('novalidate', 'true');
+        $form.attr('action', phoenix.data('phoenix.uri')['full']);
+        $form.css('display', 'none');
+        var $csrf = $('<input type="hidden" value="" name="">');
+        $csrf.attr('name', phoenix.data('csrfToken'));
+        $form.append($csrf);
+        $('body').append($form);
+      }
 
       options = $.extend(true, {}, this.constructor.defaultOptions, options);
       this.form = $form;
