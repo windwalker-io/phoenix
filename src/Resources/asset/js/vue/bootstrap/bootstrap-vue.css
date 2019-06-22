@@ -341,7 +341,7 @@ input[type="color"].form-control:disabled {
   background: rgba(220, 53, 69, 0.35);
 }
 
-.modal-backdrop:not(.show):not(.fade) {
+.modal-backdrop {
   opacity: 0.5;
 }
 
