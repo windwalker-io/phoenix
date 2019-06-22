@@ -54,7 +54,7 @@
 </button>
 
 <a role="button" class="btn btn-default btn-outline-secondary btn-sm phoenix-btn-cancel"
-    href="{{ $router->route('{$controller.list.name.lower$}') }}">
+    href="{{ $router->to('{$controller.list.name.lower$}') }}">
     <span class="fa fa-remove fa-times"></span>
     @lang('phoenix.toolbar.cancel')
 </a>

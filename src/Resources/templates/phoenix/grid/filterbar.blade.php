@@ -35,10 +35,10 @@ $filterFields = $form->getFields(null, 'filter');
 
                 {{-- Submit Button --}}
                 <span class="input-group-btn input-group-append">
-            <button class="btn btn-default btn-outline-secondary has-tooltip" type="submit"
-                title="@lang('phoenix.grid.search.button.desc')">
-                <span class="fa fa-search"></span>
-            </button>
+                <button class="btn btn-default btn-outline-secondary has-tooltip" type="submit"
+                    title="@lang('phoenix.grid.search.button.desc')">
+                    <span class="fa fa-search"></span>
+                </button>
         </span>
             </div>
         @endif
