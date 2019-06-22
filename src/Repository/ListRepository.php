@@ -14,7 +14,9 @@ use Phoenix\Repository\Filter\SearchHelper;
 use Phoenix\Repository\Traits\FormAwareRepositoryTrait;
 use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Core\Repository\DatabaseRepository;
+use Windwalker\Data\Data;
 use Windwalker\Data\DataSet;
+use Windwalker\Database\Iterator\DataIterator;
 use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Query\Query;
 use Windwalker\Query\QueryElement;
@@ -134,6 +136,33 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
 
             return new DataSet($items);
         });
+    }
+
+    /**
+     * getIterator
+     *
+     * @return  \Generator
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getIterator(): \Generator
+    {
+        // Make sure we change state values before cache detected.
+        $this->prepareState();
+
+        $query = $this->getListQuery($this->db->getQuery(true));
+
+        $query->limit($this->get('list.limit'), $this->getStart());
+
+        $generator = function () use ($query): \Generator {
+            foreach ($this->db->getReader($query)->getIterator() as $item) {
+                yield new Data($item);
+            }
+        };
+
+        return $generator();
     }
 
     /**
