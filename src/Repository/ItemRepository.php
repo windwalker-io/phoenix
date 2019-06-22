@@ -41,7 +41,7 @@ class ItemRepository extends DatabaseRepository
                 return $this->getRecord()->reset(false);
             }
 
-            $item = $this->getRecord();
+            $item = $this->registerRecordEvents($this->getRecord());
 
             $this->triggerEvent('BeforeLoad', [
                 'conditions' => $conditions,
@@ -147,5 +147,33 @@ class ItemRepository extends DatabaseRepository
         $dispatcher->triggerEvent('onModel' . $action, $params);
 
         return $dispatcher->triggerEvent('onRepository' . $action, $params);
+    }
+
+    /**
+     * registerRecordEvents
+     *
+     * @param Record $record
+     *
+     * @return  Record
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function registerRecordEvents(Record $record): Record
+    {
+        $record->getDispatcher()->listen(
+            'onBeforeLoad',
+            function (Event $event) use ($record) {
+                $this->prepareGetItem($event['conditions']);
+            }
+        );
+
+        $record->getDispatcher()->listen(
+            'onAfterLoad',
+            function (Event $event) use ($record) {
+                $this->postGetItem($record);
+            }
+        );
+
+        return $record;
     }
 }

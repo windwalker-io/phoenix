@@ -10,6 +10,7 @@ namespace Phoenix\Repository;
 
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
+use Windwalker\Record\Record;
 
 /**
  * Interface GetOrCreateInterface
@@ -24,9 +25,28 @@ interface GetOrCreateInterface
      * @param mixed               $conditions
      * @param array|DataInterface $data
      *
-     * @return  Data
+     * @return  Record
      *
      * @since  1.8.4
      */
-    public function getItemOrCreate($conditions, $data = []): Data;
+    public function getItemOrCreate($conditions, $data = []): Record;
+
+    /**
+     * updateOrCreate
+     *
+     * @param mixed         $data
+     * @param array         $initData
+     * @param array|mixed   $condFields
+     *
+     * @return  Record
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function updateItemOrCreate(
+        $data,
+        array $initData = [],
+        $condFields = null
+    ): Record;
 }

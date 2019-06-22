@@ -10,6 +10,7 @@ namespace Phoenix\Controller\Batch;
 
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Data\DataInterface;
+use Windwalker\Record\Record;
 use Windwalker\String\StringHelper;
 
 /**
@@ -77,15 +78,37 @@ abstract class AbstractCopyController extends AbstractBatchController
      */
     protected function save($pk, DataInterface $data)
     {
-        // We load existing item first and bind data into it.
-        $record = $this->repository->getRecord();
+        return $this->repository->copy($pk, function (Record $record) {
+            return $this->handleNewValue($record);
+        });
+    }
 
-        $record->reset();
+    /**
+     * getDate
+     *
+     * @return  string
+     *
+     * @throws \Exception
+     * @since  1.6
+     */
+    protected function getDate()
+    {
+        return Chronos::create()->toSql();
+    }
 
-        $record->load($pk);
-
-        $record->bind($data);
-
+    /**
+     * handleNewValue
+     *
+     * @param Record $record
+     *
+     * @return  Record
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function handleNewValue(Record $record): Record
+    {
         $recordClone = $this->repository->getRecord();
 
         $condition = [];
@@ -126,18 +149,6 @@ abstract class AbstractCopyController extends AbstractBatchController
             }
         }
 
-        return $this->repository->save($record);
-    }
-
-    /**
-     * getDate
-     *
-     * @return  string
-     *
-     * @since  1.6
-     */
-    protected function getDate()
-    {
-        return Chronos::create()->toSql();
+        return $record;
     }
 }

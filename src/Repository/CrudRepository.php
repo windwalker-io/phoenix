@@ -9,9 +9,9 @@
 namespace Phoenix\Repository;
 
 use Phoenix\Repository\Traits\FormAwareRepositoryTrait;
-use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
 use Windwalker\DataMapper\Entity\Entity;
+use Windwalker\Event\Event;
 use Windwalker\Record\Exception\NoResultException;
 use Windwalker\Record\Record;
 
@@ -20,7 +20,8 @@ use Windwalker\Record\Record;
  *
  * @since  1.0
  */
-class CrudRepository extends ItemRepository implements FormAwareRepositoryInterface,
+class CrudRepository extends ItemRepository implements
+    FormAwareRepositoryInterface,
     CrudRepositoryInterface,
     GetOrCreateInterface
 {
@@ -45,7 +46,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
     public function save(DataInterface $data)
     {
         // Prepare Record object, primary keys and dump input data
-        $record = $this->getRecord();
+        $record = $this->registerRecordEvents($this->getRecord());
         $keys   = array_filter((array) $this->getKeyName(true)); // Fix because Record return empty string
         $dumped = $data->dump(true);
 
@@ -63,23 +64,19 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
         $record->bind($dumped);
 
         $this->triggerEvent('BeforeSave', [
-            'conditions'  => $conditions,
-            'data'        => $data,
-            'record'      => $record,
+            'conditions' => $conditions,
+            'data' => $data,
+            'record' => $record,
             'updateNulls' => $this->updateNulls,
         ]);
-
-        $this->prepareSave($record);
 
         $record->validate()
             ->store($this->updateNulls);
 
-        $this->postSave($record);
-
         $this->triggerEvent('AfterSave', [
-            'conditions'  => $conditions,
-            'data'        => $data,
-            'record'      => $record,
+            'conditions' => $conditions,
+            'data' => $data,
+            'record' => $record,
             'updateNulls' => $this->updateNulls,
         ]);
 
@@ -89,47 +86,78 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
     }
 
     /**
+     * copy
+     *
+     * @param array                  $conditions
+     * @param array|object|callable  $newValue
+     * @param bool                   $removeKey
+     *
+     * @return  Record
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function copy($conditions = [], $newValue = null, bool $removeKey = true): Record
+    {
+        return $this->registerRecordEvents($this->getRecord())
+            ->load($conditions)
+            ->copy($newValue, $removeKey);
+    }
+
+    /**
      * getItemOrCreate
      *
      * @param mixed               $conditions
      * @param array|DataInterface $data
      * @param bool                $useConditions
      *
-     * @return  Data
+     * @return  Record
      *
      * @throws \Psr\Cache\InvalidArgumentException
      * @throws \Exception
      * @since  1.8.4
      */
-    public function getItemOrCreate($conditions, $data = [], bool $useConditions = true): Data
+    public function getItemOrCreate($conditions, $data = [], bool $useConditions = true): Record
     {
-        $item = $this->getItem($conditions);
+        return $this->registerRecordEvents($this->getRecord())
+            ->loadOrCreate($conditions, $data, $useConditions);
+    }
 
-        if ($item->notNull()) {
-            return $item;
-        }
+    /**
+     * updateOrCreate
+     *
+     * @param mixed         $data
+     * @param array         $initData
+     * @param array|mixed   $condFields
+     *
+     * @return  Record
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function updateItemOrCreate(
+        $data,
+        array $initData = [],
+        $condFields = null
+    ): Record {
+        $condFields = $condFields ?: $this->getKeyName(true);
 
-        if (!$data instanceof DataInterface) {
-            $data = new Data($data);
-        }
+        $conditions = [];
 
-        if ($useConditions) {
-            $conds = $conditions;
-
-            if (is_scalar($conds)) {
-                $conds = [$this->getKeyName() => $conds];
+        foreach ($condFields as $field) {
+            if (is_array($data)) {
+                $conditions[$field] = $data[$field];
+            } else {
+                $conditions[$field] = $data->$field;
             }
-
-            if (is_array($conds)) {
-                $data->bind($conds);
-            }
         }
 
-        $this->save($data);
-
-        $this->resetCache();
-
-        return $this->getItem($conditions);
+        return $this->registerRecordEvents($this->getRecord())
+            ->loadOrCreate($conditions, $initData)
+            ->bind($data)
+            ->store($this->updateNulls);
     }
 
     /**
@@ -199,7 +227,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
     {
         $conditions = $conditions ?: $this['load.conditions'];
 
-        $record = $this->getRecord();
+        $record = $this->registerRecordEvents($this->getRecord());
 
         $this->triggerEvent('BeforeDelete', [
             'conditions' => $conditions,
@@ -214,11 +242,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
                 // Find record first to check we can delete it.
                 $record->load($conditions);
 
-                $this->prepareDelete($conditions, $record);
-
                 $record->delete();
-
-                $this->postDelete($conditions, $record);
 
                 $this->triggerEvent('AfterDelete', [
                     'conditions' => $conditions,
@@ -266,7 +290,7 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
     /**
      * updateNulls
      *
-     * @param   boolean $boolean
+     * @param boolean $boolean
      *
      * @return  static|boolean
      */
@@ -279,5 +303,49 @@ class CrudRepository extends ItemRepository implements FormAwareRepositoryInterf
         }
 
         return $this->updateNulls;
+    }
+
+    /**
+     * registerRecordEvents
+     *
+     * @param Record $record
+     *
+     * @return  Record
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function registerRecordEvents(Record $record): Record
+    {
+        parent::registerRecordEvents($record);
+
+        $record->getDispatcher()->listen(
+            'onBeforeStore',
+            function () use ($record) {
+                $this->prepareSave($record);
+            }
+        );
+
+        $record->getDispatcher()->listen(
+            'onAfterStore',
+            function () use ($record) {
+                $this->postSave($record);
+            }
+        );
+
+        $record->getDispatcher()->listen(
+            'onBeforeDelete',
+            function (Event $event) use ($record) {
+                $this->prepareDelete($event['conditions'], $record);
+            }
+        );
+
+        $record->getDispatcher()->listen(
+            'onAfterDelete',
+            function (Event $event) use ($record) {
+                $this->postDelete($event['conditions'], $record);
+            }
+        );
+
+        return $record;
     }
 }

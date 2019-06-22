@@ -10,6 +10,7 @@ namespace Phoenix\Repository;
 
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\User\User;
+use Windwalker\Data\Data;
 use Windwalker\Filter\OutputFilter;
 use Windwalker\Form\Filter\MaxLengthFilter;
 use Windwalker\Record\Record;
