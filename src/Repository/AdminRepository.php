@@ -121,7 +121,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      */
     public function handleAlias($alias)
     {
-        return (new MaxLengthFilter(255))->clean(OutputFilter::stringURLSafe($alias));
+        return (new MaxLengthFilter(255))->clean($alias);
     }
 
     /**
@@ -138,7 +138,9 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      */
     public function slugify(string $alias, ?string $default = null): string
     {
-        return SlugHelper::safe($alias, false, $default, 8);
+        return (new MaxLengthFilter(255))->clean(
+            SlugHelper::safe($alias, false, $default, 8)
+        );
     }
 
     /**
