@@ -116,7 +116,7 @@
 
       this.beforeHook(value, this.element, this.dependent);
 
-      $.get(this.options.ajax.url, data)
+      Phoenix.get(this.options.ajax.url, data)
         .done(response => {
           if (response.success) {
             this.updateListElements(response.data);
@@ -124,10 +124,10 @@
             console.error(response.message);
           }
         }).fail(response => {
-        console.error(response.message);
-      }).always(() => {
-        this.afterHook(value, this.element, this.dependent);
-      });
+          console.error(response.message);
+        }).always(() => {
+          this.afterHook(value, this.element, this.dependent);
+        });
     }
 
     /**
