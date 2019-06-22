@@ -22,9 +22,15 @@ $i = 1;
         $attrs = \Windwalker\Utilities\Arr::def($attrs, 'class', '');
         $attrs = \Windwalker\Utilities\Arr::def($attrs, 'style', '');
 
-        $attrs['class'] = $subField->getType() . '-field flex-grow-1 ' . ($count === $i ? '' : 'mr-sm-3') . ' ' . $attrs['class'];
+        $attrs['class'] = $subField->getType() . '-field ' . ($count === $i ? '' : 'mr-sm-3') . ' ' . $attrs['class'];
         $attrs['style'] = ($bs4 ? '' : 'display: inline-block;') . $attrs['style'];
-        
+
+        if ($subField->get('width') !== null) {
+            $attrs['style'] .= 'width: ' . $subField->get('width') . ';';
+        } else {
+            $attrs['class'] .= ' flex-grow-1';
+        }
+
         if (!$showLabel) {
             $subField->appendAttribute('labelClass', 'sr-only');
         }
