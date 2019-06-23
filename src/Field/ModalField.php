@@ -126,7 +126,7 @@ class ModalField extends AbstractField
      */
     public function prepare(&$attrs)
     {
-        $attrs['type'] = $this->type ?: 'hidden';
+        $attrs['type'] = $this->type ?: 'text';
         $attrs['name'] = $this->getFieldName();
         $attrs['id'] = $this->getAttribute('id', $this->getId());
         $attrs['placeholder'] = $this->getAttribute('placeholder');
@@ -164,7 +164,8 @@ class ModalField extends AbstractField
 
         /** @var HtmlElement $input */
         $input                     = parent::buildInput($attribs);
-        $input['type']             = 'hidden';
+        $input['type']             = 'text';
+        $input['style']            .= 'display: none;';
         $input['data-value-store'] = true;
 
         $items = [];

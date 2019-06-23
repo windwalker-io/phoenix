@@ -52,8 +52,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
 
       if (!$input.prop('checked')) {
-        $group.addClass(options.color.default).removeClass(options.activeClass).removeClass(colors);
-        $btn.addClass(options.activeClass).addClass($input.attr('data-color-class')).removeClass(options.color.default);
+        $group.addClass(options.color["default"]).removeClass(options.activeClass).removeClass(colors);
+        $btn.addClass(options.activeClass).addClass($input.attr('data-color-class')).removeClass(options.color["default"]);
         $input.prop('checked', true);
         $input[0].dispatchEvent(new Event('change'));
       }
@@ -91,7 +91,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       colors.push(color);
 
       if ($input.prop('checked')) {
-        $radio.removeClass(options.color.default).addClass(options.activeClass).addClass(color);
+        $radio.removeClass(options.color["default"]).addClass(options.activeClass).addClass(color);
       }
 
       if ($input.prop('disabled')) {

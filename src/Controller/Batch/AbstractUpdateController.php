@@ -41,6 +41,7 @@ abstract class AbstractUpdateController extends AbstractBatchController
      * getUpdateData
      *
      * @return  array
+     * @throws \Exception
      */
     protected function getUpdateData()
     {

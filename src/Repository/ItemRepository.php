@@ -48,15 +48,15 @@ class ItemRepository extends DatabaseRepository
                 'item' => $item
             ]);
 
-            try {
-                $this->prepareGetItem($conditions);
+            $this->prepareGetItem($conditions);
 
+            try {
                 $item->load($conditions);
+
+                $this->postGetItem($item);
             } catch (NoResultException $e) {
                 return $item->reset(false);
             }
-
-            $this->postGetItem($item);
 
             $this->triggerEvent('AfterLoad', [
                 'conditions' => $conditions,
@@ -160,19 +160,19 @@ class ItemRepository extends DatabaseRepository
      */
     public function registerRecordEvents(Record $record): Record
     {
-        $record->getDispatcher()->listen(
-            'onBeforeLoad',
-            function (Event $event) use ($record) {
-                $this->prepareGetItem($event['conditions']);
-            }
-        );
-
-        $record->getDispatcher()->listen(
-            'onAfterLoad',
-            function (Event $event) use ($record) {
-                $this->postGetItem($record);
-            }
-        );
+//        $record->getDispatcher()->listen(
+//            'onBeforeLoad',
+//            function (Event $event) use ($record) {
+//                $this->prepareGetItem($event['conditions']);
+//            }
+//        );
+//
+//        $record->getDispatcher()->listen(
+//            'onAfterLoad',
+//            function (Event $event) use ($record) {
+//                $this->postGetItem($record);
+//            }
+//        );
 
         return $record;
     }

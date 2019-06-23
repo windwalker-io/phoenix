@@ -42,6 +42,7 @@
   class PhoenixValidationElement {
     static get defaultOptions() {
       return {
+        enabled: true,
         events: ['change'],
         scroll: {
           enabled: true,
@@ -297,7 +298,7 @@
      */
     registerEvents() {
       this.form.on('submit', event => {
-        if (!this.validateAll()) {
+        if (this.options.enabled && !this.validateAll()) {
           event.stopPropagation();
           event.preventDefault();
 

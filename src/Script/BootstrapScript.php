@@ -382,4 +382,18 @@ JS;
             static::addCSS(static::phoenixName() . '/css/bootstrap/switch.min.css');
         }
     }
+
+    /**
+     * multiLevelDropdown
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function multiLevelDropdown(): void
+    {
+        if (!static::inited(__METHOD__)) {
+            static::addCSS(static::phoenixName() . '/css/bootstrap/multi-level-dropdown.min.css');
+        }
+    }
 }

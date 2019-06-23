@@ -70,8 +70,7 @@ class CrudRepository extends ItemRepository implements
             'updateNulls' => $this->updateNulls,
         ]);
 
-        $record->validate()
-            ->store($this->updateNulls);
+        $record->store($this->updateNulls);
 
         $this->triggerEvent('AfterSave', [
             'conditions' => $conditions,
@@ -322,6 +321,8 @@ class CrudRepository extends ItemRepository implements
             'onBeforeStore',
             function () use ($record) {
                 $this->prepareSave($record);
+
+                $record->validate();
             }
         );
 

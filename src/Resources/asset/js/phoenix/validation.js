@@ -92,6 +92,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
       key: "defaultOptions",
       get: function get() {
         return {
+          enabled: true,
           events: ['change'],
           scroll: {
             enabled: true,
@@ -359,7 +360,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
         var _this2 = this;
 
         this.form.on('submit', function (event) {
-          if (!_this2.validateAll()) {
+          if (_this2.options.enabled && !_this2.validateAll()) {
             event.stopPropagation();
             event.preventDefault();
             return false;

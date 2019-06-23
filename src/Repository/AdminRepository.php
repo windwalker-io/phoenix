@@ -56,7 +56,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
 
         // Alias
         if ($data->hasField('alias')) {
-            $data->alias = $this->slugify($data->alias, $data->title);
+            $data->alias = $this->slugify((string) $data->alias, (string) $data->title);
         }
 
         // Created date

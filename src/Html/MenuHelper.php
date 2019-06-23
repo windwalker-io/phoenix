@@ -114,13 +114,13 @@ class MenuHelper
         }
 
         // If route not matched, we match extra values from routing.
-        $routePaths = (array) $matched->getExtra('menu')[$menu];
+        $routePaths = $matched->getExtra('menu')[$menu] ?? null;
 
-        if ($routePaths === '') {
+        if (!$routePaths) {
             return false;
         }
 
-        foreach ($routePaths as $routePath) {
+        foreach ((array) $routePaths as $routePath) {
             $paths     = array_filter(explode('/', trim($path, '/')), 'strlen');
             $routePath = array_filter(explode('/', trim($routePath, '/')), 'strlen');
 
@@ -212,7 +212,7 @@ class MenuHelper
         $requests = $this->input->toArray();
 
         foreach ($requests as $key => &$request) {
-            if (in_array($key, $this->pathVars, true)) {
+            if (is_array($request) && in_array($key, $this->pathVars, true)) {
                 $request = implode('/', $request);
             }
         }
