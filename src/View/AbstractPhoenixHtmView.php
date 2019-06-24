@@ -36,6 +36,34 @@ abstract class AbstractPhoenixHtmView extends HtmlView
     protected $langPrefix;
 
     /**
+     * Method to get property LangPrefix
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getLangPrefix(): ?string
+    {
+        return $this->langPrefix;
+    }
+
+    /**
+     * Method to set property langPrefix
+     *
+     * @param string $langPrefix
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function setLangPrefix(?string $langPrefix)
+    {
+        $this->langPrefix = $langPrefix;
+
+        return $this;
+    }
+
+    /**
      * prepareRender
      *
      * @param   Data $data
