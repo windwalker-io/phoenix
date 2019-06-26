@@ -72,4 +72,25 @@
        -o-transition-delay: 0s, 0s, 0s;
           transition-delay: 0s, 0s, 0s; }
 
-/*# sourceMappingURL=multi-level-dropdown.css.map */
+.subnav {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+  margin-left: 1rem; }
+
+.subnav-link {
+  display: block;
+  padding: 0.5rem 1rem; }
+  .subnav-link:hover, .subnav-link:focus {
+    text-decoration: none; }
+  .subnav-link.disabled {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: default; }
+
+/*# sourceMappingURL=multi-level-menu.css.map */

@@ -388,12 +388,26 @@ JS;
      *
      * @return  void
      *
+     * @deprecated Use multiLevelMenu()
+     *
      * @since  __DEPLOY_VERSION__
      */
     public static function multiLevelDropdown(): void
     {
+        static::multiLevelMenu();
+    }
+
+    /**
+     * multiLevelDropdown
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function multiLevelMenu(): void
+    {
         if (!static::inited(__METHOD__)) {
-            static::addCSS(static::phoenixName() . '/css/bootstrap/multi-level-dropdown.min.css');
+            static::addCSS(static::phoenixName() . '/css/bootstrap/multi-level-menu.min.css');
         }
     }
 }
