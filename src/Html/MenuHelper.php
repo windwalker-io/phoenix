@@ -108,6 +108,10 @@ class MenuHelper
 
         $package = $this->packageResolver->getCurrentPackage();
         $matched = $package->router->getMatched();
+        
+        if (!$matched) {
+            return false;
+        }
 
         if ($matched->getName() === $route && $this->matchRequest($query)) {
             return true;
