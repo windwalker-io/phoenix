@@ -780,14 +780,18 @@ JS;
      * @since  1.6.11
      */
     public static function disableWhenSubmit(
-        $formSelector = '#admin-form',
-        $buttonsSelector = '#admin-toolbar button, #admin-toolbar a, .disable-on-submit',
-        $event = 'phoenix.validate.success'
-    ) {
+        string $formSelector = '#admin-form',
+        string $buttonsSelector = '#admin-toolbar button, #admin-toolbar a, .disable-on-submit',
+        string $event = 'submit'
+    ): void {
         if (!static::inited(__METHOD__)) {
             static::domready(<<<JS
 $('$formSelector').on('$event', () => {
-  $('$buttonsSelector').attr('disabled', true).addClass('disabled').attr('href', 'javascript://');
+  $('$buttonsSelector')
+    .attr('disabled', true)
+    .addClass('disabled')
+    .attr('href', 'javascript://')
+    .attr('onclick', 'return false;');
 });
 JS
             );

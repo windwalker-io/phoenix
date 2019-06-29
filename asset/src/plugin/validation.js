@@ -299,6 +299,7 @@
     registerEvents() {
       this.form.on('submit', event => {
         if (this.options.enabled && !this.validateAll()) {
+          event.stopImmediatePropagation(); // Stop following events
           event.stopPropagation();
           event.preventDefault();
 

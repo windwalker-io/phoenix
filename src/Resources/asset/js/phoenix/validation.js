@@ -361,6 +361,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
         this.form.on('submit', function (event) {
           if (_this2.options.enabled && !_this2.validateAll()) {
+            event.stopImmediatePropagation(); // Stop following events
+
             event.stopPropagation();
             event.preventDefault();
             return false;

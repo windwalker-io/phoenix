@@ -4,7 +4,7 @@
     <span class="{{ $icon or '' }} has-tooltip icon-button" title="@lang($title)"></span>
 @else
     <button type="button"
-        class="icon-button grid-boolean-icon data-state-{{ $value or '' }} btn {{ $options['button_color'] or 'btn-default btn-light' }} btn-sm has-tooltip"
+        class="icon-button grid-boolean-icon disable-on-submit data-state-{{ $value or '' }} btn {{ $options['button_color'] or 'btn-default btn-light' }} btn-sm has-tooltip"
         title="@lang($title)"
         {{ !empty($disabled) ? 'disabled' : null }}
 
