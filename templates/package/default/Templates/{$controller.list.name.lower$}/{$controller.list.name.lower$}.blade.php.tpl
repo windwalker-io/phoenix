@@ -121,7 +121,8 @@
                                 <td class="text-nowrap">
                                     <span class="btn-group">
                                         {!! $grid->published($item->state) !!}
-                                        <button type="button" class="btn btn-default btn-light btn-sm has-tooltip"
+                                        <button type="button"
+                                            class="btn btn-default btn-light btn-sm has-tooltip disable-on-submit"
                                             onclick="Phoenix.Grid.copyRow({{ $i }});"
                                             title="@lang('phoenix.toolbar.duplicate')">
                                             <span class="fa fa-fw fa-copy text-info"></span>
