@@ -156,7 +156,7 @@ class ItemRepository extends DatabaseRepository
      *
      * @return  Record
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public function registerRecordEvents(Record $record): Record
     {

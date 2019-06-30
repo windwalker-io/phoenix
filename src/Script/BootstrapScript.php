@@ -390,7 +390,7 @@ JS;
      *
      * @deprecated Use multiLevelMenu()
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public static function multiLevelDropdown(): void
     {
@@ -402,7 +402,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public static function multiLevelMenu(): void
     {

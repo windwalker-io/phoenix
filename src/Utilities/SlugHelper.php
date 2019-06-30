@@ -14,7 +14,7 @@ use Windwalker\Filter\OutputFilter;
 /**
  * The SlugifyHelper class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8.13
  */
 class SlugHelper
 {
@@ -82,7 +82,7 @@ class SlugHelper
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public static function breakWords(string $text): array
     {
@@ -103,7 +103,7 @@ class SlugHelper
      *
      * @throws \Exception
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public static function getDefaultSlug(): string
     {

@@ -134,7 +134,7 @@ abstract class AdminRepository extends CrudRepository implements AdminRepository
      *
      * @throws \Exception
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public function slugify(string $alias, ?string $default = null): string
     {

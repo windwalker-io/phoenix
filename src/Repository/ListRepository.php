@@ -145,7 +145,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @throws \Psr\Cache\InvalidArgumentException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public function getIterator(): \Generator
     {
