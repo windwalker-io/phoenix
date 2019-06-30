@@ -5,10 +5,10 @@
  * @license    __LICENSE__
  */
 
-($ => {
+(($) => {
   class PhoenixPlugin {
     static get is() {
-      throw new Error('Please add "is" property to Phoenix Plugin: ' + this.name);
+      throw new Error(`Please add "is" property to Phoenix Plugin: ${this.name}`);
     }
 
     static get proxies() {
@@ -16,7 +16,7 @@
     }
 
     static get defaultOptions() {
-      return {}
+      return {};
     }
 
     get options() {
@@ -24,7 +24,7 @@
     }
 
     static install(phoenix) {
-      const self = new this;
+      const self = new this();
 
       this.createProxies(phoenix, self);
       return self;
@@ -50,7 +50,7 @@
         true,
         {},
         this.constructor.defaultOptions,
-        this.phoenix.options[name]
+        this.phoenix.options[name],
       );
 
       // Created hook
@@ -84,9 +84,9 @@
 
       phoenix[plugin.constructor.is] = plugin;
 
-      const proxies = plugin.constructor.proxies;
+      const { proxies } = plugin.constructor;
 
-      for (let name in proxies) {
+      for (const name in proxies) {
         if (!proxies.hasOwnProperty(name)) {
           continue;
         }
@@ -107,9 +107,9 @@
           } else {
             Object.defineProperties(phoenix, name, {
               get: () => plugin[origin],
-              set: value => {
+              set: (value) => {
                 plugin[origin] = value;
-              }
+              },
             });
           }
         } else {
@@ -129,7 +129,7 @@
         return;
       }
 
-      for (let name in plugin.constructor.proxies) {
+      for (const name in plugin.constructor.proxies) {
         delete phoenix[name];
       }
 

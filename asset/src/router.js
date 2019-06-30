@@ -9,20 +9,20 @@
  * Phoenix.Router
  */
 (($) => {
-  "use strict";
+  'use strict';
 
   class PhoenixRouter extends PhoenixPlugin {
-    static get is() { return 'Router' }
+    static get is() { return 'Router'; }
 
     static get proxies() {
       return {
         addRoute: 'add',
-        route: 'route'
+        route: 'route',
       };
     }
 
     ready() {
-      $(window).on('popstate', (e) => this.phoenix.on('router.popstate', e));
+      $(window).on('popstate', e => this.phoenix.on('router.popstate', e));
     }
 
     /**
@@ -50,10 +50,10 @@
      * @returns {String|PhoenixRouter}
      */
     route(route, query = null) {
-      let url = this.phoenix.data('phoenix.routes')[route];
+      const url = this.phoenix.data('phoenix.routes')[route];
 
       if (url === undefined) {
-        throw new Error('Route: "' + route + '" not found');
+        throw new Error(`Route: "${route}" not found`);
       }
 
       return this.addQuery(url, query);
@@ -68,20 +68,21 @@
         return url;
       }
 
-      query = $.param(query);
+      const queryString = $.param(query);
 
-      return url + (/\?/.test(url) ? '&' + query : '?' + query);
+      return url + (/\?/.test(url) ? `&${queryString}` : `?${queryString}`);
     }
 
     push(data) {
       if (typeof data === 'string') {
-        data = {uri: data};
+        // eslint-disable-next-line no-param-reassign
+        data = { uri: data };
       }
 
       window.history.pushState(
         data.state || null,
         data.title || null,
-        data.uri || this.route(data.route, data.params)
+        data.uri || this.route(data.route, data.params),
       );
 
       return this;
@@ -89,13 +90,14 @@
 
     replace(data) {
       if (typeof data === 'string') {
-        data = {uri: data};
+        // eslint-disable-next-line no-param-reassign
+        data = { uri: data };
       }
 
       window.history.replaceState(
         data.state || null,
         data.title || null,
-        data.uri || this.route(data.route, data.params)
+        data.uri || this.route(data.route, data.params),
       );
 
       return this;
