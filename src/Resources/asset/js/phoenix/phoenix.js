@@ -572,8 +572,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "detach",
       value: function detach(plugin) {
-        if (!plugin instanceof PhoenixPlugin) {
-          throw new Error('Plugin must instance of : ' + PhoenixPlugin.name);
+        if (!(plugin instanceof PhoenixPlugin)) {
+          throw new Error("Plugin must instance of : ".concat(PhoenixPlugin.name));
         }
 
         plugin.uninstall(this);
@@ -647,18 +647,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       }
     }, {
       key: "plugin",
-      value: function plugin(name, _plugin) {
+      value: function plugin(name, PluginClass) {
         var self = this;
 
         $.fn[name] = function () {
-          if (!this.data('phoenix.' + name)) {
+          if (!this.data("phoenix.".concat(name))) {
             for (var _len5 = arguments.length, args = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
               args[_key5] = arguments[_key5];
             }
 
-            var _instance = _construct(_plugin, [this].concat(args));
+            var _instance = _construct(PluginClass, [this].concat(args));
 
-            this.data('phoenix.' + name, _instance);
+            this.data("phoenix.".concat(name), _instance);
             self.trigger('jquery.plugin.created', {
               name: name,
               ele: this,
@@ -666,7 +666,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             });
           }
 
-          var instance = this.data('phoenix.' + name);
+          var instance = this.data("phoenix.".concat(name));
           self.trigger('jquery.plugin.get', {
             name: name,
             ele: this,
@@ -725,7 +725,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "is",
       get: function get() {
-        throw new Error('Please add "is" property to Phoenix Plugin: ' + this.name);
+        throw new Error("Please add \"is\" property to Phoenix Plugin: ".concat(this.name));
       }
     }, {
       key: "proxies",
@@ -1653,7 +1653,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 (function ($) {
-  "use strict";
+  'use strict';
 
   var PhoenixRouter =
   /*#__PURE__*/
@@ -1708,7 +1708,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var url = this.phoenix.data('phoenix.routes')[_route];
 
         if (url === undefined) {
-          throw new Error('Route: "' + _route + '" not found');
+          throw new Error("Route: \"".concat(_route, "\" not found"));
         }
 
         return this.addQuery(url, query);
@@ -1727,13 +1727,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           return url;
         }
 
-        query = $.param(query);
-        return url + (/\?/.test(url) ? '&' + query : '?' + query);
+        var queryString = $.param(query);
+        return url + (/\?/.test(url) ? "&".concat(queryString) : "?".concat(queryString));
       }
     }, {
       key: "push",
       value: function push(data) {
         if (typeof data === 'string') {
+          // eslint-disable-next-line no-param-reassign
           data = {
             uri: data
           };
@@ -1746,6 +1747,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       key: "replace",
       value: function replace(data) {
         if (typeof data === 'string') {
+          // eslint-disable-next-line no-param-reassign
           data = {
             uri: data
           };
@@ -1803,7 +1805,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 (function ($) {
-  "use strict";
+  'use strict';
 
   var PhoenixAjax =
   /*#__PURE__*/
@@ -1936,7 +1938,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "sendDelete",
       value: function sendDelete(url, data, headers, options) {
-        return this['delete'](url, data, headers, options);
+        return this["delete"](url, data, headers, options);
       }
       /**
        * Send a DELETE request.
@@ -2022,36 +2024,41 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
         var headers = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
         var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+        var reqOptions = options;
+        var reqUrl = url;
+        var reqHeaders = headers;
 
-        if (_typeof(url) === 'object') {
-          options = url;
-          url = options.url;
+        if (_typeof(reqUrl) === 'object') {
+          reqOptions = reqUrl;
+          reqUrl = reqOptions.url;
         }
 
         var isFormData = data instanceof FormData;
 
         if (isFormData) {
-          options.processData = false;
-          options.contentType = false;
+          reqOptions.processData = false;
+          reqOptions.contentType = false;
         }
 
-        if (typeof options.dataType === 'undefined') {
-          options.dataType = 'json';
+        if (typeof reqOptions.dataType === 'undefined') {
+          reqOptions.dataType = 'json';
         }
 
-        options.data = typeof data === 'string' || isFormData ? data : $.extend(true, {}, this.data, options.data, data);
-        options.type = method.toUpperCase() || 'GET';
-        var type = options.type;
+        reqOptions.data = typeof data === 'string' || isFormData ? data : $.extend(true, {}, this.data, reqOptions.data, data);
+        reqOptions.type = method.toUpperCase() || 'GET';
+        var _reqOptions = reqOptions,
+            type = _reqOptions.type;
 
-        if (['POST', 'GET'].indexOf(options.type) === -1 && this.config.customMethod) {
-          headers['X-HTTP-Method-Override'] = options.type;
-          options.data._method = options.type;
-          options.type = 'POST';
+        if (['POST', 'GET'].indexOf(reqOptions.type) === -1 && this.config.customMethod) {
+          reqHeaders['X-HTTP-Method-Override'] = reqOptions.type;
+          reqOptions.data._method = reqOptions.type;
+          reqOptions.type = 'POST';
         }
 
-        options.headers = $.extend(true, {}, this.headers._global, this.headers[type], options.headers, headers);
-        return this.$.ajax(url, options).fail(function (xhr, error) {
+        reqOptions.headers = $.extend(true, {}, this.headers._global, this.headers[type], reqOptions.headers, reqHeaders);
+        return this.$.ajax(reqUrl, reqOptions).fail(function (xhr, error) {
           if (error === 'parsererror') {
+            // eslint-disable-next-line no-param-reassign
             xhr.statusText = 'Unable to parse data.';
           } else {
             xhr.statusText = decodeURIComponent(xhr.statusText);
@@ -2063,7 +2070,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
        *
        * This method will return a clone of this object to help us send request once.
        *
-       * @returns {Ajax}
+       * @returns {PhoenixAjax}
        */
 
     }, {
@@ -2093,7 +2100,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 (function () {
-  "use strict";
+  'use strict';
 
   var globalSerial = 1;
 
@@ -2165,11 +2172,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       value: function decrypt(key, data) {
         var _this16 = this;
 
-        data = this.base64Decode(data);
+        // eslint-disable-next-line no-param-reassign
+        data = this.base64Decode(data); // eslint-disable-next-line no-param-reassign
+
         data = data.split(',');
         return data.map(function (c, i) {
           return String.fromCharCode(c ^ _this16.keyCharAt(key, i));
-        }).join("");
+        }).join('');
       }
       /**
        * Key char at.
