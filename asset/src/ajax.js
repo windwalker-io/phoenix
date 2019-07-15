@@ -5,18 +5,18 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-(function($) {
-  "use strict";
+(function ($) {
+  'use strict';
 
   class PhoenixAjax extends PhoenixPlugin {
-    static get is() { return 'Ajax' }
+    static get is() { return 'Ajax'; }
 
     static get proxies() {
       return {};
     }
 
     static get defaultOptions() {
-      return {}
+      return {};
     }
 
     constructor() {
@@ -25,11 +25,11 @@
       this.$ = $;
 
       this.config = {
-        customMethod: false
+        customMethod: false,
       };
-      
+
       this.data = {};
-      
+
       this.headers = {
         GET: {},
         POST: {},
@@ -38,8 +38,8 @@
         DELETE: {},
         HEAD: {},
         OPTIONS: {},
-        _global: {}
-      }
+        _global: {},
+      };
     }
 
     ready() {
@@ -115,7 +115,7 @@
      * @returns {jqXHR}
      */
     sendDelete(url, data, headers, options) {
-      return this['delete'](url, data, headers, options);
+      return this.delete(url, data, headers, options);
     }
 
     /**
@@ -187,40 +187,52 @@
      * @returns {jqXHR}
      */
     request(method, url = '', data = {}, headers = {}, options = {}) {
-      if (typeof url === 'object') {
-        options = url;
-        url = options.url;
+      let reqOptions = options;
+      let reqUrl = url;
+      let reqHeaders = headers;
+
+      if (typeof reqUrl === 'object') {
+        reqOptions = reqUrl;
+        reqUrl = reqOptions.url;
       }
 
       const isFormData = data instanceof FormData;
 
       if (isFormData) {
-        options.processData = false;
-        options.contentType = false;
+        reqOptions.processData = false;
+        reqOptions.contentType = false;
       }
 
-      if (typeof options.dataType === 'undefined') {
-        options.dataType = 'json';
+      if (typeof reqOptions.dataType === 'undefined') {
+        reqOptions.dataType = 'json';
       }
 
-      options.data = typeof data === 'string' || isFormData
+      reqOptions.data = typeof data === 'string' || isFormData
         ? data
-        : $.extend(true, {}, this.data, options.data, data);
+        : $.extend(true, {}, this.data, reqOptions.data, data);
 
-      options.type = method.toUpperCase() || 'GET';
-      const type = options.type;
+      reqOptions.type = method.toUpperCase() || 'GET';
+      const { type } = reqOptions;
 
-      if (['POST', 'GET'].indexOf(options.type) === -1 && this.config.customMethod) {
-        headers['X-HTTP-Method-Override'] = options.type;
-        options.data._method = options.type;
-        options.type = 'POST';
+      if (['POST', 'GET'].indexOf(reqOptions.type) === -1 && this.config.customMethod) {
+        reqHeaders['X-HTTP-Method-Override'] = reqOptions.type;
+        reqOptions.data._method = reqOptions.type;
+        reqOptions.type = 'POST';
       }
 
-      options.headers = $.extend(true, {}, this.headers._global, this.headers[type], options.headers, headers);
+      reqOptions.headers = $.extend(
+        true,
+        {},
+        this.headers._global,
+        this.headers[type],
+        reqOptions.headers,
+        reqHeaders,
+      );
 
-      return this.$.ajax(url, options)
+      return this.$.ajax(reqUrl, reqOptions)
         .fail((xhr, error) => {
           if (error === 'parsererror') {
+            // eslint-disable-next-line no-param-reassign
             xhr.statusText = 'Unable to parse data.';
           } else {
             xhr.statusText = decodeURIComponent(xhr.statusText);
@@ -233,10 +245,10 @@
      *
      * This method will return a clone of this object to help us send request once.
      *
-     * @returns {Ajax}
+     * @returns {PhoenixAjax}
      */
     customMethod() {
-      var clone = $.extend(true, {}, this);
+      const clone = $.extend(true, {}, this);
 
       clone.config.customMethod = true;
 
@@ -245,5 +257,4 @@
   }
 
   window.PhoenixAjax = PhoenixAjax;
-
-})(jQuery);
+}(jQuery));

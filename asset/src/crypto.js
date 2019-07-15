@@ -8,13 +8,13 @@
 /**
  * PhoenixCrypto
  */
-(function() {
-  "use strict";
+(function () {
+  'use strict';
 
   let globalSerial = 1;
 
   class PhoenixCrypto extends PhoenixPlugin {
-    static get is() { return 'Crypto' }
+    static get is() { return 'Crypto'; }
 
     static get proxies() {
       return {
@@ -24,12 +24,12 @@
         decrypt: 'decrypt',
         uuid4: 'uuid4',
         md5: 'md5',
-        uniqid: 'uniqid'
+        uniqid: 'uniqid',
       };
     }
 
     static get defaultOptions() {
-      return {}
+      return {};
     }
 
     /**
@@ -75,11 +75,13 @@
      * @returns {string}
      */
     decrypt(key, data) {
+      // eslint-disable-next-line no-param-reassign
       data = this.base64Decode(data);
 
+      // eslint-disable-next-line no-param-reassign
       data = data.split(',');
 
-      return data.map((c, i) => String.fromCharCode(c ^ this.keyCharAt(key, i))).join("");
+      return data.map((c, i) => String.fromCharCode(c ^ this.keyCharAt(key, i))).join('');
     }
 
     /**
@@ -103,8 +105,8 @@
      */
     uuid4() {
       return (function b(a) {
-        return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b)
-      })();
+        return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
+      }());
     }
 
     /**
@@ -116,29 +118,29 @@
      * @param {boolean} moreEntropy
      * @returns {*}
      */
-    uniqid (prefix = '', moreEntropy = false) {
+    uniqid(prefix = '', moreEntropy = false) {
       let retId;
       const _formatSeed = function (seed, reqWidth) {
         seed = parseInt(seed, 10).toString(16); // to hex str
         if (reqWidth < seed.length) {
           // so long we split
-          return seed.slice(seed.length - reqWidth)
+          return seed.slice(seed.length - reqWidth);
         }
         if (reqWidth > seed.length) {
           // so short we pad
-          return Array(1 + (reqWidth - seed.length)).join('0') + seed
+          return Array(1 + (reqWidth - seed.length)).join('0') + seed;
         }
-        return seed
+        return seed;
       };
 
       const $global = (typeof window !== 'undefined' ? window : global);
       $global.$locutus = $global.$locutus || {};
-      const $locutus = $global.$locutus;
+      const { $locutus } = $global;
       $locutus.php = $locutus.php || {};
 
       if (!$locutus.php.uniqidSeed) {
         // init seed with big random int
-        $locutus.php.uniqidSeed = Math.floor(Math.random() * 0x75bcd15)
+        $locutus.php.uniqidSeed = Math.floor(Math.random() * 0x75bcd15);
       }
 
       $locutus.php.uniqidSeed++;
@@ -151,7 +153,7 @@
 
       if (moreEntropy) {
         // for more entropy we add a float lower to 10
-        retId += (Math.random() * 10).toFixed(8).toString()
+        retId += (Math.random() * 10).toFixed(8).toString();
       }
 
       return retId;
@@ -167,45 +169,45 @@
    *
    * @link  https://github.com/blueimp/JavaScript-MD5
    */
-  (function(Crypto) {
+  (function (Crypto) {
     /*
      * Add integers, wrapping at 2^32. This uses 16-bit operations internally
      * to work around bugs in some JS interpreters.
      */
     function safe_add(x, y) {
-      var lsw = (x & 0xFFFF) + (y & 0xFFFF)
-      var msw = (x >> 16) + (y >> 16) + (lsw >> 16)
-      return (msw << 16) | (lsw & 0xFFFF)
+      const lsw = (x & 0xFFFF) + (y & 0xFFFF);
+      const msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+      return (msw << 16) | (lsw & 0xFFFF);
     }
 
     /*
      * Bitwise rotate a 32-bit number to the left.
      */
     function bit_rol(num, cnt) {
-      return (num << cnt) | (num >>> (32 - cnt))
+      return (num << cnt) | (num >>> (32 - cnt));
     }
 
     /*
      * These functions implement the four basic operations the algorithm uses.
      */
     function md5_cmn(q, a, b, x, s, t) {
-      return safe_add(bit_rol(safe_add(safe_add(a, q), safe_add(x, t)), s), b)
+      return safe_add(bit_rol(safe_add(safe_add(a, q), safe_add(x, t)), s), b);
     }
 
     function md5_ff(a, b, c, d, x, s, t) {
-      return md5_cmn((b & c) | ((~b) & d), a, b, x, s, t)
+      return md5_cmn((b & c) | ((~b) & d), a, b, x, s, t);
     }
 
     function md5_gg(a, b, c, d, x, s, t) {
-      return md5_cmn((b & d) | (c & (~d)), a, b, x, s, t)
+      return md5_cmn((b & d) | (c & (~d)), a, b, x, s, t);
     }
 
     function md5_hh(a, b, c, d, x, s, t) {
-      return md5_cmn(b ^ c ^ d, a, b, x, s, t)
+      return md5_cmn(b ^ c ^ d, a, b, x, s, t);
     }
 
     function md5_ii(a, b, c, d, x, s, t) {
-      return md5_cmn(c ^ (b | (~d)), a, b, x, s, t)
+      return md5_cmn(c ^ (b | (~d)), a, b, x, s, t);
     }
 
     /*
@@ -216,15 +218,15 @@
       x[len >> 5] |= 0x80 << (len % 32);
       x[(((len + 64) >>> 9) << 4) + 14] = len;
 
-      var i;
-      var olda;
-      var oldb;
-      var oldc;
-      var oldd;
-      var a = 1732584193;
-      var b = -271733879;
-      var c = -1732584194;
-      var d = 271733878;
+      let i;
+      let olda;
+      let oldb;
+      let oldc;
+      let oldd;
+      let a = 1732584193;
+      let b = -271733879;
+      let c = -1732584194;
+      let d = 271733878;
 
       for (i = 0; i < x.length; i += 16) {
         olda = a;
@@ -305,19 +307,19 @@
         c = safe_add(c, oldc);
         d = safe_add(d, oldd);
       }
-      return [a, b, c, d]
+      return [a, b, c, d];
     }
 
     /*
      * Convert an array of little-endian words to a string
      */
     function binl2rstr(input) {
-      var i;
-      var output = '';
+      let i;
+      let output = '';
       for (i = 0; i < input.length * 32; i += 8) {
-        output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xFF)
+        output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xFF);
       }
-      return output
+      return output;
     }
 
     /*
@@ -325,111 +327,109 @@
      * Characters >255 have their high-byte silently ignored.
      */
     function rstr2binl(input) {
-      var i;
-      var output = [];
+      let i;
+      const output = [];
       output[(input.length >> 2) - 1] = undefined;
       for (i = 0; i < output.length; i += 1) {
-        output[i] = 0
+        output[i] = 0;
       }
       for (i = 0; i < input.length * 8; i += 8) {
-        output[i >> 5] |= (input.charCodeAt(i / 8) & 0xFF) << (i % 32)
+        output[i >> 5] |= (input.charCodeAt(i / 8) & 0xFF) << (i % 32);
       }
-      return output
+      return output;
     }
 
     /*
      * Calculate the MD5 of a raw string
      */
     function rstr_md5(s) {
-      return binl2rstr(binl_md5(rstr2binl(s), s.length * 8))
+      return binl2rstr(binl_md5(rstr2binl(s), s.length * 8));
     }
 
     /*
      * Calculate the HMAC-MD5, of a key and some data (raw strings)
      */
     function rstr_hmac_md5(key, data) {
-      var i;
-      var bkey = rstr2binl(key);
-      var ipad = [];
-      var opad = [];
-      var hash;
+      let i;
+      let bkey = rstr2binl(key);
+      const ipad = [];
+      const opad = [];
+      let hash;
       ipad[15] = opad[15] = undefined;
       if (bkey.length > 16) {
-        bkey = binl_md5(bkey, key.length * 8)
+        bkey = binl_md5(bkey, key.length * 8);
       }
       for (i = 0; i < 16; i += 1) {
         ipad[i] = bkey[i] ^ 0x36363636;
         opad[i] = bkey[i] ^ 0x5C5C5C5C;
       }
       hash = binl_md5(ipad.concat(rstr2binl(data)), 512 + data.length * 8);
-      return binl2rstr(binl_md5(opad.concat(hash), 512 + 128))
+      return binl2rstr(binl_md5(opad.concat(hash), 512 + 128));
     }
 
     /*
      * Convert a raw string to a hex string
      */
     function rstr2hex(input) {
-      var hex_tab = '0123456789abcdef';
-      var output = '';
-      var x;
-      var i;
+      const hex_tab = '0123456789abcdef';
+      let output = '';
+      let x;
+      let i;
       for (i = 0; i < input.length; i += 1) {
         x = input.charCodeAt(i);
-        output += hex_tab.charAt((x >>> 4) & 0x0F) +
-          hex_tab.charAt(x & 0x0F)
+        output += hex_tab.charAt((x >>> 4) & 0x0F)
+          + hex_tab.charAt(x & 0x0F);
       }
-      return output
+      return output;
     }
 
     /*
      * Encode a string as utf-8
      */
     function str2rstr_utf8(input) {
-      return decodeURIComponent(encodeURIComponent(input))
+      return decodeURIComponent(encodeURIComponent(input));
     }
 
     /*
      * Take string arguments and return either raw or hex encoded strings
      */
     function raw_md5(s) {
-      return rstr_md5(str2rstr_utf8(s))
+      return rstr_md5(str2rstr_utf8(s));
     }
 
     function hex_md5(s) {
-      return rstr2hex(raw_md5(s))
+      return rstr2hex(raw_md5(s));
     }
 
     function raw_hmac_md5(k, d) {
-      return rstr_hmac_md5(str2rstr_utf8(k), str2rstr_utf8(d))
+      return rstr_hmac_md5(str2rstr_utf8(k), str2rstr_utf8(d));
     }
 
     function hex_hmac_md5(k, d) {
-      return rstr2hex(raw_hmac_md5(k, d))
+      return rstr2hex(raw_hmac_md5(k, d));
     }
 
     function md5(string, key, raw) {
       if (!key) {
         if (!raw) {
-          return hex_md5(string)
+          return hex_md5(string);
         }
-        return raw_md5(string)
+        return raw_md5(string);
       }
       if (!raw) {
-        return hex_hmac_md5(key, string)
+        return hex_hmac_md5(key, string);
       }
-      return raw_hmac_md5(key, string)
+      return raw_hmac_md5(key, string);
     }
 
     if (typeof define === 'function' && define.amd) {
-      define(function() {
-        return md5
-      })
+      define(() => md5);
     } else if (typeof module === 'object' && module.exports) {
-      module.exports = md5
+      module.exports = md5;
     }
 
     PhoenixCrypto.prototype.md5 = md5;
-  })(PhoenixCrypto);
+  }(PhoenixCrypto));
 
   window.PhoenixCrypto = PhoenixCrypto;
-})();
+}());

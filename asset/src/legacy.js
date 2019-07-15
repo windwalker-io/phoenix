@@ -15,14 +15,14 @@
     }
 
     created() {
-      const phoenix = this.phoenix;
+      const { phoenix } = this;
 
       phoenix.Theme = phoenix.UI;
 
       // Uri
       phoenix.Uri = phoenix.data('phoenix.uri');
 
-      phoenix.on('jquery.plugin.created', event => {
+      phoenix.on('jquery.plugin.created', (event) => {
         const debug = this.phoenix.data('windwalker.debug');
 
         // Legacy Form polyfill
@@ -31,7 +31,7 @@
             phoenix[method] = (...args) => {
               debug ? this.constructor.warn('Phoenix', method) : null;
               return event.instance[method](...args);
-            }
+            };
           });
 
           formInited = true;
@@ -45,7 +45,7 @@
               phoenix.Grid[method] = (...args) => {
                 debug ? this.constructor.warn('Phoenix.Grid', method) : null;
                 return event.instance[method](...args);
-              }
+              };
             });
 
           gridInited = true;
