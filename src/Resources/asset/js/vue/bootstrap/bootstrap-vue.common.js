@@ -1,5 +1,5 @@
 /*!
- * BoostrapVue 2.0.0-rc.24
+ * BoostrapVue 2.0.0-rc.26
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -70,20 +70,34 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-function _objectSpread(target) {
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    keys.push.apply(keys, Object.getOwnPropertySymbols(object));
+  }
+
+  if (enumerableOnly) keys = keys.filter(function (sym) {
+    return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+  });
+  return keys;
+}
+
+function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
 
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
+    if (i % 2) {
+      ownKeys(source, true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(source).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
     }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    });
   }
 
   return target;
@@ -308,649 +322,9 @@ var warnNoMutationObserverSupport = function warnNoMutationObserverSupport(sourc
   }
 }; // Default export
 
-// 7.1.4 ToInteger
-var ceil = Math.ceil;
-var floor = Math.floor;
-var _toInteger = function (it) {
-  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-};
-
-// 7.2.1 RequireObjectCoercible(argument)
-var _defined = function (it) {
-  if (it == undefined) throw TypeError("Can't call method on  " + it);
-  return it;
-};
-
-// true  -> String#at
-// false -> String#codePointAt
-var _stringAt = function (TO_STRING) {
-  return function (that, pos) {
-    var s = String(_defined(that));
-    var i = _toInteger(pos);
-    var l = s.length;
-    var a, b;
-    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
-    a = s.charCodeAt(i);
-    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
-      ? TO_STRING ? s.charAt(i) : a
-      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-  };
-};
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
-var _global = createCommonjsModule(function (module) {
-// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-var global = module.exports = typeof window != 'undefined' && window.Math == Math
-  ? window : typeof self != 'undefined' && self.Math == Math ? self
-  // eslint-disable-next-line no-new-func
-  : Function('return this')();
-if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
-});
-
-var _core = createCommonjsModule(function (module) {
-var core = module.exports = { version: '2.6.5' };
-if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-});
-var _core_1 = _core.version;
-
-var _aFunction = function (it) {
-  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
-  return it;
-};
-
-// optional / simple context binding
-
-var _ctx = function (fn, that, length) {
-  _aFunction(fn);
-  if (that === undefined) return fn;
-  switch (length) {
-    case 1: return function (a) {
-      return fn.call(that, a);
-    };
-    case 2: return function (a, b) {
-      return fn.call(that, a, b);
-    };
-    case 3: return function (a, b, c) {
-      return fn.call(that, a, b, c);
-    };
-  }
-  return function (/* ...args */) {
-    return fn.apply(that, arguments);
-  };
-};
-
-var _isObject = function (it) {
-  return typeof it === 'object' ? it !== null : typeof it === 'function';
-};
-
-var _anObject = function (it) {
-  if (!_isObject(it)) throw TypeError(it + ' is not an object!');
-  return it;
-};
-
-var _fails = function (exec) {
-  try {
-    return !!exec();
-  } catch (e) {
-    return true;
-  }
-};
-
-// Thank's IE8 for his funny defineProperty
-var _descriptors = !_fails(function () {
-  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
-});
-
-var document$1 = _global.document;
-// typeof document.createElement is 'object' in old IE
-var is = _isObject(document$1) && _isObject(document$1.createElement);
-var _domCreate = function (it) {
-  return is ? document$1.createElement(it) : {};
-};
-
-var _ie8DomDefine = !_descriptors && !_fails(function () {
-  return Object.defineProperty(_domCreate('div'), 'a', { get: function () { return 7; } }).a != 7;
-});
-
-// 7.1.1 ToPrimitive(input [, PreferredType])
-
-// instead of the ES6 spec version, we didn't implement @@toPrimitive case
-// and the second argument - flag - preferred type is a string
-var _toPrimitive = function (it, S) {
-  if (!_isObject(it)) return it;
-  var fn, val;
-  if (S && typeof (fn = it.toString) == 'function' && !_isObject(val = fn.call(it))) return val;
-  if (typeof (fn = it.valueOf) == 'function' && !_isObject(val = fn.call(it))) return val;
-  if (!S && typeof (fn = it.toString) == 'function' && !_isObject(val = fn.call(it))) return val;
-  throw TypeError("Can't convert object to primitive value");
-};
-
-var dP = Object.defineProperty;
-
-var f = _descriptors ? Object.defineProperty : function defineProperty(O, P, Attributes) {
-  _anObject(O);
-  P = _toPrimitive(P, true);
-  _anObject(Attributes);
-  if (_ie8DomDefine) try {
-    return dP(O, P, Attributes);
-  } catch (e) { /* empty */ }
-  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
-  if ('value' in Attributes) O[P] = Attributes.value;
-  return O;
-};
-
-var _objectDp = {
-	f: f
-};
-
-var _propertyDesc = function (bitmap, value) {
-  return {
-    enumerable: !(bitmap & 1),
-    configurable: !(bitmap & 2),
-    writable: !(bitmap & 4),
-    value: value
-  };
-};
-
-var _hide = _descriptors ? function (object, key, value) {
-  return _objectDp.f(object, key, _propertyDesc(1, value));
-} : function (object, key, value) {
-  object[key] = value;
-  return object;
-};
-
-var hasOwnProperty = {}.hasOwnProperty;
-var _has = function (it, key) {
-  return hasOwnProperty.call(it, key);
-};
-
-var PROTOTYPE = 'prototype';
-
-var $export = function (type, name, source) {
-  var IS_FORCED = type & $export.F;
-  var IS_GLOBAL = type & $export.G;
-  var IS_STATIC = type & $export.S;
-  var IS_PROTO = type & $export.P;
-  var IS_BIND = type & $export.B;
-  var IS_WRAP = type & $export.W;
-  var exports = IS_GLOBAL ? _core : _core[name] || (_core[name] = {});
-  var expProto = exports[PROTOTYPE];
-  var target = IS_GLOBAL ? _global : IS_STATIC ? _global[name] : (_global[name] || {})[PROTOTYPE];
-  var key, own, out;
-  if (IS_GLOBAL) source = name;
-  for (key in source) {
-    // contains in native
-    own = !IS_FORCED && target && target[key] !== undefined;
-    if (own && _has(exports, key)) continue;
-    // export native or passed
-    out = own ? target[key] : source[key];
-    // prevent global pollution for namespaces
-    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
-    // bind timers to global for call from export context
-    : IS_BIND && own ? _ctx(out, _global)
-    // wrap global constructors for prevent change them in library
-    : IS_WRAP && target[key] == out ? (function (C) {
-      var F = function (a, b, c) {
-        if (this instanceof C) {
-          switch (arguments.length) {
-            case 0: return new C();
-            case 1: return new C(a);
-            case 2: return new C(a, b);
-          } return new C(a, b, c);
-        } return C.apply(this, arguments);
-      };
-      F[PROTOTYPE] = C[PROTOTYPE];
-      return F;
-    // make static versions for prototype methods
-    })(out) : IS_PROTO && typeof out == 'function' ? _ctx(Function.call, out) : out;
-    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
-    if (IS_PROTO) {
-      (exports.virtual || (exports.virtual = {}))[key] = out;
-      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
-      if (type & $export.R && expProto && !expProto[key]) _hide(expProto, key, out);
-    }
-  }
-};
-// type bitmap
-$export.F = 1;   // forced
-$export.G = 2;   // global
-$export.S = 4;   // static
-$export.P = 8;   // proto
-$export.B = 16;  // bind
-$export.W = 32;  // wrap
-$export.U = 64;  // safe
-$export.R = 128; // real proto method for `library`
-var _export = $export;
-
-var _redefine = _hide;
-
-var _iterators = {};
-
-var toString = {}.toString;
-
-var _cof = function (it) {
-  return toString.call(it).slice(8, -1);
-};
-
-// fallback for non-array-like ES3 and non-enumerable old V8 strings
-
-// eslint-disable-next-line no-prototype-builtins
-var _iobject = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
-  return _cof(it) == 'String' ? it.split('') : Object(it);
-};
-
-// to indexed object, toObject with fallback for non-array-like ES3 strings
-
-
-var _toIobject = function (it) {
-  return _iobject(_defined(it));
-};
-
-// 7.1.15 ToLength
-
-var min = Math.min;
-var _toLength = function (it) {
-  return it > 0 ? min(_toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
-};
-
-var max = Math.max;
-var min$1 = Math.min;
-var _toAbsoluteIndex = function (index, length) {
-  index = _toInteger(index);
-  return index < 0 ? max(index + length, 0) : min$1(index, length);
-};
-
-// false -> Array#indexOf
-// true  -> Array#includes
-
-
-
-var _arrayIncludes = function (IS_INCLUDES) {
-  return function ($this, el, fromIndex) {
-    var O = _toIobject($this);
-    var length = _toLength(O.length);
-    var index = _toAbsoluteIndex(fromIndex, length);
-    var value;
-    // Array#includes uses SameValueZero equality algorithm
-    // eslint-disable-next-line no-self-compare
-    if (IS_INCLUDES && el != el) while (length > index) {
-      value = O[index++];
-      // eslint-disable-next-line no-self-compare
-      if (value != value) return true;
-    // Array#indexOf ignores holes, Array#includes - not
-    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {
-      if (O[index] === el) return IS_INCLUDES || index || 0;
-    } return !IS_INCLUDES && -1;
-  };
-};
-
-var _shared = createCommonjsModule(function (module) {
-var SHARED = '__core-js_shared__';
-var store = _global[SHARED] || (_global[SHARED] = {});
-
-(module.exports = function (key, value) {
-  return store[key] || (store[key] = value !== undefined ? value : {});
-})('versions', []).push({
-  version: _core.version,
-  mode: 'pure',
-  copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
-});
-});
-
-var id = 0;
-var px = Math.random();
-var _uid = function (key) {
-  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-};
-
-var shared = _shared('keys');
-
-var _sharedKey = function (key) {
-  return shared[key] || (shared[key] = _uid(key));
-};
-
-var arrayIndexOf = _arrayIncludes(false);
-var IE_PROTO = _sharedKey('IE_PROTO');
-
-var _objectKeysInternal = function (object, names) {
-  var O = _toIobject(object);
-  var i = 0;
-  var result = [];
-  var key;
-  for (key in O) if (key != IE_PROTO) _has(O, key) && result.push(key);
-  // Don't enum bug & hidden keys
-  while (names.length > i) if (_has(O, key = names[i++])) {
-    ~arrayIndexOf(result, key) || result.push(key);
-  }
-  return result;
-};
-
-// IE 8- don't enum bug keys
-var _enumBugKeys = (
-  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
-).split(',');
-
-// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-
-
-
-var _objectKeys = Object.keys || function keys(O) {
-  return _objectKeysInternal(O, _enumBugKeys);
-};
-
-var _objectDps = _descriptors ? Object.defineProperties : function defineProperties(O, Properties) {
-  _anObject(O);
-  var keys = _objectKeys(Properties);
-  var length = keys.length;
-  var i = 0;
-  var P;
-  while (length > i) _objectDp.f(O, P = keys[i++], Properties[P]);
-  return O;
-};
-
-var document$2 = _global.document;
-var _html = document$2 && document$2.documentElement;
-
-// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-
-
-
-var IE_PROTO$1 = _sharedKey('IE_PROTO');
-var Empty = function () { /* empty */ };
-var PROTOTYPE$1 = 'prototype';
-
-// Create object with fake `null` prototype: use iframe Object with cleared prototype
-var createDict = function () {
-  // Thrash, waste and sodomy: IE GC bug
-  var iframe = _domCreate('iframe');
-  var i = _enumBugKeys.length;
-  var lt = '<';
-  var gt = '>';
-  var iframeDocument;
-  iframe.style.display = 'none';
-  _html.appendChild(iframe);
-  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
-  // createDict = iframe.contentWindow.Object;
-  // html.removeChild(iframe);
-  iframeDocument = iframe.contentWindow.document;
-  iframeDocument.open();
-  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
-  iframeDocument.close();
-  createDict = iframeDocument.F;
-  while (i--) delete createDict[PROTOTYPE$1][_enumBugKeys[i]];
-  return createDict();
-};
-
-var _objectCreate = Object.create || function create(O, Properties) {
-  var result;
-  if (O !== null) {
-    Empty[PROTOTYPE$1] = _anObject(O);
-    result = new Empty();
-    Empty[PROTOTYPE$1] = null;
-    // add "__proto__" for Object.getPrototypeOf polyfill
-    result[IE_PROTO$1] = O;
-  } else result = createDict();
-  return Properties === undefined ? result : _objectDps(result, Properties);
-};
-
-var _wks = createCommonjsModule(function (module) {
-var store = _shared('wks');
-
-var Symbol = _global.Symbol;
-var USE_SYMBOL = typeof Symbol == 'function';
-
-var $exports = module.exports = function (name) {
-  return store[name] || (store[name] =
-    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : _uid)('Symbol.' + name));
-};
-
-$exports.store = store;
-});
-
-var def = _objectDp.f;
-
-var TAG = _wks('toStringTag');
-
-var _setToStringTag = function (it, tag, stat) {
-  if (it && !_has(it = stat ? it : it.prototype, TAG)) def(it, TAG, { configurable: true, value: tag });
-};
-
-var IteratorPrototype = {};
-
-// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-_hide(IteratorPrototype, _wks('iterator'), function () { return this; });
-
-var _iterCreate = function (Constructor, NAME, next) {
-  Constructor.prototype = _objectCreate(IteratorPrototype, { next: _propertyDesc(1, next) });
-  _setToStringTag(Constructor, NAME + ' Iterator');
-};
-
-// 7.1.13 ToObject(argument)
-
-var _toObject = function (it) {
-  return Object(_defined(it));
-};
-
-// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
-
-
-var IE_PROTO$2 = _sharedKey('IE_PROTO');
-var ObjectProto = Object.prototype;
-
-var _objectGpo = Object.getPrototypeOf || function (O) {
-  O = _toObject(O);
-  if (_has(O, IE_PROTO$2)) return O[IE_PROTO$2];
-  if (typeof O.constructor == 'function' && O instanceof O.constructor) {
-    return O.constructor.prototype;
-  } return O instanceof Object ? ObjectProto : null;
-};
-
-var ITERATOR = _wks('iterator');
-var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
-var FF_ITERATOR = '@@iterator';
-var KEYS = 'keys';
-var VALUES = 'values';
-
-var returnThis = function () { return this; };
-
-var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
-  _iterCreate(Constructor, NAME, next);
-  var getMethod = function (kind) {
-    if (!BUGGY && kind in proto) return proto[kind];
-    switch (kind) {
-      case KEYS: return function keys() { return new Constructor(this, kind); };
-      case VALUES: return function values() { return new Constructor(this, kind); };
-    } return function entries() { return new Constructor(this, kind); };
-  };
-  var TAG = NAME + ' Iterator';
-  var DEF_VALUES = DEFAULT == VALUES;
-  var VALUES_BUG = false;
-  var proto = Base.prototype;
-  var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
-  var $default = $native || getMethod(DEFAULT);
-  var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
-  var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
-  var methods, key, IteratorPrototype;
-  // Fix native
-  if ($anyNative) {
-    IteratorPrototype = _objectGpo($anyNative.call(new Base()));
-    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
-      // Set @@toStringTag to native iterators
-      _setToStringTag(IteratorPrototype, TAG, true);
-    }
-  }
-  // fix Array#{values, @@iterator}.name in V8 / FF
-  if (DEF_VALUES && $native && $native.name !== VALUES) {
-    VALUES_BUG = true;
-    $default = function values() { return $native.call(this); };
-  }
-  // Define iterator
-  if ((FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
-    _hide(proto, ITERATOR, $default);
-  }
-  // Plug for library
-  _iterators[NAME] = $default;
-  _iterators[TAG] = returnThis;
-  if (DEFAULT) {
-    methods = {
-      values: DEF_VALUES ? $default : getMethod(VALUES),
-      keys: IS_SET ? $default : getMethod(KEYS),
-      entries: $entries
-    };
-    if (FORCED) for (key in methods) {
-      if (!(key in proto)) _redefine(proto, key, methods[key]);
-    } else _export(_export.P + _export.F * (BUGGY || VALUES_BUG), NAME, methods);
-  }
-  return methods;
-};
-
-var $at = _stringAt(true);
-
-// 21.1.3.27 String.prototype[@@iterator]()
-_iterDefine(String, 'String', function (iterated) {
-  this._t = String(iterated); // target
-  this._i = 0;                // next index
-// 21.1.5.2.1 %StringIteratorPrototype%.next()
-}, function () {
-  var O = this._t;
-  var index = this._i;
-  var point;
-  if (index >= O.length) return { value: undefined, done: true };
-  point = $at(O, index);
-  this._i += point.length;
-  return { value: point, done: false };
-});
-
-// call something on iterator step with safe closing on error
-
-var _iterCall = function (iterator, fn, value, entries) {
-  try {
-    return entries ? fn(_anObject(value)[0], value[1]) : fn(value);
-  // 7.4.6 IteratorClose(iterator, completion)
-  } catch (e) {
-    var ret = iterator['return'];
-    if (ret !== undefined) _anObject(ret.call(iterator));
-    throw e;
-  }
-};
-
-// check on default Array iterator
-
-var ITERATOR$1 = _wks('iterator');
-var ArrayProto = Array.prototype;
-
-var _isArrayIter = function (it) {
-  return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR$1] === it);
-};
-
-var _createProperty = function (object, index, value) {
-  if (index in object) _objectDp.f(object, index, _propertyDesc(0, value));
-  else object[index] = value;
-};
-
-// getting tag from 19.1.3.6 Object.prototype.toString()
-
-var TAG$1 = _wks('toStringTag');
-// ES3 wrong here
-var ARG = _cof(function () { return arguments; }()) == 'Arguments';
-
-// fallback for IE11 Script Access Denied error
-var tryGet = function (it, key) {
-  try {
-    return it[key];
-  } catch (e) { /* empty */ }
-};
-
-var _classof = function (it) {
-  var O, T, B;
-  return it === undefined ? 'Undefined' : it === null ? 'Null'
-    // @@toStringTag case
-    : typeof (T = tryGet(O = Object(it), TAG$1)) == 'string' ? T
-    // builtinTag case
-    : ARG ? _cof(O)
-    // ES3 arguments fallback
-    : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-};
-
-var ITERATOR$2 = _wks('iterator');
-
-var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
-  if (it != undefined) return it[ITERATOR$2]
-    || it['@@iterator']
-    || _iterators[_classof(it)];
-};
-
-var ITERATOR$3 = _wks('iterator');
-var SAFE_CLOSING = false;
-
-try {
-  var riter = [7][ITERATOR$3]();
-  riter['return'] = function () { SAFE_CLOSING = true; };
-  // eslint-disable-next-line no-throw-literal
-  Array.from(riter, function () { throw 2; });
-} catch (e) { /* empty */ }
-
-var _iterDetect = function (exec, skipClosing) {
-  if (!skipClosing && !SAFE_CLOSING) return false;
-  var safe = false;
-  try {
-    var arr = [7];
-    var iter = arr[ITERATOR$3]();
-    iter.next = function () { return { done: safe = true }; };
-    arr[ITERATOR$3] = function () { return iter; };
-    exec(arr);
-  } catch (e) { /* empty */ }
-  return safe;
-};
-
-_export(_export.S + _export.F * !_iterDetect(function (iter) { Array.from(iter); }), 'Array', {
-  // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
-  from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
-    var O = _toObject(arrayLike);
-    var C = typeof this == 'function' ? this : Array;
-    var aLen = arguments.length;
-    var mapfn = aLen > 1 ? arguments[1] : undefined;
-    var mapping = mapfn !== undefined;
-    var index = 0;
-    var iterFn = core_getIteratorMethod(O);
-    var length, result, step, iterator;
-    if (mapping) mapfn = _ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
-    // if object isn't iterable or it's array with default iterator - use simple case
-    if (iterFn != undefined && !(C == Array && _isArrayIter(iterFn))) {
-      for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
-        _createProperty(result, index, mapping ? _iterCall(iterator, mapfn, [step.value, index], true) : step.value);
-      }
-    } else {
-      length = _toLength(O.length);
-      for (result = new C(length); length > index; index++) {
-        _createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
-      }
-    }
-    result.length = index;
-    return result;
-  }
-});
-
-var from_1 = _core.Array.from;
-
-// 7.2.2 IsArray(argument)
-
-var _isArray = Array.isArray || function isArray(arg) {
-  return _cof(arg) == 'Array';
-};
-
-// 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-
-
-_export(_export.S, 'Array', { isArray: _isArray });
-
-var isArray = _core.Array.isArray;
-
-var from = Array.from || from_1;
-var isArray$1 = Array.isArray || isArray; // --- Instance ---
+// --- Static ---
+var from = Array.from;
+var isArray = Array.isArray; // --- Instance ---
 
 var arrayIncludes = function arrayIncludes(array, value) {
   return array.indexOf(value) !== -1;
@@ -963,72 +337,7 @@ var concat = function concat() {
   return Array.prototype.concat.apply([], args);
 };
 
-var f$1 = Object.getOwnPropertySymbols;
-
-var _objectGops = {
-	f: f$1
-};
-
-var f$2 = {}.propertyIsEnumerable;
-
-var _objectPie = {
-	f: f$2
-};
-
-// 19.1.2.1 Object.assign(target, source, ...)
-
-
-
-
-
-var $assign = Object.assign;
-
-// should work with symbols and should have deterministic property order (V8 bug)
-var _objectAssign = !$assign || _fails(function () {
-  var A = {};
-  var B = {};
-  // eslint-disable-next-line no-undef
-  var S = Symbol();
-  var K = 'abcdefghijklmnopqrst';
-  A[S] = 7;
-  K.split('').forEach(function (k) { B[k] = k; });
-  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
-}) ? function assign(target, source) { // eslint-disable-line no-unused-vars
-  var T = _toObject(target);
-  var aLen = arguments.length;
-  var index = 1;
-  var getSymbols = _objectGops.f;
-  var isEnum = _objectPie.f;
-  while (aLen > index) {
-    var S = _iobject(arguments[index++]);
-    var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
-    var length = keys.length;
-    var j = 0;
-    var key;
-    while (length > j) if (isEnum.call(S, key = keys[j++])) T[key] = S[key];
-  } return T;
-} : $assign;
-
-// 19.1.3.1 Object.assign(target, source)
-
-
-_export(_export.S + _export.F, 'Object', { assign: _objectAssign });
-
-var assign = _core.Object.assign;
-
-// 7.2.9 SameValue(x, y)
-var _sameValue = Object.is || function is(x, y) {
-  // eslint-disable-next-line no-self-compare
-  return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
-};
-
-// 19.1.3.10 Object.is(value1, value2)
-
-_export(_export.S, 'Object', { is: _sameValue });
-
-var is$1 = _core.Object.is;
-
-var assign$1 = Object.assign || assign;
+var assign = Object.assign;
 var getOwnPropertyNames = Object.getOwnPropertyNames;
 var keys = Object.keys;
 var defineProperties = Object.defineProperties;
@@ -1036,7 +345,7 @@ var defineProperty = Object.defineProperty;
 var freeze = Object.freeze;
 var create = Object.create;
 
-var hasOwnProperty$1 = function hasOwnProperty(obj, prop) {
+var hasOwnProperty = function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }; // --- Utilities ---
 
@@ -1063,7 +372,7 @@ var omit = function omit(obj, props) {
   return keys(obj).filter(function (key) {
     return props.indexOf(key) === -1;
   }).reduce(function (result, key) {
-    return _objectSpread({}, result, _defineProperty({}, key, obj[key]));
+    return _objectSpread2({}, result, _defineProperty({}, key, obj[key]));
   }, {});
 };
 var readonlyDescriptor = function readonlyDescriptor() {
@@ -1089,7 +398,7 @@ var deepFreeze = function deepFreeze(obj) {
   props.forEach(function (prop) {
     var value = obj[prop]; // If value is a plain object or array, we deepFreeze it
 
-    obj[prop] = value && (isPlainObject(value) || isArray$1(value)) ? deepFreeze(value) : value;
+    obj[prop] = value && (isPlainObject(value) || isArray(value)) ? deepFreeze(value) : value;
   });
   return freeze(obj);
 };
@@ -1128,7 +437,7 @@ var isRegExp = function isRegExp(val) {
 var cloneDeep = function cloneDeep(obj) {
   var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : obj;
 
-  if (isArray$1(obj)) {
+  if (isArray(obj)) {
     return obj.reduce(function (result, val) {
       return [].concat(_toConsumableArray(result), [cloneDeep(val, val)]);
     }, []);
@@ -1136,7 +445,7 @@ var cloneDeep = function cloneDeep(obj) {
 
   if (isPlainObject(obj)) {
     return keys(obj).reduce(function (result, key) {
-      return _objectSpread({}, result, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
+      return _objectSpread2({}, result, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
     }, {});
   }
 
@@ -1157,7 +466,7 @@ var cloneDeep = function cloneDeep(obj) {
 var get = function get(obj, path) {
   var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   // Handle array of path values
-  path = isArray$1(path) ? path.join('.') : path; // If no path or no object passed
+  path = isArray(path) ? path.join('.') : path; // If no path or no object passed
 
   if (!path || !isObject(obj)) {
     return defaultValue;
@@ -1296,6 +605,13 @@ var DEFAULTS = deepFreeze({
   BNavbarToggle: {
     label: 'Toggle navigation'
   },
+  BPopover: {
+    boundary: 'scrollParent',
+    boundaryPadding: 5,
+    customClass: null,
+    delay: 0,
+    variant: null
+  },
   BProgress: {
     variant: null
   },
@@ -1325,14 +641,11 @@ var DEFAULTS = deepFreeze({
     role: null
   },
   BTooltip: {
-    delay: 0,
     boundary: 'scrollParent',
-    boundaryPadding: 5
-  },
-  BPopover: {
+    boundaryPadding: 5,
+    customClass: null,
     delay: 0,
-    boundary: 'scrollParent',
-    boundaryPadding: 5
+    variant: null
   }
 });
 
@@ -1374,7 +687,7 @@ function () {
       var configKeys = getOwnPropertyNames(config);
       configKeys.forEach(function (cmpName) {
         /* istanbul ignore next */
-        if (!hasOwnProperty$1(DEFAULTS, cmpName)) {
+        if (!hasOwnProperty(DEFAULTS, cmpName)) {
           warn("config: unknown config property \"".concat(cmpName, "\""));
           return;
         }
@@ -1386,7 +699,7 @@ function () {
           var breakpoints = config.breakpoints;
           /* istanbul ignore if */
 
-          if (!isArray$1(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
+          if (!isArray(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
             return !isString(b) || b.length === 0;
           })) {
             warn('config: "breakpoints" must be an array of at least 2 breakpoint names');
@@ -1398,7 +711,7 @@ function () {
           var props = getOwnPropertyNames(cmpConfig);
           props.forEach(function (prop) {
             /* istanbul ignore if */
-            if (!hasOwnProperty$1(DEFAULTS[cmpName], prop)) {
+            if (!hasOwnProperty(DEFAULTS[cmpName], prop)) {
               warn("config: unknown config property \"".concat(cmpName, ".{$prop}\""));
             } else {
               // TODO: If we pre-populate the config with defaults, we can skip this line
@@ -1518,7 +831,7 @@ var installFactory = function installFactory() {
 var pluginFactory = function pluginFactory() {
   var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var extend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  return _objectSpread({}, extend, {
+  return _objectSpread2({}, extend, {
     install: installFactory(opts)
   });
 };
@@ -1918,7 +1231,7 @@ var NO_FADE_PROPS = {
   leaveToClass: ''
 };
 
-var FADE_PROPS = _objectSpread({}, NO_FADE_PROPS, {
+var FADE_PROPS = _objectSpread2({}, NO_FADE_PROPS, {
   enterActiveClass: 'fade',
   leaveActiveClass: 'fade'
 });
@@ -1956,7 +1269,7 @@ Vue.extend({
       transProps = props.noFade ? NO_FADE_PROPS : FADE_PROPS;
     }
 
-    transProps = _objectSpread({
+    transProps = _objectSpread2({
       mode: props.mode
     }, transProps, {
       // We always need `css` true
@@ -2302,7 +1615,7 @@ var identity = function identity(x) {
 
 var pluckProps = function pluckProps(keysToPluck, objToPluck) {
   var transformFn = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : identity;
-  return (isArray$1(keysToPluck) ? keysToPluck.slice() : keys(keysToPluck)).reduce(function (memo, prop) {
+  return (isArray(keysToPluck) ? keysToPluck.slice() : keys(keysToPluck)).reduce(function (memo, prop) {
     memo[transformFn(prop)] = objToPluck[prop];
     return memo;
   }, {});
@@ -2312,9 +1625,9 @@ var pluckProps = function pluckProps(keysToPluck, objToPluck) {
  * Convert a value to a string that can be rendered.
  */
 
-var toString$1 = function toString(val) {
+var toString = function toString(val) {
   var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-  return isUndefined(val) || isNull(val) ? '' : isArray$1(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
+  return isUndefined(val) || isNull(val) ? '' : isArray(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
 };
 
 var ANCHOR_TAG = 'a'; // Precompile RegExp
@@ -2330,7 +1643,7 @@ var encodeReserveReplacer = function encodeReserveReplacer(c) {
 
 
 var encode = function encode(str) {
-  return encodeURIComponent(toString$1(str)).replace(encodeReserveRE, encodeReserveReplacer).replace(commaRE, ',');
+  return encodeURIComponent(toString(str)).replace(encodeReserveRE, encodeReserveReplacer).replace(commaRE, ',');
 };
 
 var decode = decodeURIComponent; // Stringifies an object of query parameters
@@ -2348,7 +1661,7 @@ var stringifyQueryObj = function stringifyQueryObj(obj) {
       return '';
     } else if (isNull(val)) {
       return encode(key);
-    } else if (isArray$1(val)) {
+    } else if (isArray(val)) {
       return val.reduce(function (results, val2) {
         if (isNull(val2)) {
           results.push(encode(key));
@@ -2372,7 +1685,7 @@ var stringifyQueryObj = function stringifyQueryObj(obj) {
 };
 var parseQuery = function parseQuery(query) {
   var parsed = {};
-  query = toString$1(query).trim().replace(/^(\?|#|&)/, '');
+  query = toString(query).trim().replace(/^(\?|#|&)/, '');
 
   if (!query) {
     return parsed;
@@ -2385,7 +1698,7 @@ var parseQuery = function parseQuery(query) {
 
     if (isUndefined(parsed[key])) {
       parsed[key] = val;
-    } else if (isArray$1(parsed[key])) {
+    } else if (isArray(parsed[key])) {
       parsed[key].push(val);
     } else {
       parsed[key] = [parsed[key], val];
@@ -2394,7 +1707,7 @@ var parseQuery = function parseQuery(query) {
   return parsed;
 };
 var isRouterLink = function isRouterLink(tag) {
-  return tag !== ANCHOR_TAG;
+  return toString(tag).toLowerCase() !== ANCHOR_TAG;
 };
 var computeTag = function computeTag() {
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -2445,9 +1758,9 @@ var computeHref = function computeHref() {
 
 
     if (isPlainObject(to) && (to.path || to.query || to.hash)) {
-      var path = toString$1(to.path);
+      var path = toString(to.path);
       var query = stringifyQueryObj(to.query);
-      var hash = toString$1(to.hash);
+      var hash = toString(to.hash);
       hash = !hash || hash.charAt(0) === '#' ? hash : "#".concat(hash);
       return "".concat(path).concat(query).concat(hash) || toFallback;
     }
@@ -2531,101 +1844,129 @@ var propsFactory = function propsFactory() {
   };
 };
 
-var clickHandlerFactory = function clickHandlerFactory(_ref) {
-  var disabled = _ref.disabled,
-      tag = _ref.tag,
-      href = _ref.href,
-      suppliedHandler = _ref.suppliedHandler,
-      parent = _ref.parent;
-  return function onClick(evt) {
-    var _arguments = arguments;
-
-    if (disabled && evt instanceof Event) {
-      // Stop event from bubbling up.
-      evt.stopPropagation(); // Kill the event loop attached to this specific EventTarget.
-      // Needed to prevent vue-router for doing its thing
-
-      evt.stopImmediatePropagation();
-    } else {
-      if (isRouterLink(tag) && evt.currentTarget.__vue__) {
-        // Router links do not emit instance 'click' events, so we
-        // add in an $emit('click', evt) on it's vue instance
-
-        /* istanbul ignore next: difficult to test, but we know it works */
-        evt.currentTarget.__vue__.$emit('click', evt);
-      } // Call the suppliedHandler(s), if any provided
-
-
-      concat(suppliedHandler).filter(function (h) {
-        return isFunction(h);
-      }).forEach(function (handler) {
-        handler.apply(void 0, _toConsumableArray(_arguments));
-      });
-      parent.$root.$emit('clicked::link', evt);
-    }
-
-    if (!isRouterLink(tag) && href === '#' || disabled) {
-      // Stop scroll-to-top behavior or navigation on regular links
-      // when href is just '#'
-      evt.preventDefault();
-    }
-  };
-}; // @vue/component
-
-
 var BLink =
 /*#__PURE__*/
 Vue.extend({
   name: 'BLink',
-  functional: true,
+  mixins: [normalizeSlotMixin],
+  inheritAttrs: false,
   props: propsFactory(),
-  render: function render(h, _ref2) {
-    var props = _ref2.props,
-        data = _ref2.data,
-        parent = _ref2.parent,
-        children = _ref2.children;
-    var tag = computeTag(props, parent);
-    var rel = computeRel(props);
-    var href = computeHref(props, tag);
-    var eventType = isRouterLink(tag) ? 'nativeOn' : 'on';
-    var suppliedHandler = (data[eventType] || {}).click;
-    var handlers = {
-      click: clickHandlerFactory({
-        tag: tag,
-        href: href,
-        disabled: props.disabled,
-        suppliedHandler: suppliedHandler,
-        parent: parent
-      })
-    };
-    var componentData = vueFunctionalDataMerge.mergeData(data, {
+  computed: {
+    computedTag: function computedTag() {
+      // We don't pass `this` as the first arg as we need reactivity of the props
+      return computeTag({
+        to: this.to,
+        disabled: this.disabled
+      }, this);
+    },
+    isRouterLink: function isRouterLink$1() {
+      return isRouterLink(this.computedTag);
+    },
+    computedRel: function computedRel() {
+      // We don't pass `this` as the first arg as we need reactivity of the props
+      return computeRel({
+        target: this.target,
+        rel: this.rel
+      });
+    },
+    computedHref: function computedHref() {
+      // We don't pass `this` as the first arg as we need reactivity of the props
+      return computeHref({
+        to: this.to,
+        href: this.href
+      }, this.computedTag);
+    },
+    computedProps: function computedProps() {
+      return this.isRouterLink ? _objectSpread2({}, this.$props, {
+        tag: this.routerTag
+      }) : {};
+    }
+  },
+  methods: {
+    onClick: function onClick(evt) {
+      var _arguments = arguments;
+      var isEvent = evt instanceof Event;
+      var isRouterLink = this.isRouterLink;
+      var suppliedHandler = this.$listeners.click;
+
+      if (isEvent && this.disabled) {
+        // Stop event from bubbling up
+        evt.stopPropagation(); // Kill the event loop attached to this specific `EventTarget`
+        // Needed to prevent `vue-router` for doing it's thing
+
+        evt.stopImmediatePropagation();
+      } else {
+        /* istanbul ignore next: difficult to test, but we know it works */
+        if (isRouterLink && evt.currentTarget.__vue__) {
+          // Router links do not emit instance `click` events, so we
+          // add in an $emit('click', evt) on it's vue instance
+          evt.currentTarget.__vue__.$emit('click', evt);
+        } // Call the suppliedHandler(s), if any provided
+
+
+        concat(suppliedHandler).filter(function (h) {
+          return isFunction(h);
+        }).forEach(function (handler) {
+          handler.apply(void 0, _toConsumableArray(_arguments));
+        }); // Emit the global $root click event
+
+        this.$root.$emit('clicked::link', evt);
+      } // Stop scroll-to-top behavior or navigation on
+      // regular links when href is just '#'
+
+
+      if (isEvent && (this.disabled || !isRouterLink && this.computedHref === '#')) {
+        evt.preventDefault();
+      }
+    },
+    focus: function focus() {
+      if (this.$el && this.$el.focus) {
+        this.$el.focus();
+      }
+    },
+    blur: function blur() {
+      if (this.$el && this.$el.blur) {
+        this.$el.blur();
+      }
+    }
+  },
+  render: function render(h) {
+    var tag = this.computedTag;
+    var rel = this.computedRel;
+    var href = this.computedHref;
+    var isRouterLink = this.isRouterLink; // We want to overwrite any click handler since our callback
+    // will invoke the user supplied handler9s) if !props.disabled
+
+    var handlers = _objectSpread2({}, this.$listeners, {
+      click: this.onClick
+    });
+
+    var componentData = {
       class: {
-        active: props.active,
-        disabled: props.disabled
+        active: this.active,
+        disabled: this.disabled
       },
-      attrs: {
+      attrs: _objectSpread2({}, this.$attrs, {
         rel: rel,
-        target: props.target,
-        tabindex: props.disabled ? '-1' : data.attrs ? data.attrs.tabindex : null,
-        'aria-disabled': props.disabled ? 'true' : null
-      },
-      props: _objectSpread({}, props, {
-        tag: props.routerTag
-      })
-    }); // If href attribute exists on router-link (even undefined or null) it fails working on SSR
-    // So we explicitly add it here if needed (i.e. if computeHref() is truthy)
+        target: this.target,
+        tabindex: this.disabled ? '-1' : isUndefined(this.$attrs.tabindex) ? null : this.$attrs.tabindex,
+        'aria-disabled': this.disabled ? 'true' : null
+      }),
+      props: this.computedProps,
+      on: isRouterLink ? {} : handlers,
+      nativeOn: isRouterLink ? handlers : {} // If href attribute exists on <router-link> (even undefined or null) it fails working on
+      // SSR, so we explicitly add it here if needed (i.e. if computedHref() is truthy)
+
+    };
 
     if (href) {
       componentData.attrs.href = href;
     } else {
       // Ensure the prop HREF does not exist for router links
       delete componentData.props.href;
-    } // We want to overwrite any click handler since our callback
-    // will invoke the user supplied handler if !props.disabled
+    }
 
-
-    componentData[eventType] = _objectSpread({}, componentData[eventType] || {}, handlers);
-    return h(tag, componentData, children);
+    return h(tag, componentData, this.normalizeSlot('default', {}));
   }
 });
 
@@ -2633,7 +1974,7 @@ var NAME$2 = 'BBadge';
 var linkProps = propsFactory();
 delete linkProps.href.default;
 delete linkProps.to.default;
-var props$1 = _objectSpread({}, linkProps, {
+var props$1 = _objectSpread2({}, linkProps, {
   tag: {
     type: String,
     default: 'span'
@@ -2697,7 +2038,7 @@ var htmlOrText = function htmlOrText(innerHTML, textContent) {
   } : {};
 };
 
-var props$2 = _objectSpread({}, propsFactory(), {
+var props$2 = _objectSpread2({}, propsFactory(), {
   text: {
     type: String,
     default: null
@@ -2781,12 +2122,12 @@ Vue.extend({
         children = _ref.children;
     var childNodes = children; // Build child nodes from items if given.
 
-    if (isArray$1(props.items)) {
+    if (isArray(props.items)) {
       var activeDefined = false;
       childNodes = props.items.map(function (item, idx) {
         if (!isObject(item)) {
           item = {
-            text: toString$1(item)
+            text: toString(item)
           };
         } // Copy the value here so we can normalize it.
 
@@ -2803,7 +2144,7 @@ Vue.extend({
         }
 
         return h(BBreadcrumbItem, {
-          props: _objectSpread({}, item, {
+          props: _objectSpread2({}, item, {
             active: active
           })
         });
@@ -2873,7 +2214,7 @@ var linkProps$1 = propsFactory();
 delete linkProps$1.href.default;
 delete linkProps$1.to.default;
 var linkPropKeys = keys(linkProps$1);
-var props$4 = _objectSpread({}, linkProps$1, btnProps); // --- Helper methods ---
+var props$4 = _objectSpread2({}, linkProps$1, {}, btnProps); // --- Helper methods ---
 // Focus handler for toggle buttons.  Needs class of 'focus' when focused.
 
 var handleFocus = function handleFocus(evt) {
@@ -3267,7 +2608,7 @@ var unprefixPropName = function unprefixPropName(prefix, value) {
 var copyProps = function copyProps(props) {
   var transformFn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : identity;
 
-  if (isArray$1(props)) {
+  if (isArray(props)) {
     return props.map(transformFn);
   } // Props as an object.
 
@@ -3279,7 +2620,7 @@ var copyProps = function copyProps(props) {
     if (props.hasOwnProperty(prop)) {
       // If the prop value is an object, do a shallow clone to prevent
       // potential mutations to the original object.
-      copied[transformFn(prop)] = isObject(props[prop]) ? _objectSpread({}, props[prop]) : props[prop];
+      copied[transformFn(prop)] = isObject(props[prop]) ? _objectSpread2({}, props[prop]) : props[prop];
     }
   }
 
@@ -3370,12 +2711,12 @@ Vue.extend({
   }
 });
 
-var props$8 = _objectSpread({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'body')), {
+var props$8 = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'body')), {
   bodyClass: {
     type: [String, Object, Array],
     default: null
   }
-}, props$6, props$7, {
+}, props$6, {}, props$7, {
   overlay: {
     type: Boolean,
     default: false
@@ -3420,7 +2761,7 @@ Vue.extend({
   }
 });
 
-var props$9 = _objectSpread({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'header')), {
+var props$9 = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'header')), {
   header: {
     type: String,
     default: null
@@ -3456,7 +2797,7 @@ Vue.extend({
   }
 });
 
-var props$a = _objectSpread({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'footer')), {
+var props$a = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'footer')), {
   footer: {
     type: String,
     default: null
@@ -3573,7 +2914,7 @@ Vue.extend({
 
 var cardImgProps = copyProps(props$b, prefixPropName.bind(null, 'img'));
 cardImgProps.imgSrc.required = false;
-var props$c = _objectSpread({}, props$8, props$9, props$a, cardImgProps, copyProps(cardMixin.props), {
+var props$c = _objectSpread2({}, props$8, {}, props$9, {}, props$a, {}, cardImgProps, {}, copyProps(cardMixin.props), {
   align: {
     type: String,
     default: null
@@ -4063,7 +3404,7 @@ Vue.extend({
 // The `omit()` util creates a new object, so we can just pass the original props
 
 var lazyProps = omit(props$e, ['left', 'right', 'center', 'block', 'rounded', 'thumbnail', 'fluid', 'fluidGrow']);
-var props$f = _objectSpread({}, lazyProps, {
+var props$f = _objectSpread2({}, lazyProps, {
   top: {
     type: Boolean,
     default: false
@@ -4114,7 +3455,7 @@ Vue.extend({
     } // False out the left/center/right props before passing to b-img-lazy
 
 
-    var lazyProps = _objectSpread({}, props, {
+    var lazyProps = _objectSpread2({}, props, {
       left: false,
       right: false,
       center: false
@@ -4268,7 +3609,7 @@ var observeDom = function observeDom(el, callback, opts)
     }
   }); // Have the observer observe foo for changes in children, etc
 
-  obs.observe(el, _objectSpread({
+  obs.observe(el, _objectSpread2({
     childList: true,
     subtree: true
   }, opts)); // We return a reference to the observer so that `obs.disconnect()`
@@ -5116,14 +4457,22 @@ Vue.extend({
       img = h(false);
     }
 
-    var content = h(this.contentTag, {
-      staticClass: 'carousel-caption',
-      class: this.contentClasses
-    }, [this.caption || this.captionHtml ? h(this.captionTag, {
+    var content = h(false);
+    var contentChildren = [this.caption || this.captionHtml ? h(this.captionTag, {
       domProps: htmlOrText(this.captionHtml, this.caption)
-    }) : h(false), this.text || this.textHtml ? h(this.textTag, {
+    }) : false, this.text || this.textHtml ? h(this.textTag, {
       domProps: htmlOrText(this.textHtml, this.text)
-    }) : h(false), this.normalizeSlot('default')]);
+    }) : false, this.normalizeSlot('default') || false];
+
+    if (contentChildren.some(Boolean)) {
+      content = h(this.contentTag, {
+        staticClass: 'carousel-caption',
+        class: this.contentClasses
+      }, contentChildren.map(function (i) {
+        return i || h(false);
+      }));
+    }
+
     return h('div', {
       staticClass: 'carousel-item',
       style: {
@@ -5321,7 +4670,7 @@ Vue.extend({
       _this.emitState();
     }); // Listen for "Sync state" requests from `v-b-toggle`
 
-    this.$root.$on(EVENT_STATE_REQUEST, function (id) {
+    this.listenOnRoot(EVENT_STATE_REQUEST, function (id) {
       if (id === _this.id) {
         _this.$nextTick(_this.emitSync);
       }
@@ -5532,8 +4881,8 @@ var looseEqual = function looseEqual(a, b) {
     return aValidType && bValidType ? a.getTime() === b.getTime() : false;
   }
 
-  aValidType = isArray$1(a);
-  bValidType = isArray$1(b);
+  aValidType = isArray(a);
+  bValidType = isArray(b);
 
   if (aValidType || bValidType) {
     return aValidType && bValidType ? compareArrays(a, b) : false;
@@ -5801,7 +5150,7 @@ function () {
     // and the type last so it can't be overwritten.
 
 
-    assign$1(this, BvEvent.Defaults, this.constructor.Defaults, eventInit, {
+    assign(this, BvEvent.Defaults, this.constructor.Defaults, eventInit, {
       type: type
     }); // Freeze some props as readonly, but leave them enumerable.
 
@@ -6029,6 +5378,11 @@ var dropdownMixin = {
       type: Boolean,
       default: false
     },
+    lazy: {
+      // If true, only render menu contents when open
+      type: Boolean,
+      default: false
+    },
     popperOpts: {
       // type: Object,
       default: function _default() {}
@@ -6214,7 +5568,7 @@ var dropdownMixin = {
         };
       }
 
-      return _objectSpread({}, popperConfig, this.popperOpts || {});
+      return _objectSpread2({}, popperConfig, {}, this.popperOpts || {});
     },
     whileOpenListen: function whileOpenListen(open) {
       // turn listeners on/off while open
@@ -6574,9 +5928,9 @@ Vue.extend({
         keydown: this.onKeydown // up, down, esc
 
       }
-    }, this.normalizeSlot('default', {
+    }, !this.lazy || this.visible ? this.normalizeSlot('default', {
       hide: this.hide
-    }));
+    }) : [h(false)]);
     return h('div', {
       staticClass: 'dropdown btn-group b-dropdown',
       class: this.dropdownClasses,
@@ -6600,7 +5954,7 @@ Vue.extend({
       default: null
     }
   },
-  props: _objectSpread({}, props$k, {
+  props: _objectSpread2({}, props$k, {
     variant: {
       type: String,
       default: null
@@ -6627,7 +5981,7 @@ Vue.extend({
       props: this.$props,
       staticClass: 'dropdown-item',
       class: _defineProperty({}, "text-".concat(this.variant), this.variant && !(this.active || this.disabled)),
-      attrs: _objectSpread({}, this.$attrs, {
+      attrs: _objectSpread2({}, this.$attrs, {
         role: 'menuitem'
       }),
       on: {
@@ -6686,7 +6040,7 @@ Vue.extend({
     return h('li', [h('button', {
       staticClass: 'dropdown-item',
       class: (_class = {}, _defineProperty(_class, this.activeClass, this.active), _defineProperty(_class, "text-".concat(this.variant), this.variant && !(this.active || this.disabled)), _class),
-      attrs: _objectSpread({}, this.$attrs, {
+      attrs: _objectSpread2({}, this.$attrs, {
         role: 'menuitem',
         type: 'button',
         disabled: this.disabled
@@ -6813,7 +6167,7 @@ Vue.extend({
   name: 'BDropdownForm',
   functional: true,
   inheritAttrs: false,
-  props: _objectSpread({}, props$o, {
+  props: _objectSpread2({}, props$o, {
     disabled: {
       type: Boolean,
       default: false
@@ -7040,7 +6394,7 @@ var formOptionsMixin = {
       var htmlField = this.htmlField;
       var disabledField = this.disabledField;
 
-      if (isArray$1(options)) {
+      if (isArray(options)) {
         // Normalize flat-ish arrays to Array of Objects
         return options.map(function (option) {
           if (isPlainObject(option)) {
@@ -7107,7 +6461,7 @@ Vue.extend({
         attrs: {
           disabled: option.disabled
         },
-        domProps: _objectSpread({}, htmlOrText(option.html, option.text), {
+        domProps: _objectSpread2({}, htmlOrText(option.html, option.text), {
           value: option.value
         })
       });
@@ -7452,13 +6806,13 @@ var generateProps = function generateProps() {
   }, create(null)); // For loop doesn't need to check hasOwnProperty
   // when using an object created from null
 
-  breakpointPropMap = assign$1(create(null), {
+  breakpointPropMap = assign(create(null), {
     col: keys(breakpointCol),
     offset: keys(breakpointOffset),
     order: keys(breakpointOrder)
   }); // Return the generated props
 
-  return _objectSpread({
+  return _objectSpread2({
     // Generic flexbox .col (xs)
     col: {
       type: Boolean,
@@ -7636,7 +6990,7 @@ var renderLabel = function renderLabel(h, ctx) {
       on: isLegend ? {
         click: ctx.legendClick
       } : {},
-      props: isHorizontal ? _objectSpread({
+      props: isHorizontal ? _objectSpread2({
         tag: labelTag
       }, ctx.labelColProps) : {},
       attrs: {
@@ -7688,7 +7042,7 @@ var generateProps$1 = function generateProps() {
     };
     return props;
   }, create(null));
-  return _objectSpread({
+  return _objectSpread2({
     label: {
       type: String,
       default: null
@@ -7705,7 +7059,7 @@ var generateProps$1 = function generateProps() {
       type: Boolean,
       default: false
     }
-  }, bpLabelColProps, bpLabelAlignProps, {
+  }, bpLabelColProps, {}, bpLabelAlignProps, {
     labelClass: {
       type: [String, Array, Object],
       default: null
@@ -7926,7 +7280,7 @@ var BFormGroup = {
             return !arrayIncludes(remove, id);
           }).concat(add).filter(Boolean);
           ids = keys(ids.reduce(function (memo, id) {
-            return _objectSpread({}, memo, _defineProperty({}, id, true));
+            return _objectSpread2({}, memo, _defineProperty({}, id, true));
           }, {})).join(' ').trim();
 
           if (ids) {
@@ -8368,7 +7722,7 @@ Vue.extend({
       var checked = this.computedLocalChecked;
       var value = this.value;
 
-      if (isArray$1(checked)) {
+      if (isArray(checked)) {
         return looseIndexOf(checked, value) > -1;
       } else {
         return looseEqual(checked, value);
@@ -8404,7 +7758,7 @@ Vue.extend({
           indeterminate = _ref$target.indeterminate;
       var localChecked = this.computedLocalChecked;
       var value = this.value;
-      var isArr = isArray$1(localChecked);
+      var isArr = isArray(localChecked);
       var uncheckedValue = isArr ? null : this.uncheckedValue; // Update computedLocalChecked
 
       if (isArr) {
@@ -8433,7 +7787,7 @@ Vue.extend({
     },
     setIndeterminate: function setIndeterminate(state) {
       // Indeterminate only supported in single checkbox mode
-      if (isArray$1(this.computedLocalChecked)) {
+      if (isArray(this.computedLocalChecked)) {
         state = false;
       }
 
@@ -9159,7 +8513,7 @@ Vue.extend({
       domProps: {
         value: self.localValue
       },
-      on: _objectSpread({}, self.$listeners, {
+      on: _objectSpread2({}, self.$listeners, {
         input: self.onInput,
         change: self.onChange,
         blur: self.onBlur
@@ -9368,7 +8722,7 @@ Vue.extend({
       domProps: {
         value: self.localValue
       },
-      on: _objectSpread({}, self.$listeners, {
+      on: _objectSpread2({}, self.$listeners, {
         input: self.onInput,
         change: self.onChange,
         blur: self.onBlur
@@ -9509,7 +8863,7 @@ Vue.extend({
       // exact same file(s) are selected to prevent an infinite loop.
       // When in `multiple` mode we need to check for two empty arrays or
       // two arrays with identical files
-      if (newVal === oldVal || isArray$1(newVal) && isArray$1(oldVal) && newVal.length === oldVal.length && newVal.every(function (v, i) {
+      if (newVal === oldVal || isArray(newVal) && isArray(oldVal) && newVal.length === oldVal.length && newVal.every(function (v, i) {
         return v === oldVal[i];
       })) {
         return;
@@ -9522,7 +8876,7 @@ Vue.extend({
       }
     },
     value: function value(newVal) {
-      if (!newVal || isArray$1(newVal) && newVal.length === 0) {
+      if (!newVal || isArray(newVal) && newVal.length === 0) {
         this.reset();
       }
     }
@@ -9819,7 +9173,7 @@ Vue.extend({
         attrs: {
           disabled: Boolean(option.disabled)
         },
-        domProps: _objectSpread({}, htmlOrText(option.html, option.text), {
+        domProps: _objectSpread2({}, htmlOrText(option.html, option.text), {
           value: option.value
         })
       });
@@ -9924,7 +9278,7 @@ var BInputGroupAddon =
 Vue.extend({
   name: 'BInputGroupAddon',
   functional: true,
-  props: _objectSpread({}, commonProps, {
+  props: _objectSpread2({}, commonProps, {
     append: {
       type: Boolean,
       default: false
@@ -9958,7 +9312,7 @@ Vue.extend({
         children = _ref.children;
     // pass all our props/attrs down to child, and set`append` to false
     return h(BInputGroupAddon, vueFunctionalDataMerge.mergeData(data, {
-      props: _objectSpread({}, props, {
+      props: _objectSpread2({}, props, {
         append: false
       })
     }), children);
@@ -9977,7 +9331,7 @@ Vue.extend({
         children = _ref.children;
     // pass all our props/attrs down to child, and set`append` to true
     return h(BInputGroupAddon, vueFunctionalDataMerge.mergeData(data, {
-      props: _objectSpread({}, props, {
+      props: _objectSpread2({}, props, {
         append: true
       })
     }), children);
@@ -9994,13 +9348,13 @@ var props$y = {
   prepend: {
     type: String
   },
-  prependHTML: {
+  prependHtml: {
     type: String
   },
   append: {
     type: String
   },
-  appendHTML: {
+  appendHtml: {
     type: String
   },
   tag: {
@@ -10024,10 +9378,10 @@ Vue.extend({
     var $scopedSlots = scopedSlots || {};
     var childNodes = []; // Prepend prop/slot
 
-    if (props.prepend || props.prependHTML || hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
+    if (props.prepend || props.prependHtml || hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
       childNodes.push(h(BInputGroupPrepend, [// Prop
-      props.prepend || props.prependHTML ? h(BInputGroupText, {
-        domProps: htmlOrText(props.prependHTML, props.prepend)
+      props.prepend || props.prependHtml ? h(BInputGroupText, {
+        domProps: htmlOrText(props.prependHtml, props.prepend)
       }) : h(false), // Slot
       normalizeSlot('prepend', {}, $scopedSlots, $slots) || h(false)]));
     } else {
@@ -10042,10 +9396,10 @@ Vue.extend({
     } // Append prop
 
 
-    if (props.append || props.appendHTML || hasNormalizedSlot('append', $scopedSlots, $slots)) {
+    if (props.append || props.appendHtml || hasNormalizedSlot('append', $scopedSlots, $slots)) {
       childNodes.push(h(BInputGroupAppend, [// prop
-      props.append || props.appendHTML ? h(BInputGroupText, {
-        domProps: htmlOrText(props.appendHTML, props.append)
+      props.append || props.appendHtml ? h(BInputGroupText, {
+        domProps: htmlOrText(props.appendHtml, props.append)
       }) : h(false), // Slot
       normalizeSlot('append', {}, $scopedSlots, $slots) || h(false)]));
     } else {
@@ -10348,7 +9702,7 @@ var actionTags = ['a', 'router-link', 'button', 'b-link'];
 var linkProps$2 = propsFactory();
 delete linkProps$2.href.default;
 delete linkProps$2.to.default;
-var props$D = _objectSpread({
+var props$D = _objectSpread2({
   tag: {
     type: String,
     default: 'div'
@@ -10816,7 +10170,7 @@ function (_BvEvent) {
   }], [{
     key: "Defaults",
     get: function get() {
-      return _objectSpread({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this), {
+      return _objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this), {
         trigger: null
       });
     }
@@ -11378,7 +10732,7 @@ Vue.extend({
     // Private method to create a BvModalEvent object
     buildEvent: function buildEvent(type) {
       var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      return new BvModalEvent(type, _objectSpread({
+      return new BvModalEvent(type, _objectSpread2({
         // Default options
         cancelable: false,
         target: this.$refs.modal || this.$el || null,
@@ -12079,7 +11433,7 @@ var plugin = function plugin(Vue) {
       // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
       parent: $parent,
       // Preset the prop values
-      propsData: _objectSpread({}, filterOptions(getComponentConfig('BModal') || {}), {
+      propsData: _objectSpread2({}, filterOptions(getComponentConfig('BModal') || {}), {
         // Defaults that user can override
         hideHeaderClose: true,
         hideHeader: !(props.title || props.titleHtml)
@@ -12134,7 +11488,7 @@ var plugin = function plugin(Vue) {
       _classCallCheck(this, BvModal);
 
       // Assign the new properties to this instance
-      assign$1(this, {
+      assign(this, {
         _vm: vm,
         _root: vm.$root
       }); // Set these properties as read-only and non-enumerable
@@ -12190,7 +11544,7 @@ var plugin = function plugin(Vue) {
           return;
         }
 
-        return asyncMsgBox(_objectSpread({}, filterOptions(options), {
+        return asyncMsgBox(_objectSpread2({}, filterOptions(options), {
           msgBoxContent: content
         }), this._vm, resolver);
       } // Open a message box with OK button only and returns a promise
@@ -12201,7 +11555,7 @@ var plugin = function plugin(Vue) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         // Pick the modal props we support from options
-        var props = _objectSpread({}, options, {
+        var props = _objectSpread2({}, options, {
           // Add in overrides and our content prop
           okOnly: true,
           okDisabled: false,
@@ -12222,7 +11576,7 @@ var plugin = function plugin(Vue) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         // Set the modal props we support from options
-        var props = _objectSpread({}, options, {
+        var props = _objectSpread2({}, options, {
           // Add in overrides and our content prop
           okOnly: false,
           okDisabled: false,
@@ -12371,7 +11725,7 @@ var BNavItem =
 Vue.extend({
   name: 'BNavItem',
   functional: true,
-  props: _objectSpread({}, props$J, {
+  props: _objectSpread2({}, props$J, {
     linkAttrs: {
       type: Object,
       default: function _default() {
@@ -12438,14 +11792,14 @@ Vue.extend({
         data = _ref.data,
         children = _ref.children;
     return h(BForm, vueFunctionalDataMerge.mergeData(data, {
-      props: _objectSpread({}, props, {
+      props: _objectSpread2({}, props, {
         inline: true
       })
     }), children);
   }
 });
 
-var props$M = _objectSpread({}, pluckProps(['menuClass', 'toggleClass', 'noCaret', 'role'], props$j), {
+var props$M = _objectSpread2({}, pluckProps(['menuClass', 'toggleClass', 'noCaret', 'role'], props$j), {
   extraMenuClasses: {
     type: String,
     default: '',
@@ -12527,9 +11881,9 @@ Vue.extend({
         keydown: this.onKeydown // up, down, esc
 
       }
-    }, [this.normalizeSlot('default', {
+    }, !this.lazy || this.visible ? this.normalizeSlot('default', {
       hide: this.hide
-    })]);
+    }) : [h(false)]);
     return h('li', {
       staticClass: 'nav-item b-nav-dropdown dropdown',
       class: this.dropdownClasses,
@@ -12659,7 +12013,7 @@ Vue.extend({
 var linkProps$3 = propsFactory();
 linkProps$3.href.default = undefined;
 linkProps$3.to.default = undefined;
-var props$P = _objectSpread({}, linkProps$3, {
+var props$P = _objectSpread2({}, linkProps$3, {
   tag: {
     type: String,
     default: 'div'
@@ -13199,7 +12553,7 @@ var paginationMixin = {
         page: pageNum,
         index: pageNum - 1
       };
-      var btnContent = _this7.normalizeSlot(btnSlot, scope) || toString$1(btnText) || h(false);
+      var btnContent = _this7.normalizeSlot(btnSlot, scope) || toString(btnText) || h(false);
       var inner = h(isDisabled ? 'span' : BLink, {
         staticClass: 'page-link',
         props: isDisabled ? {} : _this7.linkProps(linkTo),
@@ -13242,7 +12596,7 @@ var paginationMixin = {
         }
       }, [h('span', {
         staticClass: 'page-link'
-      }, [_this7.normalizeSlot('ellipsis-text', {}) || toString$1(_this7.ellipsisText) || h(false)])]);
+      }, [_this7.normalizeSlot('ellipsis-text', {}) || toString(_this7.ellipsisText) || h(false)])]);
     }; // Goto First Page button bookend
 
 
@@ -13267,7 +12621,7 @@ var paginationMixin = {
         // ARIA "roving tabindex" method
         tabindex: tabIndex
       };
-      var btnContent = toString$1(_this7.makePage(page.number));
+      var btnContent = toString(_this7.makePage(page.number));
       var scope = {
         page: page.number,
         index: page.number - 1,
@@ -13593,7 +12947,7 @@ Vue.extend({
     setNumPages: function setNumPages() {
       var _this4 = this;
 
-      if (isArray$1(this.pages) && this.pages.length > 0) {
+      if (isArray(this.pages) && this.pages.length > 0) {
         this.localNumPages = this.pages.length;
       } else {
         this.localNumPages = sanitizeNumPages(this.numberOfPages);
@@ -13630,13 +12984,13 @@ Vue.extend({
       });
     },
     getPageInfo: function getPageInfo(pageNum) {
-      if (!isArray$1(this.pages) || this.pages.length === 0 || isUndefined(this.pages[pageNum - 1])) {
+      if (!isArray(this.pages) || this.pages.length === 0 || isUndefined(this.pages[pageNum - 1])) {
         var link = "".concat(this.baseUrl).concat(pageNum);
         return {
           link: this.useRouter ? {
             path: link
           } : link,
-          text: toString$1(pageNum)
+          text: toString(pageNum)
         };
       }
 
@@ -13650,12 +13004,12 @@ Vue.extend({
             path: _link
           } : _link,
           // Make sure text has a value
-          text: toString$1(info.text || pageNum)
+          text: toString(info.text || pageNum)
         };
       } else {
         return {
-          link: toString$1(info),
-          text: toString$1(pageNum)
+          link: toString(info),
+          text: toString(pageNum)
         };
       }
     },
@@ -13880,7 +13234,9 @@ var Defaults = {
   fallbackPlacement: 'flip',
   callbacks: {},
   boundary: 'scrollParent',
-  boundaryPadding: 5 // Transition event names
+  boundaryPadding: 5,
+  variant: null,
+  customClass: null // Transition event names
 
 };
 var TransitionEndEvents$1 = {
@@ -13911,7 +13267,7 @@ var ToolTip =
 /*#__PURE__*/
 function () {
   // Main constructor
-  function ToolTip(element, config, $root) {
+  function ToolTip(element, config, $parent) {
     _classCallCheck(this, ToolTip);
 
     // New tooltip object
@@ -13925,7 +13281,8 @@ function () {
     this.$element = element;
     this.$tip = null;
     this.$id = generateId(this.constructor.NAME);
-    this.$root = $root || null;
+    this.$parent = $parent || null;
+    this.$root = $parent && $parent.$root ? $parent.$root : null;
     this.$routeWatcher = null; // We use a bound version of the following handlers for root/modal
     // listeners to maintain the 'this' context
 
@@ -13936,7 +13293,11 @@ function () {
     this.$doEnable = this.doEnable.bind(this);
     this._noop = noop.bind(this); // Set the configuration
 
-    this.updateConfig(config);
+    this.updateConfig(config); // Destroy ourselves if the parent is destroyed
+
+    if ($parent) {
+      $parent.$once('hook:beforeDestroy', this.destroy.bind(this));
+    }
   } // NOTE: Overridden by PopOver class
 
 
@@ -13945,7 +13306,7 @@ function () {
     // Update config
     value: function updateConfig(config) {
       // Merge config into defaults. We use "this" here because PopOver overrides Default
-      var updatedConfig = _objectSpread({}, this.constructor.Default, config); // Sanitize delay
+      var updatedConfig = _objectSpread2({}, this.constructor.Default, {}, config); // Sanitize delay
 
 
       if (config.delay && isNumber(config.delay)) {
@@ -14004,6 +13365,7 @@ function () {
 
       this.$id = null;
       this.$isEnabled = null;
+      this.$parent = null;
       this.$root = null;
       this.$element = null;
       this.$config = null;
@@ -14186,9 +13548,7 @@ function () {
       this.setModalListener(on); // Periodic $element visibility check
       // For handling when tip is in <keepalive>, tabs, carousel, etc
 
-      this.visibleCheck(on); // Route change events
-
-      this.setRouteWatcher(on); // On-touch start listeners
+      this.visibleCheck(on); // On-touch start listeners
 
       this.setOnTouchStartListener(on);
 
@@ -14291,10 +13651,11 @@ function () {
     key: "emitEvent",
     value: function emitEvent(evt) {
       var evtName = evt.type;
+      var $root = this.$root;
 
-      if (this.$root && this.$root.$emit) {
+      if ($root && $root.$emit) {
         // Emit an event on $root
-        this.$root.$emit("bv::".concat(this.constructor.NAME, "::").concat(evtName), evt);
+        $root.$emit("bv::".concat(this.constructor.NAME, "::").concat(evtName), evt);
       }
 
       var callbacks = this.$config.callbacks || {};
@@ -14437,7 +13798,16 @@ function () {
       // set as relatedTarget in focusin/out events
 
 
-      this.$tip.tabIndex = -1;
+      this.$tip.tabIndex = -1; // Add variant if specified
+
+      if (this.$config.variant) {
+        addClass(this.$tip, "b-".concat(this.constructor.NAME, "-").concat(this.$config.variant));
+      }
+
+      if (this.$config.customClass) {
+        addClass(this.$tip, String(this.$config.customClass));
+      }
+
       return this.$tip;
     }
   }, {
@@ -14528,8 +13898,14 @@ function () {
     value: function listen() {
       var _this6 = this;
 
-      var triggers = this.$config.trigger.trim().split(/\s+/);
-      var el = this.$element; // Listen for global show/hide events
+      var el = this.$element;
+      /* istanbul ignore next */
+
+      if (!el) {
+        return;
+      }
+
+      var triggers = this.$config.trigger.trim().split(/\s+/); // Listen for global show/hide events
 
       this.setRootListener(true); // Using 'this' as the handler will get automatically directed to
       // this.handleEvent and maintain our binding to 'this'
@@ -14554,10 +13930,17 @@ function () {
     value: function unListen() {
       var _this7 = this;
 
+      var el = this.$element;
+      /* istanbul ignore next */
+
+      if (!el) {
+        return;
+      }
+
       var events = ['click', 'focusin', 'focusout', 'mouseenter', 'mouseleave']; // Using "this" as the handler will get automatically directed to this.handleEvent
 
       events.forEach(function (evt) {
-        eventOff(_this7.$element, evt, _this7, EvtOpts);
+        eventOff(el, evt, _this7, EvtOpts);
       }, this); // Stop listening for global show/hide/enable/disable events
 
       this.setRootListener(false);
@@ -14629,37 +14012,16 @@ function () {
     /* istanbul ignore next */
 
   }, {
-    key: "setRouteWatcher",
-    value: function setRouteWatcher(on) {
-      var _this8 = this;
-
-      if (on) {
-        this.setRouteWatcher(false);
-
-        if (this.$root && Boolean(this.$root.$route)) {
-          this.$routeWatcher = this.$root.$watch('$route', function (newVal, oldVal) {
-            if (newVal === oldVal) {
-              return;
-            } // If route has changed, we force hide the tooltip/popover
-
-
-            _this8.forceHide();
-          });
-        }
-      } else {
-        if (this.$routeWatcher) {
-          // Cancel the route watcher by calling the stored reference
-          this.$routeWatcher();
-          this.$routeWatcher = null;
-        }
-      }
-    }
-    /* istanbul ignore next */
-
-  }, {
     key: "setModalListener",
     value: function setModalListener(on) {
-      var modal = closest(MODAL_CLASS, this.$element);
+      var el = this.$element;
+      /* istanbul ignore next */
+
+      if (!el || !this.$root) {
+        return;
+      }
+
+      var modal = closest(MODAL_CLASS, el);
 
       if (!modal) {
         // If we are not in a modal, don't worry. be happy
@@ -14667,19 +14029,19 @@ function () {
       } // We can listen for modal hidden events on $root
 
 
-      if (this.$root) {
-        this.$root[on ? '$on' : '$off'](MODAL_CLOSE_EVENT, this.$forceHide);
-      }
+      this.$root[on ? '$on' : '$off'](MODAL_CLOSE_EVENT, this.$forceHide);
     }
   }, {
     key: "setRootListener",
     value: function setRootListener(on) {
       // Listen for global 'bv::{hide|show}::{tooltip|popover}' hide request event
-      if (this.$root) {
-        this.$root[on ? '$on' : '$off']("bv::hide::".concat(this.constructor.NAME), this.$doHide);
-        this.$root[on ? '$on' : '$off']("bv::show::".concat(this.constructor.NAME), this.$doShow);
-        this.$root[on ? '$on' : '$off']("bv::disable::".concat(this.constructor.NAME), this.$doDisable);
-        this.$root[on ? '$on' : '$off']("bv::enable::".concat(this.constructor.NAME), this.$doEnable);
+      var $root = this.$root;
+
+      if ($root) {
+        $root[on ? '$on' : '$off']("bv::hide::".concat(this.constructor.NAME), this.$doHide);
+        $root[on ? '$on' : '$off']("bv::show::".concat(this.constructor.NAME), this.$doShow);
+        $root[on ? '$on' : '$off']("bv::disable::".concat(this.constructor.NAME), this.$doDisable);
+        $root[on ? '$on' : '$off']("bv::enable::".concat(this.constructor.NAME), this.$doEnable);
       }
     }
   }, {
@@ -14733,7 +14095,7 @@ function () {
   }, {
     key: "setOnTouchStartListener",
     value: function setOnTouchStartListener(on) {
-      var _this9 = this;
+      var _this8 = this;
 
       // If this is a touch-enabled device we add extra
       // empty mouseover listeners to the body's immediate children
@@ -14743,9 +14105,9 @@ function () {
         /* istanbul ignore next: JSDOM does not support 'ontouchstart' event */
         from(document.body.children).forEach(function (el) {
           if (on) {
-            eventOn(el, 'mouseover', _this9._noop);
+            eventOn(el, 'mouseover', _this8._noop);
           } else {
-            eventOff(el, 'mouseover', _this9._noop);
+            eventOff(el, 'mouseover', _this8._noop);
           }
         });
       }
@@ -14764,7 +14126,7 @@ function () {
   }, {
     key: "enter",
     value: function enter(e) {
-      var _this10 = this;
+      var _this9 = this;
 
       if (e) {
         this.$activeTrigger[e.type === 'focusin' ? 'focus' : 'hover'] = true;
@@ -14784,8 +14146,8 @@ function () {
       }
 
       this.$hoverTimeout = setTimeout(function () {
-        if (_this10.$hoverState === HoverState.SHOW) {
-          _this10.show();
+        if (_this9.$hoverState === HoverState.SHOW) {
+          _this9.show();
         }
       }, this.$config.delay.show);
     } // Leave handler
@@ -14793,7 +14155,7 @@ function () {
   }, {
     key: "leave",
     value: function leave(e) {
-      var _this11 = this;
+      var _this10 = this;
 
       if (e) {
         this.$activeTrigger[e.type === 'focusout' ? 'focus' : 'hover'] = false;
@@ -14818,15 +14180,15 @@ function () {
       }
 
       this.$hoverTimeout = setTimeout(function () {
-        if (_this11.$hoverState === HoverState.OUT) {
-          _this11.hide();
+        if (_this10.$hoverState === HoverState.OUT) {
+          _this10.hide();
         }
       }, this.$config.delay.hide);
     }
   }, {
     key: "getPopperConfig",
     value: function getPopperConfig(placement, tip) {
-      var _this12 = this;
+      var _this11 = this;
 
       return {
         placement: this.constructor.getAttachment(placement),
@@ -14850,14 +14212,14 @@ function () {
 
           /* istanbul ignore next */
           if (data.originalPlacement !== data.placement) {
-            _this12.handlePopperPlacementChange(data);
+            _this11.handlePopperPlacementChange(data);
           }
         },
         onUpdate: function onUpdate(data) {
           // Handle flipping arrow classes
 
           /* istanbul ignore next */
-          _this12.handlePopperPlacementChange(data);
+          _this11.handlePopperPlacementChange(data);
         }
       };
     }
@@ -14972,7 +14334,7 @@ var NAME$i = 'popover';
 var CLASS_PREFIX$1 = 'bs-popover';
 var BS_CLASS_PREFIX_REGEX$1 = new RegExp("\\b".concat(CLASS_PREFIX$1, "\\S+"), 'g');
 
-var Defaults$1 = _objectSpread({}, ToolTip.Default, {
+var Defaults$1 = _objectSpread2({}, ToolTip.Default, {
   placement: 'right',
   trigger: 'click',
   content: '',
@@ -15197,8 +14559,12 @@ var toolpopMixin = {
         offset: this.offset || 0,
         // Disable fade Animation?
         animation: !this.noFade,
+        // Variant
+        variant: this.variant,
+        // Custom class
+        customClass: this.customClass,
         // Open/Close Trigger(s)
-        trigger: isArray$1(this.triggers) ? this.triggers.join(' ') : this.triggers,
+        trigger: isArray(this.triggers) ? this.triggers.join(' ') : this.triggers,
         // Callbacks so we can trigger events on component
         callbacks: {
           show: this.onShow,
@@ -15309,7 +14675,7 @@ var toolpopMixin = {
   },
   methods: {
     getConfig: function getConfig() {
-      var cfg = _objectSpread({}, this.baseConfig);
+      var cfg = _objectSpread2({}, this.baseConfig);
 
       if (this.$refs.title && this.$refs.title.innerHTML.trim()) {
         // If slot has content, it overrides 'title' prop
@@ -15491,7 +14857,19 @@ var props$T = {
     type: [String, Array],
     default: 'flip',
     validator: function validator(value) {
-      return isArray$1(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+      return isArray(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+    }
+  },
+  variant: {
+    type: String,
+    default: function _default() {
+      return getComponentConfig(NAME$j, 'variant');
+    }
+  },
+  customClass: {
+    type: String,
+    default: function _default() {
+      return getComponentConfig(NAME$j, 'customClass');
     }
   },
   delay: {
@@ -15532,7 +14910,7 @@ Vue.extend({
       /* istanbul ignore else */
 
       if (target) {
-        this._toolpop = new PopOver(target, this.getConfig(), this.$root);
+        this._toolpop = new PopOver(target, this.getConfig(), this);
       } else {
         this._toolpop = null;
         warn("b-popover: 'target' element not found!");
@@ -15564,12 +14942,19 @@ var validTriggers = {
   focus: true,
   hover: true,
   click: true,
-  blur: true // Build a PopOver config based on bindings (if any)
-  // Arguments and modifiers take precedence over passed value config object
-
-  /* istanbul ignore next: not easy to test */
+  blur: true // Directive modifier test regular expressions. Pre-compile for performance
 
 };
+var htmlRE = /^html$/;
+var noFadeRE = /^nofade$/i;
+var placementRE = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/;
+var boundaryRE = /^(window|viewport|scrollParent)$/;
+var delayRE = /^d\d+$/;
+var offsetRE = /^o-?\d+$/;
+var variantRE = /^v-.+$/; // Build a PopOver config based on bindings (if any)
+// Arguments and modifiers take precedence over passed value config object
+
+/* istanbul ignore next: not easy to test */
 
 var parseBindings = function parseBindings(bindings)
 /* istanbul ignore next: not easy to test */
@@ -15579,7 +14964,9 @@ var parseBindings = function parseBindings(bindings)
   var config = {
     delay: getComponentConfig(NAME, 'delay'),
     boundary: String(getComponentConfig(NAME, 'boundary')),
-    boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0 // Process bindings.value
+    boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0,
+    variant: getComponentConfig(NAME, 'variant'),
+    customClass: getComponentConfig(NAME, 'customClass') // Process bindings.value
 
   };
 
@@ -15591,7 +14978,7 @@ var parseBindings = function parseBindings(bindings)
     config.content = bindings.value;
   } else if (isObject(bindings.value)) {
     // Value is config object, so merge
-    config = _objectSpread({}, config, bindings.value);
+    config = _objectSpread2({}, config, {}, bindings.value);
   } // If argument, assume element ID of container element
 
 
@@ -15603,32 +14990,35 @@ var parseBindings = function parseBindings(bindings)
 
 
   keys(bindings.modifiers).forEach(function (mod) {
-    if (/^html$/.test(mod)) {
+    if (htmlRE.test(mod)) {
       // Title allows HTML
       config.html = true;
-    } else if (/^nofade$/.test(mod)) {
+    } else if (noFadeRE.test(mod)) {
       // no animation
       config.animation = false;
-    } else if (/^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/.test(mod)) {
+    } else if (placementRE.test(mod)) {
       // placement of popover
       config.placement = mod;
-    } else if (/^(window|viewport|scrollParent)$/.test(mod)) {
+    } else if (boundaryRE.test(mod)) {
       // Boundary of popover
       config.boundary = mod;
-    } else if (/^d\d+$/.test(mod)) {
+    } else if (delayRE.test(mod)) {
       // Delay value
       var delay = parseInt(mod.slice(1), 10) || 0;
 
       if (delay) {
         config.delay = delay;
       }
-    } else if (/^o-?\d+$/.test(mod)) {
+    } else if (offsetRE.test(mod)) {
       // Offset value (negative allowed)
       var offset = parseInt(mod.slice(1), 10) || 0;
 
       if (offset) {
         config.offset = offset;
       }
+    } else if (variantRE.test(mod)) {
+      // Variant
+      config.variant = mod.slice(2) || null;
     }
   }); // Special handling of event trigger modifiers trigger is
   // a space separated list
@@ -15684,7 +15074,7 @@ var applyPopover = function applyPopover(el, bindings, vnode) {
   if (el[BV_POPOVER]) {
     el[BV_POPOVER].updateConfig(config);
   } else {
-    el[BV_POPOVER] = new PopOver(el, config, vnode.context.$root);
+    el[BV_POPOVER] = new PopOver(el, config, vnode.context);
   }
 }; // Remove PopOver on our element
 
@@ -16092,7 +15482,7 @@ var processField = function processField(key, value) {
       formatter: value
     };
   } else if (isObject(value)) {
-    field = _objectSpread({}, value);
+    field = _objectSpread2({}, value);
     field.key = field.key || key;
   } else if (value !== false) {
     // Fallback to just key
@@ -16111,7 +15501,7 @@ var processField = function processField(key, value) {
 var normalizeFields = function normalizeFields(origFields, items) {
   var fields = [];
 
-  if (isArray$1(origFields)) {
+  if (isArray(origFields)) {
     // Normalize array Form
     origFields.filter(function (f) {
       return f;
@@ -16123,7 +15513,7 @@ var normalizeFields = function normalizeFields(origFields, items) {
         });
       } else if (isObject(f) && f.key && isString(f.key)) {
         // Full object definition. We use assign so that we don't mutate the original
-        fields.push(_objectSpread({}, f));
+        fields.push(_objectSpread2({}, f));
       } else if (isObject(f) && keys(f).length === 1) {
         // Shortcut object (i.e. { 'foo_bar': 'This is Foo Bar' }
         var key = keys(f)[0];
@@ -16146,7 +15536,7 @@ var normalizeFields = function normalizeFields(origFields, items) {
   } // If no field provided, take a sample from first record (if exits)
 
 
-  if (fields.length === 0 && isArray$1(items) && items.length > 0) {
+  if (fields.length === 0 && isArray(items) && items.length > 0) {
     var sample = items[0];
     keys(sample).forEach(function (k) {
       if (!IGNORED_FIELD_KEYS[k]) {
@@ -16204,7 +15594,7 @@ var itemsMixin = {
   data: function data() {
     return {
       // Our local copy of the items. Must be an array
-      localItems: isArray$1(this.items) ? this.items.slice() : []
+      localItems: isArray(this.items) ? this.items.slice() : []
     };
   },
   computed: {
@@ -16213,12 +15603,10 @@ var itemsMixin = {
       // [ { key:..., label:..., ...}, {...}, ..., {..}]
       return normalizeFields(this.fields, this.localItems);
     },
-    computedFieldsObj: function computedFieldsObj()
-    /* istanbul ignore next: not using at the moment */
-    {
+    computedFieldsObj: function computedFieldsObj() {
       // Fields as a simple lookup hash object
-      // Mainly for scopedSlots for convenience
-      return this.computedFields.reduce(function (f, obj) {
+      // Mainly for formatter lookup and scopedSlots for convenience
+      return this.computedFields.reduce(function (obj, f) {
         obj[f.key] = f;
         return obj;
       }, {});
@@ -16242,7 +15630,7 @@ var itemsMixin = {
   watch: {
     items: function items(newItems) {
       /* istanbul ignore else */
-      if (isArray$1(newItems)) {
+      if (isArray(newItems)) {
         // Set localItems/filteredItems to a copy of the provided array
         this.localItems = newItems.slice();
       } else if (isUndefined(newItems) || isNull(newItems)) {
@@ -16265,6 +15653,24 @@ var itemsMixin = {
   mounted: function mounted() {
     // Initially update the v-model of displayed items
     this.$emit('input', this.computedItems);
+  },
+  methods: {
+    // Method to get the formatter method for a given field key
+    getFieldFormatter: function getFieldFormatter(key) {
+      var fieldsObj = this.computedFieldsObj;
+      var field = fieldsObj[key];
+      var parent = this.$parent;
+      var formatter = field && field.formatter;
+
+      if (isString(formatter) && isFunction(parent[formatter])) {
+        formatter = parent[formatter];
+      } else if (!isFunction(formatter)) {
+        formatter = undefined;
+      } // Return formatter function or undefined if none
+
+
+      return formatter;
+    }
   }
 };
 
@@ -16569,29 +15975,32 @@ var stableSort = function stableSort(array, compareFn) {
 };
 
 //
-// TODO: add option to sort by multiple columns (tri-state per column, plus order of columns in sort)
-//  where sortBy could be an array of objects [ {key: 'foo', sortDir: 'asc'}, {key:'bar', sortDir: 'desc'} ...]
-//  or an array of arrays [ ['foo','asc'], ['bar','desc'] ]
+// TODO: Add option to sort by multiple columns (tri-state per column,
+//       plus order of columns in sort)  where sortBy could be an array
+//       of objects [ {key: 'foo', sortDir: 'asc'}, {key:'bar', sortDir: 'desc'} ...]
+//       or an array of arrays [ ['foo','asc'], ['bar','desc'] ]
+//       Multisort will most likely be handled in mixin-sort.js by
+//       calling this method for each sortBy
 
-function defaultSortCompare(a, b, sortBy) {
-  a = get(a, sortBy, '');
-  b = get(b, sortBy, '');
+function defaultSortCompare(a, b, sortBy, formatter, localeOpts, locale) {
+  var aa = get(a, sortBy, '');
+  var bb = get(b, sortBy, '');
 
-  if (isDate(a) && isDate(b) || isNumber(a) && isNumber(b)) {
-    // Special case for comparing Dates and Numbers
+  if (isFunction(formatter)) {
+    aa = formatter(aa, sortBy, a);
+    bb = formatter(bb, sortBy, b);
+  }
+
+  aa = isUndefined(aa) || isNull(aa) ? '' : aa;
+  bb = isUndefined(bb) || isNull(bb) ? '' : bb;
+
+  if (isDate(aa) && isDate(bb) || isNumber(aa) && isNumber(bb)) {
+    // Special case for comparing dates and numbers
     // Internally dates are compared via their epoch number values
-    if (a < b) {
-      return -1;
-    } else if (a > b) {
-      return 1;
-    } else {
-      return 0;
-    }
+    return aa < bb ? -1 : aa > bb ? 1 : 0;
   } else {
     // Do localized string comparison
-    return stringifyObjectValues(a).localeCompare(stringifyObjectValues(b), undefined, {
-      numeric: true
-    });
+    return stringifyObjectValues(aa).localeCompare(stringifyObjectValues(bb), locale, localeOpts);
   }
 }
 
@@ -16620,6 +16029,20 @@ var sortingMixin = {
     sortCompare: {
       type: Function,
       default: null
+    },
+    sortCompareOptions: {
+      // Supported localCompare options, see `options` section of:
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
+      type: Object,
+      default: function _default() {
+        return {
+          numeric: true
+        };
+      }
+    },
+    sortCompareLocale: {
+      type: String // default: undefined
+
     },
     noSortReset: {
       // Another prop that should have had a better name.
@@ -16674,20 +16097,27 @@ var sortingMixin = {
       var sortCompare = this.sortCompare;
       var localSorting = this.localSorting;
 
+      var sortOptions = _objectSpread2({}, this.sortCompareOptions, {
+        usage: 'sort'
+      });
+
+      var sortLocale = this.sortCompareLocale || undefined;
+
       if (sortBy && localSorting) {
-        // stableSort returns a new array, and leaves the original array intact
+        var formatter = this.getFieldFormatter(sortBy); // stableSort returns a new array, and leaves the original array intact
+
         return stableSort(items, function (a, b) {
           var result = null;
 
           if (isFunction(sortCompare)) {
             // Call user provided sortCompare routine
-            result = sortCompare(a, b, sortBy, sortDesc);
+            result = sortCompare(a, b, sortBy, sortDesc, formatter, sortOptions, sortLocale);
           }
 
           if (isUndefined(result) || isNull(result) || result === false) {
             // Fallback to built-in defaultSortCompare if sortCompare
             // is not defined or returns null/false
-            result = defaultSortCompare(a, b, sortBy);
+            result = defaultSortCompare(a, b, sortBy, formatter, sortOptions, sortLocale);
           } // Negate result if sorting in descending order
 
 
@@ -17066,13 +16496,14 @@ var theadMixin = {
 
       var isFoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var h = this.$createElement;
+      var fields = this.computedFields || [];
 
-      if (this.isStacked === true) {
-        // In always stacked mode, we don't bother rendering the head/foot
+      if (this.isStacked === true || fields.length === 0) {
+        // In always stacked mode, we don't bother rendering the head/foot.
+        // Or if no field headings (empty table)
         return h(false);
-      }
+      } // Helper function to generate a field TH cell
 
-      var fields = this.computedFields || []; // Helper function to generate a field TH cell
 
       var makeCell = function makeCell(field, colIndex) {
         var ariaLabel = null;
@@ -17108,7 +16539,7 @@ var theadMixin = {
           key: field.key,
           class: [_this.fieldClasses(field), sortClass],
           style: field.thStyle || {},
-          attrs: _objectSpread({
+          attrs: _objectSpread2({
             // We only add a tabindex of 0 if there is a head-clicked listener
             tabindex: hasHeadClickListener ? '0' : null,
             abbr: field.headerAbbr || null,
@@ -17243,7 +16674,7 @@ var tbodyRowMixin = {
         attrs['data-label'] = field.label;
       }
 
-      return _objectSpread({}, attrs, this.getTdValues(item, field.key, field.tdAttr, {}));
+      return _objectSpread2({}, attrs, {}, this.getTdValues(item, field.key, field.tdAttr, {}));
     },
     rowClasses: function rowClasses(item) {
       return [item._rowVariant ? "".concat(this.dark ? 'bg' : 'table', "-").concat(item._rowVariant) : '', isFunction(this.tbodyTrClass) ? this.tbodyTrClass(item, 'row') : this.tbodyTrClass];
@@ -17268,16 +16699,11 @@ var tbodyRowMixin = {
     // Method to get the value for a field
     getFormattedValue: function getFormattedValue(item, field) {
       var key = field.key;
-      var formatter = field.formatter;
-      var parent = this.$parent;
+      var formatter = this.getFieldFormatter(key);
       var value = get(item, key, null);
 
-      if (formatter) {
-        if (isFunction(formatter)) {
-          value = formatter(value, key, item);
-        } else if (isString(formatter) && isFunction(parent[formatter])) {
-          value = parent[formatter](value, key, item);
-        }
+      if (isFunction(formatter)) {
+        value = formatter(value, key, item);
       }
 
       return isUndefined(value) || isNull(value) ? '' : value;
@@ -17431,7 +16857,7 @@ var tbodyRowMixin = {
         slotScope.rowSelected = Boolean(this.selectedRows[rowIndex]);
       }
 
-      var $childNodes = $scoped[field.key] ? $scoped[field.key](slotScope) : toString$1(formatted);
+      var $childNodes = $scoped[field.key] ? $scoped[field.key](slotScope) : toString(formatted);
 
       if (this.isStacked) {
         // We wrap in a DIV to ensure rendered as a single cell when visually stacked!
@@ -17479,7 +16905,7 @@ var tbodyRowMixin = {
 
 
       var primaryKey = this.primaryKey;
-      var rowKey = primaryKey && !isUndefined(item[primaryKey]) && !isNull(item[primaryKey]) ? toString$1(item[primaryKey]) : String(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
+      var rowKey = primaryKey && !isUndefined(item[primaryKey]) && !isNull(item[primaryKey]) ? toString(item[primaryKey]) : String(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
       // In the format of '{tableId}__row_{primaryKeyValue}'
 
       var rowId = primaryKey && !isUndefined(item[primaryKey]) && !isNull(item[primaryKey]) ? this.safeId("_row_".concat(item[primaryKey])) : null;
@@ -17506,7 +16932,7 @@ var tbodyRowMixin = {
         class: [this.rowClasses(item), selectableClasses, {
           'b-table-has-details': rowShowDetails
         }],
-        attrs: _objectSpread({
+        attrs: _objectSpread2({
           id: rowId,
           tabindex: hasRowClickHandler ? '0' : null,
           'data-pk': rowId ? String(item[primaryKey]) : null,
@@ -17515,7 +16941,7 @@ var tbodyRowMixin = {
           'aria-rowindex': ariaRowIndex,
           role: 'row'
         }, selectableAttrs),
-        on: _objectSpread({}, handlers, {
+        on: _objectSpread2({}, handlers, {
           // TODO: Instantiate the following handlers only if we have registered
           //       listeners i.e. this.$listeners['row-middle-clicked'], etc.
           auxclick: function auxclick(evt) {
@@ -17645,7 +17071,7 @@ var tbodyMixin = {
 
       if (isTransGroup) {
         tbodyOn = this.tbodyTransitionHandlers || {};
-        tbodyProps = _objectSpread({}, this.tbodyTransitionProps || {}, {
+        tbodyProps = _objectSpread2({}, this.tbodyTransitionProps || {}, {
           tag: 'tbody'
         });
       } // Assemble rows into the tbody
@@ -17910,7 +17336,7 @@ var selectableMixin = {
 
       if (this.selectable && this.selectedRows.length > 0) {
         // Quick check against array length
-        equal = isArray$1(newVal) && isArray$1(oldVal) && newVal.length === oldVal.length;
+        equal = isArray(newVal) && isArray(oldVal) && newVal.length === oldVal.length;
 
         for (var i = 0; equal && i < newVal.length; i++) {
           // Look for the first non-loosely equal row, after ignoring reserved fields
@@ -18094,7 +17520,7 @@ var providerMixin = {
         ctx.currentPage = this.currentPage;
       }
 
-      return _objectSpread({}, ctx);
+      return _objectSpread2({}, ctx);
     }
   },
   watch: {
@@ -18146,13 +17572,13 @@ var providerMixin = {
           this.$nextTick(this._providerUpdate);
         } else {
           /* istanbul ignore next */
-          this.localItems = isArray$1(this.items) ? this.items.slice() : [];
+          this.localItems = isArray(this.items) ? this.items.slice() : [];
         }
       }
     },
     // Provider related methods
     _providerSetLocal: function _providerSetLocal(items) {
-      this.localItems = isArray$1(items) ? items.slice() : [];
+      this.localItems = isArray(items) ? items.slice() : [];
       this.localBusy = false;
       this.$emit('refreshed'); // New root emit
 
@@ -18190,7 +17616,7 @@ var providerMixin = {
               // Provider resolved with items
               _this2._providerSetLocal(items);
             });
-          } else if (isArray$1(data)) {
+          } else if (isArray(data)) {
             // Provider returned Array data
             this._providerSetLocal(data);
           } else if (this.items.length !== 2) {
@@ -18304,7 +17730,7 @@ var tableRendererMixin = {
       var items = this.computedItems;
       var fields = this.computedFields;
       var selectableAttrs = this.selectableTableAttrs || {};
-      return _objectSpread({
+      return _objectSpread2({
         // We set aria-rowcount before merging in $attrs, in case user has supplied their own
         'aria-rowcount': this.filteredItems && this.filteredItems.length > items.length ? String(this.filteredItems.length) : null
       }, this.$attrs, {
@@ -18544,7 +17970,7 @@ Vue.extend({
     prop: 'value',
     event: 'input'
   },
-  props: _objectSpread({}, navProps, {
+  props: _objectSpread2({}, navProps, {
     tag: {
       type: String,
       default: 'div'
@@ -18690,14 +18116,32 @@ Vue.extend({
         });
       });
     },
-    isMounted: function isMounted(newVal, oldVal) {
+    tabs: function tabs(newVal, oldVal) {
       var _this2 = this;
 
-      // Trigger an update after mounted.  Needed
-      // for tabs inside lazy modals.
+      // If tabs added, removed, or re-ordered, we emit a `changed` event.
+      // We use `tab._uid` instead of `tab.safeId()`, as the later is changed
+      // in a nextTick if no explicit ID is provided, causing duplicate emits.
+      if (!looseEqual(newVal.map(function (t) {
+        return t._uid;
+      }), oldVal.map(function (t) {
+        return t._uid;
+      }))) {
+        // In a nextTick to ensure currentTab has been set first.
+        this.$nextTick(function () {
+          // We emit shallow copies of the new and old arrays of tabs, to
+          // prevent users from potentially mutating the internal arrays.
+          _this2.$emit('changed', newVal.slice(), oldVal.slice());
+        });
+      }
+    },
+    isMounted: function isMounted(newVal, oldVal) {
+      var _this3 = this;
+
+      // Trigger an update after mounted.  Needed for tabs inside lazy modals.
       if (newVal) {
         requestAF(function () {
-          _this2.updateTabs();
+          _this3.updateTabs();
         });
       } // Enable or disable the observer
 
@@ -18706,7 +18150,7 @@ Vue.extend({
     }
   },
   created: function created() {
-    var _this3 = this;
+    var _this4 = this;
 
     var tabIdx = parseInt(this.value, 10);
     this.currentTab = isNaN(tabIdx) ? -1 : tabIdx;
@@ -18714,11 +18158,11 @@ Vue.extend({
     // We wrap this in a `$nextTick()` to ensure the child tabs have been created
 
     this.$nextTick(function () {
-      _this3.updateTabs();
+      _this4.updateTabs();
     });
   },
   mounted: function mounted() {
-    var _this4 = this;
+    var _this5 = this;
 
     // Call `updateTabs()` just in case...
     this.updateTabs();
@@ -18727,7 +18171,7 @@ Vue.extend({
       // As this.$slots.default appears to lie about component instances
       // after b-tabs is destroyed and re-instantiated.
       // And this.$children does not respect DOM order.
-      _this4.isMounted = true;
+      _this5.isMounted = true;
     });
   },
   deactivated: function deactivated()
@@ -18738,14 +18182,14 @@ Vue.extend({
   activated: function activated()
   /* istanbul ignore next */
   {
-    var _this5 = this;
+    var _this6 = this;
 
     var tabIdx = parseInt(this.value, 10);
     this.currentTab = isNaN(tabIdx) ? -1 : tabIdx;
     this.$nextTick(function () {
-      _this5.updateTabs();
+      _this6.updateTabs();
 
-      _this5.isMounted = true;
+      _this6.isMounted = true;
     });
   },
   beforeDestroy: function beforeDestroy() {
@@ -18757,12 +18201,12 @@ Vue.extend({
   },
   methods: {
     registerTab: function registerTab(tab) {
-      var _this6 = this;
+      var _this7 = this;
 
       if (!arrayIncludes(this.registeredTabs, tab)) {
         this.registeredTabs.push(tab);
         tab.$once('hook:destroyed', function () {
-          _this6.unregisterTab(tab);
+          _this7.unregisterTab(tab);
         });
       }
     },
@@ -18775,9 +18219,22 @@ Vue.extend({
       // DOM observer is needed to detect changes in order of tabs
       if (on) {
         // Make sure no existing observer running
-        this.setObserver(false); // Watch for changes to <b-tab> sub components
+        this.setObserver(false);
+        var self = this;
+        /* istanbul ignore next: difficult to test mutation observer in JSDOM */
 
-        this._bvObserver = observeDom(this.$refs.tabsContainer, this.updateTabs.bind(this), {
+        var handler = function handler() {
+          // We delay the update to ensure that `tab.safeId()` has
+          // updated with the final ID value.
+          self.$nextTick(function () {
+            requestAF(function () {
+              self.updateTabs();
+            });
+          });
+        }; // Watch for changes to <b-tab> sub components
+
+
+        this._bvObserver = observeDom(this.$refs.tabsContainer, handler, {
           childList: true,
           subtree: false,
           attributes: true,
@@ -18792,7 +18249,7 @@ Vue.extend({
       }
     },
     getTabs: function getTabs() {
-      // We use registeredTabs as the shouce of truth for child tab components. And we
+      // We use registeredTabs as the source of truth for child tab components. And we
       // filter out any BTab components that are extended BTab with a root child BTab.
       // https://github.com/bootstrap-vue/bootstrap-vue/issues/3260
       var tabs = this.registeredTabs.filter(function (tab) {
@@ -18920,11 +18377,11 @@ Vue.extend({
     },
     // Focus a tab button given it's <b-tab> instance
     focusButton: function focusButton(tab) {
-      var _this7 = this;
+      var _this8 = this;
 
       // Wrap in `$nextTick()` to ensure DOM has completed rendering/updating before focusing
       this.$nextTick(function () {
-        var button = _this7.getButtonForTab(tab);
+        var button = _this8.getButtonForTab(tab);
 
         if (button && button.focus) {
           button.focus();
@@ -18982,7 +18439,7 @@ Vue.extend({
     }
   },
   render: function render(h) {
-    var _this8 = this;
+    var _this9 = this;
 
     var tabs = this.tabs; // Currently active tab
 
@@ -18997,7 +18454,7 @@ Vue.extend({
     var buttons = tabs.map(function (tab, index) {
       var tabIndex = null; // Ensure at least one tab button is focusable when keynav enabled (if possible)
 
-      if (!_this8.noKeyNav) {
+      if (!_this9.noKeyNav) {
         // Buttons are not in tab index unless active, or a fallback tab
         tabIndex = -1;
 
@@ -19015,21 +18472,21 @@ Vue.extend({
         props: {
           tab: tab,
           tabs: tabs,
-          id: tab.controlledBy || (_this8.tab && _this8.tab.safeId ? _this8.tab.safeId("_BV_tab_button_") : null),
-          controls: _this8.tab && _this8.tab.safeId ? _this8.tab.safeId() : null,
+          id: tab.controlledBy || (_this9.tab && _this9.tab.safeId ? _this9.tab.safeId("_BV_tab_button_") : null),
+          controls: _this9.tab && _this9.tab.safeId ? _this9.tab.safeId() : null,
           tabIndex: tabIndex,
           setSize: tabs.length,
           posInSet: index + 1,
-          noKeyNav: _this8.noKeyNav
+          noKeyNav: _this9.noKeyNav
         },
         on: {
           click: function click(evt) {
-            _this8.clickTab(tab, evt);
+            _this9.clickTab(tab, evt);
           },
-          first: _this8.firstTab,
-          prev: _this8.previousTab,
-          next: _this8.nextTab,
-          last: _this8.lastTab
+          first: _this9.firstTab,
+          prev: _this9.previousTab,
+          next: _this9.nextTab,
+          last: _this9.lastTab
         }
       });
     }); // Nav
@@ -19715,7 +19172,7 @@ Vue.extend({
     },
     buildEvent: function buildEvent(type) {
       var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      return new BvEvent(type, _objectSpread({
+      return new BvEvent(type, _objectSpread2({
         cancelable: false,
         target: this.$el || null,
         relatedTarget: null
@@ -19874,7 +19331,7 @@ Vue.extend({
         ref: 'toast',
         staticClass: 'toast',
         class: this.toastClass,
-        attrs: _objectSpread({}, this.$attrs, {
+        attrs: _objectSpread2({}, this.$attrs, {
           tabindex: '0',
           id: this.safeId()
         })
@@ -19998,7 +19455,7 @@ var plugin$1 = function plugin(Vue) {
       // We set parent as the local VM so these toasts can emit events on the
       // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
       parent: $parent,
-      propsData: _objectSpread({}, filterOptions$1(getComponentConfig('BToast') || {}), omit(props, keys(propsToSlots$1)), {
+      propsData: _objectSpread2({}, filterOptions$1(getComponentConfig('BToast') || {}), {}, omit(props, keys(propsToSlots$1)), {
         // Props that can't be overridden
         static: false,
         visible: true
@@ -20034,7 +19491,7 @@ var plugin$1 = function plugin(Vue) {
       _classCallCheck(this, BvToast);
 
       // Assign the new properties to this instance
-      assign$1(this, {
+      assign(this, {
         _vm: vm,
         _root: vm.$root
       }); // Set these properties as read-only and non-enumerable
@@ -20057,7 +19514,7 @@ var plugin$1 = function plugin(Vue) {
           return;
         }
 
-        makeToast(_objectSpread({}, filterOptions$1(options), {
+        makeToast(_objectSpread2({}, filterOptions$1(options), {
           toastContent: content
         }), this._vm);
       } // shows a `<b-toast>` component with the specified ID
@@ -20151,7 +19608,19 @@ Vue.extend({
       type: [String, Array],
       default: 'flip',
       validator: function validator(value) {
-        return isArray$1(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+        return isArray(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+      }
+    },
+    variant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$p, 'variant');
+      }
+    },
+    customClass: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$p, 'customClass');
       }
     },
     delay: {
@@ -20185,7 +19654,7 @@ Vue.extend({
       /* istanbul ignore else */
 
       if (target) {
-        this._toolpop = new ToolTip(target, this.getConfig(), this.$root);
+        this._toolpop = new ToolTip(target, this.getConfig(), this);
       } else {
         this._toolpop = null;
         warn("b-tooltip: 'target' element not found!");
@@ -20215,12 +19684,19 @@ var validTriggers$1 = {
   focus: true,
   hover: true,
   click: true,
-  blur: true // Build a ToolTip config based on bindings (if any)
-  // Arguments and modifiers take precedence over passed value config object
-
-  /* istanbul ignore next: not easy to test */
+  blur: true // Directive modifier test regular expressions. Pre-compile for performance
 
 };
+var htmlRE$1 = /^html$/;
+var noFadeRE$1 = /^nofade$/i;
+var placementRE$1 = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/;
+var boundaryRE$1 = /^(window|viewport|scrollParent)$/;
+var delayRE$1 = /^d\d+$/;
+var offsetRE$1 = /^o-?\d+$/;
+var variantRE$1 = /^v-.+$/; // Build a ToolTip config based on bindings (if any)
+// Arguments and modifiers take precedence over passed value config object
+
+/* istanbul ignore next: not easy to test */
 
 var parseBindings$1 = function parseBindings(bindings)
 /* istanbul ignore next: not easy to test */
@@ -20230,7 +19706,9 @@ var parseBindings$1 = function parseBindings(bindings)
   var config = {
     delay: getComponentConfig(NAME, 'delay'),
     boundary: String(getComponentConfig(NAME, 'boundary')),
-    boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0 // Process bindings.value
+    boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0,
+    variant: getComponentConfig(NAME, 'variant'),
+    customClass: getComponentConfig(NAME, 'customClass') // Process bindings.value
 
   };
 
@@ -20242,7 +19720,7 @@ var parseBindings$1 = function parseBindings(bindings)
     config.title = bindings.value;
   } else if (isObject(bindings.value)) {
     // Value is config object, so merge
-    config = _objectSpread({}, config, bindings.value);
+    config = _objectSpread2({}, config, {}, bindings.value);
   } // If argument, assume element ID of container element
 
 
@@ -20254,32 +19732,35 @@ var parseBindings$1 = function parseBindings(bindings)
 
 
   keys(bindings.modifiers).forEach(function (mod) {
-    if (/^html$/.test(mod)) {
+    if (htmlRE$1.test(mod)) {
       // Title allows HTML
       config.html = true;
-    } else if (/^nofade$/.test(mod)) {
+    } else if (noFadeRE$1.test(mod)) {
       // No animation
       config.animation = false;
-    } else if (/^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/.test(mod)) {
+    } else if (placementRE$1.test(mod)) {
       // Placement of tooltip
       config.placement = mod;
-    } else if (/^(window|viewport|scrollParent)$/.test(mod)) {
+    } else if (boundaryRE$1.test(mod)) {
       // Boundary of tooltip
       config.boundary = mod;
-    } else if (/^d\d+$/.test(mod)) {
+    } else if (delayRE$1.test(mod)) {
       // Delay value
       var delay = parseInt(mod.slice(1), 10) || 0;
 
       if (delay) {
         config.delay = delay;
       }
-    } else if (/^o-?\d+$/.test(mod)) {
+    } else if (offsetRE$1.test(mod)) {
       // Offset value, negative allowed
       var offset = parseInt(mod.slice(1), 10) || 0;
 
       if (offset) {
         config.offset = offset;
       }
+    } else if (variantRE$1.test(mod)) {
+      // Variant
+      config.variant = mod.slice(2) || null;
     }
   }); // Special handling of event trigger modifiers trigger is
   // a space separated list
@@ -20336,7 +19817,7 @@ var applyTooltip = function applyTooltip(el, bindings, vnode) {
   if (el[BV_TOOLTIP]) {
     el[BV_TOOLTIP].updateConfig(config);
   } else {
-    el[BV_TOOLTIP] = new ToolTip(el, config, vnode.context.$root);
+    el[BV_TOOLTIP] = new ToolTip(el, config, vnode.context);
   }
 }; // Remove ToolTip on our element
 
@@ -20573,7 +20054,7 @@ function () {
         this.$scroller = null;
       }
 
-      var cfg = _objectSpread({}, this.constructor.Default, config);
+      var cfg = _objectSpread2({}, this.constructor.Default, {}, config);
 
       if ($root) {
         this.$root = $root;
