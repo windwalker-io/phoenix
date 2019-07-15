@@ -123,7 +123,7 @@ abstract class AbstractBatchController extends AbstractPostController
 
         $this->preSave($data);
 
-        $results = $this->doSave($this->pks, clone $data);
+        $results = $this->doSave($this->pks, $data);
 
         $this->postSave($data);
 
@@ -147,19 +147,21 @@ abstract class AbstractBatchController extends AbstractPostController
         $results = [];
 
         foreach ((array) $pks as $pk) {
-            if (!$this->checkItemAccess($pk, $data)) {
+            $clonedData = clone $data;
+
+            if (!$this->checkItemAccess($pk, $clonedData)) {
                 $results[$pk] = false;
                 continue;
             }
 
-            if (!$this->validateItem($pk, $data)) {
+            if (!$this->validateItem($pk, $clonedData)) {
                 $results[$pk] = false;
                 continue;
             }
 
-            $this->prepareSaveItem($pk, $data);
+            $this->prepareSaveItem($pk, $clonedData);
 
-            $result = $this->save($pk, $data);
+            $result = $this->save($pk, $clonedData);
 
             if ($result) {
                 $this->postSaveItem($pk, $result);
@@ -169,7 +171,7 @@ abstract class AbstractBatchController extends AbstractPostController
             }
         }
 
-        return $results = [];
+        return $results;
     }
 
     /**
@@ -182,7 +184,7 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @since  __DEPLOY_VERSION__
      */
-    protected function prepareSaveItem($pk, DataInterface $data): void
+    protected function prepareSaveItem($pk, $data): void
     {
         //
     }
@@ -197,7 +199,7 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @since  __DEPLOY_VERSION__
      */
-    protected function postSaveItem($pk, DataInterface $data): void
+    protected function postSaveItem($pk, $data): void
     {
         //
     }
