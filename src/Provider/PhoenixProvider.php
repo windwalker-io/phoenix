@@ -44,9 +44,11 @@ class PhoenixProvider implements ServiceProviderInterface
     /**
      * Registers the service provider with a DI container.
      *
-     * @param   Container $container The DI container.
+     * @param Container $container The DI container.
      *
      * @return  void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function register(Container $container)
     {
@@ -55,6 +57,9 @@ class PhoenixProvider implements ServiceProviderInterface
         if ($container->getParent()) {
             $container = $container->getParent();
         }
+
+        $container->registerServiceProvider($container->newInstance(SendgridProvider::class));
+        $container->registerServiceProvider($container->newInstance(MailgunProvider::class));
 
         if ($this->package->app->isConsole()) {
             return;

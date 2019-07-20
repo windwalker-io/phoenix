@@ -35,8 +35,7 @@ class MailgunProvider implements ServiceProviderInterface
             ->alias('mailgun', Mailgun::class);
 
         $container->prepareSharedObject(MailgunAdapter::class)
-            ->alias('mailer.adapter.mailgun', MailgunAdapter::class)
-            ->bindShared(MailerAdapterInterface::class, MailgunAdapter::class);
+            ->alias('mailer.adapter.mailgun', MailgunAdapter::class);
     }
 
     /**

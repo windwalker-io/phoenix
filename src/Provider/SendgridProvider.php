@@ -34,8 +34,7 @@ class SendgridProvider implements ServiceProviderInterface
             ->alias('sendgrid', \SendGrid::class);
 
         $container->prepareSharedObject(SendGridAdapter::class)
-            ->alias('mailer.adapter.sendgrid', SendGridAdapter::class)
-            ->bindShared(MailerAdapterInterface::class, SendGridAdapter::class);
+            ->alias('mailer.adapter.sendgrid', SendGridAdapter::class);
     }
 
     /**
@@ -51,7 +50,7 @@ class SendgridProvider implements ServiceProviderInterface
     public function sendgrid(Container $container)
     {
         if (!class_exists(\SendGrid::class)) {
-            throw new \LogicException('Please install sendgrid/sendgrid 5.* first.');
+            throw new \LogicException('Please install sendgrid/sendgrid ^5.* first.');
         }
 
         /** @var Config $config */
