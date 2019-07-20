@@ -60,22 +60,22 @@ $url->delVar('page');
                     <tr>
                         {{-- TITLE --}}
                         <th class="text-nowrap">
-                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
+                            {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
                         </th>
 
                         {{-- STATE --}}
                         <th width="5%" class="text-nowrap">
-                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
+                            {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
                         </th>
 
                         {{-- CREATED --}}
                         <th width="15%" class="text-nowrap">
-                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
+                            {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
                         </th>
 
                         {{-- ID --}}
                         <th width="5%" class="text-nowrap">
-                            {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
+                            {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
                         </th>
                     </tr>
                     </thead>

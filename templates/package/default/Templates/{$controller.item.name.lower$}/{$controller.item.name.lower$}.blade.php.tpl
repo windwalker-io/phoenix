@@ -37,7 +37,7 @@
         <div class="row">
             <div class="col-md-7">
                 <div id="fieldset-basic" class="fieldset-card form-horizontal card mb-4">
-                    <h5 class="card-header">@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.basic')</h5>
+                    <h5 class="card-header">@lang('{$project.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.basic')</h5>
                     <div class="card-body">
 
                         {!! $form->renderFields('basic') !!}
@@ -45,7 +45,7 @@
                 </div>
 
                 <div id="fieldset-text" class="fieldset-card form-horizontal card mb-4">
-                    <h5 class="card-header">@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.text')</h5>
+                    <h5 class="card-header">@lang('{$project.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.text')</h5>
                     <div class="card-body">
                         {!! $form->renderFields('text') !!}
                     </div>
@@ -53,7 +53,7 @@
             </div>
             <div class="col-md-5">
                 <div id="fieldset-created" class="fieldset-card form-horizontal card mb-4">
-                    <h5 class="card-header">@lang('{$package.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.created')</h5>
+                    <h5 class="card-header">@lang('{$project.name.lower$}.{$controller.item.name.lower$}.edit.fieldset.created')</h5>
                     <div class="card-body">
                     {!! $form->renderFields('created') !!}
                     </div>

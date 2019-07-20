@@ -29,7 +29,7 @@ $menu = $app->make(\Phoenix\Html\MenuHelper::class);
 
     <li class="{{ $menu->active('{$controller.list.name.lower$}') }}">
         <a href="nav-item {{ $router->route('{$controller.list.name.lower$}') }}" class="nav-link {{ $menu->active('{$controller.list.name.lower$}') }}">
-            @lang('{$package.name.lower$}.{$controller.list.name.lower$}.title')
+            @lang('{$project.name.lower$}.{$controller.list.name.lower$}.title')
         </a>
     </li>
 

@@ -133,7 +133,7 @@ abstract class AbstractPackageController extends AbstractTaskController
             $ctrl[1] = $inflector->toPlural($ctrl[0]);
         }
 
-        list($itemName, $listName) = $ctrl;
+        [$itemName, $listName] = $ctrl;
 
         // Prepare package name
         $class = explode('\\', str_replace('/', '\\', $config['name']));
@@ -158,6 +158,8 @@ abstract class AbstractPackageController extends AbstractTaskController
         $config['package.name']      = $name;
         $config['package.namespace'] = $class;
 
+        $project = $config['project'];
+
         $this->replace = new Structure();
 
         $this->replace['package.namespace'] = $class;
@@ -165,6 +167,10 @@ abstract class AbstractPackageController extends AbstractTaskController
         $this->replace['package.name.lower'] = lcfirst($name);
         $this->replace['package.name.upper'] = strtoupper($name);
         $this->replace['package.name.cap']   = ucfirst($name);
+
+        $this->replace['project.name.lower'] = lcfirst($project);
+        $this->replace['project.name.upper'] = strtoupper($project);
+        $this->replace['project.name.cap']   = ucfirst($project);
 
         $this->replace['controller.list.name.lower'] = strtolower($listName);
         $this->replace['controller.list.name.upper'] = strtoupper($listName);

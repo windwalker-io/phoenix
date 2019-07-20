@@ -44,25 +44,25 @@ class EditDefinition extends AbstractFieldDefinition
 
             // Title
             $this->text('title')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.title'))
                 ->addFilter('trim')
                 ->maxlength(255)
                 ->required(true);
 
             // Alias
             $this->text('alias')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'))
-                ->description(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias.desc'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.alias'))
+                ->description(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.alias.desc'))
                 ->maxlength(255);
 
             // Image
             $this->text('image')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.image'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.image'))
                 ->maxlength(255);
 
             // URL
             $this->text('url')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.url'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.url'))
                 ->maxlength(255)
                 ->addValidator(Rule\UrlValidator::class)
                 ->attr('data-validate', 'url');
@@ -85,13 +85,13 @@ class EditDefinition extends AbstractFieldDefinition
         $this->fieldset('text', function (Form $form) {
             // Introtext
             $this->textarea('introtext')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.introtext'))
                 ->maxlength(static::TEXT_MAX_UTF8)
                 ->rows(10);
 
             // Fulltext
             $this->textarea('fulltext')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.fulltext'))
                 ->maxlength(static::TEXT_MAX_UTF8)
                 ->rows(10);
         });
@@ -100,7 +100,7 @@ class EditDefinition extends AbstractFieldDefinition
         $this->fieldset('created', function (Form $form) {
             // State
             $this->switch('state')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.published'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.published'))
                 ->class('')
                 ->color('success')
                 ->circle(true)
@@ -108,22 +108,22 @@ class EditDefinition extends AbstractFieldDefinition
 
             // Created
             $this->calendar('created')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.created'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.created'))
                 ->addFilter(UtcFilter::class);
 
             // Modified
             $this->calendar('modified')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.modified'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.modified'))
                 ->addFilter(UtcFilter::class)
                 ->disabled();
 
             // Author
             $this->text('created_by')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.author'));
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.author'));
 
             // Modified User
             $this->text('modified_by')
-                ->label(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'))
+                ->label(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.modifiedby'))
                 ->disabled();
         });
     }

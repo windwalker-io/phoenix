@@ -41,8 +41,8 @@ class GridDefinition extends AbstractFieldDefinition
                 ->set('display', false)
                 ->defaultValue('*')
                 ->option(__('phoenix.core.all'), '*')
-                ->option(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.title'), '{$controller.item.name.lower$}.title')
-                ->option(__('{$package.name.lower$}.{$controller.item.name.lower$}.field.alias'), '{$controller.item.name.lower$}.alias');
+                ->option(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.title'), '{$controller.item.name.lower$}.title')
+                ->option(__('{$project.name.lower$}.{$controller.item.name.lower$}.field.alias'), '{$controller.item.name.lower$}.alias');
 
             // Search Content
             $this->search('content')
@@ -65,7 +65,7 @@ class GridDefinition extends AbstractFieldDefinition
                 ->addClass('has-select2')
                 // Add empty option to support single deselect button
                 ->option('', '')
-                ->option(__('{$package.name.lower$}.{$controller.item.name.lower$}.filter.state.select'), '')
+                ->option(__('{$project.name.lower$}.{$controller.item.name.lower$}.filter.state.select'), '')
                 ->option(__('phoenix.grid.state.published'), '1')
                 ->option(__('phoenix.grid.state.unpublished'), '0')
                 ->onchange('this.form.submit()');

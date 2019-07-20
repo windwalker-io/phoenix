@@ -9,11 +9,13 @@
 namespace {$package.namespace$}{$package.name.cap$};
 
 use Phoenix\Script\BootstrapScript;
+use Phoenix\View\AbstractPhoenixHtmView;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Debugger\Helper\DebuggerHelper;
+use Windwalker\Event\Event;
 use Windwalker\Router\Exception\RouteNotFoundException;
 
 /**
@@ -50,11 +52,25 @@ class {$package.name.cap$}Package extends AbstractPackage
         // Assets
         BootstrapScript::css(4);
         BootstrapScript::script(4);
-        BootstrapScript::fontAwesome(5);
+        BootstrapScript::fontAwesome(5, ['v4shims' => true]);
         Asset::addCSS($this->name . '/css/{$package.name.lower$}.css');
 
         // Language
+        Translator::loadAll();
         Translator::loadAll($this, 'ini');
+
+        // Use global lang prefix
+        $this->getDispatcher()->listen(
+            'onViewBeforeHandleData',
+            static function (Event $event) {
+                /** @var AbstractPhoenixHtmView $view */
+                $view = $event['view'];
+
+                if (!$view->getLangPrefix()) {
+                    $view->setLangPrefix('{$project.name.lower$}.');
+                }
+            }
+        );
     }
 
     /**
@@ -79,15 +95,6 @@ class {$package.name.cap$}Package extends AbstractPackage
      */
     protected function postExecute($result = null)
     {
-        if (WINDWALKER_DEBUG) {
-            if (class_exists(DebuggerHelper::class)) {
-                DebuggerHelper::addCustomData(
-                    'Language Orphans',
-                    '<pre>' . Translator::getFormattedOrphans() . '</pre>'
-                );
-            }
-        }
-
         return $result;
     }
 }

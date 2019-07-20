@@ -65,43 +65,43 @@
 
                             {{-- STATE --}}
                             <th style="min-width: 70px;" width="8%" class="text-nowrap">
-                                {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
+                                {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.state', '{$controller.item.name.lower$}.state') !!}
                             </th>
 
                             {{-- TITLE --}}
                             <th class="text-nowrap" style="min-width: 300px;">
-                                {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
+                                {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.title', '{$controller.item.name.lower$}.title') !!}
                             </th>
 
                             {{-- ORDERING --}}
                             <th width="5%" class="text-nowrap">
-                                {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!}
+                                {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.ordering', '{$controller.item.name.lower$}.ordering') !!}
                                 {!! $grid->saveOrderButton() !!}
                             </th>
 
                             {{-- AUTHOR --}}
                             <th width="10%" class="text-nowrap">
-                                {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
+                                {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.author', '{$controller.item.name.lower$}.created_by') !!}
                             </th>
 
                             {{-- CREATED --}}
                             <th width="10%" class="text-nowrap">
-                                {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
+                                {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.created', '{$controller.item.name.lower$}.created') !!}
                             </th>
 
                             {{-- LANGUAGE --}}
                             <th width="7%" class="text-nowrap">
-                                {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') !!}
+                                {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.language', '{$controller.item.name.lower$}.language') !!}
                             </th>
 
                             {{-- DELETE --}}
                             <th width="1%" class="text-nowrap">
-                                @lang('{$package.name.lower$}.{$controller.item.name.lower$}.field.delete')
+                                @lang('{$project.name.lower$}.{$controller.item.name.lower$}.field.delete')
                             </th>
 
                             {{-- ID --}}
                             <th width="3%" class="text-nowrap text-right">
-                                {!! $grid->sortTitle('{$package.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
+                                {!! $grid->sortTitle('{$project.name.lower$}.{$controller.item.name.lower$}.field.id', '{$controller.item.name.lower$}.id') !!}
                             </th>
                         </tr>
                         </thead>
