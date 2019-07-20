@@ -64,7 +64,7 @@ class {$package.name.cap$}Package extends AbstractPackage
                 $view = $event['view'];
 
                 if (!$view->getLangPrefix()) {
-                    $view->setLangPrefix('asuka.');
+                    $view->setLangPrefix('{$project.name.lower$}.');
                 }
             }
         );
