@@ -15,6 +15,7 @@ use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Security\Exception\UnauthorizedException;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataInterface;
+use function Windwalker\tap;
 
 /**
  * The AbstractBatchController class.
@@ -61,6 +62,13 @@ abstract class AbstractBatchController extends AbstractPostController
     protected $emptyMark = '__EMPTY__';
 
     /**
+     * Property updatedItems.
+     *
+     * @var  array
+     */
+    protected $updatedItems = [];
+
+    /**
      * A hook before main process executing.
      *
      * @return  void
@@ -80,7 +88,7 @@ abstract class AbstractBatchController extends AbstractPostController
      * @param   string|int    $pk
      * @param   DataInterface $data
      *
-     * @return  DataInterface
+     * @return  DataInterface|bool
      *
      * @throws \Exception
      */
@@ -111,35 +119,89 @@ abstract class AbstractBatchController extends AbstractPostController
             throw new ValidateFailException(__('phoenix.message.batch.data.empty'));
         }
 
-        if (count($this->pks) < 1) {
-            throw new ValidateFailException(__($this->langPrefix . 'message.batch.item.empty'));
-        }
-
         $this->validate($data);
 
         $this->preSave($data);
 
-        $results = [];
-
-        foreach ((array) $this->pks as $pk) {
-            if (!$this->checkItemAccess($pk, $data)) {
-                $results[$pk] = false;
-                continue;
-            }
-
-            if (!$this->validateItem($pk, $data)) {
-                $results[$pk] = false;
-                continue;
-            }
-
-            $this->save($pk, clone $data);
-
-            $results[$pk] = true;
-        }
+        $results = $this->doSave($this->pks, $data);
 
         $this->postSave($data);
 
         return $results;
+    }
+
+    /**
+     * doSave
+     *
+     * @param array         $pks
+     * @param DataInterface $data
+     *
+     * @return  array
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function doSave(array $pks, DataInterface $data): array
+    {
+        $results = [];
+
+        foreach ((array) $pks as $pk) {
+            $clonedData = clone $data;
+
+            if (!$this->checkItemAccess($pk, $clonedData)) {
+                $results[$pk] = false;
+                continue;
+            }
+
+            if (!$this->validateItem($pk, $clonedData)) {
+                $results[$pk] = false;
+                continue;
+            }
+
+            $this->prepareSaveItem($pk, $clonedData);
+
+            $result = $this->save($pk, $clonedData);
+
+            if ($result) {
+                $this->postSaveItem($pk, $result);
+
+                $this->updatedItems[$pk] = $result;
+                $results[$pk] = true;
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * prepareSaveItem
+     *
+     * @param mixed         $pk
+     * @param DataInterface $data
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function prepareSaveItem($pk, $data): void
+    {
+        //
+    }
+
+    /**
+     * postSaveItem
+     *
+     * @param mixed         $pk
+     * @param DataInterface $data
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function postSaveItem($pk, $data): void
+    {
+        //
     }
 
     /**
@@ -183,8 +245,8 @@ abstract class AbstractBatchController extends AbstractPostController
     {
         return Translator::plural(
             $this->langPrefix . 'message.batch.' . $this->action . '.success',
-            count($this->pks),
-            count($this->pks)
+            count($this->updatedItems),
+            count($this->updatedItems)
         );
     }
 
@@ -246,7 +308,9 @@ abstract class AbstractBatchController extends AbstractPostController
      */
     protected function validate(DataInterface $data)
     {
-        // Do some stuff
+        if (count($this->pks) < 1) {
+            throw new ValidateFailException(__($this->langPrefix . 'message.batch.item.empty'));
+        }
     }
 
     /**

@@ -35,8 +35,7 @@ class MailgunProvider implements ServiceProviderInterface
             ->alias('mailgun', Mailgun::class);
 
         $container->prepareSharedObject(MailgunAdapter::class)
-            ->alias('mailer.adapter.mailgun', MailgunAdapter::class)
-            ->bindShared(MailerAdapterInterface::class, MailgunAdapter::class);
+            ->alias('mailer.adapter.mailgun', MailgunAdapter::class);
     }
 
     /**
@@ -52,7 +51,7 @@ class MailgunProvider implements ServiceProviderInterface
     public function mailgun(Container $container)
     {
         if (!class_exists(Mailgun::class)) {
-            throw new \LogicException('Please install mailgun/mailgun-php first.');
+            throw new \LogicException('Please install mailgun/mailgun-php kriswallsmith/buzz nyholm/psr7 first.');
         }
 
         /** @var Config $config */

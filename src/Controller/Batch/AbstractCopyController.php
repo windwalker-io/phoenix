@@ -105,7 +105,7 @@ abstract class AbstractCopyController extends AbstractBatchController
      *
      * @throws \Exception
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     protected function handleNewValue(Record $record): Record
     {

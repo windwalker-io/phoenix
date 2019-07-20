@@ -9,6 +9,7 @@
 namespace Phoenix\Mailer;
 
 use Mailgun\Mailgun;
+use Mailgun\Message\MessageBuilder;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 use Windwalker\Core\Mailer\MailMessage;
@@ -53,29 +54,38 @@ class MailgunAdapter implements MailerAdapterInterface
      * @return  boolean
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
+     * @throws \Mailgun\Message\Exceptions\TooManyRecipients
      */
     public function send(MailMessage $message)
     {
         $params            = [];
         $params['subject'] = $message->getSubject();
 
-        $message->getHtml() ? $params['html'] = $message->getBody() : $params['text'] = $message->getBody();
+        $builder = new MessageBuilder();
+
+        $message->getHtml() ? $builder->setHtmlBody($message->getBody()) : $builder->setTextBody($message->getBody());
 
         foreach ($message->getFrom() as $email => $name) {
-            $params['from'][] = sprintf('%s <%s>', $name, $email);
+            $builder->setFromAddress($email, ['full_name' => $name]);
         }
 
         foreach ($message->getTo() as $email => $name) {
-            $params['to'][] = sprintf('%s <%s>', $name, $email);
+            $builder->addToRecipient($email, ['full_name' => $name]);
         }
 
         foreach ($message->getCc() as $email => $name) {
-            $params['cc'][] = sprintf('%s <%s>', $name, $email);
+            $builder->addCcRecipient($email, ['full_name' => $name]);
         }
 
         foreach ($message->getBcc() as $email => $name) {
-            $params['bcc'][] = sprintf('%s <%s>', $name, $email);
+            $builder->addBccRecipient($email, ['full_name' => $name]);
         }
+
+        foreach ($message->getReplyTo() as $email => $name) {
+            $builder->setReplyToAddress($email, ['full_name' => $name]);
+        }
+
+        $params = $builder->getMessage();
 
         foreach ($message->getFiles() as $file) {
             $attach = [];

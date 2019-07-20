@@ -13,6 +13,7 @@ use SendGrid\Content;
 use SendGrid\Email;
 use SendGrid\Mail;
 use SendGrid\Personalization;
+use SendGrid\ReplyTo;
 use SendGrid\Response;
 use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 use Windwalker\Core\Mailer\MailMessage;
@@ -70,6 +71,10 @@ class SendGridAdapter implements MailerAdapterInterface
 
         foreach ($message->getBcc() as $email => $name) {
             $personalization->addBcc(new Email($name, $email));
+        }
+
+        foreach ($message->getReplyTo() as $email => $name) {
+            $mail->setReplyTo(new ReplyTo($email, $name));
         }
 
         foreach ($message->getFiles() as $file) {

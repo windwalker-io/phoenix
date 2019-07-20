@@ -40,7 +40,7 @@ abstract class AbstractPhoenixHtmView extends HtmlView
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public function getLangPrefix(): ?string
     {
@@ -54,7 +54,7 @@ abstract class AbstractPhoenixHtmView extends HtmlView
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public function setLangPrefix(?string $langPrefix)
     {

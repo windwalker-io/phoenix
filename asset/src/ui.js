@@ -11,13 +11,13 @@
 
     static get defaultOptions() {
       return {
-        messageSelector: '.message-wrap'
+        messageSelector: '.message-wrap',
       };
     }
 
     static get proxies() {
       return {
-        addMessage: 'renderMessage'
+        addMessage: 'renderMessage',
       };
     }
 
@@ -32,11 +32,11 @@
 
       this.messageContainer = $(this.options.messageSelector);
 
-      this.phoenix.on('validation.response', event => {
+      this.phoenix.on('validation.response', (event) => {
         this.showValidateResponse(event.validation, event.state, event.$input, event.help);
       });
 
-      this.phoenix.on('validation.remove', event => {
+      this.phoenix.on('validation.remove', (event) => {
         this.removeValidateResponse(event.$element);
       });
     }
@@ -89,7 +89,7 @@
      * Remove all messages.
      */
     removeMessages() {
-      this.messageContainer.children().each(function() {
+      this.messageContainer.children().each(function () {
         this.remove();
       });
     }

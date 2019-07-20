@@ -13,7 +13,7 @@ use Windwalker\Core\DateTime\Chronos;
 /**
  * The ServerTZFilter class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8.13
  */
 class ServerTZFilter extends TimezoneFilter
 {

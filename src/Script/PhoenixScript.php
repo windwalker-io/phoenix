@@ -784,7 +784,7 @@ JS;
         string $buttonsSelector = '#admin-toolbar button, #admin-toolbar a, .disable-on-submit',
         string $event = 'submit'
     ): void {
-        if (!static::inited(__METHOD__)) {
+        if (!static::inited(__METHOD__, get_defined_vars())) {
             static::domready(<<<JS
 $('$formSelector').on('$event', () => {
   $('$buttonsSelector')

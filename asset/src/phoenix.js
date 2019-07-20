@@ -5,14 +5,14 @@
  * @license    __LICENSE__
  */
 
-($ => {
+(($) => {
   class PhoenixCore extends mix(class {}).with(PhoenixEventMixin) {
     /**
      * Default options.
      * @returns {Object}
      */
     static get defaultOptions() {
-      return {}
+      return {};
     }
 
     constructor(options = {}) {
@@ -22,7 +22,7 @@
       this.waits = [];
 
       // Wait dom ready
-      this.wait(resolve => {
+      this.wait((resolve) => {
         $(() => resolve());
       });
 
@@ -51,8 +51,8 @@
     }
 
     detach(plugin) {
-      if (!plugin instanceof PhoenixPlugin) {
-        throw new Error('Plugin must instance of : ' + PhoenixPlugin.name);
+      if (!(plugin instanceof PhoenixPlugin)) {
+        throw new Error(`Plugin must instance of : ${PhoenixPlugin.name}`);
       }
 
       plugin.uninstall(this);
@@ -118,18 +118,18 @@
       return promise;
     }
 
-    plugin(name, plugin) {
+    plugin(name, PluginClass) {
       const self = this;
       $.fn[name] = function (...args) {
-        if (!this.data('phoenix.' + name)) {
-          const instance = new plugin(this, ...args);
-          this.data('phoenix.' + name, instance);
-          self.trigger('jquery.plugin.created', {name: name, ele: this, instance: instance});
+        if (!this.data(`phoenix.${name}`)) {
+          const instance = new PluginClass(this, ...args);
+          this.data(`phoenix.${name}`, instance);
+          self.trigger('jquery.plugin.created', { name, ele: this, instance });
         }
 
-        const instance = this.data('phoenix.' + name);
+        const instance = this.data(`phoenix.${name}`);
 
-        self.trigger('jquery.plugin.get', {name: name, ele: this, instance: instance});
+        self.trigger('jquery.plugin.get', { name, ele: this, instance });
 
         return instance;
       };

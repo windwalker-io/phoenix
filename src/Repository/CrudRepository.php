@@ -95,7 +95,7 @@ class CrudRepository extends ItemRepository implements
      *
      * @throws \Exception
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public function copy($conditions = [], $newValue = null, bool $removeKey = true): Record
     {
@@ -134,7 +134,7 @@ class CrudRepository extends ItemRepository implements
      *
      * @throws \Exception
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public function updateItemOrCreate(
         $data,
@@ -311,7 +311,7 @@ class CrudRepository extends ItemRepository implements
      *
      * @return  Record
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     public function registerRecordEvents(Record $record): Record
     {
