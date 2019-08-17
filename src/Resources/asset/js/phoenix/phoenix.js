@@ -2682,7 +2682,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "find",
       value: function find(key) {
-        var langs = this.phoenix.data('phoenix.languages');
+        var langs = this.phoenix.data('phoenix.languages') || {};
 
         if (langs[key]) {
           return langs[key];

@@ -62,7 +62,7 @@
      * @returns {*}
      */
     find(key) {
-      const langs = this.phoenix.data('phoenix.languages');
+      const langs = this.phoenix.data('phoenix.languages') || {};
 
       if (langs[key]) {
         return langs[key];
