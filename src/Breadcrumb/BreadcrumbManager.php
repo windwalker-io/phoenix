@@ -123,11 +123,19 @@ class BreadcrumbManager implements \IteratorAggregate
     /**
      * render
      *
+     * @param array $params
+     *
      * @return  string
      */
-    public function render()
+    public function render(array $params = [])
     {
-        return WidgetHelper::render('phoenix.bootstrap.ui.breadcrumbs', ['paths' => $this], 'edge');
+        $params['paths'] = $this;
+
+        return WidgetHelper::render(
+            'phoenix.bootstrap.ui.breadcrumbs',
+            $params,
+            'edge'
+        );
     }
 
     /**
