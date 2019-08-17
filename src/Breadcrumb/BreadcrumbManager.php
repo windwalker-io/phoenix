@@ -139,6 +139,18 @@ class BreadcrumbManager implements \IteratorAggregate
     }
 
     /**
+     * __toString
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function __toString(): string
+    {
+        return $this->render();
+    }
+
+    /**
      * Method to get property Items
      *
      * @return  DataSet
@@ -174,5 +186,17 @@ class BreadcrumbManager implements \IteratorAggregate
     public function getIterator()
     {
         return $this->items;
+    }
+
+    /**
+     * __clone
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function __clone()
+    {
+        $this->items = clone $this->items;
     }
 }
