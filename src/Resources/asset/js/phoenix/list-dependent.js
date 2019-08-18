@@ -147,7 +147,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var data = {};
         data[this.options.ajax.value_field] = value;
         this.beforeHook(value, this.element, this.dependent);
-        Phoenix.get(this.options.ajax.url, data).done(function (response) {
+        Phoenix.Ajax.get(this.options.ajax.url, data).done(function (response) {
           if (response.success) {
             _this2.updateListElements(response.data);
           } else {
