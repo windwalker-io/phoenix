@@ -143,7 +143,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.19
      */
     public function __toString(): string
     {
@@ -193,7 +193,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.19
      */
     public function __clone()
     {
