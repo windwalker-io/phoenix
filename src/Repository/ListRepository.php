@@ -903,6 +903,16 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      */
     public function hasFilter($key)
     {
+        $v = $this->get('list.filter.' . $key);
+
+        if (is_array($v)) {
+            return $v !== [];
+        }
+
+        if (is_object($v)) {
+            return true;
+        }
+
         return (string) $this->get('list.filter.' . $key) !== '';
     }
 
