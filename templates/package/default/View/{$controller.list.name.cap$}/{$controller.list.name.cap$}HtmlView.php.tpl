@@ -63,6 +63,13 @@ class {$controller.list.name.cap$}HtmlView extends GridView
     protected $simplePagination = false;
 
     /**
+     * Property langPrefix.
+     *
+     * @var  string
+     */
+    protected $langPrefix = '{$project.name.lower$}.';
+
+    /**
      * prepareData
      *
      * @param \Windwalker\Data\Data                 $data

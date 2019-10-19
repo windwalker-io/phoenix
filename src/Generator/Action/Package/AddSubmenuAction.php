@@ -27,6 +27,7 @@ class AddSubmenuAction extends AbstractAction
     {
         $name    = $this->config['replace.controller.list.name.lower'];
         $package = $this->config['replace.package.name.lower'];
+        $app     = $this->config['replace.project.name.lower'];
         $file    = $this->config['dir.dest'] . '/Templates/_global/' . $this->config['replace.package.name.lower'] . '/widget/submenu.blade.php';
 
         if (!is_file($file)) {
@@ -42,7 +43,7 @@ class AddSubmenuAction extends AbstractAction
         $replace = <<<HTML
     <li class="nav-item {{ \$menu->active('$name') }}">
         <a href="{{ \$router->route('$name') }}" class="nav-link {{ \$menu->active('$name') }}">
-            @lang('$package.$name.title')
+            @lang('$app.$name.title')
         </a>
     </li>
 

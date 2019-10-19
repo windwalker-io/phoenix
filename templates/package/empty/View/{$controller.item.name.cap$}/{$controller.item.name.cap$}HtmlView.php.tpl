@@ -26,6 +26,13 @@ class {$controller.item.name.cap$}HtmlView extends AbstractPhoenixHtmView
     protected $name = '{$controller.item.name.cap$}';
 
     /**
+     * Property langPrefix.
+     *
+     * @var  string
+     */
+    protected $langPrefix = '{$project.name.lower$}.';
+
+    /**
      * prepareData
      *
      * @param \Windwalker\Data\Data $data

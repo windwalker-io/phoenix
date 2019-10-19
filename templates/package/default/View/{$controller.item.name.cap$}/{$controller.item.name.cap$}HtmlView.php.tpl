@@ -50,6 +50,13 @@ class {$controller.item.name.cap$}HtmlView extends EditView
     protected $formLoadData = true;
 
     /**
+     * Property langPrefix.
+     *
+     * @var  string
+     */
+    protected $langPrefix = '{$project.name.lower$}.';
+
+    /**
      * prepareData
      *
      * @param \Windwalker\Data\Data            $data

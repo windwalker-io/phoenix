@@ -58,19 +58,6 @@ class {$package.name.cap$}Package extends AbstractPackage
         // Language
         Translator::loadAll();
         Translator::loadAll($this, 'ini');
-
-        // Use global lang prefix
-        $this->getDispatcher()->listen(
-            'onViewBeforeHandleData',
-            static function (Event $event) {
-                /** @var AbstractPhoenixHtmView $view */
-                $view = $event['view'];
-
-                if (!$view->getLangPrefix()) {
-                    $view->setLangPrefix('{$project.name.lower$}.');
-                }
-            }
-        );
     }
 
     /**
