@@ -17,7 +17,7 @@ $form->setRenderer($field->getForm()->getRenderer());
                 <th>#</th>
             @endif
             @foreach ($form->getFields() as $subField)
-                <th>
+                <th class="{{ $subField->getType() === 'hidden' ? 'sr-only' : '' }}">
                     {!! $subField->getLabel() !!}
                 </th>
             @endforeach
@@ -40,7 +40,7 @@ $form->setRenderer($field->getForm()->getRenderer());
                     </td>
                 @endif
                 @foreach ($form->getFields() as $subField)
-                    <td>
+                    <td class="{{ $subField->getType() === 'hidden' ? 'sr-only' : '' }}">
                         {!! $subField->renderInput() !!}
                     </td>
                 @endforeach
