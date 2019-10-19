@@ -144,15 +144,17 @@
 
                                 {{-- AUTHOR --}}
                                 <td class="text-nowrap">
-                                    {{ property_exists($item, 'user_name') ? $item->user_name : $item->created_by }}
+                                    {{ $item->user_name ?? '' }}
                                 </td>
 
                                 {{-- CREATED --}}
                                 <td class="text-nowrap">
-                                    <span class="has-tooltip"
-                                        title="{{ $datetime::toLocalTime($item->created, 'Y-m-d H:i:s') }}">
-                                        {{ $datetime::toLocalTime($item->created, 'Y-m-d') }}
-                                    </span>
+                                    @if (!$chronos::isNullDate($item->created))
+                                        <span class="has-tooltip"
+                                            title="{{ $datetime::toLocalTime($item->created, 'Y-m-d H:i:s') }}">
+                                            {{ $datetime::toLocalTime($item->created, 'Y-m-d') }}
+                                        </span>
+                                    @endif
                                 </td>
 
                                 {{-- LANGUAGE --}}
