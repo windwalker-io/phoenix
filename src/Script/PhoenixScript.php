@@ -13,6 +13,7 @@ use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Ioc;
 use Windwalker\Language\Language;
+use Windwalker\Language\LanguageNormalize;
 use Windwalker\String\Str;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\ArrayHelper;
@@ -726,13 +727,7 @@ JS;
      */
     public static function shortLangCode($code, $separator = '_')
     {
-        list($first, $last) = explode('-', $code, 2);
-
-        if (strtolower($first) === strtolower($last)) {
-            return strtolower($first);
-        }
-
-        return strtolower($first) . $separator . strtoupper($last);
+        LanguageNormalize::shortLangCode($code, $separator);
     }
 
     /**
