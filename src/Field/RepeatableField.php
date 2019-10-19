@@ -18,6 +18,7 @@ use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Form;
 use Windwalker\Ioc;
 use Windwalker\String\Str;
+use function Windwalker\arr;
 
 /**
  * The RepeatableField class.
@@ -26,6 +27,7 @@ use Windwalker\String\Str;
  * @method  mixed|$this  configure(bool|callable|AbstractFieldDefinition $value = null)
  * @method  mixed|$this  sortable(bool $value = null)
  * @method  mixed|$this  ensureFirstRow(bool $value = null)
+ * @method  mixed|$this  singleArray(bool $value = null)
  *
  * @since  1.4.2
  */
@@ -97,6 +99,7 @@ class RepeatableField extends AbstractField
     protected function getRepeatableForm(): Form
     {
         $form = new Form($this->getFieldName(true));
+        $singleArray = $this->singleArray();
 
         $configure = $this->configure();
 
@@ -112,15 +115,30 @@ class RepeatableField extends AbstractField
             throw new \InvalidArgumentException('Wrong definition format.');
         }
 
+        if ($singleArray) {
+            if (\Windwalker\count($form->getFields()) > 2) {
+                throw new \UnexpectedValueException(
+                    'Repeatable field in singleArray mode should only contain key/value fields.'
+                );
+            }
+
+            if (!$form->getField('value')) {
+                throw new \UnexpectedValueException(
+                    'Repeatable field in singleArray mode must have a `value` field.'
+                );
+            }
+        }
+
         foreach ($form->getFields() as $field) {
             $field->set('id', null);
             $field->set('name', null);
-            $field->attr(':id', 'getId(i, item, \'' . $field->getName() . '\')');
-            $field->attr(':name', 'getName(i, item, \'' . $field->getName() . '\')');
+            $field->attr(':id', sprintf("getId(i, item, '%s')", $field->getName()));
+            $field->attr(':name', sprintf("getName(i, item, '%s')", $field->getName()));
 
             $field->attr(':disabled', 'item.__disabled');
 
             $field->setValue(null);
+
             $field->attr('v-model', 'item.' . $field->getName(true));
         }
 
@@ -158,6 +176,28 @@ class RepeatableField extends AbstractField
                 $values = array_filter(explode(',', $this->getValue()), 'strlen');
             }
         }
+
+        $singleArray = $this->singleArray();
+        $hasKey = (bool) $form->getField('key');
+
+        $values = arr($values);
+
+        if ($singleArray) {
+            $values = $values->map(function ($v, $k) use ($hasKey) {
+                if ($hasKey) {
+                    return [
+                        'key' => $k,
+                        'value' => $v
+                    ];
+                }
+
+                return [
+                    'value' => $v
+                ];
+            }, true);
+        }
+
+        $values = $values->values()->dump();
 
         $fields = [];
 
@@ -203,6 +243,7 @@ JS;
             'configure',
             'sortable',
             'ensureFirstRow',
+            'singleArray',
         ]);
     }
 }

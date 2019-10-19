@@ -8,8 +8,13 @@
 
 // Set renderer
 $form->setRenderer($field->getForm()->getRenderer());
+
+$singleArray = $field->singleArray();
+
+$hasKey = (bool) $form->getField('key');
 ?>
-<div id="{{ $field->getId() }}-wrap" class="phoenix-repeatable">
+<div id="{{ $field->getId() }}-wrap" class="phoenix-repeatable"
+    data-has-key="{{ (int) $hasKey }}" data-single-array="{{ (int) $singleArray }}">
     <table class="table">
         <thead>
         <tr>

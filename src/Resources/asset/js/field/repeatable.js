@@ -14,7 +14,9 @@
       id: '',
       items: [],
       fields: [],
-      ensureFirstRow: 0
+      ensureFirstRow: 0,
+      singleArray: false,
+      hasKey: false
     },
     created: function created() {
       this.items.map(this.prepareItem);
@@ -23,13 +25,27 @@
         this.makeSureDefaultItem();
       }
     },
-    mounted: function mounted() {//
+    mounted: function mounted() {
+      this.singleArray = this.$el.dataset.singleArray === '1';
+      this.hasKey = this.$el.dataset.hasKey === '1';
     },
     methods: {
       getId: function getId(i, item, field) {
         return "".concat(this.id, "-").concat(item.__key, "-").concat(field);
       },
       getName: function getName(i, item, field) {
+        if (this.singleArray) {
+          if (this.hasKey) {
+            if (field === 'key') {
+              return '';
+            }
+
+            return "".concat(this.control, "[").concat(item.key, "]");
+          }
+
+          return "".concat(this.control, "[]");
+        }
+
         return "".concat(this.control, "[").concat(i, "][").concat(field, "]");
       },
       addItem: function addItem(i) {
@@ -68,6 +84,8 @@
           this.items.push(this.prepareItem(this.getEmptyItem()));
         }
       }
+    },
+    computed: {//
     }
   };
 })();
