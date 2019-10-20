@@ -6,6 +6,7 @@
  */
 
 \Phoenix\Script\BootstrapScript::modal();
+\Phoenix\Script\BootstrapScript::tooltip();
 $disabled = $attrs['readonly'] || $attrs['disabled'];
 ?>
 
@@ -22,11 +23,18 @@ $disabled = $attrs['readonly'] || $attrs['disabled'];
                 </div>
             @endif
             <div class="modal-field-toolbar ml-auto">
-                <a class="btn btn-info {{ $disabled ? 'disabled' : null }}" role="button"
-                    href="{{ $disabled ? 'javascript:void(0);' : $url }}"
-                    onclick="$(this).closest('[data-modal-list]').data('modal-list').open(event)">
-                    @lang($field->getAttribute('buttonText', 'phoenix.form.field.modal.button.text'))
-                </a>
+                <div class="btn-group">
+                    <a class="btn btn-info {{ $disabled ? 'disabled' : null }}" role="button"
+                        href="{{ $disabled ? 'javascript:void(0);' : $url }}"
+                        onclick="$(this).closest('[data-modal-list]').data('modal-list').open(event)">
+                        @lang($field->getAttribute('buttonText', 'phoenix.form.field.modal.button.text'))
+                    </a>
+                    <button type="button" class="btn btn-info has-tooltip"
+                        onclick="$(this).closest('[data-modal-list]').find('.modal-list-item-delete button').click()"
+                        title="@lang('phoenix.form.field.modal.clear.all')">
+                        <span class="fas fa-times"></span>
+                    </button>
+                </div>
             </div>
         </div>
         @if ($field->get('list_type') === \Phoenix\Field\ModalField::TYPE_LIST)
