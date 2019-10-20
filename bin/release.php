@@ -41,11 +41,7 @@ HELP;
         $targetVersion = $this->getArgument(0);
 
         if (!$targetVersion) {
-            if (strpos($currentVersion, '-dev') !== false) {
-                $targetVersion = static::versionPlus($currentVersion, 0, '');
-            } else {
-                $targetVersion = static::versionPlus($currentVersion, 1);
-            }
+            $targetVersion = static::versionPlus($currentVersion, 1);
         }
 
         $this->out('Release version: ' . $targetVersion);
@@ -55,14 +51,6 @@ HELP;
 
         $this->exec(sprintf('git commit -am "Release version: %s"', $targetVersion));
         $this->exec(sprintf('git tag %s', $targetVersion));
-
-        $nextVersion = $this->getArgument(1) ?: static::versionPlus($targetVersion, 1, 'dev');
-
-        $this->out('Prepare version: ' . $nextVersion);
-
-        static::writeVersion($nextVersion);
-
-        $this->exec(sprintf('git commit -am "Prepare %s dev."', $nextVersion));
 
         $this->exec('git push');
         $this->exec('git push --tags');
