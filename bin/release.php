@@ -159,8 +159,8 @@ HELP;
             $content = file_get_contents($file->getPathname());
 
             $content = str_replace(
-                ['{DEPLOY_VERSION}', '__DEPLOY_VERSION__', '__LICENSE__', '{ORGANIZATION}'],
-                [$version, $version, 'LGPL-2.0-or-later', 'LYRASOFT'],
+                ['{DEPLOY_VERSION}', '__DEPLOY_VERSION__', '__LICENSE__', '${ORGANIZATION}', '{ORGANIZATION}'],
+                [$version, $version, 'LGPL-2.0-or-later', 'LYRASOFT', 'LYRASOFT'],
                 $content
             );
 
@@ -168,7 +168,7 @@ HELP;
         }
 
         $this->exec('git checkout master');
-        $this->exec(sprintf('git commit -am "Prepare for %s release."', $this->tag));
+        $this->exec(sprintf('git commit -am "Prepare for %s release."', $version));
         $this->exec('git push origin master');
     }
 
