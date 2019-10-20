@@ -1107,7 +1107,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.20
      */
     public function getCacheId($id = null)
     {
@@ -1121,7 +1121,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.20
      */
     public function handleQuery(callable $handler): self
     {
@@ -1251,7 +1251,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.20
      */
     public function pipe(callable $handler): self
     {

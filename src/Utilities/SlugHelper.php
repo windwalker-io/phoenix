@@ -3,7 +3,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2019 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Phoenix\Utilities;

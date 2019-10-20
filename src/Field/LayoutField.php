@@ -4,7 +4,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2019 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Phoenix\Field;
@@ -21,7 +21,7 @@ use Windwalker\Form\Field\CustomHtmlField;
  * @method  mixed|$this  engine(string $value = null)
  * @method  mixed|$this  package($value = null)
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8.20
  */
 class LayoutField extends CustomHtmlField
 {
@@ -64,7 +64,7 @@ class LayoutField extends CustomHtmlField
      *
      * @return  $this
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.20
      */
     public function renderLayout(string $layout, array $data = [], string $engine = 'edge', $package = null): self
     {

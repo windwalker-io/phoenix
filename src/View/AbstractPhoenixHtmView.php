@@ -98,7 +98,7 @@ abstract class AbstractPhoenixHtmView extends HtmlView
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.20
      */
     public function getTitle(): string
     {
