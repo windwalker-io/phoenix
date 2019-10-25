@@ -59,12 +59,11 @@ class DragFileField extends FileField
         $attrs['data-max-size'] = $this->maxSize();
 
         $input = parent::buildInput($attrs);
-        $id    = $this->getId();
 
-        $this->prepareScript();
+        $this->prepareScript($attrs);
 
         return WidgetHelper::render($this->get('layout', 'phoenix.form.field.drag-file'), [
-            'id' => $id,
+            'id' => $attrs['id'],
             'input' => $input,
             'attrs' => $attrs,
             'field' => $this,
@@ -78,7 +77,7 @@ class DragFileField extends FileField
      *
      * @since  1.7.3
      */
-    protected function prepareScript()
+    protected function prepareScript(array $attrs)
     {
         if (!static::$inited) {
             Asset::addJS(PhoenixScript::phoenixName() . '/js/field/drag-file.min.js');
@@ -95,7 +94,7 @@ class DragFileField extends FileField
             static::$inited = true;
         }
 
-        $id = $this->getId();
+        $id = $attrs['id'];
 
         $js = <<<JS
 $('#$id').dragFile();
