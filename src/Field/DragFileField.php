@@ -11,7 +11,10 @@ namespace Phoenix\Field;
 use Phoenix\Script\PhoenixScript;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Data\Collection;
 use Windwalker\Form\Field\FileField;
+use Windwalker\String\Str;
+use function Windwalker\arr;
 
 /**
  * The DragFileField class.
@@ -38,7 +41,7 @@ class DragFileField extends FileField
      */
     public function prepareAttributes()
     {
-        $this->class('custom-file-input');
+        $this->addClass('custom-file-input');
 
         return parent::prepareAttributes();
     }
@@ -57,6 +60,20 @@ class DragFileField extends FileField
         }
 
         $attrs['data-max-size'] = $this->maxSize();
+
+        // Fix accept
+        if (trim($attrs['accept'])) {
+            $attrs['accept'] = Collection::explode(',', $attrs['accept'])
+                ->map('trim')
+                ->map(function ($type) {
+                    if (strpos($type, '/') === false) {
+                        return Str::ensureLeft($type, '.');
+                    }
+
+                    return $type;
+                })
+                ->implode(',');
+        }
 
         $input = parent::buildInput($attrs);
 

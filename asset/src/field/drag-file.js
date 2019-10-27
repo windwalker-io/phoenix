@@ -22,10 +22,18 @@ $(() => {
           const limit = $self.attr('data-max-files');
           const sizeLimit = $self.attr('data-max-size');
           let placeholder = $self.attr('placeholder');
-          const acceptExtensions = ($self.attr('data-accepted') || '')
+          const accepted = ($self.attr('accept') || $self.attr('data-accepted') || '')
             .split(',')
             .map(v => v.trim())
-            .filter(v => v.length > 0);
+            .filter(v => v.length > 0)
+            .map(v => {
+              if (v.indexOf('/') === -1 && v[0] === '.') {
+                return v.substr(1);
+              }
+
+              return v;
+            });
+
           let text;
 
           if (!placeholder) {
@@ -46,14 +54,7 @@ $(() => {
           // Files size
           let fileSize = 0;
           Array.prototype.forEach.call(files, file => {
-            if (acceptExtensions.length && acceptExtensions.indexOf(file.name.split('.').pop().toLowerCase()) === -1) {
-              swal(
-                Phoenix.__('phoenix.form.field.drag.file.message.unaccepted.files'),
-                Phoenix.__('phoenix.form.field.drag.file.message.unaccepted.files.desc', acceptExtensions.join(', ')),
-                'warning'
-              );
-              throw new Error('Not accepted file ext');
-            }
+            this.checkFileType(accepted, file);
 
             fileSize += file.size;
           });
@@ -93,6 +94,50 @@ $(() => {
           $(e.currentTarget).removeClass('hover');
         })
         .trigger('change');
+    }
+
+    checkFileType(accepted, file) {
+      const fileExt = file.name.split('.').pop();
+
+      if (accepted.length) {
+        let allow = false;
+
+        accepted.forEach((type) => {
+          if (allow) {
+            return;
+          }
+
+          if (type.indexOf('/') !== -1) {
+            if (this.compareMimeType(type, file.type)) {
+              allow = true;
+            }
+          } else {
+            if (type === fileExt) {
+              allow = true;
+            }
+          }
+        });
+
+        if (!allow) {
+          swal(
+            Phoenix.__('phoenix.form.field.drag.file.message.unaccepted.files'),
+            Phoenix.__('phoenix.form.field.drag.file.message.unaccepted.files.desc', accepted.join(', ')),
+            'warning'
+          );
+          throw new Error('Not accepted file ext');
+        }
+      }
+    }
+
+    compareMimeType(accepted, mime) {
+      const accepted2 = accepted.split('/');
+      const mime2 = mime.split('/');
+
+      if (accepted2[1] === '*') {
+        return accepted2[0] === mime2[0];
+      }
+
+      return accepted === mime;
     }
   });
 });
