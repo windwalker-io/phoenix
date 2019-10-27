@@ -27,6 +27,10 @@ class CssMinifyListener
      */
     public function onAssetRenderStyles(Event $event)
     {
+        if (!class_exists(CssMinify::class)) {
+            throw new \DomainException('Please install asika/minify ~1.0 first');
+        }
+
         $minify = new CssMinify($event['asset']);
 
         $minify->compress();
