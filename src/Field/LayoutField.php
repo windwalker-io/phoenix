@@ -42,7 +42,13 @@ class LayoutField extends CustomHtmlField
             } else {
                 $html = WidgetHelper::render(
                     $this->layout(),
-                    $this->variables() ?: [],
+                    array_merge(
+                        [
+                            'field' => $this,
+                            'attrs' => $attrs
+                        ],
+                        $this->variables() ?: []
+                    ),
                     $this->engine() ?: 'engine',
                     $this->package()
                 );
