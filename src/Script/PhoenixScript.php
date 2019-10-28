@@ -727,7 +727,7 @@ JS;
      */
     public static function shortLangCode($code, $separator = '_')
     {
-        LanguageNormalize::shortLangCode($code, $separator);
+        return LanguageNormalize::shortLangCode($code, $separator);
     }
 
     /**
