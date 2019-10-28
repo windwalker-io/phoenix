@@ -776,17 +776,53 @@ JS;
      */
     public static function disableWhenSubmit(
         string $formSelector = '#admin-form',
-        string $buttonsSelector = '#admin-toolbar button, #admin-toolbar a, .disable-on-submit',
-        string $event = 'submit'
+        ?string $buttonsSelector = null,
+        array $options = []
     ): void {
         if (!static::inited(__METHOD__, get_defined_vars())) {
-            static::domready(<<<JS
-$('$formSelector').on('$event', () => {
-  $('$buttonsSelector')
-    .attr('disabled', true)
-    .addClass('disabled')
-    .attr('href', 'javascript://')
-    .attr('onclick', 'return false;');
+            $buttonsSelector = $buttonsSelector ?? implode(
+                ', ',
+                [
+                    '#admin-toolbar button',
+                    '#admin-toolbar a',
+                    $formSelector . ' .disable-on-submit',
+                    $formSelector . ' [data-disable-on-submit]',
+                ]
+            );
+
+            $iconSelector = $options['iconSelector'] ?? implode(
+                ', ',
+                [
+                    '.fa, .fal, .far, .fas, .fab',
+                    '[data-spin]',
+                    '[data-spinner]',
+                ]
+            );
+
+            $event = $options['event'] ?? 'submit';
+
+            static::domready(
+                <<<JS
+$('$buttonsSelector').on('click', function (e) {
+  e.currentTarget.dataset.clicked = 1;
+  
+  setTimeout(function() {
+    delete e.currentTarget.dataset.clicked;
+  }, 1500);
+});
+
+$('$formSelector').on('$event', function (e) {
+  setTimeout(function () {
+    $('$buttonsSelector')
+      .attr('disabled', true)
+      .addClass('disabled')
+      .attr('href', 'javascript://')
+      .attr('onclick', 'return false;')
+      .filter('[data-clicked]')
+      .find('$iconSelector')
+      .removeClass()
+      .addClass('spinner-border spinner-border-sm');
+  }, 0);
 });
 JS
             );
