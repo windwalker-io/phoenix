@@ -98,14 +98,20 @@
         const feedback = `<span class="${icon}" aria-hidden="true"></span>`;
         const helpElement = $(`<small class="${color}-${this.options.feedbackContainer} form-control-${this.options.feedbackContainer}">${feedback} ${help}</small>`);
 
-        const tagName = $input.prop('tagName').toLowerCase();
-
-        if (tagName === 'div') {
-          $input.append(helpElement);
+        if (color === 'invalid' && !$input.is(':visible')) {
+          this.renderMessage(`<strong>${$control.find('label').text()}:</strong> ${help}`, 'warning');
         } else {
-          $input.parent().append(helpElement);
+          const tagName = $input.prop('tagName').toLowerCase();
+
+          if (tagName === 'div') {
+            $input.append(helpElement);
+          } else {
+            $input.parent().append(helpElement);
+          }
         }
       }
+
+      // End method
     }
 
     /**

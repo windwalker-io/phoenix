@@ -118,14 +118,20 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
         if (help) {
           var feedback = "<span class=\"".concat(icon, "\" aria-hidden=\"true\"></span>");
           var helpElement = $("<small class=\"".concat(color, "-").concat(this.options.feedbackContainer, " form-control-").concat(this.options.feedbackContainer, "\">").concat(feedback, " ").concat(help, "</small>"));
-          var tagName = $input.prop('tagName').toLowerCase();
 
-          if (tagName === 'div') {
-            $input.append(helpElement);
+          if (color === 'invalid' && !$input.is(':visible')) {
+            this.renderMessage("<strong>".concat($control.find('label').text(), ":</strong> ").concat(help), 'warning');
           } else {
-            $input.parent().append(helpElement);
+            var tagName = $input.prop('tagName').toLowerCase();
+
+            if (tagName === 'div') {
+              $input.append(helpElement);
+            } else {
+              $input.parent().append(helpElement);
+            }
           }
-        }
+        } // End method
+
       }
       /**
        * Remove validation response.
