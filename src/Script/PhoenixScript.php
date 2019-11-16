@@ -726,7 +726,7 @@ JS;
      */
     public static function shortLangCode($code, $separator = '_')
     {
-        list($first, $last) = explode('-', $code, 2);
+        [$first, $last] = explode('-', $code, 2);
 
         if (strtolower($first) === strtolower($last)) {
             return strtolower($first);
