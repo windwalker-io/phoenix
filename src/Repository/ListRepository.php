@@ -68,6 +68,13 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
     protected $searchHelper;
 
     /**
+     * Property queryHandlers.
+     *
+     * @var  callable[]
+     */
+    protected $queryHandlers = [];
+
+    /**
      * prepareState
      *
      * @return  void
@@ -223,6 +230,11 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
         // Custom Binding
         foreach ((array) $this['query.bounded'] as $k => $v) {
             $query->bind(...$v);
+        }
+
+        // Custom Handlers
+        foreach ((array) $this->queryHandlers as $k => $handler) {
+            $handler($query, $this);
         }
 
         // Build query
@@ -891,6 +903,16 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      */
     public function hasFilter($key)
     {
+        $v = $this->get('list.filter.' . $key);
+
+        if (is_array($v)) {
+            return $v !== [];
+        }
+
+        if (is_object($v)) {
+            return true;
+        }
+
         return (string) $this->get('list.filter.' . $key) !== '';
     }
 
@@ -1079,6 +1101,36 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
     }
 
     /**
+     * getCacheId
+     *
+     * @param mixed $id
+     *
+     * @return  string
+     *
+     * @since  1.8.20
+     */
+    public function getCacheId($id = null)
+    {
+        return parent::getCacheId($id);
+    }
+
+    /**
+     * handleQuery
+     *
+     * @param callable $handler
+     *
+     * @return  static
+     *
+     * @since  1.8.20
+     */
+    public function handleQuery(callable $handler): self
+    {
+        $this->queryHandlers[] = $handler;
+
+        return $this;
+    }
+
+    /**
      * Method to add a variable to an internal array that will be bound to a prepared SQL statement before query
      * execution. Also removes a variable that has been bounded from the internal bounded array when the passed in
      * value is null.
@@ -1190,5 +1242,33 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
         }
 
         return $return;
+    }
+
+    /**
+     * pipe
+     *
+     * @param callable $handler
+     *
+     * @return  static
+     *
+     * @since  1.8.20
+     */
+    public function pipe(callable $handler): self
+    {
+        $handler($this);
+
+        return $this;
+    }
+
+    /**
+     * reset
+     *
+     * @return  static
+     */
+    public function reset()
+    {
+        $this->queryHandlers = [];
+
+        return parent::reset();
     }
 }

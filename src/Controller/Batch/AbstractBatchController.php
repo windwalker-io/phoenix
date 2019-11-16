@@ -140,7 +140,7 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @throws \Exception
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.19
      */
     protected function doSave(array $pks, DataInterface $data): array
     {
@@ -182,7 +182,7 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.19
      */
     protected function prepareSaveItem($pk, $data): void
     {
@@ -197,7 +197,7 @@ abstract class AbstractBatchController extends AbstractPostController
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.19
      */
     protected function postSaveItem($pk, $data): void
     {

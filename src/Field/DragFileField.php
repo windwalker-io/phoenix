@@ -2,8 +2,8 @@
 /**
  * Part of earth project.
  *
- * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2018 LYRASOFT.
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Phoenix\Field;
@@ -11,7 +11,10 @@ namespace Phoenix\Field;
 use Phoenix\Script\PhoenixScript;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Data\Collection;
 use Windwalker\Form\Field\FileField;
+use Windwalker\String\Str;
+use function Windwalker\arr;
 
 /**
  * The DragFileField class.
@@ -38,7 +41,7 @@ class DragFileField extends FileField
      */
     public function prepareAttributes()
     {
-        $this->class('custom-file-input');
+        $this->addClass('custom-file-input');
 
         return parent::prepareAttributes();
     }
@@ -58,13 +61,26 @@ class DragFileField extends FileField
 
         $attrs['data-max-size'] = $this->maxSize();
 
-        $input = parent::buildInput($attrs);
-        $id    = $this->getId();
+        // Fix accept
+        if (trim($attrs['accept'])) {
+            $attrs['accept'] = Collection::explode(',', $attrs['accept'])
+                ->map('trim')
+                ->map(function ($type) {
+                    if (strpos($type, '/') === false) {
+                        return Str::ensureLeft($type, '.');
+                    }
 
-        $this->prepareScript();
+                    return $type;
+                })
+                ->implode(',');
+        }
+
+        $input = parent::buildInput($attrs);
+
+        $this->prepareScript($attrs);
 
         return WidgetHelper::render($this->get('layout', 'phoenix.form.field.drag-file'), [
-            'id' => $id,
+            'id' => $attrs['id'],
             'input' => $input,
             'attrs' => $attrs,
             'field' => $this,
@@ -78,7 +94,7 @@ class DragFileField extends FileField
      *
      * @since  1.7.3
      */
-    protected function prepareScript()
+    protected function prepareScript(array $attrs)
     {
         if (!static::$inited) {
             Asset::addJS(PhoenixScript::phoenixName() . '/js/field/drag-file.min.js');
@@ -95,7 +111,7 @@ class DragFileField extends FileField
             static::$inited = true;
         }
 
-        $id = $this->getId();
+        $id = $attrs['id'];
 
         $js = <<<JS
 $('#$id').dragFile();

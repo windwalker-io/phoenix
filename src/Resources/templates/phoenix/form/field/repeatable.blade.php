@@ -8,8 +8,13 @@
 
 // Set renderer
 $form->setRenderer($field->getForm()->getRenderer());
+
+$singleArray = $field->singleArray();
+
+$hasKey = (bool) $form->getField('key');
 ?>
-<div id="{{ $field->getId() }}-wrap" class="phoenix-repeatable">
+<div id="{{ $field->getId() }}-wrap" class="phoenix-repeatable"
+    data-has-key="{{ (int) $hasKey }}" data-single-array="{{ (int) $singleArray }}">
     <table class="table">
         <thead>
         <tr>
@@ -17,7 +22,7 @@ $form->setRenderer($field->getForm()->getRenderer());
                 <th>#</th>
             @endif
             @foreach ($form->getFields() as $subField)
-                <th>
+                <th class="{{ $subField->getType() === 'hidden' ? 'sr-only' : '' }}">
                     {!! $subField->getLabel() !!}
                 </th>
             @endforeach
@@ -40,7 +45,7 @@ $form->setRenderer($field->getForm()->getRenderer());
                     </td>
                 @endif
                 @foreach ($form->getFields() as $subField)
-                    <td>
+                    <td class="{{ $subField->getType() === 'hidden' ? 'sr-only' : '' }}">
                         {!! $subField->renderInput() !!}
                     </td>
                 @endforeach

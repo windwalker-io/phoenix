@@ -128,7 +128,7 @@ class GeneratorController extends AbstractMuseController
         $config['all']             = (!$config['only_controller'] && !$config['only_model'] && !$config['only_view']);
 
         $config['project'] = $this->command->getOption('project')
-            ?: $command->in('Project Name (app.): ') ?: 'app';
+            ?: $command->in('Project Name (app): ') ?: 'app';
 
         // Get Handler
         $task = StringNormalise::toClassNamespace(str_replace('.', '\\', $task));

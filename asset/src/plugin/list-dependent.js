@@ -116,7 +116,7 @@
 
       this.beforeHook(value, this.element, this.dependent);
 
-      Phoenix.get(this.options.ajax.url, data)
+      Phoenix.Ajax.get(this.options.ajax.url, data)
         .done(response => {
           if (response.success) {
             this.updateListElements(response.data);

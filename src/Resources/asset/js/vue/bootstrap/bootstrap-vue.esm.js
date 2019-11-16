@@ -1,5 +1,5 @@
 /*!
- * BoostrapVue 2.0.0-rc.28
+ * BoostrapVue 2.0.4
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -127,6 +127,74 @@ function _setPrototypeOf(o, p) {
   };
 
   return _setPrototypeOf(o, p);
+}
+
+function isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _construct(Parent, args, Class) {
+  if (isNativeReflectConstruct()) {
+    _construct = Reflect.construct;
+  } else {
+    _construct = function _construct(Parent, args, Class) {
+      var a = [null];
+      a.push.apply(a, args);
+      var Constructor = Function.bind.apply(Parent, a);
+      var instance = new Constructor();
+      if (Class) _setPrototypeOf(instance, Class.prototype);
+      return instance;
+    };
+  }
+
+  return _construct.apply(null, arguments);
+}
+
+function _isNativeFunction(fn) {
+  return Function.toString.call(fn).indexOf("[native code]") !== -1;
+}
+
+function _wrapNativeSuper(Class) {
+  var _cache = typeof Map === "function" ? new Map() : undefined;
+
+  _wrapNativeSuper = function _wrapNativeSuper(Class) {
+    if (Class === null || !_isNativeFunction(Class)) return Class;
+
+    if (typeof Class !== "function") {
+      throw new TypeError("Super expression must either be null or a function");
+    }
+
+    if (typeof _cache !== "undefined") {
+      if (_cache.has(Class)) return _cache.get(Class);
+
+      _cache.set(Class, Wrapper);
+    }
+
+    function Wrapper() {
+      return _construct(Class, arguments, _getPrototypeOf(this).constructor);
+    }
+
+    Wrapper.prototype = Object.create(Class.prototype, {
+      constructor: {
+        value: Wrapper,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    return _setPrototypeOf(Wrapper, Class);
+  };
+
+  return _wrapNativeSuper(Class);
 }
 
 function _assertThisInitialized(self) {
@@ -401,6 +469,60 @@ var deepFreeze = function deepFreeze(obj) {
   return freeze(obj);
 };
 
+var w = hasWindowSupport ? window : {};
+var Element$1 = hasWindowSupport ? w.Element :
+/*#__PURE__*/
+function (_Object) {
+  _inherits(Element, _Object);
+
+  function Element() {
+    _classCallCheck(this, Element);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(Element).apply(this, arguments));
+  }
+
+  return Element;
+}(_wrapNativeSuper(Object));
+var HTMLElement = hasWindowSupport ? w.HTMLElement :
+/*#__PURE__*/
+function (_Element) {
+  _inherits(HTMLElement, _Element);
+
+  function HTMLElement() {
+    _classCallCheck(this, HTMLElement);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(HTMLElement).apply(this, arguments));
+  }
+
+  return HTMLElement;
+}(Element$1);
+var SVGElement = hasWindowSupport ? w.SVGElement :
+/*#__PURE__*/
+function (_Element2) {
+  _inherits(SVGElement, _Element2);
+
+  function SVGElement() {
+    _classCallCheck(this, SVGElement);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(SVGElement).apply(this, arguments));
+  }
+
+  return SVGElement;
+}(Element$1);
+var File = hasWindowSupport ? w.File :
+/*#__PURE__*/
+function (_Object2) {
+  _inherits(File, _Object2);
+
+  function File() {
+    _classCallCheck(this, File);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(File).apply(this, arguments));
+  }
+
+  return File;
+}(_wrapNativeSuper(Object));
+
 var toType = function toType(val) {
   return _typeof(val);
 };
@@ -433,6 +555,9 @@ var isDate = function isDate(val) {
 };
 var isEvent = function isEvent(val) {
   return val instanceof Event;
+};
+var isFile = function isFile(val) {
+  return val instanceof File;
 };
 var isRegExp = function isRegExp(val) {
   return toRawType(val) === 'RegExp';
@@ -637,7 +762,7 @@ var DEFAULTS = deepFreeze({
     boundary: 'scrollParent',
     boundaryPadding: 5,
     customClass: null,
-    delay: 0,
+    delay: 50,
     variant: null
   },
   BProgress: {
@@ -671,7 +796,7 @@ var DEFAULTS = deepFreeze({
     boundary: 'scrollParent',
     boundaryPadding: 5,
     customClass: null,
-    delay: 0,
+    delay: 50,
     variant: null
   }
 });
@@ -979,7 +1104,7 @@ var getBreakpointsUpCached = memoize(function () {
   return breakpoints;
 }); // Convenience method for getting breakpoints with
 
-var w = hasWindowSupport ? window : {};
+var w$1 = hasWindowSupport ? window : {};
 var d = hasDocumentSupport ? document : {};
 var elProto = typeof Element !== 'undefined' ? Element.prototype : {}; // --- Normalization utils ---
 // See: https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
@@ -1007,14 +1132,14 @@ var closestEl = elProto.closest || function (sel)
   return null;
 }; // `requestAnimationFrame()` convenience method
 
-var requestAF = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.mozRequestAnimationFrame || w.msRequestAnimationFrame || w.oRequestAnimationFrame || // Fallback, but not a true polyfill
+var requestAF = w$1.requestAnimationFrame || w$1.webkitRequestAnimationFrame || w$1.mozRequestAnimationFrame || w$1.msRequestAnimationFrame || w$1.oRequestAnimationFrame || // Fallback, but not a true polyfill
 // Only needed for Opera Mini
 
 /* istanbul ignore next */
 function (cb) {
   return setTimeout(cb, 16);
 };
-var MutationObs = w.MutationObserver || w.WebKitMutationObserver || w.MozMutationObserver || null; // --- Utils ---
+var MutationObs = w$1.MutationObserver || w$1.WebKitMutationObserver || w$1.MozMutationObserver || null; // --- Utils ---
 // Normalize event options based on support of passive option
 // Exported only for testing purposes
 
@@ -1093,13 +1218,17 @@ var matches = function matches(el, selector) {
 }; // Finds closest element matching selector. Returns `null` if not found
 
 var closest = function closest(selector, root) {
+  var includeRoot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
   if (!isElement(root)) {
     return null;
   }
 
-  var el = closestEl.call(root, selector); // Emulate jQuery closest and return `null` if match is the passed in element (root)
+  var el = closestEl.call(root, selector); // Native closest behaviour when `includeRoot` is truthy,
+  // else emulate jQuery closest and return `null` if match is
+  // the passed in root element when `includeRoot` is falsey
 
-  return el === root ? null : el;
+  return includeRoot ? el : el === root ? null : el;
 }; // Returns true if the parent element contains the child element
 
 var contains = function contains(parent, child) {
@@ -1175,14 +1304,14 @@ var getBCR = function getBCR(el) {
 /* istanbul ignore next: getComputedStyle() doesn't work in JSDOM */
 
 var getCS = function getCS(el) {
-  return hasWindowSupport && isElement(el) ? w.getComputedStyle(el) : {};
+  return hasWindowSupport && isElement(el) ? w$1.getComputedStyle(el) : {};
 }; // Returns a `Selection` object representing the range of text selected
 // Returns `null` if no window support is given
 
 /* istanbul ignore next: getSelection() doesn't work in JSDOM */
 
 var getSel = function getSel() {
-  return hasWindowSupport && w.getSelection ? w.getSelection() : null;
+  return hasWindowSupport && w$1.getSelection ? w$1.getSelection() : null;
 }; // Return an element's offset with respect to document element
 // https://j11y.io/jquery/#v=git&fn=jQuery.fn.offset
 
@@ -1280,7 +1409,13 @@ Vue.extend({
       type: Boolean,
       default: false
     },
+    appear: {
+      // Has no effect if `trans-props` provided
+      type: Boolean,
+      default: false
+    },
     mode: {
+      // Can be overridden by user supplied trans-props
       type: String // default: undefined
 
     },
@@ -1299,6 +1434,16 @@ Vue.extend({
 
     if (!isPlainObject(transProps)) {
       transProps = props.noFade ? NO_FADE_PROPS : FADE_PROPS;
+
+      if (props.appear) {
+        // Default the appear classes to equal the enter classes
+        transProps = _objectSpread2({}, transProps, {
+          appear: true,
+          appearClass: transProps.enterClass,
+          appearActiveClass: transProps.enterActiveClass,
+          appearToClass: transProps.enterToClass
+        });
+      }
     }
 
     transProps = _objectSpread2({
@@ -1307,7 +1452,7 @@ Vue.extend({
       // We always need `css` true
       css: true
     });
-    return h('transition', // Any listeners will get merged here
+    return h('transition', // Any transition event listeners will get merged here
     mergeData(data, {
       props: transProps
     }), children);
@@ -1324,7 +1469,7 @@ Vue.extend({
  * @param {String, Array} name or name[]
  * @param {Object} scopedSlots
  * @param {Object} slots
- * @returns {Array|undefined} vNodes
+ * @returns {Array|undefined} VNodes
  */
 
 var hasNormalizedSlot = function hasNormalizedSlot(names) {
@@ -1338,13 +1483,13 @@ var hasNormalizedSlot = function hasNormalizedSlot(names) {
   });
 };
 /**
- * Returns vNodes for named slot either scoped or unscoped
+ * Returns VNodes for named slot either scoped or unscoped
  *
  * @param {String, Array} name or name[]
  * @param {String} scope
  * @param {Object} scopedSlots
  * @param {Object} slots
- * @returns {Array|undefined} vNodes
+ * @returns {Array|undefined} VNodes
  */
 
 
@@ -1375,7 +1520,7 @@ var normalizeSlotMixin = {
     normalizeSlot: function normalizeSlot$1(names) {
       var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      // Returns an array of rendered vNodes if slot found.
+      // Returns an array of rendered VNodes if slot found.
       // Returns undefined if not found.
       // `names` can be a string name or an array of names
       var vNodes = normalizeSlot(names, scope, this.$scopedSlots, this.$slots);
@@ -1402,9 +1547,9 @@ var props = {
     default: function _default() {
       return getComponentConfig(NAME, 'textVariant');
     }
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BButtonClose =
 /*#__PURE__*/
 Vue.extend({
@@ -1437,9 +1582,8 @@ Vue.extend({
             evt.preventDefault();
           }
         }
-      } // Careful not to override the default slot with innerHTML
-
-    };
+      }
+    }; // Careful not to override the default slot with innerHTML
 
     if (!hasNormalizedSlot('default', $scopedSlots, $slots)) {
       componentData.domProps = {
@@ -1980,13 +2124,7 @@ Vue.extend({
     var tag = this.computedTag;
     var rel = this.computedRel;
     var href = this.computedHref;
-    var isRouterLink = this.isRouterLink; // We want to overwrite any click handler since our callback
-    // will invoke the user supplied handler9s) if !props.disabled
-
-    var handlers = _objectSpread2({}, this.$listeners, {
-      click: this.onClick
-    });
-
+    var isRouterLink = this.isRouterLink;
     var componentData = {
       class: {
         active: this.active,
@@ -1998,12 +2136,16 @@ Vue.extend({
         tabindex: this.disabled ? '-1' : isUndefined(this.$attrs.tabindex) ? null : this.$attrs.tabindex,
         'aria-disabled': this.disabled ? 'true' : null
       }),
-      props: this.computedProps,
-      on: isRouterLink ? {} : handlers,
-      nativeOn: isRouterLink ? handlers : {} // If href attribute exists on <router-link> (even undefined or null) it fails working on
-      // SSR, so we explicitly add it here if needed (i.e. if computedHref() is truthy)
+      props: this.computedProps
+    }; // Add the event handlers. We must use `navtiveOn` for
+    // `<router-link>`/`<nuxt-link>` instead of `on`
 
-    };
+    componentData[isRouterLink ? 'nativeOn' : 'on'] = _objectSpread2({}, this.$listeners, {
+      // We want to overwrite any click handler since our callback
+      // will invoke the user supplied handler(s) if `!this.disabled`
+      click: this.onClick
+    }); // If href attribute exists on <router-link> (even undefined or null) it fails working on
+    // SSR, so we explicitly add it here if needed (i.e. if computedHref() is truthy)
 
     if (href) {
       componentData.attrs.href = href;
@@ -2034,9 +2176,9 @@ var props$1 = _objectSpread2({}, linkProps, {
   pill: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}); // @vue/component
 
-});
 var BBadge =
 /*#__PURE__*/
 Vue.extend({
@@ -2096,9 +2238,9 @@ var props$2 = _objectSpread2({}, propsFactory(), {
   ariaCurrent: {
     type: String,
     default: 'location'
-  } // @vue/component
+  }
+}); // @vue/component
 
-});
 var BBreadcrumbLink =
 /*#__PURE__*/
 Vue.extend({
@@ -2153,9 +2295,9 @@ var props$3 = {
   items: {
     type: Array,
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BBreadcrumb =
 /*#__PURE__*/
 Vue.extend({
@@ -2318,8 +2460,8 @@ var computeAttrs = function computeAttrs(props, data) {
   var link = isLink(props);
   var toggle = isToggle(props);
   var nonStdTag = isNonStandardTag(props);
-  var role = data.attrs && data.attrs['role'] ? data.attrs['role'] : null;
-  var tabindex = data.attrs ? data.attrs['tabindex'] : null;
+  var role = data.attrs && data.attrs.role ? data.attrs.role : null;
+  var tabindex = data.attrs ? data.attrs.tabindex : null;
 
   if (nonStdTag) {
     tabindex = '0';
@@ -2427,9 +2569,9 @@ var props$5 = {
   ariaRole: {
     type: String,
     default: 'group'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BButtonGroup =
 /*#__PURE__*/
 Vue.extend({
@@ -2709,9 +2851,9 @@ var props$6 = {
   titleTag: {
     type: String,
     default: 'h4'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BCardTitle =
 /*#__PURE__*/
 Vue.extend({
@@ -2743,9 +2885,9 @@ var props$7 = {
     default: function _default() {
       return getComponentConfig(NAME$5, 'subTitleTextVariant');
     }
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BCardSubTitle =
 /*#__PURE__*/
 Vue.extend({
@@ -2772,9 +2914,9 @@ var props$8 = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(
   overlay: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}); // @vue/component
 
-});
 var BCardBody =
 /*#__PURE__*/
 Vue.extend({
@@ -2825,9 +2967,9 @@ var props$9 = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(
   headerClass: {
     type: [String, Object, Array],
     default: null
-  } // @vue/component
+  }
+}); // @vue/component
 
-});
 var BCardHeader =
 /*#__PURE__*/
 Vue.extend({
@@ -2861,9 +3003,9 @@ var props$a = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(
   footerClass: {
     type: [String, Object, Array],
     default: null
-  } // @vue/component
+  }
+}); // @vue/component
 
-});
 var BCardFooter =
 /*#__PURE__*/
 Vue.extend({
@@ -2903,34 +3045,34 @@ var props$b = {
     type: Boolean,
     default: false
   },
-  left: {
+  start: {
     type: Boolean,
     default: false
   },
-  start: {
-    type: Boolean,
-    default: false // alias of 'left'
-
-  },
-  right: {
+  left: {
+    // alias of 'start'
     type: Boolean,
     default: false
   },
   end: {
     type: Boolean,
-    default: false // alias of 'right'
-
+    default: false
+  },
+  right: {
+    // alias of 'end'
+    type: Boolean,
+    default: false
   },
   height: {
-    type: String,
+    type: [Number, String],
     default: null
   },
   width: {
-    type: String,
+    type: [Number, String],
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BCardImg =
 /*#__PURE__*/
 Vue.extend({
@@ -2974,9 +3116,9 @@ var props$c = _objectSpread2({}, props$8, {}, props$9, {}, props$a, {}, cardImgP
   noBody: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}); // @vue/component
 
-});
 var BCard =
 /*#__PURE__*/
 Vue.extend({
@@ -3042,6 +3184,250 @@ Vue.extend({
     }), [imgFirst, header].concat(_toConsumableArray(content), [footer, imgLast]));
   }
 });
+
+// Handles when arrays are "sparse" (array.every(...) doesn't handle sparse)
+
+var compareArrays = function compareArrays(a, b) {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  var equal = true;
+
+  for (var i = 0; equal && i < a.length; i++) {
+    equal = looseEqual(a[i], b[i]);
+  }
+
+  return equal;
+};
+/**
+ * Check if two values are loosely equal - that is,
+ * if they are plain objects, do they have the same shape?
+ * Returns boolean true or false
+ */
+
+
+var looseEqual = function looseEqual(a, b) {
+  if (a === b) {
+    return true;
+  }
+
+  var aValidType = isDate(a);
+  var bValidType = isDate(b);
+
+  if (aValidType || bValidType) {
+    return aValidType && bValidType ? a.getTime() === b.getTime() : false;
+  }
+
+  aValidType = isArray(a);
+  bValidType = isArray(b);
+
+  if (aValidType || bValidType) {
+    return aValidType && bValidType ? compareArrays(a, b) : false;
+  }
+
+  aValidType = isObject(a);
+  bValidType = isObject(b);
+
+  if (aValidType || bValidType) {
+    /* istanbul ignore if: this if will probably never be called */
+    if (!aValidType || !bValidType) {
+      return false;
+    }
+
+    var aKeysCount = keys(a).length;
+    var bKeysCount = keys(b).length;
+
+    if (aKeysCount !== bKeysCount) {
+      return false;
+    }
+
+    for (var key in a) {
+      // eslint-disable-next-line no-prototype-builtins
+      var aHasKey = a.hasOwnProperty(key); // eslint-disable-next-line no-prototype-builtins
+
+      var bHasKey = b.hasOwnProperty(key);
+
+      if (aHasKey && !bHasKey || !aHasKey && bHasKey || !looseEqual(a[key], b[key])) {
+        return false;
+      }
+    }
+  }
+
+  return String(a) === String(b);
+};
+
+var OBSERVER_PROP_NAME = '__bv__visibility_observer';
+
+var VisibilityObserver =
+/*#__PURE__*/
+function () {
+  function VisibilityObserver(el, options, vnode) {
+    _classCallCheck(this, VisibilityObserver);
+
+    this.el = el;
+    this.callback = options.callback;
+    this.margin = options.margin || 0;
+    this.once = options.once || false;
+    this.observer = null;
+    this.visible = undefined;
+    this.doneOnce = false; // Create the observer instance (if possible)
+
+    this.createObserver(vnode);
+  }
+
+  _createClass(VisibilityObserver, [{
+    key: "createObserver",
+    value: function createObserver(vnode) {
+      var _this = this;
+
+      // Remove any previous observer
+      if (this.observer) {
+        /* istanbul ignore next */
+        this.stop();
+      } // Should only be called once and `callback` prop should be a function
+
+
+      if (this.doneOnce || !isFunction(this.callback)) {
+        /* istanbul ignore next */
+        return;
+      } // Create the observer instance
+
+
+      try {
+        // Future: Possibly add in other modifiers for left/right/top/bottom
+        // offsets, root element reference, and thresholds
+        this.observer = new IntersectionObserver(this.handler.bind(this), {
+          // `null` = 'viewport'
+          root: null,
+          // Pixels away from view port to consider "visible"
+          rootMargin: this.margin,
+          // Intersection ratio of el and root (as a value from 0 to 1)
+          threshold: 0
+        });
+      } catch (_unused) {
+        // No IntersectionObserver support, so just stop trying to observe
+        this.doneOnce = true;
+        this.observer = undefined;
+        this.callback(null);
+        return;
+      } // Start observing in a `$nextTick()` (to allow DOM to complete rendering)
+
+      /* istanbul ignore next: IntersectionObserver not supported in JSDOM */
+
+
+      vnode.context.$nextTick(function () {
+        requestAF(function () {
+          // Placed in an `if` just in case we were destroyed before
+          // this `requestAnimationFrame` runs
+          if (_this.observer) {
+            _this.observer.observe(_this.el);
+          }
+        });
+      });
+    }
+  }, {
+    key: "handler",
+    value: function handler(entries)
+    /* istanbul ignore next: IntersectionObserver not supported in JSDOM */
+    {
+      var entry = entries ? entries[0] : {};
+      var isIntersecting = Boolean(entry.isIntersecting || entry.intersectionRatio > 0.0);
+
+      if (isIntersecting !== this.visible) {
+        this.visible = isIntersecting;
+        this.callback(isIntersecting);
+
+        if (this.once && this.visible) {
+          this.doneOnce = true;
+          this.stop();
+        }
+      }
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      var observer = this.observer;
+      /* istanbul ignore next */
+
+      if (observer && observer.disconnect) {
+        observer.disconnect();
+      }
+
+      this.observer = null;
+    }
+  }]);
+
+  return VisibilityObserver;
+}();
+
+var destroy = function destroy(el) {
+  var observer = el[OBSERVER_PROP_NAME];
+
+  if (observer && observer.stop) {
+    observer.stop();
+  }
+
+  delete el[OBSERVER_PROP_NAME];
+};
+
+var bind = function bind(el, _ref, vnode) {
+  var value = _ref.value,
+      modifiers = _ref.modifiers;
+  // `value` is the callback function
+  var options = {
+    margin: '0px',
+    once: false,
+    callback: value
+  }; // Parse modifiers
+
+  keys(modifiers).forEach(function (mod) {
+    /* istanbul ignore else: Until <b-img-lazy> is switched to use this directive */
+    if (/^\d+$/.test(mod)) {
+      options.margin = "".concat(mod, "px");
+    } else if (mod.toLowerCase() === 'once') {
+      options.once = true;
+    }
+  }); // Destroy any previous observer
+
+  destroy(el); // Create new observer
+
+  el[OBSERVER_PROP_NAME] = new VisibilityObserver(el, options, vnode); // Store the current modifiers on the object (cloned)
+
+  el[OBSERVER_PROP_NAME]._prevModifiers = _objectSpread2({}, modifiers);
+}; // When the directive options may have been updated (or element)
+
+
+var componentUpdated = function componentUpdated(el, _ref2, vnode) {
+  var value = _ref2.value,
+      oldValue = _ref2.oldValue,
+      modifiers = _ref2.modifiers;
+
+  // Compare value/oldValue and modifiers to see if anything has changed
+  // and if so, destroy old observer and create new observer
+
+  /* istanbul ignore next */
+  if (value !== oldValue || !el[OBSERVER_PROP_NAME] || !looseEqual(modifiers, el[OBSERVER_PROP_NAME]._prevModifiers)) {
+    // Re-bind on element
+    bind(el, {
+      value: value,
+      modifiers: modifiers
+    }, vnode);
+  }
+}; // When directive un-binds from element
+
+
+var unbind = function unbind(el) {
+  // Remove the observer
+  destroy(el);
+}; // Export the directive
+
+
+var VBVisible = {
+  bind: bind,
+  componentUpdated: componentUpdated,
+  unbind: unbind
+};
 
 var NAME$6 = 'BImg'; // Blank image with fill template
 
@@ -3114,9 +3500,8 @@ var props$d = {
     default: function _default() {
       return getComponentConfig(NAME$6, 'blankColor');
     }
-  } // --- Helper methods ---
-
-};
+  }
+}; // --- Helper methods ---
 
 var makeBlankImgSrc = function makeBlankImgSrc(width, height, color) {
   var src = encodeURIComponent(BLANK_TEMPLATE.replace('%{w}', String(width)).replace('%{h}', String(height)).replace('%{f}', color));
@@ -3184,11 +3569,6 @@ Vue.extend({
 });
 
 var NAME$7 = 'BImgLazy';
-var THROTTLE = 100;
-var EVENT_OPTIONS = {
-  passive: true,
-  capture: false
-};
 var props$e = {
   src: {
     type: String,
@@ -3263,25 +3643,24 @@ var props$e = {
     default: false
   },
   offset: {
+    // Distance away from viewport (in pixels) before being
+    // considered "visible"
     type: [Number, String],
     default: 360
-  },
-  throttle: {
-    type: [Number, String],
-    default: THROTTLE
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BImgLazy =
 /*#__PURE__*/
 Vue.extend({
   name: NAME$7,
+  directives: {
+    bVisible: VBVisible
+  },
   props: props$e,
   data: function data() {
     return {
-      isShown: false,
-      scrollTimeout: null,
-      observer: null
+      isShown: this.show
     };
   },
   computed: {
@@ -3301,143 +3680,65 @@ Vue.extend({
   watch: {
     show: function show(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.isShown = newVal;
+        // If IntersectionObserver support is not available, image is always shown
+        var visible = hasIntersectionObserverSupport ? newVal : true;
+        this.isShown = visible;
 
-        if (!newVal) {
-          // Make sure listeners are re-enabled if img is force set to blank
-          this.setListeners(true);
+        if (visible !== newVal) {
+          // Ensure the show prop is synced (when no IntersectionObserver)
+          this.$nextTick(this.updateShowProp);
         }
       }
     },
     isShown: function isShown(newVal, oldVal) {
       if (newVal !== oldVal) {
         // Update synched show prop
-        this.$emit('update:show', newVal);
+        this.updateShowProp();
       }
     }
-  },
-  created: function created() {
-    this.isShown = this.show;
   },
   mounted: function mounted() {
-    if (this.isShown) {
-      this.setListeners(false);
-    } else {
-      this.setListeners(true);
-    }
-  },
-  activated: function activated()
-  /* istanbul ignore next */
-  {
-    if (!this.isShown) {
-      this.setListeners(true);
-    }
-  },
-  deactivated: function deactivated()
-  /* istanbul ignore next */
-  {
-    this.setListeners(false);
-  },
-  beforeDestroy: function beforeDestroy() {
-    this.setListeners(false);
+    // If IntersectionObserver is not available, image is always shown
+    this.isShown = hasIntersectionObserverSupport ? this.show : true;
   },
   methods: {
-    setListeners: function setListeners(on) {
-      var _this = this;
-
-      if (this.scrollTimeout) {
-        clearTimeout(this.scrollTimeout);
-        this.scrollTimeout = null;
-      }
-      /* istanbul ignore next: JSDOM doen't support IntersectionObserver */
-
-
-      if (this.observer) {
-        this.observer.unobserve(this.$el);
-        this.observer.disconnect();
-        this.observer = null;
-      }
-
-      var winEvts = ['scroll', 'resize', 'orientationchange'];
-      winEvts.forEach(function (evt) {
-        return eventOff(window, evt, _this.onScroll, EVENT_OPTIONS);
-      });
-      eventOff(this.$el, 'load', this.checkView, EVENT_OPTIONS);
-      eventOff(document, 'transitionend', this.onScroll, EVENT_OPTIONS);
-
-      if (on) {
-        /* istanbul ignore if: JSDOM doen't support IntersectionObserver */
-        if (hasIntersectionObserverSupport) {
-          this.observer = new IntersectionObserver(this.doShow, {
-            root: null,
-            // viewport
-            rootMargin: "".concat(parseInt(this.offset, 10) || 0, "px"),
-            threshold: 0 // percent intersection
-
-          });
-          this.observer.observe(this.$el);
-        } else {
-          // Fallback to scroll/etc events
-          winEvts.forEach(function (evt) {
-            return eventOn(window, evt, _this.onScroll, EVENT_OPTIONS);
-          });
-          eventOn(this.$el, 'load', this.checkView, EVENT_OPTIONS);
-          eventOn(document, 'transitionend', this.onScroll, EVENT_OPTIONS);
-        }
-      }
+    updateShowProp: function updateShowProp() {
+      this.$emit('update:show', this.isShown);
     },
-    doShow: function doShow(entries) {
-      if (entries && (entries[0].isIntersecting || entries[0].intersectionRatio > 0.0)) {
+    doShow: function doShow(visible) {
+      // If IntersectionObserver is not supported, the callback
+      // will be called with `null` rather than `true` or `false`
+      if ((visible || visible === null) && !this.isShown) {
         this.isShown = true;
-        this.setListeners(false);
-      }
-    },
-    checkView: function checkView() {
-      // check bounding box + offset to see if we should show
-
-      /* istanbul ignore next: should rarely occur */
-      if (this.isShown) {
-        this.setListeners(false);
-        return;
-      }
-
-      var offset = parseInt(this.offset, 10) || 0;
-      var docElement = document.documentElement;
-      var view = {
-        l: 0 - offset,
-        t: 0 - offset,
-        b: docElement.clientHeight + offset,
-        r: docElement.clientWidth + offset // JSDOM Doesn't support BCR, but we fake it in the tests
-
-      };
-      var box = getBCR(this.$el);
-
-      if (box.right >= view.l && box.bottom >= view.t && box.left <= view.r && box.top <= view.b) {
-        // image is in view (or about to be in view)
-        this.doShow([{
-          isIntersecting: true
-        }]);
-      }
-    },
-    onScroll: function onScroll() {
-      /* istanbul ignore if: should rarely occur */
-      if (this.isShown) {
-        this.setListeners(false);
-      } else {
-        clearTimeout(this.scrollTimeout);
-        this.scrollTimeout = setTimeout(this.checkView, parseInt(this.throttle, 10) || THROTTLE);
       }
     }
   },
   render: function render(h) {
+    var directives = [];
+
+    if (!this.isShown) {
+      var _modifiers;
+
+      // We only add the visible directive if we are not shown
+      directives.push({
+        // Visible directive will silently do nothing if
+        // IntersectionObserver is not supported
+        name: 'b-visible',
+        // Value expects a callback (passed one arg of `visible` = `true` or `false`)
+        value: this.doShow,
+        modifiers: (_modifiers = {}, _defineProperty(_modifiers, "".concat(parseInt(this.offset, 10) || 0), true), _defineProperty(_modifiers, "once", true), _modifiers)
+      });
+    }
+
     return h(BImg, {
+      directives: directives,
       props: {
         // Computed value props
         src: this.computedSrc,
         blank: this.computedBlank,
         width: this.computedWidth,
         height: this.computedHeight,
-        // Passthough props
+        // Passthrough props
         alt: this.alt,
         blankColor: this.blankColor,
         fluid: this.fluid,
@@ -3465,26 +3766,26 @@ var props$f = _objectSpread2({}, lazyProps, {
     type: Boolean,
     default: false
   },
-  left: {
+  start: {
     type: Boolean,
     default: false
   },
-  start: {
-    type: Boolean,
-    default: false // alias of 'left'
-
-  },
-  right: {
+  left: {
+    // alias of 'start'
     type: Boolean,
     default: false
   },
   end: {
     type: Boolean,
-    default: false // alias of 'right'
+    default: false
+  },
+  right: {
+    // alias of 'end'
+    type: Boolean,
+    default: false
+  }
+}); // @vue/component
 
-  } // @vue/component
-
-});
 var BCardImgLazy =
 /*#__PURE__*/
 Vue.extend({
@@ -3524,9 +3825,9 @@ var props$g = {
   textTag: {
     type: String,
     default: 'p'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BCardText =
 /*#__PURE__*/
 Vue.extend({
@@ -3555,9 +3856,9 @@ var props$h = {
   columns: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BCardGroup =
 /*#__PURE__*/
 Vue.extend({
@@ -3731,9 +4032,9 @@ var DIRECTION = {
   prev: {
     dirClass: 'carousel-item-right',
     overlayClass: 'carousel-item-prev'
-  } // Fallback Transition duration (with a little buffer) in ms
+  }
+}; // Fallback Transition duration (with a little buffer) in ms
 
-};
 var TRANS_DURATION = 600 + 50; // Time for mouse compat events to fire after touch
 
 var TOUCH_EVENT_COMPAT_WAIT = 500; // Number of pixels to consider touch move a swipe
@@ -3742,9 +4043,9 @@ var SWIPE_THRESHOLD = 40; // PointerEvent pointer types
 
 var PointerType = {
   TOUCH: 'touch',
-  PEN: 'pen' // Transition Event names
+  PEN: 'pen'
+}; // Transition Event names
 
-};
 var TransitionEndEvents = {
   WebkitTransition: 'webkitTransitionEnd',
   MozTransition: 'transitionend',
@@ -3753,9 +4054,8 @@ var TransitionEndEvents = {
 };
 var EventOptions = {
   passive: true,
-  capture: false // Return the browser specific transitionEnd event name
-
-};
+  capture: false
+}; // Return the browser specific transitionEnd event name
 
 var getTransitionEndEvent = function getTransitionEndEvent(el) {
   for (var name in TransitionEndEvents) {
@@ -3774,7 +4074,7 @@ var getTransitionEndEvent = function getTransitionEndEvent(el) {
 var BCarousel =
 /*#__PURE__*/
 Vue.extend({
-  name: 'BCarousel',
+  name: NAME$8,
   mixins: [idMixin, normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -3832,6 +4132,11 @@ Vue.extend({
       type: Boolean,
       default: false
     },
+    noWrap: {
+      // Disable wrapping/looping when start/end is reached
+      type: Boolean,
+      default: false
+    },
     noTouch: {
       // Sniffed by carousel-slide
       type: Boolean,
@@ -3874,10 +4179,15 @@ Vue.extend({
       touchDeltaX: 0
     };
   },
+  computed: {
+    numSlides: function numSlides() {
+      return this.slides.length;
+    }
+  },
   watch: {
     value: function value(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.setSlide(newVal);
+        this.setSlide(parseInt(newVal, 10) || 0);
       }
     },
     interval: function interval(newVal, oldVal) {
@@ -3952,9 +4262,12 @@ Vue.extend({
         return;
       }
 
-      var len = this.slides.length; // Don't do anything if nothing to slide to
+      var noWrap = this.noWrap;
+      var numSlides = this.numSlides; // Make sure we have an integer (you never know!)
 
-      if (len === 0) {
+      slide = Math.floor(slide); // Don't do anything if nothing to slide to
+
+      if (numSlides === 0) {
         return;
       } // Don't change slide while transitioning, wait until transition is done
 
@@ -3967,11 +4280,15 @@ Vue.extend({
         return;
       }
 
-      this.direction = direction; // Make sure we have an integer (you never know!)
+      this.direction = direction; // Set new slide index
+      // Wrap around if necessary (if no-wrap not enabled)
 
-      slide = Math.floor(slide); // Set new slide index. Wrap around if necessary
+      this.index = slide >= numSlides ? noWrap ? numSlides - 1 : 0 : slide < 0 ? noWrap ? 0 : numSlides - 1 : slide; // Ensure the v-model is synched up if no-wrap is enabled
+      // and user tried to slide pass either ends
 
-      this.index = slide >= len ? 0 : slide >= 0 ? slide : len - 1;
+      if (noWrap && this.index !== slide && this.index !== this.value) {
+        this.$emit('input', this.index);
+      }
     },
     // Previous slide
     prev: function prev() {
@@ -4006,7 +4323,7 @@ Vue.extend({
       } // Don't start if no interval, or less than 2 slides
 
 
-      if (this.interval && this.slides.length > 1) {
+      if (this.interval && this.numSlides > 1) {
         this._intervalId = setInterval(this.next, Math.max(1000, this.interval));
       }
     },
@@ -4244,20 +4561,35 @@ Vue.extend({
     var controls = h();
 
     if (this.controls) {
+      var prevHandler = function prevHandler(evt) {
+        /* istanbul ignore next */
+        if (!_this3.isSliding) {
+          _this3.handleClick(evt, _this3.prev);
+        } else {
+          evt.preventDefault();
+        }
+      };
+
+      var nextHandler = function nextHandler(evt) {
+        /* istanbul ignore next */
+        if (!_this3.isSliding) {
+          _this3.handleClick(evt, _this3.next);
+        } else {
+          evt.preventDefault();
+        }
+      };
+
       controls = [h('a', {
         class: ['carousel-control-prev'],
         attrs: {
           href: '#',
           role: 'button',
-          'aria-controls': this.safeId('__BV_inner_')
+          'aria-controls': this.safeId('__BV_inner_'),
+          'aria-disabled': this.isSliding ? 'true' : null
         },
         on: {
-          click: function click(evt) {
-            _this3.handleClick(evt, _this3.prev);
-          },
-          keydown: function keydown(evt) {
-            _this3.handleClick(evt, _this3.prev);
-          }
+          click: prevHandler,
+          keydown: prevHandler
         }
       }, [h('span', {
         class: ['carousel-control-prev-icon'],
@@ -4271,15 +4603,12 @@ Vue.extend({
         attrs: {
           href: '#',
           role: 'button',
-          'aria-controls': this.safeId('__BV_inner_')
+          'aria-controls': this.safeId('__BV_inner_'),
+          'aria-disabled': this.isSliding ? 'true' : null
         },
         on: {
-          click: function click(evt) {
-            _this3.handleClick(evt, _this3.next);
-          },
-          keydown: function keydown(evt) {
-            _this3.handleClick(evt, _this3.next);
-          }
+          click: nextHandler,
+          keydown: nextHandler
         }
       }, [h('span', {
         class: ['carousel-control-next-icon'],
@@ -4354,9 +4683,8 @@ Vue.extend({
 
           _this3[keyCode === KEY_CODES.LEFT ? 'prev' : 'next']();
         }
-      } // Touch support event handlers for environment
-
-    };
+      }
+    }; // Touch support event handlers for environment
 
     if (!this.noTouch && hasTouchSupport) {
       // Attach appropriate listeners (prepend event name with '&' for passive mode)
@@ -4447,9 +4775,9 @@ var props$i = {
   },
   background: {
     type: String
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BCarouselSlide =
 /*#__PURE__*/
 Vue.extend({
@@ -4639,23 +4967,19 @@ var EVENT_STATE_REQUEST = 'bv::request::collapse::state'; // Event listener opti
 
 var EventOptions$1 = {
   passive: true,
-  capture: false // @vue/component
+  capture: false
+}; // @vue/component
 
-};
 var BCollapse =
 /*#__PURE__*/
 Vue.extend({
   name: 'BCollapse',
-  mixins: [listenOnRootMixin, normalizeSlotMixin],
+  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
   model: {
     prop: 'visible',
     event: 'input'
   },
   props: {
-    id: {
-      type: String,
-      required: true
-    },
     isNav: {
       type: Boolean,
       default: false
@@ -4723,7 +5047,7 @@ Vue.extend({
     }); // Listen for "Sync state" requests from `v-b-toggle`
 
     this.listenOnRoot(EVENT_STATE_REQUEST, function (id) {
-      if (id === _this.id) {
+      if (id === _this.safeId()) {
         _this.$nextTick(_this.emitSync);
       }
     });
@@ -4798,18 +5122,18 @@ Vue.extend({
     emitState: function emitState() {
       this.$emit('input', this.show); // Let v-b-toggle know the state of this collapse
 
-      this.$root.$emit(EVENT_STATE, this.id, this.show);
+      this.$root.$emit(EVENT_STATE, this.safeId(), this.show);
 
       if (this.accordion && this.show) {
         // Tell the other collapses in this accordion to close
-        this.$root.$emit(EVENT_ACCORDION, this.id, this.accordion);
+        this.$root.$emit(EVENT_ACCORDION, this.safeId(), this.accordion);
       }
     },
     emitSync: function emitSync() {
       // Emit a private event every time this component updates to ensure
       // the toggle button is in sync with the collapse's state
       // It is emitted regardless if the visible state changes
-      this.$root.$emit(EVENT_STATE_SYNC, this.id, this.show);
+      this.$root.$emit(EVENT_STATE_SYNC, this.safeId(), this.show);
     },
     checkDisplayBlock: function checkDisplayBlock() {
       // Check to see if the collapse has `display: block !important;` set.
@@ -4838,7 +5162,7 @@ Vue.extend({
       }
     },
     handleToggleEvt: function handleToggleEvt(target) {
-      if (target !== this.id) {
+      if (target !== this.safeId()) {
         return;
       }
 
@@ -4849,7 +5173,7 @@ Vue.extend({
         return;
       }
 
-      if (openedId === this.id) {
+      if (openedId === this.safeId()) {
         // Open this collapse if not shown
         if (!this.show) {
           this.toggle();
@@ -4874,7 +5198,7 @@ Vue.extend({
         value: this.show
       }],
       attrs: {
-        id: this.id || null
+        id: this.safeId()
       },
       on: {
         click: this.clickHandler
@@ -4898,78 +5222,6 @@ Vue.extend({
     }, [content]);
   }
 });
-
-// Handles when arrays are "sparse" (array.every(...) doesn't handle sparse)
-
-var compareArrays = function compareArrays(a, b) {
-  if (a.length !== b.length) {
-    return false;
-  }
-
-  var equal = true;
-
-  for (var i = 0; equal && i < a.length; i++) {
-    equal = looseEqual(a[i], b[i]);
-  }
-
-  return equal;
-};
-/**
- * Check if two values are loosely equal - that is,
- * if they are plain objects, do they have the same shape?
- * Returns boolean true or false
- */
-
-
-var looseEqual = function looseEqual(a, b) {
-  if (a === b) {
-    return true;
-  }
-
-  var aValidType = isDate(a);
-  var bValidType = isDate(b);
-
-  if (aValidType || bValidType) {
-    return aValidType && bValidType ? a.getTime() === b.getTime() : false;
-  }
-
-  aValidType = isArray(a);
-  bValidType = isArray(b);
-
-  if (aValidType || bValidType) {
-    return aValidType && bValidType ? compareArrays(a, b) : false;
-  }
-
-  aValidType = isObject(a);
-  bValidType = isObject(b);
-
-  if (aValidType || bValidType) {
-    /* istanbul ignore if: this if will probably never be called */
-    if (!aValidType || !bValidType) {
-      return false;
-    }
-
-    var aKeysCount = keys(a).length;
-    var bKeysCount = keys(b).length;
-
-    if (aKeysCount !== bKeysCount) {
-      return false;
-    }
-
-    for (var key in a) {
-      // eslint-disable-next-line no-prototype-builtins
-      var aHasKey = a.hasOwnProperty(key); // eslint-disable-next-line no-prototype-builtins
-
-      var bHasKey = b.hasOwnProperty(key);
-
-      if (aHasKey && !bHasKey || !aHasKey && bHasKey || !looseEqual(a[key], b[key])) {
-        return false;
-      }
-    }
-  }
-
-  return String(a) === String(b);
-};
 
 var allListenTypes = {
   hover: true,
@@ -5029,9 +5281,9 @@ var unbindTargets = function unbindTargets(vnode, binding, listenTypes) {
 };
 
 var listenTypes = {
-  click: true // Property key for handler storage
+  click: true
+}; // Property key for handler storage
 
-};
 var BV_TOGGLE = '__BV_toggle__';
 var BV_TOGGLE_STATE = '__BV_toggle_STATE__';
 var BV_TOGGLE_CONTROLS = '__BV_toggle_CONTROLS__';
@@ -5118,7 +5370,7 @@ var VBToggle = {
       setAttr(el, 'aria-controls', el[BV_TOGGLE_CONTROLS]);
       setAttr(el, 'aria-expanded', 'false'); // If element is not a button, we add `role="button"` for accessibility
 
-      if (el.tagName !== 'BUTTON') {
+      if (el.tagName !== 'BUTTON' && !hasAttr(el, 'role')) {
         setAttr(el, 'role', 'button');
       } // Toggle state handler
 
@@ -5183,12 +5435,6 @@ pluginFactory({
     VBToggle: VBToggle
   }
 });
-
-/**
- * SSR safe types
- */
-var w$1 = hasWindowSupport ? window : {};
-var HTMLElement = w$1.HTMLElement || Object;
 
 var BvEvent =
 /*#__PURE__*/
@@ -5256,114 +5502,24 @@ function () {
   return BvEvent;
 }(); // Named Exports
 
-var clickOutMixin = {
-  data: function data() {
-    return {
-      listenForClickOut: false
-    };
-  },
-  watch: {
-    listenForClickOut: function listenForClickOut(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        eventOff(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, false);
-
-        if (newValue) {
-          eventOn(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, false);
-        }
-      }
-    }
-  },
-  beforeCreate: function beforeCreate() {
-    // Declare non-reactive properties
-    this.clickOutElement = null;
-    this.clickOutEventName = null;
-  },
-  mounted: function mounted() {
-    if (!this.clickOutElement) {
-      this.clickOutElement = document;
-    }
-
-    if (!this.clickOutEventName) {
-      this.clickOutEventName = 'ontouchstart' in document.documentElement ? 'touchstart' : 'click';
-    }
-
-    if (this.listenForClickOut) {
-      eventOn(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, false);
-    }
-  },
-  beforeDestroy: function beforeDestroy()
-  /* istanbul ignore next */
-  {
-    eventOff(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, false);
-  },
-  methods: {
-    isClickOut: function isClickOut(evt) {
-      return !contains(this.$el, evt.target);
-    },
-    _clickOutHandler: function _clickOutHandler(evt) {
-      if (this.clickOutHandler && this.isClickOut(evt)) {
-        this.clickOutHandler(evt);
-      }
-    }
-  }
-};
-
-var focusInMixin = {
-  data: function data() {
-    return {
-      listenForFocusIn: false
-    };
-  },
-  watch: {
-    listenForFocusIn: function listenForFocusIn(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        eventOff(this.focusInElement, 'focusin', this._focusInHandler, false);
-
-        if (newValue) {
-          eventOn(this.focusInElement, 'focusin', this._focusInHandler, false);
-        }
-      }
-    }
-  },
-  beforeCreate: function beforeCreate() {
-    // Declare non-reactive properties
-    this.focusInElement = null;
-  },
-  mounted: function mounted() {
-    if (!this.focusInElement) {
-      this.focusInElement = document;
-    }
-
-    if (this.listenForFocusIn) {
-      eventOn(this.focusInElement, 'focusin', this._focusInHandler, false);
-    }
-  },
-  beforeDestroy: function beforeDestroy()
-  /* istanbul ignore next */
-  {
-    eventOff(this.focusInElement, 'focusin', this._focusInHandler, false);
-  },
-  methods: {
-    _focusInHandler: function _focusInHandler(evt) {
-      if (this.focusInHandler) {
-        this.focusInHandler(evt);
-      }
-    }
-  }
-};
-
 var filterVisibles = function filterVisibles(els) {
   return (els || []).filter(isVisible);
-}; // Dropdown item CSS selectors
+}; // Root dropdown event names
 
+
+var ROOT_DROPDOWN_PREFIX = 'bv::dropdown::';
+var ROOT_DROPDOWN_SHOWN = "".concat(ROOT_DROPDOWN_PREFIX, "shown");
+var ROOT_DROPDOWN_HIDDEN = "".concat(ROOT_DROPDOWN_PREFIX, "hidden"); // Delay when loosing focus before closing menu (in ms)
+
+var FOCUSOUT_DELAY = 100; // Dropdown item CSS selectors
 
 var Selector = {
   FORM_CHILD: '.dropdown form',
   ITEM_SELECTOR: ['.dropdown-item', '.b-dropdown-form'].map(function (selector) {
     return "".concat(selector, ":not(.disabled):not([disabled])");
-  }).join(', ') // Popper attachment positions
+  }).join(', ')
+}; // Popper attachment positions
 
-};
 var AttachmentMap = {
   // Dropup left align
   TOP: 'top-start',
@@ -5380,11 +5536,11 @@ var AttachmentMap = {
   // Dropleft left align
   LEFT: 'left-start',
   // Dropleft right align
-  LEFTEND: 'left-end' // @vue/component
+  LEFTEND: 'left-end'
+}; // @vue/component
 
-};
 var dropdownMixin = {
-  mixins: [clickOutMixin, focusInMixin],
+  mixins: [idMixin],
   provide: function provide() {
     return {
       bvDropdown: this
@@ -5481,7 +5637,8 @@ var dropdownMixin = {
           cancelable: true,
           vueTarget: this,
           target: this.$refs.menu,
-          relatedTarget: null
+          relatedTarget: null,
+          componentId: this.safeId ? this.safeId() : this.id || null
         });
         this.emitEvent(bvEvt);
 
@@ -5530,7 +5687,7 @@ var dropdownMixin = {
     emitEvent: function emitEvent(bvEvt) {
       var type = bvEvt.type;
       this.$emit(type, bvEvt);
-      this.$root.$emit("bv::dropdown::".concat(type), bvEvt);
+      this.$root.$emit("".concat(ROOT_DROPDOWN_PREFIX).concat(type), bvEvt);
     },
     showMenu: function showMenu() {
       var _this = this;
@@ -5538,10 +5695,8 @@ var dropdownMixin = {
       if (this.disabled) {
         /* istanbul ignore next */
         return;
-      } // Ensure other menus are closed
+      } // Are we in a navbar ?
 
-
-      this.$root.$emit('bv::dropdown::shown', this); // Are we in a navbar ?
 
       if (isNull(this.inNavbar) && this.isNav) {
         // We should use an injection for this
@@ -5563,8 +5718,10 @@ var dropdownMixin = {
 
           this.createPopper(element);
         }
-      }
+      } // Ensure other menus are closed
 
+
+      this.$root.$emit(ROOT_DROPDOWN_SHOWN, this);
       this.whileOpenListen(true); // Wrap in nextTick to ensure menu is fully rendered/shown
 
       this.$nextTick(function () {
@@ -5577,7 +5734,7 @@ var dropdownMixin = {
     },
     hideMenu: function hideMenu() {
       this.whileOpenListen(false);
-      this.$root.$emit('bv::dropdown::hidden', this);
+      this.$root.$emit(ROOT_DROPDOWN_HIDDEN, this);
       this.$emit('hidden');
       this.removePopper();
     },
@@ -5626,19 +5783,20 @@ var dropdownMixin = {
 
       return _objectSpread2({}, popperConfig, {}, this.popperOpts || {});
     },
-    whileOpenListen: function whileOpenListen(open) {
+    whileOpenListen: function whileOpenListen(isOpen) {
       // turn listeners on/off while open
-      if (open) {
+      if (isOpen) {
         // If another dropdown is opened
-        this.$root.$on('bv::dropdown::shown', this.rootCloseListener); // Hide the dropdown when clicked outside
+        this.$root.$on(ROOT_DROPDOWN_SHOWN, this.rootCloseListener); // Hide the menu when focus moves out
 
-        this.listenForClickOut = true; // Hide the dropdown when it loses focus
-
-        this.listenForFocusIn = true;
+        eventOn(this.$el, 'focusout', this.onFocusOut, {
+          passive: true
+        });
       } else {
-        this.$root.$off('bv::dropdown::shown', this.rootCloseListener);
-        this.listenForClickOut = false;
-        this.listenForFocusIn = false;
+        this.$root.$off(ROOT_DROPDOWN_SHOWN, this.rootCloseListener);
+        eventOff(this.$el, 'focusout', this.onFocusOut, {
+          passive: true
+        });
       }
     },
     rootCloseListener: function rootCloseListener(vm) {
@@ -5731,6 +5889,7 @@ var dropdownMixin = {
         this.focusNext(evt, true);
       }
     },
+    // If uses presses ESC to close menu
     onEsc: function onEsc(evt) {
       if (this.visible) {
         this.visible = false;
@@ -5740,23 +5899,29 @@ var dropdownMixin = {
         this.$once('hidden', this.focusToggler);
       }
     },
-    // Document click out listener
-    clickOutHandler: function clickOutHandler() {
-      if (this.visible) {
-        this.visible = false;
-      }
-    },
-    // Document focusin listener
-    focusInHandler: function focusInHandler(evt) {
-      var target = evt.target; // If focus leaves dropdown, hide it
+    // Dropdown wrapper focusOut handler
+    onFocusOut: function onFocusOut(evt) {
+      var _this3 = this;
 
-      if (this.visible && !contains(this.$refs.menu, target) && !contains(this.toggler, target)) {
-        this.visible = false;
+      // `relatedTarget` is the element gaining focus
+      var relatedTarget = evt.relatedTarget; // If focus moves outside the menu or toggler, then close menu
+
+      if (this.visible && !contains(this.$refs.menu, relatedTarget) && !contains(this.toggler, relatedTarget)) {
+        var doHide = function doHide() {
+          _this3.visible = false;
+        }; // When we are in a navbar (which has been responsively stacked), we
+        // delay the dropdown's closing so that the next element has a chance
+        // to have it's click handler fired (in case it's position moves on
+        // the screen do to a navbar menu above it collapsing)
+        // https://github.com/bootstrap-vue/bootstrap-vue/issues/4113
+
+
+        this.inNavbar ? setTimeout(doHide, FOCUSOUT_DELAY) : doHide();
       }
     },
     // Keyboard nav
     focusNext: function focusNext(evt, up) {
-      var _this3 = this;
+      var _this4 = this;
 
       // Ignore key up/down on form elements
       if (!this.visible || evt && closest(Selector.FORM_CHILD, evt.target)) {
@@ -5767,7 +5932,7 @@ var dropdownMixin = {
       evt.preventDefault();
       evt.stopPropagation();
       this.$nextTick(function () {
-        var items = _this3.getItems();
+        var items = _this4.getItems();
 
         if (items.length < 1) {
           /* istanbul ignore next: should never happen */
@@ -5787,7 +5952,7 @@ var dropdownMixin = {
           index = 0;
         }
 
-        _this3.focusItem(index, items);
+        _this4.focusItem(index, items);
       });
     },
     focusItem: function focusItem(idx, items) {
@@ -5807,10 +5972,10 @@ var dropdownMixin = {
       this.$refs.menu.focus && this.$refs.menu.focus();
     },
     focusToggler: function focusToggler() {
-      var _this4 = this;
+      var _this5 = this;
 
       this.$nextTick(function () {
-        var toggler = _this4.toggler;
+        var toggler = _this5.toggler;
 
         if (toggler && toggler.focus) {
           toggler.focus();
@@ -5891,9 +6056,9 @@ var props$j = {
     // HTMLElement: HTML Element reference
     type: [String, HTMLElement],
     default: 'scrollParent'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BDropdown =
 /*#__PURE__*/
 Vue.extend({
@@ -5925,15 +6090,14 @@ Vue.extend({
   },
   render: function render(h) {
     var split = h();
-    var buttonContent = this.normalizeSlot('button-content') || this.normalizeSlot('text') || this.html || stripTags(this.text);
+    var buttonContent = this.normalizeSlot('button-content') || this.html || stripTags(this.text);
 
     if (this.split) {
       var btnProps = {
         disabled: this.disabled,
         variant: this.splitVariant || this.variant,
-        size: this.size // We add these as needed due to router-link issues with defined property with undefined/null values
-
-      };
+        size: this.size
+      }; // We add these as needed due to router-link issues with defined property with undefined/null values
 
       if (this.splitTo) {
         btnProps.to = this.splitTo;
@@ -6041,7 +6205,11 @@ Vue.extend({
     }
   },
   render: function render(h) {
-    return h('li', [h(BLink, {
+    return h('li', {
+      attrs: {
+        role: 'presentation'
+      }
+    }, [h(BLink, {
       props: this.$props,
       staticClass: 'dropdown-item',
       class: _defineProperty({}, "text-".concat(this.variant), this.variant && !(this.active || this.disabled)),
@@ -6072,9 +6240,9 @@ var props$l = {
   variant: {
     type: String,
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BDropdownItemButton =
 /*#__PURE__*/
 Vue.extend({
@@ -6101,7 +6269,11 @@ Vue.extend({
   render: function render(h) {
     var _class;
 
-    return h('li', [h('button', {
+    return h('li', {
+      attrs: {
+        role: 'presentation'
+      }
+    }, [h('button', {
       staticClass: 'dropdown-item',
       class: (_class = {}, _defineProperty(_class, this.activeClass, this.active), _defineProperty(_class, "text-".concat(this.variant), this.variant && !(this.active || this.disabled)), _class),
       attrs: _objectSpread2({}, this.$attrs, {
@@ -6129,29 +6301,34 @@ var props$m = {
   variant: {
     type: String,
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BDropdownHeader =
 /*#__PURE__*/
 Vue.extend({
   name: 'BDropdownHeader',
   functional: true,
-  inheritAttrs: false,
   props: props$m,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h('li', [h(props.tag, mergeData(data, {
+    var $attrs = data.attrs || {};
+    data.attrs = {};
+    return h('li', mergeData(data, {
+      attrs: {
+        role: 'presentation'
+      }
+    }), [h(props.tag, {
       staticClass: 'dropdown-header',
       class: _defineProperty({}, "text-".concat(props.variant), props.variant),
-      attrs: {
+      attrs: _objectSpread2({}, $attrs, {
         id: props.id || null,
         role: 'heading'
-      },
+      }),
       ref: 'header'
-    }), children)]);
+    }, children)]);
   }
 });
 
@@ -6159,27 +6336,32 @@ var props$n = {
   tag: {
     type: String,
     default: 'hr'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BDropdownDivider =
 /*#__PURE__*/
 Vue.extend({
   name: 'BDropdownDivider',
   functional: true,
-  inheritAttrs: false,
   props: props$n,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data;
-    return h('li', [h(props.tag, mergeData(data, {
-      staticClass: 'dropdown-divider',
+    var $attrs = data.attrs || {};
+    data.attrs = {};
+    return h('li', mergeData(data, {
       attrs: {
+        role: 'presentation'
+      }
+    }), [h(props.tag, {
+      staticClass: 'dropdown-divider',
+      attrs: _objectSpread2({}, $attrs, {
         role: 'separator',
         'aria-orientation': 'horizontal'
-      },
+      }),
       ref: 'divider'
-    }))]);
+    })]);
   }
 });
 
@@ -6199,9 +6381,9 @@ var props$o = {
   validated: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BForm =
 /*#__PURE__*/
 Vue.extend({
@@ -6230,7 +6412,6 @@ var BDropdownForm =
 Vue.extend({
   name: 'BDropdownForm',
   functional: true,
-  inheritAttrs: false,
   props: _objectSpread2({}, props$o, {
     disabled: {
       type: Boolean,
@@ -6241,19 +6422,28 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h('li', [h(BForm, mergeData(data, {
+    var $attrs = data.attrs || {};
+    var $listeners = data.on || {};
+    data.attrs = {};
+    data.on = {};
+    return h('li', mergeData(data, {
+      attrs: {
+        role: 'presentation'
+      }
+    }), [h(BForm, {
       ref: 'form',
       staticClass: 'b-dropdown-form',
       class: {
         disabled: props.disabled
       },
       props: props,
-      attrs: {
+      attrs: _objectSpread2({}, $attrs, {
         disabled: props.disabled,
         // Tab index of -1 for keyboard navigation
         tabindex: props.disabled ? null : '-1'
-      }
-    }), children)]);
+      }),
+      on: $listeners
+    }, children)]);
   }
 });
 
@@ -6262,7 +6452,6 @@ var BDropdownText =
 Vue.extend({
   name: 'BDropdownText',
   functional: true,
-  inheritAttrs: false,
   props: {
     tag: {
       type: String,
@@ -6277,12 +6466,19 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    return h('li', [h(props.tag, mergeData(data, {
+    var $attrs = data.attrs || {};
+    data.attrs = {};
+    return h('li', mergeData(data, {
+      attrs: {
+        role: 'presentation'
+      }
+    }), [h(props.tag, {
       staticClass: 'b-dropdown-text',
       class: _defineProperty({}, "text-".concat(props.variant), props.variant),
       props: props,
+      attrs: $attrs,
       ref: 'text'
-    }), children)]);
+    }, children)]);
   }
 });
 
@@ -6310,15 +6506,14 @@ var props$p = {
   ariaDescribedby: {
     type: String,
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BDropdownGroup =
 /*#__PURE__*/
 Vue.extend({
   name: 'BDropdownGroup',
   functional: true,
-  inheritAttrs: false,
   props: props$p,
   render: function render(h, _ref) {
     var props = _ref.props,
@@ -6327,6 +6522,8 @@ Vue.extend({
         scopedSlots = _ref.scopedSlots;
     var $slots = slots();
     var $scopedSlots = scopedSlots || {};
+    var $attrs = data.attrs || {};
+    data.attrs = {};
     var header;
     var headerId = null;
 
@@ -6343,13 +6540,18 @@ Vue.extend({
     }
 
     var adb = [headerId, props.ariaDescribedBy].filter(Boolean).join(' ').trim();
-    return h('li', [header || h(), h('ul', mergeData(data, {
-      staticClass: 'list-unstyled',
+    return h('li', mergeData(data, {
       attrs: {
-        id: props.id || null,
-        'aria-describedby': adb || null
+        role: 'presentation'
       }
-    }), normalizeSlot('default', {}, $scopedSlots, $slots))]);
+    }), [header || h(), h('ul', {
+      staticClass: 'list-unstyled',
+      attrs: _objectSpread2({}, $attrs, {
+        id: props.id || null,
+        role: 'group',
+        'aria-describedby': adb || null
+      })
+    }, normalizeSlot('default', {}, $scopedSlots, $slots))]);
   }
 });
 
@@ -6393,9 +6595,9 @@ var props$q = {
   aspect: {
     type: String,
     default: '16by9'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BEmbed =
 /*#__PURE__*/
 Vue.extend({
@@ -6557,9 +6759,9 @@ var props$r = {
   inline: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BFormText =
 /*#__PURE__*/
 Vue.extend({
@@ -6599,7 +6801,7 @@ var props$s = {
     default: false
   },
   state: {
-    type: [Boolean, String],
+    type: Boolean,
     default: null
   },
   ariaLive: {
@@ -6609,9 +6811,9 @@ var props$s = {
   role: {
     type: String,
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BFormInvalidFeedback =
 /*#__PURE__*/
 Vue.extend({
@@ -6622,7 +6824,7 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    var show = props.forceShow === true || props.state === false || props.state === 'invalid';
+    var show = props.forceShow === true || props.state === false;
     return h(props.tag, mergeData(data, {
       class: {
         'invalid-feedback': !props.tooltip,
@@ -6657,7 +6859,7 @@ var props$t = {
     default: false
   },
   state: {
-    type: [Boolean, String],
+    type: Boolean,
     default: null
   },
   ariaLive: {
@@ -6667,9 +6869,9 @@ var props$t = {
   role: {
     type: String,
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BFormValidFeedback =
 /*#__PURE__*/
 Vue.extend({
@@ -6680,7 +6882,7 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    var show = props.forceShow === true || props.state === true || props.state === 'valid';
+    var show = props.forceShow === true || props.state === true;
     return h(props.tag, mergeData(data, {
       class: {
         'valid-feedback': !props.tooltip,
@@ -6701,9 +6903,9 @@ var props$u = {
   tag: {
     type: String,
     default: 'div'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BFormRow =
 /*#__PURE__*/
 Vue.extend({
@@ -6740,33 +6942,23 @@ pluginFactory({
  *
  * Returned class is either 'is-valid' or 'is-invalid' based on the 'state' prop
  * state can be one of five values:
- *  - true or 'valid' for is-valid
- *  - false or 'invalid' for is-invalid
- *  - null (or empty string) for no contextual state
+ *  - true for is-valid
+ *  - false for is-invalid
+ *  - null for no contextual state
  */
-// @vue/component
+
 var formStateMixin = {
   props: {
     state: {
-      // true/'valid', false/'invalid', '',null
-      // The order must be String first, then Boolean!
-      type: [String, Boolean],
+      // Tri-state prop: true, false, null (or undefined)
+      type: Boolean,
       default: null
     }
   },
   computed: {
     computedState: function computedState() {
-      var state = this.state;
-
-      if (state === '') {
-        return null;
-      } else if (state === true || state === 'valid') {
-        return true;
-      } else if (state === false || state === 'invalid') {
-        return false;
-      }
-
-      return null;
+      // If not a boolean, ensure that value is null
+      return isBoolean(this.state) ? this.state : null;
     },
     stateClass: function stateClass() {
       var state = this.computedState;
@@ -6951,8 +7143,7 @@ var BCol = {
 
 var NAME$b = 'BFormGroup'; // Selector for finding first input in the form-group
 
-var SELECTOR = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])';
-var DEPRECATED_MSG = 'Props "horizontal" and "breakpoint" are deprecated. Use "label-cols(-{breakpoint})" props instead.'; // Render helper functions (here rather than polluting the instance with more methods)
+var SELECTOR = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])'; // Render helper functions (here rather than polluting the instance with more methods)
 
 var renderInvalidFeedback = function renderInvalidFeedback(h, ctx) {
   var content = ctx.normalizeSlot('invalid-feedback') || ctx.invalidFeedback;
@@ -7150,19 +7341,6 @@ var generateProps$1 = function generateProps() {
     disabled: {
       type: Boolean,
       default: false
-    },
-    horizontal: {
-      // Deprecated
-      type: Boolean,
-      default: false,
-      deprecated: DEPRECATED_MSG
-    },
-    breakpoint: {
-      // Deprecated (ignored if horizontal is not true)
-      type: String,
-      default: null,
-      // legacy value 'sm',
-      deprecated: DEPRECATED_MSG
     }
   });
 }; // We do not use Vue.extend here as that would evaluate the props
@@ -7188,22 +7366,6 @@ var BFormGroup = {
       var _this = this;
 
       var props = {};
-      /* istanbul ignore next: deprecated */
-
-      if (this.horizontal) {
-        // Deprecated setting of horizontal/breakpoint props
-
-        /* istanbul ignore next */
-        warn("b-form-group: ".concat(DEPRECATED_MSG)); // Legacy default is breakpoint sm and cols 3
-
-        var bp = this.breakpoint || getBreakpointsUpCached()[1]; // 'sm'
-
-        var cols = parseInt(this.labelCols, 10) || 3;
-        props[bp] = cols > 0 ? cols : 3; // We then return the single breakpoint prop for legacy compatibility
-
-        return props;
-      }
-
       getBreakpointsUpCached().forEach(function (breakpoint) {
         // Grab the value if the label column breakpoint prop
         var propVal = _this[makePropName(breakpoint, 'labelCols')]; // Handle case where the prop's value is an empty string,
@@ -7251,22 +7413,21 @@ var BFormGroup = {
       return keys(this.labelColProps).length > 0;
     },
     labelId: function labelId() {
-      return this.$slots['label'] || this.label ? this.safeId('_BV_label_') : null;
+      return this.hasNormalizedSlot('label') || this.label ? this.safeId('_BV_label_') : null;
     },
     descriptionId: function descriptionId() {
-      return this.$slots['description'] || this.description ? this.safeId('_BV_description_') : null;
+      return this.hasNormalizedSlot('description') || this.description ? this.safeId('_BV_description_') : null;
     },
     hasInvalidFeedback: function hasInvalidFeedback() {
       // Used for computing aria-describedby
-      var $slots = this.$slots;
-      return this.computedState === false && ($slots['invalid-feedback'] || this.invalidFeedback);
+      return this.computedState === false && (this.hasNormalizedSlot('invalid-feedback') || this.invalidFeedback);
     },
     invalidFeedbackId: function invalidFeedbackId() {
       return this.hasInvalidFeedback ? this.safeId('_BV_feedback_invalid_') : null;
     },
     hasValidFeedback: function hasValidFeedback() {
       // Used for computing aria-describedby
-      return this.computedState === true && (this.$slots['valid-feedback'] || this.validFeedback);
+      return this.computedState === true && (this.hasNormalizedSlot('valid-feedback') || this.validFeedback);
     },
     validFeedbackId: function validFeedbackId() {
       return this.hasValidFeedback ? this.safeId('_BV_feedback_valid_') : null;
@@ -7379,12 +7540,12 @@ var BFormGroup = {
         // Only apply aria-describedby IDs if we are a fieldset
         // as the input will have the IDs when not a fieldset
         'aria-describedby': isFieldset ? this.describedByIds : null
-      } // Return it wrapped in a form-group
-      // Note: Fieldsets do not support adding `row` or `form-row` directly
-      // to them due to browser specific render issues, so we move the `form-row`
-      // to an inner wrapper div when horizontal and using a fieldset
+      }
+    }; // Return it wrapped in a form-group
+    // Note: Fieldsets do not support adding `row` or `form-row` directly
+    // to them due to browser specific render issues, so we move the `form-row`
+    // to an inner wrapper div when horizontal and using a fieldset
 
-    };
     return h(isFieldset ? 'fieldset' : isHorizontal ? BFormRow : 'div', data, isHorizontal && isFieldset ? [h(BFormRow, {}, [label, content])] : [label, content]);
   }
 };
@@ -7752,11 +7913,11 @@ Vue.extend({
   },
   props: {
     value: {
-      // type: [Object, Boolean],
+      // type: [String, Number, Boolean, Object],
       default: true
     },
     uncheckedValue: {
-      // type: [Object, Boolean],
+      // type: [String, Number, Boolean, Object],
       // Not applicable in multi-check mode
       default: false
     },
@@ -7771,8 +7932,8 @@ Vue.extend({
       default: false
     },
     checked: {
-      // v-model
-      type: [String, Number, Object, Array, Boolean],
+      // v-model (Array when multiple checkboxes have same name)
+      // type: [String, Number, Boolean, Object, Array],
       default: null
     }
   },
@@ -7874,7 +8035,7 @@ Vue.extend({
   props: {
     checked: {
       // v-model
-      type: [String, Object, Number, Boolean],
+      // type: [String, Number, Boolean, Object],
       default: null
     }
   },
@@ -8022,11 +8183,11 @@ var props$v = {
     default: false
   },
   checked: {
-    type: [String, Number, Object, Array, Boolean],
+    type: Array,
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BFormCheckboxGroup =
 /*#__PURE__*/
 Vue.extend({
@@ -8066,11 +8227,11 @@ pluginFactory({
 
 var props$w = {
   checked: {
-    type: [String, Object, Number, Boolean],
+    // type: [String, Number, Boolean, Object],
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BFormRadioGroup =
 /*#__PURE__*/
 Vue.extend({
@@ -8594,7 +8755,10 @@ var BFormTextarea =
 /*#__PURE__*/
 Vue.extend({
   name: 'BFormTextarea',
-  mixins: [idMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
+  directives: {
+    'b-visible': VBVisible
+  },
+  mixins: [idMixin, listenOnRootMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
   props: {
     rows: {
       type: [Number, String],
@@ -8622,7 +8786,6 @@ Vue.extend({
   },
   data: function data() {
     return {
-      dontResize: true,
       heightInPx: null
     };
   },
@@ -8635,10 +8798,10 @@ Vue.extend({
       };
 
       if (!this.computedRows) {
-        // Conditionaly set the computed CSS height when auto rows/height is enabled.
-        // We avoid setting the style to null, which can override user manual resize handle.
+        // Conditionally set the computed CSS height when auto rows/height is enabled
+        // We avoid setting the style to `null`, which can override user manual resize handle
         styles.height = this.heightInPx; // We always add a vertical scrollbar to the textarea when auto-height is
-        // enabled so that the computed height calcaultion returns a stable value.
+        // enabled so that the computed height calculation returns a stable value
 
         styles.overflowY = 'scroll';
       }
@@ -8646,60 +8809,46 @@ Vue.extend({
       return styles;
     },
     computedMinRows: function computedMinRows() {
-      // Ensure rows is at least 2 and positive (2 is the native textarea value).
-      // A value of 1 can cause issues in some browsers, and most browsers only support
-      // 2 as the smallest value.
+      // Ensure rows is at least 2 and positive (2 is the native textarea value)
+      // A value of 1 can cause issues in some browsers, and most browsers
+      // only support 2 as the smallest value
       return Math.max(parseInt(this.rows, 10) || 2, 2);
     },
     computedMaxRows: function computedMaxRows() {
       return Math.max(this.computedMinRows, parseInt(this.maxRows, 10) || 0);
     },
     computedRows: function computedRows() {
-      // This is used to set the attribute 'rows' on the textarea.
-      // If auto-height is enabled, then we return null as we use CSS to control height.
+      // This is used to set the attribute 'rows' on the textarea
+      // If auto-height is enabled, then we return `null` as we use CSS to control height
       return this.computedMinRows === this.computedMaxRows ? this.computedMinRows : null;
     }
   },
   watch: {
-    dontResize: function dontResize(newVal, oldval) {
-      if (!newVal) {
-        this.setHeight();
-      }
-    },
     localValue: function localValue(newVal, oldVal) {
       this.setHeight();
     }
   },
   mounted: function mounted() {
-    var _this = this;
-
-    // Enable opt-in resizing once mounted
-    this.$nextTick(function () {
-      _this.dontResize = false;
-    });
-  },
-  activated: function activated() {
-    var _this2 = this;
-
-    // If we are being re-activated in <keep-alive>, enable opt-in resizing
-    this.$nextTick(function () {
-      _this2.dontResize = false;
-    });
-  },
-  deactivated: function deactivated() {
-    // If we are in a deactivated <keep-alive>, disable opt-in resizing
-    this.dontResize = true;
-  },
-  beforeDestroy: function beforeDestroy() {
-    /* istanbul ignore next */
-    this.dontResize = true;
+    this.setHeight();
   },
   methods: {
+    // Called by intersection observer directive
+    visibleCallback: function visibleCallback(visible)
+    /* istanbul ignore next */
+    {
+      if (visible) {
+        // We use a `$nextTick()` here just to make sure any
+        // transitions or portalling have completed
+        this.$nextTick(this.setHeight);
+      }
+    },
     setHeight: function setHeight() {
-      var _this3 = this;
+      var _this = this;
 
       this.$nextTick(function () {
-        _this3.heightInPx = _this3.computeHeight();
+        requestAF(function () {
+          _this.heightInPx = _this.computeHeight();
+        });
       });
     },
     computeHeight: function computeHeight()
@@ -8709,7 +8858,7 @@ Vue.extend({
         return null;
       }
 
-      var el = this.$el; // Element must be visible (not hidden) and in document.
+      var el = this.$el; // Element must be visible (not hidden) and in document
       // Must be checked after above checks
 
       if (!isVisible(el)) {
@@ -8731,16 +8880,16 @@ Vue.extend({
       var oldHeight = el.style.height || computedStyle.height; // Probe scrollHeight by temporarily changing the height to `auto`
 
       el.style.height = 'auto';
-      var scrollHeight = el.scrollHeight; // Place the original old height back on the element, just in case this computedProp
-      // returns the same value as before.
+      var scrollHeight = el.scrollHeight; // Place the original old height back on the element, just in case `computedProp`
+      // returns the same value as before
 
-      el.style.height = oldHeight; // Calculate content height in "rows" (scrollHeight includes padding but not border)
+      el.style.height = oldHeight; // Calculate content height in 'rows' (scrollHeight includes padding but not border)
 
       var contentRows = Math.max((scrollHeight - padding) / lineHeight, 2); // Calculate number of rows to display (limited within min/max rows)
 
       var rows = Math.min(Math.max(contentRows, this.computedMinRows), this.computedMaxRows); // Calculate the required height of the textarea including border and padding (in pixels)
 
-      var height = Math.max(Math.ceil(rows * lineHeight + offset), minHeight); // Computed height remains the larger of oldHeight and new height,
+      var height = Math.max(Math.ceil(rows * lineHeight + offset), minHeight); // Computed height remains the larger of `oldHeight` and new `height`,
       // when height is in `sticky` mode (prop `no-auto-shrink` is true)
 
       if (this.noAutoShrink && (parseFloat(oldHeight) || 0) > height) {
@@ -8760,9 +8909,14 @@ Vue.extend({
       style: self.computedStyle,
       directives: [{
         name: 'model',
-        rawName: 'v-model',
-        value: self.localValue,
-        expression: 'localValue'
+        value: self.localValue
+      }, {
+        name: 'b-visible',
+        value: this.visibleCallback,
+        // If textarea is within 640px of viewport, consider it visible
+        modifiers: {
+          '640': true
+        }
       }],
       attrs: {
         id: self.safeId(),
@@ -8834,8 +8988,17 @@ Vue.extend({
       }
     },
     value: {
-      // type: Object,
-      default: null
+      type: [File, Array],
+      default: null,
+      validator: function validator(val) {
+        /* istanbul ignore next */
+        if (val === '') {
+          warn("".concat(NAME$c, " - setting value/v-model to an empty string for reset is deprecated. Set to 'null' instead"));
+          return true;
+        }
+
+        return isUndefinedOrNull(val) || isFile(val) || isArray(val) && (val.length === 0 || val.every(isFile));
+      }
     },
     accept: {
       type: String,
@@ -9305,9 +9468,9 @@ var props$x = {
   tag: {
     type: String,
     default: 'div'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BInputGroupText =
 /*#__PURE__*/
 Vue.extend({
@@ -9336,9 +9499,9 @@ var commonProps = {
   isText: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BInputGroupAddon =
 /*#__PURE__*/
 Vue.extend({
@@ -9430,9 +9593,9 @@ var props$y = {
   tag: {
     type: String,
     default: 'div'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BInputGroup =
 /*#__PURE__*/
 Vue.extend({
@@ -9507,9 +9670,9 @@ var props$z = {
   fluid: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BContainer =
 /*#__PURE__*/
 Vue.extend({
@@ -9588,9 +9751,9 @@ var props$A = {
     default: function _default() {
       return getComponentConfig(NAME$e, 'textVariant');
     }
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BJumbotron =
 /*#__PURE__*/
 Vue.extend({
@@ -9686,9 +9849,9 @@ var props$B = {
     validator: function validator(str) {
       return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around', 'stretch']), str);
     }
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BRow =
 /*#__PURE__*/
 Vue.extend({
@@ -9741,9 +9904,9 @@ var props$C = {
   horizontal: {
     type: [Boolean, String],
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BListGroup =
 /*#__PURE__*/
 Vue.extend({
@@ -9847,9 +10010,9 @@ var props$E = {
   tag: {
     type: String,
     default: 'div'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BMediaBody =
 /*#__PURE__*/
 Vue.extend({
@@ -9874,9 +10037,9 @@ var props$F = {
   verticalAlign: {
     type: String,
     default: 'top'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BMediaAside =
 /*#__PURE__*/
 Vue.extend({
@@ -9887,9 +10050,10 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
+    var align = props.verticalAlign === 'top' ? 'start' : props.verticalAlign === 'bottom' ? 'end' : props.verticalAlign;
     return h(props.tag, mergeData(data, {
       staticClass: 'd-flex',
-      class: _defineProperty({}, "align-self-".concat(props.verticalAlign), props.verticalAlign)
+      class: _defineProperty({}, "align-self-".concat(align), align)
     }), children);
   }
 });
@@ -9910,9 +10074,9 @@ var props$G = {
   noBody: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BMedia =
 /*#__PURE__*/
 Vue.extend({
@@ -9970,6 +10134,201 @@ pluginFactory({
   }
 });
 
+//
+// Single root node portaling of content, which retains parent/child hierarchy
+// Unlike Portal-Vue where portaled content is no longer a descendent of it's
+// intended parent components
+//
+// Private components for use by Tooltips, Popovers and Modals
+//
+// Based on vue-simple-portal
+// https://github.com/LinusBorg/vue-simple-portal
+// Transporter target used by BTransporterSingle
+// Supports only a single root element
+// @vue/component
+
+var BTransporterTargetSingle =
+/*#__PURE__*/
+Vue.extend({
+  // As an abstract component, it doesn't appear in the $parent chain of
+  // components, which means the next parent of any component rendered inside
+  // of this one will be the parent from which is was portal'd
+  abstract: true,
+  name: 'BTransporterTargetSingle',
+  props: {
+    nodes: {
+      // Even though we only support a single root element,
+      // VNodes are always passed as an array
+      type: [Array, Function] // default: undefined
+
+    }
+  },
+  data: function data(vm) {
+    return {
+      updatedNodes: vm.nodes
+    };
+  },
+  destroyed: function destroyed() {
+    var el = this.$el;
+    el && el.parentNode && el.parentNode.removeChild(el);
+  },
+  render: function render(h) {
+    var nodes = isFunction(this.updatedNodes) ? this.updatedNodes({}) : this.updatedNodes;
+    nodes = concat(nodes).filter(Boolean);
+    /* istanbul ignore else */
+
+    if (nodes && nodes.length > 0 && !nodes[0].text) {
+      return nodes[0];
+    } else {
+      /* istanbul ignore next */
+      return h();
+    }
+  }
+}); // This component has no root element, so only a single VNode is allowed
+// @vue/component
+
+var BTransporterSingle =
+/*#__PURE__*/
+Vue.extend({
+  name: 'BTransporterSingle',
+  mixins: [normalizeSlotMixin],
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    container: {
+      // String: CSS selector,
+      // HTMLElement: Element reference
+      // Mainly needed for tooltips/popovers inside modals
+      type: [String, HTMLElement],
+      default: 'body'
+    },
+    tag: {
+      // This should be set to match the root element type
+      type: String,
+      default: 'div'
+    }
+  },
+  watch: {
+    disabled: {
+      immediate: true,
+      handler: function handler(disabled) {
+        disabled ? this.unmountTarget() : this.$nextTick(this.mountTarget);
+      }
+    }
+  },
+  created: function created() {
+    this._bv_defaultFn = null;
+    this._bv_target = null;
+  },
+  beforeMount: function beforeMount() {
+    this.mountTarget();
+  },
+  updated: function updated() {
+    var _this = this;
+
+    // Placed in a nextTick to ensure that children have completed
+    // updating before rendering in the target
+    this.$nextTick(function () {
+      _this.updateTarget();
+    });
+  },
+  beforeDestroy: function beforeDestroy() {
+    this.unmountTarget();
+    this._bv_defaultFn = null;
+  },
+  methods: {
+    // Get the element which the target should be appended to
+    getContainer: function getContainer() {
+      /* istanbul ignore else */
+      if (isBrowser) {
+        var container = this.container;
+        return isString(container) ? select(container) : container;
+      } else {
+        return null;
+      }
+    },
+    // Mount the target
+    mountTarget: function mountTarget() {
+      if (!this._bv_target) {
+        var container = this.getContainer();
+
+        if (container) {
+          var el = document.createElement('div');
+          container.appendChild(el);
+          this._bv_target = new BTransporterTargetSingle({
+            el: el,
+            parent: this,
+            propsData: {
+              // Initial nodes to be rendered
+              nodes: concat(this.normalizeSlot('default'))
+            }
+          });
+        }
+      }
+    },
+    // Update the content of the target
+    updateTarget: function updateTarget() {
+      if (isBrowser && this._bv_target) {
+        var defaultFn = this.$scopedSlots.default;
+
+        if (!this.disabled) {
+          /* istanbul ignore else: only applicable in Vue 2.5.x */
+          if (defaultFn && this._bv_defaultFn !== defaultFn) {
+            // We only update the target component if the scoped slot
+            // function is a fresh one. The new slot syntax (since Vue 2.6)
+            // can cache unchanged slot functions and we want to respect that here
+            this._bv_target.updatedNodes = defaultFn;
+          } else if (!defaultFn) {
+            // We also need to be back compatible with non-scoped default slot (i.e. 2.5.x)
+            this._bv_target.updatedNodes = this.$slots.default;
+          }
+        } // Update the scoped slot function cache
+
+
+        this._bv_defaultFn = defaultFn;
+      }
+    },
+    // Unmount the target
+    unmountTarget: function unmountTarget() {
+      if (this._bv_target) {
+        this._bv_target.$destroy();
+
+        this._bv_target = null;
+      }
+    }
+  },
+  render: function render(h) {
+    if (this.disabled) {
+      var nodes = concat(this.normalizeSlot('default')).filter(Boolean);
+
+      if (nodes.length > 0 && !nodes[0].text) {
+        return nodes[0];
+      }
+    }
+
+    return h();
+  }
+});
+
+// This method returns a component's scoped style attribute name: `data-v-xxxxxxx`
+// The `_scopeId` options property is added by vue-loader when using scoped styles
+// and will be `undefined` if no scoped styles are in use
+var getScopeId = function getScopeId(vm) {
+  var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  return vm ? vm.$options._scopeId || defaultValue : defaultValue;
+};
+
+var scopedStyleAttrsMixin = {
+  computed: {
+    scopedStyleAttrs: function scopedStyleAttrs() {
+      var scopeId = getScopeId(this.$parent);
+      return scopeId ? _defineProperty({}, scopeId, '') : {};
+    }
+  }
+};
+
 /**
  * Private ModalManager helper
  * Handles controlling modal stacking zIndexes and body adjustments/classes
@@ -9981,9 +10340,9 @@ var DEFAULT_ZINDEX = 1040; // Selectors for padding/margin adjustments
 var Selector$1 = {
   FIXED_CONTENT: '.fixed-top, .fixed-bottom, .is-fixed, .sticky-top',
   STICKY_CONTENT: '.sticky-top',
-  NAVBAR_TOGGLER: '.navbar-toggler' // @vue/component
+  NAVBAR_TOGGLER: '.navbar-toggler'
+}; // @vue/component
 
-};
 var ModalManager =
 /*#__PURE__*/
 Vue.extend({
@@ -10135,7 +10494,9 @@ Vue.extend({
 
         /* istanbul ignore next: difficult to test in JSDOM */
 
-        selectAll(Selector$1.STICKY_CONTENT).forEach(function (el) {
+        selectAll(Selector$1.STICKY_CONTENT).forEach(function (el)
+        /* istanbul ignore next */
+        {
           var actualMargin = el.style.marginRight;
           var calculatedMargin = getCS(el).marginRight || 0;
           setAttr(el, 'data-margin-right', actualMargin);
@@ -10146,7 +10507,9 @@ Vue.extend({
 
         /* istanbul ignore next: difficult to test in JSDOM */
 
-        selectAll(Selector$1.NAVBAR_TOGGLER).forEach(function (el) {
+        selectAll(Selector$1.NAVBAR_TOGGLER).forEach(function (el)
+        /* istanbul ignore next */
+        {
           var actualMargin = el.style.marginRight;
           var calculatedMargin = getCS(el).marginRight || 0;
           setAttr(el, 'data-margin-right', actualMargin);
@@ -10195,7 +10558,7 @@ Vue.extend({
       }
     }
   }
-}); // Export our ModalManager
+}); // Create and export our modal manager instance
 
 var modalManager = new ModalManager();
 
@@ -10219,25 +10582,7 @@ function (_BvEvent) {
     return _this;
   }
 
-  _createClass(BvModalEvent, [{
-    key: "cancel",
-    value: function cancel()
-    /* istanbul ignore next */
-    {
-      // Backwards compatibility for BootstrapVue 1.x
-      warn('b-modal: evt.cancel() is deprecated. Please use evt.preventDefault().');
-      this.preventDefault();
-    }
-  }, {
-    key: "modalId",
-    get: function get()
-    /* istanbul ignore next */
-    {
-      // Backwards compatability <= 2.0.0-rc.19
-      warn('b-modal: evt.modalId is deprecated. Please use evt.componentId.');
-      return this.componentId;
-    }
-  }], [{
+  _createClass(BvModalEvent, null, [{
     key: "Defaults",
     get: function get() {
       return _objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this), {
@@ -10249,183 +10594,6 @@ function (_BvEvent) {
   return BvModalEvent;
 }(BvEvent); // Named exports
 
-//
-// Single root node portaling of content, which retains parent/child hierarchy
-// Unlike Portal-Vue where portaled content is no longer a descendent of it's
-// intended parent components
-//
-// Private components for use by Tooltips, Popovers and Modals
-//
-// Based on vue-simple-portal
-// https://github.com/LinusBorg/vue-simple-portal
-// Transporter target used by BTransporterSingle
-// Supports only a single root element
-// @vue/component
-
-var BTransporterTargetSingle =
-/*#__PURE__*/
-Vue.extend({
-  // As an abstract component, it doesn't appear in the $parent chain of
-  // components, which means the next parent of any component rendered inside
-  // of this one will be the parent from which is was portal'd
-  abstract: true,
-  name: 'BTransporterTargetSingle',
-  props: {
-    nodes: {
-      // Even though we only support a single root element,
-      // vNodes are always passed as an array
-      type: [Array, Function] // default: undefined
-
-    }
-  },
-  data: function data(vm) {
-    return {
-      updatedNodes: vm.nodes
-    };
-  },
-  destroyed: function destroyed() {
-    var el = this.$el;
-    el && el.parentNode && el.parentNode.removeChild(el);
-  },
-  render: function render(h) {
-    var nodes = isFunction(this.updatedNodes) ? this.updatedNodes({}) : this.updatedNodes;
-    nodes = concat(nodes).filter(Boolean);
-    /* istanbul ignore else */
-
-    if (nodes && nodes.length > 0 && !nodes[0].text) {
-      return nodes[0];
-    } else {
-      return h();
-    }
-  }
-}); // This component has no root element, so only a single VNode is allowed
-// @vue/component
-
-var BTransporterSingle =
-/*#__PURE__*/
-Vue.extend({
-  name: 'BTransporterSingle',
-  mixins: [normalizeSlotMixin],
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    container: {
-      // String: CSS selector,
-      // HTMLElement: Element reference
-      // Mainly needed for tooltips/popovers inside modals
-      type: [String, HTMLElement],
-      default: 'body'
-    },
-    tag: {
-      // This should be set to match the root element type
-      type: String,
-      default: 'div'
-    }
-  },
-  watch: {
-    disabled: {
-      immediate: true,
-      handler: function handler(disabled) {
-        disabled ? this.unmountTarget() : this.$nextTick(this.mountTarget);
-      }
-    }
-  },
-  created: function created() {
-    this._bv_defaultFn = null;
-    this._bv_target = null;
-  },
-  beforeMount: function beforeMount() {
-    this.mountTarget();
-  },
-  updated: function updated() {
-    var _this = this;
-
-    // Placed in a nextTick to ensure that children have completed
-    // updating before rendering in the target
-    this.$nextTick(function () {
-      _this.updateTarget();
-    });
-  },
-  beforeDestroy: function beforeDestroy() {
-    this.unmountTarget();
-    this._bv_defaultFn = null;
-  },
-  methods: {
-    // Get the element which the target should be appended to
-    getContainer: function getContainer() {
-      /* istanbul ignore else */
-      if (isBrowser) {
-        var container = this.container;
-        return isString(container) ? select(container) : container;
-      } else {
-        return null;
-      }
-    },
-    // Mount the target
-    mountTarget: function mountTarget() {
-      if (!this._bv_target) {
-        var container = this.getContainer();
-
-        if (container) {
-          var el = document.createElement('div');
-          container.appendChild(el);
-          this._bv_target = new BTransporterTargetSingle({
-            el: el,
-            parent: this,
-            propsData: {
-              // Initial nodes to be rendered
-              nodes: concat(this.normalizeSlot('default'))
-            }
-          });
-        }
-      }
-    },
-    // Update the content of the target
-    updateTarget: function updateTarget() {
-      if (isBrowser && this._bv_target) {
-        var defaultFn = this.$scopedSlots.default;
-
-        if (!this.disabled) {
-          /* istanbul ignore else: only applicable in Vue 2.5.x */
-          if (defaultFn && this._bv_defaultFn !== defaultFn) {
-            // We only update the target component if the scoped slot
-            // function is a fresh one. The new slot syntax (since Vue 2.6)
-            // can cache unchanged slot functions and we want to respect that here
-            this._bv_target.updatedNodes = defaultFn;
-          } else if (!defaultFn) {
-            // We also need to be back compatible with non-scoped default slot (i.e. 2.5.x)
-            this._bv_target.updatedNodes = this.$slots.default;
-          }
-        } // Update the scoped slot function cache
-
-
-        this._bv_defaultFn = defaultFn;
-      }
-    },
-    // Unmount the target
-    unmountTarget: function unmountTarget() {
-      if (this._bv_target) {
-        this._bv_target.$destroy();
-
-        this._bv_target = null;
-      }
-    }
-  },
-  render: function render(h) {
-    if (this.disabled) {
-      var nodes = concat(this.normalizeSlot('default')).filter(Boolean);
-
-      if (nodes.length > 0 && !nodes[0].text) {
-        return nodes[0];
-      }
-    }
-
-    return h();
-  }
-});
-
 var NAME$g = 'BModal'; // ObserveDom config to detect changes in modal content
 // so that we can adjust the modal padding if needed
 
@@ -10434,15 +10602,15 @@ var OBSERVER_CONFIG = {
   childList: true,
   characterData: true,
   attributes: true,
-  attributeFilter: ['style', 'class'] // Options for DOM event listeners
+  attributeFilter: ['style', 'class']
+}; // Options for DOM event listeners
 
-};
 var EVT_OPTIONS = {
   passive: true,
-  capture: false // Query selector to find all tabbable elements
-  // (includes tabindex="-1", which we filter out after)
+  capture: false
+}; // Query selector to find all tabbable elements
+// (includes tabindex="-1", which we filter out after)
 
-};
 var TABABLE_SELECTOR = ['button', '[href]:not(.disabled)', 'input', 'select', 'textarea', '[tabindex]', '[contenteditable]'].map(function (s) {
   return "".concat(s, ":not(:disabled):not([disabled])");
 }).join(', '); // --- Utility methods ---
@@ -10635,7 +10803,8 @@ var props$H = {
     default: false
   },
   returnFocus: {
-    // type: Object,
+    // HTML Element, CSS selector string or Vue component instance
+    type: [HTMLElement, String, Object],
     default: null
   },
   headerCloseLabel: {
@@ -10685,14 +10854,23 @@ var props$H = {
   static: {
     type: Boolean,
     default: false
-  } // @vue/component
+  },
+  autoFocusButton: {
+    type: String,
+    default: null,
+    validator: function validator(val) {
+      /* istanbul ignore next */
+      return isUndefinedOrNull(val) || arrayIncludes(['ok', 'cancel', 'close'], val);
+    }
+  }
+}; // @vue/component
 
-};
 var BModal =
 /*#__PURE__*/
 Vue.extend({
   name: NAME$g,
-  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
+  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
+  inheritAttrs: false,
   model: {
     prop: 'visible',
     event: 'change'
@@ -10858,11 +11036,13 @@ Vue.extend({
         /* istanbul ignore next */
         return;
       }
+      /* istanbul ignore next */
+
 
       if (this.isClosing) {
         // If we are in the process of closing, wait until hidden before re-opening
 
-        /* istanbul ignore next: very difficult to test */
+        /* istanbul ignore next */
         this.$once('hidden', this.show);
         /* istanbul ignore next */
 
@@ -11013,13 +11193,21 @@ Vue.extend({
 
       this.checkModalOverflow();
       this.isShow = true;
-      this.isTransitioning = false;
-      this.$nextTick(function () {
+      this.isTransitioning = false; // We use `requestAF()` to allow transition hooks to complete
+      // before passing control over to the other handlers
+      // This will allow users to not have to use `$nextTick()` or `requestAF()`
+      // when trying to pre-focus an element
+
+      requestAF(function () {
         _this2.emitEvent(_this2.buildEvent('shown'));
 
-        _this2.focusFirst();
-
         _this2.setEnforceFocus(true);
+
+        _this2.$nextTick(function () {
+          // Delayed in a `$nextTick()` to allow users time to pre-focus
+          // an element if the wish
+          _this2.focusFirst();
+        });
       });
     },
     onBeforeLeave: function onBeforeLeave() {
@@ -11178,20 +11366,35 @@ Vue.extend({
     },
     // Focus control handlers
     focusFirst: function focusFirst() {
+      var _this5 = this;
+
       // Don't try and focus if we are SSR
       if (isBrowser) {
-        var modal = this.$refs.modal;
-        var content = this.$refs.content;
-        var activeElement = this.getActiveElement(); // If the modal contains the activeElement, we don't do anything
+        requestAF(function () {
+          var modal = _this5.$refs.modal;
+          var content = _this5.$refs.content;
 
-        if (modal && content && !(activeElement && contains(content, activeElement))) {
-          // Make sure top of modal is showing (if longer than the viewport)
-          // and focus the modal content wrapper
-          this.$nextTick(function () {
-            modal.scrollTop = 0;
-            content.focus();
-          });
-        }
+          var activeElement = _this5.getActiveElement(); // If the modal contains the activeElement, we don't do anything
+
+
+          if (modal && content && !(activeElement && contains(content, activeElement))) {
+            var ok = _this5.$refs['ok-button'];
+            var cancel = _this5.$refs['cancel-button'];
+            var close = _this5.$refs['close-button']; // Focus the appropriate button or modal content wrapper
+
+            var autoFocus = _this5.autoFocusButton;
+            var el = autoFocus === 'ok' && ok ? ok.$el || ok : autoFocus === 'cancel' && cancel ? cancel.$el || cancel : autoFocus === 'close' && close ? close.$el || close : content; // Focus the element
+
+            attemptFocus(el);
+
+            if (el === content) {
+              // Make sure top of modal is showing (if longer than the viewport)
+              _this5.$nextTick(function () {
+                modal.scrollTop = 0;
+              });
+            }
+          }
+        });
       }
     },
     returnFocusTo: function returnFocusTo() {
@@ -11228,6 +11431,7 @@ Vue.extend({
 
           if (!this.hideHeaderClose) {
             closeButton = h(BButtonClose, {
+              ref: 'close-button',
               props: {
                 disabled: this.isTransitioning,
                 ariaLabel: this.headerCloseLabel,
@@ -11285,6 +11489,7 @@ Vue.extend({
               innerHTML: this.cancelTitleHtml
             } : null;
             cancelButton = h(BButton, {
+              ref: 'cancel-button',
               props: {
                 variant: this.cancelVariant,
                 size: this.buttonSize,
@@ -11302,6 +11507,7 @@ Vue.extend({
             innerHTML: this.okTitleHtml
           } : null;
           var okButton = h(BButton, {
+            ref: 'ok-button',
             props: {
               variant: this.okVariant,
               size: this.buttonSize,
@@ -11430,14 +11636,17 @@ Vue.extend({
         props: {
           noFade: this.noFade
         }
-      }, [backdrop]); // Assemble modal and backdrop in an outer <div>
+      }, [backdrop]); // If the parent has a scoped style attribute, and the modal
+      // is portalled, add the scoped attribute to the modal wrapper
+
+      var scopedStyleAttrs = !this.static ? this.scopedStyleAttrs : {}; // Assemble modal and backdrop in an outer <div>
 
       return h('div', {
         key: "modal-outer-".concat(this._uid),
         style: this.modalOuterStyle,
-        attrs: {
+        attrs: _objectSpread2({}, scopedStyleAttrs, {}, this.$attrs, {
           id: this.safeId('__BV_modal_outer_')
-        }
+        })
       }, [modal, backdrop]);
     }
   },
@@ -11450,44 +11659,96 @@ Vue.extend({
   }
 });
 
-var listenTypes$1 = {
-  click: true // Emitted show event for modal
+var EVENT_SHOW = 'bv::show::modal'; // Prop name we use to store info on root element
 
+var HANDLER = '__bv_modal_directive__';
+var EVENT_OPTS = {
+  passive: true
 };
-var EVENT_SHOW = 'bv::show::modal';
 
-var setRole = function setRole(el, binding, vnode) {
-  if (el.tagName !== 'BUTTON') {
-    setAttr(el, 'role', 'button');
+var getTarget = function getTarget(_ref) {
+  var _ref$modifiers = _ref.modifiers,
+      modifiers = _ref$modifiers === void 0 ? {} : _ref$modifiers,
+      arg = _ref.arg,
+      value = _ref.value;
+  // Try value, then arg, otherwise pick last modifier
+  return isString(value) ? value : isString(arg) ? arg : keys(modifiers).reverse()[0];
+};
+
+var getTriggerElement = function getTriggerElement(el) {
+  // If root element is a dropdown item or nav item, we
+  // need to target the inner link or button instead
+  return el && matches(el, '.dropdown-menu > li, li.nav-item') ? select('a, button', el) || el : el;
+};
+
+var setRole = function setRole(trigger) {
+  // Only set a role if the trigger element doesn't have one
+  if (trigger && trigger.tagName !== 'BUTTON' && !hasAttr(trigger, 'role')) {
+    setAttr(trigger, 'role', 'button');
   }
 };
+
+var bind$1 = function bind(el, binding, vnode) {
+  var target = getTarget(binding);
+  var trigger = getTriggerElement(el);
+
+  if (target && trigger) {
+    var handler = function handler(evt) {
+      // `currentTarget` is the element with the listener on it
+      var currentTarget = evt.currentTarget;
+
+      if (!isDisabled(currentTarget)) {
+        var type = evt.type; // Open modal only if trigger is not disabled
+
+        if (type === 'click' || type === 'keydown' && evt.keyCode === 32) {
+          vnode.context.$root.$emit(EVENT_SHOW, target, currentTarget);
+        }
+      }
+    };
+
+    el[HANDLER] = handler; // If element is not a button, we add `role="button"` for accessibility
+
+    setRole(trigger); // Listen for click events
+
+    eventOn(trigger, 'click', handler, EVENT_OPTS);
+
+    if (trigger.tagName !== 'BUTTON' && getAttr(trigger, 'role') === 'button') {
+      // If trigger isn't a button but has role button,
+      // we also listen for `keydown.space`
+      eventOn(trigger, 'keydown', handler, EVENT_OPTS);
+    }
+  }
+};
+
+var unbind$1 = function unbind(el) {
+  var trigger = getTriggerElement(el);
+  var handler = el ? el[HANDLER] : null;
+
+  if (trigger && handler) {
+    eventOff(trigger, 'click', handler, EVENT_OPTS);
+    eventOff(trigger, 'keydown', handler, EVENT_OPTS);
+  }
+
+  delete el[HANDLER];
+};
+
+var componentUpdated$1 = function componentUpdated(el, binding, vnode) {
+  // We bind and rebind just in case target changes
+  unbind$1(el);
+  bind$1(el, binding, vnode);
+};
+
+var updated = function updated() {};
 /*
  * Export our directive
  */
 
 
 var VBModal = {
-  // eslint-disable-next-line no-shadow-restricted-names
-  bind: function bind(el, binding, vnode) {
-    bindTargets(vnode, binding, listenTypes$1, function (_ref) {
-      var targets = _ref.targets,
-          vnode = _ref.vnode;
-      targets.forEach(function (target) {
-        vnode.context.$root.$emit(EVENT_SHOW, target, vnode.elm);
-      });
-    }); // If element is not a button, we add `role="button"` for accessibility
-
-    setRole(el);
-  },
-  updated: setRole,
-  componentUpdated: setRole,
-  unbind: function unbind(el, binding, vnode) {
-    unbindTargets(vnode, binding, listenTypes$1); // If element is not a button, we add `role="button"` for accessibility
-
-    if (el.tagName !== 'BUTTON') {
-      removeAttr(el, 'role');
-    }
-  }
+  inserted: componentUpdated$1,
+  updated: updated,
+  componentUpdated: componentUpdated$1,
+  unbind: unbind$1
 };
 
 var PROP_NAME$2 = '$bvModal';
@@ -11505,10 +11766,9 @@ var propsToSlots = {
   msgBoxContent: 'default',
   title: 'modal-title',
   okTitle: 'modal-ok',
-  cancelTitle: 'modal-cancel' // --- Utility methods ---
-  // Method to filter only recognized props that are not undefined
-
-};
+  cancelTitle: 'modal-cancel'
+}; // --- Utility methods ---
+// Method to filter only recognized props that are not undefined
 
 var filterOptions = function filterOptions(options) {
   return BASE_PROPS.reduce(function (memo, key) {
@@ -11557,8 +11817,10 @@ var plugin = function plugin(Vue) {
       /* istanbul ignore if */
 
       if (this.$router && this.$route) {
-        var unwatch = this.$watch('$router', handleDestroy);
-        this.$once('hook:beforeDestroy', unwatch);
+        // Destroy ourselves if route changes
+
+        /* istanbul ignore next */
+        this.$once('hook:beforeDestroy', this.$watch('$router', handleDestroy));
       } // Show the `BMsgBox`
 
 
@@ -11790,7 +12052,6 @@ pluginFactory({
   }
 });
 
-var DEPRECATED_MSG$1 = 'Setting prop "is-nav-bar" is deprecated. Use the <b-navbar-nav> component instead.';
 var props$I = {
   tag: {
     type: String,
@@ -11824,15 +12085,12 @@ var props$I = {
     type: Boolean,
     default: false
   },
-  isNavBar: {
+  cardHeader: {
+    // Set to true if placing in a card header
     type: Boolean,
-    default: false,
-    // `deprecated` -> Don't use this prop
-    // `deprecation` -> Refers to a change in prop usage
-    deprecated: DEPRECATED_MSG$1
-  } // -- Utils --
-
-};
+    default: false
+  }
+}; // -- Utils --
 
 var computeJustifyContent = function computeJustifyContent(value) {
   // Normalize value
@@ -11854,12 +12112,13 @@ Vue.extend({
         data = _ref.data,
         children = _ref.children;
     return h(props.tag, mergeData(data, {
+      staticClass: 'nav',
       class: (_class = {
-        nav: !props.isNavBar,
-        'navbar-nav': props.isNavBar,
-        'nav-tabs': props.tabs && !props.isNavBar,
-        'nav-pills': props.pills && !props.isNavBar,
-        'flex-column': props.vertical && !props.isNavBar,
+        'nav-tabs': props.tabs,
+        'nav-pills': props.pills && !props.tabs,
+        'card-header-tabs': !props.vertical && props.cardHeader && props.tabs,
+        'card-header-pills': !props.vertical && props.cardHeader && props.pills && !props.tabs,
+        'flex-column': props.vertical,
         'nav-fill': !props.vertical && props.fill,
         'nav-justified': !props.vertical && props.justified
       }, _defineProperty(_class, computeJustifyContent(props.align), !props.vertical && props.align), _defineProperty(_class, "small", props.small), _class)
@@ -11907,9 +12166,9 @@ var props$K = {
   tag: {
     type: String,
     default: 'span'
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BNavText =
 /*#__PURE__*/
 Vue.extend({
@@ -11946,23 +12205,8 @@ Vue.extend({
   }
 });
 
-var props$M = _objectSpread2({}, pluckProps(['menuClass', 'toggleClass', 'noCaret', 'role'], props$j), {
-  extraMenuClasses: {
-    type: String,
-    default: '',
-    // `deprecated` -> Don't use this prop
-    // `deprecation` -> Refers to a change in prop usage
-    deprecated: 'Setting prop "extra-menu-classes" is deprecated. Use "menu-class" prop instead.'
-  },
-  extraToggleClasses: {
-    type: String,
-    default: '',
-    // `deprecated` -> Don't use this prop
-    // `deprecation` -> Refers to a change in prop usage
-    deprecated: 'Setting prop "extra-toggle-classes" is deprecated. Use "toggle-class" prop instead.'
-  } // @vue/component
+var props$M = pluckProps(['menuClass', 'toggleClass', 'noCaret', 'role'], props$j); // @vue/component
 
-});
 var BNavItemDropdown =
 /*#__PURE__*/
 Vue.extend({
@@ -11980,15 +12224,13 @@ Vue.extend({
       }];
     },
     menuClasses: function menuClasses() {
-      return [this.extraMenuClasses, // Deprecated
-      this.menuClass, {
+      return [this.menuClass, {
         'dropdown-menu-right': this.right,
         show: this.visible
       }];
     },
     toggleClasses: function toggleClasses() {
-      return [this.extraToggleClasses, // Deprecated
-      this.toggleClass, {
+      return [this.toggleClass, {
         'dropdown-toggle-no-caret': this.noCaret
       }];
     }
@@ -12088,9 +12330,9 @@ var props$N = {
   print: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BNavbar =
 /*#__PURE__*/
 Vue.extend({
@@ -12163,9 +12405,9 @@ var props$P = _objectSpread2({}, linkProps$3, {
   tag: {
     type: String,
     default: 'div'
-  } // @vue/component
+  }
+}); // @vue/component
 
-});
 var BNavbarBrand =
 /*#__PURE__*/
 Vue.extend({
@@ -12329,9 +12571,10 @@ var props$Q = {
   value: {
     type: [Number, String],
     default: null,
-    validator: function validator(value) {
+    validator: function validator(value)
+    /* istanbul ignore next */
+    {
       var num = parseInt(value, 10);
-      /* istanbul ignore if */
 
       if (!isNull(value) && (isNaN(num) || num < 1)) {
         warn('pagination: v-model value must be a number greater than 0');
@@ -12344,9 +12587,10 @@ var props$Q = {
   limit: {
     type: [Number, String],
     default: DEFAULT_LIMIT,
-    validator: function validator(value) {
+    validator: function validator(value)
+    /* istanbul ignore next */
+    {
       var num = parseInt(value, 10);
-      /* istanbul ignore if */
 
       if (isNaN(num) || num < 1) {
         warn('pagination: prop "limit" must be a number greater than 0');
@@ -12416,9 +12660,9 @@ var props$Q = {
     type: String,
     default: "\u2026" // '…'
 
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var paginationMixin = {
   mixins: [normalizeSlotMixin],
   model: {
@@ -12719,7 +12963,7 @@ var paginationMixin = {
           'flex-fill': fill
         },
         attrs: {
-          role: 'none presentation',
+          role: 'presentation',
           'aria-hidden': isDisabled ? 'true' : null
         }
       }, [inner]);
@@ -12789,7 +13033,7 @@ var paginationMixin = {
           'flex-fill': fill
         }, page.classes],
         attrs: {
-          role: 'none presentation'
+          role: 'presentation'
         }
       }, [inner]));
     }); // Last Ellipsis Bookend
@@ -12840,19 +13084,7 @@ var paginationMixin = {
 
 var NAME$j = 'BPagination';
 var DEFAULT_PER_PAGE = 20;
-var DEFAULT_TOTAL_ROWS = 0; // Sanitize the provided per page number (converting to a number)
-
-var sanitizePerPage = function sanitizePerPage(val) {
-  var perPage = parseInt(val, 10) || DEFAULT_PER_PAGE;
-  return perPage < 1 ? 1 : perPage;
-}; // Sanitize the provided total rows number (converting to a number)
-
-
-var sanitizeTotalRows = function sanitizeTotalRows(val) {
-  var totalRows = parseInt(val, 10) || DEFAULT_TOTAL_ROWS;
-  return totalRows < 0 ? 0 : totalRows;
-};
-
+var DEFAULT_TOTAL_ROWS = 0;
 var props$R = {
   size: {
     type: String,
@@ -12871,10 +13103,23 @@ var props$R = {
   ariaControls: {
     type: String,
     default: null
-  } // The render function is brought in via the pagination mixin
-  // @vue/component
+  }
+}; // --- Helper functions ---
+// Sanitize the provided per page number (converting to a number)
 
-};
+var sanitizePerPage = function sanitizePerPage(val) {
+  var perPage = parseInt(val, 10) || DEFAULT_PER_PAGE;
+  return perPage < 1 ? 1 : perPage;
+}; // Sanitize the provided total rows number (converting to a number)
+
+
+var sanitizeTotalRows = function sanitizeTotalRows(val) {
+  var totalRows = parseInt(val, 10) || DEFAULT_TOTAL_ROWS;
+  return totalRows < 0 ? 0 : totalRows;
+}; // The render function is brought in via the `paginationMixin`
+// @vue/component
+
+
 var BPagination =
 /*#__PURE__*/
 Vue.extend({
@@ -12885,17 +13130,30 @@ Vue.extend({
     numberOfPages: function numberOfPages() {
       var result = Math.ceil(sanitizeTotalRows(this.totalRows) / sanitizePerPage(this.perPage));
       return result < 1 ? 1 : result;
+    },
+    pageSizeNumberOfPages: function pageSizeNumberOfPages() {
+      // Used for watching changes to `perPage` and `numberOfPages`
+      return {
+        perPage: sanitizePerPage(this.perPage),
+        totalRows: sanitizeTotalRows(this.totalRows),
+        numberOfPages: this.numberOfPages
+      };
     }
   },
   watch: {
-    numberOfPages: function numberOfPages(newVal) {
-      if (newVal === this.localNumberOfPages) {
-        /* istanbul ignore next */
-        return;
+    pageSizeNumberOfPages: function pageSizeNumberOfPages(newVal, oldVal) {
+      if (!isUndefinedOrNull(oldVal)) {
+        if (newVal.perPage !== oldVal.perPage && newVal.totalRows === oldVal.totalRows) {
+          // If the page size changes, reset to page 1
+          this.currentPage = 1;
+        } else if (newVal.numberOfPages !== oldVal.numberOfPages && this.currentPage > newVal.numberOfPages) {
+          // If `numberOfPages` changes and is less than
+          // the `currentPage` number, reset to page 1
+          this.currentPage = 1;
+        }
       }
 
-      this.localNumberOfPages = newVal;
-      this.currentPage = 1;
+      this.localNumberOfPages = newVal.numberOfPages;
     }
   },
   created: function created() {
@@ -12986,9 +13244,10 @@ var props$S = {
   numberOfPages: {
     type: [Number, String],
     default: 1,
-    validator: function validator(value) {
+    validator: function validator(value)
+    /* istanbul ignore next */
+    {
       var num = parseInt(value, 10);
-      /* istanbul ignore if */
 
       if (isNaN(num) || num < 1) {
         warn('b-pagination: prop "number-of-pages" must be a number greater than 0');
@@ -13041,10 +13300,10 @@ var props$S = {
   noPrefetch: {
     type: Boolean,
     default: false
-  } // The render function is brought in via the pagination mixin
-  // @vue/component
+  }
+}; // The render function is brought in via the pagination mixin
+// @vue/component
 
-};
 var BPaginationNav =
 /*#__PURE__*/
 Vue.extend({
@@ -13321,17 +13580,8 @@ pluginFactory({
   }
 });
 
-var NAME$l = 'tooltip';
-var CLASS_PREFIX = 'bs-tooltip';
-var BS_CLASS_PREFIX_REGEX = new RegExp("\\b".concat(CLASS_PREFIX, "\\S+"), 'g');
-var TRANSITION_DURATION = 150; // Modal `$root` hidden event
-
-var MODAL_CLOSE_EVENT = 'bv::modal::hidden'; // Modal container selector for appending tooltip/popover
-
-var MODAL_SELECTOR = '.modal-content'; // For dropdown sniffing
-
-var DROPDOWN_CLASS = 'dropdown';
-var DROPDOWN_OPEN_SELECTOR = '.dropdown-menu.show';
+// Base on-demand component for tooltip / popover templates
+var NAME$l = 'BVPopper';
 var AttachmentMap$1 = {
   AUTO: 'auto',
   TOP: 'top',
@@ -13361,1349 +13611,1344 @@ var OffsetMap = {
   LEFTTOP: -1,
   LEFT: 0,
   LEFTBOTTOM: +1
-};
-var HoverState = {
-  SHOW: 'show',
-  OUT: 'out'
-};
-var ClassName = {
-  FADE: 'fade',
-  SHOW: 'show'
-};
-var Selector$2 = {
-  TOOLTIP: '.tooltip',
-  TOOLTIP_INNER: '.tooltip-inner',
-  ARROW: '.arrow' // Defaults
+}; // @vue/component
 
-};
-var Defaults = {
-  animation: true,
-  template: '<div class="tooltip" role="tooltip">' + '<div class="arrow"></div>' + '<div class="tooltip-inner"></div>' + '</div>',
-  trigger: 'hover focus',
-  title: '',
-  delay: 0,
-  html: false,
-  placement: 'top',
-  offset: 0,
-  arrowPadding: 6,
-  container: false,
-  fallbackPlacement: 'flip',
-  callbacks: {},
-  boundary: 'scrollParent',
-  boundaryPadding: 5,
-  variant: null,
-  customClass: null // Transition event names
-
-};
-var TransitionEndEvents$1 = {
-  WebkitTransition: ['webkitTransitionEnd'],
-  MozTransition: ['transitionend'],
-  OTransition: ['otransitionend', 'oTransitionEnd'],
-  transition: ['transitionend'] // Options for Native Event Listeners (since we never call preventDefault)
-
-};
-var EvtOpts = {
-  passive: true,
-  capture: false // Client-side tip ID counter for aria-describedby attribute
-  // Each tooltip requires a unique client side ID
-
-};
-var NEXTID = 1;
-/* istanbul ignore next */
-
-var generateId = function generateId(name) {
-  return "__BV_".concat(name, "_").concat(NEXTID++, "__");
-};
-/*
- * ToolTip class definition
- */
-
-
-var ToolTip =
+var BVPopper =
 /*#__PURE__*/
-function () {
-  // Main constructor
-  function ToolTip(element, config, $parent) {
-    _classCallCheck(this, ToolTip);
-
-    // New tooltip object
-    this.$isEnabled = true;
-    this.$fadeTimeout = null;
-    this.$hoverTimeout = null;
-    this.$visibleInterval = null;
-    this.$hoverState = '';
-    this.$activeTrigger = {};
-    this.$popper = null;
-    this.$element = element;
-    this.$tip = null;
-    this.$id = generateId(this.constructor.NAME);
-    this.$parent = $parent || null;
-    this.$root = $parent && $parent.$root ? $parent.$root : null;
-    this.$routeWatcher = null; // We use a bound version of the following handlers for root/modal
-    // listeners to maintain the correct `this` context
-
-    this.$forceHide = this.forceHide.bind(this);
-    this.$doHide = this.doHide.bind(this);
-    this.$doShow = this.doShow.bind(this);
-    this.$doDisable = this.doDisable.bind(this);
-    this.$doEnable = this.doEnable.bind(this);
-    this._noop = noop.bind(this); // Set the configuration
-
-    this.updateConfig(config); // Destroy ourselves if the parent is destroyed
-
-    if ($parent) {
-      $parent.$once('hook:beforeDestroy', this.destroy.bind(this));
+Vue.extend({
+  name: NAME$l,
+  props: {
+    target: {
+      // Element that the tooltip/popover is positioned relative to
+      type: [HTMLElement, SVGElement],
+      default: null
+    },
+    placement: {
+      type: String,
+      default: 'top'
+    },
+    fallbackPlacement: {
+      type: [String, Array],
+      default: 'flip'
+    },
+    offset: {
+      type: Number,
+      default: 0
+    },
+    boundary: {
+      // 'scrollParent', 'viewport', 'window', or Element
+      type: [String, HTMLElement],
+      default: 'scrollParent'
+    },
+    boundaryPadding: {
+      // Tooltip/popover will try and stay away from
+      // boundary edge by this many pixels
+      type: Number,
+      default: 5
+    },
+    arrowPadding: {
+      // The minimum distance (in `px`) from the edge of the
+      // tooltip/popover that the arrow can be positioned
+      type: Number,
+      default: 6
     }
-  } // NOTE: Overridden by PopOver class
-
-
-  _createClass(ToolTip, [{
-    key: "updateConfig",
-    // Update config
-    value: function updateConfig(config) {
-      // Merge config into defaults. We use `this` here because PopOver overrides Default
-      var updatedConfig = _objectSpread2({}, this.constructor.Default, {}, config); // Sanitize delay
-
-
-      if (config.delay && isNumber(config.delay)) {
-        /* istanbul ignore next */
-        updatedConfig.delay = {
-          show: config.delay,
-          hide: config.delay
-        };
-      } // Title for tooltip and popover
-
-
-      if (config.title && isNumber(config.title)) {
-        /* istanbul ignore next */
-        updatedConfig.title = config.title.toString();
-      } // Content only for popover
-
-
-      if (config.content && isNumber(config.content)) {
-        /* istanbul ignore next */
-        updatedConfig.content = config.content.toString();
-      } // Hide element original title if needed
-
-
-      this.fixTitle(); // Update the config
-
-      this.$config = updatedConfig; // Stop/Restart listening
-
-      this.unListen();
-      this.listen();
-    } // Destroy this instance
-
-  }, {
-    key: "destroy",
-    value: function destroy() {
-      // Stop listening to trigger events
-      this.unListen(); // Disable while open listeners/watchers
-
-      this.setWhileOpenListeners(false); // Clear any timeouts
-
-      clearTimeout(this.$hoverTimeout);
-      this.$hoverTimeout = null;
-      clearTimeout(this.$fadeTimeout);
-      this.$fadeTimeout = null; // Remove popper
-
-      if (this.$popper) {
-        this.$popper.destroy();
-      }
-
-      this.$popper = null; // Remove tip from document
-
-      if (this.$tip && this.$tip.parentElement) {
-        this.$tip.parentElement.removeChild(this.$tip);
-      }
-
-      this.$tip = null; // Null out other properties
-
-      this.$id = null;
-      this.$isEnabled = null;
-      this.$parent = null;
-      this.$root = null;
-      this.$element = null;
-      this.$config = null;
-      this.$hoverState = null;
-      this.$activeTrigger = null;
-      this.$forceHide = null;
-      this.$doHide = null;
-      this.$doShow = null;
-      this.$doDisable = null;
-      this.$doEnable = null;
-    }
-  }, {
-    key: "enable",
-    value: function enable() {
-      // Create a non-cancelable BvEvent
-      var enabledEvt = new BvEvent('enabled', {
-        cancelable: false,
-        target: this.$element,
-        relatedTarget: null
-      });
-      this.$isEnabled = true;
-      this.emitEvent(enabledEvt);
-    }
-  }, {
-    key: "disable",
-    value: function disable() {
-      // Create a non-cancelable BvEvent
-      var disabledEvt = new BvEvent('disabled', {
-        cancelable: false,
-        target: this.$element,
-        relatedTarget: null
-      });
-      this.$isEnabled = false;
-      this.emitEvent(disabledEvt);
-    } // Click toggler
-
-  }, {
-    key: "toggle",
-    value: function toggle(event) {
-      if (!this.$isEnabled) {
-        /* istanbul ignore next */
-        return;
-      } // Prevent showing if tip/popover is on a dropdown and the menu is open
-
-
-      if (this.dropdownOpen()) {
-        /* istanbul ignore next */
-        return;
-      }
-      /* istanbul ignore else */
-
-
-      if (event) {
-        this.$activeTrigger.click = !this.$activeTrigger.click;
-
-        if (this.isWithActiveTrigger()) {
-          this.enter(null);
-        } else {
-          this.leave(null);
-        }
-      } else {
-        if (hasClass(this.getTipElement(), ClassName.SHOW)) {
-          this.leave(null);
-        } else {
-          this.enter(null);
-        }
-      }
-    } // Show tooltip
-
-  }, {
-    key: "show",
-    value: function show() {
+  },
+  data: function data() {
+    return {
+      // reactive props set by parent
+      noFade: false,
+      // State related data
+      localShow: true,
+      attachment: this.getAttachment(this.placement)
+    };
+  },
+  computed: {
+    templateType: function templateType()
+    /* istanbul ignore next */
+    {
+      // Overridden by template component
+      return 'unknown';
+    },
+    popperConfig: function popperConfig() {
       var _this = this;
 
-      if (!document.body.contains(this.$element) || !isVisible(this.$element)) {
-        // If trigger element isn't in the DOM or is not visible
-        return;
-      } // Prevent showing if tip/popover is on a dropdown and the menu is open
-
-
-      if (this.dropdownOpen()) {
-        /* istanbul ignore next */
-        return;
-      } // Build tooltip element (also sets this.$tip)
-
-
-      var tip = this.getTipElement();
-      this.fixTitle();
-      this.setContent(tip);
-
-      if (!this.isWithContent(tip)) {
-        // If no content, don't bother showing
-
-        /* istanbul ignore next */
-        this.$tip = null;
-        /* istanbul ignore next */
-
-        return;
-      } // Set ID on tip and aria-describedby on element
-
-
-      setAttr(tip, 'id', this.$id);
-      this.addAriaDescribedby(); // Set animation on or off
-
-      if (this.$config.animation) {
-        addClass(tip, ClassName.FADE);
-      } else {
-        removeClass(tip, ClassName.FADE);
-      }
-
-      var placement = this.getPlacement();
-      var attachment = this.constructor.getAttachment(placement);
-      this.addAttachmentClass(attachment); // Create a cancelable BvEvent
-
-      var showEvt = new BvEvent('show', {
-        cancelable: true,
-        target: this.$element,
-        relatedTarget: tip
-      });
-      this.emitEvent(showEvt);
-
-      if (showEvt.defaultPrevented) {
-        // Don't show if event cancelled
-        this.$tip = null;
-        return;
-      } // Insert tooltip if needed
-
-
-      var container = this.getContainer();
-
-      if (!document.body.contains(tip)) {
-        container.appendChild(tip);
-      } // Refresh popper
-
-
-      this.removePopper();
-      this.$popper = new Popper(this.$element, tip, this.getPopperConfig(placement, tip)); // Transitionend callback
-
-      var complete = function complete() {
-        if (_this.$config.animation) {
-          _this.fixTransition(tip);
-        }
-
-        var prevHoverState = _this.$hoverState;
-        _this.$hoverState = null;
-
-        if (prevHoverState === HoverState.OUT) {
-          _this.leave(null);
-        } // Create a non-cancelable BvEvent
-
-
-        var shownEvt = new BvEvent('shown', {
-          cancelable: false,
-          target: _this.$element,
-          relatedTarget: tip
-        });
-
-        _this.emitEvent(shownEvt);
-      }; // Enable while open listeners/watchers
-
-
-      this.setWhileOpenListeners(true); // Show tip
-
-      addClass(tip, ClassName.SHOW); // Start the transition/animation
-
-      this.transitionOnce(tip, complete);
-    } // Handler for periodic visibility check
-
-  }, {
-    key: "visibleCheck",
-    value: function visibleCheck(on) {
-      var _this2 = this;
-
-      clearInterval(this.$visibleInterval);
-      this.$visibleInterval = null;
-
-      if (on) {
-        this.$visibleInterval = setInterval(function () {
-          var tip = _this2.$tip;
-
-          if (tip && !isVisible(_this2.$element) && hasClass(tip, ClassName.SHOW)) {
-            // Element is no longer visible, so force-hide the tooltip
-            _this2.forceHide();
-          }
-        }, 100);
-      }
-    }
-  }, {
-    key: "setWhileOpenListeners",
-    value: function setWhileOpenListeners(on) {
-      // Modal close events
-      this.setModalListener(on); // Dropdown open events (if we are attached to a dropdown)
-
-      this.setDropdownListener(on); // Periodic $element visibility check
-      // For handling when tip is in <keepalive>, tabs, carousel, etc
-
-      this.visibleCheck(on); // On-touch start listeners
-
-      this.setOnTouchStartListener(on);
-
-      if (on && /(focus|blur)/.test(this.$config.trigger)) {
-        // If focus moves between trigger element and tip container, don't close
-        eventOn(this.$tip, 'focusout', this, EvtOpts);
-      } else {
-        eventOff(this.$tip, 'focusout', this, EvtOpts);
-      }
-    } // Force hide of tip (internal method)
-
-  }, {
-    key: "forceHide",
-    value: function forceHide() {
-      if (!this.$tip || !hasClass(this.$tip, ClassName.SHOW)) {
-        /* istanbul ignore next */
-        return;
-      } // Disable while open listeners/watchers
-
-
-      this.setWhileOpenListeners(false); // Clear any hover enter/leave event
-
-      clearTimeout(this.$hoverTimeout);
-      this.$hoverTimeout = null;
-      this.$hoverState = '';
-      this.$activeTrigger = {}; // Hide the tip
-
-      this.hide(null, true);
-    } // Hide tooltip
-
-  }, {
-    key: "hide",
-    value: function hide(callback, force) {
-      var _this3 = this;
-
-      var tip = this.$tip;
-
-      if (!tip) {
-        /* istanbul ignore next */
-        return;
-      } // Create a cancelable BvEvent
-
-
-      var hideEvt = new BvEvent('hide', {
-        // We disable cancelling if force is true
-        cancelable: !force,
-        target: this.$element,
-        relatedTarget: tip
-      });
-      this.emitEvent(hideEvt);
-
-      if (hideEvt.defaultPrevented) {
-        // Don't hide if event cancelled
-        return;
-      } // Transitionend callback
-
-
-      var complete = function complete() {
-        if (_this3.$hoverState !== HoverState.SHOW && tip.parentNode) {
-          // Remove tip from DOM, and force recompile on next show
-          tip.parentNode.removeChild(tip);
-
-          _this3.removeAriaDescribedby();
-
-          _this3.removePopper();
-
-          _this3.$tip = null;
-        }
-
-        if (callback) {
-          /* istanbul ignore next */
-          callback();
-        } // Create a non-cancelable BvEvent
-
-
-        var hiddenEvt = new BvEvent('hidden', {
-          cancelable: false,
-          target: _this3.$element,
-          relatedTarget: null
-        });
-
-        _this3.emitEvent(hiddenEvt);
-      }; // Disable while open listeners/watchers
-
-
-      this.setWhileOpenListeners(false); // If forced close, disable animation
-
-      if (force) {
-        removeClass(tip, ClassName.FADE);
-      } // Hide tip
-
-
-      removeClass(tip, ClassName.SHOW); // Clear any active triggers
-
-      this.$activeTrigger = {}; // Start the hide transition
-
-      this.transitionOnce(tip, complete);
-      this.$hoverState = '';
-    }
-  }, {
-    key: "emitEvent",
-    value: function emitEvent(evt) {
-      var evtName = evt.type;
-      var $root = this.$root;
-
-      if ($root && $root.$emit) {
-        // Emit an event on $root
-        $root.$emit("bv::".concat(this.constructor.NAME, "::").concat(evtName), evt);
-      }
-
-      var callbacks = this.$config.callbacks || {};
-
-      if (isFunction(callbacks[evtName])) {
-        callbacks[evtName](evt);
-      }
-    }
-  }, {
-    key: "getContainer",
-    value: function getContainer() {
-      var container = this.$config.container;
-      var body = document.body; // If we are in a modal, we append to the modal instead of body,
-      // unless a container is specified
-
-      return container === false ? closest(MODAL_SELECTOR, this.$element) || body : select(container, body) || body;
-    } // Will be overridden by PopOver if needed
-
-  }, {
-    key: "addAriaDescribedby",
-    value: function addAriaDescribedby() {
-      // Add aria-describedby on trigger element, without removing any other IDs
-      var desc = getAttr(this.$element, 'aria-describedby') || '';
-      desc = desc.split(/\s+/).concat(this.$id).join(' ').trim();
-      setAttr(this.$element, 'aria-describedby', desc);
-    } // Will be overridden by PopOver if needed
-
-  }, {
-    key: "removeAriaDescribedby",
-    value: function removeAriaDescribedby() {
-      var _this4 = this;
-
-      var desc = getAttr(this.$element, 'aria-describedby') || '';
-      desc = desc.split(/\s+/).filter(function (d) {
-        return d !== _this4.$id;
-      }).join(' ').trim();
-
-      if (desc) {
-        /* istanbul ignore next */
-        setAttr(this.$element, 'aria-describedby', desc);
-      } else {
-        removeAttr(this.$element, 'aria-describedby');
-      }
-    }
-  }, {
-    key: "removePopper",
-    value: function removePopper() {
-      if (this.$popper) {
-        this.$popper.destroy();
-      }
-
-      this.$popper = null;
-    }
-  }, {
-    key: "transitionOnce",
-    value: function transitionOnce(tip, complete) {
-      var _this5 = this;
-
-      var transEvents = this.getTransitionEndEvents();
-      var called = false;
-      clearTimeout(this.$fadeTimeout);
-      this.$fadeTimeout = null;
-
-      var fnOnce = function fnOnce() {
-        if (called) {
-          /* istanbul ignore next */
-          return;
-        }
-
-        called = true;
-        clearTimeout(_this5.$fadeTimeout);
-        _this5.$fadeTimeout = null;
-        transEvents.forEach(function (evtName) {
-          eventOff(tip, evtName, fnOnce, EvtOpts);
-        }); // Call complete callback
-
-        complete();
-      };
-
-      if (hasClass(tip, ClassName.FADE)) {
-        transEvents.forEach(function (evtName) {
-          eventOn(tip, evtName, fnOnce, EvtOpts);
-        }); // Fallback to setTimeout()
-
-        this.$fadeTimeout = setTimeout(fnOnce, TRANSITION_DURATION);
-      } else {
-        fnOnce();
-      }
-    } // What transitionend event(s) to use? (returns array of event names)
-
-  }, {
-    key: "getTransitionEndEvents",
-    value: function getTransitionEndEvents() {
-      for (var name in TransitionEndEvents$1) {
-        if (!isUndefined(this.$element.style[name])) {
-          return TransitionEndEvents$1[name];
-        }
-      } // Fallback
-
-      /* istanbul ignore next */
-
-
-      return [];
-    }
-    /* istanbul ignore next */
-
-  }, {
-    key: "update",
-    value: function update() {
-      if (!isNull(this.$popper)) {
-        this.$popper.scheduleUpdate();
-      }
-    } // NOTE: Overridden by PopOver class
-
-  }, {
-    key: "isWithContent",
-    value: function isWithContent(tip) {
-      tip = tip || this.$tip;
-
-      if (!tip) {
-        /* istanbul ignore next */
-        return false;
-      }
-
-      return Boolean((select(Selector$2.TOOLTIP_INNER, tip) || {}).innerHTML);
-    } // NOTE: Overridden by PopOver class
-
-  }, {
-    key: "addAttachmentClass",
-    value: function addAttachmentClass(attachment) {
-      addClass(this.getTipElement(), "".concat(CLASS_PREFIX, "-").concat(attachment));
-    }
-  }, {
-    key: "getTipElement",
-    value: function getTipElement() {
-      if (!this.$tip) {
-        // Try and compile user supplied template, or fallback to default template
-        this.$tip = this.compileTemplate(this.$config.template) || this.compileTemplate(this.constructor.Default.template);
-      } // Add tab index so tip can be focused, and to allow it to be
-      // set as relatedTarget in focusin/out events
-
-
-      this.$tip.tabIndex = -1; // Add variant if specified
-
-      if (this.$config.variant) {
-        addClass(this.$tip, "b-".concat(this.constructor.NAME, "-").concat(this.$config.variant));
-      }
-
-      if (this.$config.customClass) {
-        addClass(this.$tip, String(this.$config.customClass));
-      }
-
-      return this.$tip;
-    }
-  }, {
-    key: "compileTemplate",
-    value: function compileTemplate(html) {
-      if (!html || !isString(html)) {
-        /* istanbul ignore next */
-        return null;
-      }
-
-      var div = document.createElement('div');
-      div.innerHTML = html.trim();
-      var node = div.firstElementChild ? div.removeChild(div.firstElementChild) : null;
-      div = null;
-      return node;
-    } // NOTE: Overridden by PopOver class
-
-  }, {
-    key: "setContent",
-    value: function setContent(tip) {
-      this.setElementContent(select(Selector$2.TOOLTIP_INNER, tip), this.getTitle());
-      removeClass(tip, ClassName.FADE);
-      removeClass(tip, ClassName.SHOW);
-    }
-  }, {
-    key: "setElementContent",
-    value: function setElementContent(container, content) {
-      if (!container) {
-        // If container element doesn't exist, just return
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      var allowHtml = this.$config.html;
-
-      if (isObject(content) && content.nodeType) {
-        // Content is a DOM node
-        if (allowHtml) {
-          if (content.parentElement !== container) {
-            container.innerHTML = '';
-            container.appendChild(content);
-          }
-        } else {
-          /* istanbul ignore next */
-          container.innerText = content.innerText;
-        }
-      } else {
-        // We have a plain HTML string or Text
-        container[allowHtml ? 'innerHTML' : 'innerText'] = content;
-      }
-    } // NOTE: Overridden by PopOver class
-
-  }, {
-    key: "getTitle",
-    value: function getTitle() {
-      var title = this.$config.title || '';
-
-      if (isFunction(title)) {
-        // Call the function to get the title value
-
-        /* istanbul ignore next */
-        title = title(this.$element);
-      }
-
-      if (isObject(title) && title.nodeType && !title.innerHTML.trim()) {
-        // We have a DOM node, but without inner content,
-        // so just return empty string
-
-        /* istanbul ignore next */
-        title = '';
-      }
-
-      if (isString(title)) {
-        title = title.trim();
-      }
-
-      if (!title) {
-        // If an explicit title is not given, try element's title attributes
-        title = getAttr(this.$element, 'title') || getAttr(this.$element, 'data-original-title') || '';
-        title = title.trim();
-      }
-
-      return title;
-    }
-  }, {
-    key: "listen",
-    value: function listen() {
-      var _this6 = this;
-
-      var el = this.$element;
-      /* istanbul ignore next */
-
-      if (!el) {
-        return;
-      }
-
-      var triggers = this.$config.trigger.trim().split(/\s+/); // Listen for global show/hide events
-
-      this.setRootListener(true); // Using `this` as the handler will get automatically directed to
-      // this.handleEvent and maintain our binding to `this`
-
-      triggers.forEach(function (trigger) {
-        if (trigger === 'click') {
-          eventOn(el, 'click', _this6, EvtOpts);
-        } else if (trigger === 'focus') {
-          eventOn(el, 'focusin', _this6, EvtOpts);
-          eventOn(el, 'focusout', _this6, EvtOpts);
-        } else if (trigger === 'blur') {
-          // Used to close $tip when element looses focus
-          eventOn(el, 'focusout', _this6, EvtOpts);
-        } else if (trigger === 'hover') {
-          eventOn(el, 'mouseenter', _this6, EvtOpts);
-          eventOn(el, 'mouseleave', _this6, EvtOpts);
-        }
-      }, this);
-    }
-  }, {
-    key: "unListen",
-    value: function unListen() {
-      var _this7 = this;
-
-      var el = this.$element;
-      /* istanbul ignore next */
-
-      if (!el) {
-        return;
-      }
-
-      var events = ['click', 'focusin', 'focusout', 'mouseenter', 'mouseleave']; // Using `this` as the handler will get automatically directed to this.handleEvent
-
-      events.forEach(function (evt) {
-        eventOff(el, evt, _this7, EvtOpts);
-      }, this); // Stop listening for global show/hide/enable/disable events
-
-      this.setRootListener(false);
-    } // This special method allows us to use `this` as the event handlers
-
-  }, {
-    key: "handleEvent",
-    value: function handleEvent(e) {
-      // If disabled, don't do anything
-      // If tip is shown before element gets disabled, then tip will not
-      // close until no longer disabled or forcefully closed
-      if (isDisabled(this.$element)) {
-        /* istanbul ignore next */
-        return;
-      } // Exit if not enabled
-
-
-      if (!this.$isEnabled) {
-        return;
-      } // Prevent showing if tip/popover is on a dropdown and the menu is open
-
-
-      if (this.dropdownOpen()) {
-        /* istanbul ignore next */
-        return;
-      }
-
-      var type = e.type;
-      var target = e.target;
-      var relatedTarget = e.relatedTarget;
-      var $element = this.$element;
-      var $tip = this.$tip;
-
-      if (type === 'click') {
-        this.toggle(e);
-      } else if (type === 'focusin' || type === 'mouseenter') {
-        this.enter(e);
-      } else if (type === 'focusout') {
-        // `target` is the element which is loosing focus and
-        // `relatedTarget` is the element gaining focus
-        // If focus moves from `$element` to `$tip`, don't trigger a leave
-        if ($tip && $element && $element.contains(target) && $tip.contains(relatedTarget)) {
-          /* istanbul ignore next */
-          return;
-        } // If focus moves from `$tip` to `$element`, don't trigger a leave
-
-
-        if ($tip && $element && $tip.contains(target) && $element.contains(relatedTarget)) {
-          /* istanbul ignore next */
-          return;
-        } // If focus moves within `$tip`, don't trigger a leave
-
-
-        if ($tip && $tip.contains(target) && $tip.contains(relatedTarget)) {
-          /* istanbul ignore next */
-          return;
-        } // If focus moves within `$element`, don't trigger a leave
-
-
-        if ($element && $element.contains(target) && $element.contains(relatedTarget)) {
-          /* istanbul ignore next */
-          return;
-        } // Otherwise trigger a leave
-
-
-        this.leave(e);
-      } else if (type === 'mouseleave') {
-        this.leave(e);
-      }
-    }
-    /* istanbul ignore next */
-
-  }, {
-    key: "setModalListener",
-    value: function setModalListener(on) {
-      var el = this.$element;
-
-      if (!el || !this.$root) {
-        return;
-      }
-
-      var modal = closest(MODAL_SELECTOR, el); // If we are not in a modal, don't worry
-
-      if (!modal) {
-        return;
-      } // We can listen for modal hidden events on `$root`
-
-
-      this.$root[on ? '$on' : '$off'](MODAL_CLOSE_EVENT, this.$forceHide);
-    }
-    /* istanbul ignore next */
-
-  }, {
-    key: "setDropdownListener",
-    value: function setDropdownListener(on) {
-      var el = this.$element;
-
-      if (!el || !this.$root) {
-        return;
-      } // If we are not on a dropdown menu, don't worry
-
-
-      if (!hasClass(el, DROPDOWN_CLASS)) {
-        return;
-      } // We can listen for dropdown shown events on it's instance
-
-
-      if (el && el.__vue__) {
-        el.__vue__[on ? '$on' : '$off']('shown', this.$forceHide);
-      }
-    }
-  }, {
-    key: "setRootListener",
-    value: function setRootListener(on) {
-      // Listen for global `bv::{hide|show}::{tooltip|popover}` hide request event
-      var $root = this.$root;
-
-      if ($root) {
-        var method = on ? '$on' : '$off';
-        $root[method]("bv::hide::".concat(this.constructor.NAME), this.$doHide);
-        $root[method]("bv::show::".concat(this.constructor.NAME), this.$doShow);
-        $root[method]("bv::disable::".concat(this.constructor.NAME), this.$doDisable);
-        $root[method]("bv::enable::".concat(this.constructor.NAME), this.$doEnable);
-      }
-    }
-  }, {
-    key: "dropdownOpen",
-    value: function dropdownOpen() {
-      // Returns true if trigger is a dropdown and the dropdown menu is open
-      return hasClass(this.$element, DROPDOWN_CLASS) && select(DROPDOWN_OPEN_SELECTOR, this.$element);
-    } // Programmatically hide tooltip or popover
-
-  }, {
-    key: "doHide",
-    value: function doHide(id) {
-      if (!id) {
-        // Close all tooltips or popovers
-        this.forceHide();
-      } else if (this.$element && this.$element.id && this.$element.id === id) {
-        // Close this specific tooltip or popover
-        this.hide();
-      }
-    } // Programmatically show tooltip or popover
-
-  }, {
-    key: "doShow",
-    value: function doShow(id) {
-      if (!id) {
-        // Open all tooltips or popovers
-        this.show();
-      } else if (id && this.$element && this.$element.id && this.$element.id === id) {
-        // Show this specific tooltip or popover
-        this.show();
-      }
-    } // Programmatically disable tooltip or popover
-
-  }, {
-    key: "doDisable",
-    value: function doDisable(id) {
-      if (!id) {
-        // Disable all tooltips or popovers
-        this.disable();
-      } else if (this.$element && this.$element.id && this.$element.id === id) {
-        // Disable this specific tooltip or popover
-        this.disable();
-      }
-    } // Programmatically enable tooltip or popover
-
-  }, {
-    key: "doEnable",
-    value: function doEnable(id) {
-      if (!id) {
-        // Enable all tooltips or popovers
-        this.enable();
-      } else if (this.$element && this.$element.id && this.$element.id === id) {
-        // Enable this specific tooltip or popover
-        this.enable();
-      }
-    }
-  }, {
-    key: "setOnTouchStartListener",
-    value: function setOnTouchStartListener(on) {
-      var _this8 = this;
-
-      // If this is a touch-enabled device we add extra empty
-      // `mouseover` listeners to the body's immediate children
-      // Only needed because of broken event delegation on iOS
-      // https://www.quirksmode.org/blog/archives/2014/02/mouse_event_bub.html
-      if ('ontouchstart' in document.documentElement) {
-        /* istanbul ignore next: JSDOM does not support `ontouchstart` event */
-        from(document.body.children).forEach(function (el) {
-          if (on) {
-            eventOn(el, 'mouseover', _this8._noop);
-          } else {
-            eventOff(el, 'mouseover', _this8._noop);
-          }
-        });
-      }
-    }
-  }, {
-    key: "fixTitle",
-    value: function fixTitle() {
-      var el = this.$element;
-
-      if (getAttr(el, 'title') || !isString(getAttr(el, 'data-original-title'))) {
-        setAttr(el, 'data-original-title', getAttr(el, 'title') || '');
-        setAttr(el, 'title', '');
-      }
-    } // Enter handler
-
-  }, {
-    key: "enter",
-    value: function enter(e) {
-      var _this9 = this;
-
-      if (e) {
-        this.$activeTrigger[e.type === 'focusin' ? 'focus' : 'hover'] = true;
-      }
-
-      if (hasClass(this.getTipElement(), ClassName.SHOW) || this.$hoverState === HoverState.SHOW) {
-        this.$hoverState = HoverState.SHOW;
-        return;
-      }
-
-      clearTimeout(this.$hoverTimeout);
-      this.$hoverState = HoverState.SHOW;
-
-      if (!this.$config.delay || !this.$config.delay.show) {
-        this.show();
-        return;
-      }
-
-      this.$hoverTimeout = setTimeout(function () {
-        if (_this9.$hoverState === HoverState.SHOW) {
-          _this9.show();
-        }
-      }, this.$config.delay.show);
-    } // Leave handler
-
-  }, {
-    key: "leave",
-    value: function leave(e) {
-      var _this10 = this;
-
-      if (e) {
-        this.$activeTrigger[e.type === 'focusout' ? 'focus' : 'hover'] = false;
-
-        if (e.type === 'focusout' && /blur/.test(this.$config.trigger)) {
-          // Special case for `blur`: we clear out the other triggers
-          this.$activeTrigger.click = false;
-          this.$activeTrigger.hover = false;
-        }
-      }
-
-      if (this.isWithActiveTrigger()) {
-        return;
-      }
-
-      clearTimeout(this.$hoverTimeout);
-      this.$hoverState = HoverState.OUT;
-
-      if (!this.$config.delay || !this.$config.delay.hide) {
-        this.hide();
-        return;
-      }
-
-      this.$hoverTimeout = setTimeout(function () {
-        if (_this10.$hoverState === HoverState.OUT) {
-          _this10.hide();
-        }
-      }, this.$config.delay.hide);
-    }
-  }, {
-    key: "getPopperConfig",
-    value: function getPopperConfig(placement, tip) {
-      var _this11 = this;
-
+      var placement = this.placement;
       return {
-        placement: this.constructor.getAttachment(placement),
+        placement: this.getAttachment(placement),
         modifiers: {
           offset: {
-            offset: this.getOffset(placement, tip)
+            offset: this.getOffset(placement)
           },
           flip: {
-            behavior: this.$config.fallbackPlacement
+            behavior: this.fallbackPlacement
           },
+          // `arrow.element` can also be a reference to an HTML Element
+          // maybe we should make this a `$ref` in the templates?
           arrow: {
             element: '.arrow'
           },
           preventOverflow: {
-            padding: this.$config.boundaryPadding,
-            boundariesElement: this.$config.boundary
+            padding: this.boundaryPadding,
+            boundariesElement: this.boundary
           }
         },
         onCreate: function onCreate(data) {
           // Handle flipping arrow classes
-
-          /* istanbul ignore next */
           if (data.originalPlacement !== data.placement) {
-            _this11.handlePopperPlacementChange(data);
+            /* istanbul ignore next: can't test in JSDOM */
+            _this.popperPlacementChange(data);
           }
         },
         onUpdate: function onUpdate(data) {
           // Handle flipping arrow classes
-
-          /* istanbul ignore next */
-          _this11.handlePopperPlacementChange(data);
+          _this.popperPlacementChange(data);
         }
       };
     }
-    /* istanbul ignore next */
+  },
+  created: function created() {
+    var _this2 = this;
 
-  }, {
-    key: "getOffset",
-    value: function getOffset(placement, tip) {
-      if (!this.$config.offset) {
-        var arrow = select(Selector$2.ARROW, tip);
-        var arrowOffset = parseFloat(getCS(arrow).width) + parseFloat(this.$config.arrowPadding);
+    // Note: We are created on-demand, and should be guaranteed that
+    // DOM is rendered/ready by the time the created hook runs
+    this.$_popper = null; // Ensure we show as we mount
 
-        switch (OffsetMap[placement.toUpperCase()]) {
+    this.localShow = true; // Create popper instance before shown
+
+    this.$on('show', function (el) {
+      _this2.popperCreate(el);
+    }); // Self destruct once hidden
+
+    this.$on('hidden', function () {
+      _this2.$nextTick(_this2.$destroy);
+    }); // If parent is destroyed, ensure we are destroyed
+
+    this.$parent.$once('hook:destroyed', this.$destroy);
+  },
+  beforeMount: function beforeMount() {
+    // Ensure that the attachment position is correct before mounting
+    // as our propsData is added after `new Template({...})`
+    this.attachment = this.getAttachment(this.placement);
+  },
+  mounted: function mounted() {// TBD
+  },
+  updated: function updated() {
+    // Update popper if needed
+    // TODO: Should this be a watcher on `this.popperConfig` instead?
+    this.popperUpdate();
+  },
+  beforeDestroy: function beforeDestroy() {
+    this.popperDestroy();
+  },
+  destroyed: function destroyed() {
+    // Make sure template is removed from DOM
+    var el = this.$el;
+    el && el.parentNode && el.parentNode.removeChild(el);
+  },
+  methods: {
+    // "Public" method to trigger hide template
+    hide: function hide() {
+      this.localShow = false;
+    },
+    // Private
+    getAttachment: function getAttachment(placement) {
+      return AttachmentMap$1[String(placement).toUpperCase()] || 'auto';
+    },
+    getOffset: function getOffset(placement) {
+      if (!this.offset) {
+        // Could set a ref for the arrow element
+        var arrow = this.$refs.arrow || select('.arrow', this.$el);
+        var arrowOffset = (parseFloat(getCS(arrow).width) || 0) + (parseFloat(this.arrowPadding) || 0);
+
+        switch (OffsetMap[String(placement).toUpperCase()] || 0) {
           case +1:
+            /* istanbul ignore next: can't test in JSDOM */
             return "+50%p - ".concat(arrowOffset, "px");
 
           case -1:
+            /* istanbul ignore next: can't test in JSDOM */
             return "-50%p + ".concat(arrowOffset, "px");
 
           default:
             return 0;
         }
       }
+      /* istanbul ignore next */
 
-      return this.$config.offset;
+
+      return this.offset;
+    },
+    popperCreate: function popperCreate(el) {
+      this.popperDestroy(); // We use `el` rather than `this.$el` just in case the original
+      // mountpoint root element type was changed by the template
+
+      this.$_popper = new Popper(this.target, el, this.popperConfig);
+    },
+    popperDestroy: function popperDestroy() {
+      this.$_popper && this.$_popper.destroy();
+      this.$_popper = null;
+    },
+    popperUpdate: function popperUpdate() {
+      this.$_popper && this.$_popper.scheduleUpdate();
+    },
+    popperPlacementChange: function popperPlacementChange(data) {
+      // Callback used by popper to adjust the arrow placement
+      this.attachment = this.getAttachment(data.placement);
+    },
+    renderTemplate: function renderTemplate(h)
+    /* istanbul ignore next */
+    {
+      // Will be overridden by templates
+      return h('div');
     }
-  }, {
-    key: "getPlacement",
-    value: function getPlacement() {
-      var placement = this.$config.placement;
+  },
+  render: function render(h) {
+    var _this3 = this;
 
-      if (isFunction(placement)) {
-        /* istanbul ignore next */
-        return placement.call(this, this.$tip, this.$element);
+    // Note: `show` and 'fade' classes are only appled during transition
+    return h(BVTransition, {
+      // Transitions as soon as mounted
+      props: {
+        appear: true,
+        noFade: this.noFade
+      },
+      on: {
+        // Events used by parent component/instance
+        beforeEnter: function beforeEnter(el) {
+          return _this3.$emit('show', el);
+        },
+        afterEnter: function afterEnter(el) {
+          return _this3.$emit('shown', el);
+        },
+        beforeLeave: function beforeLeave(el) {
+          return _this3.$emit('hide', el);
+        },
+        afterLeave: function afterLeave(el) {
+          return _this3.$emit('hidden', el);
+        }
+      }
+    }, [this.localShow ? this.renderTemplate(h) : h()]);
+  }
+});
+
+var NAME$m = 'BVTooltipTemplate'; // @vue/component
+
+var BVTooltipTemplate =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$m,
+  extends: BVPopper,
+  mixins: [scopedStyleAttrsMixin],
+  props: {
+    // Other non-reactive (while open) props are pulled in from BVPopper
+    id: {
+      type: String,
+      default: null
+    },
+    html: {
+      // Used only by the directive versions
+      type: Boolean,
+      default: false
+    }
+  },
+  data: function data() {
+    // We use data, rather than props to ensure reactivity
+    // Parent component will directly set this data
+    return {
+      title: '',
+      content: '',
+      variant: null,
+      customClass: null
+    };
+  },
+  computed: {
+    templateType: function templateType() {
+      return 'tooltip';
+    },
+    templateClasses: function templateClasses() {
+      var _ref;
+
+      return [(_ref = {}, _defineProperty(_ref, "b-".concat(this.templateType, "-").concat(this.variant), this.variant), _defineProperty(_ref, "bs-".concat(this.templateType, "-").concat(this.attachment), this.attachment), _ref), this.customClass];
+    },
+    templateAttributes: function templateAttributes() {
+      return _objectSpread2({
+        id: this.id,
+        role: 'tooltip',
+        tabindex: '-1'
+      }, this.scopedStyleAttrs);
+    },
+    templateListeners: function templateListeners() {
+      var _this = this;
+
+      // Used for hover/focus trigger listeners
+      return {
+        mouseenter: function mouseenter(evt) {
+          /* istanbul ignore next: difficult to test in JSDOM */
+          _this.$emit('mouseenter', evt);
+        },
+        mouseleave: function mouseleave(evt) {
+          /* istanbul ignore next: difficult to test in JSDOM */
+          _this.$emit('mouseleave', evt);
+        },
+        focusin: function focusin(evt) {
+          /* istanbul ignore next: difficult to test in JSDOM */
+          _this.$emit('focusin', evt);
+        },
+        focusout: function focusout(evt) {
+          /* istanbul ignore next: difficult to test in JSDOM */
+          _this.$emit('focusout', evt);
+        }
+      };
+    }
+  },
+  methods: {
+    renderTemplate: function renderTemplate(h) {
+      // Title can be a scoped slot function
+      var $title = isFunction(this.title) ? this.title({}) : isUndefinedOrNull(this.title) ? h() : this.title; // Directive versions only
+
+      var domProps = this.html && !isFunction(this.title) ? {
+        innerHTML: this.title
+      } : {};
+      return h('div', {
+        staticClass: 'tooltip b-tooltip',
+        class: this.templateClasses,
+        attrs: this.templateAttributes,
+        on: this.templateListeners
+      }, [h('div', {
+        ref: 'arrow',
+        staticClass: 'arrow'
+      }), h('div', {
+        staticClass: 'tooltip-inner',
+        domProps: domProps
+      }, [$title])]);
+    }
+  }
+});
+
+var NAME$n = 'BVTooltip'; // Modal container selector for appending tooltip/popover
+
+var MODAL_SELECTOR = '.modal-content'; // Modal `$root` hidden event
+
+var MODAL_CLOSE_EVENT = 'bv::modal::hidden'; // For dropdown sniffing
+
+var DROPDOWN_CLASS = 'dropdown';
+var DROPDOWN_OPEN_SELECTOR = '.dropdown-menu.show'; // Options for Native Event Listeners (since we never call preventDefault)
+
+var EvtOpts = {
+  passive: true,
+  capture: false
+}; // Data specific to popper and template
+// We don't use props, as we need reactivity (we can't pass reactive props)
+
+var templateData = {
+  // Text string or Scoped slot function
+  title: '',
+  // Text string or Scoped slot function
+  content: '',
+  // String
+  variant: null,
+  // String, Array, Object
+  customClass: null,
+  // String or array of Strings (overwritten by BVPopper)
+  triggers: '',
+  // String (overwritten by BVPopper)
+  placement: 'auto',
+  // String or array of strings
+  fallbackPlacement: 'flip',
+  // Element or Component reference (or function that returns element) of
+  // the element that will have the trigger events bound, and is also
+  // default element for positioning
+  target: null,
+  // HTML ID, Element or Component reference
+  container: null,
+  // 'body'
+  // Boolean
+  noFade: false,
+  // 'scrollParent', 'viewport', 'window', Element, or Component reference
+  boundary: 'scrollParent',
+  // Tooltip/popover will try and stay away from
+  // boundary edge by this many pixels (Number)
+  boundaryPadding: 5,
+  // Arrow offset (Number)
+  offset: 0,
+  // Hover/focus delay (Number or Object)
+  delay: 0,
+  // Arrow of Tooltip/popover will try and stay away from
+  // the edge of tooltip/popover edge by this many pixels
+  arrowPadding: 6,
+  // Disabled state (Boolean)
+  disabled: false,
+  // ID to use for tooltip/popover
+  id: null,
+  // Flag used by directives only, for HTML content
+  html: false
+}; // @vue/component
+
+var BVTooltip =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$n,
+  props: {// None
+  },
+  data: function data() {
+    return _objectSpread2({}, templateData, {
+      // State management data
+      activeTrigger: {
+        // manual: false,
+        hover: false,
+        click: false,
+        focus: false
+      },
+      localShow: false
+    });
+  },
+  computed: {
+    templateType: function templateType() {
+      // Overwritten by BVPopover
+      return 'tooltip';
+    },
+    computedId: function computedId() {
+      return this.id || "__bv_".concat(this.templateType, "_").concat(this._uid, "__");
+    },
+    computedDelay: function computedDelay() {
+      // Normalizes delay into object form
+      var delay = {
+        show: 0,
+        hide: 0
+      };
+
+      if (isPlainObject(this.delay)) {
+        delay.show = Math.max(parseInt(this.delay.show, 10) || 0, 0);
+        delay.hide = Math.max(parseInt(this.delay.hide, 10) || 0, 0);
+      } else if (isNumber(this.delay) || isString(this.delay)) {
+        delay.show = delay.hide = Math.max(parseInt(this.delay, 10) || 0, 0);
       }
 
-      return placement;
-    }
-  }, {
-    key: "isWithActiveTrigger",
-    value: function isWithActiveTrigger() {
-      for (var trigger in this.$activeTrigger) {
-        if (this.$activeTrigger[trigger]) {
+      return delay;
+    },
+    computedTriggers: function computedTriggers() {
+      // Returns the triggers in sorted array form
+      // TODO: Switch this to object form for easier lookup
+      return concat(this.triggers).filter(Boolean).join(' ').trim().toLowerCase().split(/\s+/).sort();
+    },
+    isWithActiveTrigger: function isWithActiveTrigger() {
+      for (var trigger in this.activeTrigger) {
+        if (this.activeTrigger[trigger]) {
           return true;
         }
       }
 
       return false;
-    } // NOTE: Overridden by PopOver class
+    },
+    computedTemplateData: function computedTemplateData() {
+      return {
+        title: this.title,
+        content: this.content,
+        variant: this.variant,
+        customClass: this.customClass,
+        noFade: this.noFade
+      };
+    }
+  },
+  watch: {
+    computedTriggers: function computedTriggers(newTriggers, oldTriggers) {
+      var _this = this;
 
-    /* istanbul ignore next */
+      // Triggers have changed, so re-register them
 
-  }, {
-    key: "cleanTipClass",
-    value: function cleanTipClass() {
-      var tip = this.getTipElement();
-      var tabClass = tip.className.match(BS_CLASS_PREFIX_REGEX);
+      /* istanbul ignore next */
+      if (!looseEqual(newTriggers, oldTriggers)) {
+        this.$nextTick(function () {
+          // Disable trigger listeners
+          _this.unListen(); // Clear any active triggers that are no longer in the list of triggers
 
-      if (!isNull(tabClass) && tabClass.length > 0) {
-        tabClass.forEach(function (cls) {
-          removeClass(tip, cls);
+
+          oldTriggers.forEach(function (trigger) {
+            if (!arrayIncludes(newTriggers, trigger)) {
+              if (_this.activeTrigger[trigger]) {
+                _this.activeTrigger[trigger] = false;
+              }
+            }
+          }); // Re-enable the trigger listeners
+
+          _this.listen();
         });
       }
+    },
+    computedTemplateData: function computedTemplateData() {
+      // If any of the while open reactive "props" change,
+      // ensure that the template updates accordingly
+      this.handleTemplateUpdate();
+    },
+    disabled: function disabled(newVal) {
+      newVal ? this.disable() : this.enable();
     }
-    /* istanbul ignore next */
+  },
+  created: function created() {
+    var _this2 = this;
 
-  }, {
-    key: "handlePopperPlacementChange",
-    value: function handlePopperPlacementChange(data) {
-      this.cleanTipClass();
-      this.addAttachmentClass(this.constructor.getAttachment(data.placement));
+    // Create non-reactive properties
+    this.$_tip = null;
+    this.$_hoverTimeout = null;
+    this.$_hoverState = '';
+    this.$_visibleInterval = null;
+    this.$_enabled = !this.disabled;
+
+    this.$_noop = function () {}; // Destroy ourselves when the parent is destroyed
+
+
+    if (this.$parent) {
+      this.$parent.$once('hook:beforeDestroy', this.$destroy);
     }
-    /* istanbul ignore next */
 
-  }, {
-    key: "fixTransition",
-    value: function fixTransition(tip) {
-      var initConfigAnimation = this.$config.animation || false;
+    this.$nextTick(function () {
+      var target = _this2.getTarget();
 
-      if (!isNull(getAttr(tip, 'x-placement'))) {
+      if (target && contains(document.body, target)) {
+        // Copy the parent's scoped style attribute
+        _this2.scopeId = getScopeId(_this2.$parent); // Set up all trigger handlers and listeners
+
+        _this2.listen();
+      } else {
+        /* istanbul ignore next */
+        warn("".concat(_this2.templateType, " unable to find target element in document"));
+      }
+    });
+  },
+  updated: function updated()
+  /* istanbul ignore next */
+  {
+    // Usually called when the slots/data changes
+    this.$nextTick(this.handleTemplateUpdate);
+  },
+  deactivated: function deactivated()
+  /* istanbul ignore next */
+  {
+    // In a keepalive that has been deactivated, so hide
+    // the tooltip/popover if it is showing
+    this.forceHide();
+  },
+  beforeDestroy: function beforeDestroy()
+  /* istanbul ignore next */
+  {
+    // Remove all handler/listeners
+    this.unListen();
+    this.setWhileOpenListeners(false); // Clear any timeouts/Timers
+
+    clearTimeout(this.$_hoverTimeout);
+    this.$_hoverTimeout = null;
+    this.destroyTemplate();
+    this.restoreTitle();
+  },
+  methods: {
+    //
+    // Methods for creating and destroying the template
+    //
+    getTemplate: function getTemplate() {
+      // Overridden by BVPopover
+      return BVTooltipTemplate;
+    },
+    updateData: function updateData() {
+      var _this3 = this;
+
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      // Method for updating popper/template data
+      // We only update data if it exists, and has not changed
+      var titleUpdated = false;
+      keys(templateData).forEach(function (prop) {
+        if (!isUndefined(data[prop]) && _this3[prop] !== data[prop]) {
+          _this3[prop] = data[prop];
+
+          if (prop === 'title') {
+            titleUpdated = true;
+          }
+        }
+      });
+
+      if (titleUpdated && this.localShow) {
+        // If the title has updated, we may need to handle the title
+        // attribute on the trigger target. We only do this while the
+        // template is open
+        this.fixTitle();
+      }
+    },
+    createTemplateAndShow: function createTemplateAndShow() {
+      // Creates the template instance and show it
+      // this.destroyTemplate()
+      var container = this.getContainer();
+      var Template = this.getTemplate();
+      var $tip = this.$_tip = new Template({
+        parent: this,
+        // The following is not reactive to changes in the props data
+        propsData: {
+          // These values cannot be changed while template is showing
+          id: this.computedId,
+          html: this.html,
+          placement: this.placement,
+          fallbackPlacement: this.fallbackPlacement,
+          target: this.getPlacementTarget(),
+          boundary: this.getBoundary(),
+          // Ensure the following are integers
+          offset: parseInt(this.offset, 10) || 0,
+          arrowPadding: parseInt(this.arrowPadding, 10) || 0,
+          boundaryPadding: parseInt(this.boundaryPadding, 10) || 0
+        }
+      }); // We set the initial reactive data (values that can be changed while open)
+
+      this.handleTemplateUpdate(); // Template transition phase events (handled once only)
+      // When the template has mounted, but not visibly shown yet
+
+      $tip.$once('show', this.onTemplateShow); // When the template has completed showing
+
+      $tip.$once('shown', this.onTemplateShown); // When the template has started to hide
+
+      $tip.$once('hide', this.onTemplateHide); // When the template has completed hiding
+
+      $tip.$once('hidden', this.onTemplateHidden); // When the template gets destroyed for any reason
+
+      $tip.$once('hook:destroyed', this.destroyTemplate); // Convenience events from template
+      // To save us from manually adding/removing DOM
+      // listeners to tip element when it is open
+
+      $tip.$on('focusin', this.handleEvent);
+      $tip.$on('focusout', this.handleEvent);
+      $tip.$on('mouseenter', this.handleEvent);
+      $tip.$on('mouseleave', this.handleEvent); // Mount (which triggers the `show`)
+
+      $tip.$mount(container.appendChild(document.createElement('div'))); // Template will automatically remove its markup from DOM when hidden
+    },
+    hideTemplate: function hideTemplate() {
+      // Trigger the template to start hiding
+      // The template will emit the `hide` event after this and
+      // then emit the `hidden` event once it is fully hidden
+      // The `hook:destroyed` will also be called (safety measure)
+      this.$_tip && this.$_tip.hide();
+    },
+    destroyTemplate: function destroyTemplate() {
+      // Destroy the template instance and reset state
+      this.setWhileOpenListeners(false);
+      clearTimeout(this.$_hoverTimeout);
+      this.$_hoverTimout = null;
+      this.$_hoverState = '';
+      this.clearActiveTriggers();
+      this.localPlacementTarget = null;
+
+      try {
+        this.$_tip && this.$_tip.$destroy();
+      } catch (_unused) {}
+
+      this.$_tip = null;
+      this.localShow = false;
+    },
+    getTemplateElement: function getTemplateElement() {
+      return this.$_tip ? this.$_tip.$el : null;
+    },
+    handleTemplateUpdate: function handleTemplateUpdate() {
+      var _this4 = this;
+
+      // Update our template title/content "props"
+      // So that the template updates accordingly
+      var $tip = this.$_tip;
+
+      if ($tip) {
+        var props = ['title', 'content', 'variant', 'customClass', 'noFade']; // Only update the values if they have changed
+
+        props.forEach(function (prop) {
+          if ($tip[prop] !== _this4[prop]) {
+            $tip[prop] = _this4[prop];
+          }
+        });
+      }
+    },
+    //
+    // Show and Hide handlers
+    //
+    show: function show() {
+      // Show the tooltip
+      var target = this.getTarget();
+
+      if (!target || !contains(document.body, target) || !isVisible(target) || this.dropdownOpen() || (isUndefinedOrNull(this.title) || this.title === '') && (isUndefinedOrNull(this.content) || this.content === '')) {
+        // If trigger element isn't in the DOM or is not visible, or
+        // is on an open dropdown toggle, or has no content, then
+        // we exit without showing
         return;
       }
 
-      removeClass(tip, ClassName.FADE);
-      this.$config.animation = false;
-      this.hide();
-      this.show();
-      this.$config.animation = initConfigAnimation;
-    }
-  }], [{
-    key: "getAttachment",
-    value: function getAttachment(placement) {
-      return AttachmentMap$1[placement.toUpperCase()];
-    }
-  }, {
-    key: "Default",
-    get: function get() {
-      return Defaults;
-    } // NOTE: Overridden by PopOver class
+      if (this.$_tip || this.localShow) {
+        // If tip already exists, exit early
 
-  }, {
-    key: "NAME",
-    get: function get() {
-      return NAME$l;
-    }
-  }]);
-
-  return ToolTip;
-}();
-
-var NAME$m = 'popover';
-var CLASS_PREFIX$1 = 'bs-popover';
-var BS_CLASS_PREFIX_REGEX$1 = new RegExp("\\b".concat(CLASS_PREFIX$1, "\\S+"), 'g');
-
-var Defaults$1 = _objectSpread2({}, ToolTip.Default, {
-  placement: 'right',
-  trigger: 'click',
-  content: '',
-  template: '<div class="popover" role="tooltip">' + '<div class="arrow"></div>' + '<h3 class="popover-header"></h3>' + '<div class="popover-body"></div></div>'
-});
-
-var ClassName$1 = {
-  FADE: 'fade',
-  SHOW: 'show'
-};
-var Selector$3 = {
-  TITLE: '.popover-header',
-  CONTENT: '.popover-body'
-};
-
-var PopOver =
-/*#__PURE__*/
-function (_ToolTip) {
-  _inherits(PopOver, _ToolTip);
-
-  function PopOver() {
-    _classCallCheck(this, PopOver);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(PopOver).apply(this, arguments));
-  }
-
-  _createClass(PopOver, [{
-    key: "isWithContent",
-    // --- Method overrides ---
-    value: function isWithContent(tip) {
-      tip = tip || this.$tip;
-
-      if (!tip) {
         /* istanbul ignore next */
-        return false;
+        return;
+      } // In the process of showing
+
+
+      this.localShow = true; // Create a cancelable BvEvent
+
+      var showEvt = this.buildEvent('show', {
+        cancelable: true
+      });
+      this.emitEvent(showEvt);
+      /* istanbul ignore next: ignore for now */
+
+      if (showEvt.defaultPrevented) {
+        // Don't show if event cancelled
+        // Destroy the template (if for some reason it was created)
+
+        /* istanbul ignore next */
+        this.destroyTemplate(); // Clear the localShow flag
+
+        /* istanbul ignore next */
+
+        this.localShow = false;
+        /* istanbul ignore next */
+
+        return;
+      } // Fix the title attribute on target
+
+
+      this.fixTitle(); // Set aria-describedby on target
+
+      this.addAriaDescribedby(); // Create and show the tooltip
+
+      this.createTemplateAndShow();
+    },
+    hide: function hide() {
+      var force = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      // Hide the tooltip
+      var tip = this.getTemplateElement();
+
+      if (!tip || !this.localShow) {
+        /* istanbul ignore next */
+        this.restoreTitle();
+        /* istanbul ignore next */
+
+        return;
+      } // Emit cancelable BvEvent 'hide'
+      // We disable cancelling if `force` is true
+
+
+      var hideEvt = this.buildEvent('hide', {
+        cancelable: !force
+      });
+      this.emitEvent(hideEvt);
+      /* istanbul ignore next: ignore for now */
+
+      if (hideEvt.defaultPrevented) {
+        // Don't hide if event cancelled
+
+        /* istanbul ignore next */
+        return;
+      } // Tell the template to hide
+
+
+      this.hideTemplate(); // TODO: The following could be added to `hideTemplate()`
+      // Clear out any stragging active triggers
+
+      this.clearActiveTriggers(); // Reset the hover state
+
+      this.$_hoverState = '';
+    },
+    forceHide: function forceHide() {
+      // Forcefully hides/destroys the template, regardless of any active triggers
+      var tip = this.getTemplateElement();
+
+      if (!tip || !this.localShow) {
+        /* istanbul ignore next */
+        return;
+      } // Disable while open listeners/watchers
+      // This is also done in the template `hide` evt handler
+
+
+      this.setWhileOpenListeners(false); // Clear any hover enter/leave event
+
+      clearTimeout(this.hoverTimeout);
+      this.$_hoverTimeout = null;
+      this.$_hoverState = '';
+      this.clearActiveTriggers(); // Disable the fade animation on the template
+
+      if (this.$_tip) {
+        this.$_tip.noFade = true;
+      } // Hide the tip (with force = true)
+
+
+      this.hide(true);
+    },
+    enable: function enable() {
+      this.$_enabled = true; // Create a non-cancelable BvEvent
+
+      this.emitEvent(this.buildEvent('enabled', {}));
+    },
+    disable: function disable() {
+      this.$_enabled = false; // Create a non-cancelable BvEvent
+
+      this.emitEvent(this.buildEvent('disabled', {}));
+    },
+    //
+    // Handlers for template events
+    //
+    onTemplateShow: function onTemplateShow() {
+      // When template is inserted into DOM, but not yet shown
+      // Enable while open listeners/watchers
+      this.setWhileOpenListeners(true);
+    },
+    onTemplateShown: function onTemplateShown() {
+      // When template show transition completes
+      var prevHoverState = this.$_hoverState;
+      this.$_hoverState = '';
+
+      if (prevHoverState === 'out') {
+        this.leave(null);
+      } // Emit a non-cancelable BvEvent 'shown'
+
+
+      this.emitEvent(this.buildEvent('shown', {}));
+    },
+    onTemplateHide: function onTemplateHide() {
+      // When template is starting to hide
+      // Disable while open listeners/watchers
+      this.setWhileOpenListeners(false);
+    },
+    onTemplateHidden: function onTemplateHidden() {
+      // When template has completed closing (just before it self destructs)
+      // TODO:
+      //   The next two lines could be moved into `destroyTemplate()`
+      this.removeAriaDescribedby();
+      this.restoreTitle();
+      this.destroyTemplate(); // Emit a non-cancelable BvEvent 'shown'
+
+      this.emitEvent(this.buildEvent('hidden', {}));
+    },
+    //
+    // Utility methods
+    //
+    getTarget: function getTarget() {
+      // Handle case where target may be a component ref
+      var target = this.target ? this.target.$el || this.target : null; // If an ID
+
+      target = isString(target) ? getById(target.replace(/^#/, '')) : target; // If a function
+
+      target = isFunction(target) ? target() : target; // If an element ref
+
+      return isElement(target) ? target : null;
+    },
+    getPlacementTarget: function getPlacementTarget() {
+      // This is the target that the tooltip will be placed on, which may not
+      // necessarily be the same element that has the trigger event listeners
+      // For now, this is the same as target
+      // TODO:
+      //   Add in child selector support
+      //   Add in visibility checks for this element
+      //   Fallback to target if not found
+      return this.getTarget();
+    },
+    getTargetId: function getTargetId() {
+      // Returns the ID of the trigger element
+      var target = this.getTarget();
+      return target && target.id ? target.id : null;
+    },
+    getContainer: function getContainer() {
+      // Handle case where container may be a component ref
+      var container = this.container ? this.container.$el || this.container : false;
+      var body = document.body;
+      var target = this.getTarget(); // If we are in a modal, we append to the modal instead
+      // of body, unless a container is specified
+      // TODO:
+      //   Template should periodically check to see if it is in dom
+      //   And if not, self destruct (if container got v-if'ed out of DOM)
+      //   Or this could possibly be part of the visibility check
+
+      return container === false ? closest(MODAL_SELECTOR, target) || body : isString(container) ? getById(container.replace(/^#/, '')) || body : body;
+    },
+    getBoundary: function getBoundary() {
+      return this.boundary ? this.boundary.$el || this.boundary : 'scrollParent';
+    },
+    isInModal: function isInModal() {
+      var target = this.getTarget();
+      return target && closest(MODAL_SELECTOR, target);
+    },
+    isDropdown: function isDropdown() {
+      // Returns true if trigger is a dropdown
+      var target = this.getTarget();
+      return target && hasClass(target, DROPDOWN_CLASS);
+    },
+    dropdownOpen: function dropdownOpen() {
+      // Returns true if trigger is a dropdown and the dropdown menu is open
+      var target = this.getTarget();
+      return this.isDropdown() && target && select(DROPDOWN_OPEN_SELECTOR, target);
+    },
+    clearActiveTriggers: function clearActiveTriggers() {
+      for (var trigger in this.activeTrigger) {
+        this.activeTrigger[trigger] = false;
+      }
+    },
+    addAriaDescribedby: function addAriaDescribedby() {
+      // Add aria-describedby on trigger element, without removing any other IDs
+      var target = this.getTarget();
+      var desc = getAttr(target, 'aria-describedby') || '';
+      desc = desc.split(/\s+/).concat(this.computedId).join(' ').trim(); // Update/add aria-described by
+
+      setAttr(target, 'aria-describedby', desc);
+    },
+    removeAriaDescribedby: function removeAriaDescribedby() {
+      var _this5 = this;
+
+      // Remove aria-describedby on trigger element, without removing any other IDs
+      var target = this.getTarget();
+      var desc = getAttr(target, 'aria-describedby') || '';
+      desc = desc.split(/\s+/).filter(function (d) {
+        return d !== _this5.computedId;
+      }).join(' ').trim(); // Update or remove aria-describedby
+
+      if (desc) {
+        /* istanbul ignore next */
+        setAttr(target, 'aria-describedby', desc);
+      } else {
+        removeAttr(target, 'aria-describedby');
+      }
+    },
+    fixTitle: function fixTitle() {
+      // If the target has a title attribute, null it out and
+      // store on data-title
+      var target = this.getTarget();
+
+      if (target && getAttr(target, 'title')) {
+        // We only update title attribute if it has a value
+        setAttr(target, 'data-original-title', getAttr(target, 'title') || '');
+        setAttr(target, 'title', '');
+      }
+    },
+    restoreTitle: function restoreTitle() {
+      // If target had a title, restore the title attribute
+      // and remove the data-title attribute
+      var target = this.getTarget();
+
+      if (target && hasAttr(target, 'data-original-title')) {
+        setAttr(target, 'title', getAttr(target, 'data-original-title') || '');
+        removeAttr(target, 'data-original-title');
+      }
+    },
+    //
+    // BvEvent helpers
+    //
+    buildEvent: function buildEvent(type) {
+      var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      // Defaults to a non-cancellable event
+      return new BvEvent(type, _objectSpread2({
+        cancelable: false,
+        target: this.getTarget(),
+        relatedTarget: this.getTemplateElement() || null,
+        componentId: this.computedId,
+        vueTarget: this
+      }, opts));
+    },
+    emitEvent: function emitEvent(bvEvt) {
+      // Emits a BvEvent on $root and this instance
+      var evtName = bvEvt.type;
+      var $root = this.$root;
+
+      if ($root && $root.$emit) {
+        // Emit an event on $root
+        $root.$emit("bv::".concat(this.templateType, "::").concat(evtName), bvEvt);
       }
 
-      var hasTitle = Boolean((select(Selector$3.TITLE, tip) || {}).innerHTML);
-      var hasContent = Boolean((select(Selector$3.CONTENT, tip) || {}).innerHTML);
-      return hasTitle || hasContent;
-    }
-  }, {
-    key: "addAttachmentClass",
-    value: function addAttachmentClass(attachment)
+      this.$emit(evtName, bvEvt);
+    },
+    //
+    // Event handler setup methods
+    //
+    listen: function listen() {
+      var _this6 = this;
+
+      // Enable trigger event handlers
+      var el = this.getTarget();
+
+      if (!el) {
+        /* istanbul ignore next */
+        return;
+      } // Listen for global show/hide events
+
+
+      this.setRootListener(true); // Set up our listeners on the target trigger element
+
+      this.computedTriggers.forEach(function (trigger) {
+        if (trigger === 'click') {
+          eventOn(el, 'click', _this6.handleEvent, EvtOpts);
+        } else if (trigger === 'focus') {
+          eventOn(el, 'focusin', _this6.handleEvent, EvtOpts);
+          eventOn(el, 'focusout', _this6.handleEvent, EvtOpts);
+        } else if (trigger === 'blur') {
+          // Used to close $tip when element looses focus
+
+          /* istanbul ignore next */
+          eventOn(el, 'focusout', _this6.handleEvent, EvtOpts);
+        } else if (trigger === 'hover') {
+          eventOn(el, 'mouseenter', _this6.handleEvent, EvtOpts);
+          eventOn(el, 'mouseleave', _this6.handleEvent, EvtOpts);
+        }
+      }, this);
+    },
+    unListen: function unListen()
     /* istanbul ignore next */
     {
-      addClass(this.getTipElement(), "".concat(CLASS_PREFIX$1, "-").concat(attachment));
-    }
-  }, {
-    key: "setContent",
-    value: function setContent(tip) {
-      // we use append for html objects to maintain js events/components
-      this.setElementContent(select(Selector$3.TITLE, tip), this.getTitle());
-      this.setElementContent(select(Selector$3.CONTENT, tip), this.getContent());
-      removeClass(tip, ClassName$1.FADE);
-      removeClass(tip, ClassName$1.SHOW);
-    } // This method may look identical to ToolTip version, but it uses a different RegEx defined above
+      var _this7 = this;
 
-  }, {
-    key: "cleanTipClass",
-    value: function cleanTipClass()
-    /* istanbul ignore next */
+      // Remove trigger event handlers
+      var events = ['click', 'focusin', 'focusout', 'mouseenter', 'mouseleave'];
+      var target = this.getTarget(); // Stop listening for global show/hide/enable/disable events
+
+      this.setRootListener(false); // Clear out any active target listeners
+
+      events.forEach(function (evt) {
+        target && eventOff(target, evt, _this7.handleEvent, EvtOpts);
+      }, this);
+    },
+    setRootListener: function setRootListener(on) {
+      // Listen for global `bv::{hide|show}::{tooltip|popover}` hide request event
+      var $root = this.$root;
+
+      if ($root) {
+        var method = on ? '$on' : '$off';
+        var type = this.templateType;
+        $root[method]("bv::hide::".concat(type), this.doHide);
+        $root[method]("bv::show::".concat(type), this.doShow);
+        $root[method]("bv::disable::".concat(type), this.doDisable);
+        $root[method]("bv::enable::".concat(type), this.doEnable);
+      }
+    },
+    setWhileOpenListeners: function setWhileOpenListeners(on) {
+      // Events that are only registered when the template is showing
+      // Modal close events
+      this.setModalListener(on); // Dropdown open events (if we are attached to a dropdown)
+
+      this.setDropdownListener(on); // Periodic $element visibility check
+      // For handling when tip target is in <keepalive>, tabs, carousel, etc
+
+      this.visibleCheck(on); // On-touch start listeners
+
+      this.setOnTouchStartListener(on);
+    },
+    visibleCheck: function visibleCheck(on) {
+      var _this8 = this;
+
+      // Handler for periodic visibility check
+      clearInterval(this.$_visibleInterval);
+      this.$_visibleInterval = null;
+      var target = this.getTarget();
+      var tip = this.getTemplateElement();
+
+      if (on) {
+        this.visibleInterval = setInterval(function () {
+          if (tip && _this8.localShow && (!target.parentNode || !isVisible(target))) {
+            // Target element is no longer visible or not in DOM, so force-hide the tooltip
+            _this8.forceHide();
+          }
+        }, 100);
+      }
+    },
+    setModalListener: function setModalListener(on) {
+      // Handle case where tooltip/target is in a modal
+      if (this.isInModal()) {
+        // We can listen for modal hidden events on `$root`
+        this.$root[on ? '$on' : '$off'](MODAL_CLOSE_EVENT, this.forceHide);
+      }
+    },
+    setOnTouchStartListener: function setOnTouchStartListener(on)
+    /* istanbul ignore next: JSDOM doesn't support `ontouchstart` */
     {
-      var tip = this.getTipElement();
-      var tabClass = tip.className.match(BS_CLASS_PREFIX_REGEX$1);
+      var _this9 = this;
 
-      if (!isNull(tabClass) && tabClass.length > 0) {
-        tabClass.forEach(function (cls) {
-          removeClass(tip, cls);
+      // If this is a touch-enabled device we add extra empty
+      // `mouseover` listeners to the body's immediate children
+      // Only needed because of broken event delegation on iOS
+      // https://www.quirksmode.org/blog/archives/2014/02/mouse_event_bub.html
+      if ('ontouchstart' in document.documentElement) {
+        var method = on ? eventOn : eventOff;
+        from(document.body.children).forEach(function (el) {
+          method(el, 'mouseover', _this9.$_noop);
         });
       }
-    }
-  }, {
-    key: "getTitle",
-    value: function getTitle() {
-      var title = this.$config.title || '';
-      /* istanbul ignore next */
+    },
+    setDropdownListener: function setDropdownListener(on) {
+      var target = this.getTarget();
 
-      if (isFunction(title)) {
-        title = title(this.$element);
+      if (!target || !this.$root || !this.isDropdown) {
+        return;
+      } // We can listen for dropdown shown events on it's instance
+      // TODO:
+      //   We could grab the ID from the dropdown, and listen for
+      //   $root events for that particular dropdown id
+      //   Dropdown shown and hidden events will need to emit
+      //   Note: Dropdown auto-ID happens in a `$nextTick()` after mount
+      //         So the ID lookup would need to be done in a `$nextTick()`
+
+
+      if (target.__vue__) {
+        target.__vue__[on ? '$on' : '$off']('shown', this.forceHide);
+      }
+    },
+    //
+    // Event handlers
+    //
+    handleEvent: function handleEvent(evt) {
+      // General trigger event handler
+      // target is the trigger element
+      var target = this.getTarget();
+
+      if (!target || isDisabled(target) || !this.$_enabled || this.dropdownOpen()) {
+        // If disabled or not enabled, or if a dropdown that is open, don't do anything
+        // If tip is shown before element gets disabled, then tip will not
+        // close until no longer disabled or forcefully closed
+        return;
+      }
+
+      var type = evt.type;
+      var triggers = this.computedTriggers;
+
+      if (type === 'click' && arrayIncludes(triggers, 'click')) {
+        this.click(evt);
+      } else if (type === 'mouseenter' && arrayIncludes(triggers, 'hover')) {
+        // `mouseenter` is a non-bubbling event
+        this.enter(evt);
+      } else if (type === 'focusin' && arrayIncludes(triggers, 'focus')) {
+        // `focusin` is a bubbling event
+        // `evt` includes `relatedTarget` (element loosing focus)
+        this.enter(evt);
+      } else if (type === 'focusout' && (arrayIncludes(triggers, 'focus') || arrayIncludes(triggers, 'blur')) || type === 'mouseleave' && arrayIncludes(triggers, 'hover')) {
+        // `focusout` is a bubbling event
+        // `mouseleave` is a non-bubbling event
+        // `tip` is the template (will be null if not open)
+        var tip = this.getTemplateElement(); // `evtTarget` is the element which is loosing focus/hover and
+
+        var evtTarget = evt.target; // `relatedTarget` is the element gaining focus/hover
+
+        var relatedTarget = evt.relatedTarget;
+        /* istanbul ignore next */
+
+        if ( // From tip to target
+        tip && contains(tip, evtTarget) && contains(target, relatedTarget) || // From target to tip
+        tip && contains(target, evtTarget) && contains(tip, relatedTarget) || // Within tip
+        tip && contains(tip, evtTarget) && contains(tip, relatedTarget) || // Within target
+        contains(target, evtTarget) && contains(target, relatedTarget)) {
+          // If focus/hover moves within `tip` and `target`, don't trigger a leave
+          return;
+        } // Otherwise trigger a leave
+
+
+        this.leave(evt);
+      }
+    },
+    doHide: function doHide(id) {
+      // Programmatically hide tooltip or popover
+      if (!id || this.getTargetId() === id || this.computedId === id) {
+        // Close all tooltips or popovers, or this specific tip (with ID)
+        this.forceHide();
+      }
+    },
+    doShow: function doShow(id) {
+      // Programmatically show tooltip or popover
+      if (!id || this.getTargetId() === id || this.computedId === id) {
+        // Open all tooltips or popovers, or this specific tip (with ID)
+        this.show();
+      }
+    },
+    doDisable: function doDisable(id)
+    /*istanbul ignore next: ignore for now */
+    {
+      // Programmatically disable tooltip or popover
+      if (!id || this.getTargetId() === id || this.computedId === id) {
+        // Disable all tooltips or popovers (no ID), or this specific tip (with ID)
+        this.disable();
+      }
+    },
+    doEnable: function doEnable(id)
+    /*istanbul ignore next: ignore for now */
+    {
+      // Programmatically enable tooltip or popover
+      if (!id || this.getTargetId() === id || this.computedId === id) {
+        // Enable all tooltips or popovers (no ID), or this specific tip (with ID)
+        this.enable();
+      }
+    },
+    click: function click(evt) {
+      if (!this.$_enabled || this.dropdownOpen()) {
+        /* istanbul ignore next */
+        return;
+      }
+
+      this.activeTrigger.click = !this.activeTrigger.click;
+
+      if (this.isWithActiveTrigger) {
+        this.enter(null);
+      } else {
+        /* istanbul ignore next */
+        this.leave(null);
+      }
+    },
+    toggle: function toggle()
+    /* istanbul ignore next */
+    {
+      // Manual toggle handler
+      if (!this.$_enabled || this.dropdownOpen()) {
+        /* istanbul ignore next */
+        return;
+      } // Should we register as an active trigger?
+      // this.activeTrigger.manual = !this.activeTrigger.manual
+
+
+      if (this.localShow) {
+        this.leave(null);
+      } else {
+        this.enter(null);
+      }
+    },
+    enter: function enter() {
+      var _this10 = this;
+
+      var evt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      // Opening trigger handler
+      // Note: Click events are sent with evt === null
+      if (evt) {
+        this.activeTrigger[evt.type === 'focusin' ? 'focus' : 'hover'] = true;
       }
       /* istanbul ignore next */
 
 
-      if (isObject(title) && title.nodeType && !title.innerHTML.trim()) {
-        // We have a dom node, but without inner content, so just return an empty string
-        title = '';
+      if (this.localShow || this.$_hoverState === 'in') {
+        this.$_hoverState = 'in';
+        return;
       }
 
-      if (isString(title)) {
-        title = title.trim();
+      clearTimeout(this.hoverTimeout);
+      this.$_hoverState = 'in';
+
+      if (!this.computedDelay.show) {
+        this.show();
+      } else {
+        // Hide any title attribute while enter delay is active
+        this.fixTitle();
+        this.hoverTimeout = setTimeout(function () {
+          /* istanbul ignore else */
+          if (_this10.$_hoverState === 'in') {
+            _this10.show();
+          } else if (!_this10.localShow) {
+            _this10.restoreTitle();
+          }
+        }, this.computedDelay.show);
+      }
+    },
+    leave: function leave() {
+      var _this11 = this;
+
+      var evt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      // Closing trigger handler
+      // Note: Click events are sent with evt === null
+      if (evt) {
+        this.activeTrigger[evt.type === 'focusout' ? 'focus' : 'hover'] = false;
+        /* istanbul ignore next */
+
+        if (evt.type === 'focusout' && arrayIncludes(this.computedTriggers, 'blur')) {
+          // Special case for `blur`: we clear out the other triggers
+          this.activeTrigger.click = false;
+          this.activeTrigger.hover = false;
+        }
+      }
+      /* istanbul ignore next: ignore for now */
+
+
+      if (this.isWithActiveTrigger) {
+        return;
       }
 
-      if (!title) {
-        // Try and grab element's title attribute
-        title = getAttr(this.$element, 'title') || getAttr(this.$element, 'data-original-title') || '';
-        title = title.trim();
+      clearTimeout(this.hoverTimeout);
+      this.$_hoverState = 'out';
+
+      if (!this.computedDelay.hide) {
+        this.hide();
+      } else {
+        this.$hoverTimeout = setTimeout(function () {
+          if (_this11.$_hoverState === 'out') {
+            _this11.hide();
+          }
+        }, this.computedDelay.hide);
       }
-
-      return title;
-    } // New methods
-
-  }, {
-    key: "getContent",
-    value: function getContent() {
-      var content = this.$config.content || '';
-      /* istanbul ignore next */
-
-      if (isFunction(content)) {
-        content = content(this.$element);
-      }
-      /* istanbul ignore next */
-
-
-      if (isObject(content) && content.nodeType && !content.innerHTML.trim()) {
-        // We have a dom node, but without inner content, so just return an empty string
-        content = '';
-      }
-
-      if (isString(content)) {
-        content = content.trim();
-      }
-
-      return content;
     }
-  }], [{
-    key: "Default",
-    // --- Getter overrides ---
-    get: function get() {
-      return Defaults$1;
-    }
-  }, {
-    key: "NAME",
-    get: function get() {
-      return NAME$m;
-    }
-  }]);
+  }
+});
 
-  return PopOver;
-}(ToolTip);
+var NAME$o = 'BTooltip'; // @vue/component
 
-var PLACEMENTS = {
-  top: 'top',
-  topleft: 'topleft',
-  topright: 'topright',
-  right: 'right',
-  righttop: 'righttop',
-  rightbottom: 'rightbottom',
-  bottom: 'bottom',
-  bottomleft: 'bottomleft',
-  bottomright: 'bottomright',
-  left: 'left',
-  lefttop: 'lefttop',
-  leftbottom: 'leftbottom',
-  auto: 'auto'
-};
-var OBSERVER_CONFIG$1 = {
-  subtree: true,
-  childList: true,
-  characterData: true,
-  attributes: true,
-  attributeFilter: ['class', 'style'] // @vue/component
-
-};
-var toolpopMixin = {
+var BTooltip =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$o,
   props: {
+    title: {
+      type: String // default: undefined
+
+    },
+    // Added in by BPopover
+    // content: {
+    //   type: String,
+    //   default: undefined
+    // },
     target: {
       // String ID of element, or element/component reference
-      type: [String, Object, HTMLElement, Function] // default: undefined
-
+      // Or function that returns one of the above
+      type: [String, HTMLElement, SVGElement, Function, Object],
+      // default: undefined,
+      required: true
+    },
+    triggers: {
+      type: [String, Array],
+      default: 'hover focus'
+    },
+    placement: {
+      type: String,
+      default: 'top'
+    },
+    fallbackPlacement: {
+      type: [String, Array],
+      default: 'flip',
+      validator: function validator(value) {
+        return isArray(value) && value.every(function (v) {
+          return isString(v);
+        }) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
+      }
+    },
+    variant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$o, 'variant');
+      }
+    },
+    customClass: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$o, 'customClass');
+      }
+    },
+    delay: {
+      type: [Number, Object, String],
+      default: function _default() {
+        return getComponentConfig(NAME$o, 'delay');
+      }
+    },
+    boundary: {
+      // String: scrollParent, window, or viewport
+      // Element: element reference
+      // Object: Vue component
+      type: [String, HTMLElement, Object],
+      default: function _default() {
+        return getComponentConfig(NAME$o, 'boundary');
+      }
+    },
+    boundaryPadding: {
+      type: [Number, String],
+      default: function _default() {
+        return getComponentConfig(NAME$o, 'boundaryPadding');
+      }
     },
     offset: {
       type: [Number, String],
@@ -14714,9 +14959,11 @@ var toolpopMixin = {
       default: false
     },
     container: {
-      // String ID of container, if null body is used (default)
-      type: String,
-      default: null
+      // String: HTML ID of container, if null body is used (default)
+      // HTMLElement: element reference reference
+      // Object: Vue Component
+      type: [String, HTMLElement, Object] // default: undefined
+
     },
     show: {
       type: Boolean,
@@ -14725,454 +14972,447 @@ var toolpopMixin = {
     disabled: {
       type: Boolean,
       default: false
+    },
+    id: {
+      // ID to use for tooltip element
+      // If not provided on will automatically be generated
+      type: String,
+      default: null
     }
   },
   data: function data() {
     return {
-      // semaphore for preventing multiple show events
-      localShow: false
+      localShow: this.show,
+      localTitle: '',
+      localContent: ''
     };
   },
   computed: {
-    baseConfig: function baseConfig() {
-      var cont = this.container;
-      var delay = isObject(this.delay) ? this.delay : parseInt(this.delay, 10) || 0;
+    templateData: function templateData() {
+      // Data that will be passed to the template and popper
       return {
-        // Title prop
-        title: (this.title || '').trim() || '',
-        // Content prop (if popover)
-        content: (this.content || '').trim() || '',
-        // Tooltip/Popover placement
-        placement: PLACEMENTS[this.placement] || 'auto',
-        // Tooltip/popover fallback placement
-        fallbackPlacement: this.fallbackPlacement || 'flip',
-        // Container currently needs to be an ID with '#' prepended, if null then body is used
-        container: cont ? /^#/.test(cont) ? cont : "#".concat(cont) : false,
-        // boundariesElement passed to popper
-        boundary: this.boundary,
-        // boundariesElement padding passed to popper
-        boundaryPadding: this.boundaryPadding,
-        // Show/Hide delay
-        delay: delay || 0,
-        // Offset can be css distance. if no units, pixels are assumed
-        offset: this.offset || 0,
-        // Disable fade Animation?
-        animation: !this.noFade,
-        // Variant
+        // We use massaged versions of the title and content props/slots
+        title: this.localTitle,
+        content: this.localContent,
+        // Pass these props as is
+        target: this.target,
+        triggers: this.triggers,
+        placement: this.placement,
+        fallbackPlacement: this.fallbackPlacement,
         variant: this.variant,
-        // Custom class
         customClass: this.customClass,
-        // Open/Close Trigger(s)
-        trigger: isArray(this.triggers) ? this.triggers.join(' ') : this.triggers,
-        // Callbacks so we can trigger events on component
-        callbacks: {
-          show: this.onShow,
-          shown: this.onShown,
-          hide: this.onHide,
-          hidden: this.onHidden,
-          enabled: this.onEnabled,
-          disabled: this.onDisabled
-        }
+        container: this.container,
+        boundary: this.boundary,
+        boundaryPadding: this.boundaryPadding,
+        delay: this.delay,
+        offset: this.offset,
+        noFade: this.noFade,
+        disabled: this.disabled,
+        id: this.id
+      };
+    },
+    templateTitleContent: function templateTitleContent() {
+      // Used to watch for changes to the title and content props
+      return {
+        title: this.title,
+        content: this.content
       };
     }
   },
   watch: {
-    show: function show(_show, old) {
-      if (_show !== old) {
-        _show ? this.onOpen() : this.onClose();
+    show: function show(_show, oldVal) {
+      if (_show !== oldVal && _show !== this.localShow && this.$_bv_toolpop) {
+        if (_show) {
+          this.$_bv_toolpop.show();
+        } else {
+          // We use `forceHide()` to override any active triggers
+          this.$_bv_toolpop.forceHide();
+        }
       }
     },
-    disabled: function disabled(_disabled, old) {
-      if (_disabled !== old) {
-        _disabled ? this.onDisable() : this.onEnable();
+    disabled: function disabled(newVal, oldVal) {
+      if (newVal) {
+        this.doDisable();
+      } else {
+        this.doEnable();
       }
     },
-    localShow: function localShow(show, old) {
-      if (show !== this.show) {
-        this.$emit('update:show', show);
-      }
+    localShow: function localShow(show, oldVal) {
+      // TODO: May need to be done in a `$nextTick()`
+      this.$emit('update:show', show);
+    },
+    templateData: function templateData(newVal, oldVal) {
+      var _this = this;
+
+      this.$nextTick(function () {
+        if (_this.$_bv_toolpop) {
+          _this.$_bv_toolpop.updateData(_this.templateData);
+        }
+      });
+    },
+    // Watchers for title/content props (prop changes do not trigger the `updated()` hook)
+    templateTitleContent: function templateTitleContent(newVal, oldVal) {
+      this.$nextTick(this.updateContent);
     }
   },
   created: function created() {
-    // Create non-reactive property
-    this._toolpop = null;
-    this._obs_title = null;
-    this._obs_content = null;
-  },
-  mounted: function mounted() {
-    var _this = this;
-
-    // We do this in a next tick to ensure DOM has rendered first
-    this.$nextTick(function () {
-      // Instantiate ToolTip/PopOver on target
-      // The createToolpop method must exist in main component
-      if (_this.createToolpop()) {
-        if (_this.disabled) {
-          // Initially disabled
-          _this.onDisable();
-        } // Listen to open signals from others
-
-
-        _this.$on('open', _this.onOpen); // Listen to close signals from others
-
-
-        _this.$on('close', _this.onClose); // Listen to disable signals from others
-
-
-        _this.$on('disable', _this.onDisable); // Listen to enable signals from others
-
-
-        _this.$on('enable', _this.onEnable); // Observe content Child changes so we can notify popper of possible size change
-
-
-        _this.setObservers(true); // Set initially open state
-
-
-        if (_this.show) {
-          _this.onOpen();
-        }
-      }
-    });
+    // Non reactive properties
+    this.$_bv_toolpop = null;
   },
   updated: function updated() {
-    // If content/props changes, etc
-    if (this._toolpop) {
-      this._toolpop.updateConfig(this.getConfig());
-    }
-  },
-  activated: function activated()
-  /* istanbul ignore next: can't easily test in JSDOM */
-  {
-    // Called when component is inside a <keep-alive> and component brought offline
-    this.setObservers(true);
-  },
-  deactivated: function deactivated()
-  /* istanbul ignore next: can't easily test in JSDOM */
-  {
-    // Called when component is inside a <keep-alive> and component taken offline
-    if (this._toolpop) {
-      this.setObservers(false);
-
-      this._toolpop.hide();
-    }
+    // Update the `propData` object
+    // Done in a `$nextTick()` to ensure slot(s) have updated
+    this.$nextTick(this.updateContent);
   },
   beforeDestroy: function beforeDestroy() {
     // Shutdown our local event listeners
-    this.$off('open', this.onOpen);
-    this.$off('close', this.onClose);
-    this.$off('disable', this.onDisable);
-    this.$off('enable', this.onEnable);
-    this.setObservers(false); // bring our content back if needed
+    this.$off('open', this.doOpen);
+    this.$off('close', this.doClose);
+    this.$off('disable', this.doDisable);
+    this.$off('enable', this.doEnable); // Destroy the tip instance
 
-    this.bringItBack();
+    this.$_bv_toolpop && this.$_bv_toolpop.$destroy();
+    this.$_bv_toolpop = null;
+  },
+  mounted: function mounted() {
+    var _this2 = this;
 
-    if (this._toolpop) {
-      this._toolpop.destroy();
+    // Instantiate a new BVTooltip instance
+    // Done in a `$nextTick()` to ensure DOM has completed rendering
+    // so that target can be found
+    this.$nextTick(function () {
+      // Load the on demand child instance
+      var Component = _this2.getComponent(); // Ensure we have initial content
 
-      this._toolpop = null;
-    }
+
+      _this2.updateContent(); // Pass down the scoped style attribute if available
+
+
+      var scopeId = getScopeId(_this2) || getScopeId(_this2.$parent); // Create the instance
+
+      var $toolpop = _this2.$_bv_toolpop = new Component({
+        parent: _this2,
+        // Pass down the scoped style ID
+        _scopeId: scopeId || undefined
+      }); // Set the initial data
+
+      $toolpop.updateData(_this2.templateData); // Set listeners
+
+      $toolpop.$on('show', _this2.onShow);
+      $toolpop.$on('shown', _this2.onShown);
+      $toolpop.$on('hide', _this2.onHide);
+      $toolpop.$on('hidden', _this2.onHidden);
+      $toolpop.$on('disabled', _this2.onDisabled);
+      $toolpop.$on('enabled', _this2.onEnabled); // Initially disabled?
+
+      if (_this2.disabled) {
+        // Initially disabled
+        _this2.doDisable();
+      } // Listen to open signals from others
+
+
+      _this2.$on('open', _this2.doOpen); // Listen to close signals from others
+
+
+      _this2.$on('close', _this2.doClose); // Listen to disable signals from others
+
+
+      _this2.$on('disable', _this2.doDisable); // Listen to enable signals from others
+
+
+      _this2.$on('enable', _this2.doEnable); // Initially show tooltip?
+
+
+      if (_this2.localShow) {
+        _this2.$_bv_toolpop && _this2.$_bv_toolpop.show();
+      }
+    });
   },
   methods: {
-    getConfig: function getConfig() {
-      var cfg = _objectSpread2({}, this.baseConfig);
-
-      if (this.$refs.title && this.$refs.title.innerHTML.trim()) {
-        // If slot has content, it overrides 'title' prop
-        // We use the DOM node as content to allow components!
-        cfg.title = this.$refs.title;
-        cfg.html = true;
-      }
-
-      if (this.$refs.content && this.$refs.content.innerHTML.trim()) {
-        // If slot has content, it overrides 'content' prop
-        // We use the DOM node as content to allow components!
-        cfg.content = this.$refs.content;
-        cfg.html = true;
-      }
-
-      return cfg;
+    getComponent: function getComponent() {
+      // Overridden by BPopover
+      return BVTooltip;
     },
-    onOpen: function onOpen() {
-      if (this._toolpop && !this.localShow) {
-        this.localShow = true;
+    updateContent: function updateContent() {
+      // Overridden by BPopover
+      // Tooltip: Default slot is `title`
+      // Popover: Default slot is `content`, `title` slot is title
+      // We pass a scoped slot function reference by default (Vue v2.6x)
+      // And pass the title prop as a fallback
+      this.setTitle(this.$scopedSlots.default || this.title);
+    },
+    // Helper methods for `updateContent()`
+    setTitle: function setTitle(val) {
+      val = isUndefinedOrNull(val) ? '' : val; // We only update the value if it has changed
 
-        this._toolpop.show();
+      if (this.localTitle !== val) {
+        this.localTitle = val;
       }
     },
-    onClose: function onClose(callback) {
-      // What is callback for ? it is not documented
+    setContent: function setContent(val) {
+      val = isUndefinedOrNull(val) ? '' : val; // We only update the value if it has changed
 
-      /* istanbul ignore else */
-      if (this._toolpop && this.localShow) {
-        this._toolpop.hide(callback);
-      } else if (isFunction(callback)) {
-        // Is this even used?
-        callback();
+      if (this.localContent !== val) {
+        this.localContent = val;
       }
     },
-    onDisable: function onDisable() {
-      if (this._toolpop) {
-        this._toolpop.disable();
+    // --- Template event handlers ---
+    onShow: function onShow(bvEvt) {
+      // Placeholder
+      this.$emit('show', bvEvt);
+
+      if (bvEvt) {
+        this.localShow = !bvEvt.defaultPrevented;
       }
     },
-    onEnable: function onEnable() {
-      if (this._toolpop) {
-        this._toolpop.enable();
-      }
-    },
-    updatePosition: function updatePosition() {
-      /* istanbul ignore next: can't test in JSDOM until mutation observer is implemented */
-      if (this._toolpop) {
-        // Instruct popper to reposition popover if necessary
-        this._toolpop.update();
-      }
-    },
-    getTarget: function getTarget() {
-      var target = this.target;
-
-      if (isFunction(target)) {
-        /* istanbul ignore next */
-        target = target();
-      }
-      /* istanbul ignore else */
-
-
-      if (isString(target)) {
-        // Assume ID of element
-        return getById(target);
-      } else if (isObject(target) && isElement(target.$el)) {
-        // Component reference
-
-        /* istanbul ignore next */
-        return target.$el;
-      } else if (isObject(target) && isElement(target)) {
-        // Element reference
-
-        /* istanbul ignore next */
-        return target;
-      }
-      /* istanbul ignore next */
-
-
-      return null;
-    },
-    // Callbacks called by Tooltip/Popover class instance
-    onShow: function onShow(evt) {
-      this.$emit('show', evt);
-      this.localShow = !(evt && evt.defaultPrevented);
-    },
-    onShown: function onShown(evt) {
-      this.setObservers(true);
-      this.$emit('shown', evt);
+    onShown: function onShown(bvEvt) {
+      // Tip is now showing
       this.localShow = true;
+      this.$emit('shown', bvEvt);
     },
-    onHide: function onHide(evt) {
-      this.$emit('hide', evt);
-      this.localShow = !!(evt && evt.defaultPrevented);
+    onHide: function onHide(bvEvt) {
+      this.$emit('hide', bvEvt);
     },
-    onHidden: function onHidden(evt) {
-      this.setObservers(false); // bring our content back if needed to keep Vue happy
-      // Tooltip class will move it back to tip when shown again
-
-      this.bringItBack();
-      this.$emit('hidden', evt);
+    onHidden: function onHidden(bvEvt) {
+      // Tip is no longer showing
+      this.$emit('hidden', bvEvt);
       this.localShow = false;
     },
-    onEnabled: function onEnabled(evt) {
-      /* istanbul ignore next */
-      if (!evt || evt.type !== 'enabled') {
-        // Prevent possible endless loop if user mistakenly fires enabled instead of enable
-        return;
-      }
-
-      this.$emit('update:disabled', false);
-      this.$emit('disabled');
-    },
-    onDisabled: function onDisabled(evt) {
-      /* istanbul ignore next */
-      if (!evt || evt.type !== 'disabled') {
-        // Prevent possible endless loop if user mistakenly fires disabled instead of disable
-        return;
-      }
-
-      this.$emit('update:disabled', true);
-      this.$emit('enabled');
-    },
-    bringItBack: function bringItBack() {
-      // bring our content back if needed to keep Vue happy
-      if (this.$el && this.$refs.title) {
-        this.$el.appendChild(this.$refs.title);
-      }
-
-      if (this.$el && this.$refs.content) {
-        this.$el.appendChild(this.$refs.content);
+    onDisabled: function onDisabled(bvEvt) {
+      // Prevent possible endless loop if user mistakenly
+      // fires `disabled` instead of `disable`
+      if (bvEvt && bvEvt.type === 'disabled') {
+        this.$emit('update:disabled', true);
+        this.$emit('disabled', bvEvt);
       }
     },
-    setObservers: function setObservers(on) {
-      if (on) {
-        if (this.$refs.title) {
-          this._obs_title = observeDom(this.$refs.title, this.updatePosition.bind(this), OBSERVER_CONFIG$1);
-        }
-
-        if (this.$refs.content) {
-          this._obs_content = observeDom(this.$refs.content, this.updatePosition.bind(this), OBSERVER_CONFIG$1);
-        }
-      } else {
-        if (this._obs_title) {
-          this._obs_title.disconnect();
-
-          this._obs_title = null;
-        }
-
-        if (this._obs_content) {
-          this._obs_content.disconnect();
-
-          this._obs_content = null;
-        }
+    onEnabled: function onEnabled(bvEvt) {
+      // Prevent possible endless loop if user mistakenly
+      // fires `enabled` instead of `enable`
+      if (bvEvt && bvEvt.type === 'enabled') {
+        this.$emit('update:disabled', false);
+        this.$emit('enabled', bvEvt);
       }
-    }
-  }
-};
-
-var NAME$n = 'BPopover';
-var props$T = {
-  title: {
-    type: String,
-    default: ''
-  },
-  content: {
-    type: String,
-    default: ''
-  },
-  triggers: {
-    type: [String, Array],
-    default: 'click'
-  },
-  placement: {
-    type: String,
-    default: 'right'
-  },
-  fallbackPlacement: {
-    type: [String, Array],
-    default: 'flip',
-    validator: function validator(value) {
-      return isArray(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
-    }
-  },
-  variant: {
-    type: String,
-    default: function _default() {
-      return getComponentConfig(NAME$n, 'variant');
-    }
-  },
-  customClass: {
-    type: String,
-    default: function _default() {
-      return getComponentConfig(NAME$n, 'customClass');
-    }
-  },
-  delay: {
-    type: [Number, Object, String],
-    default: function _default() {
-      return getComponentConfig(NAME$n, 'delay');
-    }
-  },
-  boundary: {
-    // String: scrollParent, window, or viewport
-    // Element: element reference
-    type: [String, HTMLElement],
-    default: function _default() {
-      return getComponentConfig(NAME$n, 'boundary');
-    }
-  },
-  boundaryPadding: {
-    type: Number,
-    default: function _default() {
-      return getComponentConfig(NAME$n, 'boundaryPadding');
-    }
-  } // @vue/component
-
-};
-var BPopover =
-/*#__PURE__*/
-Vue.extend({
-  name: NAME$n,
-  mixins: [toolpopMixin, normalizeSlotMixin],
-  props: props$T,
-  methods: {
-    createToolpop: function createToolpop() {
-      // getTarget is in toolpop mixin
-      var target = this.getTarget();
-      /* istanbul ignore else */
-
-      if (target) {
-        this._toolpop = new PopOver(target, this.getConfig(), this);
-      } else {
-        this._toolpop = null;
-        warn("b-popover: 'target' element not found!");
-      }
-
-      return this._toolpop;
+    },
+    // --- Local event listeners ---
+    doOpen: function doOpen() {
+      !this.localShow && this.$_bv_toolpop && this.$_bv_toolpop.show();
+    },
+    doClose: function doClose() {
+      this.localShow && this.$_bv_toolpop && this.$_bv_toolpop.hide();
+    },
+    doDisable: function doDisable(evt) {
+      this.$_bv_toolpop && this.$_bv_toolpop.disable();
+    },
+    doEnable: function doEnable() {
+      this.$_bv_toolpop && this.$_bv_toolpop.enable();
     }
   },
   render: function render(h) {
-    return h('div', {
-      class: ['d-none'],
-      style: {
-        display: 'none'
-      },
-      attrs: {
-        'aria-hidden': true
-      }
-    }, [h('div', {
-      ref: 'title'
-    }, this.normalizeSlot('title')), h('div', {
-      ref: 'content'
-    }, this.normalizeSlot('default'))]);
+    // Always renders a comment node
+    // TODO:
+    //   Future: Possibly render a target slot (single root element)
+    //   which we can apply the listeners to (pass `this.$el` to BVTooltip)
+    return h();
   }
 });
 
-var BV_POPOVER = '__BV_PopOver__'; // Valid event triggers
+var NAME$p = 'BVPopoverTemplate'; // @vue/component
+
+var BVPopoverTemplate =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$p,
+  extends: BVTooltipTemplate,
+  computed: {
+    templateType: function templateType() {
+      return 'popover';
+    }
+  },
+  methods: {
+    renderTemplate: function renderTemplate(h) {
+      // Title and content could be a scoped slot function
+      var $title = isFunction(this.title) ? this.title({}) : this.title;
+      var $content = isFunction(this.content) ? this.content({}) : this.content; // Directive usage only
+
+      var titleDomProps = this.html && !isFunction(this.title) ? {
+        innerHTML: this.title
+      } : {};
+      var contentDomProps = this.html && !isFunction(this.content) ? {
+        innerHTML: this.content
+      } : {};
+      return h('div', {
+        staticClass: 'popover b-popover',
+        class: this.templateClasses,
+        attrs: this.templateAttributes,
+        on: this.templateListeners
+      }, [h('div', {
+        ref: 'arrow',
+        staticClass: 'arrow'
+      }), isUndefinedOrNull($title) || $title === '' ? h() : h('h3', {
+        staticClass: 'popover-header',
+        domProps: titleDomProps
+      }, [$title]), isUndefinedOrNull($content) || $content === '' ? h() : h('div', {
+        staticClass: 'popover-body',
+        domProps: contentDomProps
+      }, [$content])]);
+    }
+  }
+});
+
+// Popover "Class" (Built as a renderless Vue instance)
+var NAME$q = 'BVPopover'; // @vue/component
+
+var BVPopover =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$q,
+  extends: BVTooltip,
+  computed: {
+    // Overwrites BVTooltip
+    templateType: function templateType() {
+      return 'popover';
+    }
+  },
+  methods: {
+    getTemplate: function getTemplate() {
+      // Overwrites BVTooltip
+      return BVPopoverTemplate;
+    }
+  }
+});
+
+var NAME$r = 'BPopover';
+var BPopover =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$r,
+  extends: BTooltip,
+  inheritAttrs: false,
+  props: {
+    title: {
+      type: String // default: undefined
+
+    },
+    content: {
+      type: String // default: undefined
+
+    },
+    triggers: {
+      type: [String, Array],
+      default: 'click'
+    },
+    placement: {
+      type: String,
+      default: 'right'
+    },
+    variant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$r, 'variant');
+      }
+    },
+    customClass: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$r, 'customClass');
+      }
+    },
+    delay: {
+      type: [Number, Object, String],
+      default: function _default() {
+        return getComponentConfig(NAME$r, 'delay');
+      }
+    },
+    boundary: {
+      // String: scrollParent, window, or viewport
+      // Element: element reference
+      // Object: Vue component
+      type: [String, HTMLElement, Object],
+      default: function _default() {
+        return getComponentConfig(NAME$r, 'boundary');
+      }
+    },
+    boundaryPadding: {
+      type: [Number, String],
+      default: function _default() {
+        return getComponentConfig(NAME$r, 'boundaryPadding');
+      }
+    }
+  },
+  methods: {
+    getComponent: function getComponent() {
+      // Overridden by BPopover
+      return BVPopover;
+    },
+    updateContent: function updateContent() {
+      // Tooltip: Default slot is `title`
+      // Popover: Default slot is `content`, `title` slot is title
+      // We pass a scoped slot function references by default (Vue v2.6x)
+      // And pass the title prop as a fallback
+      this.setContent(this.$scopedSlots.default || this.content);
+      this.setTitle(this.$scopedSlots.title || this.title);
+    }
+  } // Render function provided by BTooltip
+
+});
+
+var BV_POPOVER = '__BV_Popover__'; // Default trigger
+
+var DefaultTrigger = 'click'; // Valid event triggers
 
 var validTriggers = {
   focus: true,
   hover: true,
   click: true,
-  blur: true // Directive modifier test regular expressions. Pre-compile for performance
+  blur: true,
+  manual: true
+}; // Directive modifier test regular expressions. Pre-compile for performance
 
-};
-var htmlRE = /^html$/;
+var htmlRE = /^html$/i;
 var noFadeRE = /^nofade$/i;
-var placementRE = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/;
-var boundaryRE = /^(window|viewport|scrollParent)$/;
-var delayRE = /^d\d+$/;
-var offsetRE = /^o-?\d+$/;
-var variantRE = /^v-.+$/; // Build a PopOver config based on bindings (if any)
+var placementRE = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/i;
+var boundaryRE = /^(window|viewport|scrollParent)$/i;
+var delayRE = /^d\d+$/i;
+var delayShowRE = /^ds\d+$/i;
+var delayHideRE = /^dh\d+$/i;
+var offsetRE = /^o-?\d+$/i;
+var variantRE = /^v-.+$/i; // Build a Popover config based on bindings (if any)
 // Arguments and modifiers take precedence over passed value config object
 
-/* istanbul ignore next: not easy to test */
-
-var parseBindings = function parseBindings(bindings)
+var parseBindings = function parseBindings(bindings, vnode)
 /* istanbul ignore next: not easy to test */
 {
   // We start out with a basic config
   var NAME = 'BPopover';
   var config = {
+    title: undefined,
+    content: undefined,
+    trigger: '',
+    // Default set below if needed
+    placement: 'right',
+    fallbackPlacement: 'flip',
+    container: false,
+    // Default of body
+    animation: true,
+    offset: 0,
+    disabled: false,
+    id: null,
+    html: false,
     delay: getComponentConfig(NAME, 'delay'),
     boundary: String(getComponentConfig(NAME, 'boundary')),
     boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0,
     variant: getComponentConfig(NAME, 'variant'),
-    customClass: getComponentConfig(NAME, 'customClass') // Process bindings.value
+    customClass: getComponentConfig(NAME, 'customClass')
+  }; // Process `bindings.value`
 
-  };
-
-  if (isString(bindings.value)) {
+  if (isString(bindings.value) || isNumber(bindings.value)) {
     // Value is popover content (html optionally supported)
     config.content = bindings.value;
   } else if (isFunction(bindings.value)) {
     // Content generator function
     config.content = bindings.value;
-  } else if (isObject(bindings.value)) {
+  } else if (isPlainObject(bindings.value)) {
     // Value is config object, so merge
     config = _objectSpread2({}, config, {}, bindings.value);
   } // If argument, assume element ID of container element
@@ -15182,36 +15422,52 @@ var parseBindings = function parseBindings(bindings)
     // Element ID specified as arg
     // We must prepend '#' to become a CSS selector
     config.container = "#".concat(bindings.arg);
+  } // If title is not provided, try title attribute
+
+
+  if (isUndefined(config.title)) {
+    // Try attribute
+    var data = vnode.data || {};
+    config.title = data.attrs && !isUndefinedOrNull(data.attrs.title) ? data.attrs.title : undefined;
+  } // Normalize delay
+
+
+  if (!isPlainObject(config.delay)) {
+    config.delay = {
+      show: parseInt(config.delay, 10) || 0,
+      hide: parseInt(config.delay, 10) || 0
+    };
   } // Process modifiers
 
 
   keys(bindings.modifiers).forEach(function (mod) {
     if (htmlRE.test(mod)) {
-      // Title allows HTML
+      // Title/content allows HTML
       config.html = true;
     } else if (noFadeRE.test(mod)) {
-      // no animation
+      // No animation
       config.animation = false;
     } else if (placementRE.test(mod)) {
-      // placement of popover
+      // Placement of popover
       config.placement = mod;
     } else if (boundaryRE.test(mod)) {
       // Boundary of popover
+      mod = mod === 'scrollparent' ? 'scrollParent' : mod;
       config.boundary = mod;
     } else if (delayRE.test(mod)) {
       // Delay value
       var delay = parseInt(mod.slice(1), 10) || 0;
-
-      if (delay) {
-        config.delay = delay;
-      }
+      config.delay.show = delay;
+      config.delay.hide = delay;
+    } else if (delayShowRE.test(mod)) {
+      // Delay show value
+      config.delay.show = parseInt(mod.slice(2), 10) || 0;
+    } else if (delayHideRE.test(mod)) {
+      // Delay hide value
+      config.delay.hide = parseInt(mod.slice(2), 10) || 0;
     } else if (offsetRE.test(mod)) {
-      // Offset value (negative allowed)
-      var offset = parseInt(mod.slice(1), 10) || 0;
-
-      if (offset) {
-        config.offset = offset;
-      }
+      // Offset value, negative allowed
+      config.offset = parseInt(mod.slice(1), 10) || 0;
     } else if (variantRE.test(mod)) {
       // Variant
       config.variant = mod.slice(2) || null;
@@ -15221,97 +15477,145 @@ var parseBindings = function parseBindings(bindings)
 
   var selectedTriggers = {}; // Parse current config object trigger
 
-  var triggers = isString(config.trigger) ? config.trigger.trim().split(/\s+/) : [];
-  triggers.forEach(function (trigger) {
+  concat(config.trigger || '').filter(Boolean).join(' ').trim().toLowerCase().split(/\s+/).forEach(function (trigger) {
     if (validTriggers[trigger]) {
       selectedTriggers[trigger] = true;
     }
   }); // Parse modifiers for triggers
 
-  keys(validTriggers).forEach(function (trigger) {
-    if (bindings.modifiers[trigger]) {
-      selectedTriggers[trigger] = true;
+  keys(bindings.modifiers).forEach(function (mod) {
+    mod = mod.toLowerCase();
+
+    if (validTriggers[mod]) {
+      // If modifier is a valid trigger
+      selectedTriggers[mod] = true;
     }
   }); // Sanitize triggers
 
   config.trigger = keys(selectedTriggers).join(' ');
 
   if (config.trigger === 'blur') {
-    // Blur by itself is useless, so convert it to focus
+    // Blur by itself is useless, so convert it to 'focus'
     config.trigger = 'focus';
   }
 
   if (!config.trigger) {
-    // Remove trigger config
-    delete config.trigger;
+    // Use default trigger
+    config.trigger = DefaultTrigger;
   }
 
   return config;
-}; // Add or update PopOver on our element
+}; // Add or update Popover on our element
 
 
 var applyPopover = function applyPopover(el, bindings, vnode) {
   if (!isBrowser) {
     /* istanbul ignore next */
     return;
-  } // Popper is required for PopOvers to work
-
-
-  if (!Popper) {
-    /* istanbul ignore next */
-    warn('v-b-popover: Popper.js is required for PopOvers to work');
-    /* istanbul ignore next */
-
-    return;
   }
 
-  var config = parseBindings(bindings);
+  var config = parseBindings(bindings, vnode);
 
-  if (el[BV_POPOVER]) {
-    el[BV_POPOVER].updateConfig(config);
-  } else {
-    el[BV_POPOVER] = new PopOver(el, config, vnode.context);
+  if (!el[BV_POPOVER]) {
+    var $parent = vnode.context;
+    el[BV_POPOVER] = new BVPopover({
+      parent: $parent,
+      // Add the parent's scoped style attribute data
+      _scopeId: getScopeId($parent, undefined)
+    });
+    el[BV_POPOVER].__bv_prev_data__ = {};
+    el[BV_POPOVER].$on('show', function ()
+    /* istanbul ignore next: for now */
+    {
+      // Before showing the popover, we update the title
+      // and content if they are functions
+      var data = {};
+
+      if (isFunction(config.title)) {
+        data.title = config.title();
+      }
+
+      if (isFunction(config.content)) {
+        data.content = config.content();
+      }
+
+      if (keys(data).length > 0) {
+        el[BV_POPOVER].updateData(data);
+      }
+    });
   }
-}; // Remove PopOver on our element
+
+  var data = {
+    title: config.title,
+    content: config.content,
+    triggers: config.trigger,
+    placement: config.placement,
+    fallbackPlacement: config.fallbackPlacement,
+    variant: config.variant,
+    customClass: config.customClass,
+    container: config.container,
+    boundary: config.boundary,
+    delay: config.delay,
+    offset: config.offset,
+    noFade: !config.animation,
+    id: config.id,
+    disabled: config.disabled,
+    html: config.html
+  };
+  var oldData = el[BV_POPOVER].__bv_prev_data__;
+  el[BV_POPOVER].__bv_prev_data__ = data;
+
+  if (!looseEqual(data, oldData)) {
+    // We only update the instance if data has changed
+    var newData = {
+      target: el
+    };
+    keys(data).forEach(function (prop) {
+      // We only pass data properties that have changed
+      if (data[prop] !== oldData[prop]) {
+        // If title/content is a function, we execute it here
+        newData[prop] = (prop === 'title' || prop === 'content') && isFunction(data[prop]) ? data[prop]() : data[prop];
+      }
+    });
+    el[BV_POPOVER].updateData(newData);
+  }
+}; // Remove Popover from our element
 
 
 var removePopover = function removePopover(el) {
   if (el[BV_POPOVER]) {
-    el[BV_POPOVER].destroy();
+    el[BV_POPOVER].$destroy();
     el[BV_POPOVER] = null;
-    delete el[BV_POPOVER];
   }
-};
-/*
- * Export our directive
- */
+
+  delete el[BV_POPOVER];
+}; // Export our directive
 
 
 var VBPopover = {
   bind: function bind(el, bindings, vnode) {
     applyPopover(el, bindings, vnode);
   },
-  inserted: function inserted(el, bindings, vnode) {
-    applyPopover(el, bindings, vnode);
-  },
-  update: function update(el, bindings, vnode)
-  /* istanbul ignore next: not easy to test */
-  {
-    if (bindings.value !== bindings.oldValue) {
+  // We use `componentUpdated` here instead of `update`, as the former
+  // waits until the containing component and children have finished updating
+  componentUpdated: function componentUpdated(el, bindings, vnode) {
+    // Performed in a `$nextTick()` to prevent endless render/update loops
+    vnode.context.$nextTick(function () {
       applyPopover(el, bindings, vnode);
-    }
-  },
-  componentUpdated: function componentUpdated(el, bindings, vnode)
-  /* istanbul ignore next: not easy to test */
-  {
-    if (bindings.value !== bindings.oldValue) {
-      applyPopover(el, bindings, vnode);
-    }
+    });
   },
   unbind: function unbind(el) {
     removePopover(el);
   }
 };
+
+var VBPopoverPlugin =
+/*#__PURE__*/
+pluginFactory({
+  directives: {
+    VBPopover: VBPopover
+  }
+});
 
 var PopoverPlugin =
 /*#__PURE__*/
@@ -15319,17 +15623,17 @@ pluginFactory({
   components: {
     BPopover: BPopover
   },
-  directives: {
-    VBPopover: VBPopover
+  plugins: {
+    VBPopoverPlugin: VBPopoverPlugin
   }
 });
 
-var NAME$o = 'BProgressBar'; // @vue/component
+var NAME$s = 'BProgressBar'; // @vue/component
 
 var BProgressBar =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$o,
+  name: NAME$s,
   mixins: [normalizeSlotMixin],
   inject: {
     bvProgress: {
@@ -15365,7 +15669,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$o, 'variant');
+        return getComponentConfig(NAME$s, 'variant');
       }
     },
     striped: {
@@ -15456,12 +15760,12 @@ Vue.extend({
   }
 });
 
-var NAME$p = 'BProgress'; // @vue/component
+var NAME$t = 'BProgress'; // @vue/component
 
 var BProgress =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$p,
+  name: NAME$t,
   mixins: [normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -15473,7 +15777,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$p, 'variant');
+        return getComponentConfig(NAME$t, 'variant');
       }
     },
     striped: {
@@ -15551,12 +15855,12 @@ pluginFactory({
   }
 });
 
-var NAME$q = 'BSpinner'; // @vue/component
+var NAME$u = 'BSpinner'; // @vue/component
 
 var BSpinner =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$q,
+  name: NAME$u,
   functional: true,
   props: {
     type: {
@@ -15571,7 +15875,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$q, 'variant');
+        return getComponentConfig(NAME$u, 'variant');
       }
     },
     small: {
@@ -15655,10 +15959,10 @@ var startCase = function startCase(str) {
 var IGNORED_FIELD_KEYS = {
   _rowVariant: true,
   _cellVariants: true,
-  _showDetails: true // Filter CSS selector for click/dblclick/etc. events
-  // If any of these selectors match the clicked element, we ignore the event
+  _showDetails: true
+}; // Filter CSS selector for click/dblclick/etc. events
+// If any of these selectors match the clicked element, we ignore the event
 
-};
 var EVENT_FILTER = ['a', 'a *', // Include content inside links
 'button', 'button *', // Include content inside buttons
 'input:not(.disabled):not([disabled])', 'select:not(.disabled):not([disabled])', 'textarea:not(.disabled):not([disabled])', '[role="link"]', '[role="link"] *', '[role="button"]', '[role="button"] *', '[tabindex]:not(.disabled):not([disabled])'].join(',');
@@ -15721,15 +16025,6 @@ var normalizeFields = function normalizeFields(origFields, items) {
         }
       }
     });
-  } else if (origFields && isObject(origFields) && keys(origFields).length > 0) {
-    // Normalize object Form (deprecated)
-    keys(origFields).forEach(function (key) {
-      var field = processField(key, origFields[key]);
-
-      if (field) {
-        fields.push(field);
-      }
-    });
   } // If no field provided, take a sample from first record (if exits)
 
 
@@ -15770,8 +16065,7 @@ var itemsMixin = {
       }
     },
     fields: {
-      // Object format is deprecated and should be avoided
-      type: [Array, Object],
+      type: Array,
       default: null
     },
     primaryKey: {
@@ -15893,11 +16187,11 @@ var stackedMixin = {
   },
   computed: {
     isStacked: function isStacked() {
-      // `true` when always stacked, or breakpoint specified
-      return this.stacked === '' ? true : Boolean(this.stacked);
+      // `true` when always stacked, or returns breakpoint specified
+      return this.stacked === '' ? true : this.stacked;
     },
     isStackedAlways: function isStackedAlways() {
-      return this.stacked === true || this.stacked === '';
+      return this.isStacked === true;
     },
     stackedTableClasses: function stackedTableClasses() {
       return _defineProperty({
@@ -15914,9 +16208,13 @@ var sanitizeRow = function sanitizeRow(row, ignoreFields, includeFields) {
     // Ignore fields in the `ignoreFields` array
     // Include only fields in the `includeFields` array
     if (!IGNORED_FIELD_KEYS[key] && !(ignoreFields && ignoreFields.length > 0 && arrayIncludes(ignoreFields, key)) && !(includeFields && includeFields.length > 0 && !arrayIncludes(includeFields, key))) {
-      var f = fieldsObj[key];
-      var val = row[key];
-      obj[key] = f && f.filterByFormatted && f.formatter ? f.formatter(val, key, row) : val;
+      var f = fieldsObj[key] || {};
+      var val = row[key]; // `f.filterByFormatted` will either be a function or boolean
+      // `f.formater` will have already been noramlized into a function ref
+
+      var filterByFormatted = f.filterByFormatted;
+      var formatter = isFunction(filterByFormatted) ? filterByFormatted : filterByFormatted ? f.formatter : null;
+      obj[key] = isFunction(formatter) ? formatter(val, key, row) : val;
     }
 
     return obj;
@@ -15961,16 +16259,11 @@ var stringifyRecordValues = function stringifyRecordValues(row, ignoreFields, in
   return isObject(row) ? stringifyObjectValues(sanitizeRow(row, ignoreFields, includeFields, fieldsObj)) : '';
 };
 
-var DEPRECATION_MSG = 'Supplying a function to prop "filter" is deprecated. Use "filter-function" instead.';
 var filteringMixin = {
   props: {
     filter: {
-      // Passing a function to filter is deprecated and should be avoided
-      type: [String, RegExp, Object, Array, Function],
-      default: null,
-      // `deprecated` -> Don't use this prop
-      // `deprecation` -> Refers to a change in prop usage
-      deprecation: DEPRECATION_MSG
+      type: [String, RegExp, Object, Array],
+      default: null
     },
     filterFunction: {
       type: Function,
@@ -15983,12 +16276,22 @@ var filteringMixin = {
     filterIncludedFields: {
       type: Array // default: undefined
 
+    },
+    filterDebounce: {
+      type: [Number, String],
+      default: 0,
+      validator: function validator(val) {
+        return /^\d+/.test(String(val));
+      }
     }
   },
   data: function data() {
     return {
       // Flag for displaying which empty slot to show and some event triggering
-      isFiltered: false
+      isFiltered: false,
+      // Where we store the copy of the filter criteria after debouncing
+      // We pre-set it with the sanitized filter value
+      localFilter: this.filterSanitize(this.filter)
     };
   },
   computed: {
@@ -15997,6 +16300,9 @@ var filteringMixin = {
     },
     computedFilterIncluded: function computedFilterIncluded() {
       return this.filterIncludedFields ? concat(this.filterIncludedFields).filter(Boolean) : null;
+    },
+    computedFilterDebounce: function computedFilterDebounce() {
+      return parseInt(this.filterDebounce, 10) || 0;
     },
     localFiltering: function localFiltering() {
       return this.hasProvider ? !!this.noProviderFiltering : true;
@@ -16009,72 +16315,59 @@ var filteringMixin = {
         localFilter: this.localFilter
       };
     },
-    // Sanitized/normalized version of filter prop
-    localFilter: function localFilter() {
-      // Deprecate setting prop filter to a function
-      // `localFilterFn` will contain the correct function ref
-      if (isFunction(this.filter)) {
-        /* istanbul ignore next */
-        return '';
-      } // Using internal filter function, which only accepts string or RegExp
-
-
-      if (this.localFiltering && !isFunction(this.filterFunction) && !(isString(this.filter) || isRegExp(this.filter))) {
-        return '';
-      } // Could be a string, object or array, as needed by external filter function
-      // We use `cloneDeep` to ensure we have a new copy of an object or array
-      // without Vue reactive observers
-
-
-      return cloneDeep(this.filter);
-    },
     // Sanitized/normalize filter-function prop
     localFilterFn: function localFilterFn() {
-      var filterFn = this.filterFunction;
-      var filter = this.filter; // Prefer `filterFn` prop
-
-      if (isFunction(filterFn)) {
-        return filterFn;
-      } // Deprecate setting `filter` prop to a function
-
-
-      if (isFunction(filter)) {
-        /* istanbul ignore next */
-        warn("b-table: ".concat(DEPRECATION_MSG));
-        /* istanbul ignore next */
-
-        return filter;
-      } // No `filterFunction`, so signal to use internal filter function
-
-
-      return null;
+      // Return `null` to signal to use internal filter function
+      return isFunction(this.filterFunction) ? this.filterFunction : null;
     },
     // Returns the records in `localItems` that match the filter criteria
     // Returns the original `localItems` array if not sorting
     filteredItems: function filteredItems() {
-      var items = this.localItems || []; // Resolve the filtering function, when requested
+      var items = this.localItems || []; // Note the criteria is debounced and sanitized
+
+      var criteria = this.localFilter; // Resolve the filtering function, when requested
       // We prefer the provided filtering function and fallback to the internal one
       // When no filtering criteria is specified the filtering factories will return `null`
 
-      var filterFn = null;
+      var filterFn = this.localFiltering ? this.filterFnFactory(this.localFilterFn, criteria) || this.defaultFilterFnFactory(criteria) : null; // We only do local filtering when requested and there are records to filter
 
-      if (this.localFiltering) {
-        var criteria = this.localFilter;
-        filterFn = this.filterFnFactory(this.localFilterFn, criteria) || this.defaultFilterFnFactory(criteria);
-      } // We only do local filtering when requested and there are records to filter
-
-
-      if (filterFn && items.length > 0) {
-        return items.filter(filterFn);
-      } // Otherwise return all items
-
-
-      return items;
+      return filterFn && items.length > 0 ? items.filter(filterFn) : items;
     }
   },
   watch: {
-    // Watch for changes to the filter criteria and filtered items vs localItems).
-    // And set visual state and emit events as required
+    // Watch for debounce being set to 0
+    computedFilterDebounce: function computedFilterDebounce(newVal, oldVal) {
+      if (!newVal && this.$_filterTimer) {
+        clearTimeout(this.$_filterTimer);
+        this.$_filterTimer = null;
+        this.localFilter = this.filterSanitize(this.filter);
+      }
+    },
+    // Watch for changes to the filter criteria, and debounce if necessary
+    filter: {
+      // We need a deep watcher in case the user passes
+      // an object when using `filter-function`
+      deep: true,
+      handler: function handler(newCriteria, oldCriteria) {
+        var _this = this;
+
+        var timeout = this.computedFilterDebounce;
+        clearTimeout(this.$_filterTimer);
+        this.$_filterTimer = null;
+
+        if (timeout && timeout > 0) {
+          // If we have a debounce time, delay the update of `localFilter`
+          this.$_filterTimer = setTimeout(function () {
+            _this.localFilter = _this.filterSanitize(newCriteria);
+          }, timeout);
+        } else {
+          // Otherwise, immediately update `localFilter` with `newFilter` value
+          this.localFilter = this.filterSanitize(newCriteria);
+        }
+      }
+    },
+    // Watch for changes to the filter criteria and filtered items vs `localItems`
+    // Set visual state and emit events as required
     filteredCheck: function filteredCheck(_ref) {
       var filteredItems = _ref.filteredItems,
           localItems = _ref.localItems,
@@ -16108,15 +16401,39 @@ var filteringMixin = {
     }
   },
   created: function created() {
-    var _this = this;
+    var _this2 = this;
 
-    // Set the initial filtered state.
-    // In a nextTick so that we trigger a filtered event if needed
+    // Create non-reactive prop where we store the debounce timer id
+    this.$_filterTimer = null; // If filter is "pre-set", set the criteria
+    // This will trigger any watchers/dependents
+    // this.localFilter = this.filterSanitize(this.filter)
+    // Set the initial filtered state in a `$nextTick()` so that
+    // we trigger a filtered event if needed
+
     this.$nextTick(function () {
-      _this.isFiltered = Boolean(_this.localFilter);
+      _this2.isFiltered = Boolean(_this2.localFilter);
     });
   },
+  beforeDestroy: function beforeDestroy()
+  /* istanbul ignore next */
+  {
+    clearTimeout(this.$_filterTimer);
+    this.$_filterTimer = null;
+  },
   methods: {
+    filterSanitize: function filterSanitize(criteria) {
+      // Sanitizes filter criteria based on internal or external filtering
+      if (this.localFiltering && !this.localFilterFn && !(isString(criteria) || isRegExp(criteria))) {
+        // If using internal filter function, which only accepts string or RegExp,
+        // return '' to signify no filter
+        return '';
+      } // Could be a string, object or array, as needed by external filter function
+      // We use `cloneDeep` to ensure we have a new copy of an object or array
+      // without Vue's reactive observers
+
+
+      return cloneDeep(criteria);
+    },
     // Filter Function factories
     filterFnFactory: function filterFnFactory(filterFn, criteria) {
       // Wrapper factory for external filter functions
@@ -16140,9 +16457,10 @@ var filteringMixin = {
       return fn;
     },
     defaultFilterFnFactory: function defaultFilterFnFactory(criteria) {
-      var _this2 = this;
+      var _this3 = this;
 
       // Generates the default filter function, using the given filter criteria
+      // Returns `null` if no criteria or criteria format not supported
       if (!criteria || !(isString(criteria) || isRegExp(criteria))) {
         // Built in filter can only support strings or RegExp criteria (at the moment)
         return null;
@@ -16169,13 +16487,13 @@ var filteringMixin = {
         // Users can ignore filtering on specific fields, or on only certain fields,
         // and can optionall specify searching results of fields with formatter
         //
-        // TODO: Enable searching on scoped slots
+        // TODO: Enable searching on scoped slots (optional, as it will be SLOW)
         //
         // Generated function returns true if the criteria matches part of
         // the serialized data, otherwise false
         // We set `lastIndex = 0` on the `RegExp` in case someone specifies the `/g` global flag
         regexp.lastIndex = 0;
-        return regexp.test(stringifyRecordValues(item, _this2.computedFilterIgnored, _this2.computedFilterIncluded, _this2.computedFieldsObj));
+        return regexp.test(stringifyRecordValues(item, _this3.computedFilterIgnored, _this3.computedFilterIncluded, _this3.computedFieldsObj));
       }; // Return the generated function
 
 
@@ -16324,6 +16642,11 @@ var sortingMixin = {
     noFooterSorting: {
       type: Boolean,
       default: false
+    },
+    sortIconLeft: {
+      // Place the sorting icon on the left of the header cells
+      type: Boolean,
+      default: false
     }
   },
   data: function data() {
@@ -16358,8 +16681,9 @@ var sortingMixin = {
       var nullLast = this.sortNullLast;
 
       if (sortBy && localSorting) {
-        var field = this.computedFieldsObj[sortBy];
-        var formatter = field && field.sortByFormatted ? this.getFieldFormatter(sortBy) : undefined; // stableSort returns a new array, and leaves the original array intact
+        var field = this.computedFieldsObj[sortBy] || {};
+        var sortByFormatted = field.sortByFormatted;
+        var formatter = isFunction(sortByFormatted) ? sortByFormatted : sortByFormatted ? this.getFieldFormatter(sortBy) : undefined; // `stableSort` returns a new array, and leaves the original array intact
 
         return stableSort(items, function (a, b) {
           var result = null;
@@ -16483,8 +16807,9 @@ var sortingMixin = {
     },
     // methods to compute classes and attrs for thead>th cells
     sortTheadThClasses: function sortTheadThClasses(key, field, isFoot) {
-      return {// No Classes for sorting currently...
-        // All styles targeted using aria-* attrs
+      return {
+        // If sortable and sortIconLeft are true, then place sort icon on the left
+        'b-table-sort-icon-left': field.sortable && this.sortIconLeft && !(isFoot && this.noFooterSorting)
       };
     },
     sortTheadThAttrs: function sortTheadThAttrs(key, field, isFoot) {
@@ -16698,14 +17023,15 @@ var textSelectionActive = function textSelectionActive() {
   return sel && sel.toString().trim() !== '' && sel.containsNode && isElement(el) ? sel.containsNode(el, true) : false;
 };
 
-var props$U = {
+var props$T = {
   headVariant: {
+    // Also sniffed by <b-tr> / <b-td> / <b-th>
     type: String,
     // supported values: 'lite', 'dark', or null
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BThead =
 /*#__PURE__*/
 Vue.extend({
@@ -16714,16 +17040,48 @@ Vue.extend({
   inheritAttrs: false,
   provide: function provide() {
     return {
-      bvTableThead: this
+      bvTableRowGroup: this
     };
   },
   inject: {
     bvTable: {
-      default: null
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      default: function _default()
+      /* istanbul ignore next */
+      {
+        return {};
+      }
     }
   },
-  props: props$U,
+  props: props$T,
   computed: {
+    isThead: function isThead() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return true;
+    },
+    isDark: function isDark() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.dark;
+    },
+    isStacked: function isStacked() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.isStacked;
+    },
+    isResponsive: function isResponsive() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.isResponsive;
+    },
+    isStickyHeader: function isStickyHeader() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      // Needed to handle header background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
+      // Sticky headers only apply to cells in table `thead`
+      return !this.isStacked && this.bvTable.stickyHeader;
+    },
+    tableVariant: function tableVariant() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.tableVariant;
+    },
     theadClasses: function theadClasses() {
       return [this.headVariant ? "thead-".concat(this.headVariant) : null];
     },
@@ -16743,14 +17101,14 @@ Vue.extend({
   }
 });
 
-var props$V = {
+var props$U = {
   footVariant: {
     type: String,
     // supported values: 'lite', 'dark', or null
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BTfoot =
 /*#__PURE__*/
 Vue.extend({
@@ -16759,16 +17117,50 @@ Vue.extend({
   inheritAttrs: false,
   provide: function provide() {
     return {
-      bvTableTfoot: this
+      bvTableRowGroup: this
     };
   },
   inject: {
     bvTable: {
-      default: null
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      default: function _default()
+      /* istanbul ignore next */
+      {
+        return {};
+      }
     }
   },
-  props: props$V,
+  props: props$U,
   computed: {
+    isTfoot: function isTfoot() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return true;
+    },
+    isDark: function isDark()
+    /* istanbul ignore next: Not currently sniffed in tests */
+    {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.dark;
+    },
+    isStacked: function isStacked() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.isStacked;
+    },
+    isResponsive: function isResponsive() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.isResponsive;
+    },
+    isStickyHeader: function isStickyHeader() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      // Sticky headers are only supported in thead
+      return false;
+    },
+    tableVariant: function tableVariant()
+    /* istanbul ignore next: Not currently sniffed in tests */
+    {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.tableVariant;
+    },
     tfootClasses: function tfootClasses() {
       return [this.footVariant ? "thead-".concat(this.footVariant) : null];
     },
@@ -16788,13 +17180,13 @@ Vue.extend({
   }
 });
 
-var props$W = {
+var props$V = {
   variant: {
     type: String,
     default: null
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BTr =
 /*#__PURE__*/
 Vue.extend({
@@ -16807,14 +17199,52 @@ Vue.extend({
     };
   },
   inject: {
-    bvTable: {
-      default: null
+    bvTableRowGroup: {
+      defaut: function defaut()
+      /* istanbul ignore next */
+      {
+        return {};
+      }
     }
   },
-  props: props$W,
+  props: props$V,
   computed: {
+    inTbody: function inTbody() {
+      // Sniffed by <b-td> / <b-th>
+      return this.bvTableRowGroup.isTbody;
+    },
+    inThead: function inThead() {
+      // Sniffed by <b-td> / <b-th>
+      return this.bvTableRowGroup.isThead;
+    },
+    inTfoot: function inTfoot() {
+      // Sniffed by <b-td> / <b-th>
+      return this.bvTableRowGroup.isTfoot;
+    },
     isDark: function isDark() {
-      return this.bvTable && this.bvTable.dark;
+      // Sniffed by <b-td> / <b-th>
+      return this.bvTableRowGroup.isDark;
+    },
+    isStacked: function isStacked() {
+      // Sniffed by <b-td> / <b-th>
+      return this.bvTableRowGroup.isStacked;
+    },
+    isResponsive: function isResponsive() {
+      // Sniffed by <b-td> / <b-th>
+      return this.bvTableRowGroup.isResponsive;
+    },
+    isStickyHeader: function isStickyHeader() {
+      // Sniffed by <b-td> / <b-th>
+      // Sticky headers are only supported in thead
+      return this.bvTableRowGroup.isStickyHeader;
+    },
+    tableVariant: function tableVariant() {
+      // Sniffed by <b-td> / <b-th>
+      return this.bvTableRowGroup.tableVariant;
+    },
+    headVariant: function headVariant() {
+      // Sniffed by <b-td> / <b-th>
+      return this.bvTableRowGroup.headVariant;
     },
     trClasses: function trClasses() {
       return [this.variant ? "".concat(this.isDark ? 'bg' : 'table', "-").concat(this.variant) : null];
@@ -16848,11 +17278,7 @@ var spanValidator = function spanValidator(val) {
   return isUndefinedOrNull(val) || parseSpan(val) > 0;
 };
 
-var props$X = {
-  header: {
-    type: Boolean,
-    default: false
-  },
+var props$W = {
   variant: {
     type: String,
     default: null
@@ -16874,74 +17300,79 @@ var props$X = {
   stickyColumn: {
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
-var BTableCell =
+var BTd =
 /*#__PURE__*/
 Vue.extend({
   name: 'BTableCell',
   mixins: [normalizeSlotMixin],
   inheritAttrs: false,
   inject: {
-    // Injections for feature / attribute detection
-    bvTable: {
-      default: null
-    },
-    bvTableTbody: {
-      default: null
-    },
-    bvTableThead: {
-      default: null
-    },
-    bvTableTfoot: {
-      default: null
-    },
     bvTableTr: {
-      default: null
+      default: function _default()
+      /* istanbul ignore next */
+      {
+        return {};
+      }
     }
   },
-  props: props$X,
+  props: props$W,
   computed: {
+    tag: function tag() {
+      // Overridden by <b-th>
+      return 'td';
+    },
+    inTbody: function inTbody() {
+      return this.bvTableTr.inTbody;
+    },
+    inThead: function inThead() {
+      return this.bvTableTr.inThead;
+    },
+    inTfoot: function inTfoot() {
+      return this.bvTableTr.inTfoot;
+    },
     isDark: function isDark() {
-      return this.bvTable && this.bvTable.dark;
+      return this.bvTableTr.isDark;
     },
     isStacked: function isStacked() {
-      return this.bvTable && this.bvTable.isStacked;
+      return this.bvTableTr.isStacked;
     },
     isStackedCell: function isStackedCell() {
       // We only support stacked-heading in tbody in stacked mode
-      return this.isStacked && this.bvTableTbody;
+      return this.inTbody && this.isStacked;
     },
     isResponsive: function isResponsive() {
-      return this.bvTable && this.bvTable.isResponsive && !this.isStacked;
+      return this.bvTableTr.isResponsive;
     },
     isStickyHeader: function isStickyHeader() {
       // Needed to handle header background classes, due to lack of
-      // bg color inheritance with Bootstrap v4 tabl css
+      // background color inheritance with Bootstrap v4 table CSS
       // Sticky headers only apply to cells in table `thead`
-      return !this.isStacked && this.bvTable && this.bvTableThead && this.bvTableTr && this.bvTable.stickyHeader;
+      return this.bvTableTr.isStickyHeader;
     },
     isStickyColumn: function isStickyColumn() {
       // Needed to handle header background classes, due to lack of
-      // background color inheritance with Bootstrap v4 table css.
+      // background color inheritance with Bootstrap v4 table CSS
       // Sticky column cells are only available in responsive
-      // mode (horzontal scrolling) or when sticky header mode.
+      // mode (horizontal scrolling) or when sticky header mode
       // Applies to cells in `thead`, `tbody` and `tfoot`
-      return (this.isResponsive || this.isStickyHeader) && this.stickyColumn && !this.isStacked && this.bvTable && this.bvTableTr;
+      return !this.isStacked && (this.isResponsive || this.isStickyHeader) && this.stickyColumn;
     },
-    cellClasses: function cellClasses() {
-      // We use computed props here for improved performance by caching
-      // the results of the string interpolation
-      var variant = this.variant;
-
-      if (!variant && this.isStickyHeader && !this.bvTableThead.headVariant || !variant && this.isStickyColumn) {
-        // Needed for stickyheader mode as Bootstrap v4 table cells do
-        // not inherit parent's background-color. Boo!
-        variant = this.bvTableTr.variant || this.bvTable.tableVariant || 'b-table-default';
-      }
-
-      return [variant ? "".concat(this.isDark ? 'bg' : 'table', "-").concat(variant) : null, this.isStickyColumn ? 'b-table-sticky-column' : null];
+    rowVariant: function rowVariant() {
+      return this.bvTableTr.variant;
+    },
+    headVariant: function headVariant() {
+      return this.bvTableTr.headVariant;
+    },
+    footVariant: function footVariant()
+    /* istanbul ignore next: need to add in tests for footer variant */
+    {
+      return this.bvTableTr.footVariant;
+    },
+    tableVariant: function tableVariant() {
+      return this.bvTableTr.tableVariant;
     },
     computedColspan: function computedColspan() {
       return parseSpan(this.colspan);
@@ -16949,10 +17380,24 @@ Vue.extend({
     computedRowspan: function computedRowspan() {
       return parseSpan(this.rowspan);
     },
+    cellClasses: function cellClasses() {
+      // We use computed props here for improved performance by caching
+      // the results of the string interpolation
+      // TODO: need to add handling for footVariant
+      var variant = this.variant;
+
+      if (!variant && this.isStickyHeader && !this.headVariant || !variant && this.isStickyColumn) {
+        // Needed for sticky-header mode as Bootstrap v4 table cells do
+        // not inherit parent's background-color. Boo!
+        variant = this.rowVariant || this.tableVariant || 'b-table-default';
+      }
+
+      return [variant ? "".concat(this.isDark ? 'bg' : 'table', "-").concat(variant) : null, this.isStickyColumn ? 'b-table-sticky-column' : null];
+    },
     cellAttrs: function cellAttrs() {
       // We use computed props here for improved performance by caching
       // the results of the object spread (Object.assign)
-      var headOrFoot = this.bvTableThead || this.bvTableTfoot; // Make sure col/rowspan's are > 0 or null
+      var headOrFoot = this.inThead || this.inTfoot; // Make sure col/rowspan's are > 0 or null
 
       var colspan = this.computedColspan;
       var rowspan = this.computedRowspan; // Default role and scope
@@ -16965,7 +17410,7 @@ Vue.extend({
         // Header or footer cells
         role = 'columnheader';
         scope = colspan > 0 ? 'colspan' : 'col';
-      } else if (this.header) {
+      } else if (this.tag === 'th') {
         // th's in tbody
         role = 'rowheader';
         scope = rowspan > 0 ? 'rowgroup' : 'row';
@@ -16985,32 +17430,24 @@ Vue.extend({
   },
   render: function render(h) {
     var content = [this.normalizeSlot('default')];
-    return h(this.header ? 'th' : 'td', {
+    return h(this.tag, {
       class: this.cellClasses,
       attrs: this.cellAttrs,
       // Transfer any native listeners
       on: this.$listeners
-    }, [this.isStackedCell ? h('div', {}, [content]) : content]);
+    }, [this.isStackedCell ? h('div', [content]) : content]);
   }
 });
-
-var props$Y = omit(props$X, ['header']); // @vue/component
 
 var BTh =
 /*#__PURE__*/
 Vue.extend({
   name: 'BTh',
-  functional: true,
-  props: props$Y,
-  render: function render(h, _ref) {
-    var props = _ref.props,
-        data = _ref.data,
-        children = _ref.children;
-    // `data` already includes any listeners
-    data.props = _objectSpread2({}, props, {
-      header: true
-    });
-    return h(BTableCell, data, children);
+  extends: BTd,
+  computed: {
+    tag: function tag() {
+      return 'th';
+    }
   }
 });
 
@@ -17062,13 +17499,15 @@ var theadMixin = {
       var h = this.$createElement;
       var fields = this.computedFields || [];
 
-      if (this.isStacked === true || fields.length === 0) {
+      if (this.isStackedAlways || fields.length === 0) {
         // In always stacked mode, we don't bother rendering the head/foot.
         // Or if no field headings (empty table)
         return h();
-      } // Helper function to generate a field <th> cell
-      // TODO: This should be moved into it's own mixin
+      } // Refernce to `selectAllRows` and `clearSelected()`, if table is Selectable
 
+
+      var selectAllRows = this.isSelectable ? this.selectAllRows : function () {};
+      var clearSelected = this.isSelectable ? this.clearSelected : function () {}; // Helper function to generate a field <th> cell
 
       var makeCell = function makeCell(field, colIndex) {
         var ariaLabel = null;
@@ -17115,31 +17554,40 @@ var theadMixin = {
             title: field.headerTitle || null,
             'aria-colindex': String(colIndex + 1),
             'aria-label': ariaLabel
-          }, sortAttrs),
+          }, _this.getThValues(null, field.key, field.thAttr, isFoot ? 'foot' : 'head', {}), {}, sortAttrs),
           on: handlers
-        };
-        var fieldScope = {
-          label: field.label,
-          column: field.key,
-          field: field,
-          isFoot: isFoot
-        };
-        var slot;
+        }; // Handle edge case where in-document templates are used with new
+        // `v-slot:name` syntax where the browser lower-cases the v-slot's
+        // name (attributes become lower cased when parsed by the browser)
+        // We have replaced the square bracket syntax with round brackets
+        // to prevent confusion with dynamic slot names
 
-        if (isFoot && _this.hasNormalizedSlot(["FOOT[".concat(field.key, "]"), 'FOOT[]', "FOOT_".concat(field.key)])) {
-          // TODO: `FOOT_${field.key}` is deprecated, to be removed in future release
-          slot = _this.normalizeSlot(["FOOT[".concat(field.key, "]"), 'FOOT[]', "FOOT_".concat(field.key)], fieldScope);
-        } else {
-          // TODO: `HEAD_${field.key}` is deprecated, to be removed in future release
-          slot = _this.normalizeSlot(["HEAD[".concat(field.key, "]"), 'HEAD[]', "HEAD_".concat(field.key)], fieldScope);
+        var slotNames = ["head(".concat(field.key, ")"), "head(".concat(field.key.toLowerCase(), ")"), 'head()'];
+
+        if (isFoot) {
+          // Footer will fallback to header slot names
+          slotNames = ["foot(".concat(field.key, ")"), "foot(".concat(field.key.toLowerCase(), ")"), 'foot()'].concat(_toConsumableArray(slotNames));
         }
 
-        if (!slot) {
-          // need to check if this will work
+        var hasSlot = _this.hasNormalizedSlot(slotNames);
+
+        var slot = field.label;
+
+        if (hasSlot) {
+          slot = _this.normalizeSlot(slotNames, {
+            label: field.label,
+            column: field.key,
+            field: field,
+            isFoot: isFoot,
+            // Add in row select methods
+            selectAllRows: selectAllRows,
+            clearSelected: clearSelected
+          });
+        } else {
           data.domProps = htmlOrText(field.labelHtml);
         }
 
-        return h(BTh, data, slot || field.label);
+        return h(BTh, data, slot);
       }; // Generate the array of <th> cells
 
 
@@ -17156,7 +17604,10 @@ var theadMixin = {
       } else {
         var scope = {
           columns: fields.length,
-          fields: fields
+          fields: fields,
+          // Add in row select methods
+          selectAllRows: selectAllRows,
+          clearSelected: clearSelected
         };
         $trs.push(this.normalizeSlot('thead-top', scope) || h());
         $trs.push(h(BTr, {
@@ -17199,15 +17650,33 @@ var tfootMixin = {
     }
   },
   methods: {
-    renderTfoot: function renderTfoot() {
-      var h = this.$createElement; // Passing true to renderThead will make it render a tfoot
+    renderTFootCustom: function renderTFootCustom() {
+      var h = this.$createElement;
 
-      return this.footClone ? this.renderThead(true) : h();
+      if (this.hasNormalizedSlot('custom-foot')) {
+        return h(BTfoot, {
+          key: 'bv-tfoot-custom',
+          class: this.tfootClass || null,
+          props: {
+            footVariant: this.footVariant || this.headVariant || null
+          }
+        }, this.normalizeSlot('custom-foot', {
+          items: this.computedItems.slice(),
+          fields: this.computedFields.slice(),
+          columns: this.computedFields.length
+        }));
+      } else {
+        return h();
+      }
+    },
+    renderTfoot: function renderTfoot() {
+      // Passing true to renderThead will make it render a tfoot
+      return this.footClone ? this.renderThead(true) : this.renderTFootCustom();
     }
   }
 };
 
-var props$Z = {
+var props$X = {
   tbodyTransitionProps: {
     type: Object // default: undefined
 
@@ -17215,9 +17684,9 @@ var props$Z = {
   tbodyTransitionHandlers: {
     type: Object // default: undefined
 
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BTbody =
 /*#__PURE__*/
 Vue.extend({
@@ -17226,16 +17695,48 @@ Vue.extend({
   inheritAttrs: false,
   provide: function provide() {
     return {
-      bvTableTbody: this
+      bvTableRowGroup: this
     };
   },
   inject: {
     bvTable: {
-      default: null
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      default: function _default()
+      /* istanbul ignore next */
+      {
+        return {};
+      }
     }
   },
-  props: props$Z,
+  props: props$X,
   computed: {
+    isTbody: function isTbody() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return true;
+    },
+    isDark: function isDark() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.dark;
+    },
+    isStacked: function isStacked() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.isStacked;
+    },
+    isResponsive: function isResponsive() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.isResponsive;
+    },
+    isStickyHeader: function isStickyHeader() {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      // Sticky headers are only supported in thead
+      return false;
+    },
+    tableVariant: function tableVariant()
+    /* istanbul ignore next: Not currently sniffed in tests */
+    {
+      // Sniffed by <b-tr> / <b-td> / <b-th>
+      return this.bvTable.tableVariant;
+    },
     isTransitionGroup: function isTransitionGroup() {
       return this.tbodyTransitionProps || this.tbodyTransitionHandlers;
     },
@@ -17261,26 +17762,6 @@ Vue.extend({
       // Pass down any listeners
       on: this.tbodyListeners
     }, this.normalizeSlot('default', {}));
-  }
-});
-
-var props$_ = omit(props$X, ['header']); // @vue/component
-
-var BTd =
-/*#__PURE__*/
-Vue.extend({
-  name: 'BTd',
-  functional: true,
-  props: props$_,
-  render: function render(h, _ref) {
-    var props = _ref.props,
-        data = _ref.data,
-        children = _ref.children;
-    // `data` already includes any listeners
-    data.props = _objectSpread2({}, props, {
-      header: false
-    });
-    return h(BTableCell, data, children);
   }
 });
 
@@ -17311,6 +17792,23 @@ var tbodyRowMixin = {
 
       return defValue;
     },
+    getThValues: function getThValues(item, key, thValue, type, defValue) {
+      var parent = this.$parent;
+
+      if (thValue) {
+        var value = get(item, key, '');
+
+        if (isFunction(thValue)) {
+          return thValue(value, key, item, type);
+        } else if (isString(thValue) && isFunction(parent[thValue])) {
+          return parent[thValue](value, key, item, type);
+        }
+
+        return thValue;
+      }
+
+      return defValue;
+    },
     // Method to get the value for a field
     getFormattedValue: function getFormattedValue(item, field) {
       var key = field.key;
@@ -17334,111 +17832,22 @@ var tbodyRowMixin = {
         }
       };
     },
-    rowEvtFactory: function rowEvtFactory(handler, item, rowIndex) {
-      var _this2 = this;
-
-      // Return a row event handler
-      return function (evt) {
-        // If table is busy (via provider) then don't propagate
-        if (_this2.stopIfBusy && _this2.stopIfBusy(evt)) {
-          return;
-        } // Otherwise call the handler
-
-
-        handler(evt, item, rowIndex);
-      };
-    },
-    // Row event handlers (will be wrapped by the above rowEvtFactory function)
-    tbodyRowKeydown: function tbodyRowKeydown(evt, item, rowIndex) {
-      // Keypress handler
-      var keyCode = evt.keyCode;
-      var target = evt.target; // `this.$refs.itemRow`s is most likely an array of `BTr` components, but it
-      // could be regular `tr` elements, so we map to the `tr` elements just in case
-
-      var trs = (this.$refs.itemRows || []).map(function (tr) {
-        return tr.$el || tr;
-      });
-
-      if (!(target && target.tagName === 'TR' && target === document.activeElement)) {
-        // Ignore if not the active tr element
-        return;
-      } else if (target.tabIndex !== 0) {
-        // Ignore if not focusable
-
-        /* istanbul ignore next */
-        return;
-      } else if (trs.length === 0) {
-        // No item rows
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      var index = trs.indexOf(target);
-
-      if (keyCode === KEY_CODES.ENTER || keyCode === KEY_CODES.SPACE) {
-        // We also allow enter/space to trigger a click (when row is focused)
-        evt.stopPropagation();
-        evt.preventDefault(); // We translate to a row-clicked event
-
-        this.rowClicked(evt, item, rowIndex);
-      } else if (arrayIncludes([KEY_CODES.UP, KEY_CODES.DOWN, KEY_CODES.HOME, KEY_CODES.END], keyCode)) {
-        // Keyboard navigation of rows
-        evt.stopPropagation();
-        evt.preventDefault();
-        var shift = evt.shiftKey;
-
-        if (keyCode === KEY_CODES.HOME || shift && keyCode === KEY_CODES.UP) {
-          // Focus first row
-          trs[0].focus();
-        } else if (keyCode === KEY_CODES.END || shift && keyCode === KEY_CODES.DOWN) {
-          // Focus last row
-          trs[trs.length - 1].focus();
-        } else if (keyCode === KEY_CODES.UP && index > 0) {
-          // Focus previous row
-          trs[index - 1].focus();
-        } else if (keyCode === KEY_CODES.DOWN && index < trs.length - 1) {
-          // Focus next row
-          trs[index + 1].focus();
-        }
+    // Row event handlers
+    rowHovered: function rowHovered(evt) {
+      // `mouseenter` handler (non-bubbling)
+      // `this.tbodyRowEvtStopped` from tbody mixin
+      if (!this.tbodyRowEvtStopped(evt)) {
+        // `this.emitTbodyRowEvent` from tbody mixin
+        this.emitTbodyRowEvent('row-hovered', evt);
       }
     },
-    rowClicked: function rowClicked(evt, item, index) {
-      if (filterEvent(evt)) {
-        // clicked on a non-disabled control so ignore
-        return;
-      } else if (textSelectionActive(this.$el)) {
-        // User is selecting text, so ignore
-
-        /* istanbul ignore next: JSDOM doesn't support getSelection() */
-        return;
+    rowUnhovered: function rowUnhovered(evt) {
+      // `mouseleave` handler (non-bubbling)
+      // `this.tbodyRowEvtStopped` from tbody mixin
+      if (!this.tbodyRowEvtStopped(evt)) {
+        // `this.emitTbodyRowEvent` from tbody mixin
+        this.emitTbodyRowEvent('row-unhovered', evt);
       }
-
-      this.$emit('row-clicked', item, index, evt);
-    },
-    middleMouseRowClicked: function middleMouseRowClicked(evt, item, index) {
-      if (evt.which === 2) {
-        this.$emit('row-middle-clicked', item, index, evt);
-      }
-    },
-    rowDblClicked: function rowDblClicked(evt, item, index) {
-      if (filterEvent(evt)) {
-        // clicked on a non-disabled control so ignore
-
-        /* istanbul ignore next: event filtering already tested via click handler */
-        return;
-      }
-
-      this.$emit('row-dblclicked', item, index, evt);
-    },
-    rowHovered: function rowHovered(evt, item, index) {
-      this.$emit('row-hovered', item, index, evt);
-    },
-    rowUnhovered: function rowUnhovered(evt, item, index) {
-      this.$emit('row-unhovered', item, index, evt);
-    },
-    rowContextmenu: function rowContextmenu(evt, item, index) {
-      this.$emit('row-contextmenu', item, index, evt);
     },
     // Render helpers
     renderTbodyRowCell: function renderTbodyRowCell(field, colIndex, item, rowIndex) {
@@ -17446,7 +17855,12 @@ var tbodyRowMixin = {
       var h = this.$createElement;
       var hasDetailsSlot = this.hasNormalizedSlot(detailsSlotName);
       var formatted = this.getFormattedValue(item, field);
-      var key = field.key;
+      var key = field.key; // We only uses the helper components for sticky columns to
+      // improve performance of BTable/BTableLite by reducing the
+      // total number of vue instances created during render
+
+      var cellTag = field.stickyColumn ? field.isRowHeader ? BTh : BTd : field.isRowHeader ? 'th' : 'td';
+      var cellVariant = item._cellVariants && item._cellVariants[key] ? item._cellVariants[key] : field.variant || null;
       var data = {
         // For the Vue key, we concatenate the column index and
         // field key (as field keys could be duplicated)
@@ -17454,15 +17868,31 @@ var tbodyRowMixin = {
         //   So we could change this to: `row-${rowIndex}-cell-${key}`
         key: "row-".concat(rowIndex, "-cell-").concat(colIndex, "-").concat(key),
         class: [field.class ? field.class : '', this.getTdValues(item, key, field.tdClass, '')],
-        props: {
-          stackedHeading: this.isStacked ? field.label : null,
-          stickyColumn: field.stickyColumn,
-          variant: item._cellVariants && item._cellVariants[key] ? item._cellVariants[key] : field.variant || null
-        },
+        props: {},
         attrs: _objectSpread2({
           'aria-colindex': String(colIndex + 1)
-        }, this.getTdValues(item, key, field.tdAttr, {}))
+        }, field.isRowHeader ? this.getThValues(item, key, field.thAttr, 'row', {}) : this.getTdValues(item, key, field.tdAttr, {}))
       };
+
+      if (field.stickyColumn) {
+        // We are using the helper BTd or BTh
+        data.props = {
+          stackedHeading: this.isStacked ? field.label : null,
+          stickyColumn: field.stickyColumn,
+          variant: cellVariant
+        };
+      } else {
+        // Using native TD or TH element, so we need to
+        // add in the attributes and variant class
+        data.attrs['data-label'] = this.isStacked && !isUndefinedOrNull(field.label) ? toString$1(field.label) : null;
+        data.attrs.role = field.isRowHeader ? 'rowheader' : 'cell';
+        data.attrs.scope = field.isRowHeader ? 'row' : null; // Add in the variant class
+
+        if (cellVariant) {
+          data.class.push("".concat(this.dark ? 'bg' : 'table', "-").concat(cellVariant));
+        }
+      }
+
       var slotScope = {
         item: item,
         index: rowIndex,
@@ -17476,12 +17906,18 @@ var tbodyRowMixin = {
       if (this.selectedRows) {
         // Add in rowSelected scope property if selectable rows supported
         slotScope.rowSelected = this.isRowSelected(rowIndex);
-      } // TODO:
-      //   Using `field.key` as scoped slot name is deprecated, to be removed in future release
-      //   New format uses the square bracketed naming convention
+      } // The new `v-slot` syntax doesn't like a slot name starting with
+      // a square bracket and if using in-document HTML templates, the
+      // v-slot attributes are lower-cased by the browser.
+      // Switched to round bracket syntax to prevent confusion with
+      // dynamic slot name syntax.
+      // We look for slots in this order: `cell(${key})`, `cell(${key.toLowerCase()})`, 'cell()'
+      // Slot names are now cached by mixin tbody in `this.$_bodyFieldSlotNameCache`
+      // Will be `null` if no slot (or fallback slot) exists
 
 
-      var $childNodes = this.normalizeSlot(["[".concat(key, "]"), '[]', key], slotScope) || toString$1(formatted);
+      var slotName = this.$_bodyFieldSlotNameCache[key];
+      var $childNodes = slotName ? this.normalizeSlot(slotName, slotScope) : toString$1(formatted);
 
       if (this.isStacked) {
         // We wrap in a DIV to ensure rendered as a single cell when visually stacked!
@@ -17489,10 +17925,10 @@ var tbodyRowMixin = {
       } // Render either a td or th cell
 
 
-      return h(field.isRowHeader ? BTh : BTd, data, [$childNodes]);
+      return h(cellTag, data, [$childNodes]);
     },
     renderTbodyRow: function renderTbodyRow(item, rowIndex) {
-      var _this3 = this;
+      var _this2 = this;
 
       // Renders an item's row (or rows if details supported)
       var h = this.$createElement;
@@ -17502,12 +17938,14 @@ var tbodyRowMixin = {
       var rowShowDetails = Boolean(item._showDetails && hasDetailsSlot);
       var hasRowClickHandler = this.$listeners['row-clicked'] || this.isSelectable; // We can return more than one TR if rowDetails enabled
 
-      var $rows = []; // Details ID needed for aria-describedby when details showing
+      var $rows = []; // Details ID needed for `aria-details` when details showing
+      // We set it to `null` when not showing so that attribute
+      // does not appear on the element
 
       var detailsId = rowShowDetails ? this.safeId("_details_".concat(rowIndex, "_")) : null; // For each item data field in row
 
       var $tds = fields.map(function (field, colIndex) {
-        return _this3.renderTbodyRowCell(field, colIndex, item, rowIndex);
+        return _this2.renderTbodyRowCell(field, colIndex, item, rowIndex);
       }); // Calculate the row number in the dataset (indexed from 1)
 
       var ariaRowIndex = null;
@@ -17525,15 +17963,7 @@ var tbodyRowMixin = {
       var rowKey = hasPkValue ? toString$1(item[primaryKey]) : String(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
       // In the format of '{tableId}__row_{primaryKeyValue}'
 
-      var rowId = hasPkValue ? this.safeId("_row_".concat(item[primaryKey])) : null;
-      var evtFactory = this.rowEvtFactory;
-      var handlers = {};
-
-      if (hasRowClickHandler) {
-        handlers.click = evtFactory(this.rowClicked, item, rowIndex);
-        handlers.keydown = evtFactory(this.tbodyRowKeydown, item, rowIndex);
-      } // Selectable classes and attributes
-
+      var rowId = hasPkValue ? this.safeId("_row_".concat(item[primaryKey])) : null; // Selectable classes and attributes
 
       var selectableClasses = this.selectableRowClasses ? this.selectableRowClasses(rowIndex) : {};
       var selectableAttrs = this.selectableRowAttrs ? this.selectableRowAttrs(rowIndex) : {}; // Add the item row
@@ -17551,27 +17981,15 @@ var tbodyRowMixin = {
           tabindex: hasRowClickHandler ? '0' : null,
           'data-pk': rowId ? String(item[primaryKey]) : null,
           // Should this be `aria-details` instead?
-          'aria-describedby': detailsId,
+          'aria-details': detailsId,
           'aria-owns': detailsId,
           'aria-rowindex': ariaRowIndex
         }, selectableAttrs),
-        on: _objectSpread2({}, handlers, {
-          // TODO:
-          //   Instantiate the following handlers only if we have registered
-          //   listeners i.e. `this.$listeners['row-middle-clicked']`, etc.
-          //
-          //   Could make all of this (including the above click/key handlers)
-          //   the result of a factory function and/or make it a delegated event
-          //   handler on the tbody (if we store the row index as a data-attribute
-          //   on the TR as we can lookup the item data from the computedItems array
-          //   or it could be a hidden prop (via attrs) on BTr instance)
-          auxclick: evtFactory(this.middleMouseRowClicked, item, rowIndex),
-          contextmenu: evtFactory(this.rowContextmenu, item, rowIndex),
-          // Note: These events are not accessibility friendly!
-          dblclick: evtFactory(this.rowDblClicked, item, rowIndex),
-          mouseenter: evtFactory(this.rowHovered, item, rowIndex),
-          mouseleave: evtFactory(this.rowUnhovered, item, rowIndex)
-        })
+        on: {
+          // Note: These events are not A11Y friendly!
+          mouseenter: this.rowHovered,
+          mouseleave: this.rowUnhovered
+        }
       }, $tds)); // Row Details slot
 
       if (rowShowDetails) {
@@ -17579,22 +17997,19 @@ var tbodyRowMixin = {
           item: item,
           index: rowIndex,
           fields: fields,
-          toggleDetails: this.toggleDetailsFactory(hasDetailsSlot, item) // Render the details slot in a TD
+          toggleDetails: this.toggleDetailsFactory(hasDetailsSlot, item)
+        }; // Render the details slot in a TD
 
-        };
         var $details = h(BTd, {
           props: {
             colspan: fields.length
-          },
-          attrs: {
-            id: detailsId
           }
         }, [this.normalizeSlot(detailsSlotName, detailsScope)]); // Add a hidden row to keep table row striping consistent when details showing
 
         if (tableStriped) {
           $rows.push( // We don't use `BTr` here as we dont need the extra functionality
           h('tr', {
-            key: "__b-table-details-".concat(rowIndex, "-stripe__"),
+            key: "__b-table-details-stripe__".concat(rowKey),
             staticClass: 'd-none',
             attrs: {
               'aria-hidden': 'true',
@@ -17605,14 +18020,15 @@ var tbodyRowMixin = {
 
 
         $rows.push(h(BTr, {
-          key: "__b-table-details-".concat(rowIndex, "__"),
+          key: "__b-table-details__".concat(rowKey),
           staticClass: 'b-table-details',
           class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(item, detailsSlotName) : this.tbodyTrClass],
           props: {
             variant: item._rowVariant || null
           },
           attrs: {
-            id: detailsId
+            id: detailsId,
+            tabindex: '-1'
           }
         }, [$details]));
       } else if (hasDetailsSlot) {
@@ -17631,24 +18047,139 @@ var tbodyRowMixin = {
   }
 };
 
-var props$$ = _objectSpread2({
+var props$Y = _objectSpread2({}, props$X, {
   tbodyClass: {
     type: [String, Array, Object] // default: undefined
 
   }
-}, props$Z);
+});
 
 var tbodyMixin = {
   mixins: [tbodyRowMixin],
-  props: props$$,
+  props: props$Y,
   methods: {
+    // Helper methods
+    getTbodyTrs: function getTbodyTrs() {
+      // Returns all the item TR elements (excludes detail and spacer rows)
+      // `this.$refs.itemRows` is an array of item TR components/elements
+      // Rows should all be B-TR components, but we map to TR elements
+      // TODO: This may take time for tables many rows, so we may want to cache
+      //       the result of this during each render cycle on a non-reactive
+      //       property. We clear out the cache as each render starts, and
+      //       populate it on first access of this method if null
+      return (this.$refs.itemRows || []).map(function (tr) {
+        return tr.$el || tr;
+      });
+    },
+    getTbodyTrIndex: function getTbodyTrIndex(el) {
+      // Returns index of a particular TBODY item TR
+      // We set `true` on closest to include self in result
+
+      /* istanbul ignore next: should not normally happen */
+      if (!isElement(el)) {
+        return -1;
+      }
+
+      var tr = el.tagName === 'TR' ? el : closest('tr', el, true);
+      return tr ? this.getTbodyTrs().indexOf(tr) : -1;
+    },
+    emitTbodyRowEvent: function emitTbodyRowEvent(type, evt) {
+      // Emits a row event, with the item object, row index and original event
+      if (type && evt && evt.target) {
+        var rowIndex = this.getTbodyTrIndex(evt.target);
+
+        if (rowIndex > -1) {
+          // The array of TRs correlate to the `computedItems` array
+          var item = this.computedItems[rowIndex];
+          this.$emit(type, item, rowIndex, evt);
+        }
+      }
+    },
+    tbodyRowEvtStopped: function tbodyRowEvtStopped(evt) {
+      return this.stopIfBusy && this.stopIfBusy(evt);
+    },
+    // Delegated row event handlers
+    onTbodyRowKeydown: function onTbodyRowKeydown(evt) {
+      // Keyboard navigation and row click emulation
+      var target = evt.target;
+
+      if (this.tbodyRowEvtStopped(evt) || target.tagName !== 'TR' || target !== document.activeElement || target.tabIndex !== 0) {
+        // Early exit if not an item row TR
+        return;
+      }
+
+      var keyCode = evt.keyCode;
+
+      if (arrayIncludes([KEY_CODES.ENTER, KEY_CODES.SPACE], keyCode)) {
+        // Emulated click for keyboard users, transfer to click handler
+        evt.stopPropagation();
+        evt.preventDefault();
+        this.onTBodyRowClicked(evt);
+      } else if (arrayIncludes([KEY_CODES.UP, KEY_CODES.DOWN, KEY_CODES.HOME, KEY_CODES.END], keyCode)) {
+        // Keyboard navigation
+        var rowIndex = this.getTbodyTrIndex(target);
+
+        if (rowIndex > -1) {
+          evt.stopPropagation();
+          evt.preventDefault();
+          var trs = this.getTbodyTrs();
+          var shift = evt.shiftKey;
+
+          if (keyCode === KEY_CODES.HOME || shift && keyCode === KEY_CODES.UP) {
+            // Focus first row
+            trs[0].focus();
+          } else if (keyCode === KEY_CODES.END || shift && keyCode === KEY_CODES.DOWN) {
+            // Focus last row
+            trs[trs.length - 1].focus();
+          } else if (keyCode === KEY_CODES.UP && rowIndex > 0) {
+            // Focus previous row
+            trs[rowIndex - 1].focus();
+          } else if (keyCode === KEY_CODES.DOWN && rowIndex < trs.length - 1) {
+            // Focus next row
+            trs[rowIndex + 1].focus();
+          }
+        }
+      }
+    },
+    onTBodyRowClicked: function onTBodyRowClicked(evt) {
+      if (this.tbodyRowEvtStopped(evt)) {
+        // If table is busy, then don't propagate
+        return;
+      } else if (filterEvent(evt) || textSelectionActive(this.$el)) {
+        // Clicked on a non-disabled control so ignore
+        // Or user is selecting text, so ignore
+        return;
+      }
+
+      this.emitTbodyRowEvent('row-clicked', evt);
+    },
+    onTbodyRowMiddleMouseRowClicked: function onTbodyRowMiddleMouseRowClicked(evt) {
+      if (!this.tbodyRowEvtStopped(evt) && evt.which === 2) {
+        this.emitTbodyRowEvent('row-middle-clicked', evt);
+      }
+    },
+    onTbodyRowContextmenu: function onTbodyRowContextmenu(evt) {
+      if (!this.tbodyRowEvtStopped(evt)) {
+        this.emitTbodyRowEvent('row-contextmenu', evt);
+      }
+    },
+    onTbodyRowDblClicked: function onTbodyRowDblClicked(evt) {
+      if (!this.tbodyRowEvtStopped(evt) && !filterEvent(evt)) {
+        this.emitTbodyRowEvent('row-dblclicked', evt);
+      }
+    },
+    // Note: Row hover handlers are handled by the tbody-row mixin
+    // As mouseenter/mouseleave events do not bubble
+    //
+    // Render Helper
     renderTbody: function renderTbody() {
       var _this = this;
 
       // Render the tbody element and children
       var items = this.computedItems; // Shortcut to `createElement` (could use `this._c()` instead)
 
-      var h = this.$createElement; // Prepare the tbody rows
+      var h = this.$createElement;
+      var hasRowClickHandler = this.$listeners['row-clicked'] || this.isSelectable; // Prepare the tbody rows
 
       var $rows = []; // Add the item data rows or the busy slot
 
@@ -17659,26 +18190,65 @@ var tbodyMixin = {
         $rows.push($busy);
       } else {
         // Table isn't busy, or we don't have a busy slot
-        // Add static Top Row slot (hidden in visibly stacked mode as we can't control data-label attr)
-        $rows.push(this.renderTopRow ? this.renderTopRow() : h()); // render the rows
+        // Create a slot cache for improved performance when looking up cell slot names
+        // Values will be keyed by the field's `key` and will store the slot's name
+        // Slots could be dynamic (i.e. `v-if`), so we must compute on each render
+        // Used by tbody-row mixin render helper
+        var cache = {};
+        var defaultSlotName = this.hasNormalizedSlot('cell()') ? 'cell()' : null;
+        this.computedFields.forEach(function (field) {
+          var key = field.key;
+          var fullName = "cell(".concat(key, ")");
+          var lowerName = "cell(".concat(key.toLowerCase(), ")");
+          cache[key] = _this.hasNormalizedSlot(fullName) ? fullName : _this.hasNormalizedSlot(lowerName) ? lowerName : defaultSlotName;
+        }); // Created as a non-reactive property so to not trigger component updates
+        // Must be a fresh object each render
+
+        this.$_bodyFieldSlotNameCache = cache; // Add static top row slot (hidden in visibly stacked mode
+        // as we can't control `data-label` attr)
+
+        $rows.push(this.renderTopRow ? this.renderTopRow() : h()); // Render the rows
 
         items.forEach(function (item, rowIndex) {
           // Render the individual item row (rows if details slot)
           $rows.push(_this.renderTbodyRow(item, rowIndex));
-        }); // Empty Items / Empty Filtered Row slot (only shows if items.length < 1)
+        }); // Empty items / empty filtered row slot (only shows if `items.length < 1`)
 
-        $rows.push(this.renderEmpty ? this.renderEmpty() : h()); // Static bottom row slot (hidden in visibly stacked mode as we can't control data-label attr)
+        $rows.push(this.renderEmpty ? this.renderEmpty() : h()); // Static bottom row slot (hidden in visibly stacked mode
+        // as we can't control `data-label` attr)
 
         $rows.push(this.renderBottomRow ? this.renderBottomRow() : h());
+      }
+
+      var handlers = {
+        // TODO: We may want to to only instantiate these handlers
+        //       if there is an event listener registered
+        auxclick: this.onTbodyRowMiddleMouseRowClicked,
+        // TODO: Perhaps we do want to automatically prevent the
+        //       default context menu from showing if there is
+        //       a `row-contextmenu` listener registered.
+        contextmenu: this.onTbodyRowContextmenu,
+        // The following event(s) is not considered A11Y friendly
+        dblclick: this.onTbodyRowDblClicked // hover events (mouseenter/mouseleave) ad handled by tbody-row mixin
+
+      };
+
+      if (hasRowClickHandler) {
+        handlers.click = this.onTBodyRowClicked;
+        handlers.keydown = this.onTbodyRowKeydown;
       } // Assemble rows into the tbody
 
 
       var $tbody = h(BTbody, {
+        ref: 'tbody',
         class: this.tbodyClass || null,
         props: {
           tbodyTransitionProps: this.tbodyTransitionProps,
           tbodyTransitionHandlers: this.tbodyTransitionHandlers
-        }
+        },
+        // BTbody transfers all native event listeners to the root element
+        // TODO: Only set the handlers if the table is not busy
+        on: handlers
       }, $rows); // Return the assembled tbody
 
       return $tbody;
@@ -18229,16 +18799,17 @@ var providerMixin = {
           } else if (isArray(data)) {
             // Provider returned Array data
             _this2._providerSetLocal(data);
-          } else if (_this2.items.length !== 2) {
-            // Check number of arguments provider function requested
-            // Provider not using callback (didn't request second argument), so we clear
-            // busy state as most likely there was an error in the provider function
+          } else {
+            /* istanbul ignore if */
+            if (_this2.items.length !== 2) {
+              // Check number of arguments provider function requested
+              // Provider not using callback (didn't request second argument), so we clear
+              // busy state as most likely there was an error in the provider function
 
-            /* istanbul ignore next */
-            warn("b-table provider function didn't request callback and did not return a promise or data");
-            /* istanbul ignore next */
-
-            _this2.localBusy = false;
+              /* istanbul ignore next */
+              warn("b-table provider function didn't request callback and did not return a promise or data");
+              _this2.localBusy = false;
+            }
           }
         } catch (e)
         /* istanbul ignore next */
@@ -18308,6 +18879,10 @@ var tableRendererMixin = {
       type: [Boolean, String],
       default: false
     },
+    noBorderCollapse: {
+      type: Boolean,
+      default: false
+    },
     captionTop: {
       type: Boolean,
       default: false
@@ -18353,7 +18928,8 @@ var tableRendererMixin = {
         // The following are b-table custom styles
         border: this.outlined,
         'b-table-fixed': this.fixed,
-        'b-table-caption-top': this.captionTop
+        'b-table-caption-top': this.captionTop,
+        'b-table-no-border-collapse': this.noBorderCollapse
       }, this.tableVariant ? "".concat(this.dark ? 'bg' : 'table', "-").concat(this.tableVariant) : '', // Stacked table classes
       this.stackedTableClasses, // Selectable classes
       this.selectableTableClasses];
@@ -18426,7 +19002,7 @@ Vue.extend({
   // They are merged from first to last, followed by this component.
   mixins: [// Required Mixins
   idMixin, normalizeSlotMixin, itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Features Mixins
-  filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin] // render function provided by table-renderer mixin
+  stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin] // render function provided by table-renderer mixin
 
 });
 
@@ -18498,7 +19074,7 @@ pluginFactory({
   }
 });
 
-var navProps = omit(props$I, ['tabs', 'isNavBar']); // -- Utils --
+var navProps = omit(props$I, ['tabs', 'isNavBar', 'cardHeader']); // -- Utils --
 // Filter function to filter out disabled tabs
 
 var notDisabled = function notDisabled(tab) {
@@ -18618,8 +19194,6 @@ Vue.extend({
       }, this.tab.titleLinkClass, // Apply <b-tabs> `activeNavItemClass` styles when the tab is active
       this.tab.localActive ? this.bvTabs.activeNavItemClass : null],
       props: {
-        href: this.tab.href,
-        // To be deprecated to always be '#'
         disabled: this.tab.disabled
       },
       attrs: {
@@ -18667,10 +19241,6 @@ Vue.extend({
       default: 'div'
     },
     card: {
-      type: Boolean,
-      default: false
-    },
-    bottom: {
       type: Boolean,
       default: false
     },
@@ -18744,18 +19314,11 @@ Vue.extend({
       // This computed prop is sniffed by the tab child
       return !this.noFade;
     },
-    navStyle: function navStyle() {
-      return this.pills ? 'pills' : 'tabs';
-    },
     localNavClass: function localNavClass() {
       var classes = [];
 
-      if (this.card) {
-        if (this.vertical) {
-          classes.push('card-header', 'h-100', 'border-bottom-0', 'rounded-0');
-        } else {
-          classes.push("card-header-".concat(this.navStyle));
-        }
+      if (this.card && this.vertical) {
+        classes.push('card-header', 'h-100', 'border-bottom-0', 'rounded-0');
       }
 
       return [].concat(classes, [this.navClass]);
@@ -19196,14 +19759,15 @@ Vue.extend({
         tabs: !this.noNavStyle && !this.pills,
         pills: !this.noNavStyle && this.pills,
         vertical: this.vertical,
-        small: this.small
+        small: this.small,
+        cardHeader: this.card && !this.vertical
       }
-    }, [this.normalizeSlot('tabs-start') || h(false), buttons, this.normalizeSlot('tabs-end') || this.normalizeSlot('tabs') || h(false)]);
+    }, [this.normalizeSlot('tabs-start') || h(), buttons, this.normalizeSlot('tabs-end') || h()]);
     nav = h('div', {
       key: 'bv-tabs-nav',
       class: [{
-        'card-header': this.card && !this.vertical && !(this.end || this.bottom),
-        'card-footer': this.card && !this.vertical && (this.end || this.bottom),
+        'card-header': this.card && !this.vertical && !this.end,
+        'card-footer': this.card && !this.vertical && this.end,
         'col-auto': this.vertical
       }, this.navWrapperClass]
     }, [nav]);
@@ -19240,11 +19804,9 @@ Vue.extend({
       attrs: {
         id: this.safeId()
       }
-    }, [this.end || this.bottom ? content : h(), [nav], this.end || this.bottom ? h() : content]);
+    }, [this.end ? content : h(), [nav], this.end ? h() : content]);
   }
 });
-
-var DEPRECATED_MSG$2 = 'Setting prop "href" is deprecated. Use the <b-nav> component instead.'; // @vue/component
 
 var BTab =
 /*#__PURE__*/
@@ -19288,11 +19850,6 @@ Vue.extend({
       type: [String, Array, Object],
       default: null
     },
-    headHtml: {
-      // Is this actually ever used?
-      type: String,
-      default: null
-    },
     disabled: {
       type: Boolean,
       default: false
@@ -19300,16 +19857,6 @@ Vue.extend({
     noBody: {
       type: Boolean,
       default: false
-    },
-    href: {
-      // This should be deprecated, as tabs are not navigation (URL) based
-      // <b-nav> + <b-card> + <router-view>/<nuxt-child> should be used instead
-      // We don't support router-links here
-      type: String,
-      default: '#',
-      // `deprecated` -> Don't use this prop
-      // `deprecation` -> Refers to a change in prop usage
-      deprecated: DEPRECATED_MSG$2
     },
     lazy: {
       type: Boolean,
@@ -19356,6 +19903,7 @@ Vue.extend({
           // If activated post mount
           this.activate();
         } else {
+          /* istanbul ignore next */
           if (!this.deactivate()) {
             // Tab couldn't be deactivated, so we reset the synced active prop
             // Deactivation will fail if no other tabs to activate
@@ -19377,12 +19925,7 @@ Vue.extend({
     // Inform b-tabs of our presence
     this.registerTab(); // Initially show on mount if active and not disabled
 
-    this.show = this.localActive; // Deprecate use of `href` prop
-
-    if (this.href && this.href !== '#') {
-      /* istanbul ignore next */
-      warn("b-tab: ".concat(DEPRECATED_MSG$2));
-    }
+    this.show = this.localActive;
   },
   updated: function updated() {
     // Force the tab button content to update (since slots are not reactive)
@@ -19461,8 +20004,8 @@ pluginFactory({
   }
 });
 
-var NAME$r = 'BToaster';
-var props$10 = {
+var NAME$v = 'BToaster';
+var props$Z = {
   name: {
     type: String,
     required: true
@@ -19470,13 +20013,13 @@ var props$10 = {
   ariaLive: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$r, 'ariaLive');
+      return getComponentConfig(NAME$v, 'ariaLive');
     }
   },
   ariaAtomic: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$r, 'ariaAtomic');
+      return getComponentConfig(NAME$v, 'ariaAtomic');
     } // Allowed: 'true' or 'false' or null
 
   },
@@ -19484,18 +20027,18 @@ var props$10 = {
     // Aria role
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$r, 'role');
+      return getComponentConfig(NAME$v, 'role');
     }
-    /*
-    transition: {
-      type: [Boolean, String, Object],
-      default: false
-    }
-    */
+  }
+  /*
+  transition: {
+    type: [Boolean, String, Object],
+    default: false
+  }
+  */
 
-  } // @vue/component
+}; // @vue/component
 
-};
 var DefaultTransition =
 /*#__PURE__*/
 Vue.extend({
@@ -19533,8 +20076,8 @@ Vue.extend({
 var BToaster =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$r,
-  props: props$10,
+  name: NAME$v,
+  props: props$Z,
   data: function data() {
     return {
       // We don't render on SSR or if a an existing target found
@@ -19606,14 +20149,14 @@ Vue.extend({
   }
 });
 
-var NAME$s = 'BToast';
+var NAME$w = 'BToast';
 var MIN_DURATION = 1000;
-var EVENT_OPTIONS$1 = {
+var EVENT_OPTIONS = {
   passive: true,
-  capture: false // --- Props ---
+  capture: false
+}; // --- Props ---
 
-};
-var props$11 = {
+var props$_ = {
   id: {
     // Even though the ID prop is provided by idMixin, we
     // add it here for $bvToast props filtering
@@ -19627,7 +20170,7 @@ var props$11 = {
   toaster: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'toaster');
+      return getComponentConfig(NAME$w, 'toaster');
     }
   },
   visible: {
@@ -19637,7 +20180,7 @@ var props$11 = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'variant');
+      return getComponentConfig(NAME$w, 'variant');
     }
   },
   isStatus: {
@@ -19656,7 +20199,7 @@ var props$11 = {
   autoHideDelay: {
     type: [Number, String],
     default: function _default() {
-      return getComponentConfig(NAME$s, 'autoHideDelay');
+      return getComponentConfig(NAME$w, 'autoHideDelay');
     }
   },
   noCloseButton: {
@@ -19678,19 +20221,19 @@ var props$11 = {
   toastClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$s, 'toastClass');
+      return getComponentConfig(NAME$w, 'toastClass');
     }
   },
   headerClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$s, 'headerClass');
+      return getComponentConfig(NAME$w, 'headerClass');
     }
   },
   bodyClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$s, 'bodyClass');
+      return getComponentConfig(NAME$w, 'bodyClass');
     }
   },
   href: {
@@ -19705,20 +20248,20 @@ var props$11 = {
     // Render the toast in place, rather than in a portal-target
     type: Boolean,
     default: false
-  } // @vue/component
+  }
+}; // @vue/component
 
-};
 var BToast =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$s,
-  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
+  name: NAME$w,
+  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
   inheritAttrs: false,
   model: {
     prop: 'visible',
     event: 'change'
   },
-  props: props$11,
+  props: props$_,
   data: function data() {
     return {
       isMounted: false,
@@ -19817,7 +20360,9 @@ Vue.extend({
     /* istanbul ignore next: difficult to test */
 
     this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
+      /* istanbul ignore next */
       if (toaster === _this2.computedToaster) {
+        /* istanbul ignore next */
         _this2.hide();
       }
     });
@@ -19910,8 +20455,8 @@ Vue.extend({
     setHoverHandler: function setHoverHandler(on) {
       var method = on ? eventOn : eventOff;
       var el = this.$refs['b-toast'];
-      method(el, 'mouseenter', this.onPause, EVENT_OPTIONS$1);
-      method(el, 'mouseleave', this.onUnPause, EVENT_OPTIONS$1);
+      method(el, 'mouseenter', this.onPause, EVENT_OPTIONS);
+      method(el, 'mouseleave', this.onUnPause, EVENT_OPTIONS);
     },
     onPause: function onPause(evt) {
       // Determine time remaining, and then pause timer
@@ -20036,7 +20581,10 @@ Vue.extend({
       return h();
     }
 
-    var name = "b-toast-".concat(this._uid);
+    var name = "b-toast-".concat(this._uid); // If scoped styles are applied and the toast is not static,
+    // make sure the scoped style data attribute is applied
+
+    var scopedStyleAttrs = !this.static ? this.scopedStyleAttrs : {};
     return h(Portal, {
       props: {
         name: name,
@@ -20050,12 +20598,12 @@ Vue.extend({
       ref: 'b-toast',
       staticClass: 'b-toast',
       class: this.bToastClasses,
-      attrs: {
+      attrs: _objectSpread2({}, scopedStyleAttrs, {
         id: this.safeId('_toast_outer'),
         role: this.isHiding ? null : this.isStatus ? 'status' : 'alert',
         'aria-live': this.isHiding ? null : this.isStatus ? 'polite' : 'assertive',
         'aria-atomic': this.isHiding ? null : 'true'
-      }
+      })
     }, [h(BVTransition, {
       props: {
         noFade: this.noFade
@@ -20071,14 +20619,13 @@ var PROP_NAME_PRIV$1 = '_bv__toast'; // Base toast props that are allowed
 // Prop ID is allowed, but really only should be used for testing
 // We need to add it in explicitly as it comes from the `idMixin`
 
-var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$11, ['static', 'visible'])))); // Map prop names to toast slot names
+var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$_, ['static', 'visible'])))); // Map prop names to toast slot names
 
 var propsToSlots$1 = {
   toastContent: 'default',
-  title: 'toast-title' // --- Utility methods ---
-  // Method to filter only recognized props that are not undefined
-
-};
+  title: 'toast-title'
+}; // --- Utility methods ---
+// Method to filter only recognized props that are not undefined
 
 var filterOptions$1 = function filterOptions(options) {
   return BASE_PROPS$1.reduce(function (memo, key) {
@@ -20262,7 +20809,7 @@ pluginFactory({
   plugins: {
     plugin: plugin$1
   }
-}); // Default export is the Plugin
+});
 
 var ToastPlugin =
 /*#__PURE__*/
@@ -20277,140 +20824,79 @@ pluginFactory({
   }
 });
 
-var NAME$t = 'BTooltip'; // @vue/component
+var BV_TOOLTIP = '__BV_Tooltip__'; // Default trigger
 
-var BTooltip =
-/*#__PURE__*/
-Vue.extend({
-  name: NAME$t,
-  mixins: [toolpopMixin, normalizeSlotMixin],
-  props: {
-    title: {
-      type: String,
-      default: ''
-    },
-    triggers: {
-      type: [String, Array],
-      default: 'hover focus'
-    },
-    placement: {
-      type: String,
-      default: 'top'
-    },
-    fallbackPlacement: {
-      type: [String, Array],
-      default: 'flip',
-      validator: function validator(value) {
-        return isArray(value) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
-      }
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$t, 'variant');
-      }
-    },
-    customClass: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$t, 'customClass');
-      }
-    },
-    delay: {
-      type: [Number, Object, String],
-      default: function _default() {
-        return getComponentConfig(NAME$t, 'delay');
-      }
-    },
-    boundary: {
-      // String: scrollParent, window, or viewport
-      // Element: element reference
-      type: [String, HTMLElement],
-      default: function _default() {
-        return getComponentConfig(NAME$t, 'boundary');
-      }
-    },
-    boundaryPadding: {
-      type: Number,
-      default: function _default() {
-        return getComponentConfig(NAME$t, 'boundaryPadding');
-      }
-    }
-  },
-  methods: {
-    createToolpop: function createToolpop() {
-      // getTarget is in toolpop mixin
-      var target = this.getTarget();
-      /* istanbul ignore else */
-
-      if (target) {
-        this._toolpop = new ToolTip(target, this.getConfig(), this);
-      } else {
-        this._toolpop = null;
-        warn("b-tooltip: 'target' element not found!");
-      }
-
-      return this._toolpop;
-    }
-  },
-  render: function render(h) {
-    return h('div', {
-      class: ['d-none'],
-      style: {
-        display: 'none'
-      },
-      attrs: {
-        'aria-hidden': true
-      }
-    }, [h('div', {
-      ref: 'title'
-    }, this.normalizeSlot('default'))]);
-  }
-});
-
-var BV_TOOLTIP = '__BV_ToolTip__'; // Valid event triggers
+var DefaultTrigger$1 = 'hover focus'; // Valid event triggers
 
 var validTriggers$1 = {
   focus: true,
   hover: true,
   click: true,
-  blur: true // Directive modifier test regular expressions. Pre-compile for performance
+  blur: true,
+  manual: true
+}; // Directive modifier test regular expressions. Pre-compile for performance
 
-};
-var htmlRE$1 = /^html$/;
+var htmlRE$1 = /^html$/i;
 var noFadeRE$1 = /^nofade$/i;
-var placementRE$1 = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/;
-var boundaryRE$1 = /^(window|viewport|scrollParent)$/;
-var delayRE$1 = /^d\d+$/;
-var offsetRE$1 = /^o-?\d+$/;
-var variantRE$1 = /^v-.+$/; // Build a ToolTip config based on bindings (if any)
+var placementRE$1 = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/i;
+var boundaryRE$1 = /^(window|viewport|scrollParent)$/i;
+var delayRE$1 = /^d\d+$/i;
+var delayShowRE$1 = /^ds\d+$/i;
+var delayHideRE$1 = /^dh\d+$/i;
+var offsetRE$1 = /^o-?\d+$/i;
+var variantRE$1 = /^v-.+$/i; // Build a Tooltip config based on bindings (if any)
 // Arguments and modifiers take precedence over passed value config object
 
-/* istanbul ignore next: not easy to test */
-
-var parseBindings$1 = function parseBindings(bindings)
+var parseBindings$1 = function parseBindings(bindings, vnode)
 /* istanbul ignore next: not easy to test */
 {
   // We start out with a basic config
-  var NAME = 'BTooltip';
+  var NAME = 'BTooltip'; // Default config
+
   var config = {
+    title: undefined,
+    trigger: '',
+    // Default set below if needed
+    placement: 'top',
+    fallbackPlacement: 'flip',
+    container: false,
+    // Default of body
+    animation: true,
+    offset: 0,
+    id: null,
+    html: false,
+    disabled: false,
     delay: getComponentConfig(NAME, 'delay'),
     boundary: String(getComponentConfig(NAME, 'boundary')),
     boundaryPadding: parseInt(getComponentConfig(NAME, 'boundaryPadding'), 10) || 0,
     variant: getComponentConfig(NAME, 'variant'),
-    customClass: getComponentConfig(NAME, 'customClass') // Process bindings.value
+    customClass: getComponentConfig(NAME, 'customClass')
+  }; // Process `bindings.value`
 
-  };
-
-  if (isString(bindings.value)) {
-    // Value is tooltip content (html optionally supported)
+  if (isString(bindings.value) || isNumber(bindings.value)) {
+    // Value is tooltip content (HTML optionally supported)
     config.title = bindings.value;
   } else if (isFunction(bindings.value)) {
     // Title generator function
     config.title = bindings.value;
-  } else if (isObject(bindings.value)) {
+  } else if (isPlainObject(bindings.value)) {
     // Value is config object, so merge
     config = _objectSpread2({}, config, {}, bindings.value);
+  } // If title is not provided, try title attribute
+
+
+  if (isUndefined(config.title)) {
+    // Try attribute
+    var data = vnode.data || {};
+    config.title = data.attrs && !isUndefinedOrNull(data.attrs.title) ? data.attrs.title : undefined;
+  } // Normalize delay
+
+
+  if (!isPlainObject(config.delay)) {
+    config.delay = {
+      show: parseInt(config.delay, 10) || 0,
+      hide: parseInt(config.delay, 10) || 0
+    };
   } // If argument, assume element ID of container element
 
 
@@ -20433,21 +20919,22 @@ var parseBindings$1 = function parseBindings(bindings)
       config.placement = mod;
     } else if (boundaryRE$1.test(mod)) {
       // Boundary of tooltip
+      mod = mod === 'scrollparent' ? 'scrollParent' : mod;
       config.boundary = mod;
     } else if (delayRE$1.test(mod)) {
       // Delay value
       var delay = parseInt(mod.slice(1), 10) || 0;
-
-      if (delay) {
-        config.delay = delay;
-      }
+      config.delay.show = delay;
+      config.delay.hide = delay;
+    } else if (delayShowRE$1.test(mod)) {
+      // Delay show value
+      config.delay.show = parseInt(mod.slice(2), 10) || 0;
+    } else if (delayHideRE$1.test(mod)) {
+      // Delay hide value
+      config.delay.hide = parseInt(mod.slice(2), 10) || 0;
     } else if (offsetRE$1.test(mod)) {
       // Offset value, negative allowed
-      var offset = parseInt(mod.slice(1), 10) || 0;
-
-      if (offset) {
-        config.offset = offset;
-      }
+      config.offset = parseInt(mod.slice(1), 10) || 0;
     } else if (variantRE$1.test(mod)) {
       // Variant
       config.variant = mod.slice(2) || null;
@@ -20457,16 +20944,18 @@ var parseBindings$1 = function parseBindings(bindings)
 
   var selectedTriggers = {}; // Parse current config object trigger
 
-  var triggers = isString(config.trigger) ? config.trigger.trim().split(/\s+/) : [];
-  triggers.forEach(function (trigger) {
+  concat(config.trigger || '').filter(Boolean).join(' ').trim().toLowerCase().split(/\s+/).forEach(function (trigger) {
     if (validTriggers$1[trigger]) {
       selectedTriggers[trigger] = true;
     }
   }); // Parse modifiers for triggers
 
-  keys(validTriggers$1).forEach(function (trigger) {
-    if (bindings.modifiers[trigger]) {
-      selectedTriggers[trigger] = true;
+  keys(bindings.modifiers).forEach(function (mod) {
+    mod = mod.toLowerCase();
+
+    if (validTriggers$1[mod]) {
+      // If modifier is a valid trigger
+      selectedTriggers[mod] = true;
     }
   }); // Sanitize triggers
 
@@ -20478,12 +20967,13 @@ var parseBindings$1 = function parseBindings(bindings)
   }
 
   if (!config.trigger) {
-    // Remove trigger config
-    delete config.trigger;
-  }
+    // Use default trigger
+    config.trigger = DefaultTrigger$1;
+  } // Return the config
+
 
   return config;
-}; // Add or update ToolTip on our element
+}; // Add/update Tooltip on our element
 
 
 var applyTooltip = function applyTooltip(el, bindings, vnode) {
@@ -20492,63 +20982,98 @@ var applyTooltip = function applyTooltip(el, bindings, vnode) {
     return;
   }
 
-  if (!Popper) {
-    // Popper is required for ToolTips to work
+  var config = parseBindings$1(bindings, vnode);
 
-    /* istanbul ignore next */
-    warn('v-b-tooltip: Popper.js is required for ToolTips to work');
-    /* istanbul ignore next */
-
-    return;
+  if (!el[BV_TOOLTIP]) {
+    var $parent = vnode.context;
+    el[BV_TOOLTIP] = new BVTooltip({
+      parent: $parent,
+      // Add the parent's scoped style attribute data
+      _scopeId: getScopeId($parent, undefined)
+    });
+    el[BV_TOOLTIP].__bv_prev_data__ = {};
+    el[BV_TOOLTIP].$on('show', function ()
+    /* istanbul ignore next: for now */
+    {
+      // Before showing the tooltip, we update the title if it is a function
+      if (isFunction(config.title)) {
+        el[BV_TOOLTIP].updateData({
+          title: config.title()
+        });
+      }
+    });
   }
 
-  var config = parseBindings$1(bindings);
+  var data = {
+    title: config.title,
+    triggers: config.trigger,
+    placement: config.placement,
+    fallbackPlacement: config.fallbackPlacement,
+    variant: config.variant,
+    customClass: config.customClass,
+    container: config.container,
+    boundary: config.boundary,
+    delay: config.delay,
+    offset: config.offset,
+    noFade: !config.animation,
+    id: config.id,
+    disabled: config.disabled,
+    html: config.html
+  };
+  var oldData = el[BV_TOOLTIP].__bv_prev_data__;
+  el[BV_TOOLTIP].__bv_prev_data__ = data;
 
-  if (el[BV_TOOLTIP]) {
-    el[BV_TOOLTIP].updateConfig(config);
-  } else {
-    el[BV_TOOLTIP] = new ToolTip(el, config, vnode.context);
+  if (!looseEqual(data, oldData)) {
+    // We only update the instance if data has changed
+    var newData = {
+      target: el
+    };
+    keys(data).forEach(function (prop) {
+      // We only pass data properties that have changed
+      if (data[prop] !== oldData[prop]) {
+        // if title is a function, we execute it here
+        newData[prop] = prop === 'title' && isFunction(data[prop]) ? data[prop]() : data[prop];
+      }
+    });
+    el[BV_TOOLTIP].updateData(newData);
   }
-}; // Remove ToolTip on our element
+}; // Remove Tooltip on our element
 
 
 var removeTooltip = function removeTooltip(el) {
   if (el[BV_TOOLTIP]) {
-    el[BV_TOOLTIP].destroy();
+    el[BV_TOOLTIP].$destroy();
     el[BV_TOOLTIP] = null;
-    delete el[BV_TOOLTIP];
   }
-};
-/*
- * Export our directive
- */
+
+  delete el[BV_TOOLTIP];
+}; // Export our directive
 
 
 var VBTooltip = {
   bind: function bind(el, bindings, vnode) {
     applyTooltip(el, bindings, vnode);
   },
-  inserted: function inserted(el, bindings, vnode) {
-    applyTooltip(el, bindings, vnode);
-  },
-  update: function update(el, bindings, vnode)
-  /* istanbul ignore next: not easy to test */
-  {
-    if (bindings.value !== bindings.oldValue) {
+  // We use `componentUpdated` here instead of `update`, as the former
+  // waits until the containing component and children have finished updating
+  componentUpdated: function componentUpdated(el, bindings, vnode) {
+    // Performed in a `$nextTick()` to prevent render update loops
+    vnode.context.$nextTick(function () {
       applyTooltip(el, bindings, vnode);
-    }
-  },
-  componentUpdated: function componentUpdated(el, bindings, vnode)
-  /* istanbul ignore next: not easy to test */
-  {
-    if (bindings.value !== bindings.oldValue) {
-      applyTooltip(el, bindings, vnode);
-    }
+    });
   },
   unbind: function unbind(el) {
     removeTooltip(el);
   }
 };
+
+var VBTooltipPlugin =
+/*#__PURE__*/
+pluginFactory({
+  directives: {
+    VBTooltip: VBTooltip
+  }
+});
 
 var TooltipPlugin =
 /*#__PURE__*/
@@ -20556,12 +21081,10 @@ pluginFactory({
   components: {
     BTooltip: BTooltip
   },
-  directives: {
-    VBTooltip: VBTooltip
+  plugins: {
+    VBTooltipPlugin: VBTooltipPlugin
   }
 });
-
-// Index file used for the main builds, which does not include legacy plugin names
 
 var componentsPlugin =
 /*#__PURE__*/
@@ -20606,7 +21129,7 @@ pluginFactory({
     ToastPlugin: ToastPlugin,
     TooltipPlugin: TooltipPlugin
   }
-}); // Export named injection plugins
+});
 
 var VBModalPlugin =
 /*#__PURE__*/
@@ -20616,19 +21139,11 @@ pluginFactory({
   }
 });
 
-var VBPopoverPlugin =
-/*#__PURE__*/
-pluginFactory({
-  directives: {
-    VBPopover: VBPopover
-  }
-});
-
 /*
  * Constants / Defaults
  */
 
-var NAME$u = 'v-b-scrollspy';
+var NAME$x = 'v-b-scrollspy';
 var ACTIVATE_EVENT = 'bv::scrollspy::activate';
 var Default = {
   element: 'body',
@@ -20642,11 +21157,11 @@ var DefaultType = {
   method: 'string',
   throttle: 'number'
 };
-var ClassName$2 = {
+var ClassName = {
   DROPDOWN_ITEM: 'dropdown-item',
   ACTIVE: 'active'
 };
-var Selector$4 = {
+var Selector$2 = {
   ACTIVE: '.active',
   NAV_LIST_GROUP: '.nav, .list-group',
   NAV_LINKS: '.nav-link',
@@ -20658,24 +21173,23 @@ var Selector$4 = {
 };
 var OffsetMethod = {
   OFFSET: 'offset',
-  POSITION: 'position' // HREFs must end with a hash followed by at least one non-hash character.
-  // HREFs in the links are assumed to point to non-external links.
-  // Comparison to the current page base URL is not performed!
+  POSITION: 'position'
+}; // HREFs must end with a hash followed by at least one non-hash character.
+// HREFs in the links are assumed to point to non-external links.
+// Comparison to the current page base URL is not performed!
 
-};
 var HREF_REGEX = /^.*(#[^#]+)$/; // Transition Events
 
-var TransitionEndEvents$2 = ['webkitTransitionEnd', 'transitionend', 'otransitionend', 'oTransitionEnd']; // Options for events
+var TransitionEndEvents$1 = ['webkitTransitionEnd', 'transitionend', 'otransitionend', 'oTransitionEnd']; // Options for events
 
 var EventOptions$2 = {
   passive: true,
   capture: false
-  /*
-   * Utility Methods
-   */
-  // Better var type detection
-
 };
+/*
+ * Utility Methods
+ */
+// Better var type detection
 
 var toType$1 = function toType(obj)
 /* istanbul ignore next: not easy to test */
@@ -20722,7 +21236,7 @@ function () {
     // The element we activate links in
     this.$el = element;
     this.$scroller = null;
-    this.$selector = [Selector$4.NAV_LINKS, Selector$4.LIST_ITEMS, Selector$4.DROPDOWN_ITEMS].join(',');
+    this.$selector = [Selector$2.NAV_LINKS, Selector$2.LIST_ITEMS, Selector$2.DROPDOWN_ITEMS].join(',');
     this.$offsets = [];
     this.$targets = [];
     this.$activeTarget = null;
@@ -20791,7 +21305,7 @@ function () {
       eventOn(window, 'scroll', this, EventOptions$2);
       eventOn(window, 'resize', this, EventOptions$2);
       eventOn(window, 'orientationchange', this, EventOptions$2);
-      TransitionEndEvents$2.forEach(function (evtName) {
+      TransitionEndEvents$1.forEach(function (evtName) {
         eventOn(window, evtName, _this, EventOptions$2);
       });
       this.setObservers(true); // Schedule a refresh
@@ -20813,7 +21327,7 @@ function () {
       eventOff(window, 'scroll', this, EventOptions$2);
       eventOff(window, 'resize', this, EventOptions$2);
       eventOff(window, 'orientationchange', this, EventOptions$2);
-      TransitionEndEvents$2.forEach(function (evtName) {
+      TransitionEndEvents$1.forEach(function (evtName) {
         eventOff(window, evtName, _this2, EventOptions$2);
       });
     }
@@ -21039,12 +21553,12 @@ function () {
       }) // Join back into a single selector string
       .join(','), this.$el);
       links.forEach(function (link) {
-        if (hasClass(link, ClassName$2.DROPDOWN_ITEM)) {
+        if (hasClass(link, ClassName.DROPDOWN_ITEM)) {
           // This is a dropdown item, so find the .dropdown-toggle and set it's state
-          var dropdown = closest(Selector$4.DROPDOWN, link);
+          var dropdown = closest(Selector$2.DROPDOWN, link);
 
           if (dropdown) {
-            _this5.setActiveState(select(Selector$4.DROPDOWN_TOGGLE, dropdown), true);
+            _this5.setActiveState(select(Selector$2.DROPDOWN_TOGGLE, dropdown), true);
           } // Also set this link's state
 
 
@@ -21053,7 +21567,7 @@ function () {
           // Set triggered link as active
           _this5.setActiveState(link, true);
 
-          if (matches(link.parentElement, Selector$4.NAV_ITEMS)) {
+          if (matches(link.parentElement, Selector$2.NAV_ITEMS)) {
             // Handle nav-link inside nav-item, and set nav-item active
             _this5.setActiveState(link.parentElement, true);
           } // Set triggered links parents as active
@@ -21063,16 +21577,16 @@ function () {
           var el = link;
 
           while (el) {
-            el = closest(Selector$4.NAV_LIST_GROUP, el);
+            el = closest(Selector$2.NAV_LIST_GROUP, el);
             var sibling = el ? el.previousElementSibling : null;
 
-            if (sibling && matches(sibling, "".concat(Selector$4.NAV_LINKS, ", ").concat(Selector$4.LIST_ITEMS))) {
+            if (sibling && matches(sibling, "".concat(Selector$2.NAV_LINKS, ", ").concat(Selector$2.LIST_ITEMS))) {
               _this5.setActiveState(sibling, true);
             } // Handle special case where nav-link is inside a nav-item
 
 
-            if (sibling && matches(sibling, Selector$4.NAV_ITEMS)) {
-              _this5.setActiveState(select(Selector$4.NAV_LINKS, sibling), true); // Add active state to nav-item as well
+            if (sibling && matches(sibling, Selector$2.NAV_ITEMS)) {
+              _this5.setActiveState(select(Selector$2.NAV_LINKS, sibling), true); // Add active state to nav-item as well
 
 
               _this5.setActiveState(sibling, true);
@@ -21090,8 +21604,8 @@ function () {
     value: function clear() {
       var _this6 = this;
 
-      selectAll("".concat(this.$selector, ", ").concat(Selector$4.NAV_ITEMS), this.$el).filter(function (el) {
-        return hasClass(el, ClassName$2.ACTIVE);
+      selectAll("".concat(this.$selector, ", ").concat(Selector$2.NAV_ITEMS), this.$el).filter(function (el) {
+        return hasClass(el, ClassName.ACTIVE);
       }).forEach(function (el) {
         return _this6.setActiveState(el, false);
       });
@@ -21104,15 +21618,15 @@ function () {
       }
 
       if (active) {
-        addClass(el, ClassName$2.ACTIVE);
+        addClass(el, ClassName.ACTIVE);
       } else {
-        removeClass(el, ClassName$2.ACTIVE);
+        removeClass(el, ClassName.ACTIVE);
       }
     }
   }], [{
     key: "Name",
     get: function get() {
-      return NAME$u;
+      return NAME$x;
     }
   }, {
     key: "Default",
@@ -21258,16 +21772,6 @@ pluginFactory({
   }
 });
 
-var VBTooltipPlugin =
-/*#__PURE__*/
-pluginFactory({
-  directives: {
-    VBTooltip: VBTooltip
-  }
-});
-
-// Index file used for the main builds, which does not include legacy plugin names
-
 var directivesPlugin =
 /*#__PURE__*/
 pluginFactory({
@@ -21278,14 +21782,16 @@ pluginFactory({
     VBTogglePlugin: VBTogglePlugin,
     VBTooltipPlugin: VBTooltipPlugin
   }
-}); // Named exports of all directives (VB<Name>) and Plugins (VB<name>Plugin)
+});
 
 //
 var BVConfigPlugin =
 /*#__PURE__*/
 pluginFactory();
 
-var NAME$v = 'BootstrapVue'; // Named exports of all components and component group plugins
+var NAME$y = 'BootstrapVue'; //
+// BootstrapVue installer
+//
 
 var install =
 /*#__PURE__*/
@@ -21294,16 +21800,17 @@ installFactory({
     componentsPlugin: componentsPlugin,
     directivesPlugin: directivesPlugin
   }
-}); // BootstrapVue plugin
+}); //
+// BootstrapVue plugin
+//
 
 var BootstrapVue =
 /*#__PURE__*/
 {
   install: install,
-  NAME: NAME$v // Named exports for BvConfigPlugin and BootstrapVue
-
-};
+  NAME: NAME$y
+}; //
 
 export default BootstrapVue;
-export { AlertPlugin, BAlert, BBadge, BBreadcrumb, BBreadcrumbItem, BButton, BButtonClose, BButtonGroup, BButtonToolbar, BCard, BCardBody, BCardFooter, BCardGroup, BCardHeader, BCardImg, BCardImgLazy, BCardSubTitle, BCardText, BCardTitle, BCarousel, BCarouselSlide, BCol, BCollapse, BContainer, BDropdown, BDropdownDivider, BDropdownForm, BDropdownGroup, BDropdownHeader, BDropdownItem, BDropdownItemButton, BDropdownText, BEmbed, BForm, BFormCheckbox, BFormCheckboxGroup, BFormDatalist, BFormFile, BFormGroup, BFormInput, BFormInvalidFeedback, BFormRadio, BFormRadioGroup, BFormRow, BFormSelect, BFormText, BFormTextarea, BFormValidFeedback, BImg, BImgLazy, BInputGroup, BInputGroupAddon, BInputGroupAppend, BInputGroupPrepend, BInputGroupText, BJumbotron, BLink, BListGroup, BListGroupItem, BMedia, BMediaAside, BMediaBody, BModal, BNav, BNavForm, BNavItem, BNavItemDropdown, BNavText, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BPagination, BPaginationNav, BPopover, BProgress, BProgressBar, BRow, BSpinner, BTab, BTable, BTableLite, BTableSimple, BTabs, BTbody, BTd, BTfoot, BTh, BThead, BToast, BToaster, BTooltip, BTr, BVConfigPlugin as BVConfig, BVConfigPlugin, BVModalPlugin, BVToastPlugin, BadgePlugin, BootstrapVue, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, ButtonToolbarPlugin, CardPlugin, CarouselPlugin, CollapsePlugin, DropdownPlugin, EmbedPlugin, FormCheckboxPlugin, FormFilePlugin, FormGroupPlugin, FormInputPlugin, FormPlugin, FormRadioPlugin, FormSelectPlugin, FormTextareaPlugin, ImagePlugin, InputGroupPlugin, JumbotronPlugin, LayoutPlugin, LinkPlugin, ListGroupPlugin, MediaPlugin, ModalPlugin, NAME$v as NAME, NavPlugin, NavbarPlugin, PaginationNavPlugin, PaginationPlugin, PopoverPlugin, ProgressPlugin, SpinnerPlugin, TableLitePlugin, TablePlugin, TableSimplePlugin, TabsPlugin, ToastPlugin, TooltipPlugin, VBModal, VBModalPlugin, VBPopover, VBPopoverPlugin, VBScrollspy, VBScrollspyPlugin, VBToggle, VBTogglePlugin, VBTooltip, VBTooltipPlugin, componentsPlugin, directivesPlugin, install };
+export { AlertPlugin, BAlert, BBadge, BBreadcrumb, BBreadcrumbItem, BButton, BButtonClose, BButtonGroup, BButtonToolbar, BCard, BCardBody, BCardFooter, BCardGroup, BCardHeader, BCardImg, BCardImgLazy, BCardSubTitle, BCardText, BCardTitle, BCarousel, BCarouselSlide, BCol, BCollapse, BContainer, BDropdown, BDropdownDivider, BDropdownForm, BDropdownGroup, BDropdownHeader, BDropdownItem, BDropdownItemButton, BDropdownText, BEmbed, BForm, BFormCheckbox, BFormCheckboxGroup, BFormDatalist, BFormFile, BFormGroup, BFormInput, BFormInvalidFeedback, BFormRadio, BFormRadioGroup, BFormRow, BFormSelect, BFormText, BFormTextarea, BFormValidFeedback, BImg, BImgLazy, BInputGroup, BInputGroupAddon, BInputGroupAppend, BInputGroupPrepend, BInputGroupText, BJumbotron, BLink, BListGroup, BListGroupItem, BMedia, BMediaAside, BMediaBody, BModal, BNav, BNavForm, BNavItem, BNavItemDropdown, BNavText, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BPagination, BPaginationNav, BPopover, BProgress, BProgressBar, BRow, BSpinner, BTab, BTable, BTableLite, BTableSimple, BTabs, BTbody, BTd, BTfoot, BTh, BThead, BToast, BToaster, BTooltip, BTr, BVConfigPlugin as BVConfig, BVConfigPlugin, BVModalPlugin, BVToastPlugin, BadgePlugin, BootstrapVue, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, ButtonToolbarPlugin, CardPlugin, CarouselPlugin, CollapsePlugin, DropdownPlugin, EmbedPlugin, FormCheckboxPlugin, FormFilePlugin, FormGroupPlugin, FormInputPlugin, FormPlugin, FormRadioPlugin, FormSelectPlugin, FormTextareaPlugin, ImagePlugin, InputGroupPlugin, JumbotronPlugin, LayoutPlugin, LinkPlugin, ListGroupPlugin, MediaPlugin, ModalPlugin, NAME$y as NAME, NavPlugin, NavbarPlugin, PaginationNavPlugin, PaginationPlugin, PopoverPlugin, ProgressPlugin, SpinnerPlugin, TableLitePlugin, TablePlugin, TableSimplePlugin, TabsPlugin, ToastPlugin, TooltipPlugin, VBModal, VBModalPlugin, VBPopover, VBPopoverPlugin, VBScrollspy, VBScrollspyPlugin, VBToggle, VBTogglePlugin, VBTooltip, VBTooltipPlugin, install };
 //# sourceMappingURL=bootstrap-vue.esm.js.map

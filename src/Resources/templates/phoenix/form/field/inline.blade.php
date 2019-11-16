@@ -35,13 +35,11 @@ $i = 1;
             $subField->appendAttribute('labelClass', 'sr-only');
         }
 
-        $subField->appendAttribute('labelWidth', 'w-100');
+        $subField->set('labelWidth', 'col-12');
+        $subField->set('fieldWidth', 'col-12')
         ?>
         <div {!! \Windwalker\Dom\Builder\HtmlBuilder::buildAttributes($attrs) !!}>
-            @if (trim($subField->getLabel()))
-                {!! $subField->renderLabel() !!}
-            @endif
-            {!! $subField->renderInput() !!}
+            {!! $subField->render(['no_label' => false, 'vertical' => true]) !!}
         </div>
         @php($i++)
     @endforeach

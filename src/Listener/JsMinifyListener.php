@@ -27,6 +27,10 @@ class JsMinifyListener
      */
     public function onAssetRenderScripts(Event $event)
     {
+        if (!class_exists(JsMinify::class)) {
+            throw new \DomainException('Please install asika/minify ~1.0 first');
+        }
+
         $minify = new JsMinify($event['asset']);
 
         $minify->compress();

@@ -2,7 +2,7 @@
 /**
  * Part of Phoenix project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -16,7 +16,7 @@ use Windwalker\Data\DataSet;
 /**
  * The Breadcrumbs class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  1.8.20
  */
 class BreadcrumbManager implements \IteratorAggregate
 {
@@ -143,7 +143,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.19
      */
     public function __toString(): string
     {
@@ -193,7 +193,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.19
      */
     public function __clone()
     {

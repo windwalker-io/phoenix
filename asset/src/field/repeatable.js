@@ -13,7 +13,9 @@
       id: '',
       items: [],
       fields: [],
-      ensureFirstRow: 0
+      ensureFirstRow: 0,
+      singleArray: false,
+      hasKey: false
     },
     created() {
       this.items.map(this.prepareItem);
@@ -23,7 +25,8 @@
       }
     },
     mounted() {
-      //
+      this.singleArray = this.$el.dataset.singleArray === '1';
+      this.hasKey = this.$el.dataset.hasKey === '1';
     },
     methods: {
       getId(i, item, field) {
@@ -31,6 +34,18 @@
       },
 
       getName(i, item, field) {
+        if (this.singleArray) {
+          if (this.hasKey) {
+            if (field === 'key') {
+              return '';
+            }
+
+            return `${this.control}[${item.key}]`;
+          }
+
+          return `${this.control}[]`;
+        }
+
         return `${this.control}[${i}][${field}]`;
       },
 
@@ -73,6 +88,10 @@
           this.items.push(this.prepareItem(this.getEmptyItem()));
         }
       }
+    },
+
+    computed: {
+      //
     }
   };
 })();

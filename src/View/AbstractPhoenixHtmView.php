@@ -92,4 +92,16 @@ abstract class AbstractPhoenixHtmView extends HtmlView
 
         return $this;
     }
+
+    /**
+     * getTitle
+     *
+     * @return  string
+     *
+     * @since  1.8.20
+     */
+    public function getTitle(): string
+    {
+        return HtmlHeader::getTitle();
+    }
 }
