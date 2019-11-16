@@ -576,6 +576,16 @@ input[type="color"].form-control:disabled {
   opacity: 0.5;
 }
 
+.b-pagination-pills .page-item .page-link {
+  border-radius: 50rem !important;
+  margin-left: 0.25rem;
+  line-height: 1;
+}
+
+.b-pagination-pills .page-item:first-child .page-link {
+  margin-left: 0;
+}
+
 .popover.b-popover {
   display: block;
   opacity: 1;
@@ -1217,11 +1227,11 @@ input[type="color"].form-control:disabled {
   padding-left: calc(0.3rem + 0.65em);
 }
 
-.table.b-table.b-table-selectable > tbody > tr {
+.table.b-table.b-table-selectable:not(.b-table-selectable-no-click) > tbody > tr {
   cursor: pointer;
 }
 
-.table.b-table.b-table-selectable.b-table-selecting.b-table-select-range > tbody > tr {
+.table.b-table.b-table-selectable:not(.b-table-selectable-no-click).b-table-selecting.b-table-select-range > tbody > tr {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;

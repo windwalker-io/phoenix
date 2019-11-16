@@ -1,5 +1,5 @@
 /*!
- * BoostrapVue 2.0.4
+ * BoostrapVue 2.1.0
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -12,7 +12,7 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vue')) :
   typeof define === 'function' && define.amd ? define(['vue'], factory) :
   (global = global || self, global.bootstrapVue = factory(global.Vue));
-}(this, function (Vue) { 'use strict';
+}(this, (function (Vue) { 'use strict';
 
   Vue = Vue && Vue.hasOwnProperty('default') ? Vue['default'] : Vue;
 
@@ -435,7 +435,20 @@
 
   var isPlainObject = function isPlainObject(obj) {
     return Object.prototype.toString.call(obj) === '[object Object]';
-  }; // @link https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
+  };
+  /**
+   * Shallow copy an object. If the passed in object
+   * is null or undefined, returns an empty object
+   */
+
+  var clone = function clone(obj) {
+    return _objectSpread2({}, obj);
+  };
+  /**
+   * Return a shallow copy of object with
+   * the specified properties omitted
+   * @link https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
+   */
 
   var omit = function omit(obj, props) {
     return keys(obj).filter(function (key) {
@@ -444,6 +457,10 @@
       return _objectSpread2({}, result, _defineProperty({}, key, obj[key]));
     }, {});
   };
+  /**
+   * Convenience method to create a read-only descriptor
+   */
+
   var readonlyDescriptor = function readonlyDescriptor() {
     return {
       enumerable: true,
@@ -778,7 +795,7 @@
       variant: null
     },
     BTable: {
-      selectedVariant: 'primary',
+      selectedVariant: 'active',
       headVariant: null,
       footVariant: null
     },
@@ -2836,7 +2853,7 @@
       if (props.hasOwnProperty(prop)) {
         // If the prop value is an object, do a shallow clone to prevent
         // potential mutations to the original object.
-        copied[transformFn(prop)] = isObject(props[prop]) ? _objectSpread2({}, props[prop]) : props[prop];
+        copied[transformFn(prop)] = isObject(props[prop]) ? clone(props[prop]) : props[prop];
       }
     }
 
@@ -3416,7 +3433,7 @@
 
     el[OBSERVER_PROP_NAME] = new VisibilityObserver(el, options, vnode); // Store the current modifiers on the object (cloned)
 
-    el[OBSERVER_PROP_NAME]._prevModifiers = _objectSpread2({}, modifiers);
+    el[OBSERVER_PROP_NAME]._prevModifiers = clone(modifiers);
   }; // When the directive options may have been updated (or element)
 
 
@@ -3424,12 +3441,14 @@
     var value = _ref2.value,
         oldValue = _ref2.oldValue,
         modifiers = _ref2.modifiers;
-
     // Compare value/oldValue and modifiers to see if anything has changed
     // and if so, destroy old observer and create new observer
 
     /* istanbul ignore next */
-    if (value !== oldValue || !el[OBSERVER_PROP_NAME] || !looseEqual(modifiers, el[OBSERVER_PROP_NAME]._prevModifiers)) {
+    modifiers = clone(modifiers);
+    /* istanbul ignore next */
+
+    if (el && (value !== oldValue || !el[OBSERVER_PROP_NAME] || !looseEqual(modifiers, el[OBSERVER_PROP_NAME]._prevModifiers))) {
       // Re-bind on element
       bind(el, {
         value: value,
@@ -3457,6 +3476,14 @@
   var props$d = {
     src: {
       type: String,
+      default: null
+    },
+    srcset: {
+      type: [String, Array],
+      default: null
+    },
+    sizes: {
+      type: [String, Array],
       default: null
     },
     alt: {
@@ -3547,6 +3574,8 @@
       var height = parseInt(props.height, 10) ? parseInt(props.height, 10) : null;
       var align = null;
       var block = props.block;
+      var srcset = concat(props.srcset).filter(Boolean).join(',');
+      var sizes = concat(props.sizes).filter(Boolean).join(',');
 
       if (props.blank) {
         if (!height && Boolean(width)) {
@@ -3561,7 +3590,10 @@
         } // Make a blank SVG image
 
 
-        src = makeBlankImgSrc(width, height, props.blankColor || 'transparent');
+        src = makeBlankImgSrc(width, height, props.blankColor || 'transparent'); // Disable srcset and sizes
+
+        srcset = null;
+        sizes = null;
       }
 
       if (props.left) {
@@ -3578,7 +3610,9 @@
           src: src,
           alt: props.alt,
           width: width ? String(width) : null,
-          height: height ? String(height) : null
+          height: height ? String(height) : null,
+          srcset: srcset || null,
+          sizes: sizes || null
         },
         class: (_class = {
           'img-thumbnail': props.thumbnail,
@@ -3596,6 +3630,14 @@
       type: String,
       default: null,
       required: true
+    },
+    srcset: {
+      type: [String, Array],
+      default: null
+    },
+    sizes: {
+      type: [String, Array],
+      default: null
     },
     alt: {
       type: String,
@@ -3697,6 +3739,14 @@
       },
       computedHeight: function computedHeight() {
         return this.isShown ? this.height : this.blankHeight || this.height;
+      },
+      computedSrcset: function computedSrcset() {
+        var srcset = concat(this.srcset).filter(Boolean).join(',');
+        return !this.blankSrc || this.isShown ? srcset : null;
+      },
+      computedSizes: function computedSizes() {
+        var sizes = concat(this.sizes).filter(Boolean).join(',');
+        return !this.blankSrc || this.isShown ? sizes : null;
       }
     },
     watch: {
@@ -3760,6 +3810,8 @@
           blank: this.computedBlank,
           width: this.computedWidth,
           height: this.computedHeight,
+          srcset: this.computedSrcset || null,
+          sizes: this.computedSizes || null,
           // Passthrough props
           alt: this.alt,
           blankColor: this.blankColor,
@@ -5460,7 +5512,7 @@
 
   /**!
    * @fileOverview Kickass library to create and place poppers near their reference elements.
-   * @version 1.15.0
+   * @version 1.16.0
    * @license
    * Copyright (c) 2016 Federico Zivolo and contributors
    *
@@ -5482,16 +5534,17 @@
    * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
    * SOFTWARE.
    */
-  var isBrowser$1 = typeof window !== 'undefined' && typeof document !== 'undefined';
+  var isBrowser$1 = typeof window !== 'undefined' && typeof document !== 'undefined' && typeof navigator !== 'undefined';
 
-  var longerTimeoutBrowsers = ['Edge', 'Trident', 'Firefox'];
-  var timeoutDuration = 0;
-  for (var i = 0; i < longerTimeoutBrowsers.length; i += 1) {
-    if (isBrowser$1 && navigator.userAgent.indexOf(longerTimeoutBrowsers[i]) >= 0) {
-      timeoutDuration = 1;
-      break;
+  var timeoutDuration = function () {
+    var longerTimeoutBrowsers = ['Edge', 'Trident', 'Firefox'];
+    for (var i = 0; i < longerTimeoutBrowsers.length; i += 1) {
+      if (isBrowser$1 && navigator.userAgent.indexOf(longerTimeoutBrowsers[i]) >= 0) {
+        return 1;
+      }
     }
-  }
+    return 0;
+  }();
 
   function microtaskDebounce(fn) {
     var called = false;
@@ -5609,6 +5662,17 @@
     }
 
     return getScrollParent(getParentNode(element));
+  }
+
+  /**
+   * Returns the reference node of the reference object, or the reference object itself.
+   * @method
+   * @memberof Popper.Utils
+   * @param {Element|Object} reference - the reference element (the popper will be relative to this)
+   * @returns {Element} parent
+   */
+  function getReferenceNode(reference) {
+    return reference && reference.referenceNode ? reference.referenceNode : reference;
   }
 
   var isIE11 = isBrowser$1 && !!(window.MSInputMethodContext && document.documentMode);
@@ -5919,8 +5983,8 @@
 
     // subtract scrollbar size from sizes
     var sizes = element.nodeName === 'HTML' ? getWindowSizes(element.ownerDocument) : {};
-    var width = sizes.width || element.clientWidth || result.right - result.left;
-    var height = sizes.height || element.clientHeight || result.bottom - result.top;
+    var width = sizes.width || element.clientWidth || result.width;
+    var height = sizes.height || element.clientHeight || result.height;
 
     var horizScrollbar = element.offsetWidth - width;
     var vertScrollbar = element.offsetHeight - height;
@@ -6072,7 +6136,7 @@
     // NOTE: 1 DOM access here
 
     var boundaries = { top: 0, left: 0 };
-    var offsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, reference);
+    var offsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, getReferenceNode(reference));
 
     // Handle viewport case
     if (boundariesElement === 'viewport') {
@@ -6200,7 +6264,7 @@
   function getReferenceOffsets(state, popper, reference) {
     var fixedPosition = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-    var commonOffsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, reference);
+    var commonOffsetParent = fixedPosition ? getFixedPositionOffsetParent(popper) : findCommonOffsetParent(popper, getReferenceNode(reference));
     return getOffsetRectRelativeToArbitraryNode(reference, commonOffsetParent, fixedPosition);
   }
 
@@ -6462,7 +6526,7 @@
 
     this.disableEventListeners();
 
-    // remove the popper if user explicity asked for the deletion on destroy
+    // remove the popper if user explicitly asked for the deletion on destroy
     // do not use `remove` because IE11 doesn't support it
     if (this.options.removeOnDestroy) {
       this.popper.parentNode.removeChild(this.popper);
@@ -8126,6 +8190,112 @@
     return BvEvent;
   }(); // Named Exports
 
+  var eventOptions = {
+    passive: true,
+    capture: false
+  }; // @vue/component
+
+  var clickOutMixin = {
+    data: function data() {
+      return {
+        listenForClickOut: false
+      };
+    },
+    watch: {
+      listenForClickOut: function listenForClickOut(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          eventOff(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, eventOptions);
+
+          if (newValue) {
+            eventOn(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, eventOptions);
+          }
+        }
+      }
+    },
+    beforeCreate: function beforeCreate() {
+      // Declare non-reactive properties
+      this.clickOutElement = null;
+      this.clickOutEventName = null;
+    },
+    mounted: function mounted() {
+      if (!this.clickOutElement) {
+        this.clickOutElement = document;
+      }
+
+      if (!this.clickOutEventName) {
+        this.clickOutEventName = 'ontouchstart' in document.documentElement ? 'touchstart' : 'click';
+      }
+
+      if (this.listenForClickOut) {
+        eventOn(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, eventOptions);
+      }
+    },
+    beforeDestroy: function beforeDestroy()
+    /* istanbul ignore next */
+    {
+      eventOff(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, eventOptions);
+    },
+    methods: {
+      isClickOut: function isClickOut(evt) {
+        return !contains(this.$el, evt.target);
+      },
+      _clickOutHandler: function _clickOutHandler(evt) {
+        if (this.clickOutHandler && this.isClickOut(evt)) {
+          this.clickOutHandler(evt);
+        }
+      }
+    }
+  };
+
+  var eventOptions$1 = {
+    passive: true,
+    capture: false
+  }; // @vue/component
+
+  var focusInMixin = {
+    data: function data() {
+      return {
+        listenForFocusIn: false
+      };
+    },
+    watch: {
+      listenForFocusIn: function listenForFocusIn(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          eventOff(this.focusInElement, 'focusin', this._focusInHandler, eventOptions$1);
+
+          if (newValue) {
+            eventOn(this.focusInElement, 'focusin', this._focusInHandler, eventOptions$1);
+          }
+        }
+      }
+    },
+    beforeCreate: function beforeCreate() {
+      // Declare non-reactive properties
+      this.focusInElement = null;
+    },
+    mounted: function mounted() {
+      if (!this.focusInElement) {
+        this.focusInElement = document;
+      }
+
+      if (this.listenForFocusIn) {
+        eventOn(this.focusInElement, 'focusin', this._focusInHandler, eventOptions$1);
+      }
+    },
+    beforeDestroy: function beforeDestroy()
+    /* istanbul ignore next */
+    {
+      eventOff(this.focusInElement, 'focusin', this._focusInHandler, eventOptions$1);
+    },
+    methods: {
+      _focusInHandler: function _focusInHandler(evt) {
+        if (this.focusInHandler) {
+          this.focusInHandler(evt);
+        }
+      }
+    }
+  };
+
   var filterVisibles = function filterVisibles(els) {
     return (els || []).filter(isVisible);
   }; // Root dropdown event names
@@ -8135,7 +8305,7 @@
   var ROOT_DROPDOWN_SHOWN = "".concat(ROOT_DROPDOWN_PREFIX, "shown");
   var ROOT_DROPDOWN_HIDDEN = "".concat(ROOT_DROPDOWN_PREFIX, "hidden"); // Delay when loosing focus before closing menu (in ms)
 
-  var FOCUSOUT_DELAY = 100; // Dropdown item CSS selectors
+  var FOCUSOUT_DELAY = hasTouchSupport ? 450 : 150; // Dropdown item CSS selectors
 
   var Selector = {
     FORM_CHILD: '.dropdown form',
@@ -8164,7 +8334,7 @@
   }; // @vue/component
 
   var dropdownMixin = {
-    mixins: [idMixin],
+    mixins: [idMixin, clickOutMixin, focusInMixin],
     provide: function provide() {
       return {
         bvDropdown: this
@@ -8291,7 +8461,10 @@
     },
     created: function created() {
       // Create non-reactive property
-      this._popper = null;
+      this.$_popper = null;
+      this.$_hideTimeout = null;
+
+      this.$_noop = function () {};
     },
     deactivated: function deactivated()
     /* istanbul ignore next: not easy to test */
@@ -8299,12 +8472,13 @@
       // In case we are inside a `<keep-alive>`
       this.visible = false;
       this.whileOpenListen(false);
-      this.removePopper();
+      this.destroyPopper();
     },
     beforeDestroy: function beforeDestroy() {
       this.visible = false;
       this.whileOpenListen(false);
-      this.removePopper();
+      this.destroyPopper();
+      this.clearHideTimeout();
     },
     methods: {
       // Event emitter
@@ -8360,19 +8534,26 @@
         this.whileOpenListen(false);
         this.$root.$emit(ROOT_DROPDOWN_HIDDEN, this);
         this.$emit('hidden');
-        this.removePopper();
+        this.destroyPopper();
       },
       createPopper: function createPopper(element) {
-        this.removePopper();
-        this._popper = new Popper(element, this.$refs.menu, this.getPopperConfig());
+        this.destroyPopper();
+        this.$_popper = new Popper(element, this.$refs.menu, this.getPopperConfig());
       },
-      removePopper: function removePopper() {
-        if (this._popper) {
+      destroyPopper: function destroyPopper() {
+        if (this.$_popper) {
           // Ensure popper event listeners are removed cleanly
-          this._popper.destroy();
+          this.$_popper.destroy();
         }
 
-        this._popper = null;
+        this.$_popper = null;
+      },
+      clearHideTimeout: function clearHideTimeout() {
+        /* istanbul ignore next */
+        if (this.$_hideTimeout) {
+          clearTimeout(this.$_hideTimeout);
+          this.$_hideTimeout = null;
+        }
       },
       getPopperConfig: function getPopperConfig() {
         var placement = AttachmentMap.BOTTOM;
@@ -8407,21 +8588,15 @@
 
         return _objectSpread2({}, popperConfig, {}, this.popperOpts || {});
       },
+      // Turn listeners on/off while open
       whileOpenListen: function whileOpenListen(isOpen) {
-        // turn listeners on/off while open
-        if (isOpen) {
-          // If another dropdown is opened
-          this.$root.$on(ROOT_DROPDOWN_SHOWN, this.rootCloseListener); // Hide the menu when focus moves out
+        // Hide the dropdown when clicked outside
+        this.listenForClickOut = isOpen; // Hide the dropdown when it loses focus
 
-          eventOn(this.$el, 'focusout', this.onFocusOut, {
-            passive: true
-          });
-        } else {
-          this.$root.$off(ROOT_DROPDOWN_SHOWN, this.rootCloseListener);
-          eventOff(this.$el, 'focusout', this.onFocusOut, {
-            passive: true
-          });
-        }
+        this.listenForFocusIn = isOpen; // Hide the dropdown when another dropdown is opened
+
+        var method = isOpen ? '$on' : '$off';
+        this.$root[method](ROOT_DROPDOWN_SHOWN, this.rootCloseListener);
       },
       rootCloseListener: function rootCloseListener(vm) {
         if (vm !== this) {
@@ -8523,16 +8698,16 @@
           this.$once('hidden', this.focusToggler);
         }
       },
-      // Dropdown wrapper focusOut handler
-      onFocusOut: function onFocusOut(evt) {
+      // Document click out listener
+      clickOutHandler: function clickOutHandler(evt) {
         var _this3 = this;
 
-        // `relatedTarget` is the element gaining focus
-        var relatedTarget = evt.relatedTarget; // If focus moves outside the menu or toggler, then close menu
+        var target = evt.target;
 
-        if (this.visible && !contains(this.$refs.menu, relatedTarget) && !contains(this.toggler, relatedTarget)) {
+        if (this.visible && !contains(this.$refs.menu, target) && !contains(this.toggler, target)) {
           var doHide = function doHide() {
             _this3.visible = false;
+            return null;
           }; // When we are in a navbar (which has been responsively stacked), we
           // delay the dropdown's closing so that the next element has a chance
           // to have it's click handler fired (in case it's position moves on
@@ -8540,8 +8715,14 @@
           // https://github.com/bootstrap-vue/bootstrap-vue/issues/4113
 
 
-          this.inNavbar ? setTimeout(doHide, FOCUSOUT_DELAY) : doHide();
+          this.clearHideTimeout();
+          this.$_hideTimeout = this.inNavbar ? setTimeout(doHide, FOCUSOUT_DELAY) : doHide();
         }
+      },
+      // Document focusin listener
+      focusInHandler: function focusInHandler(evt) {
+        // Shared logic with click-out handler
+        this.clickOutHandler(evt);
       },
       // Keyboard nav
       focusNext: function focusNext(evt, up) {
@@ -8630,6 +8811,10 @@
         return getComponentConfig(NAME$9, 'variant');
       }
     },
+    block: {
+      type: Boolean,
+      default: false
+    },
     menuClass: {
       type: [String, Array],
       default: null
@@ -8693,9 +8878,16 @@
       dropdownClasses: function dropdownClasses() {
         return [this.directionClass, {
           show: this.visible,
-          // Position `static` is needed to allow menu to "breakout" of the scrollParent boundaries
-          // when boundary is anything other than `scrollParent`
-          // See https://github.com/twbs/bootstrap/issues/24251#issuecomment-341413786
+          // The 'btn-group' class is required in `split` mode for button alignment
+          // It needs also to be applied when `block` is disabled to allow multiple
+          // dropdowns to be aligned one line
+          'btn-group': this.split || !this.block,
+          // When `block` is enabled and we are in `split` mode the 'd-flex' class
+          // needs to be applied to allow the buttons to stretch to full width
+          'd-flex': this.block && this.split,
+          // Position `static` is needed to allow menu to "breakout" of the `scrollParent`
+          // boundaries when boundary is anything other than `scrollParent`
+          // See: https://github.com/twbs/bootstrap/issues/24251#issuecomment-341413786
           'position-static': this.boundary !== 'scrollParent' || !this.boundary
         }];
       },
@@ -8718,9 +8910,10 @@
 
       if (this.split) {
         var btnProps = {
-          disabled: this.disabled,
           variant: this.splitVariant || this.variant,
-          size: this.size
+          size: this.size,
+          block: this.block,
+          disabled: this.disabled
         }; // We add these as needed due to router-link issues with defined property with undefined/null values
 
         if (this.splitTo) {
@@ -8748,10 +8941,11 @@
         staticClass: 'dropdown-toggle',
         class: this.toggleClasses,
         props: {
+          tag: this.toggleTag,
           variant: this.variant,
           size: this.size,
-          disabled: this.disabled,
-          tag: this.toggleTag
+          block: this.block && !this.split,
+          disabled: this.disabled
         },
         attrs: {
           id: this.safeId('_BV_toggle_'),
@@ -8784,7 +8978,7 @@
         hide: this.hide
       }) : [h()]);
       return h('div', {
-        staticClass: 'dropdown btn-group b-dropdown',
+        staticClass: 'dropdown b-dropdown',
         class: this.dropdownClasses,
         attrs: {
           id: this.safeId()
@@ -9998,7 +10192,7 @@
 
           propVal = propVal === '' ? true : propVal || false;
 
-          if (!isBoolean(propVal)) {
+          if (!isBoolean(propVal) && propVal !== 'auto') {
             // Convert to column size to number
             propVal = parseInt(propVal, 10) || 0; // Ensure column size is greater than 0
 
@@ -10925,6 +11119,10 @@
         type: Function,
         default: null
       },
+      lazyFormatter: {
+        type: Boolean,
+        default: false
+      },
       trim: {
         type: Boolean,
         default: false
@@ -10933,35 +11131,47 @@
         type: Boolean,
         default: false
       },
-      lazyFormatter: {
+      lazy: {
+        // Only update the `v-model` on blur/change events
         type: Boolean,
-        value: false
+        default: false
+      },
+      debounce: {
+        // Debounce timout (in ms). Not applicable with `lazy` prop
+        type: [Number, String],
+        default: 0
       }
     },
     data: function data() {
       return {
-        localValue: this.stringifyValue(this.value)
+        localValue: this.stringifyValue(this.value),
+        vModelValue: this.value
       };
     },
     computed: {
+      computedDebounce: function computedDebounce() {
+        // Ensure we have a positive number equal to or greater than 0
+        return Math.max(parseInt(this.debounce, 10) || 0, 0);
+      },
       computedClass: function computedClass() {
         return [{
-          // Range input needs class custom-range
+          // Range input needs class `custom-range`
           'custom-range': this.type === 'range',
-          // plaintext not supported by type=range or type=color
+          // `plaintext` not supported by `type="range"` or `type="color"`
           'form-control-plaintext': this.plaintext && this.type !== 'range' && this.type !== 'color',
-          // form-control not used by type=range or plaintext. Always used by type=color
+          // `form-control` not used by `type="range"` or `plaintext`
+          // Always used by `type="color"`
           'form-control': !this.plaintext && this.type !== 'range' || this.type === 'color'
         }, this.sizeFormClass, this.stateClass];
       },
       computedAriaInvalid: function computedAriaInvalid() {
         if (!this.ariaInvalid || this.ariaInvalid === 'false') {
-          // this.ariaInvalid is null or false or 'false'
+          // `this.ariaInvalid` is `null` or `false` or 'false'
           return this.computedState === false ? 'true' : null;
         }
 
         if (this.ariaInvalid === true) {
-          // User wants explicit aria-invalid=true
+          // User wants explicit `:aria-invalid="true"`
           return 'true';
         } // Most likely a string value (which could be the string 'true')
 
@@ -10971,24 +11181,40 @@
     },
     watch: {
       value: function value(newVal) {
-        if (newVal !== this.localValue) {
-          this.localValue = this.stringifyValue(newVal);
+        var stringifyValue = this.stringifyValue(newVal);
+
+        if (stringifyValue !== this.localValue && newVal !== this.vModelValue) {
+          // Clear any pending debounce timeout, as we are overwriting the user input
+          this.clearDebounce(); // Update the local values
+
+          this.localValue = stringifyValue;
+          this.vModelValue = newVal;
         }
       }
     },
     mounted: function mounted() {
-      var value = this.stringifyValue(this.value);
+      // Create non-reactive property and set up destroy handler
+      this.$_inputDebounceTimer = null;
+      this.$on('hook:beforeDestroy', this.clearDebounce); // Preset the internal state
 
-      if (value !== this.localValue) {
-        /* istanbul ignore next */
-        this.localValue = value;
+      var value = this.value;
+      var stringifyValue = this.stringifyValue(value);
+      /* istanbul ignore next */
+
+      if (stringifyValue !== this.localValue && value !== this.vModelValue) {
+        this.localValue = stringifyValue;
+        this.vModelValue = value;
       }
     },
     methods: {
-      stringifyValue: function stringifyValue(value) {
-        return isUndefined(value) || isNull(value) ? '' : String(value);
+      clearDebounce: function clearDebounce() {
+        clearTimeout(this.$_inputDebounceTimer);
+        this.$_inputDebounceTimer = null;
       },
-      getFormatted: function getFormatted(value, evt) {
+      stringifyValue: function stringifyValue(value) {
+        return isUndefinedOrNull(value) ? '' : String(value);
+      },
+      formatValue: function formatValue(value, evt) {
         var force = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
         value = this.stringifyValue(value);
 
@@ -10998,34 +11224,49 @@
 
         return value;
       },
+      modifyValue: function modifyValue(value) {
+        // Emulate `.trim` modifier behaviour
+        if (this.trim) {
+          value = value.trim();
+        } // Emulate `.number` modifier behaviour
+
+
+        if (this.number) {
+          var number = parseFloat(value);
+          value = isNaN(number) ? value : number;
+        }
+
+        return value;
+      },
       updateValue: function updateValue(value) {
-        value = this.stringifyValue(value);
+        var _this = this;
 
-        if (value !== this.localValue) {
-          // Keep the input set to the value before modifiers
-          this.localValue = value;
+        var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var lazy = this.lazy;
+        var ms = this.computedDebounce;
 
-          if (this.number) {
-            // Emulate `.number` modifier behaviour
-            var num = parseFloat(value);
-            value = isNaN(num) ? value : num;
-          } else if (this.trim) {
-            // Emulate `.trim` modifier behaviour
-            value = value.trim();
-          } // Update the v-model
+        if (lazy && !force) {
+          return;
+        }
 
+        value = this.modifyValue(value);
 
-          this.$emit('update', value);
-        } else if (this.$refs.input && value !== this.$refs.input.value) {
-          // When the `localValue` hasn't changed but the actual input value
-          // is out of sync, make sure to change it to the given one.
-          // Usually casued by browser autocomplete and how it triggers the
-          // change or input event, or depending on the formatter function.
-          // https://github.com/bootstrap-vue/bootstrap-vue/issues/2657
-          // https://github.com/bootstrap-vue/bootstrap-vue/issues/3498
+        if (value !== this.vModelValue) {
+          this.clearDebounce();
 
-          /* istanbul ignore next: hard to test */
-          this.$refs.input.value = value;
+          var doUpdate = function doUpdate() {
+            _this.vModelValue = value;
+
+            _this.$emit('update', value);
+          };
+
+          if (ms > 0 && !lazy && !force) {
+            // Change/Blur/Force will not be debounced
+            this.$_inputDebounceTimer = setTimeout(doUpdate, ms);
+          } else {
+            // Immediately update the v-model
+            doUpdate();
+          }
         }
       },
       onInput: function onInput(evt) {
@@ -11037,17 +11278,20 @@
           return;
         }
 
-        var formatted = this.getFormatted(evt.target.value, evt); // Exit when the `formatter` function strictly returned `false`
+        var value = evt.target.value;
+        var formattedValue = this.formatValue(value, evt); // Exit when the `formatter` function strictly returned `false`
         // or prevented the input event
 
-        if (formatted === false || evt.defaultPrevented) {
-          /* istanbul ignore next */
+        /* istanbul ignore next */
+
+        if (formattedValue === false || evt.defaultPrevented) {
           evt.preventDefault();
           return;
         }
 
-        this.updateValue(formatted);
-        this.$emit('input', formatted);
+        this.localValue = formattedValue;
+        this.updateValue(formattedValue);
+        this.$emit('input', formattedValue);
       },
       onChange: function onChange(evt) {
         // `evt.target.composing` is set by Vue
@@ -11058,28 +11302,34 @@
           return;
         }
 
-        var formatted = this.getFormatted(evt.target.value, evt); // Exit when the `formatter` function strictly returned `false`
+        var value = evt.target.value;
+        var formattedValue = this.formatValue(value, evt); // Exit when the `formatter` function strictly returned `false`
         // or prevented the input event
 
-        if (formatted === false || evt.defaultPrevented) {
-          /* istanbul ignore next */
+        /* istanbul ignore next */
+
+        if (formattedValue === false || evt.defaultPrevented) {
           evt.preventDefault();
           return;
         }
 
-        this.updateValue(formatted);
-        this.$emit('change', formatted);
+        this.localValue = formattedValue;
+        this.updateValue(formattedValue, true);
+        this.$emit('change', formattedValue);
       },
       onBlur: function onBlur(evt) {
-        // Lazy formatter
-        if (this.lazyFormatter) {
-          var formatted = this.getFormatted(evt.target.value, evt, true); // Exit when the `formatter` function strictly returned `false`
+        // Apply the `localValue` on blur to prevent cursor jumps
+        // on mobile browsers (e.g. caused by autocomplete)
+        var value = evt.target.value;
+        var formattedValue = this.formatValue(value, evt, true);
 
-          if (formatted === false) {
-            return;
-          }
+        if (formattedValue !== false) {
+          // We need to use the modified value here to apply the
+          // `.trim` and `.number` modifiers properly
+          this.localValue = this.stringifyValue(this.modifyValue(formattedValue)); // We pass the formatted value here since the `updateValue` method
+          // handles the modifiers itself
 
-          this.updateValue(formatted);
+          this.updateValue(formattedValue, true);
         } // Emit native blur event
 
 
@@ -14300,15 +14550,23 @@
   };
 
   var getTriggerElement = function getTriggerElement(el) {
-    // If root element is a dropdown item or nav item, we
+    // If root element is a dropdown-item or nav-item, we
     // need to target the inner link or button instead
     return el && matches(el, '.dropdown-menu > li, li.nav-item') ? select('a, button', el) || el : el;
   };
 
   var setRole = function setRole(trigger) {
-    // Only set a role if the trigger element doesn't have one
-    if (trigger && trigger.tagName !== 'BUTTON' && !hasAttr(trigger, 'role')) {
-      setAttr(trigger, 'role', 'button');
+    // Ensure accessibility on non button elements
+    if (trigger && trigger.tagName !== 'BUTTON') {
+      // Only set a role if the trigger element doesn't have one
+      if (!hasAttr(trigger, 'role')) {
+        setAttr(trigger, 'role', 'button');
+      } // Add a tabindex is not a button or link, and tabindex is not provided
+
+
+      if (trigger.tagName !== 'A' && !hasAttr(trigger, 'tabindex')) {
+        setAttr(trigger, 'tabindex', '0');
+      }
     }
   };
 
@@ -14322,9 +14580,10 @@
         var currentTarget = evt.currentTarget;
 
         if (!isDisabled(currentTarget)) {
-          var type = evt.type; // Open modal only if trigger is not disabled
+          var type = evt.type;
+          var key = evt.keyCode; // Open modal only if trigger is not disabled
 
-          if (type === 'click' || type === 'keydown' && evt.keyCode === 32) {
+          if (type === 'click' || type === 'keydown' && (key === KEY_CODES.ENTER || key === KEY_CODES.SPACE)) {
             vnode.context.$root.$emit(EVENT_SHOW, target, currentTarget);
           }
         }
@@ -14338,7 +14597,7 @@
 
       if (trigger.tagName !== 'BUTTON' && getAttr(trigger, 'role') === 'button') {
         // If trigger isn't a button but has role button,
-        // we also listen for `keydown.space`
+        // we also listen for `keydown.space` && `keydown.enter`
         eventOn(trigger, 'keydown', handler, EVENT_OPTS);
       }
     }
@@ -14786,12 +15045,7 @@
     }
   });
 
-  var props$K = {
-    tag: {
-      type: String,
-      default: 'span'
-    }
-  }; // @vue/component
+  var props$K = {}; // @vue/component
 
   var BNavText =
   /*#__PURE__*/
@@ -14803,13 +15057,18 @@
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      return h(props.tag, a(data, {
+      return h('li', a(data, {
         staticClass: 'navbar-text'
       }), children);
     }
   });
 
-  var props$L = omit(props$o, ['inline']); // @vue/component
+  var props$L = _objectSpread2({}, omit(props$o, ['inline']), {
+    formClass: {
+      type: [String, Array, Object],
+      default: null
+    }
+  }); // @vue/component
 
   var BNavForm =
   /*#__PURE__*/
@@ -14820,12 +15079,25 @@
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
-          children = _ref.children;
-      return h(BForm, a(data, {
+          children = _ref.children,
+          _ref$listeners = _ref.listeners,
+          listeners = _ref$listeners === void 0 ? {} : _ref$listeners;
+      var attrs = data.attrs; // The following data properties are cleared out
+      // as they will be passed to BForm directly
+
+      data.attrs = {};
+      data.on = {};
+      var $form = h(BForm, {
+        class: props.formClass,
         props: _objectSpread2({}, props, {
           inline: true
-        })
-      }), children);
+        }),
+        attrs: attrs,
+        on: listeners
+      }, children);
+      return h('li', a(data, {
+        staticClass: 'form-inline'
+      }), [$form]);
     }
   });
 
@@ -15228,6 +15500,10 @@
       type: String,
       default: 'left'
     },
+    pills: {
+      type: Boolean,
+      default: false
+    },
     hideGotoEndButtons: {
       type: Boolean,
       default: false
@@ -15321,6 +15597,9 @@
         }
 
         return '';
+      },
+      styleClass: function styleClass() {
+        return this.pills ? 'b-pagination-pills' : '';
       },
       computedCurrentPage: function computedCurrentPage() {
         return sanitizeCurrentPage(this.currentPage, this.localNumberOfPages);
@@ -15451,6 +15730,18 @@
       });
     },
     methods: {
+      handleKeyNav: function handleKeyNav(evt) {
+        var keyCode = evt.keyCode;
+        var shift = evt.shiftKey;
+
+        if (keyCode === KEY_CODES.LEFT || keyCode === KEY_CODES.UP) {
+          evt.preventDefault();
+          shift ? this.focusFirst() : this.focusPrev();
+        } else if (keyCode === KEY_CODES.RIGHT || keyCode === KEY_CODES.DOWN) {
+          evt.preventDefault();
+          shift ? this.focusLast() : this.focusNext();
+        }
+      },
       getButtons: function getButtons() {
         // Return only buttons that are visible
         return selectAll('a.page-link', this.$el).filter(function (btn) {
@@ -15671,25 +15962,14 @@
       var pagination = h('ul', {
         ref: 'ul',
         staticClass: 'pagination',
-        class: ['b-pagination', this.btnSize, this.alignment],
+        class: ['b-pagination', this.btnSize, this.alignment, this.styleClass],
         attrs: {
           role: 'menubar',
           'aria-disabled': disabled ? 'true' : 'false',
           'aria-label': this.ariaLabel || null
         },
         on: {
-          keydown: function keydown(evt) {
-            var keyCode = evt.keyCode;
-            var shift = evt.shiftKey;
-
-            if (keyCode === KEY_CODES.LEFT) {
-              evt.preventDefault();
-              shift ? _this7.focusFirst() : _this7.focusPrev();
-            } else if (keyCode === KEY_CODES.RIGHT) {
-              evt.preventDefault();
-              shift ? _this7.focusLast() : _this7.focusNext();
-            }
-          }
+          keydown: this.handleKeyNav
         }
       }, buttons); // if we are pagination-nav, wrap in '<nav>' wrapper
 
@@ -18156,11 +18436,11 @@
         var data = {};
 
         if (isFunction(config.title)) {
-          data.title = config.title();
+          data.title = config.title(el);
         }
 
         if (isFunction(config.content)) {
-          data.content = config.content();
+          data.content = config.content(el);
         }
 
         if (keys(data).length > 0) {
@@ -18198,7 +18478,7 @@
         // We only pass data properties that have changed
         if (data[prop] !== oldData[prop]) {
           // If title/content is a function, we execute it here
-          newData[prop] = (prop === 'title' || prop === 'content') && isFunction(data[prop]) ? data[prop]() : data[prop];
+          newData[prop] = (prop === 'title' || prop === 'content') && isFunction(data[prop]) ? data[prop](el) : data[prop];
         }
       });
       el[BV_POPOVER].updateData(newData);
@@ -18607,7 +18887,7 @@
         formatter: value
       };
     } else if (isObject(value)) {
-      field = _objectSpread2({}, value);
+      field = clone(value);
       field.key = field.key || key;
     } else if (value !== false) {
       // Fallback to just key
@@ -18638,7 +18918,7 @@
           });
         } else if (isObject(f) && f.key && isString(f.key)) {
           // Full object definition. We use assign so that we don't mutate the original
-          fields.push(_objectSpread2({}, f));
+          fields.push(clone(f));
         } else if (isObject(f) && keys(f).length === 1) {
           // Shortcut object (i.e. { 'foo_bar': 'This is Foo Bar' }
           var key = keys(f)[0];
@@ -18727,7 +19007,7 @@
         var parent = this.$parent;
         return this.computedFields.reduce(function (obj, f) {
           // We use object spread here so we don't mutate the original field object
-          obj[f.key] = _objectSpread2({}, f);
+          obj[f.key] = clone(f);
 
           if (f.formatter) {
             // Normalize formatter to a function ref or `undefined`
@@ -18883,6 +19163,7 @@
     return isObject(row) ? stringifyObjectValues(sanitizeRow(row, ignoreFields, includeFields, fieldsObj)) : '';
   };
 
+  var DEPRECATED_DEBOUNCE = 'b-table: Prop "filter-debounce" is deprecated. Use the debounce feature of <b-form-input> instead';
   var filteringMixin = {
     props: {
       filter: {
@@ -18903,6 +19184,7 @@
       },
       filterDebounce: {
         type: [Number, String],
+        deprecated: DEPRECATED_DEBOUNCE,
         default: 0,
         validator: function validator(val) {
           return /^\d+/.test(String(val));
@@ -18926,7 +19208,14 @@
         return this.filterIncludedFields ? concat(this.filterIncludedFields).filter(Boolean) : null;
       },
       computedFilterDebounce: function computedFilterDebounce() {
-        return parseInt(this.filterDebounce, 10) || 0;
+        var ms = parseInt(this.filterDebounce, 10) || 0;
+        /* istanbul ignore next */
+
+        if (ms > 0) {
+          warn(DEPRECATED_DEBOUNCE);
+        }
+
+        return ms;
       },
       localFiltering: function localFiltering() {
         return this.hasProvider ? !!this.noProviderFiltering : true;
@@ -19702,6 +19991,12 @@
         // Sticky headers only apply to cells in table `thead`
         return !this.isStacked && this.bvTable.stickyHeader;
       },
+      hasStickyHeader: function hasStickyHeader() {
+        // Sniffed by <b-tr> / <b-td> / <b-th>
+        // Needed to handle header background classes, due to lack of
+        // background color inheritance with Bootstrap v4 table CSS
+        return !this.isStacked && this.bvTable.stickyHeader;
+      },
       tableVariant: function tableVariant() {
         // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.tableVariant;
@@ -19779,6 +20074,12 @@
         // Sticky headers are only supported in thead
         return false;
       },
+      hasStickyHeader: function hasStickyHeader() {
+        // Sniffed by <b-tr> / <b-td> / <b-th>
+        // Needed to handle header background classes, due to lack of
+        // background color inheritance with Bootstrap v4 table CSS
+        return !this.isStacked && this.bvTable.stickyHeader;
+      },
       tableVariant: function tableVariant()
       /* istanbul ignore next: Not currently sniffed in tests */
       {
@@ -19809,7 +20110,9 @@
       type: String,
       default: null
     }
-  }; // @vue/component
+  };
+  var LIGHT = 'light';
+  var DARK = 'dark'; // @vue/component
 
   var BTr =
   /*#__PURE__*/
@@ -19862,16 +20165,29 @@
         // Sticky headers are only supported in thead
         return this.bvTableRowGroup.isStickyHeader;
       },
+      hasStickyHeader: function hasStickyHeader() {
+        // Sniffed by <b-tr> / <b-td> / <b-th>
+        // Needed to handle header background classes, due to lack of
+        // background color inheritance with Bootstrap v4 table CSS
+        return !this.isStacked && this.bvTableRowGroup.hasStickyHeader;
+      },
       tableVariant: function tableVariant() {
         // Sniffed by <b-td> / <b-th>
         return this.bvTableRowGroup.tableVariant;
       },
       headVariant: function headVariant() {
         // Sniffed by <b-td> / <b-th>
-        return this.bvTableRowGroup.headVariant;
+        return this.inThead ? this.bvTableRowGroup.headVariant : null;
+      },
+      footVariant: function footVariant() {
+        // Sniffed by <b-td> / <b-th>
+        return this.inTfoot ? this.bvTableRowGroup.footVariant : null;
+      },
+      isRowDark: function isRowDark() {
+        return this.headVariant === LIGHT || this.footVariant === LIGHT ? false : this.headVariant === DARK || this.footVariant === DARK ? true : this.isDark;
       },
       trClasses: function trClasses() {
-        return [this.variant ? "".concat(this.isDark ? 'bg' : 'table', "-").concat(this.variant) : null];
+        return [this.variant ? "".concat(this.isRowDark ? 'bg' : 'table', "-").concat(this.variant) : null];
       },
       trAttrs: function trAttrs() {
         return _objectSpread2({
@@ -19976,13 +20292,18 @@
         // Sticky headers only apply to cells in table `thead`
         return this.bvTableTr.isStickyHeader;
       },
-      isStickyColumn: function isStickyColumn() {
+      hasStickyHeader: function hasStickyHeader() {
         // Needed to handle header background classes, due to lack of
+        // background color inheritance with Bootstrap v4 table CSS
+        return this.bvTableTr.hasStickyHeader;
+      },
+      isStickyColumn: function isStickyColumn() {
+        // Needed to handle background classes, due to lack of
         // background color inheritance with Bootstrap v4 table CSS
         // Sticky column cells are only available in responsive
         // mode (horizontal scrolling) or when sticky header mode
         // Applies to cells in `thead`, `tbody` and `tfoot`
-        return !this.isStacked && (this.isResponsive || this.isStickyHeader) && this.stickyColumn;
+        return !this.isStacked && (this.isResponsive || this.hasStickyHeader) && this.stickyColumn;
       },
       rowVariant: function rowVariant() {
         return this.bvTableTr.variant;
@@ -20079,10 +20400,15 @@
     props: {
       headVariant: {
         type: String,
-        // 'light', 'dark' or null (or custom)
+        // 'light', 'dark' or `null` (or custom)
         default: function _default() {
           return getComponentConfig('BTable', 'headVariant');
         }
+      },
+      headRowVariant: {
+        type: String,
+        // Any Bootstrap theme variant (or custom)
+        default: null
       },
       theadClass: {
         type: [String, Array, Object] // default: undefined
@@ -20124,10 +20450,10 @@
         var fields = this.computedFields || [];
 
         if (this.isStackedAlways || fields.length === 0) {
-          // In always stacked mode, we don't bother rendering the head/foot.
+          // In always stacked mode, we don't bother rendering the head/foot
           // Or if no field headings (empty table)
           return h();
-        } // Refernce to `selectAllRows` and `clearSelected()`, if table is Selectable
+        } // Reference to `selectAllRows` and `clearSelected()`, if table is selectable
 
 
         var selectAllRows = this.isSelectable ? this.selectAllRows : function () {};
@@ -20222,8 +20548,12 @@
         var $trs = [];
 
         if (isFoot) {
+          var trProps = {
+            variant: isUndefinedOrNull(this.footRowVariant) ? this.headRowVariant : this.footRowVariant
+          };
           $trs.push(h(BTr, {
-            class: this.tfootTrClass
+            class: this.tfootTrClass,
+            props: trProps
           }, $cells));
         } else {
           var scope = {
@@ -20235,7 +20565,10 @@
           };
           $trs.push(this.normalizeSlot('thead-top', scope) || h());
           $trs.push(h(BTr, {
-            class: this.theadTrClass
+            class: this.theadTrClass,
+            props: {
+              variant: this.headRowVariant
+            }
           }, $cells));
         }
 
@@ -20260,9 +20593,15 @@
       },
       footVariant: {
         type: String,
+        // 'dark', 'light', or `null` (or custom)
         default: function _default() {
           return getComponentConfig('BTable', 'footVariant');
         }
+      },
+      footRowVariant: {
+        type: String,
+        // Any Bootstrap theme variant (or custom). Falls back to `headRowVariant`
+        default: null
       },
       tfootClass: {
         type: [String, Array, Object],
@@ -20355,6 +20694,12 @@
         // Sticky headers are only supported in thead
         return false;
       },
+      hasStickyHeader: function hasStickyHeader() {
+        // Sniffed by <b-tr> / <b-td> / <b-th>
+        // Needed to handle header background classes, due to lack of
+        // background color inheritance with Bootstrap v4 table CSS
+        return !this.isStacked && this.bvTable.stickyHeader;
+      },
       tableVariant: function tableVariant()
       /* istanbul ignore next: Not currently sniffed in tests */
       {
@@ -20373,19 +20718,25 @@
         return this.tbodyTransitionProps ? _objectSpread2({}, this.tbodyTransitionProps, {
           tag: 'tbody'
         }) : {};
-      },
-      tbodyListeners: function tbodyListeners() {
-        var handlers = this.tbodyTransitionHandlers || {};
-        return _objectSpread2({}, this.$listeners, {}, handlers);
       }
     },
     render: function render(h) {
-      return h(this.isTransitionGroup ? 'transition-group' : 'tbody', {
+      var data = {
         props: this.tbodyProps,
-        attrs: this.tbodyAttrs,
-        // Pass down any listeners
-        on: this.tbodyListeners
-      }, this.normalizeSlot('default', {}));
+        attrs: this.tbodyAttrs
+      };
+
+      if (this.isTransitionGroup) {
+        // We use native listeners if a transition group
+        // for any delegated events
+        data.on = this.tbodyTransitionHandlers || {};
+        data.nativeOn = this.$listeners || {};
+      } else {
+        // Otherwise we place any listeners on the tbody element
+        data.on = this.$listeners || {};
+      }
+
+      return h(this.isTransitionGroup ? 'transition-group' : 'tbody', data, this.normalizeSlot('default', {}));
     }
   });
 
@@ -20393,7 +20744,11 @@
   var tbodyRowMixin = {
     props: {
       tbodyTrClass: {
-        type: [String, Array, Function],
+        type: [String, Array, Object, Function],
+        default: null
+      },
+      detailsTdClass: {
+        type: [String, Array, Object],
         default: null
       }
     },
@@ -20475,15 +20830,18 @@
       },
       // Render helpers
       renderTbodyRowCell: function renderTbodyRowCell(field, colIndex, item, rowIndex) {
+        var _this2 = this;
+
         // Renders a TD or TH for a row's field
         var h = this.$createElement;
         var hasDetailsSlot = this.hasNormalizedSlot(detailsSlotName);
         var formatted = this.getFormattedValue(item, field);
-        var key = field.key; // We only uses the helper components for sticky columns to
+        var key = field.key;
+        var stickyColumn = !this.isStacked && (this.isResponsive || this.stickyHeader) && field.stickyColumn; // We only uses the helper components for sticky columns to
         // improve performance of BTable/BTableLite by reducing the
         // total number of vue instances created during render
 
-        var cellTag = field.stickyColumn ? field.isRowHeader ? BTh : BTd : field.isRowHeader ? 'th' : 'td';
+        var cellTag = stickyColumn ? field.isRowHeader ? BTh : BTd : field.isRowHeader ? 'th' : 'td';
         var cellVariant = item._cellVariants && item._cellVariants[key] ? item._cellVariants[key] : field.variant || null;
         var data = {
           // For the Vue key, we concatenate the column index and
@@ -20498,11 +20856,11 @@
           }, field.isRowHeader ? this.getThValues(item, key, field.thAttr, 'row', {}) : this.getTdValues(item, key, field.tdAttr, {}))
         };
 
-        if (field.stickyColumn) {
+        if (stickyColumn) {
           // We are using the helper BTd or BTh
           data.props = {
             stackedHeading: this.isStacked ? field.label : null,
-            stickyColumn: field.stickyColumn,
+            stickyColumn: true,
             variant: cellVariant
           };
         } else {
@@ -20525,11 +20883,19 @@
           value: formatted,
           toggleDetails: this.toggleDetailsFactory(hasDetailsSlot, item),
           detailsShowing: Boolean(item._showDetails)
-        };
+        }; // If table supports selectable mode, then add in the following scope
+        // this.supportsSelectableRows will be undefined if mixin isn't loaded
 
-        if (this.selectedRows) {
-          // Add in rowSelected scope property if selectable rows supported
+        if (this.supportsSelectableRows) {
           slotScope.rowSelected = this.isRowSelected(rowIndex);
+
+          slotScope.selectRow = function () {
+            return _this2.selectRow(rowIndex);
+          };
+
+          slotScope.unselectRow = function () {
+            return _this2.unselectRow(rowIndex);
+          };
         } // The new `v-slot` syntax doesn't like a slot name starting with
         // a square bracket and if using in-document HTML templates, the
         // v-slot attributes are lower-cased by the browser.
@@ -20552,7 +20918,7 @@
         return h(cellTag, data, [$childNodes]);
       },
       renderTbodyRow: function renderTbodyRow(item, rowIndex) {
-        var _this2 = this;
+        var _this3 = this;
 
         // Renders an item's row (or rows if details supported)
         var h = this.$createElement;
@@ -20560,7 +20926,7 @@
         var tableStriped = this.striped;
         var hasDetailsSlot = this.hasNormalizedSlot(detailsSlotName);
         var rowShowDetails = Boolean(item._showDetails && hasDetailsSlot);
-        var hasRowClickHandler = this.$listeners['row-clicked'] || this.isSelectable; // We can return more than one TR if rowDetails enabled
+        var hasRowClickHandler = this.$listeners['row-clicked'] || this.hasSelectableRowClick; // We can return more than one TR if rowDetails enabled
 
         var $rows = []; // Details ID needed for `aria-details` when details showing
         // We set it to `null` when not showing so that attribute
@@ -20569,7 +20935,7 @@
         var detailsId = rowShowDetails ? this.safeId("_details_".concat(rowIndex, "_")) : null; // For each item data field in row
 
         var $tds = fields.map(function (field, colIndex) {
-          return _this2.renderTbodyRowCell(field, colIndex, item, rowIndex);
+          return _this3.renderTbodyRowCell(field, colIndex, item, rowIndex);
         }); // Calculate the row number in the dataset (indexed from 1)
 
         var ariaRowIndex = null;
@@ -20583,11 +20949,11 @@
 
 
         var primaryKey = this.primaryKey;
-        var hasPkValue = primaryKey && !isUndefinedOrNull(item[primaryKey]);
-        var rowKey = hasPkValue ? toString$1(item[primaryKey]) : String(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
+        var primaryKeyValue = toString$1(get(item, primaryKey)) || null;
+        var rowKey = primaryKeyValue || String(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
         // In the format of '{tableId}__row_{primaryKeyValue}'
 
-        var rowId = hasPkValue ? this.safeId("_row_".concat(item[primaryKey])) : null; // Selectable classes and attributes
+        var rowId = primaryKeyValue ? this.safeId("_row_".concat(primaryKeyValue)) : null; // Selectable classes and attributes
 
         var selectableClasses = this.selectableRowClasses ? this.selectableRowClasses(rowIndex) : {};
         var selectableAttrs = this.selectableRowAttrs ? this.selectableRowAttrs(rowIndex) : {}; // Add the item row
@@ -20603,8 +20969,7 @@
           attrs: _objectSpread2({
             id: rowId,
             tabindex: hasRowClickHandler ? '0' : null,
-            'data-pk': rowId ? String(item[primaryKey]) : null,
-            // Should this be `aria-details` instead?
+            'data-pk': primaryKeyValue || null,
             'aria-details': detailsId,
             'aria-owns': detailsId,
             'aria-rowindex': ariaRowIndex
@@ -20622,16 +20987,32 @@
             index: rowIndex,
             fields: fields,
             toggleDetails: this.toggleDetailsFactory(hasDetailsSlot, item)
-          }; // Render the details slot in a TD
+          }; // If table supports selectable mode, then add in the following scope
+          // this.supportsSelectableRows will be undefined if mixin isn't loaded
+
+          if (this.supportsSelectableRows) {
+            detailsScope.rowSelected = this.isRowSelected(rowIndex);
+
+            detailsScope.selectRow = function () {
+              return _this3.selectRow(rowIndex);
+            };
+
+            detailsScope.unselectRow = function () {
+              return _this3.unselectRow(rowIndex);
+            };
+          } // Render the details slot in a TD
+
 
           var $details = h(BTd, {
             props: {
               colspan: fields.length
-            }
+            },
+            class: this.detailsTdClass
           }, [this.normalizeSlot(detailsSlotName, detailsScope)]); // Add a hidden row to keep table row striping consistent when details showing
+          // Only added if the table is striped
 
           if (tableStriped) {
-            $rows.push( // We don't use `BTr` here as we dont need the extra functionality
+            $rows.push( // We don't use `BTr` here as we don't need the extra functionality
             h('tr', {
               key: "__b-table-details-stripe__".concat(rowKey),
               staticClass: 'd-none',
@@ -20687,12 +21068,17 @@
         // Returns all the item TR elements (excludes detail and spacer rows)
         // `this.$refs.itemRows` is an array of item TR components/elements
         // Rows should all be B-TR components, but we map to TR elements
-        // TODO: This may take time for tables many rows, so we may want to cache
+        // Also note that `this.$refs.itemRows` may not always be in document order
+        var tbody = this.$refs.tbody.$el || this.$refs.tbody;
+        var trs = (this.$refs.itemRows || []).map(function (tr) {
+          return tr.$el || tr;
+        }); // TODO: This may take time for tables many rows, so we may want to cache
         //       the result of this during each render cycle on a non-reactive
         //       property. We clear out the cache as each render starts, and
         //       populate it on first access of this method if null
-        return (this.$refs.itemRows || []).map(function (tr) {
-          return tr.$el || tr;
+
+        return from(tbody.children).filter(function (tr) {
+          return arrayIncludes(trs, tr);
         });
       },
       getTbodyTrIndex: function getTbodyTrIndex(el) {
@@ -20803,7 +21189,7 @@
         var items = this.computedItems; // Shortcut to `createElement` (could use `this._c()` instead)
 
         var h = this.$createElement;
-        var hasRowClickHandler = this.$listeners['row-clicked'] || this.isSelectable; // Prepare the tbody rows
+        var hasRowClickHandler = this.$listeners['row-clicked'] || this.hasSelectableRowClick; // Prepare the tbody rows
 
         var $rows = []; // Add the item data rows or the busy slot
 
@@ -21074,6 +21460,11 @@
         default: function _default() {
           return getComponentConfig('BTable', 'selectedVariant');
         }
+      },
+      noSelectOnClick: {
+        // Disable use of click handlers for row selection
+        type: Boolean,
+        default: false
       }
     },
     data: function data() {
@@ -21086,6 +21477,12 @@
       isSelectable: function isSelectable() {
         return this.selectable && this.selectMode;
       },
+      hasSelectableRowClick: function hasSelectableRowClick() {
+        return this.isSelectable && !this.noSelectOnClick;
+      },
+      supportsSelectableRows: function supportsSelectableRows() {
+        return true;
+      },
       selectableHasSelection: function selectableHasSelection() {
         return this.isSelectable && this.selectedRows && this.selectedRows.length > 0 && this.selectedRows.some(Boolean);
       },
@@ -21097,10 +21494,13 @@
 
         return _ref = {
           'b-table-selectable': this.isSelectable
-        }, _defineProperty(_ref, "b-table-select-".concat(this.selectMode), this.isSelectable), _defineProperty(_ref, 'b-table-selecting', this.selectableHasSelection), _ref;
+        }, _defineProperty(_ref, "b-table-select-".concat(this.selectMode), this.isSelectable), _defineProperty(_ref, 'b-table-selecting', this.selectableHasSelection), _defineProperty(_ref, 'b-table-selectable-no-click', this.isSelectable && !this.hasSelectableRowClick), _ref;
       },
       selectableTableAttrs: function selectableTableAttrs() {
         return {
+          // TODO:
+          //   Should this attribute not be included when no-select-on-click is set
+          //   since this attribute implies keyboard navigation?
           'aria-multiselectable': !this.isSelectable ? null : this.selectableIsMultiSelect ? 'true' : 'false'
         };
       }
@@ -21131,6 +21531,10 @@
       selectMode: function selectMode(newVal, oldVal) {
         this.clearSelected();
       },
+      hasSelectableRowClick: function hasSelectableRowClick(newVal, oldVal) {
+        this.clearSelected();
+        this.setSelectionHandlers(!newVal);
+      },
       selectedRows: function selectedRows(_selectedRows, oldVal) {
         var _this = this;
 
@@ -21148,7 +21552,7 @@
       }
     },
     beforeMount: function beforeMount() {
-      // Set up handlers
+      // Set up handlers if needed
       if (this.isSelectable) {
         this.setSelectionHandlers(true);
       }
@@ -21209,7 +21613,7 @@
         };
       },
       setSelectionHandlers: function setSelectionHandlers(on) {
-        var method = on ? '$on' : '$off'; // Handle row-clicked event
+        var method = on && !this.noSelectOnClick ? '$on' : '$off'; // Handle row-clicked event
 
         this[method]('row-clicked', this.selectionHandler); // Clear selection on filter, pagination, and sort changes
 
@@ -21218,13 +21622,9 @@
       },
       selectionHandler: function selectionHandler(item, index, evt) {
         /* istanbul ignore if: should never happen */
-        if (!this.isSelectable) {
+        if (!this.isSelectable || this.noSelectOnClick) {
           // Don't do anything if table is not in selectable mode
-
-          /* istanbul ignore next: should never happen */
           this.clearSelected();
-          /* istanbul ignore next: should never happen */
-
           return;
         }
 
@@ -21324,7 +21724,7 @@
           ctx.currentPage = this.currentPage;
         }
 
-        return _objectSpread2({}, ctx);
+        return clone(ctx);
       }
     },
     watch: {
@@ -21782,8 +22182,10 @@
         if (type === 'click') {
           stop();
           this.$emit('click', evt);
-        } else if (type === 'keydown' && !this.noKeyNav && key === KEY_CODES.SPACE) {
-          // In keynav mode, SPACE press will also trigger a click/select
+        } else if (type === 'keydown' && key === KEY_CODES.SPACE) {
+          // For ARIA tabs the SPACE key will also trigger a click/select
+          // Even with keyboard navigation disabled, SPACE should "click" the button
+          // See: https://github.com/bootstrap-vue/bootstrap-vue/issues/4323
           stop();
           this.$emit('click', evt);
         } else if (type === 'keydown' && !this.noKeyNav) {
@@ -21971,7 +22373,7 @@
           var tabs = this.tabs;
 
           if (tabs[val] && !tabs[val].disabled) {
-            this.currentTab = val;
+            this.activateTab(tabs[val]);
           } else {
             // Try next or prev tabs
             if (val < old) {
@@ -22222,16 +22624,25 @@
         if (tab) {
           var index = this.tabs.indexOf(tab);
 
-          if (!tab.disabled && index > -1) {
-            result = true;
-            this.currentTab = index;
+          if (!tab.disabled && index > -1 && index !== this.currentTab) {
+            var tabEvt = new BvEvent('activate-tab', {
+              cancelable: true,
+              vueTarget: this,
+              componentId: this.safeId()
+            });
+            this.$emit(tabEvt.type, index, this.currentTab, tabEvt);
+
+            if (!tabEvt.defaultPrevented) {
+              result = true;
+              this.currentTab = index;
+            }
           }
-        }
+        } // Couldn't set tab, so ensure v-model is set to `this.currentTab`
 
-        if (!result) {
-          // Couldn't set tab, so ensure v-model is set to `this.currentTab`
+        /* istanbul ignore next: should rarely happen */
 
-          /* istanbul ignore next: should rarely happen */
+
+        if (!result && this.currentTab !== this.value) {
           this.$emit('input', this.currentTab);
         }
 
@@ -22246,12 +22657,11 @@
           return this.activateTab(this.tabs.filter(function (t) {
             return t !== tab;
           }).find(notDisabled));
-        } else {
-          // No tab specified
-
-          /* istanbul ignore next: should never happen */
-          return false;
         }
+        /* istanbul ignore next: should never/rarely happen */
+
+
+        return false;
       },
       // Focus a tab button given it's <b-tab> instance
       focusButton: function focusButton(tab) {
@@ -24201,7 +24611,7 @@
         // Before showing the tooltip, we update the title if it is a function
         if (isFunction(config.title)) {
           el[BV_TOOLTIP].updateData({
-            title: config.title()
+            title: config.title(el)
           });
         }
       });
@@ -24235,7 +24645,7 @@
         // We only pass data properties that have changed
         if (data[prop] !== oldData[prop]) {
           // if title is a function, we execute it here
-          newData[prop] = prop === 'title' && isFunction(data[prop]) ? data[prop]() : data[prop];
+          newData[prop] = prop === 'title' && isFunction(data[prop]) ? data[prop](el) : data[prop];
         }
       });
       el[BV_TOOLTIP].updateData(newData);
@@ -24975,6 +25385,14 @@
     }
   });
 
+  var VBVisiblePlugin =
+  /*#__PURE__*/
+  pluginFactory({
+    directives: {
+      VBVisible: VBVisible
+    }
+  });
+
   var directivesPlugin =
   /*#__PURE__*/
   pluginFactory({
@@ -24983,7 +25401,8 @@
       VBPopoverPlugin: VBPopoverPlugin,
       VBScrollspyPlugin: VBScrollspyPlugin,
       VBTogglePlugin: VBTogglePlugin,
-      VBTooltipPlugin: VBTooltipPlugin
+      VBTooltipPlugin: VBTooltipPlugin,
+      VBVisiblePlugin: VBVisiblePlugin
     }
   });
 
@@ -25015,5 +25434,5 @@
 
   return BootstrapVue;
 
-}));
+})));
 //# sourceMappingURL=bootstrap-vue.js.map
