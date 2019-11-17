@@ -370,7 +370,7 @@ $('{$selector}').each(function () {
 
   var select = $(this);
   var p = select.attr('placeholder');
-  
+
   if (p) {
     if (select.attr('multiple')) {
       \$select2Container.find('.select2-search__field').attr('placeholder', p);
@@ -379,7 +379,7 @@ $('{$selector}').each(function () {
     }
   } else {
     select.find('option[value=""]').each(function () {
-      if (select.text().trim()) {
+      if ($(this).text().trim()) {
         \$select2Container.find('.select2-selection__placeholder').text($(this).text());
         return false;
       }
@@ -779,9 +779,9 @@ JS;
     /**
      * disableWhenSubmit
      *
-     * @param string $formSelector
-     * @param string $buttonsSelector
-     * @param string $event
+     * @param  string  $formSelector
+     * @param  string  $buttonsSelector
+     * @param  array   $options
      *
      * @return  void
      *
