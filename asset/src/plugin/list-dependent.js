@@ -18,6 +18,8 @@
    * @constructor
    */
   class ListDependent {
+    $xhr = null;
+
     static get pluginName() { return 'listDependent' }
     static get defaultOptions() {
       return {
@@ -116,17 +118,23 @@
 
       this.beforeHook(value, this.element, this.dependent);
 
-      Phoenix.Ajax.get(this.options.ajax.url, data)
+      if (this.$xhr) {
+        this.$xhr.abort();
+        this.$xhr = null;
+      }
+
+      this.$xhr = Phoenix.Ajax.get(this.options.ajax.url, data)
         .done(response => {
           if (response.success) {
             this.updateListElements(response.data);
           } else {
             console.error(response.message);
           }
-        }).fail(response => {
-          console.error(response.message);
+        }).fail(err => {
+          console.error(err);
         }).always(() => {
           this.afterHook(value, this.element, this.dependent);
+          this.$xhr = null;
         });
     }
 
