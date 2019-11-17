@@ -20,7 +20,7 @@
  */
 ?>
 
-@extends('_global.{$package.name.lower$}.admin')
+@extends('_global.{$package.name.lower$}.admin-pure')
 
 @section('toolbar-buttons')
     @include('toolbar')
