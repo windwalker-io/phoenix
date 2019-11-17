@@ -196,10 +196,10 @@
     isSelected(value) {
       let defaultValues = '';
 
-      // Convery all types to array
+      // Convert all types to array
       if (Array.isArray(this.options.default_value)) {
         defaultValues = this.options.default_value;
-      } else if (typeof this.options.default_value === 'object') {
+      } else if (this.options.default_value && typeof this.options.default_value === 'object') {
         defaultValues = Object.keys(this.options.default_value);
       } else {
         defaultValues = [this.options.default_value];

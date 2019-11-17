@@ -230,11 +230,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "isSelected",
       value: function isSelected(value) {
-        var defaultValues = ''; // Convery all types to array
+        var defaultValues = ''; // Convert all types to array
 
         if (Array.isArray(this.options.default_value)) {
           defaultValues = this.options.default_value;
-        } else if (_typeof(this.options.default_value) === 'object') {
+        } else if (this.options.default_value && _typeof(this.options.default_value) === 'object') {
           defaultValues = Object.keys(this.options.default_value);
         } else {
           defaultValues = [this.options.default_value];
