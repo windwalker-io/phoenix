@@ -147,26 +147,65 @@
         items[0][valueField] = this.options.first_option[valueField];
       }
 
-      $.each(items, function() {
-        const value = this[valueField];
-        const option = $('<option>' + this[textField] + '</option>');
-        option.attr('value', value);
+      $.each(items, (i, item) => {
+        if (Array.isArray(item)) {
+          const group = $(`<optgroup label="${i}"></optgroup>`);
 
-        if (this.attributes) {
-          $.each(this.attributes, function(index) {
-            option.attr(index, this);
-          });
+          $.each(item, (k, child) => {
+            this.appendOptionTo({
+              value: child[valueField],
+              text: child[textField],
+              attributes: child.attributes,
+            }, group);
+          })
+
+          this.element.append(group);
+
+          return;
         }
 
-        if (self.options.default_value == value) {
-          option.attr('selected', 'selected');
-        }
-
-        self.element.append(option);
+        this.appendOptionTo({
+          value: item[valueField],
+          text: item[textField],
+          attributes: item.attributes,
+        }, this.element);
       });
 
-      self.element.trigger('chosen:updated');
-      self.element.trigger('change');
+      this.element.trigger('chosen:updated');
+      this.element.trigger('change');
+    }
+
+    appendOptionTo(item, parent) {
+      const value = item.value;
+      const option = $('<option>' + item.text + '</option>');
+      option.attr('value', value);
+
+      if (item.attributes) {
+        $.each(item.attributes, (index, val) => {
+          option.attr(index, val);
+        });
+      }
+
+      if (this.isSelected(value)) {
+        option.attr('selected', 'selected');
+      }
+
+      parent.append(option);
+    }
+
+    isSelected(value) {
+      let defaultValues = '';
+
+      // Convery all types to array
+      if (Array.isArray(this.options.default_value)) {
+        defaultValues = this.options.default_value;
+      } else if (typeof this.options.default_value === 'object') {
+        defaultValues = Object.keys(this.options.default_value);
+      } else {
+        defaultValues = [this.options.default_value];
+      }
+
+      return defaultValues.indexOf(value) !== -1;
     }
 
     /**
