@@ -358,20 +358,33 @@ $('{$selector}').select2($optionsString);
 
 // Fix for 4.0.3 [1]
 $('{$selector}').on('select2:close', function () {
-    var input = $(this).parent().find('.select2-search__field').focus();
-    setTimeout(function () { input.focus(); }, 100);
+  var input = $(this).parent().find('.select2-search__field').focus();
+  setTimeout(function () {
+    input.focus();
+  }, 100);
 });
 
 // Fix for select2 v4.RC1 [2]
 $('{$selector}').each(function () {
-    var \$select2Container = $(this).data('select2').\$container;
-    
-    $(this).find('option[value=""]').each(function () {
-        if ($(this).text().trim()) {
-            \$select2Container.find('.select2-selection__placeholder').text($(this).text());
-            return false;
-        }
+  var \$select2Container = $(this).data('select2').\$container;
+
+  var select = $(this);
+  var p = select.attr('placeholder');
+  
+  if (p) {
+    if (select.attr('multiple')) {
+      \$select2Container.find('.select2-search__field').attr('placeholder', p);
+    } else {
+      \$select2Container.find('.select2-selection__placeholder').text(p);
+    }
+  } else {
+    select.find('option[value=""]').each(function () {
+      if (select.text().trim()) {
+        \$select2Container.find('.select2-selection__placeholder').text($(this).text());
+        return false;
+      }
     });
+  }
 });
 JS;
 
