@@ -8,6 +8,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 /**
  * Part of phoenix project.
  *
@@ -62,6 +64,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     function ListDependent($element, dependent, options) {
       _classCallCheck(this, ListDependent);
+
+      _defineProperty(this, "$xhr", null);
 
       this.element = $element;
       this.options = $.extend(true, {}, this.constructor.defaultOptions, options);
@@ -149,16 +153,24 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var data = {};
         data[this.options.ajax.value_field] = value;
         this.beforeHook(value, this.element, this.dependent);
-        Phoenix.Ajax.get(this.options.ajax.url, data).done(function (response) {
+
+        if (this.$xhr) {
+          this.$xhr.abort();
+          this.$xhr = null;
+        }
+
+        this.$xhr = Phoenix.Ajax.get(this.options.ajax.url, data).done(function (response) {
           if (response.success) {
             _this2.updateListElements(response.data);
           } else {
             console.error(response.message);
           }
-        }).fail(function (response) {
-          console.error(response.message);
+        }).fail(function (err) {
+          console.error(err);
         }).always(function () {
           _this2.afterHook(value, _this2.element, _this2.dependent);
+
+          _this2.$xhr = null;
         });
       }
       /**
