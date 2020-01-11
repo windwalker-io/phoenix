@@ -1,9 +1,9 @@
 /*!
- * BoostrapVue 2.1.0
+ * BootstrapVue 2.2.0
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
- * @copyright (c) 2016-2019 BootstrapVue
+ * @copyright (c) 2016-2020 BootstrapVue
  * @license MIT
  * https://github.com/bootstrap-vue/bootstrap-vue/blob/master/LICENSE
  */
@@ -83,13 +83,13 @@ function _objectSpread2(target) {
     var source = arguments[i] != null ? arguments[i] : {};
 
     if (i % 2) {
-      ownKeys(source, true).forEach(function (key) {
+      ownKeys(Object(source), true).forEach(function (key) {
         _defineProperty(target, key, source[key]);
       });
     } else if (Object.getOwnPropertyDescriptors) {
       Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
     } else {
-      ownKeys(source).forEach(function (key) {
+      ownKeys(Object(source)).forEach(function (key) {
         Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
       });
     }
@@ -265,126 +265,6 @@ function _nonIterableSpread() {
 
 //
 
-/**
- * Utilities to get information about the current environment
- */
-// --- Constants ---
-var hasWindowSupport = typeof window !== 'undefined';
-var hasDocumentSupport = typeof document !== 'undefined';
-var hasNavigatorSupport = typeof navigator !== 'undefined';
-var hasPromiseSupport = typeof Promise !== 'undefined';
-var hasMutationObserverSupport = typeof MutationObserver !== 'undefined' || typeof WebKitMutationObserver !== 'undefined' || typeof MozMutationObserver !== 'undefined';
-var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Browser type sniffing
-
-var userAgent = isBrowser ? window.navigator.userAgent.toLowerCase() : '';
-var isJSDOM = userAgent.indexOf('jsdom') > 0;
-var isIE = /msie|trident/.test(userAgent); // Determine if the browser supports the option passive for events
-
-var hasPassiveEventSupport = function () {
-  var passiveEventSupported = false;
-
-  if (isBrowser) {
-    try {
-      var options = {
-        get passive() {
-          // This function will be called when the browser
-          // attempts to access the passive property.
-
-          /* istanbul ignore next: will never be called in JSDOM */
-          passiveEventSupported = true;
-        }
-
-      };
-      window.addEventListener('test', options, options);
-      window.removeEventListener('test', options, options);
-    } catch (err) {
-      /* istanbul ignore next: will never be called in JSDOM */
-      passiveEventSupported = false;
-    }
-  }
-
-  return passiveEventSupported;
-}();
-var hasTouchSupport = isBrowser && ('ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0);
-var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent);
-var hasIntersectionObserverSupport = isBrowser && 'IntersectionObserver' in window && 'IntersectionObserverEntry' in window && // Edge 15 and UC Browser lack support for `isIntersecting`
-// but we an use intersectionRatio > 0 instead
-// 'isIntersecting' in window.IntersectionObserverEntry.prototype &&
-'intersectionRatio' in window.IntersectionObserverEntry.prototype; // --- Getters ---
-
-var getEnv = function getEnv(key) {
-  var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var env = typeof process !== 'undefined' && process ? process.env || {} : {};
-
-  if (!key) {
-    /* istanbul ignore next */
-    return env;
-  }
-
-  return env[key] || fallback;
-};
-var getNoWarn = function getNoWarn() {
-  return getEnv('BOOTSTRAP_VUE_NO_WARN');
-};
-
-/**
- * Log a warning message to the console with BootstrapVue formatting
- * @param {string} message
- */
-
-var warn = function warn(message)
-/* istanbul ignore next */
-{
-  if (!getNoWarn()) {
-    console.warn("[BootstrapVue warn]: ".concat(message));
-  }
-};
-/**
- * Warn when no Promise support is given
- * @param {string} source
- * @returns {boolean} warned
- */
-
-var warnNotClient = function warnNotClient(source) {
-  /* istanbul ignore else */
-  if (isBrowser) {
-    return false;
-  } else {
-    warn("".concat(source, ": Can not be called during SSR."));
-    return true;
-  }
-};
-/**
- * Warn when no Promise support is given
- * @param {string} source
- * @returns {boolean} warned
- */
-
-var warnNoPromiseSupport = function warnNoPromiseSupport(source) {
-  /* istanbul ignore else */
-  if (hasPromiseSupport) {
-    return false;
-  } else {
-    warn("".concat(source, ": Requires Promise support."));
-    return true;
-  }
-};
-/**
- * Warn when no MutationObserver support is given
- * @param {string} source
- * @returns {boolean} warned
- */
-
-var warnNoMutationObserverSupport = function warnNoMutationObserverSupport(source) {
-  /* istanbul ignore else */
-  if (hasMutationObserverSupport) {
-    return false;
-  } else {
-    warn("".concat(source, ": Requires MutationObserver support."));
-    return true;
-  }
-}; // Default export
-
 // --- Static ---
 var from = Array.from;
 var isArray = Array.isArray; // --- Instance ---
@@ -484,6 +364,68 @@ var deepFreeze = function deepFreeze(obj) {
     obj[prop] = value && (isPlainObject(value) || isArray(value)) ? deepFreeze(value) : value;
   });
   return freeze(obj);
+};
+
+/**
+ * Utilities to get information about the current environment
+ */
+// --- Constants ---
+var hasWindowSupport = typeof window !== 'undefined';
+var hasDocumentSupport = typeof document !== 'undefined';
+var hasNavigatorSupport = typeof navigator !== 'undefined';
+var hasPromiseSupport = typeof Promise !== 'undefined';
+var hasMutationObserverSupport = typeof MutationObserver !== 'undefined' || typeof WebKitMutationObserver !== 'undefined' || typeof MozMutationObserver !== 'undefined';
+var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Browser type sniffing
+
+var userAgent = isBrowser ? window.navigator.userAgent.toLowerCase() : '';
+var isJSDOM = userAgent.indexOf('jsdom') > 0;
+var isIE = /msie|trident/.test(userAgent); // Determine if the browser supports the option passive for events
+
+var hasPassiveEventSupport = function () {
+  var passiveEventSupported = false;
+
+  if (isBrowser) {
+    try {
+      var options = {
+        get passive() {
+          // This function will be called when the browser
+          // attempts to access the passive property.
+
+          /* istanbul ignore next: will never be called in JSDOM */
+          passiveEventSupported = true;
+        }
+
+      };
+      window.addEventListener('test', options, options);
+      window.removeEventListener('test', options, options);
+    } catch (err) {
+      /* istanbul ignore next: will never be called in JSDOM */
+      passiveEventSupported = false;
+    }
+  }
+
+  return passiveEventSupported;
+}();
+var hasTouchSupport = isBrowser && ('ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0);
+var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent);
+var hasIntersectionObserverSupport = isBrowser && 'IntersectionObserver' in window && 'IntersectionObserverEntry' in window && // Edge 15 and UC Browser lack support for `isIntersecting`
+// but we an use intersectionRatio > 0 instead
+// 'isIntersecting' in window.IntersectionObserverEntry.prototype &&
+'intersectionRatio' in window.IntersectionObserverEntry.prototype; // --- Getters ---
+
+var getEnv = function getEnv(key) {
+  var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var env = typeof process !== 'undefined' && process ? process.env || {} : {};
+
+  if (!key) {
+    /* istanbul ignore next */
+    return env;
+  }
+
+  return env[key] || fallback;
+};
+var getNoWarn = function getNoWarn() {
+  return getEnv('BOOTSTRAP_VUE_NO_WARN');
 };
 
 var w = hasWindowSupport ? window : {};
@@ -601,6 +543,11 @@ var cloneDeep = function cloneDeep(obj) {
   return defaultValue;
 };
 
+var identity = function identity(x) {
+  return x;
+};
+
+var RX_ARRAY_NOTATION = /\[(\d+)]/g;
 /**
  * Get property defined by dot/array notation in string.
  *
@@ -630,8 +577,8 @@ var get = function get(obj, path) {
   } // Handle string array notation (numeric indices only)
 
 
-  path = String(path).replace(/\[(\d+)]/g, '.$1');
-  var steps = path.split('.').filter(Boolean); // Handle case where someone passes a string of only dots
+  path = String(path).replace(RX_ARRAY_NOTATION, '.$1');
+  var steps = path.split('.').filter(identity); // Handle case where someone passes a string of only dots
 
   if (steps.length === 0) {
     return defaultValue;
@@ -644,6 +591,66 @@ var get = function get(obj, path) {
   return steps.every(function (step) {
     return isObject(obj) && step in obj && (obj = obj[step]) != null;
   }) ? obj : defaultValue;
+};
+
+/**
+ * Log a warning message to the console with BootstrapVue formatting
+ * @param {string} message
+ */
+
+var warn = function warn(message)
+/* istanbul ignore next */
+{
+  var source = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (!getNoWarn()) {
+    console.warn("[BootstrapVue warn]: ".concat(source ? "".concat(source, " - ") : '').concat(message));
+  }
+};
+/**
+ * Warn when no Promise support is given
+ * @param {string} source
+ * @returns {boolean} warned
+ */
+
+var warnNotClient = function warnNotClient(source) {
+  /* istanbul ignore else */
+  if (isBrowser) {
+    return false;
+  } else {
+    warn("".concat(source, ": Can not be called during SSR."));
+    return true;
+  }
+};
+/**
+ * Warn when no Promise support is given
+ * @param {string} source
+ * @returns {boolean} warned
+ */
+
+var warnNoPromiseSupport = function warnNoPromiseSupport(source) {
+  /* istanbul ignore else */
+  if (hasPromiseSupport) {
+    return false;
+  } else {
+    warn("".concat(source, ": Requires Promise support."));
+    return true;
+  }
+};
+/**
+ * Warn when no MutationObserver support is given
+ * @param {string} source
+ * @returns {boolean} warned
+ */
+
+var warnNoMutationObserverSupport = function warnNoMutationObserverSupport(source) {
+  /* istanbul ignore else */
+  if (hasMutationObserverSupport) {
+    return false;
+  } else {
+    warn("".concat(source, ": Requires MutationObserver support."));
+    return true;
+  }
 };
 
 // NOTES
@@ -724,6 +731,19 @@ var DEFAULTS = deepFreeze({
     // Chrome default file prompt
     placeholder: 'No file chosen',
     dropPlaceholder: 'Drop files here'
+  },
+  BFormTag: {
+    removeLabel: 'Remove tag',
+    variant: 'secondary'
+  },
+  BFormTags: {
+    addButtonText: 'Add',
+    addButtonVariant: 'outline-secondary',
+    duplicateTagText: 'Duplicate tag(s)',
+    invalidTagText: 'Invalid tag(s)',
+    placeholder: 'Add tag...',
+    tagRemoveLabel: 'Remove tag',
+    tagVariant: 'secondary'
   },
   BFormText: {
     textVariant: 'muted'
@@ -992,6 +1012,35 @@ var installFactory = function installFactory() {
   return install;
 };
 /**
+ * Plugin install factory function (no plugin config option).
+ * @param {object} { components, directives }
+ * @returns {function} plugin install function
+ */
+
+var installFactoryNoConfig = function installFactoryNoConfig() {
+  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      components = _ref2.components,
+      directives = _ref2.directives,
+      plugins = _ref2.plugins;
+
+  var install = function install(Vue) {
+
+    if (install.installed) {
+      /* istanbul ignore next */
+      return;
+    }
+
+    install.installed = true;
+    checkMultipleVue(Vue);
+    registerComponents(Vue, components);
+    registerDirectives(Vue, directives);
+    registerPlugins(Vue, plugins);
+  };
+
+  install.installed = false;
+  return install;
+};
+/**
  * Plugin object factory function.
  * @param {object} { components, directives, plugins }
  * @returns {object} plugin install object
@@ -1002,6 +1051,19 @@ var pluginFactory = function pluginFactory() {
   var extend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   return _objectSpread2({}, extend, {
     install: installFactory(opts)
+  });
+};
+/**
+ * Plugin object factory function (no config option).
+ * @param {object} { components, directives, plugins }
+ * @returns {object} plugin install object
+ */
+
+var pluginFactoryNoConfig = function pluginFactoryNoConfig() {
+  var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var extend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  return _objectSpread2({}, extend, {
+    install: installFactoryNoConfig(opts)
   });
 };
 /**
@@ -1164,11 +1226,11 @@ var parseEventOptions = function parseEventOptions(options) {
   /* istanbul ignore else: can't test in JSDOM, as it supports passive */
   if (hasPassiveEventSupport) {
     return isObject(options) ? options : {
-      useCapture: Boolean(options || false)
+      useCapture: !!options || false
     };
   } else {
     // Need to translate to actual Boolean value
-    return Boolean(isObject(options) ? options.useCapture : options);
+    return !!(isObject(options) ? options.useCapture : options);
   }
 }; // Attach an event listener to an element
 
@@ -1182,7 +1244,11 @@ var eventOff = function eventOff(el, evtName, handler, options) {
   if (el && el.removeEventListener) {
     el.removeEventListener(evtName, handler, parseEventOptions(options));
   }
-}; // Determine if an element is an HTML Element
+}; // Remove a node from DOM
+
+var removeNode = function removeNode(el) {
+  return el && el.parentNode && el.parentNode.removeChild(el);
+}; // Determine if an element is an HTML element
 
 var isElement = function isElement(el) {
   return Boolean(el && el.nodeType === Node.ELEMENT_NODE);
@@ -1208,7 +1274,7 @@ var isVisible = function isVisible(el) {
 }; // Determine if an element is disabled
 
 var isDisabled = function isDisabled(el) {
-  return !isElement(el) || el.disabled || Boolean(getAttr(el, 'disabled')) || hasClass(el, 'disabled');
+  return !isElement(el) || el.disabled || hasAttr(el, 'disabled') || hasClass(el, 'disabled');
 }; // Cause/wait-for an element to reflow it's content (adjusting it's height/width)
 
 var reflow = function reflow(el) {
@@ -1399,6 +1465,25 @@ var position = function position(el)
   };
 };
 
+// Number utilities
+// Converts a value (string, number, etc) to an integer number
+// Assumes radix base 10
+// Returns NaN if the value cannot be converted
+var toInteger = function toInteger(val) {
+  return parseInt(val, 10);
+}; // Converts a value (string, number, etc) to a number
+// Returns NaN if the value cannot be converted
+
+var toFloat = function toFloat(val) {
+  return parseFloat(val);
+}; // Converts a value (string, number, etc) to a string
+// representation with 'precision' digits after the decimal
+// Returns the string 'NaN' if the value cannot be converted
+
+var toFixed = function toFixed(val, precision) {
+  return toFloat(val).toFixed(toInteger(precision) || 0);
+};
+
 var NO_FADE_PROPS = {
   name: '',
   enterClass: '',
@@ -1493,7 +1578,7 @@ var hasNormalizedSlot = function hasNormalizedSlot(names) {
   var $scopedSlots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var $slots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   // Ensure names is an array
-  names = concat(names).filter(Boolean); // Returns true if the either a $scopedSlot or $slot exists with the specified name
+  names = concat(names).filter(identity); // Returns true if the either a $scopedSlot or $slot exists with the specified name
 
   return names.some(function (name) {
     return $scopedSlots[name] || $slots[name];
@@ -1515,7 +1600,7 @@ var normalizeSlot = function normalizeSlot(names) {
   var $scopedSlots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
   var $slots = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
   // Ensure names is an array
-  names = concat(names).filter(Boolean);
+  names = concat(names).filter(identity);
   var slot;
 
   for (var i = 0; i < names.length && !slot; i++) {
@@ -1619,7 +1704,7 @@ var parseCountDown = function parseCountDown(show) {
     return 0;
   }
 
-  show = parseInt(show, 10);
+  show = toInteger(show);
   return show > 0 ? show : 0;
 }; // Convert `show` value to a boolean
 
@@ -1629,17 +1714,17 @@ var parseShow = function parseShow(show) {
     return true;
   }
 
-  if (parseInt(show, 10) < 1) {
+  if (toInteger(show) < 1) {
     // Boolean will always return false for the above comparison
     return false;
   }
 
-  return Boolean(show);
+  return !!show;
 }; // Is a value number like (i.e. a number or a number as string)
 
 
 var isNumericLike = function isNumericLike(value) {
-  return !isNaN(parseInt(value, 10));
+  return !isNaN(toInteger(value));
 }; // @vue/component
 
 
@@ -1805,10 +1890,6 @@ pluginFactory({
   }
 });
 
-var identity = function identity(x) {
-  return x;
-};
-
 /**
  * Given an array of properties or an object of property keys,
  * plucks all the values off the target object, returning a new object
@@ -1828,19 +1909,64 @@ var pluckProps = function pluckProps(keysToPluck, objToPluck) {
   }, {});
 };
 
-/**
- * Convert a value to a string that can be rendered.
- */
+// String utilities
+
+var RX_TRIM_LEFT = /^\s+/;
+var RX_REGEXP_REPLACE = /[-/\\^$*+?.()|[\]{}]/g;
+var RX_UN_KEBAB = /-(\w)/g;
+var RX_HYPHENATE = /\B([A-Z])/g; // --- Utilities ---
+// Converts PascalCase or camelCase to kebab-case
+
+var kebabCase = function kebabCase(str) {
+  return str.replace(RX_HYPHENATE, '-$1').toLowerCase();
+}; // Converts a kebab-case or camelCase string to PascalCase
+
+var pascalCase = function pascalCase(str) {
+  str = kebabCase(str).replace(RX_UN_KEBAB, function (_, c) {
+    return c ? c.toUpperCase() : '';
+  });
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}; // Lowercases the first letter of a string and returns a new string
+
+var lowerFirst = function lowerFirst(str) {
+  str = isString(str) ? str.trim() : String(str);
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}; // Uppercases the first letter of a string and returns a new string
+
+var upperFirst = function upperFirst(str) {
+  str = isString(str) ? str.trim() : String(str);
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}; // Escape characters to be used in building a regular expression
+
+var escapeRegExp = function escapeRegExp(str) {
+  return str.replace(RX_REGEXP_REPLACE, '\\$&');
+}; // Convert a value to a string that can be rendered
+// `undefined`/`null` will be converted to `''`
+// Plain objects and arrays will be JSON stringified
 
 var toString$1 = function toString(val) {
   var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
   return isUndefinedOrNull(val) ? '' : isArray(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
-};
+}; // Remove leading white space from a string
+
+var trimLeft = function trimLeft(str) {
+  return toString$1(str).replace(RX_TRIM_LEFT, '');
+}; // Remove Trailing white space from a string
+
+var trim = function trim(str) {
+  return toString$1(str).trim();
+}; // Lower case a string
+
+var lowerCase = function lowerCase(str) {
+  return toString$1(str).toLowerCase();
+}; // Upper case a string
 
 var ANCHOR_TAG = 'a'; // Precompile RegExp
 
 var commaRE = /%2C/g;
-var encodeReserveRE = /[!'()*]/g; // Method to replace reserved chars
+var encodeReserveRE = /[!'()*]/g;
+var plusRE = /\+/g;
+var queryStartRE = /^(\?|#|&)/; // Method to replace reserved chars
 
 var encodeReserveReplacer = function encodeReserveReplacer(c) {
   return '%' + c.charCodeAt(0).toString(16);
@@ -1892,14 +2018,14 @@ var stringifyQueryObj = function stringifyQueryObj(obj) {
 };
 var parseQuery = function parseQuery(query) {
   var parsed = {};
-  query = toString$1(query).trim().replace(/^(\?|#|&)/, '');
+  query = toString$1(query).trim().replace(queryStartRE, '');
 
   if (!query) {
     return parsed;
   }
 
   query.split('&').forEach(function (param) {
-    var parts = param.replace(/\+/g, ' ').split('=');
+    var parts = param.replace(plusRE, ' ').split('=');
     var key = decode(parts.shift());
     var val = parts.length > 0 ? decode(parts.join('=')) : null;
 
@@ -2206,15 +2332,16 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    var tag = !props.href && !props.to ? props.tag : BLink;
+    var isBLink = props.href || props.to;
+    var tag = isBLink ? BLink : props.tag;
     var componentData = {
       staticClass: 'badge',
       class: [props.variant ? "badge-".concat(props.variant) : 'badge-secondary', {
-        'badge-pill': Boolean(props.pill),
+        'badge-pill': props.pill,
         active: props.active,
         disabled: props.disabled
       }],
-      props: pluckProps(linkProps, props)
+      props: isBLink ? pluckProps(linkProps, props) : {}
     };
     return h(tag, mergeData(data, componentData), children);
   }
@@ -2422,7 +2549,12 @@ delete linkProps$1.href.default;
 delete linkProps$1.to.default;
 var linkPropKeys = keys(linkProps$1);
 var props$4 = _objectSpread2({}, linkProps$1, {}, btnProps); // --- Helper methods ---
-// Focus handler for toggle buttons.  Needs class of 'focus' when focused.
+// Returns true if a tag's name is name
+
+var tagIs = function tagIs(tag, name) {
+  return toString$1(tag).toLowerCase() === toString$1(name).toLowerCase();
+}; // Focus handler for toggle buttons.  Needs class of 'focus' when focused.
+
 
 var handleFocus = function handleFocus(evt) {
   if (evt.type === 'focusin') {
@@ -2431,11 +2563,11 @@ var handleFocus = function handleFocus(evt) {
     removeClass(evt.target, 'focus');
   }
 }; // Is the requested button a link?
+// If tag prop is set to `a`, we use a b-link to get proper disabled handling
 
 
 var isLink = function isLink(props) {
-  // If tag prop is set to `a`, we use a b-link to get proper disabled handling
-  return Boolean(props.href || props.to || props.tag && String(props.tag).toLowerCase() === 'a');
+  return props.href || props.to || tagIs(props.tag, 'a');
 }; // Is the button to be a toggle button?
 
 
@@ -2445,13 +2577,7 @@ var isToggle = function isToggle(props) {
 
 
 var isButton = function isButton(props) {
-  if (isLink(props)) {
-    return false;
-  } else if (props.tag && String(props.tag).toLowerCase() !== 'button') {
-    return false;
-  }
-
-  return true;
+  return !(isLink(props) || props.tag && !tagIs(props.tag, 'button'));
 }; // Is the requested tag not a button or link?
 
 
@@ -2463,7 +2589,7 @@ var isNonStandardTag = function isNonStandardTag(props) {
 var computeClass = function computeClass(props) {
   var _ref;
 
-  return ["btn-".concat(props.variant || getComponentConfig(NAME$3, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), Boolean(props.size)), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
+  return ["btn-".concat(props.variant || getComponentConfig(NAME$3, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
 }; // Compute the link props to pass to b-link (if required)
 
 
@@ -2603,7 +2729,7 @@ Vue.extend({
       class: _defineProperty({
         'btn-group': !props.vertical,
         'btn-group-vertical': props.vertical
-      }, "btn-group-".concat(props.size), Boolean(props.size)),
+      }, "btn-group-".concat(props.size), props.size),
       attrs: {
         role: props.ariaRole
       }
@@ -2623,7 +2749,7 @@ pluginFactory({
 /*
  * Key Codes (events)
  */
-var KEY_CODES = {
+var KEY_CODES = freeze({
   SPACE: 32,
   ENTER: 13,
   ESC: 27,
@@ -2645,7 +2771,7 @@ var KEY_CODES = {
   INSERT: 45,
   INS: 45,
   DELETE: 46
-};
+});
 
 var ITEM_SELECTOR = ['.btn:not(.disabled):not([disabled]):not(.dropdown-item)', '.form-control:not(.disabled):not([disabled])', 'select:not(.disabled):not([disabled])', 'input[type="checkbox"]:not(.disabled)', 'input[type="radio"]:not(.disabled)'].join(','); // @vue/component
 
@@ -2767,34 +2893,12 @@ pluginFactory({
 });
 
 /**
- * Transform the first character to uppercase
- * @param {string} str
- */
-
-var upperFirst = function upperFirst(str) {
-  if (!isString(str)) {
-    str = String(str);
-  }
-
-  str = str.trim();
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
-
-/**
  * @param {string} prefix
  * @param {string} value
  */
 
 var prefixPropName = function prefixPropName(prefix, value) {
   return prefix + upperFirst(value);
-};
-
-/**
- * @param {string} str
- */
-var lowerFirst = function lowerFirst(str) {
-  str = String(str);
-  return str.charAt(0).toLowerCase() + str.slice(1);
 };
 
 /**
@@ -2967,7 +3071,7 @@ Vue.extend({
       staticClass: 'card-body',
       class: [(_ref2 = {
         'card-img-overlay': props.overlay
-      }, _defineProperty(_ref2, "bg-".concat(props.bodyBgVariant), Boolean(props.bodyBgVariant)), _defineProperty(_ref2, "border-".concat(props.bodyBorderVariant), Boolean(props.bodyBorderVariant)), _defineProperty(_ref2, "text-".concat(props.bodyTextVariant), Boolean(props.bodyTextVariant)), _ref2), props.bodyClass || {}]
+      }, _defineProperty(_ref2, "bg-".concat(props.bodyBgVariant), props.bodyBgVariant), _defineProperty(_ref2, "border-".concat(props.bodyBorderVariant), props.bodyBorderVariant), _defineProperty(_ref2, "text-".concat(props.bodyTextVariant), props.bodyTextVariant), _ref2), props.bodyClass || {}]
     }), [cardTitle, cardSubTitle].concat(_toConsumableArray(cardContent)));
   }
 });
@@ -3001,7 +3105,7 @@ Vue.extend({
         children = _ref.children;
     return h(props.headerTag, mergeData(data, {
       staticClass: 'card-header',
-      class: [props.headerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.headerBgVariant), Boolean(props.headerBgVariant)), _defineProperty(_ref2, "border-".concat(props.headerBorderVariant), Boolean(props.headerBorderVariant)), _defineProperty(_ref2, "text-".concat(props.headerTextVariant), Boolean(props.headerTextVariant)), _ref2)]
+      class: [props.headerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.headerBgVariant), props.headerBgVariant), _defineProperty(_ref2, "border-".concat(props.headerBorderVariant), props.headerBorderVariant), _defineProperty(_ref2, "text-".concat(props.headerTextVariant), props.headerTextVariant), _ref2)]
     }), children || [h('div', {
       domProps: htmlOrText(props.headerHtml, props.header)
     })]);
@@ -3037,7 +3141,7 @@ Vue.extend({
         children = _ref.children;
     return h(props.footerTag, mergeData(data, {
       staticClass: 'card-footer',
-      class: [props.footerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.footerBgVariant), Boolean(props.footerBgVariant)), _defineProperty(_ref2, "border-".concat(props.footerBorderVariant), Boolean(props.footerBorderVariant)), _defineProperty(_ref2, "text-".concat(props.footerTextVariant), Boolean(props.footerTextVariant)), _ref2)]
+      class: [props.footerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.footerBgVariant), props.footerBgVariant), _defineProperty(_ref2, "border-".concat(props.footerBorderVariant), props.footerBorderVariant), _defineProperty(_ref2, "text-".concat(props.footerTextVariant), props.footerTextVariant), _ref2)]
     }), children || [h('div', {
       domProps: htmlOrText(props.footerHtml, props.footer)
     })]);
@@ -3197,7 +3301,7 @@ Vue.extend({
       class: (_class = {
         'flex-row': props.imgLeft || props.imgStart,
         'flex-row-reverse': (props.imgRight || props.imgEnd) && !(props.imgLeft || props.imgStart)
-      }, _defineProperty(_class, "text-".concat(props.align), Boolean(props.align)), _defineProperty(_class, "bg-".concat(props.bgVariant), Boolean(props.bgVariant)), _defineProperty(_class, "border-".concat(props.borderVariant), Boolean(props.borderVariant)), _defineProperty(_class, "text-".concat(props.textVariant), Boolean(props.textVariant)), _class)
+      }, _defineProperty(_class, "text-".concat(props.align), props.align), _defineProperty(_class, "bg-".concat(props.bgVariant), props.bgVariant), _defineProperty(_class, "border-".concat(props.borderVariant), props.borderVariant), _defineProperty(_class, "text-".concat(props.textVariant), props.textVariant), _class)
     }), [imgFirst, header].concat(_toConsumableArray(content), [footer, imgLast]));
   }
 });
@@ -3275,6 +3379,7 @@ var looseEqual = function looseEqual(a, b) {
 };
 
 var OBSERVER_PROP_NAME = '__bv__visibility_observer';
+var onlyDgitsRE = /^\d+$/;
 
 var VisibilityObserver =
 /*#__PURE__*/
@@ -3400,7 +3505,7 @@ var bind = function bind(el, _ref, vnode) {
 
   keys(modifiers).forEach(function (mod) {
     /* istanbul ignore else: Until <b-img-lazy> is switched to use this directive */
-    if (/^\d+$/.test(mod)) {
+    if (onlyDgitsRE.test(mod)) {
       options.margin = "".concat(mod, "px");
     } else if (mod.toLowerCase() === 'once') {
       options.once = true;
@@ -3531,7 +3636,7 @@ var props$d = {
 }; // --- Helper methods ---
 
 var makeBlankImgSrc = function makeBlankImgSrc(width, height, color) {
-  var src = encodeURIComponent(BLANK_TEMPLATE.replace('%{w}', String(width)).replace('%{h}', String(height)).replace('%{f}', color));
+  var src = encodeURIComponent(BLANK_TEMPLATE.replace('%{w}', toString$1(width)).replace('%{h}', toString$1(height)).replace('%{f}', color));
   return "data:image/svg+xml;charset=UTF-8,".concat(src);
 }; // @vue/component
 
@@ -3548,17 +3653,17 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data;
     var src = props.src;
-    var width = parseInt(props.width, 10) ? parseInt(props.width, 10) : null;
-    var height = parseInt(props.height, 10) ? parseInt(props.height, 10) : null;
+    var width = toInteger(props.width) || null;
+    var height = toInteger(props.height) || null;
     var align = null;
     var block = props.block;
-    var srcset = concat(props.srcset).filter(Boolean).join(',');
-    var sizes = concat(props.sizes).filter(Boolean).join(',');
+    var srcset = concat(props.srcset).filter(identity).join(',');
+    var sizes = concat(props.sizes).filter(identity).join(',');
 
     if (props.blank) {
-      if (!height && Boolean(width)) {
+      if (!height && width) {
         height = width;
-      } else if (!width && Boolean(height)) {
+      } else if (!width && height) {
         width = height;
       }
 
@@ -3587,8 +3692,8 @@ Vue.extend({
       attrs: {
         src: src,
         alt: props.alt,
-        width: width ? String(width) : null,
-        height: height ? String(height) : null,
+        width: width ? toString$1(width) : null,
+        height: height ? toString$1(height) : null,
         srcset: srcset || null,
         sizes: sizes || null
       },
@@ -3597,7 +3702,7 @@ Vue.extend({
         'img-fluid': props.fluid || props.fluidGrow,
         'w-100': props.fluidGrow,
         rounded: props.rounded === '' || props.rounded === true
-      }, _defineProperty(_class, "rounded-".concat(props.rounded), isString(props.rounded) && props.rounded !== ''), _defineProperty(_class, align, Boolean(align)), _defineProperty(_class, 'd-block', block), _class)
+      }, _defineProperty(_class, "rounded-".concat(props.rounded), isString(props.rounded) && props.rounded !== ''), _defineProperty(_class, align, align), _defineProperty(_class, 'd-block', block), _class)
     }));
   }
 });
@@ -3719,11 +3824,11 @@ Vue.extend({
       return this.isShown ? this.height : this.blankHeight || this.height;
     },
     computedSrcset: function computedSrcset() {
-      var srcset = concat(this.srcset).filter(Boolean).join(',');
+      var srcset = concat(this.srcset).filter(identity).join(',');
       return !this.blankSrc || this.isShown ? srcset : null;
     },
     computedSizes: function computedSizes() {
-      var sizes = concat(this.sizes).filter(Boolean).join(',');
+      var sizes = concat(this.sizes).filter(identity).join(',');
       return !this.blankSrc || this.isShown ? sizes : null;
     }
   },
@@ -3776,7 +3881,7 @@ Vue.extend({
         name: 'b-visible',
         // Value expects a callback (passed one arg of `visible` = `true` or `false`)
         value: this.doShow,
-        modifiers: (_modifiers = {}, _defineProperty(_modifiers, "".concat(parseInt(this.offset, 10) || 0), true), _defineProperty(_modifiers, "once", true), _modifiers)
+        modifiers: (_modifiers = {}, _defineProperty(_modifiers, "".concat(toInteger(this.offset) || 0), true), _defineProperty(_modifiers, "once", true), _modifiers)
       });
     }
 
@@ -3921,16 +4026,8 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    var baseClass = 'card-group';
-
-    if (props.deck) {
-      baseClass = 'card-deck';
-    } else if (props.columns) {
-      baseClass = 'card-columns';
-    }
-
     return h(props.tag, mergeData(data, {
-      class: baseClass
+      class: props.deck ? 'card-deck' : props.columns ? 'card-columns' : 'card-group'
     }), children);
   }
 });
@@ -4225,7 +4322,7 @@ Vue.extend({
       transitionEndEvent: null,
       slides: [],
       direction: null,
-      isPaused: !(parseInt(this.interval, 10) > 0),
+      isPaused: !(toInteger(this.interval) > 0),
       // Touch event handling values
       touchStartX: 0,
       touchDeltaX: 0
@@ -4239,7 +4336,7 @@ Vue.extend({
   watch: {
     value: function value(newVal, oldVal) {
       if (newVal !== oldVal) {
-        this.setSlide(parseInt(newVal, 10) || 0);
+        this.setSlide(toInteger(newVal) || 0);
       }
     },
     interval: function interval(newVal, oldVal) {
@@ -4277,7 +4374,7 @@ Vue.extend({
     this._animationTimeout = null;
     this._touchTimeout = null; // Set initial paused state
 
-    this.isPaused = !(parseInt(this.interval, 10) > 0);
+    this.isPaused = !(toInteger(this.interval) > 0);
   },
   mounted: function mounted() {
     // Cache current browser transitionend event name
@@ -5007,6 +5104,80 @@ var listenOnRootMixin = {
   }
 };
 
+// Generic collapse transion helper component
+
+var onEnter = function onEnter(el) {
+  el.style.height = 0; // Animaton frame delay neeeded for `appear` to work
+
+  requestAF(function () {
+    reflow(el);
+    el.style.height = "".concat(el.scrollHeight, "px");
+  });
+};
+
+var onAfterEnter = function onAfterEnter(el) {
+  el.style.height = null;
+};
+
+var onLeave = function onLeave(el) {
+  el.style.height = 'auto';
+  el.style.display = 'block';
+  el.style.height = "".concat(getBCR(el).height, "px");
+  reflow(el);
+  el.style.height = 0;
+};
+
+var onAfterLeave = function onAfterLeave(el) {
+  el.style.height = null;
+}; // Default transition props
+// `appear` will use the enter classes
+
+
+var TRANSITION_PROPS = {
+  css: true,
+  enterClass: '',
+  enterActiveClass: 'collapsing',
+  enterToClass: 'collapse show',
+  leaveClass: 'collapse show',
+  leaveActiveClass: 'collapsing',
+  leaveToClass: 'collapse'
+}; // Default transition handlers
+// `appear` will use the enter handlers
+
+var TRANSITION_HANDLERS = {
+  enter: onEnter,
+  afterEnter: onAfterEnter,
+  leave: onLeave,
+  afterLeave: onAfterLeave
+}; // @vue/component
+
+var BVCollapse =
+/*#__PURE__*/
+Vue.extend({
+  name: 'BVCollapse',
+  functional: true,
+  props: {
+    appear: {
+      // If `true` (and `visible` is `true` on mount), animate initially visible
+      type: Boolean,
+      default: false
+    }
+  },
+  render: function render(h, _ref) {
+    var props = _ref.props,
+        data = _ref.data,
+        children = _ref.children;
+    return h('transition', // We merge in the `appear` prop last
+    mergeData(data, {
+      props: TRANSITION_PROPS,
+      on: TRANSITION_HANDLERS
+    }, {
+      props: props
+    }), // Note: `<tranition>` supports a single root element only
+    children);
+  }
+});
+
 var EVENT_STATE = 'bv::collapse::state';
 var EVENT_ACCORDION = 'bv::collapse::accordion'; // Private event we emit on `$root` to ensure the toggle state is
 // always synced. It gets emitted even if the state has not changed!
@@ -5047,6 +5218,11 @@ Vue.extend({
     tag: {
       type: String,
       default: 'div'
+    },
+    appear: {
+      // If `true` (and `visible` is `true` on mount), animate initially visible
+      type: Boolean,
+      default: false
     }
   },
   data: function data() {
@@ -5144,35 +5320,25 @@ Vue.extend({
       this.show = !this.show;
     },
     onEnter: function onEnter(el) {
-      el.style.height = 0;
-      reflow(el);
-      el.style.height = el.scrollHeight + 'px';
       this.transitioning = true; // This should be moved out so we can add cancellable events
 
       this.$emit('show');
     },
     onAfterEnter: function onAfterEnter(el) {
-      el.style.height = null;
       this.transitioning = false;
       this.$emit('shown');
     },
     onLeave: function onLeave(el) {
-      el.style.height = 'auto';
-      el.style.display = 'block';
-      el.style.height = getBCR(el).height + 'px';
-      reflow(el);
-      this.transitioning = true;
-      el.style.height = 0; // This should be moved out so we can add cancellable events
+      this.transitioning = true; // This should be moved out so we can add cancellable events
 
       this.$emit('hide');
     },
     onAfterLeave: function onAfterLeave(el) {
-      el.style.height = null;
       this.transitioning = false;
       this.$emit('hidden');
     },
     emitState: function emitState() {
-      this.$emit('input', this.show); // Let v-b-toggle know the state of this collapse
+      this.$emit('input', this.show); // Let `v-b-toggle` know the state of this collapse
 
       this.$root.$emit(EVENT_STATE, this.safeId(), this.show);
 
@@ -5188,13 +5354,17 @@ Vue.extend({
       this.$root.$emit(EVENT_STATE_SYNC, this.safeId(), this.show);
     },
     checkDisplayBlock: function checkDisplayBlock() {
-      // Check to see if the collapse has `display: block !important;` set.
-      // We can't set `display: none;` directly on this.$el, as it would
-      // trigger a new transition to start (or cancel a current one).
+      // Check to see if the collapse has `display: block !important` set
+      // We can't set `display: none` directly on `this.$el`, as it would
+      // trigger a new transition to start (or cancel a current one)
       var restore = hasClass(this.$el, 'show');
       removeClass(this.$el, 'show');
       var isBlock = getCS(this.$el).display === 'block';
-      restore && addClass(this.$el, 'show');
+
+      if (restore) {
+        addClass(this.$el, 'show');
+      }
+
       return isBlock;
     },
     clickHandler: function clickHandler(evt) {
@@ -5208,7 +5378,7 @@ Vue.extend({
 
       if (matches(el, '.nav-link,.dropdown-item') || closest('.nav-link,.dropdown-item', el)) {
         if (!this.checkDisplayBlock()) {
-          // Only close the collapse if it is not forced to be 'display: block !important;'
+          // Only close the collapse if it is not forced to be `display: block !important`
           this.show = false;
         }
       }
@@ -5243,6 +5413,14 @@ Vue.extend({
     }
   },
   render: function render(h) {
+    var _this2 = this;
+
+    var scope = {
+      visible: this.show,
+      close: function close() {
+        return _this2.show = false;
+      }
+    };
     var content = h(this.tag, {
       class: this.classObject,
       directives: [{
@@ -5255,15 +5433,10 @@ Vue.extend({
       on: {
         click: this.clickHandler
       }
-    }, [this.normalizeSlot('default')]);
-    return h('transition', {
+    }, [this.normalizeSlot('default', scope)]);
+    return h(BVCollapse, {
       props: {
-        enterClass: '',
-        enterActiveClass: 'collapsing',
-        enterToClass: '',
-        leaveClass: '',
-        leaveActiveClass: 'collapsing',
-        leaveToClass: ''
+        appear: this.appear
       },
       on: {
         enter: this.onEnter,
@@ -6213,6 +6386,10 @@ var props$j = {
       return getComponentConfig(NAME$9, 'splitVariant');
     }
   },
+  splitClass: {
+    type: [String, Array],
+    default: null
+  },
   splitButtonType: {
     type: String,
     default: 'button',
@@ -6291,6 +6468,7 @@ Vue.extend({
       split = h(BButton, {
         ref: 'button',
         props: btnProps,
+        class: this.splitClass,
         attrs: {
           id: this.safeId('_BV_button_')
         },
@@ -6598,6 +6776,10 @@ Vue.extend({
     disabled: {
       type: Boolean,
       default: false
+    },
+    formClass: {
+      type: [String, Object, Array],
+      default: null
     }
   }),
   render: function render(h, _ref) {
@@ -6615,9 +6797,9 @@ Vue.extend({
     }), [h(BForm, {
       ref: 'form',
       staticClass: 'b-dropdown-form',
-      class: {
+      class: [props.formClass, {
         disabled: props.disabled
-      },
+      }],
       props: props,
       attrs: _objectSpread2({}, $attrs, {
         disabled: props.disabled,
@@ -6793,7 +6975,7 @@ Vue.extend({
     return h(props.tag, {
       ref: data.ref,
       staticClass: 'embed-responsive',
-      class: _defineProperty({}, "embed-responsive-".concat(props.aspect), Boolean(props.aspect))
+      class: _defineProperty({}, "embed-responsive-".concat(props.aspect), props.aspect)
     }, [h(props.type, mergeData(data, {
       ref: '',
       staticClass: 'embed-responsive-item'
@@ -6808,6 +6990,8 @@ pluginFactory({
     BEmbed: BEmbed
   }
 });
+
+var OPTIONS_OBJECT_DEPRECATED_MSG = 'Setting prop "options" to an object is deprecated. Use the array format instead.'; // @vue/component
 
 var formOptionsMixin = {
   props: {
@@ -6836,56 +7020,46 @@ var formOptionsMixin = {
   },
   computed: {
     formOptions: function formOptions() {
-      var options = this.options;
-      var valueField = this.valueField;
-      var textField = this.textField;
-      var htmlField = this.htmlField;
-      var disabledField = this.disabledField;
+      var _this = this;
+
+      var options = this.options; // Normalize the given options array
 
       if (isArray(options)) {
-        // Normalize flat-ish arrays to Array of Objects
         return options.map(function (option) {
-          if (isPlainObject(option)) {
-            var value = option[valueField];
-            var text = String(option[textField]);
-            return {
-              value: isUndefined(value) ? text : value,
-              text: stripTags(text),
-              html: option[htmlField],
-              disabled: Boolean(option[disabledField])
-            };
-          }
-
-          return {
-            value: option,
-            text: stripTags(String(option)),
-            disabled: false
-          };
+          return _this.normalizeOption(option);
         });
-      } else {
-        // options is Object
-        // Normalize Objects to Array of Objects
-        return keys(options).map(function (key) {
-          var option = options[key] || {};
+      } // Deprecate the object options format
 
-          if (isPlainObject(option)) {
-            var value = option[valueField];
-            var text = option[textField];
-            return {
-              value: isUndefined(value) ? key : value,
-              text: isUndefined(text) ? stripTags(String(key)) : stripTags(String(text)),
-              html: option[htmlField],
-              disabled: Boolean(option[disabledField])
-            };
-          }
 
-          return {
-            value: key,
-            text: stripTags(String(option)),
-            disabled: false
-          };
-        });
-      }
+      warn(OPTIONS_OBJECT_DEPRECATED_MSG, this.$options.name); // Normalize a `options` object to an array of options
+
+      return keys(options).map(function (key) {
+        return _this.normalizeOption(options[key] || {}, key);
+      });
+    }
+  },
+  methods: {
+    normalizeOption: function normalizeOption(option) {
+      var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      // When the option is an object, normalize it
+      if (isPlainObject(option)) {
+        var value = get(option, this.valueField);
+        var text = get(option, this.textField);
+        return {
+          value: isUndefined(value) ? key || text : value,
+          text: stripTags(String(isUndefined(text) ? key : text)),
+          html: get(option, this.htmlField),
+          disabled: Boolean(get(option, this.disabledField))
+        };
+      } // Otherwise create an `<option>` object from the given value
+
+
+      return {
+        value: key || option,
+        text: stripTags(String(option)),
+        disabled: false
+      };
     }
   }
 };
@@ -6957,7 +7131,7 @@ Vue.extend({
     return h(props.tag, mergeData(data, {
       class: _defineProperty({
         'form-text': !props.inline
-      }, "text-".concat(props.textVariant), Boolean(props.textVariant)),
+      }, "text-".concat(props.textVariant), props.textVariant),
       attrs: {
         id: props.id
       }
@@ -7144,14 +7318,7 @@ var formStateMixin = {
     },
     stateClass: function stateClass() {
       var state = this.computedState;
-
-      if (state === true) {
-        return 'is-valid';
-      } else if (state === false) {
-        return 'is-invalid';
-      }
-
-      return null;
+      return state === true ? 'is-valid' : state === false ? 'is-invalid' : null;
     }
   }
 };
@@ -7167,6 +7334,8 @@ var formStateMixin = {
 var suffixPropName = function suffixPropName(suffix, str) {
   return str + (suffix ? upperFirst(suffix) : '');
 };
+
+var RX_COL_CLASS = /^col-/; // Generates a prop object with a type of `[Boolean, String, Number]`
 
 var boolStrNum = function boolStrNum() {
   return {
@@ -7187,7 +7356,7 @@ var strNum = function strNum() {
 var computeBreakpoint = function computeBreakpoint(type, breakpoint, val) {
   var className = type;
 
-  if (isUndefined(val) || isNull(val) || val === false) {
+  if (isUndefinedOrNull(val) || val === false) {
     return undefined;
   }
 
@@ -7200,12 +7369,12 @@ var computeBreakpoint = function computeBreakpoint(type, breakpoint, val) {
 
   if (type === 'col' && (val === '' || val === true)) {
     // .col-md
-    return className.toLowerCase();
+    return lowerCase(className);
   } // .order-md-6
 
 
   className += "-".concat(val);
-  return className.toLowerCase();
+  return lowerCase(className);
 }; // Memoized function for better performance on generating class names
 
 
@@ -7215,7 +7384,7 @@ var breakpointPropMap = create(null); // Lazy evaled props factory for BCol
 
 var generateProps = function generateProps() {
   // Grab the breakpoints from the cached config (exclude the '' (xs) breakpoint)
-  var breakpoints = getBreakpointsUpCached().filter(Boolean); // Supports classes like: .col-sm, .col-md-6, .col-lg-auto
+  var breakpoints = getBreakpointsUpCached().filter(identity); // Supports classes like: .col-sm, .col-md-6, .col-lg-auto
 
   var breakpointCol = breakpoints.reduce(function (propMap, breakpoint) {
     if (breakpoint) {
@@ -7311,7 +7480,7 @@ var BCol = {
     }
 
     var hasColClasses = classList.some(function (className) {
-      return /^col-/.test(className);
+      return RX_COL_CLASS.test(className);
     });
     classList.push((_classList$push = {
       // Default to .col if no other col-{bp}-* classes generated nor `cols` specified.
@@ -7431,7 +7600,8 @@ var renderLabel = function renderLabel(h, ctx) {
         // will properly read the aria-labelledby in IE.
         tabindex: isLegend ? '-1' : null
       },
-      class: [// When horizontal or if a legend is rendered, add col-form-label
+      class: [// Hide the focus ring on the legend
+      isLegend ? 'bv-no-focus-ring' : '', // When horizontal or if a legend is rendered, add col-form-label
       // for correct sizing as Bootstrap has inconsistent font styling
       // for legend in non-horizontal form-groups.
       // See: https://github.com/twbs/bootstrap/issues/27805
@@ -7660,7 +7830,9 @@ var BFormGroup = {
 
       if (inputs && inputs.length === 1 && inputs[0].focus) {
         // if only a single input, focus it, emulating label behaviour
-        inputs[0].focus();
+        try {
+          inputs[0].focus();
+        } catch (_unused) {}
       }
     },
     setInputDescribedBy: function setInputDescribedBy(add, remove) {
@@ -7702,6 +7874,8 @@ var BFormGroup = {
 
     var content = h(isHorizontal ? BCol : 'div', {
       ref: 'content',
+      // Hide focus ring
+      staticClass: 'bv-no-focus-ring',
       attrs: {
         tabindex: isFieldset ? '-1' : null,
         role: isFieldset ? 'group' : null
@@ -7902,7 +8076,7 @@ var formRadioCheckMixin = {
       // Required only works when a name is provided for the input(s)
       // Child can only be required when parent is
       // Groups will always have a name (either user supplied or auto generated)
-      return Boolean(this.getName && (this.isGroup ? this.bvGroup.required : this.required));
+      return this.getName && (this.isGroup ? this.bvGroup.required : this.required);
     },
     getName: function getName() {
       // Group name preferred over local name
@@ -8345,11 +8519,12 @@ var formRadioCheckGroupMixin = {
       })]);
     });
     return h('div', {
-      class: this.groupClasses,
+      class: [this.groupClasses, 'bv-no-focus-ring'],
       attrs: {
         id: this.safeId(),
         role: this.isRadioGroup ? 'radiogroup' : 'group',
-        // Tabindex to allow group to be focused if needed
+        // Tabindex to allow group to be focused
+        // if needed by screen readers
         tabindex: '-1',
         'aria-required': this.required ? 'true' : null,
         'aria-invalid': this.computedAriaInvalid
@@ -8449,6 +8624,848 @@ pluginFactory({
   }
 });
 
+var NAME$c = 'BFormTag';
+var BFormTag =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$c,
+  mixins: [idMixin, normalizeSlotMixin],
+  props: {
+    variant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$c, 'variant');
+      }
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    title: {
+      type: String,
+      default: null
+    },
+    pill: {
+      type: Boolean,
+      default: false
+    },
+    removeLabel: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$c, 'removeLabel');
+      }
+    },
+    tag: {
+      type: String,
+      default: 'span'
+    }
+  },
+  methods: {
+    onClick: function onClick() {
+      this.$emit('remove');
+    }
+  },
+  render: function render(h) {
+    var tagId = this.safeId();
+    var $remove = h();
+
+    if (!this.disabled) {
+      $remove = h(BButtonClose, {
+        staticClass: 'b-form-tag-remove ml-1',
+        props: {
+          ariaLabel: this.removeLabel
+        },
+        attrs: {
+          'aria-controls': tagId
+        },
+        on: {
+          click: this.onClick
+        }
+      });
+    }
+
+    var $tag = h('span', {
+      staticClass: 'b-form-tag-content flex-grow-1 text-truncate'
+    }, this.normalizeSlot('default') || this.title || [h()]);
+    return h(BBadge, {
+      staticClass: 'b-form-tag d-inline-flex align-items-baseline mw-100',
+      class: {
+        disabled: this.disabled
+      },
+      attrs: {
+        id: tagId,
+        title: this.title || null
+      },
+      props: {
+        tag: this.tag,
+        variant: this.variant,
+        pill: this.pill
+      }
+    }, [$tag, $remove]);
+  }
+});
+
+var NAME$d = 'BFormTags'; // --- Pre-compiled regular expressions for performance reasons ---
+
+var RX_SPACES = /[\s\uFEFF\xA0]+/g; // --- Utility methods ---
+// Escape special chars in string and replace
+// contiguous spaces with a whitespace match
+
+var escapeRegExpChars = function escapeRegExpChars(str) {
+  return escapeRegExp(str).replace(RX_SPACES, '\\s');
+}; // Remove leading/trailing spaces from array of tags and remove duplicates
+
+
+var cleanTags = function cleanTags(tags) {
+  return concat(tags).map(function (tag) {
+    return trim(toString$1(tag));
+  }).filter(function (tag, index, arr) {
+    return tag.length > 0 && arr.indexOf(tag) === index;
+  });
+}; // Processes an input/change event, normalizing string or event argument
+
+
+var processEventValue = function processEventValue(evt) {
+  return isString(evt) ? evt : isEvent(evt) ? evt.target.value || '' : '';
+}; // Returns a fresh empty `tagsState` object
+
+
+var cleanTagsState = function cleanTagsState() {
+  return {
+    all: [],
+    valid: [],
+    invalid: [],
+    duplicate: []
+  };
+}; // @vue/component
+
+
+var BFormTags =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$d,
+  mixins: [idMixin, normalizeSlotMixin],
+  model: {
+    // Even though this is the default that Vue assumes, we need
+    // to add it for the docs to reflect that this is the model
+    prop: 'value',
+    event: 'input'
+  },
+  props: {
+    inputId: {
+      type: String,
+      default: null
+    },
+    placeholder: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$d, 'placeholder');
+      }
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    name: {
+      type: String,
+      default: null
+    },
+    form: {
+      type: String,
+      default: null
+    },
+    autofocus: {
+      type: Boolean,
+      default: false
+    },
+    state: {
+      // Tri-state: `true`, `false`, `null`
+      type: Boolean,
+      default: null
+    },
+    size: {
+      type: String,
+      default: null
+    },
+    inputClass: {
+      type: [String, Array, Object],
+      default: null
+    },
+    inputAttrs: {
+      // Additional attributes to add to the input element
+      type: Object,
+      default: function _default() {
+        return {};
+      }
+    },
+    addButtonText: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$d, 'addButtonText');
+      }
+    },
+    addButtonVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$d, 'addButtonVariant');
+      }
+    },
+    tagVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$d, 'tagVariant');
+      }
+    },
+    tagClass: {
+      type: [String, Array, Object],
+      default: null
+    },
+    tagPills: {
+      type: Boolean,
+      default: false
+    },
+    tagRemoveLabel: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$d, 'tagRemoveLabel');
+      }
+    },
+    tagValidator: {
+      type: Function,
+      default: null
+    },
+    duplicateTagText: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$d, 'duplicateTagText');
+      }
+    },
+    invalidTagText: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$d, 'invalidTagText');
+      }
+    },
+    separator: {
+      // Character (or characters) that trigger adding tags
+      type: [String, Array],
+      default: null
+    },
+    removeOnDelete: {
+      // Enable deleting last tag in list when BACKSPACE is
+      // pressed and input is empty
+      type: Boolean,
+      default: false
+    },
+    addOnChange: {
+      // Enable change event triggering tag addition
+      // Handy if using <select> as the input
+      type: Boolean,
+      default: false
+    },
+    noAddOnEnter: {
+      // Disable ENTER key from triggering tag addition
+      type: Boolean,
+      default: false
+    },
+    noOuterFocus: {
+      // Disable the focus ring on the root element
+      type: Boolean,
+      default: false
+    },
+    value: {
+      // The v-model prop
+      type: Array,
+      default: function _default() {
+        return [];
+      }
+    }
+  },
+  data: function data() {
+    return {
+      hasFocus: false,
+      newTag: '',
+      tags: [],
+      // Populated when tags are parsed
+      tagsState: cleanTagsState()
+    };
+  },
+  computed: {
+    computedInputId: function computedInputId() {
+      return this.inputId || this.safeId('__input__');
+    },
+    computedInputAttrs: function computedInputAttrs() {
+      return _objectSpread2({}, this.inputAttrs, {
+        // Must have attributes
+        id: this.computedInputId,
+        value: this.newTag,
+        disabled: this.disabled || null,
+        form: this.form || null
+      });
+    },
+    computedInputHandlers: function computedInputHandlers() {
+      return {
+        input: this.onInputInput,
+        change: this.onInputChange,
+        keydown: this.onInputKeydown
+      };
+    },
+    computedSeparator: function computedSeparator() {
+      // Merge the array into a string
+      return concat(this.separator).filter(isString).filter(identity).join('');
+    },
+    computedSeparatorRegExp: function computedSeparatorRegExp() {
+      // We use a computed prop here to precompile the RegExp
+      // The RegExp is a character class RE in the form of `/[abc]+/`
+      // where a, b, and c are the valid separator characters
+      // -> `tags = str.split(/[abc]+/).filter(t => t)`
+      var separator = this.computedSeparator;
+      return separator ? new RegExp("[".concat(escapeRegExpChars(separator), "]+")) : null;
+    },
+    computedJoiner: function computedJoiner() {
+      // When tag(s) are invalid or duplicate, we leave them
+      // in the input so that the user can see them
+      // If there are more than one tag in the input, we use the
+      // first separator character as the separator in the input
+      // We append a space if the first separator is not a space
+      var joiner = this.computedSeparator.charAt(0);
+      return joiner !== ' ' ? "".concat(joiner, " ") : joiner;
+    },
+    disableAddButton: function disableAddButton() {
+      var _this = this;
+
+      // If 'Add' button should be disabled
+      // If the input contains at least one tag that can
+      // be added, then the 'Add' button should be enabled
+      var newTag = trim(this.newTag);
+      return newTag === '' || !this.splitTags(newTag).some(function (t) {
+        return !arrayIncludes(_this.tags, t) && _this.validateTag(t);
+      });
+    },
+    duplicateTags: function duplicateTags() {
+      return this.tagsState.duplicate;
+    },
+    hasDuplicateTags: function hasDuplicateTags() {
+      return this.duplicateTags.length > 0;
+    },
+    invalidTags: function invalidTags() {
+      return this.tagsState.invalid;
+    },
+    hasInvalidTags: function hasInvalidTags() {
+      return this.invalidTags.length > 0;
+    }
+  },
+  watch: {
+    value: function value(newVal) {
+      this.tags = cleanTags(newVal);
+    },
+    tags: function tags(newVal) {
+      // Update the `v-model` (if it differs from the value prop)
+      if (!looseEqual(newVal, this.value)) {
+        this.$emit('input', newVal);
+      }
+    },
+    tagsState: function tagsState(newVal, oldVal) {
+      // Emit a tag-state event when the `tagsState` object changes
+      if (!looseEqual(newVal, oldVal)) {
+        this.$emit('tag-state', newVal.valid, newVal.invalid, newVal.duplicate);
+      }
+    }
+  },
+  created: function created() {
+    // We do this in created to make sure an input event emits
+    // if the cleaned tags are not equal to the value prop
+    this.tags = cleanTags(this.value);
+  },
+  mounted: function mounted() {
+    this.handleAutofocus();
+  },
+  activated: function activated()
+  /* istanbul ignore next */
+  {
+    this.handleAutofocus();
+  },
+  methods: {
+    addTag: function addTag(newTag) {
+      newTag = isString(newTag) ? newTag : this.newTag;
+      /* istanbul ignore next */
+
+      if (this.disabled || trim(newTag) === '') {
+        // Early exit
+        return;
+      }
+
+      var parsed = this.parseTags(newTag); // Add any new tags to the `tags` array, or if the
+      // array of `allTags` is empty, we clear the input
+
+      if (parsed.valid.length > 0 || parsed.all.length === 0) {
+        // Clear the user input element (and leave in any invalid/duplicate tag(s)
+
+        /* istanbul ignore if: full testing to be added later */
+        if (matches(this.getInput(), 'select')) {
+          // The following is needed to properly
+          // work with `<select>` elements
+          this.newTag = '';
+        } else {
+          var invalidAndDuplicates = [].concat(_toConsumableArray(parsed.invalid), _toConsumableArray(parsed.duplicate));
+          this.newTag = parsed.all.filter(function (tag) {
+            return arrayIncludes(invalidAndDuplicates, tag);
+          }).join(this.computedJoiner).concat(invalidAndDuplicates.length > 0 ? this.computedJoiner.charAt(0) : '');
+        }
+      }
+
+      if (parsed.valid.length > 0) {
+        // We add the new tags in one atomic operation
+        // to trigger reactivity once (instead of once per tag)
+        // We do this after we update the new tag input value
+        // `concat()` can be faster than array spread, when both args are arrays
+        this.tags = concat(this.tags, parsed.valid);
+      }
+
+      this.tagsState = parsed; // Attempt to re-focus the input (specifically for when using the Add
+      // button, as the button disappears after successfully adding a tag
+
+      this.focus();
+    },
+    removeTag: function removeTag(tag) {
+      /* istanbul ignore next */
+      if (this.disabled) {
+        return;
+      } // TODO:
+      //   Add `onRemoveTag(tag)` user method, which if returns `false`
+      //   will prevent the tag from being removed (i.e. confirmation)
+      //   Or emit cancelable `BvEvent`
+
+
+      this.tags = this.tags.filter(function (t) {
+        return t !== tag;
+      }); // Return focus to the input (if possible)
+
+      this.focus();
+    },
+    // --- Input element event handlers ---
+    onInputInput: function onInputInput(evt) {
+      /* istanbul ignore next: hard to test composition events */
+      if (this.disabled || isEvent(evt) && evt.target.composing) {
+        // `evt.target.composing` is set by Vue (`v-model` directive)
+        // https://github.com/vuejs/vue/blob/dev/src/platforms/web/runtime/directives/model.js
+        return;
+      }
+
+      var newTag = processEventValue(evt);
+      var separatorRe = this.computedSeparatorRegExp;
+
+      if (this.newTag !== newTag) {
+        this.newTag = newTag;
+      } // We ignore leading whitespace for the following
+
+
+      newTag = trimLeft(newTag);
+
+      if (separatorRe && separatorRe.test(newTag.slice(-1))) {
+        // A trailing separator character was entered, so add the tag(s)
+        // Note: More than one tag on input event is possible via copy/paste
+        this.addTag();
+      } else {
+        // Validate (parse tags) on input event
+        this.tagsState = newTag === '' ? cleanTagsState() : this.parseTags(newTag);
+      }
+    },
+    onInputChange: function onInputChange(evt) {
+      // Change is triggered on `<input>` blur, or `<select>` selected
+      // This event is opt-in
+      if (!this.disabled && this.addOnChange) {
+        var newTag = processEventValue(evt);
+        /* istanbul ignore next */
+
+        if (this.newTag !== newTag) {
+          this.newTag = newTag;
+        }
+
+        this.addTag();
+      }
+    },
+    onInputKeydown: function onInputKeydown(evt) {
+      // Early exit
+
+      /* istanbul ignore next */
+      if (this.disabled || !isEvent(evt)) {
+        return;
+      }
+
+      var keyCode = evt.keyCode;
+      var value = evt.target.value || '';
+      /* istanbul ignore else: testing to be added later */
+
+      if (!this.noAddOnEnter && keyCode === KEY_CODES.ENTER) {
+        // Attempt to add the tag when user presses enter
+        evt.preventDefault();
+        this.addTag();
+      } else if (this.removeOnDelete && keyCode === KEY_CODES.BACKSPACE && value === '') {
+        // Remove the last tag if the user pressed backspace and the input is empty
+        evt.preventDefault();
+        this.tags.pop();
+      }
+    },
+    // --- Wrapper event handlers ---
+    onClick: function onClick(evt) {
+      if (!this.disabled && isEvent(evt) && evt.target === evt.currentTarget) {
+        this.$nextTick(this.focus);
+      }
+    },
+    onFocusin: function onFocusin() {
+      this.hasFocus = true;
+    },
+    onFocusout: function onFocusout() {
+      this.hasFocus = false;
+    },
+    handleAutofocus: function handleAutofocus() {
+      var _this2 = this;
+
+      this.$nextTick(function () {
+        requestAF(function () {
+          if (_this2.autofocus && !_this2.disabled) {
+            _this2.focus();
+          }
+        });
+      });
+    },
+    // --- Public methods ---
+    focus: function focus() {
+      if (!this.disabled) {
+        try {
+          this.getInput().focus();
+        } catch (_unused) {}
+      }
+    },
+    blur: function blur() {
+      try {
+        this.getInput().blur();
+      } catch (_unused2) {}
+    },
+    // --- Private methods ---
+    splitTags: function splitTags(newTag) {
+      // Split the input into an array of raw tags
+      newTag = toString$1(newTag);
+      var separatorRe = this.computedSeparatorRegExp; // Split the tag(s) via the optional separator
+      // Normally only a single tag is provided, but copy/paste
+      // can enter multiple tags in a single operation
+
+      return (separatorRe ? newTag.split(separatorRe) : [newTag]).map(trim).filter(identity);
+    },
+    parseTags: function parseTags(newTag) {
+      var _this3 = this;
+
+      // Takes `newTag` value and parses it into `validTags`,
+      // `invalidTags`, and duplicate tags as an object
+      // Split the input into raw tags
+      var tags = this.splitTags(newTag); // Base results
+
+      var parsed = {
+        all: tags,
+        valid: [],
+        invalid: [],
+        duplicate: []
+      }; // Parse the unique tags
+
+      tags.forEach(function (tag) {
+        if (arrayIncludes(_this3.tags, tag) || arrayIncludes(parsed.valid, tag)) {
+          // Unique duplicate tags
+          if (!arrayIncludes(parsed.duplicate, tag)) {
+            parsed.duplicate.push(tag);
+          }
+        } else if (_this3.validateTag(tag)) {
+          // We only add unique/valid tags
+          parsed.valid.push(tag);
+        } else {
+          // Unique invalid tags
+          if (!arrayIncludes(parsed.invalid, tag)) {
+            parsed.invalid.push(tag);
+          }
+        }
+      });
+      return parsed;
+    },
+    validateTag: function validateTag(tag) {
+      // Call the user supplied tag validator
+      var validator = this.tagValidator;
+      return isFunction(validator) ? validator(tag) : true;
+    },
+    getInput: function getInput() {
+      // Returns the input element reference (or null if not found)
+      return select("#".concat(this.computedInputId), this.$el);
+    },
+    // Default User Interface render
+    defaultRender: function defaultRender(_ref) {
+      var tags = _ref.tags,
+          addTag = _ref.addTag,
+          removeTag = _ref.removeTag,
+          inputAttrs = _ref.inputAttrs,
+          inputHandlers = _ref.inputHandlers,
+          inputClass = _ref.inputClass,
+          tagClass = _ref.tagClass,
+          tagVariant = _ref.tagVariant,
+          tagPills = _ref.tagPills,
+          tagRemoveLabel = _ref.tagRemoveLabel,
+          invalidTagText = _ref.invalidTagText,
+          duplicateTagText = _ref.duplicateTagText,
+          isInvalid = _ref.isInvalid,
+          invalidTags = _ref.invalidTags,
+          isDuplicate = _ref.isDuplicate,
+          duplicateTags = _ref.duplicateTags,
+          disabled = _ref.disabled,
+          placeholder = _ref.placeholder,
+          addButtonText = _ref.addButtonText,
+          addButtonVariant = _ref.addButtonVariant,
+          disableAddButton = _ref.disableAddButton;
+      var h = this.$createElement; // Make the list of tags
+
+      var $tags = tags.map(function (tag, idx) {
+        tag = toString$1(tag);
+        return h(BFormTag, {
+          key: "li-tag__".concat(tag),
+          staticClass: 'mt-1 mr-1',
+          class: tagClass,
+          props: {
+            // 'BFormTag' will auto generate an ID
+            // so we do not need to set the ID prop
+            tag: 'li',
+            title: tag,
+            disabled: disabled,
+            variant: tagVariant,
+            pill: tagPills,
+            removeLabel: tagRemoveLabel
+          },
+          on: {
+            remove: function remove() {
+              return removeTag(tag);
+            }
+          }
+        }, tag);
+      }); // Feedback IDs if needed
+
+      var invalidFeedbackId = invalidTagText && isInvalid ? this.safeId('__invalid_feedback__') : null;
+      var duplicateFeedbackId = duplicateTagText && isDuplicate ? this.safeId('__duplicate_feedback__') : null; // Compute the `aria-describedby` attribute value
+
+      var ariaDescribedby = [inputAttrs['aria-describedby'], invalidFeedbackId, duplicateFeedbackId].filter(identity).join(' '); // Input
+
+      var $input = h('input', {
+        ref: 'input',
+        // Directive needed to get `evt.target.composing` set (if needed)
+        directives: [{
+          name: 'model',
+          value: inputAttrs.value
+        }],
+        staticClass: 'b-form-tags-input w-100 flex-grow-1 p-0 m-0 bg-transparent border-0',
+        class: inputClass,
+        style: {
+          outline: 0,
+          minWidth: '5rem'
+        },
+        attrs: _objectSpread2({}, inputAttrs, {
+          'aria-describedby': ariaDescribedby || null,
+          type: 'text',
+          placeholder: placeholder || null
+        }),
+        domProps: {
+          value: inputAttrs.value
+        },
+        on: inputHandlers
+      }); // Add button
+
+      var $button = h(BButton, {
+        ref: 'button',
+        staticClass: 'b-form-tags-button py-0',
+        class: {
+          // Only show the button if the tag can be added
+          // We use the `invisible` class instead of not rendering
+          // the button, so that we maintain layout to prevent
+          // the user input from jumping around
+          invisible: disableAddButton
+        },
+        style: {
+          fontSize: '90%'
+        },
+        props: {
+          variant: addButtonVariant,
+          disabled: disableAddButton
+        },
+        on: {
+          click: function click() {
+            return addTag();
+          }
+        }
+      }, [this.normalizeSlot('add-button-text') || addButtonText]); // ID of the tags+input `<ul>` list
+      // Note we could concatenate inputAttrs.id with `__TAG__LIST__`
+      // But note that the inputID may be null until after mount
+      // `safeId` returns `null`, if no user provided ID, until after
+      // mount when a unique ID is generated
+
+      var tagListId = this.safeId('__TAG__LIST__');
+      var $field = h('li', {
+        key: '__li-input__',
+        staticClass: 'd-inline-flex flex-grow-1 mt-1',
+        attrs: {
+          role: 'group',
+          'aria-live': 'off',
+          'aria-controls': tagListId
+        }
+      }, [$input, $button]); // Wrap in an unordered list element (we use a list for accessibility)
+
+      var $ul = h('ul', {
+        key: '_tags_list_',
+        staticClass: 'list-unstyled mt-n1 mb-0 d-flex flex-wrap align-items-center',
+        attrs: {
+          id: tagListId,
+          // Don't interrupt the user abruptly
+          // Although maybe this should be 'assertive'
+          // to provide immediate feedback of the tag added/removed
+          'aria-live': 'polite',
+          // Only read elements that have been added or removed
+          'aria-atomic': 'false',
+          'aria-relevant': 'additions removals'
+        }
+      }, // `concat()` is faster than array spread when args are known to be arrays
+      concat($tags, $field)); // Assemble the feedback
+
+      var $feedback = h();
+
+      if (invalidTagText || duplicateTagText) {
+        // Add an aria live region for the invalid/duplicate tag
+        // messages if the user has not disabled the messages
+        var joiner = this.computedJoiner; // Invalid tag feedback if needed (error)
+
+        var $invalid = h();
+
+        if (invalidFeedbackId) {
+          $invalid = h(BFormInvalidFeedback, {
+            key: '_tags_invalid_feedback_',
+            props: {
+              id: invalidFeedbackId,
+              forceShow: true
+            }
+          }, [this.invalidTagText, ': ', this.invalidTags.join(joiner)]);
+        } // Duplicate tag feedback if needed (warning, not error)
+
+
+        var $duplicate = h();
+
+        if (duplicateFeedbackId) {
+          $duplicate = h(BFormText, {
+            key: '_tags_duplicate_feedback_',
+            props: {
+              id: duplicateFeedbackId
+            }
+          }, [this.duplicateTagText, ': ', this.duplicateTags.join(joiner)]);
+        }
+
+        $feedback = h('div', {
+          key: '_tags_feedback_',
+          attrs: {
+            'aria-live': 'polite',
+            'aria-atomic': 'true'
+          }
+        }, [$invalid, $duplicate]);
+      } // Return the content
+
+
+      return [$ul, $feedback];
+    }
+  },
+  render: function render(h) {
+    var _this4 = this;
+
+    // Scoped slot properties
+    var scope = {
+      // Array of tags (shallow copy to prevent mutations)
+      tags: this.tags.slice(),
+      // Methods
+      removeTag: this.removeTag,
+      addTag: this.addTag,
+      // <input> v-bind:inputAttrs
+      inputAttrs: this.computedInputAttrs,
+      // <input> v-on:inputHandlers
+      inputHandlers: this.computedInputHandlers,
+      // <input> :id="inputId"
+      inputId: this.computedInputId,
+      // Invalid/Duplicate state information
+      invalidTags: this.invalidTags.slice(),
+      isInvalid: this.hasInvalidTags,
+      duplicateTags: this.duplicateTags.slice(),
+      isDuplicate: this.hasDuplicateTags,
+      // If the 'Add' button should be disabled
+      disableAddButton: this.disableAddButton,
+      // Pass-though values
+      state: this.state,
+      separator: this.separator,
+      disabled: this.disabled,
+      size: this.size,
+      placeholder: this.placeholder,
+      inputClass: this.inputClass,
+      tagRemoveLabel: this.tagRemoveLabel,
+      tagVariant: this.tagVariant,
+      tagPills: this.tagPills,
+      tagClass: this.tagClass,
+      addButtonText: this.addButtonText,
+      addButtonVariant: this.addButtonVariant,
+      invalidTagText: this.invalidTagText,
+      duplicateTagText: this.duplicateTagText
+    }; // Generate the user interface
+
+    var $content = this.normalizeSlot('default', scope) || this.defaultRender(scope); // Add hidden inputs for form submission
+
+    var $hidden = h();
+
+    if (this.name && !this.disabled) {
+      // We add hidden inputs for each tag if a name is provided
+      // for native submission of forms
+      $hidden = this.tags.map(function (tag) {
+        return h('input', {
+          key: tag,
+          attrs: {
+            type: 'hidden',
+            value: tag,
+            name: _this4.name,
+            form: _this4.form || null
+          }
+        });
+      });
+    } // Return the rendered output
+
+
+    return h('div', {
+      staticClass: 'b-form-tags form-control h-auto',
+      class: _defineProperty({
+        focus: this.hasFocus && !this.noOuterFocus && !this.disabled,
+        disabled: this.disabled,
+        'is-valid': this.state === true,
+        'is-invalid': this.state === false
+      }, "form-control-".concat(this.size), this.size),
+      attrs: {
+        id: this.safeId(),
+        role: 'group',
+        tabindex: this.disabled || this.noOuterFocus ? null : '-1'
+      },
+      on: {
+        focusin: this.onFocusin,
+        focusout: this.onFocusout,
+        click: this.onClick
+      }
+    }, concat($content, $hidden));
+  }
+});
+
+var FormTagsPlugin =
+/*#__PURE__*/
+pluginFactory({
+  components: {
+    BFormTags: BFormTags,
+    BTags: BFormTags,
+    BFormTag: BFormTag,
+    BTag: BFormTag
+  }
+});
+
 var formTextMixin = {
   model: {
     prop: 'value',
@@ -8508,14 +9525,14 @@ var formTextMixin = {
   },
   data: function data() {
     return {
-      localValue: this.stringifyValue(this.value),
+      localValue: toString$1(this.value),
       vModelValue: this.value
     };
   },
   computed: {
     computedDebounce: function computedDebounce() {
       // Ensure we have a positive number equal to or greater than 0
-      return Math.max(parseInt(this.debounce, 10) || 0, 0);
+      return Math.max(toInteger(this.debounce) || 0, 0);
     },
     computedClass: function computedClass() {
       return [{
@@ -8545,7 +9562,7 @@ var formTextMixin = {
   },
   watch: {
     value: function value(newVal) {
-      var stringifyValue = this.stringifyValue(newVal);
+      var stringifyValue = toString$1(newVal);
 
       if (stringifyValue !== this.localValue && newVal !== this.vModelValue) {
         // Clear any pending debounce timeout, as we are overwriting the user input
@@ -8562,7 +9579,7 @@ var formTextMixin = {
     this.$on('hook:beforeDestroy', this.clearDebounce); // Preset the internal state
 
     var value = this.value;
-    var stringifyValue = this.stringifyValue(value);
+    var stringifyValue = toString$1(value);
     /* istanbul ignore next */
 
     if (stringifyValue !== this.localValue && value !== this.vModelValue) {
@@ -8575,12 +9592,9 @@ var formTextMixin = {
       clearTimeout(this.$_inputDebounceTimer);
       this.$_inputDebounceTimer = null;
     },
-    stringifyValue: function stringifyValue(value) {
-      return isUndefinedOrNull(value) ? '' : String(value);
-    },
     formatValue: function formatValue(value, evt) {
       var force = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      value = this.stringifyValue(value);
+      value = toString$1(value);
 
       if ((!this.lazyFormatter || force) && isFunction(this.formatter)) {
         value = this.formatter(value, evt);
@@ -8596,7 +9610,7 @@ var formTextMixin = {
 
 
       if (this.number) {
-        var number = parseFloat(value);
+        var number = toFloat(value);
         value = isNaN(number) ? value : number;
       }
 
@@ -8690,7 +9704,7 @@ var formTextMixin = {
       if (formattedValue !== false) {
         // We need to use the modified value here to apply the
         // `.trim` and `.number` modifiers properly
-        this.localValue = this.stringifyValue(this.modifyValue(formattedValue)); // We pass the formatted value here since the `updateValue` method
+        this.localValue = toString$1(this.modifyValue(formattedValue)); // We pass the formatted value here since the `updateValue` method
         // handles the modifiers itself
 
         this.updateValue(formattedValue, true);
@@ -9206,12 +10220,13 @@ var formCustomMixin = {
   }
 };
 
-var NAME$c = 'BFormFile'; // @vue/component
+var NAME$e = 'BFormFile';
+var VALUE_EMPTY_DEPRECATED_MSG = 'Setting "value"/"v-model" to an empty string for reset is deprecated. Set to "null" instead.'; // @vue/component
 
 var BFormFile =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$c,
+  name: NAME$e,
   mixins: [idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
   inheritAttrs: false,
   model: {
@@ -9231,7 +10246,7 @@ Vue.extend({
       validator: function validator(val) {
         /* istanbul ignore next */
         if (val === '') {
-          warn("".concat(NAME$c, " - setting value/v-model to an empty string for reset is deprecated. Set to 'null' instead"));
+          warn(VALUE_EMPTY_DEPRECATED_MSG, NAME$e);
           return true;
         }
 
@@ -9250,19 +10265,19 @@ Vue.extend({
     placeholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'placeholder');
+        return getComponentConfig(NAME$e, 'placeholder');
       }
     },
     browseText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'browseText');
+        return getComponentConfig(NAME$e, 'browseText');
       }
     },
     dropPlaceholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'dropPlaceholder');
+        return getComponentConfig(NAME$e, 'dropPlaceholder');
       }
     },
     multiple: {
@@ -9306,7 +10321,7 @@ Vue.extend({
       } // Convert selectedFile to an array (if not already one)
 
 
-      var files = concat(this.selectedFile).filter(Boolean);
+      var files = concat(this.selectedFile).filter(identity);
 
       if (this.hasNormalizedSlot('file-name')) {
         // There is a slot for formatting the files/names
@@ -9318,7 +10333,7 @@ Vue.extend({
         })];
       } else {
         // Use the user supplied formatter, or the built in one.
-        return isFunction(this.fileNameFormatter) ? String(this.fileNameFormatter(files)) : files.map(function (file) {
+        return isFunction(this.fileNameFormatter) ? toString$1(this.fileNameFormatter(files)) : files.map(function (file) {
           return file.name;
         }).join(', ');
       }
@@ -9543,7 +10558,7 @@ Vue.extend({
 
     return h('div', {
       staticClass: 'custom-file b-form-file',
-      class: [this.stateClass, _defineProperty({}, "b-custom-control-".concat(this.size), Boolean(this.size))],
+      class: [this.stateClass, _defineProperty({}, "b-custom-control-".concat(this.size), this.size)],
       attrs: {
         id: this.safeId('_BV_file_outer_')
       },
@@ -9565,11 +10580,123 @@ pluginFactory({
   }
 });
 
+var optionsMixin = {
+  mixins: [formOptionsMixin],
+  props: {
+    labelField: {
+      type: String,
+      default: 'label'
+    },
+    optionsField: {
+      type: String,
+      default: 'options'
+    }
+  },
+  methods: {
+    normalizeOption: function normalizeOption(option) {
+      var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      // When the option is an object, normalize it
+      if (isPlainObject(option)) {
+        var value = get(option, this.valueField);
+        var text = get(option, this.textField);
+        var options = get(option, this.optionsField); // When it has options, create an `<optgroup>` object
+
+        if (isArray(options)) {
+          return {
+            label: String(get(option, this.labelField) || text),
+            options: options
+          };
+        } // Otherwise create an `<option>` object
+
+
+        return {
+          value: isUndefined(value) ? key || text : value,
+          text: String(isUndefined(text) ? key : text),
+          html: get(option, this.htmlField),
+          disabled: Boolean(get(option, this.disabledField))
+        };
+      } // Otherwise create an `<option>` object from the given value
+
+
+      return {
+        value: key || option,
+        text: String(option),
+        disabled: false
+      };
+    }
+  }
+};
+
+var NAME$f = 'BFormSelectOption';
+var props$x = {
+  value: {
+    // type: [String, Number, Boolean, Object],
+    required: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  }
+}; // @vue/component
+
+var BFormSelectOption =
+/*#__PURE__*/
+Vue.extend({
+  name: NAME$f,
+  functional: true,
+  props: props$x,
+  render: function render(h, _ref) {
+    var props = _ref.props,
+        data = _ref.data,
+        children = _ref.children;
+    var value = props.value,
+        disabled = props.disabled;
+    return h('option', mergeData(data, {
+      attrs: {
+        disabled: disabled
+      },
+      domProps: {
+        value: value
+      }
+    }), children);
+  }
+});
+
+var BFormSelectOptionGroup =
+/*#__PURE__*/
+Vue.extend({
+  name: 'BFormSelectOptionGroup',
+  mixins: [normalizeSlotMixin, formOptionsMixin],
+  props: {
+    label: {
+      type: String,
+      required: true
+    }
+  },
+  render: function render(h) {
+    return h('optgroup', {
+      attrs: {
+        label: this.label
+      }
+    }, [this.normalizeSlot('first'), this.formOptions.map(function (option, index) {
+      return h(BFormSelectOption, {
+        props: {
+          value: option.value,
+          disabled: option.disabled
+        },
+        domProps: htmlOrText(option.html, option.text),
+        key: "option_".concat(index, "_opt")
+      });
+    }), this.normalizeSlot('default')]);
+  }
+});
+
 var BFormSelect =
 /*#__PURE__*/
 Vue.extend({
   name: 'BFormSelect',
-  mixins: [idMixin, normalizeSlotMixin, formMixin, formSizeMixin, formStateMixin, formCustomMixin, formOptionsMixin],
+  mixins: [idMixin, normalizeSlotMixin, formMixin, formSizeMixin, formStateMixin, formCustomMixin, optionsMixin],
   model: {
     prop: 'value',
     event: 'input'
@@ -9634,17 +10761,6 @@ Vue.extend({
   render: function render(h) {
     var _this = this;
 
-    var options = this.formOptions.map(function (option, index) {
-      return h('option', {
-        key: "option_".concat(index, "_opt"),
-        attrs: {
-          disabled: Boolean(option.disabled)
-        },
-        domProps: _objectSpread2({}, htmlOrText(option.html, option.text), {
-          value: option.value
-        })
-      });
-    });
     return h('select', {
       ref: 'input',
       class: this.inputClass,
@@ -9680,7 +10796,24 @@ Vue.extend({
           });
         }
       }
-    }, [this.normalizeSlot('first'), options, this.normalizeSlot('default')]);
+    }, [this.normalizeSlot('first'), this.formOptions.map(function (option, index) {
+      var key = "option_".concat(index, "_opt");
+      var options = option.options;
+      return isArray(options) ? h(BFormSelectOptionGroup, {
+        props: {
+          label: option.label,
+          options: options
+        },
+        key: key
+      }) : h(BFormSelectOption, {
+        props: {
+          value: option.value,
+          disabled: option.disabled
+        },
+        domProps: htmlOrText(option.html, option.text),
+        key: key
+      });
+    }), this.normalizeSlot('default')]);
   }
 });
 
@@ -9689,7 +10822,11 @@ var FormSelectPlugin =
 pluginFactory({
   components: {
     BFormSelect: BFormSelect,
-    BSelect: BFormSelect
+    BFormSelectOption: BFormSelectOption,
+    BFormSelectOptionGroup: BFormSelectOptionGroup,
+    BSelect: BFormSelect,
+    BSelectOption: BFormSelectOption,
+    BSelectOptionGroup: BFormSelectOptionGroup
   }
 });
 
@@ -9702,7 +10839,7 @@ pluginFactory({
   }
 });
 
-var props$x = {
+var props$y = {
   tag: {
     type: String,
     default: 'div'
@@ -9714,7 +10851,7 @@ var BInputGroupText =
 Vue.extend({
   name: 'BInputGroupText',
   functional: true,
-  props: props$x,
+  props: props$y,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -9805,15 +10942,15 @@ Vue.extend({
   }
 });
 
-var NAME$d = 'BInputGroup';
-var props$y = {
+var NAME$g = 'BInputGroup';
+var props$z = {
   id: {
     type: String
   },
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$d, 'size');
+      return getComponentConfig(NAME$g, 'size');
     }
   },
   prepend: {
@@ -9837,9 +10974,9 @@ var props$y = {
 var BInputGroup =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$d,
+  name: NAME$g,
   functional: true,
-  props: props$y,
+  props: props$z,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -9879,7 +11016,7 @@ Vue.extend({
 
     return h(props.tag, mergeData(data, {
       staticClass: 'input-group',
-      class: _defineProperty({}, "input-group-".concat(props.size), Boolean(props.size)),
+      class: _defineProperty({}, "input-group-".concat(props.size), props.size),
       attrs: {
         id: props.id || null,
         role: 'group'
@@ -9900,13 +11037,14 @@ pluginFactory({
   }
 });
 
-var props$z = {
+var props$A = {
   tag: {
     type: String,
     default: 'div'
   },
   fluid: {
-    type: Boolean,
+    // String breakpoint name new in Bootstrap v4.4.x
+    type: [Boolean, String],
     default: false
   }
 }; // @vue/component
@@ -9916,28 +11054,28 @@ var BContainer =
 Vue.extend({
   name: 'BContainer',
   functional: true,
-  props: props$z,
+  props: props$A,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
     return h(props.tag, mergeData(data, {
-      class: {
-        container: !props.fluid,
-        'container-fluid': props.fluid
-      }
+      class: _defineProperty({
+        container: !(props.fluid || props.fluid === ''),
+        'container-fluid': props.fluid === true || props.fluid === ''
+      }, "container-".concat(props.fluid), props.fluid && props.fluid !== true)
     }), children);
   }
 });
 
-var NAME$e = 'BJumbotron';
-var props$A = {
+var NAME$h = 'BJumbotron';
+var props$B = {
   fluid: {
     type: Boolean,
     default: false
   },
   containerFluid: {
-    type: Boolean,
+    type: [Boolean, String],
     default: false
   },
   header: {
@@ -9975,19 +11113,19 @@ var props$A = {
   bgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$e, 'bgVariant');
+      return getComponentConfig(NAME$h, 'bgVariant');
     }
   },
   borderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$e, 'borderVariant');
+      return getComponentConfig(NAME$h, 'borderVariant');
     }
   },
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$e, 'textVariant');
+      return getComponentConfig(NAME$h, 'textVariant');
     }
   }
 }; // @vue/component
@@ -9995,9 +11133,9 @@ var props$A = {
 var BJumbotron =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$e,
+  name: NAME$h,
   functional: true,
-  props: props$A,
+  props: props$B,
   render: function render(h, _ref) {
     var _class2;
 
@@ -10013,7 +11151,7 @@ Vue.extend({
 
     if (props.header || hasNormalizedSlot('header', $scopedSlots, $slots) || props.headerHtml) {
       childNodes.push(h(props.headerTag, {
-        class: _defineProperty({}, "display-".concat(props.headerLevel), Boolean(props.headerLevel))
+        class: _defineProperty({}, "display-".concat(props.headerLevel), props.headerLevel)
       }, normalizeSlot('header', {}, $scopedSlots, $slots) || props.headerHtml || stripTags(props.header)));
     } // Lead
 
@@ -10044,7 +11182,7 @@ Vue.extend({
       staticClass: 'jumbotron',
       class: (_class2 = {
         'jumbotron-fluid': props.fluid
-      }, _defineProperty(_class2, "text-".concat(props.textVariant), Boolean(props.textVariant)), _defineProperty(_class2, "bg-".concat(props.bgVariant), Boolean(props.bgVariant)), _defineProperty(_class2, "border-".concat(props.borderVariant), Boolean(props.borderVariant)), _defineProperty(_class2, "border", Boolean(props.borderVariant)), _class2)
+      }, _defineProperty(_class2, "text-".concat(props.textVariant), props.textVariant), _defineProperty(_class2, "bg-".concat(props.bgVariant), props.bgVariant), _defineProperty(_class2, "border-".concat(props.borderVariant), props.borderVariant), _defineProperty(_class2, "border", props.borderVariant), _class2)
     }), childNodes);
   }
 });
@@ -10057,59 +11195,115 @@ pluginFactory({
   }
 });
 
-var COMMON_ALIGNMENT = ['start', 'end', 'center'];
-var props$B = {
-  tag: {
-    type: String,
-    default: 'div'
-  },
-  noGutters: {
-    type: Boolean,
-    default: false
-  },
-  alignV: {
-    type: String,
-    default: null,
-    validator: function validator(str) {
-      return arrayIncludes(COMMON_ALIGNMENT.concat(['baseline', 'stretch']), str);
-    }
-  },
-  alignH: {
-    type: String,
-    default: null,
-    validator: function validator(str) {
-      return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around']), str);
-    }
-  },
-  alignContent: {
-    type: String,
-    default: null,
-    validator: function validator(str) {
-      return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around', 'stretch']), str);
-    }
-  }
-}; // @vue/component
+var COMMON_ALIGNMENT = ['start', 'end', 'center']; // Generates a prop object with a type of `[String, Number]`
 
-var BRow =
-/*#__PURE__*/
-Vue.extend({
+var strNum$1 = function strNum() {
+  return {
+    type: [String, Number],
+    default: null
+  };
+}; // Compute a `row-cols-{breakpoint}-{cols}` class name
+// Memoized function for better performance on generating class names
+
+
+var computeRowColsClass = memoize(function (breakpoint, cols) {
+  cols = trim(toString$1(cols));
+  return cols ? lowerCase(['row-cols', breakpoint, cols].filter(identity).join('-')) : null;
+}); // Get the breakpoint name from the `rowCols` prop name
+// Memoized function for better performance on extracting breakpoint names
+
+var computeRowColsBreakpoint = memoize(function (prop) {
+  return lowerCase(prop.replace('cols', ''));
+}); // Cached copy of the `row-cols` breakpoint prop names
+// Will be populated when the props are generated
+
+var rowColsPropList = []; // Lazy evaled props factory for <b-row> (called only once,
+// the first time the component is used)
+
+var generateProps$2 = function generateProps() {
+  // Grab the breakpoints from the cached config (including the '' (xs) breakpoint)
+  var breakpoints = getBreakpointsUpCached(); // Supports classes like: `row-cols-2`, `row-cols-md-4`, `row-cols-xl-6`
+
+  var rowColsProps = breakpoints.reduce(function (props, breakpoint) {
+    props[suffixPropName(breakpoint, 'cols')] = strNum$1();
+    return props;
+  }, create(null)); // Cache the row-cols prop names
+
+  rowColsPropList = keys(rowColsProps); // Return the generated props
+
+  return _objectSpread2({
+    tag: {
+      type: String,
+      default: 'div'
+    },
+    noGutters: {
+      type: Boolean,
+      default: false
+    },
+    alignV: {
+      type: String,
+      default: null,
+      validator: function validator(str) {
+        return arrayIncludes(COMMON_ALIGNMENT.concat(['baseline', 'stretch']), str);
+      }
+    },
+    alignH: {
+      type: String,
+      default: null,
+      validator: function validator(str) {
+        return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around']), str);
+      }
+    },
+    alignContent: {
+      type: String,
+      default: null,
+      validator: function validator(str) {
+        return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around', 'stretch']), str);
+      }
+    }
+  }, rowColsProps);
+}; // We do not use `Vue.extend()` here as that would evaluate the props
+// immediately, which we do not want to happen
+// @vue/component
+
+
+var BRow = {
   name: 'BRow',
   functional: true,
-  props: props$B,
+
+  get props() {
+    // Allow props to be lazy evaled on first access and
+    // then they become a non-getter afterwards
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get#Smart_self-overwriting_lazy_getters
+    delete this.props;
+    this.props = generateProps$2();
+    return this.props;
+  },
+
   render: function render(h, _ref) {
-    var _class;
+    var _classList$push;
 
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
+    var classList = []; // Loop through row-cols breakpoint props and generate the classes
+
+    rowColsPropList.forEach(function (prop) {
+      var c = computeRowColsClass(computeRowColsBreakpoint(prop), props[prop]); // If a class is returned, push it onto the array
+
+      if (c) {
+        classList.push(c);
+      }
+    });
+    classList.push((_classList$push = {
+      'no-gutters': props.noGutters
+    }, _defineProperty(_classList$push, "align-items-".concat(props.alignV), props.alignV), _defineProperty(_classList$push, "justify-content-".concat(props.alignH), props.alignH), _defineProperty(_classList$push, "align-content-".concat(props.alignContent), props.alignContent), _classList$push));
     return h(props.tag, mergeData(data, {
       staticClass: 'row',
-      class: (_class = {
-        'no-gutters': props.noGutters
-      }, _defineProperty(_class, "align-items-".concat(props.alignV), props.alignV), _defineProperty(_class, "justify-content-".concat(props.alignH), props.alignH), _defineProperty(_class, "align-content-".concat(props.alignContent), props.alignContent), _class)
+      class: classList
     }), children);
   }
-});
+};
 
 var LayoutPlugin =
 /*#__PURE__*/
@@ -10168,7 +11362,7 @@ Vue.extend({
   }
 });
 
-var NAME$f = 'BListGroupItem';
+var NAME$i = 'BListGroupItem';
 var actionTags = ['a', 'router-link', 'button', 'b-link'];
 var linkProps$2 = propsFactory();
 delete linkProps$2.href.default;
@@ -10189,7 +11383,7 @@ var props$D = _objectSpread2({
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$f, 'variant');
+      return getComponentConfig(NAME$i, 'variant');
     }
   }
 }, linkProps$2); // @vue/component
@@ -10197,7 +11391,7 @@ var props$D = _objectSpread2({
 var BListGroupItem =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$f,
+  name: NAME$i,
   functional: true,
   props: props$D,
   render: function render(h, _ref) {
@@ -10229,7 +11423,7 @@ Vue.extend({
       attrs: attrs,
       props: itemProps,
       staticClass: 'list-group-item',
-      class: (_class = {}, _defineProperty(_class, "list-group-item-".concat(props.variant), Boolean(props.variant)), _defineProperty(_class, 'list-group-item-action', isAction), _defineProperty(_class, "active", props.active), _defineProperty(_class, "disabled", props.disabled), _class)
+      class: (_class = {}, _defineProperty(_class, "list-group-item-".concat(props.variant), props.variant), _defineProperty(_class, 'list-group-item-action', isAction), _defineProperty(_class, "active", props.active), _defineProperty(_class, "disabled", props.disabled), _class)
     };
     return h(tag, mergeData(data, componentData), children);
   }
@@ -10407,8 +11601,7 @@ Vue.extend({
     };
   },
   destroyed: function destroyed() {
-    var el = this.$el;
-    el && el.parentNode && el.parentNode.removeChild(el);
+    removeNode(this.$el);
   },
   render: function render(h) {
     var nodes = isFunction(this.updatedNodes) ? this.updatedNodes({}) : this.updatedNodes;
@@ -10539,7 +11732,7 @@ Vue.extend({
   },
   render: function render(h) {
     if (this.disabled) {
-      var nodes = concat(this.normalizeSlot('default')).filter(Boolean);
+      var nodes = concat(this.normalizeSlot('default')).filter(identity);
 
       if (nodes.length > 0 && !nodes[0].text) {
         return nodes[0];
@@ -10549,6 +11742,121 @@ Vue.extend({
     return h();
   }
 });
+
+var eventOptions$2 = {
+  passive: true,
+  capture: false
+};
+var PROP = '$_bv_documentHandlers_'; // @vue/component
+
+var listenOnDocumentMixin = {
+  created: function created() {
+    var _this = this;
+
+    /* istanbul ignore next */
+    if (!isBrowser) {
+      return;
+    } // Declare non-reactive property
+    // Object of arrays, keyed by event name,
+    // where value is an array of handlers
+    // Prop will be defined on client only
+
+
+    this[PROP] = {}; // Set up our beforeDestroy handler (client only)
+
+    this.$once('hook:beforeDestroy', function () {
+      var items = _this[PROP] || {}; // Immediately delete this[PROP] to prevent the
+      // listenOn/Off methods from running (which may occur
+      // due to requestAnimationFrame/transition delays)
+
+      delete _this[PROP]; // Remove all registered event handlers
+
+      keys(items).forEach(function (evtName) {
+        var handlers = items[evtName] || [];
+        handlers.forEach(function (handler) {
+          return eventOff(document, evtName, handler, eventOptions$2);
+        });
+      });
+    });
+  },
+  methods: {
+    listenDocument: function listenDocument(on, evtName, handler) {
+      on ? this.listenOnDocument(evtName, handler) : this.listenOffDocument(evtName, handler);
+    },
+    listenOnDocument: function listenOnDocument(evtName, handler) {
+      if (this[PROP] && isString(evtName) && isFunction(handler)) {
+        this[PROP][evtName] = this[PROP][evtName] || [];
+
+        if (!arrayIncludes(this[PROP][evtName], handler)) {
+          this[PROP][evtName].push(handler);
+          eventOn(document, evtName, handler, eventOptions$2);
+        }
+      }
+    },
+    listenOffDocument: function listenOffDocument(evtName, handler) {
+      if (this[PROP] && isString(evtName) && isFunction(handler)) {
+        eventOff(document, evtName, handler, eventOptions$2);
+        this[PROP][evtName] = (this[PROP][evtName] || []).filter(function (h) {
+          return h !== handler;
+        });
+      }
+    }
+  }
+};
+
+var eventOptions$3 = {
+  passive: true,
+  capture: false
+};
+var PROP$1 = '$_bv_windowHandlers_'; // @vue/component
+
+var listenOnWindowMixin = {
+  beforeCreate: function beforeCreate() {
+    // Declare non-reactive property
+    // Object of arrays, keyed by event name,
+    // where value is an array of handlers
+    this[PROP$1] = {};
+  },
+  beforeDestroy: function beforeDestroy() {
+    if (isBrowser) {
+      var items = this[PROP$1]; // Immediately delete this[PROP] to prevent the
+      // listenOn/Off methods from running (which may occur
+      // due to requestAnimationFrame delays)
+
+      delete this[PROP$1]; // Remove all registered event handlers
+
+      keys(items).forEach(function (evtName) {
+        var handlers = items[evtName] || [];
+        handlers.forEach(function (handler) {
+          return eventOff(window, evtName, handler, eventOptions$3);
+        });
+      });
+    }
+  },
+  methods: {
+    listenWindow: function listenWindow(on, evtName, handler) {
+      on ? this.listenOnWindow(evtName, handler) : this.listenOffWindow(evtName, handler);
+    },
+    listenOnWindow: function listenOnWindow(evtName, handler) {
+      if (isBrowser && this[PROP$1] && isString(evtName) && isFunction(handler)) {
+        this[PROP$1][evtName] = this[PROP$1][evtName] || [];
+
+        if (!arrayIncludes(this[PROP$1][evtName], handler)) {
+          this[PROP$1][evtName].push(handler);
+          eventOn(window, evtName, handler, eventOptions$3);
+        }
+      }
+    },
+    listenOffWindow: function listenOffWindow(evtName, handler) {
+      if (isBrowser && this[PROP$1] && isString(evtName) && isFunction(handler)) {
+        eventOff(window, evtName, handler, eventOptions$3);
+        this[PROP$1][evtName] = (this[PROP$1][evtName] || []).filter(function (h) {
+          return h !== handler;
+        });
+      }
+    }
+  }
+};
 
 // This method returns a component's scoped style attribute name: `data-v-xxxxxxx`
 // The `_scopeId` options property is added by vue-loader when using scoped styles
@@ -10661,7 +11969,7 @@ Vue.extend({
         div.className = 'modal-backdrop d-none';
         div.style.display = 'none';
         document.body.appendChild(div);
-        this.baseZIndex = parseInt(getCS(div).zIndex || DEFAULT_ZINDEX, 10);
+        this.baseZIndex = toInteger(getCS(div).zIndex || DEFAULT_ZINDEX);
         document.body.removeChild(div);
       }
 
@@ -10725,7 +12033,7 @@ Vue.extend({
           var actualPadding = el.style.paddingRight;
           var calculatedPadding = getCS(el).paddingRight || 0;
           setAttr(el, 'data-padding-right', actualPadding);
-          el.style.paddingRight = "".concat(parseFloat(calculatedPadding) + scrollbarWidth, "px");
+          el.style.paddingRight = "".concat(toFloat(calculatedPadding) + scrollbarWidth, "px");
 
           body._paddingChangedForModal.push(el);
         }); // Adjust sticky content margin
@@ -10738,7 +12046,7 @@ Vue.extend({
           var actualMargin = el.style.marginRight;
           var calculatedMargin = getCS(el).marginRight || 0;
           setAttr(el, 'data-margin-right', actualMargin);
-          el.style.marginRight = "".concat(parseFloat(calculatedMargin) - scrollbarWidth, "px");
+          el.style.marginRight = "".concat(toFloat(calculatedMargin) - scrollbarWidth, "px");
 
           body._marginChangedForModal.push(el);
         }); // Adjust <b-navbar-toggler> margin
@@ -10751,7 +12059,7 @@ Vue.extend({
           var actualMargin = el.style.marginRight;
           var calculatedMargin = getCS(el).marginRight || 0;
           setAttr(el, 'data-margin-right', actualMargin);
-          el.style.marginRight = "".concat(parseFloat(calculatedMargin) + scrollbarWidth, "px");
+          el.style.marginRight = "".concat(toFloat(calculatedMargin) + scrollbarWidth, "px");
 
           body._marginChangedForModal.push(el);
         }); // Adjust body padding
@@ -10759,7 +12067,7 @@ Vue.extend({
         var actualPadding = body.style.paddingRight;
         var calculatedPadding = getCS(body).paddingRight;
         setAttr(body, 'data-padding-right', actualPadding);
-        body.style.paddingRight = "".concat(parseFloat(calculatedPadding) + scrollbarWidth, "px");
+        body.style.paddingRight = "".concat(toFloat(calculatedPadding) + scrollbarWidth, "px");
       }
     },
     resetScrollbar: function resetScrollbar() {
@@ -10832,7 +12140,7 @@ function (_BvEvent) {
   return BvModalEvent;
 }(BvEvent); // Named exports
 
-var NAME$g = 'BModal'; // ObserveDom config to detect changes in modal content
+var NAME$j = 'BModal'; // ObserveDom config to detect changes in modal content
 // so that we can adjust the modal padding if needed
 
 var OBSERVER_CONFIG = {
@@ -10870,7 +12178,7 @@ var props$H = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'size');
+      return getComponentConfig(NAME$j, 'size');
     }
   },
   centered: {
@@ -10915,7 +12223,7 @@ var props$H = {
   titleTag: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'titleTag');
+      return getComponentConfig(NAME$j, 'titleTag');
     }
   },
   titleClass: {
@@ -10933,25 +12241,25 @@ var props$H = {
   headerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'headerBgVariant');
+      return getComponentConfig(NAME$j, 'headerBgVariant');
     }
   },
   headerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'headerBorderVariant');
+      return getComponentConfig(NAME$j, 'headerBorderVariant');
     }
   },
   headerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'headerTextVariant');
+      return getComponentConfig(NAME$j, 'headerTextVariant');
     }
   },
   headerCloseVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'headerCloseVariant');
+      return getComponentConfig(NAME$j, 'headerCloseVariant');
     }
   },
   headerClass: {
@@ -10961,13 +12269,13 @@ var props$H = {
   bodyBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'bodyBgVariant');
+      return getComponentConfig(NAME$j, 'bodyBgVariant');
     }
   },
   bodyTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'bodyTextVariant');
+      return getComponentConfig(NAME$j, 'bodyTextVariant');
     }
   },
   modalClass: {
@@ -10989,19 +12297,19 @@ var props$H = {
   footerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'footerBgVariant');
+      return getComponentConfig(NAME$j, 'footerBgVariant');
     }
   },
   footerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'footerBorderVariant');
+      return getComponentConfig(NAME$j, 'footerBorderVariant');
     }
   },
   footerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'footerTextVariant');
+      return getComponentConfig(NAME$j, 'footerTextVariant');
     }
   },
   footerClass: {
@@ -11048,13 +12356,13 @@ var props$H = {
   headerCloseLabel: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'headerCloseLabel');
+      return getComponentConfig(NAME$j, 'headerCloseLabel');
     }
   },
   cancelTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'cancelTitle');
+      return getComponentConfig(NAME$j, 'cancelTitle');
     }
   },
   cancelTitleHtml: {
@@ -11063,7 +12371,7 @@ var props$H = {
   okTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'okTitle');
+      return getComponentConfig(NAME$j, 'okTitle');
     }
   },
   okTitleHtml: {
@@ -11072,13 +12380,13 @@ var props$H = {
   cancelVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'cancelVariant');
+      return getComponentConfig(NAME$j, 'cancelVariant');
     }
   },
   okVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'okVariant');
+      return getComponentConfig(NAME$j, 'okVariant');
     }
   },
   lazy: {
@@ -11106,8 +12414,8 @@ var props$H = {
 var BModal =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$g,
-  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
+  name: NAME$j,
+  mixins: [idMixin, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
   inheritAttrs: false,
   model: {
     prop: 'visible',
@@ -11161,12 +12469,12 @@ Vue.extend({
     dialogClasses: function dialogClasses() {
       var _ref;
 
-      return [(_ref = {}, _defineProperty(_ref, "modal-".concat(this.size), Boolean(this.size)), _defineProperty(_ref, 'modal-dialog-centered', this.centered), _defineProperty(_ref, 'modal-dialog-scrollable', this.scrollable), _ref), this.dialogClass];
+      return [(_ref = {}, _defineProperty(_ref, "modal-".concat(this.size), this.size), _defineProperty(_ref, 'modal-dialog-centered', this.centered), _defineProperty(_ref, 'modal-dialog-scrollable', this.scrollable), _ref), this.dialogClass];
     },
     headerClasses: function headerClasses() {
       var _ref2;
 
-      return [(_ref2 = {}, _defineProperty(_ref2, "bg-".concat(this.headerBgVariant), Boolean(this.headerBgVariant)), _defineProperty(_ref2, "text-".concat(this.headerTextVariant), Boolean(this.headerTextVariant)), _defineProperty(_ref2, "border-".concat(this.headerBorderVariant), Boolean(this.headerBorderVariant)), _ref2), this.headerClass];
+      return [(_ref2 = {}, _defineProperty(_ref2, "bg-".concat(this.headerBgVariant), this.headerBgVariant), _defineProperty(_ref2, "text-".concat(this.headerTextVariant), this.headerTextVariant), _defineProperty(_ref2, "border-".concat(this.headerBorderVariant), this.headerBorderVariant), _ref2), this.headerClass];
     },
     titleClasses: function titleClasses() {
       return [{
@@ -11176,12 +12484,12 @@ Vue.extend({
     bodyClasses: function bodyClasses() {
       var _ref3;
 
-      return [(_ref3 = {}, _defineProperty(_ref3, "bg-".concat(this.bodyBgVariant), Boolean(this.bodyBgVariant)), _defineProperty(_ref3, "text-".concat(this.bodyTextVariant), Boolean(this.bodyTextVariant)), _ref3), this.bodyClass];
+      return [(_ref3 = {}, _defineProperty(_ref3, "bg-".concat(this.bodyBgVariant), this.bodyBgVariant), _defineProperty(_ref3, "text-".concat(this.bodyTextVariant), this.bodyTextVariant), _ref3), this.bodyClass];
     },
     footerClasses: function footerClasses() {
       var _ref4;
 
-      return [(_ref4 = {}, _defineProperty(_ref4, "bg-".concat(this.footerBgVariant), Boolean(this.footerBgVariant)), _defineProperty(_ref4, "text-".concat(this.footerTextVariant), Boolean(this.footerTextVariant)), _defineProperty(_ref4, "border-".concat(this.footerBorderVariant), Boolean(this.footerBorderVariant)), _ref4), this.footerClass];
+      return [(_ref4 = {}, _defineProperty(_ref4, "bg-".concat(this.footerBgVariant), this.footerBgVariant), _defineProperty(_ref4, "text-".concat(this.footerTextVariant), this.footerTextVariant), _defineProperty(_ref4, "border-".concat(this.footerBorderVariant), this.footerBorderVariant), _ref4), this.footerClass];
     },
     modalOuterStyle: function modalOuterStyle() {
       // Styles needed for proper stacking of modals
@@ -11234,9 +12542,6 @@ Vue.extend({
 
       this._observer = null;
     }
-
-    this.setEnforceFocus(false);
-    this.setResizeEvent(false);
 
     if (this.isVisible) {
       this.isVisible = false;
@@ -11568,16 +12873,12 @@ Vue.extend({
     },
     // Turn on/off focusin listener
     setEnforceFocus: function setEnforceFocus(on) {
-      var method = on ? eventOn : eventOff;
-      method(document, 'focusin', this.focusHandler, EVT_OPTIONS);
+      this.listenDocument(on, 'focusin', this.focusHandler);
     },
     // Resize listener
     setResizeEvent: function setResizeEvent(on) {
-      var method = on ? eventOn : eventOff; // These events should probably also check if
-      // body is overflowing
-
-      method(window, 'resize', this.checkModalOverflow, EVT_OPTIONS);
-      method(window, 'orientationchange', this.checkModalOverflow, EVT_OPTIONS);
+      this.listenWindow(on, 'resize', this.checkModalOverflow);
+      this.listenWindow(on, 'orientationchange', this.checkModalOverflow);
     },
     // Root listener handlers
     showHandler: function showHandler(id, triggerEl) {
@@ -12267,7 +13568,7 @@ var plugin = function plugin(Vue) {
       get: function get() {
         /* istanbul ignore next */
         if (!this || !this[PROP_NAME_PRIV]) {
-          warn("'".concat(PROP_NAME$2, "' must be accessed from a Vue instance 'this' context"));
+          warn("\"".concat(PROP_NAME$2, "\" must be accessed from a Vue instance \"this\" context."), 'BModal');
         }
 
         return this[PROP_NAME_PRIV];
@@ -12560,7 +13861,7 @@ pluginFactory({
   }
 });
 
-var NAME$h = 'BNavbar';
+var NAME$k = 'BNavbar';
 var props$N = {
   tag: {
     type: String,
@@ -12573,7 +13874,7 @@ var props$N = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$h, 'variant');
+      return getComponentConfig(NAME$k, 'variant');
     }
   },
   toggleable: {
@@ -12596,7 +13897,7 @@ var props$N = {
 var BNavbar =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$h,
+  name: NAME$k,
   functional: true,
   props: props$N,
   render: function render(h, _ref) {
@@ -12619,7 +13920,7 @@ Vue.extend({
       class: (_class = {
         'd-print': props.print,
         'sticky-top': props.sticky
-      }, _defineProperty(_class, "navbar-".concat(props.type), Boolean(props.type)), _defineProperty(_class, "bg-".concat(props.variant), Boolean(props.variant)), _defineProperty(_class, "fixed-".concat(props.fixed), Boolean(props.fixed)), _defineProperty(_class, "".concat(breakpoint), Boolean(breakpoint)), _class),
+      }, _defineProperty(_class, "navbar-".concat(props.type), props.type), _defineProperty(_class, "bg-".concat(props.variant), props.variant), _defineProperty(_class, "fixed-".concat(props.fixed), props.fixed), _defineProperty(_class, "".concat(breakpoint), breakpoint), _class),
       attrs: {
         role: props.tag === 'nav' ? null : 'navigation'
       }
@@ -12678,7 +13979,7 @@ Vue.extend({
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    var isLink = Boolean(props.to || props.href);
+    var isLink = props.to || props.href;
     var tag = isLink ? BLink : props.tag;
     return h(tag, mergeData(data, {
       staticClass: 'navbar-brand',
@@ -12687,7 +13988,7 @@ Vue.extend({
   }
 });
 
-var NAME$i = 'BNavbarToggle'; // TODO: Switch to using VBToggle directive, will reduce code footprint
+var NAME$l = 'BNavbarToggle'; // TODO: Switch to using VBToggle directive, will reduce code footprint
 // Events we emit on $root
 
 var EVENT_TOGGLE$2 = 'bv::toggle::collapse'; // Events we listen to on $root
@@ -12699,13 +14000,13 @@ var EVENT_STATE_SYNC$2 = 'bv::collapse::sync::state'; // @vue/component
 var BNavbarToggle =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$i,
+  name: NAME$l,
   mixins: [listenOnRootMixin, normalizeSlotMixin],
   props: {
     label: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$i, 'label');
+        return getComponentConfig(NAME$l, 'label');
       }
     },
     target: {
@@ -12799,13 +14100,13 @@ var makePageArray = function makePageArray(startNumber, numberOfPages) {
 
 
 var sanitizeLimit = function sanitizeLimit(val) {
-  var limit = parseInt(val, 10) || 1;
+  var limit = toInteger(val) || 1;
   return limit < 1 ? DEFAULT_LIMIT : limit;
 }; // Sanitize the provided current page number (converting to a number)
 
 
 var sanitizeCurrentPage = function sanitizeCurrentPage(val, numberOfPages) {
-  var page = parseInt(val, 10) || 1;
+  var page = toInteger(val) || 1;
   return page > numberOfPages ? numberOfPages : page < 1 ? 1 : page;
 }; // Links don't normally respond to SPACE, so we add that
 // functionality via this handler
@@ -12834,7 +14135,7 @@ var props$Q = {
     validator: function validator(value)
     /* istanbul ignore next */
     {
-      var num = parseInt(value, 10);
+      var num = toInteger(value);
 
       if (!isNull(value) && (isNaN(num) || num < 1)) {
         warn('pagination: v-model value must be a number greater than 0');
@@ -12850,7 +14151,7 @@ var props$Q = {
     validator: function validator(value)
     /* istanbul ignore next */
     {
-      var num = parseInt(value, 10);
+      var num = toInteger(value);
 
       if (isNaN(num) || num < 1) {
         warn('pagination: prop "limit" must be a number greater than 0');
@@ -12935,7 +14236,7 @@ var paginationMixin = {
   },
   props: props$Q,
   data: function data() {
-    var curr = parseInt(this.value, 10);
+    var curr = toInteger(this.value);
     return {
       // -1 signifies no page initially selected
       currentPage: curr > 0 ? curr : -1,
@@ -13121,7 +14422,7 @@ var paginationMixin = {
       // We do this in next tick to ensure buttons have finished rendering
       this.$nextTick(function () {
         var btn = _this2.getButtons().find(function (el) {
-          return parseInt(getAttr(el, 'aria-posinset'), 10) === _this2.computedCurrentPage;
+          return toInteger(getAttr(el, 'aria-posinset')) === _this2.computedCurrentPage;
         });
 
         if (btn && btn.focus) {
@@ -13350,14 +14651,14 @@ var paginationMixin = {
   }
 };
 
-var NAME$j = 'BPagination';
+var NAME$m = 'BPagination';
 var DEFAULT_PER_PAGE = 20;
 var DEFAULT_TOTAL_ROWS = 0;
 var props$R = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'size');
+      return getComponentConfig(NAME$m, 'size');
     }
   },
   perPage: {
@@ -13376,13 +14677,13 @@ var props$R = {
 // Sanitize the provided per page number (converting to a number)
 
 var sanitizePerPage = function sanitizePerPage(val) {
-  var perPage = parseInt(val, 10) || DEFAULT_PER_PAGE;
+  var perPage = toInteger(val) || DEFAULT_PER_PAGE;
   return perPage < 1 ? 1 : perPage;
 }; // Sanitize the provided total rows number (converting to a number)
 
 
 var sanitizeTotalRows = function sanitizeTotalRows(val) {
-  var totalRows = parseInt(val, 10) || DEFAULT_TOTAL_ROWS;
+  var totalRows = toInteger(val) || DEFAULT_TOTAL_ROWS;
   return totalRows < 0 ? 0 : totalRows;
 }; // The render function is brought in via the `paginationMixin`
 // @vue/component
@@ -13391,7 +14692,7 @@ var sanitizeTotalRows = function sanitizeTotalRows(val) {
 var BPagination =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$j,
+  name: NAME$m,
   mixins: [paginationMixin],
   props: props$R,
   computed: {
@@ -13430,7 +14731,7 @@ Vue.extend({
     // Set the initial page count
     this.localNumberOfPages = this.numberOfPages; // Set the initial page value
 
-    var currentPage = parseInt(this.value, 10) || 0;
+    var currentPage = toInteger(this.value) || 0;
 
     if (currentPage > 0) {
       this.currentPage = currentPage;
@@ -13496,17 +14797,17 @@ pluginFactory({
   }
 });
 
-var NAME$k = 'BPaginationNav'; // Sanitize the provided number of pages (converting to a number)
+var NAME$n = 'BPaginationNav'; // Sanitize the provided number of pages (converting to a number)
 
 var sanitizeNumberOfPages = function sanitizeNumberOfPages(value) {
-  var numberOfPages = parseInt(value, 10) || 1;
+  var numberOfPages = toInteger(value) || 1;
   return numberOfPages < 1 ? 1 : numberOfPages;
 };
 var props$S = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$k, 'size');
+      return getComponentConfig(NAME$n, 'size');
     }
   },
   numberOfPages: {
@@ -13515,10 +14816,10 @@ var props$S = {
     validator: function validator(value)
     /* istanbul ignore next */
     {
-      var num = parseInt(value, 10);
+      var num = toInteger(value);
 
       if (isNaN(num) || num < 1) {
-        warn('b-pagination: prop "number-of-pages" must be a number greater than 0');
+        warn('Prop "number-of-pages" must be a number greater than "0"', NAME$n);
         return false;
       }
 
@@ -13575,7 +14876,7 @@ var props$S = {
 var BPaginationNav =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$k,
+  name: NAME$n,
   mixins: [paginationMixin],
   props: props$S,
   computed: {
@@ -13585,7 +14886,7 @@ Vue.extend({
     },
     computedValue: function computedValue() {
       // Returns the value prop as a number or `null` if undefined or < 1
-      var val = parseInt(this.value, 10);
+      var val = toInteger(this.value);
       return isNaN(val) || val < 1 ? null : val;
     }
   },
@@ -13849,7 +15150,7 @@ pluginFactory({
 });
 
 // Base on-demand component for tooltip / popover templates
-var NAME$l = 'BVPopper';
+var NAME$o = 'BVPopper';
 var AttachmentMap$1 = {
   AUTO: 'auto',
   TOP: 'top',
@@ -13884,7 +15185,7 @@ var OffsetMap = {
 var BVPopper =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$l,
+  name: NAME$o,
   props: {
     target: {
       // Element that the tooltip/popover is positioned relative to
@@ -14099,12 +15400,12 @@ Vue.extend({
   }
 });
 
-var NAME$m = 'BVTooltipTemplate'; // @vue/component
+var NAME$p = 'BVTooltipTemplate'; // @vue/component
 
 var BVTooltipTemplate =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$m,
+  name: NAME$p,
   extends: BVPopper,
   mixins: [scopedStyleAttrsMixin],
   props: {
@@ -14126,7 +15427,8 @@ Vue.extend({
       title: '',
       content: '',
       variant: null,
-      customClass: null
+      customClass: null,
+      interactive: true
     };
   },
   computed: {
@@ -14136,7 +15438,11 @@ Vue.extend({
     templateClasses: function templateClasses() {
       var _ref;
 
-      return [(_ref = {}, _defineProperty(_ref, "b-".concat(this.templateType, "-").concat(this.variant), this.variant), _defineProperty(_ref, "bs-".concat(this.templateType, "-").concat(this.attachment), this.attachment), _ref), this.customClass];
+      return [(_ref = {
+        // Disables pointer events to hide the tooltip when the user
+        // hovers over its content
+        noninteractive: !this.interactive
+      }, _defineProperty(_ref, "b-".concat(this.templateType, "-").concat(this.variant), this.variant), _defineProperty(_ref, "bs-".concat(this.templateType, "-").concat(this.attachment), this.attachment), _ref), this.customClass];
     },
     templateAttributes: function templateAttributes() {
       return _objectSpread2({
@@ -14193,7 +15499,7 @@ Vue.extend({
   }
 });
 
-var NAME$n = 'BVTooltip'; // Modal container selector for appending tooltip/popover
+var NAME$q = 'BVTooltip'; // Modal container selector for appending tooltip/popover
 
 var MODAL_SELECTOR = '.modal-content'; // Modal `$root` hidden event
 
@@ -14244,6 +15550,8 @@ var templateData = {
   // Arrow of Tooltip/popover will try and stay away from
   // the edge of tooltip/popover edge by this many pixels
   arrowPadding: 6,
+  // Interactive state (Boolean)
+  interactive: true,
   // Disabled state (Boolean)
   disabled: false,
   // ID to use for tooltip/popover
@@ -14255,7 +15563,7 @@ var templateData = {
 var BVTooltip =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$n,
+  name: NAME$q,
   props: {// None
   },
   data: function data() {
@@ -14314,7 +15622,8 @@ Vue.extend({
         content: this.content,
         variant: this.variant,
         customClass: this.customClass,
-        noFade: this.noFade
+        noFade: this.noFade,
+        interactive: this.interactive
       };
     }
   },
@@ -14361,9 +15670,7 @@ Vue.extend({
     this.$_hoverState = '';
     this.$_visibleInterval = null;
     this.$_enabled = !this.disabled;
-
-    this.$_noop = function () {}; // Destroy ourselves when the parent is destroyed
-
+    this.$_noop = noop.bind(this); // Destroy ourselves when the parent is destroyed
 
     if (this.$parent) {
       this.$parent.$once('hook:beforeDestroy', this.$destroy);
@@ -14379,7 +15686,7 @@ Vue.extend({
         _this2.listen();
       } else {
         /* istanbul ignore next */
-        warn("".concat(_this2.templateType, " unable to find target element in document"));
+        warn('Unable to find target element in document.', _this2.templateType);
       }
     });
   },
@@ -14401,17 +15708,15 @@ Vue.extend({
   {
     // Remove all handler/listeners
     this.unListen();
-    this.setWhileOpenListeners(false); // Clear any timeouts/Timers
+    this.setWhileOpenListeners(false); // Clear any timeouts/intervals
 
-    clearTimeout(this.$_hoverTimeout);
-    this.$_hoverTimeout = null;
+    this.clearHoverTimeout();
+    this.clearVisibilityInterval(); // Destroy the template
+
     this.destroyTemplate();
-    this.restoreTitle();
   },
   methods: {
-    //
-    // Methods for creating and destroying the template
-    //
+    // --- Methods for creating and destroying the template ---
     getTemplate: function getTemplate() {
       // Overridden by BVPopover
       return BVTooltipTemplate;
@@ -14442,7 +15747,6 @@ Vue.extend({
     },
     createTemplateAndShow: function createTemplateAndShow() {
       // Creates the template instance and show it
-      // this.destroyTemplate()
       var container = this.getContainer();
       var Template = this.getTemplate();
       var $tip = this.$_tip = new Template({
@@ -14490,13 +15794,16 @@ Vue.extend({
       // The template will emit the `hide` event after this and
       // then emit the `hidden` event once it is fully hidden
       // The `hook:destroyed` will also be called (safety measure)
-      this.$_tip && this.$_tip.hide();
+      this.$_tip && this.$_tip.hide(); // Clear out any stragging active triggers
+
+      this.clearActiveTriggers(); // Reset the hover state
+
+      this.$_hoverState = '';
     },
+    // Destroy the template instance and reset state
     destroyTemplate: function destroyTemplate() {
-      // Destroy the template instance and reset state
       this.setWhileOpenListeners(false);
-      clearTimeout(this.$_hoverTimeout);
-      this.$_hoverTimout = null;
+      this.clearHoverTimeout();
       this.$_hoverState = '';
       this.clearActiveTriggers();
       this.localPlacementTarget = null;
@@ -14506,6 +15813,8 @@ Vue.extend({
       } catch (_unused) {}
 
       this.$_tip = null;
+      this.removeAriaDescribedby();
+      this.restoreTitle();
       this.localShow = false;
     },
     getTemplateElement: function getTemplateElement() {
@@ -14519,7 +15828,7 @@ Vue.extend({
       var $tip = this.$_tip;
 
       if ($tip) {
-        var props = ['title', 'content', 'variant', 'customClass', 'noFade']; // Only update the values if they have changed
+        var props = ['title', 'content', 'variant', 'customClass', 'noFade', 'interactive']; // Only update the values if they have changed
 
         props.forEach(function (prop) {
           if ($tip[prop] !== _this4[prop]) {
@@ -14528,11 +15837,9 @@ Vue.extend({
         });
       }
     },
-    //
-    // Show and Hide handlers
-    //
+    // --- Show/Hide handlers ---
+    // Show the tooltip
     show: function show() {
-      // Show the tooltip
       var target = this.getTarget();
 
       if (!target || !contains(document.body, target) || !isVisible(target) || this.dropdownOpen() || (isUndefinedOrNull(this.title) || this.title === '') && (isUndefinedOrNull(this.content) || this.content === '')) {
@@ -14540,11 +15847,10 @@ Vue.extend({
         // is on an open dropdown toggle, or has no content, then
         // we exit without showing
         return;
-      }
+      } // If tip already exists, exit early
+
 
       if (this.$_tip || this.localShow) {
-        // If tip already exists, exit early
-
         /* istanbul ignore next */
         return;
       } // In the process of showing
@@ -14555,19 +15861,15 @@ Vue.extend({
       var showEvt = this.buildEvent('show', {
         cancelable: true
       });
-      this.emitEvent(showEvt);
+      this.emitEvent(showEvt); // Don't show if event cancelled
+
       /* istanbul ignore next: ignore for now */
 
       if (showEvt.defaultPrevented) {
-        // Don't show if event cancelled
         // Destroy the template (if for some reason it was created)
 
         /* istanbul ignore next */
-        this.destroyTemplate(); // Clear the localShow flag
-
-        /* istanbul ignore next */
-
-        this.localShow = false;
+        this.destroyTemplate();
         /* istanbul ignore next */
 
         return;
@@ -14609,12 +15911,7 @@ Vue.extend({
       } // Tell the template to hide
 
 
-      this.hideTemplate(); // TODO: The following could be added to `hideTemplate()`
-      // Clear out any stragging active triggers
-
-      this.clearActiveTriggers(); // Reset the hover state
-
-      this.$_hoverState = '';
+      this.hideTemplate();
     },
     forceHide: function forceHide() {
       // Forcefully hides/destroys the template, regardless of any active triggers
@@ -14629,8 +15926,7 @@ Vue.extend({
 
       this.setWhileOpenListeners(false); // Clear any hover enter/leave event
 
-      clearTimeout(this.hoverTimeout);
-      this.$_hoverTimeout = null;
+      this.clearHoverTimeout();
       this.$_hoverState = '';
       this.clearActiveTriggers(); // Disable the fade animation on the template
 
@@ -14644,23 +15940,21 @@ Vue.extend({
     enable: function enable() {
       this.$_enabled = true; // Create a non-cancelable BvEvent
 
-      this.emitEvent(this.buildEvent('enabled', {}));
+      this.emitEvent(this.buildEvent('enabled'));
     },
     disable: function disable() {
       this.$_enabled = false; // Create a non-cancelable BvEvent
 
-      this.emitEvent(this.buildEvent('disabled', {}));
+      this.emitEvent(this.buildEvent('disabled'));
     },
-    //
-    // Handlers for template events
-    //
+    // --- Handlers for template events ---
+    // When template is inserted into DOM, but not yet shown
     onTemplateShow: function onTemplateShow() {
-      // When template is inserted into DOM, but not yet shown
       // Enable while open listeners/watchers
       this.setWhileOpenListeners(true);
     },
+    // When template show transition completes
     onTemplateShown: function onTemplateShown() {
-      // When template show transition completes
       var prevHoverState = this.$_hoverState;
       this.$_hoverState = '';
 
@@ -14669,26 +15963,21 @@ Vue.extend({
       } // Emit a non-cancelable BvEvent 'shown'
 
 
-      this.emitEvent(this.buildEvent('shown', {}));
+      this.emitEvent(this.buildEvent('shown'));
     },
+    // When template is starting to hide
     onTemplateHide: function onTemplateHide() {
-      // When template is starting to hide
       // Disable while open listeners/watchers
       this.setWhileOpenListeners(false);
     },
+    // When template has completed closing (just before it self destructs)
     onTemplateHidden: function onTemplateHidden() {
-      // When template has completed closing (just before it self destructs)
-      // TODO:
-      //   The next two lines could be moved into `destroyTemplate()`
-      this.removeAriaDescribedby();
-      this.restoreTitle();
+      // Destroy the template
       this.destroyTemplate(); // Emit a non-cancelable BvEvent 'shown'
 
       this.emitEvent(this.buildEvent('hidden', {}));
     },
-    //
-    // Utility methods
-    //
+    // --- Utility methods ---
     getTarget: function getTarget() {
       // Handle case where target may be a component ref
       var target = this.target ? this.target.$el || this.target : null; // If an ID
@@ -14744,6 +16033,18 @@ Vue.extend({
       var target = this.getTarget();
       return this.isDropdown() && target && select(DROPDOWN_OPEN_SELECTOR, target);
     },
+    clearHoverTimeout: function clearHoverTimeout() {
+      if (this.$_hoverTimeout) {
+        clearTimeout(this.$_hoverTimeout);
+        this.$_hoverTimeout = null;
+      }
+    },
+    clearVisibilityInterval: function clearVisibilityInterval() {
+      if (this.$_visibleInterval) {
+        clearInterval(this.$_visibleInterval);
+        this.$_visibleInterval = null;
+      }
+    },
     clearActiveTriggers: function clearActiveTriggers() {
       for (var trigger in this.activeTrigger) {
         this.activeTrigger[trigger] = false;
@@ -14795,9 +16096,7 @@ Vue.extend({
         removeAttr(target, 'data-original-title');
       }
     },
-    //
-    // BvEvent helpers
-    //
+    // --- BvEvent helpers ---
     buildEvent: function buildEvent(type) {
       var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       // Defaults to a non-cancellable event
@@ -14821,9 +16120,7 @@ Vue.extend({
 
       this.$emit(evtName, bvEvt);
     },
-    //
-    // Event handler setup methods
-    //
+    // --- Event handler setup methods ---
     listen: function listen() {
       var _this6 = this;
 
@@ -14895,17 +16192,16 @@ Vue.extend({
 
       this.setOnTouchStartListener(on);
     },
+    // Handler for periodic visibility check
     visibleCheck: function visibleCheck(on) {
       var _this8 = this;
 
-      // Handler for periodic visibility check
-      clearInterval(this.$_visibleInterval);
-      this.$_visibleInterval = null;
+      this.clearVisibilityInterval();
       var target = this.getTarget();
       var tip = this.getTemplateElement();
 
       if (on) {
-        this.visibleInterval = setInterval(function () {
+        this.$_visibleInterval = setInterval(function () {
           if (tip && _this8.localShow && (!target.parentNode || !isVisible(target))) {
             // Target element is no longer visible or not in DOM, so force-hide the tooltip
             _this8.forceHide();
@@ -14954,9 +16250,7 @@ Vue.extend({
         target.__vue__[on ? '$on' : '$off']('shown', this.forceHide);
       }
     },
-    //
-    // Event handlers
-    //
+    // --- Event handlers ---
     handleEvent: function handleEvent(evt) {
       // General trigger event handler
       // target is the trigger element
@@ -15087,7 +16381,7 @@ Vue.extend({
         return;
       }
 
-      clearTimeout(this.hoverTimeout);
+      this.clearHoverTimeout();
       this.$_hoverState = 'in';
 
       if (!this.computedDelay.show) {
@@ -15095,7 +16389,7 @@ Vue.extend({
       } else {
         // Hide any title attribute while enter delay is active
         this.fixTitle();
-        this.hoverTimeout = setTimeout(function () {
+        this.$_hoverTimeout = setTimeout(function () {
           /* istanbul ignore else */
           if (_this10.$_hoverState === 'in') {
             _this10.show();
@@ -15129,13 +16423,13 @@ Vue.extend({
         return;
       }
 
-      clearTimeout(this.hoverTimeout);
+      this.clearHoverTimeout();
       this.$_hoverState = 'out';
 
       if (!this.computedDelay.hide) {
         this.hide();
       } else {
-        this.$hoverTimeout = setTimeout(function () {
+        this.$_hoverTimeout = setTimeout(function () {
           if (_this11.$_hoverState === 'out') {
             _this11.hide();
           }
@@ -15145,12 +16439,12 @@ Vue.extend({
   }
 });
 
-var NAME$o = 'BTooltip'; // @vue/component
+var NAME$r = 'BTooltip'; // @vue/component
 
 var BTooltip =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$o,
+  name: NAME$r,
   props: {
     title: {
       type: String // default: undefined
@@ -15188,19 +16482,19 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$o, 'variant');
+        return getComponentConfig(NAME$r, 'variant');
       }
     },
     customClass: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$o, 'customClass');
+        return getComponentConfig(NAME$r, 'customClass');
       }
     },
     delay: {
       type: [Number, Object, String],
       default: function _default() {
-        return getComponentConfig(NAME$o, 'delay');
+        return getComponentConfig(NAME$r, 'delay');
       }
     },
     boundary: {
@@ -15209,13 +16503,13 @@ Vue.extend({
       // Object: Vue component
       type: [String, HTMLElement, Object],
       default: function _default() {
-        return getComponentConfig(NAME$o, 'boundary');
+        return getComponentConfig(NAME$r, 'boundary');
       }
     },
     boundaryPadding: {
       type: [Number, String],
       default: function _default() {
-        return getComponentConfig(NAME$o, 'boundaryPadding');
+        return getComponentConfig(NAME$r, 'boundaryPadding');
       }
     },
     offset: {
@@ -15234,6 +16528,10 @@ Vue.extend({
 
     },
     show: {
+      type: Boolean,
+      default: false
+    },
+    noninteractive: {
       type: Boolean,
       default: false
     },
@@ -15275,6 +16573,7 @@ Vue.extend({
         delay: this.delay,
         offset: this.offset,
         noFade: this.noFade,
+        interactive: !this.noninteractive,
         disabled: this.disabled,
         id: this.id
       };
@@ -15485,12 +16784,12 @@ Vue.extend({
   }
 });
 
-var NAME$p = 'BVPopoverTemplate'; // @vue/component
+var NAME$s = 'BVPopoverTemplate'; // @vue/component
 
 var BVPopoverTemplate =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$p,
+  name: NAME$s,
   extends: BVTooltipTemplate,
   computed: {
     templateType: function templateType() {
@@ -15529,12 +16828,12 @@ Vue.extend({
 });
 
 // Popover "Class" (Built as a renderless Vue instance)
-var NAME$q = 'BVPopover'; // @vue/component
+var NAME$t = 'BVPopover'; // @vue/component
 
 var BVPopover =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$q,
+  name: NAME$t,
   extends: BVTooltip,
   computed: {
     // Overwrites BVTooltip
@@ -15550,11 +16849,11 @@ Vue.extend({
   }
 });
 
-var NAME$r = 'BPopover';
+var NAME$u = 'BPopover';
 var BPopover =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$r,
+  name: NAME$u,
   extends: BTooltip,
   inheritAttrs: false,
   props: {
@@ -15577,19 +16876,19 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$r, 'variant');
+        return getComponentConfig(NAME$u, 'variant');
       }
     },
     customClass: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$r, 'customClass');
+        return getComponentConfig(NAME$u, 'customClass');
       }
     },
     delay: {
       type: [Number, Object, String],
       default: function _default() {
-        return getComponentConfig(NAME$r, 'delay');
+        return getComponentConfig(NAME$u, 'delay');
       }
     },
     boundary: {
@@ -15598,13 +16897,13 @@ Vue.extend({
       // Object: Vue component
       type: [String, HTMLElement, Object],
       default: function _default() {
-        return getComponentConfig(NAME$r, 'boundary');
+        return getComponentConfig(NAME$u, 'boundary');
       }
     },
     boundaryPadding: {
       type: [Number, String],
       default: function _default() {
-        return getComponentConfig(NAME$r, 'boundaryPadding');
+        return getComponentConfig(NAME$u, 'boundaryPadding');
       }
     }
   },
@@ -15645,7 +16944,8 @@ var delayRE = /^d\d+$/i;
 var delayShowRE = /^ds\d+$/i;
 var delayHideRE = /^dh\d+$/i;
 var offsetRE = /^o-?\d+$/i;
-var variantRE = /^v-.+$/i; // Build a Popover config based on bindings (if any)
+var variantRE = /^v-.+$/i;
+var spacesRE = /\s+/; // Build a Popover config based on bindings (if any)
 // Arguments and modifiers take precedence over passed value config object
 
 var parseBindings = function parseBindings(bindings, vnode)
@@ -15745,7 +17045,7 @@ var parseBindings = function parseBindings(bindings, vnode)
 
   var selectedTriggers = {}; // Parse current config object trigger
 
-  concat(config.trigger || '').filter(Boolean).join(' ').trim().toLowerCase().split(/\s+/).forEach(function (trigger) {
+  concat(config.trigger || '').filter(identity).join(' ').trim().toLowerCase().split(spacesRE).forEach(function (trigger) {
     if (validTriggers[trigger]) {
       selectedTriggers[trigger] = true;
     }
@@ -15896,12 +17196,12 @@ pluginFactory({
   }
 });
 
-var NAME$s = 'BProgressBar'; // @vue/component
+var NAME$v = 'BProgressBar'; // @vue/component
 
 var BProgressBar =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$s,
+  name: NAME$v,
   mixins: [normalizeSlotMixin],
   inject: {
     bvProgress: {
@@ -15914,7 +17214,7 @@ Vue.extend({
   },
   props: {
     value: {
-      type: Number,
+      type: [Number, String],
       default: 0
     },
     label: {
@@ -15927,17 +17227,17 @@ Vue.extend({
     // $parent (this.bvProgress) prop values may take precedence over the following props
     // Which is why they are defaulted to null
     max: {
-      type: Number,
+      type: [Number, String],
       default: null
     },
     precision: {
-      type: Number,
+      type: [Number, String],
       default: null
     },
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'variant');
+        return getComponentConfig(NAME$v, 'variant');
       }
     },
     striped: {
@@ -15963,24 +17263,30 @@ Vue.extend({
     },
     progressBarStyles: function progressBarStyles() {
       return {
-        width: 100 * (this.value / this.computedMax) + '%'
+        width: 100 * (this.computedValue / this.computedMax) + '%'
       };
     },
-    computedProgress: function computedProgress() {
-      var p = Math.pow(10, this.computedPrecision);
-      return Math.round(100 * p * this.value / this.computedMax) / p;
+    computedValue: function computedValue() {
+      return toFloat(this.value) || 0;
     },
     computedMax: function computedMax() {
       // Prefer our max over parent setting
-      return isNumber(this.max) ? this.max : this.bvProgress.max || 100;
+      var max = toFloat(this.max);
+      return isNaN(max) ? toFloat(this.bvProgress.max) || 100 : max;
+    },
+    computedPrecision: function computedPrecision() {
+      // Prefer our precision over parent setting
+      var precision = toInteger(this.precision);
+      return isNaN(precision) ? toInteger(this.bvProgress.precision) || 0 : precision;
+    },
+    computedProgress: function computedProgress() {
+      var precision = this.computedPrecision;
+      var p = Math.pow(10, precision);
+      return toFixed(100 * p * this.computedValue / this.computedMax / p, precision);
     },
     computedVariant: function computedVariant() {
       // Prefer our variant over parent setting
       return this.variant || this.bvProgress.variant;
-    },
-    computedPrecision: function computedPrecision() {
-      // Prefer our precision over parent setting
-      return isNumber(this.precision) ? this.precision : this.bvProgress.precision || 0;
     },
     computedStriped: function computedStriped() {
       // Prefer our striped over parent setting
@@ -16009,9 +17315,9 @@ Vue.extend({
         domProps: htmlOrText(this.labelHtml, this.label)
       });
     } else if (this.computedShowProgress) {
-      childNodes = this.computedProgress.toFixed(this.computedPrecision);
+      childNodes = this.computedProgress;
     } else if (this.computedShowValue) {
-      childNodes = this.value.toFixed(this.computedPrecision);
+      childNodes = toFixed(this.computedValue, this.computedPrecision);
     }
 
     return h('div', {
@@ -16021,19 +17327,19 @@ Vue.extend({
       attrs: {
         role: 'progressbar',
         'aria-valuemin': '0',
-        'aria-valuemax': this.computedMax.toString(),
-        'aria-valuenow': this.value.toFixed(this.computedPrecision)
+        'aria-valuemax': toString$1(this.computedMax),
+        'aria-valuenow': toFixed(this.computedValue, this.computedPrecision)
       }
     }, [childNodes]);
   }
 });
 
-var NAME$t = 'BProgress'; // @vue/component
+var NAME$w = 'BProgress'; // @vue/component
 
 var BProgress =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$t,
+  name: NAME$w,
   mixins: [normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -16045,7 +17351,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$t, 'variant');
+        return getComponentConfig(NAME$w, 'variant');
       }
     },
     striped: {
@@ -16061,7 +17367,7 @@ Vue.extend({
       default: null
     },
     precision: {
-      type: Number,
+      type: [Number, String],
       default: 0
     },
     showProgress: {
@@ -16073,12 +17379,12 @@ Vue.extend({
       default: false
     },
     max: {
-      type: Number,
+      type: [Number, String],
       default: 100
     },
     // This prop is not inherited by child b-progress-bar(s)
     value: {
-      type: Number,
+      type: [Number, String],
       default: 0
     }
   },
@@ -16123,12 +17429,12 @@ pluginFactory({
   }
 });
 
-var NAME$u = 'BSpinner'; // @vue/component
+var NAME$x = 'BSpinner'; // @vue/component
 
 var BSpinner =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$u,
+  name: NAME$x,
   functional: true,
   props: {
     type: {
@@ -16143,7 +17449,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$u, 'variant');
+        return getComponentConfig(NAME$x, 'variant');
       }
     },
     small: {
@@ -16181,7 +17487,7 @@ Vue.extend({
         role: label ? props.role || 'status' : null,
         'aria-hidden': label ? null : 'true'
       },
-      class: (_class = {}, _defineProperty(_class, "spinner-".concat(props.type), Boolean(props.type)), _defineProperty(_class, "spinner-".concat(props.type, "-sm"), props.small), _defineProperty(_class, "text-".concat(props.variant), Boolean(props.variant)), _class)
+      class: (_class = {}, _defineProperty(_class, "spinner-".concat(props.type), props.type), _defineProperty(_class, "spinner-".concat(props.type, "-sm"), props.small), _defineProperty(_class, "text-".concat(props.variant), props.variant), _class)
     }), [label || h()]);
   }
 });
@@ -16193,6 +17499,24 @@ pluginFactory({
     BSpinner: BSpinner
   }
 });
+
+// Mixin to determine if an event listener has been registered
+
+var hasListenerMixin = {
+  methods: {
+    hasListener: function hasListener(name) {
+      // Only includes listeners registerd via `v-on:name`
+      var $listeners = this.$listeners || {}; // Includes `v-on:name` and `this.$on('name')` registerd listeners
+      // Note this property is not part of the public Vue API, but it is
+      // the only way to determine if a listener was added via `vm.$on`
+
+      var $events = this._events || {}; // Registered listeners in `this._events` are always an array,
+      // but might be zero length
+
+      return !isUndefined($listeners[name]) || isArray($events[name]) && $events[name].length > 0;
+    }
+  }
+};
 
 /**
  * Converts a string, including strings in camelCase or snake_case, into Start Case (a variant
@@ -16213,10 +17537,15 @@ pluginFactory({
  * @param {String} str
  * @returns {String}
  */
+// Precompile regular expressions for performance
+var RX_UNDERSCORE = /_/g;
+var RX_LOWER_UPPER = /([a-z])([A-Z])/g;
+var RX_START_SPACE_WORD = /(\s|^)(\w)/g;
+
 var startCase = function startCase(str) {
-  return str.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, function (str, $1, $2) {
+  return str.replace(RX_UNDERSCORE, ' ').replace(RX_LOWER_UPPER, function (str, $1, $2) {
     return $1 + ' ' + $2;
-  }).replace(/(\s|^)(\w)/g, function (str, $1, $2) {
+  }).replace(RX_START_SPACE_WORD, function (str, $1, $2) {
     return $1 + $2.toUpperCase();
   });
 };
@@ -16272,9 +17601,7 @@ var normalizeFields = function normalizeFields(origFields, items) {
 
   if (isArray(origFields)) {
     // Normalize array Form
-    origFields.filter(function (f) {
-      return f;
-    }).forEach(function (f) {
+    origFields.filter(identity).forEach(function (f) {
       if (isString(f)) {
         fields.push({
           key: f,
@@ -16413,7 +17740,7 @@ var itemsMixin = {
       if (isArray(newItems)) {
         // Set `localItems`/`filteredItems` to a copy of the provided array
         this.localItems = newItems.slice();
-      } else if (isUndefined(newItems) || isNull(newItems)) {
+      } else if (isUndefinedOrNull(newItems)) {
         /* istanbul ignore next */
         this.localItems = [];
       }
@@ -16518,7 +17845,7 @@ var stringifyObjectValues = function stringifyObjectValues(val) {
     }).join(' ');
   }
 
-  return String(val);
+  return toString$1(val);
 };
 
 // TODO: Add option to stringify `scopedSlot` items
@@ -16527,7 +17854,8 @@ var stringifyRecordValues = function stringifyRecordValues(row, ignoreFields, in
   return isObject(row) ? stringifyObjectValues(sanitizeRow(row, ignoreFields, includeFields, fieldsObj)) : '';
 };
 
-var DEPRECATED_DEBOUNCE = 'b-table: Prop "filter-debounce" is deprecated. Use the debounce feature of <b-form-input> instead';
+var DEBOUNCE_DEPRECATED_MSG = 'Prop "filter-debounce" is deprecated. Use the debounce feature of "<b-form-input>" instead.';
+var RX_SPACES$1 = /[\s\uFEFF\xA0]+/g;
 var filteringMixin = {
   props: {
     filter: {
@@ -16548,7 +17876,7 @@ var filteringMixin = {
     },
     filterDebounce: {
       type: [Number, String],
-      deprecated: DEPRECATED_DEBOUNCE,
+      deprecated: DEBOUNCE_DEPRECATED_MSG,
       default: 0,
       validator: function validator(val) {
         return /^\d+/.test(String(val));
@@ -16572,11 +17900,11 @@ var filteringMixin = {
       return this.filterIncludedFields ? concat(this.filterIncludedFields).filter(Boolean) : null;
     },
     computedFilterDebounce: function computedFilterDebounce() {
-      var ms = parseInt(this.filterDebounce, 10) || 0;
+      var ms = toInteger(this.filterDebounce) || 0;
       /* istanbul ignore next */
 
       if (ms > 0) {
-        warn(DEPRECATED_DEBOUNCE);
+        warn(DEBOUNCE_DEPRECATED_MSG, 'BTable');
       }
 
       return ms;
@@ -16741,18 +18069,18 @@ var filteringMixin = {
       if (!criteria || !(isString(criteria) || isRegExp(criteria))) {
         // Built in filter can only support strings or RegExp criteria (at the moment)
         return null;
-      } // Build the regexp needed for filtering
+      } // Build the RegExp needed for filtering
 
 
-      var regexp = criteria;
+      var regExp = criteria;
 
-      if (isString(regexp)) {
-        // Escape special `RegExp` characters in the string and convert contiguous
-        // whitespace to `\s+` matches
-        var pattern = criteria.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/[\s\uFEFF\xA0]+/g, '\\s+'); // Build the `RegExp` (no need for global flag, as we only need
+      if (isString(regExp)) {
+        // Escape special RegExp characters in the string and convert contiguous
+        // whitespace to \s+ matches
+        var pattern = escapeRegExp(criteria).replace(RX_SPACES$1, '\\s+'); // Build the RegExp (no need for global flag, as we only need
         // to find the value once in the string)
 
-        regexp = new RegExp(".*".concat(pattern, ".*"), 'i');
+        regExp = new RegExp(".*".concat(pattern, ".*"), 'i');
       } // Generate the wrapped filter test function to use
 
 
@@ -16768,9 +18096,10 @@ var filteringMixin = {
         //
         // Generated function returns true if the criteria matches part of
         // the serialized data, otherwise false
+        //
         // We set `lastIndex = 0` on the `RegExp` in case someone specifies the `/g` global flag
-        regexp.lastIndex = 0;
-        return regexp.test(stringifyRecordValues(item, _this3.computedFilterIgnored, _this3.computedFilterIncluded, _this3.computedFieldsObj));
+        regExp.lastIndex = 0;
+        return regExp.test(stringifyRecordValues(item, _this3.computedFilterIgnored, _this3.computedFilterIncluded, _this3.computedFieldsObj));
       }; // Return the generated function
 
 
@@ -17095,55 +18424,50 @@ var sortingMixin = {
         return {};
       }
 
-      var sortable = field.sortable;
-      var ariaLabel = '';
+      var sortable = field.sortable; // Assemble the aria-sort attribute value
 
-      if ((!field.label || !field.label.trim()) && !field.headerTitle) {
-        // In case field's label and title are empty/blank, we need to
-        // add a hint about what the column is about for non-sighted users.
-        // This is duplicated code from tbody-row mixin, but we need it
-        // here as well, since we overwrite the original aria-label.
+      var ariaSort = sortable && this.localSortBy === key ? this.localSortDesc ? 'descending' : 'ascending' : sortable ? 'none' : null; // Return the attribute
 
-        /* istanbul ignore next */
-        ariaLabel = startCase(key);
-      } // The correctness of these labels is very important for screen-reader users.
+      return {
+        'aria-sort': ariaSort
+      };
+    },
+    sortTheadThLabel: function sortTheadThLabel(key, field, isFoot) {
+      // A label to be placed in an `.sr-only` element in the header cell
+      if (!this.isSortable || isFoot && this.noFooterSorting) {
+        // No label if not a sortable table
+        return null;
+      }
 
+      var sortable = field.sortable; // The correctness of these labels is very important for screen-reader users.
 
-      var ariaLabelSorting = '';
+      var labelSorting = '';
 
       if (sortable) {
         if (this.localSortBy === key) {
           // currently sorted sortable column.
-          ariaLabelSorting = this.localSortDesc ? this.labelSortAsc : this.labelSortDesc;
+          labelSorting = this.localSortDesc ? this.labelSortAsc : this.labelSortDesc;
         } else {
           // Not currently sorted sortable column.
           // Not using nested ternary's here for clarity/readability
           // Default for ariaLabel
-          ariaLabelSorting = this.localSortDesc ? this.labelSortDesc : this.labelSortAsc; // Handle sortDirection setting
+          labelSorting = this.localSortDesc ? this.labelSortDesc : this.labelSortAsc; // Handle sortDirection setting
 
           var sortDirection = this.sortDirection || field.sortDirection;
 
           if (sortDirection === 'asc') {
-            ariaLabelSorting = this.labelSortAsc;
+            labelSorting = this.labelSortAsc;
           } else if (sortDirection === 'desc') {
-            ariaLabelSorting = this.labelSortDesc;
+            labelSorting = this.labelSortDesc;
           }
         }
       } else if (!this.noSortReset) {
         // Non sortable column
-        ariaLabelSorting = this.localSortBy ? this.labelSortClear : '';
-      } // Assemble the aria-label attribute value
+        labelSorting = this.localSortBy ? this.labelSortClear : '';
+      } // Return the sr-only sort label or null if no label
 
 
-      ariaLabel = [ariaLabel.trim(), ariaLabelSorting.trim()].filter(Boolean).join(': '); // Assemble the aria-sort attribute value
-
-      var ariaSort = sortable && this.localSortBy === key ? this.localSortDesc ? 'descending' : 'ascending' : sortable ? 'none' : null; // Return the attributes
-      // (All the above just to get these two values)
-
-      return {
-        'aria-label': ariaLabel || null,
-        'aria-sort': ariaSort
-      };
+      return trim(labelSorting) || null;
     }
   }
 };
@@ -17834,7 +19158,8 @@ var theadMixin = {
           ariaLabel = startCase(field.key);
         }
 
-        var hasHeadClickListener = _this.$listeners['head-clicked'] || _this.isSortable;
+        var hasHeadClickListener = _this.hasListener('head-clicked') || _this.isSortable;
+
         var handlers = {};
 
         if (hasHeadClickListener) {
@@ -17853,6 +19178,7 @@ var theadMixin = {
 
         var sortAttrs = _this.isSortable ? _this.sortTheadThAttrs(field.key, field, isFoot) : {};
         var sortClass = _this.isSortable ? _this.sortTheadThClasses(field.key, field, isFoot) : null;
+        var sortLabel = _this.isSortable ? _this.sortTheadThLabel(field.key, field, isFoot) : null;
         var data = {
           key: field.key,
           class: [_this.fieldClasses(field), sortClass],
@@ -17866,7 +19192,7 @@ var theadMixin = {
             tabindex: hasHeadClickListener ? '0' : null,
             abbr: field.headerAbbr || null,
             title: field.headerTitle || null,
-            'aria-colindex': String(colIndex + 1),
+            'aria-colindex': colIndex + 1,
             'aria-label': ariaLabel
           }, _this.getThValues(null, field.key, field.thAttr, isFoot ? 'foot' : 'head', {}), {}, sortAttrs),
           on: handlers
@@ -17883,31 +19209,27 @@ var theadMixin = {
           slotNames = ["foot(".concat(field.key, ")"), "foot(".concat(field.key.toLowerCase(), ")"), 'foot()'].concat(_toConsumableArray(slotNames));
         }
 
-        var hasSlot = _this.hasNormalizedSlot(slotNames);
+        var scope = {
+          label: field.label,
+          column: field.key,
+          field: field,
+          isFoot: isFoot,
+          // Add in row select methods
+          selectAllRows: selectAllRows,
+          clearSelected: clearSelected
+        };
+        var content = _this.normalizeSlot(slotNames, scope) || (field.labelHtml ? h('div', {
+          domProps: htmlOrText(field.labelHtml)
+        }) : field.label);
+        var srLabel = sortLabel ? h('span', {
+          staticClass: 'sr-only'
+        }, " (".concat(sortLabel, ")")) : null; // Return the header cell
 
-        var slot = field.label;
-
-        if (hasSlot) {
-          slot = _this.normalizeSlot(slotNames, {
-            label: field.label,
-            column: field.key,
-            field: field,
-            isFoot: isFoot,
-            // Add in row select methods
-            selectAllRows: selectAllRows,
-            clearSelected: clearSelected
-          });
-        } else {
-          data.domProps = htmlOrText(field.labelHtml);
-        }
-
-        return h(BTh, data, slot);
+        return h(BTh, data, [content, srLabel].filter(identity));
       }; // Generate the array of <th> cells
 
 
-      var $cells = fields.map(makeCell).filter(function (th) {
-        return th;
-      }); // Genrate the row(s)
+      var $cells = fields.map(makeCell).filter(identity); // Genrate the row(s)
 
       var $trs = [];
 
@@ -18111,6 +19433,10 @@ var tbodyRowMixin = {
       type: [String, Array, Object, Function],
       default: null
     },
+    tbodyTrAttr: {
+      type: [Object, Function],
+      default: null
+    },
     detailsTdClass: {
       type: [String, Array, Object],
       default: null
@@ -18289,7 +19615,7 @@ var tbodyRowMixin = {
       var fields = this.computedFields;
       var tableStriped = this.striped;
       var hasDetailsSlot = this.hasNormalizedSlot(detailsSlotName);
-      var rowShowDetails = Boolean(item._showDetails && hasDetailsSlot);
+      var rowShowDetails = item._showDetails && hasDetailsSlot;
       var hasRowClickHandler = this.$listeners['row-clicked'] || this.hasSelectableRowClick; // We can return more than one TR if rowDetails enabled
 
       var $rows = []; // Details ID needed for `aria-details` when details showing
@@ -18314,24 +19640,29 @@ var tbodyRowMixin = {
 
       var primaryKey = this.primaryKey;
       var primaryKeyValue = toString$1(get(item, primaryKey)) || null;
-      var rowKey = primaryKeyValue || String(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
+      var rowKey = primaryKeyValue || toString$1(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
       // In the format of '{tableId}__row_{primaryKeyValue}'
 
       var rowId = primaryKeyValue ? this.safeId("_row_".concat(primaryKeyValue)) : null; // Selectable classes and attributes
 
       var selectableClasses = this.selectableRowClasses ? this.selectableRowClasses(rowIndex) : {};
-      var selectableAttrs = this.selectableRowAttrs ? this.selectableRowAttrs(rowIndex) : {}; // Add the item row
+      var selectableAttrs = this.selectableRowAttrs ? this.selectableRowAttrs(rowIndex) : {}; // Additional classes and attributes
+
+      var userTrClasses = isFunction(this.tbodyTrClass) ? this.tbodyTrClass(item, 'row') : this.tbodyTrClass;
+      var userTrAttrs = isFunction(this.tbodyTrAttr) ? this.tbodyTrAttr(item, 'row') : this.tbodyTrAttr; // Add the item row
 
       $rows.push(h(BTr, {
         key: "__b-table-row-".concat(rowKey, "__"),
         ref: 'itemRows',
         refInFor: true,
-        class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(item, 'row') : this.tbodyTrClass, selectableClasses, rowShowDetails ? 'b-table-has-details' : ''],
+        class: [userTrClasses, selectableClasses, rowShowDetails ? 'b-table-has-details' : ''],
         props: {
           variant: item._rowVariant || null
         },
         attrs: _objectSpread2({
-          id: rowId,
+          id: rowId
+        }, userTrAttrs, {
+          // Users cannot override the following attributes
           tabindex: hasRowClickHandler ? '0' : null,
           'data-pk': primaryKeyValue || null,
           'aria-details': detailsId,
@@ -18388,17 +19719,20 @@ var tbodyRowMixin = {
         } // Add the actual details row
 
 
+        var userDetailsTrClasses = isFunction(this.tbodyTrClass) ? this.tbodyTrClass(item, detailsSlotName) : this.tbodyTrClass;
+        var userDetailsTrAttrs = isFunction(this.tbodyTrAttr) ? this.tbodyTrAttr(item, detailsSlotName) : this.tbodyTrAttr;
         $rows.push(h(BTr, {
           key: "__b-table-details__".concat(rowKey),
           staticClass: 'b-table-details',
-          class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(item, detailsSlotName) : this.tbodyTrClass],
+          class: [userDetailsTrClasses],
           props: {
             variant: item._rowVariant || null
           },
-          attrs: {
+          attrs: _objectSpread2({}, userDetailsTrAttrs, {
+            // Users cannot override the following attributes
             id: detailsId,
             tabindex: '-1'
-          }
+          })
         }, [$details]));
       } else if (hasDetailsSlot) {
         // Only add the placeholder if a the table has a row-details slot defined (but not shown)
@@ -18433,17 +19767,14 @@ var tbodyMixin = {
       // `this.$refs.itemRows` is an array of item TR components/elements
       // Rows should all be B-TR components, but we map to TR elements
       // Also note that `this.$refs.itemRows` may not always be in document order
-      var tbody = this.$refs.tbody.$el || this.$refs.tbody;
-      var trs = (this.$refs.itemRows || []).map(function (tr) {
+      var refs = this.$refs || {};
+      var tbody = refs.tbody ? refs.tbody.$el || refs.tbody : null;
+      var trs = (refs.itemRows || []).map(function (tr) {
         return tr.$el || tr;
-      }); // TODO: This may take time for tables many rows, so we may want to cache
-      //       the result of this during each render cycle on a non-reactive
-      //       property. We clear out the cache as each render starts, and
-      //       populate it on first access of this method if null
-
-      return from(tbody.children).filter(function (tr) {
-        return arrayIncludes(trs, tr);
       });
+      return tbody && tbody.children && tbody.children.length > 0 && trs && trs.length > 0 ? from(tbody.children).filter(function (tr) {
+        return arrayIncludes(trs, tr);
+      }) : [];
     },
     getTbodyTrIndex: function getTbodyTrIndex(el) {
       // Returns index of a particular TBODY item TR
@@ -18459,7 +19790,7 @@ var tbodyMixin = {
     },
     emitTbodyRowEvent: function emitTbodyRowEvent(type, evt) {
       // Emits a row event, with the item object, row index and original event
-      if (type && evt && evt.target) {
+      if (type && this.hasListener(type) && evt && evt.target) {
         var rowIndex = this.getTbodyTrIndex(evt.target);
 
         if (rowIndex > -1) {
@@ -18553,7 +19884,7 @@ var tbodyMixin = {
       var items = this.computedItems; // Shortcut to `createElement` (could use `this._c()` instead)
 
       var h = this.$createElement;
-      var hasRowClickHandler = this.$listeners['row-clicked'] || this.hasSelectableRowClick; // Prepare the tbody rows
+      var hasRowClickHandler = this.hasListener('row-clicked') || this.hasSelectableRowClick; // Prepare the tbody rows
 
       var $rows = []; // Add the item data rows or the busy slot
 
@@ -18592,20 +19923,20 @@ var tbodyMixin = {
         // as we can't control `data-label` attr)
 
         $rows.push(this.renderBottomRow ? this.renderBottomRow() : h());
-      }
+      } // Note: these events will only emit if a listener is registered
+
 
       var handlers = {
-        // TODO: We may want to to only instantiate these handlers
-        //       if there is an event listener registered
         auxclick: this.onTbodyRowMiddleMouseRowClicked,
-        // TODO: Perhaps we do want to automatically prevent the
-        //       default context menu from showing if there is
-        //       a `row-contextmenu` listener registered.
+        // TODO:
+        //   Perhaps we do want to automatically prevent the
+        //   default context menu from showing if there is a
+        //   `row-contextmenu` listener registered
         contextmenu: this.onTbodyRowContextmenu,
         // The following event(s) is not considered A11Y friendly
-        dblclick: this.onTbodyRowDblClicked // hover events (mouseenter/mouseleave) ad handled by tbody-row mixin
+        dblclick: this.onTbodyRowDblClicked // Hover events (`mouseenter`/`mouseleave`) are handled by `tbody-row` mixin
 
-      };
+      }; // Add in click/keydown listeners if needed
 
       if (hasRowClickHandler) {
         handlers.click = this.onTBodyRowClicked;
@@ -18688,7 +20019,8 @@ var emptyMixin = {
         $empty = h(BTr, {
           key: this.isFiltered ? 'b-empty-filtered-row' : 'b-empty-row',
           staticClass: 'b-table-empty-row',
-          class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, 'row-empty') : this.tbodyTrClass]
+          class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, 'row-empty') : this.tbodyTrClass],
+          attrs: isFunction(this.tbodyTrAttr) ? this.tbodyTrAttr(null, 'row-empty') : this.tbodyTrAttr
         }, [$empty]);
       }
 
@@ -18712,7 +20044,8 @@ var topRowMixin = {
       return h(BTr, {
         key: 'b-top-row',
         staticClass: 'b-table-top-row',
-        class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, 'row-top') : this.tbodyTrClass]
+        class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, 'row-top') : this.tbodyTrClass],
+        attrs: isFunction(this.tbodyTrAttr) ? this.tbodyTrAttr(null, 'row-top') : this.tbodyTrAttr
       }, [this.normalizeSlot(slotName, {
         columns: fields.length,
         fields: fields
@@ -18736,7 +20069,8 @@ var bottomRowMixin = {
       return h(BTr, {
         key: 'b-bottom-row',
         staticClass: 'b-table-bottom-row',
-        class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, 'row-bottom') : this.tbodyTrClass]
+        class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, 'row-bottom') : this.tbodyTrClass],
+        attrs: isFunction(this.tbodyTrAttr) ? this.tbodyTrAttr(null, 'row-bottom') : this.tbodyTrAttr
       }, this.normalizeSlot(slotName$1, {
         columns: fields.length,
         fields: fields
@@ -18791,7 +20125,8 @@ var busyMixin = {
         return h(BTr, {
           key: 'table-busy-slot',
           staticClass: 'b-table-busy-slot',
-          class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, busySlotName) : this.tbodyTrClass]
+          class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, busySlotName) : this.tbodyTrClass],
+          attrs: isFunction(this.tbodyTrAttr) ? this.tbodyTrAttr(null, busySlotName) : this.tbodyTrAttr
         }, [h(BTd, {
           props: {
             colspan: this.computedFields.length || null
@@ -18848,7 +20183,7 @@ var selectableMixin = {
       return true;
     },
     selectableHasSelection: function selectableHasSelection() {
-      return this.isSelectable && this.selectedRows && this.selectedRows.length > 0 && this.selectedRows.some(Boolean);
+      return this.isSelectable && this.selectedRows && this.selectedRows.length > 0 && this.selectedRows.some(identity);
     },
     selectableIsMultiSelect: function selectableIsMultiSelect() {
       return this.isSelectable && arrayIncludes(['range', 'multi'], this.selectMode);
@@ -18953,7 +20288,7 @@ var selectableMixin = {
     },
     isRowSelected: function isRowSelected(index) {
       // Determine if a row is selected (indexed based on `computedItems`)
-      return Boolean(isNumber(index) && this.selectedRows[index]);
+      return !!(isNumber(index) && this.selectedRows[index]);
     },
     clearSelected: function clearSelected() {
       // Clear any active selected row(s)
@@ -19195,7 +20530,7 @@ var providerMixin = {
               // busy state as most likely there was an error in the provider function
 
               /* istanbul ignore next */
-              warn("b-table provider function didn't request callback and did not return a promise or data");
+              warn("Provider function didn't request callback and did not return a promise or data.", 'BTable');
               _this2.localBusy = false;
             }
           }
@@ -19204,7 +20539,7 @@ var providerMixin = {
         {
           // Provider function borked on us, so we spew out a warning
           // and clear the busy state
-          warn("b-table provider function error [".concat(e.name, "] ").concat(e.message));
+          warn("Provider function error [".concat(e.name, "] ").concat(e.message, "."), 'BTable');
           _this2.localBusy = false;
 
           _this2.$off('refreshed', _this2.refresh);
@@ -19295,7 +20630,7 @@ var tableRendererMixin = {
       return this.isStacked ? false : stickyHeader;
     },
     wrapperClasses: function wrapperClasses() {
-      return [this.isStickyHeader ? 'b-table-sticky-header' : '', this.isResponsive === true ? 'table-responsive' : this.isResponsive ? "table-responsive-".concat(this.responsive) : ''].filter(Boolean);
+      return [this.isStickyHeader ? 'b-table-sticky-header' : '', this.isResponsive === true ? 'table-responsive' : this.isResponsive ? "table-responsive-".concat(this.responsive) : ''].filter(identity);
     },
     wrapperStyles: function wrapperStyles() {
       return this.isStickyHeader && !isBoolean(this.isStickyHeader) ? {
@@ -19324,17 +20659,17 @@ var tableRendererMixin = {
     },
     tableAttrs: function tableAttrs() {
       // Preserve user supplied aria-describedby, if provided in `$attrs`
-      var adb = [(this.$attrs || {})['aria-describedby'], this.captionId].filter(Boolean).join(' ') || null;
+      var adb = [(this.$attrs || {})['aria-describedby'], this.captionId].filter(identity).join(' ') || null;
       var items = this.computedItems;
       var filteredItems = this.filteredItems;
       var fields = this.computedFields;
       var selectableAttrs = this.selectableTableAttrs || {};
       var ariaAttrs = this.isTableSimple ? {} : {
         'aria-busy': this.computedBusy ? 'true' : 'false',
-        'aria-colcount': String(fields.length),
+        'aria-colcount': toString$1(fields.length),
         'aria-describedby': adb
       };
-      var rowCount = items && filteredItems && filteredItems.length > items.length ? String(filteredItems.length) : null;
+      var rowCount = items && filteredItems && filteredItems.length > items.length ? toString$1(filteredItems.length) : null;
       return _objectSpread2({
         // We set `aria-rowcount` before merging in `$attrs`,
         // in case user has supplied their own
@@ -19370,7 +20705,7 @@ var tableRendererMixin = {
       staticClass: 'table b-table',
       class: this.tableClasses,
       attrs: this.tableAttrs
-    }, $content.filter(Boolean)); // Add responsive/sticky wrapper if needed and return table
+    }, $content.filter(identity)); // Add responsive/sticky wrapper if needed and return table
 
     return this.wrapperClasses.length > 0 ? h('div', {
       key: 'wrap',
@@ -19389,7 +20724,7 @@ Vue.extend({
   // Order of mixins is important!
   // They are merged from first to last, followed by this component.
   mixins: [// Required Mixins
-  idMixin, normalizeSlotMixin, itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Features Mixins
+  hasListenerMixin, idMixin, normalizeSlotMixin, itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Features Mixins
   stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin] // render function provided by table-renderer mixin
 
 });
@@ -19403,7 +20738,7 @@ Vue.extend({
   // Order of mixins is important!
   // They are merged from first to last, followed by this component.
   mixins: [// Required mixins
-  idMixin, normalizeSlotMixin, itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Features Mixins
+  hasListenerMixin, idMixin, normalizeSlotMixin, itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Features Mixins
   // These are pretty lightweight, and are useful for lightweight tables
   captionMixin, colgroupMixin] // render function provided by table-renderer mixin
 
@@ -19913,7 +21248,7 @@ Vue.extend({
         }).join(', ');
         order = selectAll(selector, this.$el).map(function (el) {
           return el.id;
-        }).filter(Boolean);
+        }).filter(identity);
       } // Stable sort keeps the original order if not found in the
       // `order` array, which will be an empty array before mount.
 
@@ -20214,10 +21549,7 @@ Vue.extend({
   inject: {
     bvTabs: {
       default: function _default() {
-        return {
-          // Don't set a tab index if not rendered inside <b-tabs>
-          noKeyNav: true
-        };
+        return {};
       }
     }
   },
@@ -20378,7 +21710,6 @@ Vue.extend({
       attrs: {
         role: 'tabpanel',
         id: this.safeId(),
-        tabindex: this.localActive && !this.bvTabs.noKeyNav ? '-1' : null,
         'aria-hidden': this.localActive ? 'false' : 'true',
         'aria-labelledby': this.controlledBy || null
       }
@@ -20402,7 +21733,7 @@ pluginFactory({
   }
 });
 
-var NAME$v = 'BToaster';
+var NAME$y = 'BToaster';
 var props$Z = {
   name: {
     type: String,
@@ -20411,13 +21742,13 @@ var props$Z = {
   ariaLive: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$v, 'ariaLive');
+      return getComponentConfig(NAME$y, 'ariaLive');
     }
   },
   ariaAtomic: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$v, 'ariaAtomic');
+      return getComponentConfig(NAME$y, 'ariaAtomic');
     } // Allowed: 'true' or 'false' or null
 
   },
@@ -20425,7 +21756,7 @@ var props$Z = {
     // Aria role
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$v, 'role');
+      return getComponentConfig(NAME$y, 'role');
     }
   }
   /*
@@ -20474,7 +21805,7 @@ Vue.extend({
 var BToaster =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$v,
+  name: NAME$y,
   props: props$Z,
   data: function data() {
     return {
@@ -20492,7 +21823,7 @@ Vue.extend({
     /* istanbul ignore if */
 
     if (Wormhole.hasTarget(this.staticName)) {
-      warn("b-toaster: A <portal-target> with name '".concat(this.name, "' already exists in the document."));
+      warn("A \"<portal-target>\" with name \"".concat(this.name, "\" already exists in the document."), 'BToaster');
       this.dead = true;
     } else {
       this.doRender = true;
@@ -20547,7 +21878,7 @@ Vue.extend({
   }
 });
 
-var NAME$w = 'BToast';
+var NAME$z = 'BToast';
 var MIN_DURATION = 1000;
 var EVENT_OPTIONS = {
   passive: true,
@@ -20568,7 +21899,7 @@ var props$_ = {
   toaster: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$w, 'toaster');
+      return getComponentConfig(NAME$z, 'toaster');
     }
   },
   visible: {
@@ -20578,7 +21909,7 @@ var props$_ = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$w, 'variant');
+      return getComponentConfig(NAME$z, 'variant');
     }
   },
   isStatus: {
@@ -20597,7 +21928,7 @@ var props$_ = {
   autoHideDelay: {
     type: [Number, String],
     default: function _default() {
-      return getComponentConfig(NAME$w, 'autoHideDelay');
+      return getComponentConfig(NAME$z, 'autoHideDelay');
     }
   },
   noCloseButton: {
@@ -20619,19 +21950,19 @@ var props$_ = {
   toastClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$w, 'toastClass');
+      return getComponentConfig(NAME$z, 'toastClass');
     }
   },
   headerClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$w, 'headerClass');
+      return getComponentConfig(NAME$z, 'headerClass');
     }
   },
   bodyClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$w, 'bodyClass');
+      return getComponentConfig(NAME$z, 'bodyClass');
     }
   },
   href: {
@@ -20652,7 +21983,7 @@ var props$_ = {
 var BToast =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$w,
+  name: NAME$z,
   mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
   inheritAttrs: false,
   model: {
@@ -20688,7 +22019,7 @@ Vue.extend({
     },
     computedDuration: function computedDuration() {
       // Minimum supported duration is 1 second
-      return Math.max(parseInt(this.autoHideDelay, 10) || 0, MIN_DURATION);
+      return Math.max(toInteger(this.autoHideDelay) || 0, MIN_DURATION);
     },
     computedToaster: function computedToaster() {
       return String(this.toaster);
@@ -20714,12 +22045,8 @@ Vue.extend({
     toaster: function toaster(newVal)
     /* istanbul ignore next */
     {
-      var _this = this;
-
       // If toaster target changed, make sure toaster exists
-      this.$nextTick(function () {
-        return _this.ensureToaster;
-      });
+      this.$nextTick(this.ensureToaster);
     },
     static: function _static(newVal)
     /* istanbul ignore next */
@@ -20732,26 +22059,26 @@ Vue.extend({
     }
   },
   mounted: function mounted() {
-    var _this2 = this;
+    var _this = this;
 
     this.isMounted = true;
     this.$nextTick(function () {
-      if (_this2.visible) {
+      if (_this.visible) {
         requestAF(function () {
-          _this2.show();
+          _this.show();
         });
       }
     }); // Listen for global $root show events
 
     this.listenOnRoot('bv::show::toast', function (id) {
-      if (id === _this2.safeId()) {
-        _this2.show();
+      if (id === _this.safeId()) {
+        _this.show();
       }
     }); // Listen for global $root hide events
 
     this.listenOnRoot('bv::hide::toast', function (id) {
-      if (!id || id === _this2.safeId()) {
-        _this2.hide();
+      if (!id || id === _this.safeId()) {
+        _this.hide();
       }
     }); // Make sure we hide when toaster is destroyed
 
@@ -20759,9 +22086,9 @@ Vue.extend({
 
     this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
       /* istanbul ignore next */
-      if (toaster === _this2.computedToaster) {
+      if (toaster === _this.computedToaster) {
         /* istanbul ignore next */
-        _this2.hide();
+        _this.hide();
       }
     });
   },
@@ -20770,7 +22097,7 @@ Vue.extend({
   },
   methods: {
     show: function show() {
-      var _this3 = this;
+      var _this2 = this;
 
       if (!this.localShow) {
         this.ensureToaster();
@@ -20784,13 +22111,13 @@ Vue.extend({
           // We show the toast after we have rendered the portal and b-toast wrapper
           // so that screen readers will properly announce the toast
           requestAF(function () {
-            _this3.localShow = true;
+            _this2.localShow = true;
           });
         });
       }
     },
     hide: function hide() {
-      var _this4 = this;
+      var _this3 = this;
 
       if (this.localShow) {
         var hideEvt = this.buildEvent('hide');
@@ -20800,7 +22127,7 @@ Vue.extend({
         this.clearDismissTimer();
         this.isHiding = true;
         requestAF(function () {
-          _this4.localShow = false;
+          _this3.localShow = false;
         });
       }
     },
@@ -20879,13 +22206,13 @@ Vue.extend({
       this.startDismissTimer();
     },
     onLinkClick: function onLinkClick() {
-      var _this5 = this;
+      var _this4 = this;
 
       // We delay the close to allow time for the
       // browser to process the link click
       this.$nextTick(function () {
         requestAF(function () {
-          _this5.hide();
+          _this4.hide();
         });
       });
     },
@@ -20911,7 +22238,7 @@ Vue.extend({
       this.doRender = false;
     },
     makeToast: function makeToast(h) {
-      var _this6 = this;
+      var _this5 = this;
 
       // Render helper for generating the toast
       // Assemble the header content
@@ -20931,7 +22258,7 @@ Vue.extend({
           staticClass: 'ml-auto mb-1',
           on: {
             click: function click(evt) {
-              _this6.hide();
+              _this5.hide();
             }
           }
         }));
@@ -21192,7 +22519,7 @@ var plugin$1 = function plugin(Vue) {
       get: function get() {
         /* istanbul ignore next */
         if (!this || !this[PROP_NAME_PRIV$1]) {
-          warn("'".concat(PROP_NAME$3, "' must be accessed from a Vue instance 'this' context"));
+          warn("\"".concat(PROP_NAME$3, "\" must be accessed from a Vue instance \"this\" context."), 'BToast');
         }
 
         return this[PROP_NAME_PRIV$1];
@@ -21235,6 +22562,7 @@ var validTriggers$1 = {
 }; // Directive modifier test regular expressions. Pre-compile for performance
 
 var htmlRE$1 = /^html$/i;
+var noninteractiveRE = /^noninteractive$/i;
 var noFadeRE$1 = /^nofade$/i;
 var placementRE$1 = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/i;
 var boundaryRE$1 = /^(window|viewport|scrollParent)$/i;
@@ -21242,7 +22570,8 @@ var delayRE$1 = /^d\d+$/i;
 var delayShowRE$1 = /^ds\d+$/i;
 var delayHideRE$1 = /^dh\d+$/i;
 var offsetRE$1 = /^o-?\d+$/i;
-var variantRE$1 = /^v-.+$/i; // Build a Tooltip config based on bindings (if any)
+var variantRE$1 = /^v-.+$/i;
+var spacesRE$1 = /\s+/; // Build a Tooltip config based on bindings (if any)
 // Arguments and modifiers take precedence over passed value config object
 
 var parseBindings$1 = function parseBindings(bindings, vnode)
@@ -21263,6 +22592,7 @@ var parseBindings$1 = function parseBindings(bindings, vnode)
     offset: 0,
     id: null,
     html: false,
+    interactive: true,
     disabled: false,
     delay: getComponentConfig(NAME, 'delay'),
     boundary: String(getComponentConfig(NAME, 'boundary')),
@@ -21309,6 +22639,9 @@ var parseBindings$1 = function parseBindings(bindings, vnode)
     if (htmlRE$1.test(mod)) {
       // Title allows HTML
       config.html = true;
+    } else if (noninteractiveRE.test(mod)) {
+      // Noninteractive
+      config.interactive = false;
     } else if (noFadeRE$1.test(mod)) {
       // No animation
       config.animation = false;
@@ -21342,7 +22675,7 @@ var parseBindings$1 = function parseBindings(bindings, vnode)
 
   var selectedTriggers = {}; // Parse current config object trigger
 
-  concat(config.trigger || '').filter(Boolean).join(' ').trim().toLowerCase().split(/\s+/).forEach(function (trigger) {
+  concat(config.trigger || '').filter(identity).join(' ').trim().toLowerCase().split(spacesRE$1).forEach(function (trigger) {
     if (validTriggers$1[trigger]) {
       selectedTriggers[trigger] = true;
     }
@@ -21415,6 +22748,7 @@ var applyTooltip = function applyTooltip(el, bindings, vnode) {
     offset: config.offset,
     noFade: !config.animation,
     id: config.id,
+    interactive: config.interactive,
     disabled: config.disabled,
     html: config.html
   };
@@ -21504,6 +22838,7 @@ pluginFactory({
     FormCheckboxPlugin: FormCheckboxPlugin,
     FormRadioPlugin: FormRadioPlugin,
     FormInputPlugin: FormInputPlugin,
+    FormTagsPlugin: FormTagsPlugin,
     FormTextareaPlugin: FormTextareaPlugin,
     FormFilePlugin: FormFilePlugin,
     FormSelectPlugin: FormSelectPlugin,
@@ -21541,7 +22876,7 @@ pluginFactory({
  * Constants / Defaults
  */
 
-var NAME$x = 'v-b-scrollspy';
+var NAME$A = 'v-b-scrollspy';
 var ACTIVATE_EVENT = 'bv::scrollspy::activate';
 var Default = {
   element: 'body',
@@ -22024,7 +23359,7 @@ function () {
   }], [{
     key: "Name",
     get: function get() {
-      return NAME$x;
+      return NAME$A;
     }
   }, {
     key: "Default",
@@ -22041,7 +23376,10 @@ function () {
   return ScrollSpy;
 }();
 
-var BV_SCROLLSPY = '__BV_ScrollSpy__'; // Build a ScrollSpy config based on bindings (if any)
+var BV_SCROLLSPY = '__BV_ScrollSpy__'; // Pre-compiled regular expressions
+
+var onlyDigitsRE = /^\d+$/;
+var offsetRE$2 = /^(auto|position|offset)$/; // Build a ScrollSpy config based on bindings (if any)
 // Arguments and modifiers take precedence over passed value config object
 
 /* istanbul ignore next: not easy to test */
@@ -22059,10 +23397,10 @@ var parseBindings$2 = function parseBindings(bindings)
 
 
   keys(bindings.modifiers).forEach(function (mod) {
-    if (/^\d+$/.test(mod)) {
+    if (onlyDigitsRE.test(mod)) {
       // Offset value
       config.offset = parseInt(mod, 10);
-    } else if (/^(auto|position|offset)$/.test(mod)) {
+    } else if (offsetRE$2.test(mod)) {
       // Offset method
       config.method = mod;
     }
@@ -22078,7 +23416,7 @@ var parseBindings$2 = function parseBindings(bindings)
     // Value is config object
     // Filter the object based on our supported config options
     keys(bindings.value).filter(function (k) {
-      return Boolean(ScrollSpy.DefaultType[k]);
+      return !!ScrollSpy.DefaultType[k];
     }).forEach(function (k) {
       config[k] = bindings.value[k];
     });
@@ -22196,7 +23534,1459 @@ var BVConfigPlugin =
 /*#__PURE__*/
 pluginFactory();
 
-var NAME$y = 'BootstrapVue'; //
+var commonIconProps = {
+  variant: {
+    type: String,
+    default: null
+  },
+  fontScale: {
+    type: [Number, String],
+    default: 1
+  },
+  scale: {
+    type: [Number, String],
+    default: 1
+  },
+  rotate: {
+    type: [Number, String],
+    default: 0
+  },
+  flipH: {
+    type: Boolean,
+    default: false
+  },
+  flipV: {
+    type: Boolean,
+    default: false
+  },
+  shiftH: {
+    type: [Number, String],
+    default: 0
+  },
+  shiftV: {
+    type: [Number, String],
+    default: 0
+  }
+}; // Base attributes needed on all icons
+
+var baseAttrs = {
+  width: '1em',
+  height: '1em',
+  viewBox: '0 0 20 20',
+  focusable: 'false',
+  role: 'img',
+  alt: 'icon'
+}; // Shared private base component to reduce bundle/runtime size
+// @vue/component
+
+var BVIconBase = {
+  name: 'BVIconBase',
+  functional: true,
+  props: _objectSpread2({
+    content: {
+      type: String
+    }
+  }, commonIconProps),
+  render: function render(h, _ref) {
+    var data = _ref.data,
+        props = _ref.props;
+    var fontScale = toFloat(props.fontScale) || 1;
+    var scale = toFloat(props.scale) || 1;
+    var rotate = toFloat(props.rotate) || 0;
+    var shiftH = toFloat(props.shiftH) || 0;
+    var shiftV = toFloat(props.shiftV) || 0;
+    var flipH = props.flipH;
+    var flipV = props.flipV; // Compute the transforms. Note that order is important
+    // CSS transforms are applied in order from right to left
+    // and we want flipping to occur before rotation, and
+    // shifting is applied last
+
+    var transforms = [shiftH ? "translateX(".concat(100 * shiftH / 16, "%)") : null, shiftV ? "translateY(".concat(-100 * shiftV / 16, "%)") : null, rotate ? "rotate(".concat(rotate, "deg)") : null, flipH || flipV || scale !== 1 ? "scale(".concat((flipH ? -1 : 1) * scale, ", ").concat((flipV ? -1 : 1) * scale, ")") : null].filter(identity); // We wrap the content in a `<g>` for handling the transforms
+
+    var $inner = h('g', {
+      style: {
+        transform: transforms.join(' ') || null,
+        transformOrigin: transforms.length > 0 ? 'center' : null
+      },
+      domProps: {
+        innerHTML: props.content || ''
+      }
+    });
+    return h('svg', mergeData({
+      class: _defineProperty({}, "text-".concat(props.variant), !!props.variant),
+      attrs: baseAttrs,
+      style: {
+        fontSize: fontScale === 1 ? null : "".concat(fontScale * 100, "%")
+      }
+    }, // Merge in user supplied data
+    data, // These cannot be overridden by users
+    {
+      staticClass: 'b-icon bi',
+      attrs: {
+        xmlns: 'http://www.w3.org/2000/svg',
+        fill: 'currentColor'
+      }
+    }), [$inner]);
+  }
+};
+/**
+ * Icon component generator function
+ *
+ * @param {string} icon name (minus the leading `BIcon`)
+ * @param {string} raw innerHTML for SVG
+ * @return {VueComponent}
+ */
+
+var makeIcon = function makeIcon(name, content) {
+  // For performance reason we pre-compute some values, so that
+  // they are not computed on each render of the icon component
+  var iconName = "BIcon".concat(pascalCase(name));
+  var iconNameClass = "bi-".concat(kebabCase(name));
+  var svgContent = trim(content || ''); // Return the icon component definition
+
+  return Vue.extend({
+    name: iconName,
+    functional: true,
+    props: _objectSpread2({}, commonIconProps),
+    render: function render(h, _ref2) {
+      var data = _ref2.data,
+          props = _ref2.props;
+      return h(BVIconBase, mergeData(data, {
+        staticClass: iconNameClass,
+        props: _objectSpread2({}, props, {
+          content: svgContent
+        })
+      }));
+    }
+  });
+};
+
+// --- BEGIN AUTO-GENERATED FILE ---
+
+var BIconBlank =
+/*#__PURE__*/
+makeIcon('Blank', ''); // --- Bootstrap Icons ---
+
+var BIconAlarm =
+/*#__PURE__*/
+makeIcon('Alarm', '<path fill-rule="evenodd" d="M10 17a6 6 0 100-12 6 6 0 000 12zm0 1a7 7 0 100-14 7 7 0 000 14z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 6.5a.5.5 0 01.5.5v4a.5.5 0 01-.053.224l-1.5 3a.5.5 0 11-.894-.448L9.5 10.882V7a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path d="M2.86 7.387A2.5 2.5 0 116.387 3.86 8.035 8.035 0 002.86 7.387zM13.613 3.86a2.5 2.5 0 113.527 3.527 8.035 8.035 0 00-3.527-3.527z"/><path fill-rule="evenodd" d="M13.646 16.146a.5.5 0 01.708 0l1 1a.5.5 0 01-.708.708l-1-1a.5.5 0 010-.708zm-7.292 0a.5.5 0 00-.708 0l-1 1a.5.5 0 00.708.708l1-1a.5.5 0 000-.708zM7.5 2.5A.5.5 0 018 2h4a.5.5 0 010 1H8a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M9 3h2v2H9V3z"/>');
+var BIconAlarmFill =
+/*#__PURE__*/
+makeIcon('AlarmFill', '<path fill-rule="evenodd" d="M7.5 2.5A.5.5 0 018 2h4a.5.5 0 010 1h-1v1.07a7.002 7.002 0 013.537 12.26l.817.816a.5.5 0 01-.708.708l-.924-.925A6.967 6.967 0 0110 18a6.967 6.967 0 01-3.722-1.07l-.924.924a.5.5 0 01-.708-.708l.817-.816A7.002 7.002 0 019 4.07V3H8a.5.5 0 01-.5-.5zM2.86 7.387A2.5 2.5 0 116.387 3.86 8.035 8.035 0 002.86 7.387zM15.5 3c-.753 0-1.429.333-1.887.86a8.035 8.035 0 013.527 3.527A2.5 2.5 0 0015.5 3zm-5 4a.5.5 0 00-1 0v3.882l-1.447 2.894a.5.5 0 10.894.448l1.5-3A.5.5 0 0010.5 11V7z" clip-rule="evenodd"/>');
+var BIconAlertCircle =
+/*#__PURE__*/
+makeIcon('AlertCircle', '<path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm0 1a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"/><path d="M9.002 13a1 1 0 112 0 1 1 0 01-2 0zM9.1 6.995a.905.905 0 111.8 0l-.35 3.507a.553.553 0 01-1.1 0L9.1 6.995z"/>');
+var BIconAlertCircleFill =
+/*#__PURE__*/
+makeIcon('AlertCircleFill', '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8.998 3a1 1 0 112 0 1 1 0 01-2 0zM10 6a.905.905 0 00-.9.995l.35 3.507a.553.553 0 001.1 0l.35-3.507A.905.905 0 0010 6z" clip-rule="evenodd"/>');
+var BIconAlertOctagon =
+/*#__PURE__*/
+makeIcon('AlertOctagon', '<path fill-rule="evenodd" d="M6.54 2.146A.5.5 0 016.893 2h6.214a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H6.893a.5.5 0 01-.353-.146L2.146 13.46A.5.5 0 012 13.107V6.893a.5.5 0 01.146-.353L6.54 2.146zM7.1 3L3 7.1v5.8L7.1 17h5.8l4.1-4.1V7.1L12.9 3H7.1z" clip-rule="evenodd"/><rect width="2" height="2" x="9.002" y="12" rx="1"/><path d="M9.1 6.995a.905.905 0 111.8 0l-.35 3.507a.553.553 0 01-1.1 0L9.1 6.995z"/>');
+var BIconAlertOctagonFill =
+/*#__PURE__*/
+makeIcon('AlertOctagonFill', '<path fill-rule="evenodd" d="M13.107 2a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H6.893a.5.5 0 01-.353-.146L2.146 13.46A.5.5 0 012 13.107V6.893a.5.5 0 01.146-.353L6.54 2.146A.5.5 0 016.893 2h6.214zM9.002 13a1 1 0 112 0 1 1 0 01-2 0zM10 6a.905.905 0 00-.9.995l.35 3.507a.553.553 0 001.1 0l.35-3.507A.905.905 0 0010 6z" clip-rule="evenodd"/>');
+var BIconAlertSquare =
+/*#__PURE__*/
+makeIcon('AlertSquare', '<path fill-rule="evenodd" d="M16 3H4a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z" clip-rule="evenodd"/><rect width="2" height="2" x="9.002" y="12" rx="1"/><path d="M9.1 6.995a.905.905 0 111.8 0l-.35 3.507a.553.553 0 01-1.1 0L9.1 6.995z"/>');
+var BIconAlertSquareFill =
+/*#__PURE__*/
+makeIcon('AlertSquareFill', '<path fill-rule="evenodd" d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm7.002 9a1 1 0 112 0 1 1 0 01-2 0zM10 6a.905.905 0 00-.9.995l.35 3.507a.553.553 0 001.1 0l.35-3.507A.905.905 0 0010 6z" clip-rule="evenodd"/>');
+var BIconAlertTriangle =
+/*#__PURE__*/
+makeIcon('AlertTriangle', '<path fill-rule="evenodd" d="M9.938 4.016a.146.146 0 00-.054.057L3.027 15.74a.176.176 0 00-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 00.066-.017.163.163 0 00.055-.06.176.176 0 00-.003-.183L10.12 4.073a.146.146 0 00-.054-.057.13.13 0 00-.063-.016.13.13 0 00-.064.016zm1.043-.45a1.13 1.13 0 00-1.96 0L2.166 15.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L10.982 3.566z" clip-rule="evenodd"/><rect width="2" height="2" x="9.002" y="13" rx="1"/><path d="M9.1 7.995a.905.905 0 111.8 0l-.35 3.507a.553.553 0 01-1.1 0L9.1 7.995z"/>');
+var BIconAlertTriangleFill =
+/*#__PURE__*/
+makeIcon('AlertTriangleFill', '<path fill-rule="evenodd" d="M9.022 3.566a1.13 1.13 0 011.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H3.144c-.889 0-1.437-.99-.98-1.767L9.022 3.566zM9.002 14a1 1 0 112 0 1 1 0 01-2 0zM10 7a.905.905 0 00-.9.995l.35 3.507a.553.553 0 001.1 0l.35-3.507A.905.905 0 0010 7z" clip-rule="evenodd"/>');
+var BIconArchive =
+/*#__PURE__*/
+makeIcon('Archive', '<path fill-rule="evenodd" d="M4 7v7.5c0 .864.642 1.5 1.357 1.5h9.286c.715 0 1.357-.636 1.357-1.5V7h1v7.5c0 1.345-1.021 2.5-2.357 2.5H5.357C4.021 17 3 15.845 3 14.5V7h1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 9.5A.5.5 0 018 9h4a.5.5 0 010 1H8a.5.5 0 01-.5-.5zM17 4H3v2h14V4zM3 3a1 1 0 00-1 1v2a1 1 0 001 1h14a1 1 0 001-1V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/>');
+var BIconArchiveFill =
+/*#__PURE__*/
+makeIcon('ArchiveFill', '<path fill-rule="evenodd" d="M14.643 17C15.979 17 17 15.845 17 14.5V7H3v7.5C3 15.845 4.021 17 5.357 17h9.286zM8 9a.5.5 0 000 1h4a.5.5 0 000-1H8zM3 3a1 1 0 00-1 1v1.5a1 1 0 001 1h14a1 1 0 001-1V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/>');
+var BIconArrowBarBottom =
+/*#__PURE__*/
+makeIcon('ArrowBarBottom', '<path fill-rule="evenodd" d="M13.354 12.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 01.708-.708L10 14.793l2.646-2.647a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 8a.5.5 0 01.5.5V15a.5.5 0 01-1 0V8.5A.5.5 0 0110 8zM4 5.75a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowBarLeft =
+/*#__PURE__*/
+makeIcon('ArrowBarLeft', '<path fill-rule="evenodd" d="M7.854 6.646a.5.5 0 00-.708 0l-3 3a.5.5 0 000 .708l3 3a.5.5 0 00.708-.708L5.207 10l2.647-2.646a.5.5 0 000-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12 10a.5.5 0 00-.5-.5H5a.5.5 0 000 1h6.5a.5.5 0 00.5-.5zm2.5 6a.5.5 0 01-.5-.5v-11a.5.5 0 011 0v11a.5.5 0 01-.5.5z" clip-rule="evenodd"/>');
+var BIconArrowBarRight =
+/*#__PURE__*/
+makeIcon('ArrowBarRight', '<path fill-rule="evenodd" d="M12.146 6.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L14.793 10l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 10a.5.5 0 01.5-.5H15a.5.5 0 010 1H8.5A.5.5 0 018 10zm-2.5 6a.5.5 0 01-.5-.5v-11a.5.5 0 011 0v11a.5.5 0 01-.5.5z" clip-rule="evenodd"/>');
+var BIconArrowBarUp =
+/*#__PURE__*/
+makeIcon('ArrowBarUp', '<path fill-rule="evenodd" d="M13.354 7.854a.5.5 0 000-.708l-3-3a.5.5 0 00-.708 0l-3 3a.5.5 0 10.708.708L10 5.207l2.646 2.647a.5.5 0 00.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 12a.5.5 0 00.5-.5V5a.5.5 0 00-1 0v6.5a.5.5 0 00.5.5zm-6 2.75a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowClockwise =
+/*#__PURE__*/
+makeIcon('ArrowClockwise', '<path fill-rule="evenodd" d="M10 4.5a5.5 5.5 0 105.5 5.5.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63l-.5.865A5.472 5.472 0 0010 4.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.646 1.646a.5.5 0 01.708 0l2.5 2.5a.5.5 0 010 .708l-2.5 2.5a.5.5 0 01-.708-.708L12.793 4.5l-2.147-2.146a.5.5 0 010-.708z" clip-rule="evenodd"/>');
+var BIconArrowCounterclockwise =
+/*#__PURE__*/
+makeIcon('ArrowCounterclockwise', '<path fill-rule="evenodd" d="M10 4.5A5.5 5.5 0 114.5 10a.5.5 0 00-1 0 6.5 6.5 0 103.25-5.63l.5.865A5.472 5.472 0 0110 4.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.354 1.646a.5.5 0 00-.708 0l-2.5 2.5a.5.5 0 000 .708l2.5 2.5a.5.5 0 10.708-.708L7.207 4.5l2.147-2.146a.5.5 0 000-.708z" clip-rule="evenodd"/>');
+var BIconArrowDown =
+/*#__PURE__*/
+makeIcon('ArrowDown', '<path fill-rule="evenodd" d="M6.646 11.646a.5.5 0 01.708 0L10 14.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 4.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V5a.5.5 0 01.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowDownLeft =
+/*#__PURE__*/
+makeIcon('ArrowDownLeft', '<path fill-rule="evenodd" d="M5 9.5a.5.5 0 01.5.5v4.5H10a.5.5 0 010 1H5a.5.5 0 01-.5-.5v-5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.354 5.646a.5.5 0 010 .708l-9 9a.5.5 0 01-.708-.708l9-9a.5.5 0 01.708 0z" clip-rule="evenodd"/>');
+var BIconArrowDownRight =
+/*#__PURE__*/
+makeIcon('ArrowDownRight', '<path fill-rule="evenodd" d="M14 9.5a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H9a.5.5 0 010-1h4.5V10a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.646 5.646a.5.5 0 01.708 0l9 9a.5.5 0 01-.708.708l-9-9a.5.5 0 010-.708z" clip-rule="evenodd"/>');
+var BIconArrowDownShort =
+/*#__PURE__*/
+makeIcon('ArrowDownShort', '<path fill-rule="evenodd" d="M6.646 9.646a.5.5 0 01.708 0L10 12.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 6.5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V7a.5.5 0 01.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowLeft =
+/*#__PURE__*/
+makeIcon('ArrowLeft', '<path fill-rule="evenodd" d="M7.854 6.646a.5.5 0 010 .708L5.207 10l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 10a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowLeftRight =
+/*#__PURE__*/
+makeIcon('ArrowLeftRight', '<path fill-rule="evenodd" d="M12.146 9.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L14.793 13l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4 13a.5.5 0 01.5-.5H15a.5.5 0 010 1H4.5A.5.5 0 014 13zm3.854-9.354a.5.5 0 010 .708L5.207 7l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 7a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowLeftShort =
+/*#__PURE__*/
+makeIcon('ArrowLeftShort', '<path fill-rule="evenodd" d="M9.854 6.646a.5.5 0 010 .708L7.207 10l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 10a.5.5 0 01.5-.5h6.5a.5.5 0 010 1H7a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowRepeat =
+/*#__PURE__*/
+makeIcon('ArrowRepeat', '<path fill-rule="evenodd" d="M4 9.5a.5.5 0 00-.5.5 6.5 6.5 0 0012.13 3.25.5.5 0 00-.866-.5A5.5 5.5 0 014.5 10a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.354 9.146a.5.5 0 00-.708 0l-2 2a.5.5 0 00.708.708L4 10.207l1.646 1.647a.5.5 0 00.708-.708l-2-2zM15.947 10.5a.5.5 0 00.5-.5 6.5 6.5 0 00-12.13-3.25.5.5 0 10.866.5A5.5 5.5 0 0115.448 10a.5.5 0 00.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M18.354 8.146a.5.5 0 00-.708 0L16 9.793l-1.646-1.647a.5.5 0 00-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 000-.708z" clip-rule="evenodd"/>');
+var BIconArrowRight =
+/*#__PURE__*/
+makeIcon('ArrowRight', '<path fill-rule="evenodd" d="M12.146 6.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L14.793 10l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4 10a.5.5 0 01.5-.5H15a.5.5 0 010 1H4.5A.5.5 0 014 10z" clip-rule="evenodd"/>');
+var BIconArrowRightShort =
+/*#__PURE__*/
+makeIcon('ArrowRightShort', '<path fill-rule="evenodd" d="M10.146 6.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 10l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 10a.5.5 0 01.5-.5H13a.5.5 0 010 1H6.5A.5.5 0 016 10z" clip-rule="evenodd"/>');
+var BIconArrowUp =
+/*#__PURE__*/
+makeIcon('ArrowUp', '<path fill-rule="evenodd" d="M10 5.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V6a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.646 4.646a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L10 5.707 7.354 8.354a.5.5 0 11-.708-.708l3-3z" clip-rule="evenodd"/>');
+var BIconArrowUpDown =
+/*#__PURE__*/
+makeIcon('ArrowUpDown', '<path fill-rule="evenodd" d="M13 5.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V6a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.646 4.646a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L13 5.707l-2.646 2.647a.5.5 0 01-.708-.708l3-3zm-9 7a.5.5 0 01.708 0L7 14.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7 4.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V5a.5.5 0 01.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowUpLeft =
+/*#__PURE__*/
+makeIcon('ArrowUpLeft', '<path fill-rule="evenodd" d="M4.5 6a.5.5 0 01.5-.5h5a.5.5 0 010 1H5.5V11a.5.5 0 01-1 0V6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.646 5.646a.5.5 0 01.708 0l9 9a.5.5 0 01-.708.708l-9-9a.5.5 0 010-.708z" clip-rule="evenodd"/>');
+var BIconArrowUpRight =
+/*#__PURE__*/
+makeIcon('ArrowUpRight', '<path fill-rule="evenodd" d="M8.5 6a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V6.5H9a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.354 5.646a.5.5 0 010 .708l-9 9a.5.5 0 01-.708-.708l9-9a.5.5 0 01.708 0z" clip-rule="evenodd"/>');
+var BIconArrowUpShort =
+/*#__PURE__*/
+makeIcon('ArrowUpShort', '<path fill-rule="evenodd" d="M10 7.5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V8a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.646 6.646a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L10 7.707l-2.646 2.647a.5.5 0 01-.708-.708l3-3z" clip-rule="evenodd"/>');
+var BIconArrowsAngleContract =
+/*#__PURE__*/
+makeIcon('ArrowsAngleContract', '<path fill-rule="evenodd" d="M11.5 4.036a.5.5 0 01.5.5v3.5h3.5a.5.5 0 010 1h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M16.354 3.646a.5.5 0 010 .708l-4.5 4.5a.5.5 0 01-.708-.708l4.5-4.5a.5.5 0 01.708 0zm-7.5 7.5a.5.5 0 010 .708l-4.5 4.5a.5.5 0 01-.708-.708l4.5-4.5a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.036 11.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V12h-3.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowsAngleExpand =
+/*#__PURE__*/
+makeIcon('ArrowsAngleExpand', '<path fill-rule="evenodd" d="M4 11.5a.5.5 0 01.5.5v3.5H8a.5.5 0 010 1H4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.854 11.11a.5.5 0 010 .708l-4.5 4.5a.5.5 0 11-.708-.707l4.5-4.5a.5.5 0 01.708 0zm7.464-7.464a.5.5 0 010 .708l-4.5 4.5a.5.5 0 11-.707-.708l4.5-4.5a.5.5 0 01.707 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.5 4a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4.5H12a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconArrowsCollapse =
+/*#__PURE__*/
+makeIcon('ArrowsCollapse', '<path fill-rule="evenodd" d="M4 10a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 014 10zm6-7a.5.5 0 01.5.5V8a.5.5 0 01-1 0V3.5A.5.5 0 0110 3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.354 5.646a.5.5 0 010 .708l-2 2a.5.5 0 01-.708 0l-2-2a.5.5 0 11.708-.708L10 7.293l1.646-1.647a.5.5 0 01.708 0zM10 17a.5.5 0 00.5-.5V12a.5.5 0 00-1 0v4.5a.5.5 0 00.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.354 14.354a.5.5 0 000-.708l-2-2a.5.5 0 00-.708 0l-2 2a.5.5 0 00.708.708L10 12.707l1.646 1.647a.5.5 0 00.708 0z" clip-rule="evenodd"/>');
+var BIconArrowsExpand =
+/*#__PURE__*/
+makeIcon('ArrowsExpand', '<path fill-rule="evenodd" d="M4 10a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 014 10zm6-1.5a.5.5 0 00.5-.5V3.5a.5.5 0 00-1 0V8a.5.5 0 00.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.354 5.854a.5.5 0 000-.708l-2-2a.5.5 0 00-.708 0l-2 2a.5.5 0 10.708.708L10 4.207l1.646 1.647a.5.5 0 00.708 0zM10 11.5a.5.5 0 01.5.5v4.5a.5.5 0 01-1 0V12a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.354 14.146a.5.5 0 010 .708l-2 2a.5.5 0 01-.708 0l-2-2a.5.5 0 01.708-.708L10 15.793l1.646-1.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>');
+var BIconArrowsFullscreen =
+/*#__PURE__*/
+makeIcon('ArrowsFullscreen', '<path fill-rule="evenodd" d="M4 11.5a.5.5 0 01.5.5v3.5H8a.5.5 0 010 1H4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.854 11.11a.5.5 0 010 .708l-4.5 4.5a.5.5 0 11-.708-.707l4.5-4.5a.5.5 0 01.708 0zm7.464-7.464a.5.5 0 010 .708l-4.5 4.5a.5.5 0 11-.707-.708l4.5-4.5a.5.5 0 01.707 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.5 4a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4.5H12a.5.5 0 01-.5-.5zm4.5 7.5a.5.5 0 00-.5.5v3.5H12a.5.5 0 000 1h4a.5.5 0 00.5-.5v-4a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.146 11.11a.5.5 0 000 .708l4.5 4.5a.5.5 0 00.708-.707l-4.5-4.5a.5.5 0 00-.708 0zM3.682 3.646a.5.5 0 000 .708l4.5 4.5a.5.5 0 10.707-.708l-4.5-4.5a.5.5 0 00-.707 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.5 4a.5.5 0 00-.5-.5H4a.5.5 0 00-.5.5v4a.5.5 0 001 0V4.5H8a.5.5 0 00.5-.5z" clip-rule="evenodd"/>');
+var BIconAt =
+/*#__PURE__*/
+makeIcon('At', '<path fill-rule="evenodd" d="M15.106 9.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V7.206h-1.032v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907s-.601 1.914-1.538 1.914c-.895 0-1.442-.725-1.442-1.914z" clip-rule="evenodd"/>');
+var BIconAward =
+/*#__PURE__*/
+makeIcon('Award', '<path d="M10 2l1.669.864 1.858.282.842 1.68 1.337 1.32L15.4 8l.306 1.854-1.337 1.32-.842 1.68-1.858.282L10 14l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L4.6 8l-.306-1.854 1.337-1.32.842-1.68 1.858-.282L10 2z"/><path d="M6 13.794V18l4-1 4 1v-4.206l-2.018.306L10 15.126 8.018 14.1 6 13.794z"/>');
+var BIconBackspace =
+/*#__PURE__*/
+makeIcon('Backspace', '<path fill-rule="evenodd" d="M8.603 4h7.08a1 1 0 011 1v10a1 1 0 01-1 1h-7.08a1 1 0 01-.76-.35L3 10l4.844-5.65A1 1 0 018.603 4zm7.08-1a2 2 0 012 2v10a2 2 0 01-2 2h-7.08a2 2 0 01-1.519-.698L2.241 10.65a1 1 0 010-1.302L7.084 3.7A2 2 0 018.603 3h7.08z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.83 7.146a.5.5 0 000 .708l5 5a.5.5 0 00.707-.708l-5-5a.5.5 0 00-.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13.537 7.146a.5.5 0 010 .708l-5 5a.5.5 0 01-.708-.708l5-5a.5.5 0 01.707 0z" clip-rule="evenodd"/>');
+var BIconBackspaceFill =
+/*#__PURE__*/
+makeIcon('BackspaceFill', '<path fill-rule="evenodd" d="M17.683 5a2 2 0 00-2-2h-7.08a2 2 0 00-1.519.698L2.241 9.35a1 1 0 000 1.302l4.843 5.65A2 2 0 008.603 17h7.08a2 2 0 002-2V5zM7.829 7.854a.5.5 0 11.707-.708l2.147 2.147 2.146-2.147a.5.5 0 11.707.708L11.39 10l2.146 2.146a.5.5 0 01-.707.708l-2.146-2.147-2.147 2.147a.5.5 0 01-.707-.708L9.976 10 7.829 7.854z" clip-rule="evenodd"/>');
+var BIconBackspaceReverse =
+/*#__PURE__*/
+makeIcon('BackspaceReverse', '<path fill-rule="evenodd" d="M11.08 4H4a1 1 0 00-1 1v10a1 1 0 001 1h7.08a1 1 0 00.76-.35L16.682 10l-4.844-5.65A1 1 0 0011.08 4zM4 3a2 2 0 00-2 2v10a2 2 0 002 2h7.08a2 2 0 001.519-.698l4.843-5.651a1 1 0 000-1.302L12.6 3.7a2 2 0 00-1.52-.7H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.854 7.146a.5.5 0 010 .708l-5 5a.5.5 0 01-.708-.708l5-5a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 000 .708l5 5a.5.5 0 00.708-.708l-5-5a.5.5 0 00-.708 0z" clip-rule="evenodd"/>');
+var BIconBackspaceReverseFill =
+/*#__PURE__*/
+makeIcon('BackspaceReverseFill', '<path fill-rule="evenodd" d="M2 5a2 2 0 012-2h7.08a2 2 0 011.519.698l4.843 5.651a1 1 0 010 1.302L12.6 16.3a2 2 0 01-1.52.7H4a2 2 0 01-2-2V5zm9.854 2.854a.5.5 0 00-.708-.708L9 9.293 6.854 7.146a.5.5 0 10-.708.708L8.293 10l-2.147 2.146a.5.5 0 00.708.708L9 10.707l2.146 2.147a.5.5 0 00.708-.708L9.707 10l2.147-2.146z" clip-rule="evenodd"/>');
+var BIconBarChart =
+/*#__PURE__*/
+makeIcon('BarChart', '<path fill-rule="evenodd" d="M6 13H4v3h2v-3zm5-4H9v7h2V9zm5-5h-2v12h2V4zm-2-1a1 1 0 00-1 1v12a1 1 0 001 1h2a1 1 0 001-1V4a1 1 0 00-1-1h-2zM8 9a1 1 0 011-1h2a1 1 0 011 1v7a1 1 0 01-1 1H9a1 1 0 01-1-1V9zm-5 4a1 1 0 011-1h2a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3z" clip-rule="evenodd"/>');
+var BIconBarChartFill =
+/*#__PURE__*/
+makeIcon('BarChartFill', '<rect width="4" height="5" x="3" y="12" rx="1"/><rect width="4" height="9" x="8" y="8" rx="1"/><rect width="4" height="14" x="13" y="3" rx="1"/>');
+var BIconBattery =
+/*#__PURE__*/
+makeIcon('Battery', '<path fill-rule="evenodd" d="M14 7H4a1 1 0 00-1 1v4a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM4 6a2 2 0 00-2 2v4a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path d="M16.5 11.5a1.5 1.5 0 000-3v3z"/>');
+var BIconBatteryCharging =
+/*#__PURE__*/
+makeIcon('BatteryCharging', '<path d="M16.5 11.5a1.5 1.5 0 000-3v3z"/><path fill-rule="evenodd" d="M11.585 4.568a.5.5 0 01.226.579l-1.134 3.686h1.99a.5.5 0 01.364.843l-5.334 5.667a.5.5 0 01-.842-.49l1.135-3.686H6a.5.5 0 01-.364-.843l5.333-5.667a.5.5 0 01.616-.09z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.332 6H4a2 2 0 00-2 2v4a2 2 0 002 2h2.072l.307-1H4a1 1 0 01-1-1V8a1 1 0 011-1h3.391l.941-1zM6.45 8H4v4h1.313a1.5 1.5 0 01-.405-2.361L6.45 8zm.976 5l-.308 1H8.96l.21-.224h.001l.73-.776H8.53l-.085.09.028-.09H7.426zm1.354-1H7.733l.257-.833H6a.5.5 0 01-.364-.843l.793-.843L7.823 8h1.373l-2.039 2.167h1.51a.492.492 0 01.166.028.5.5 0 01.312.619L8.78 12zm.69 0h1.373l1.395-1.482.793-.842a.5.5 0 00-.364-.843h-1.99L10.933 8H9.887l-.166.54-.199.646a.5.5 0 00.478.647h1.51L9.47 12zm.725-5h1.046l.308-1H9.706l-.942 1h1.374l.085-.09-.028.09zm2.4-1l-.308 1H14a1 1 0 011 1v4a1 1 0 01-1 1h-2.724l-.942 1H14a2 2 0 002-2V8a2 2 0 00-2-2h-1.405zm-.378 6H14v-1.98a1.499 1.499 0 01-.241.341L12.217 12zM14 8.646V8h-.646a1.5 1.5 0 01.646.646z" clip-rule="evenodd"/>');
+var BIconBatteryFull =
+/*#__PURE__*/
+makeIcon('BatteryFull', '<path fill-rule="evenodd" d="M14 7H4a1 1 0 00-1 1v4a1 1 0 001 1h10a1 1 0 001-1V8a1 1 0 00-1-1zM4 6a2 2 0 00-2 2v4a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path d="M4 8h10v4H4V8zm12.5 3.5a1.5 1.5 0 000-3v3z"/>');
+var BIconBell =
+/*#__PURE__*/
+makeIcon('Bell', '<path d="M10 18a2 2 0 002-2H8a2 2 0 002 2z"/><path fill-rule="evenodd" d="M10 3.918l-.797.161A4.002 4.002 0 006 8c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C14.134 10.197 14 8.628 14 8a4.002 4.002 0 00-3.203-3.92L10 3.917zM16.22 14c.223.447.482.801.78 1H3c.299-.199.557-.553.78-1C4.68 12.2 5 8.88 5 8c0-2.42 1.72-4.44 4.005-4.901a1 1 0 111.99 0A5.002 5.002 0 0115 8c0 .88.32 4.2 1.22 6z" clip-rule="evenodd"/>');
+var BIconBellFill =
+/*#__PURE__*/
+makeIcon('BellFill', '<path d="M10 18a2 2 0 002-2H8a2 2 0 002 2zm.995-14.901a1 1 0 10-1.99 0A5.002 5.002 0 005 8c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>');
+var BIconBlockquoteLeft =
+/*#__PURE__*/
+makeIcon('BlockquoteLeft', '<path fill-rule="evenodd" d="M4 5.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm5 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm-5 3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M5.734 8.352a6.586 6.586 0 00-.445.275 1.94 1.94 0 00-.346.299 1.38 1.38 0 00-.252.369c-.058.129-.1.295-.123.498h.282c.242 0 .431.06.568.182.14.117.21.29.21.521a.697.697 0 01-.187.463c-.12.14-.289.21-.503.21-.336 0-.577-.109-.721-.327-.145-.223-.217-.514-.217-.873 0-.254.055-.485.164-.692.11-.21.242-.398.399-.562.16-.168.33-.31.51-.428.179-.117.33-.213.45-.287l.211.352zm2.168 0a6.588 6.588 0 00-.445.275 1.94 1.94 0 00-.346.299c-.113.12-.199.246-.257.375a1.75 1.75 0 00-.118.492h.282c.242 0 .431.06.568.182.14.117.21.29.21.521a.697.697 0 01-.187.463c-.12.14-.289.21-.504.21-.335 0-.576-.109-.72-.327-.145-.223-.217-.514-.217-.873 0-.254.055-.485.164-.692.11-.21.242-.398.398-.562.16-.168.33-.31.51-.428.18-.117.33-.213.451-.287l.211.352z"/>');
+var BIconBlockquoteRight =
+/*#__PURE__*/
+makeIcon('BlockquoteRight', '<path fill-rule="evenodd" d="M4 5.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M14.168 8.352c.184.105.332.197.445.275.114.074.229.174.346.299.11.117.193.24.252.369s.1.295.123.498h-.281c-.243 0-.432.06-.569.182-.14.117-.21.29-.21.521 0 .164.062.319.187.463.121.14.289.21.504.21.336 0 .576-.109.72-.327.145-.223.217-.514.217-.873 0-.254-.054-.485-.164-.692a2.436 2.436 0 00-.398-.562c-.16-.168-.33-.31-.51-.428-.18-.117-.33-.213-.451-.287l-.211.352zm-2.168 0c.184.105.332.197.445.275.114.074.229.174.346.299.113.12.2.246.258.375.055.125.094.289.117.492h-.281c-.242 0-.432.06-.569.182-.14.117-.21.29-.21.521 0 .164.062.319.187.463.121.14.289.21.504.21.336 0 .576-.109.72-.327.145-.223.217-.514.217-.873 0-.254-.054-.485-.164-.692a2.438 2.438 0 00-.398-.562c-.16-.168-.33-.31-.51-.428-.18-.117-.33-.213-.451-.287L12 8.352z"/>');
+var BIconBook =
+/*#__PURE__*/
+makeIcon('Book', '<path fill-rule="evenodd" d="M5.214 3.072c1.599-.32 3.702-.363 5.14 1.074a.5.5 0 01.146.354v11a.5.5 0 01-.854.354c-.843-.844-2.115-1.059-3.47-.92-1.344.14-2.66.617-3.452 1.013A.5.5 0 012 15.5v-11a.5.5 0 01.276-.447L2.5 4.5l-.224-.447.002-.001.004-.002.013-.006a5.116 5.116 0 01.22-.103 12.958 12.958 0 012.7-.869zM3 4.82v9.908c.846-.343 1.944-.672 3.074-.788 1.143-.118 2.387-.023 3.426.56V4.718c-1.063-.929-2.631-.956-4.09-.664A11.958 11.958 0 003 4.82z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.786 3.072c-1.598-.32-3.702-.363-5.14 1.074A.5.5 0 009.5 4.5v11a.5.5 0 00.854.354c.844-.844 2.115-1.059 3.47-.92 1.344.14 2.66.617 3.452 1.013A.5.5 0 0018 15.5v-11a.5.5 0 00-.276-.447L17.5 4.5l.224-.447-.002-.001-.004-.002-.013-.006-.047-.023a12.582 12.582 0 00-.799-.34 12.96 12.96 0 00-2.073-.609zM17 4.82v9.908c-.846-.343-1.944-.672-3.074-.788-1.143-.118-2.386-.023-3.426.56V4.718c1.063-.929 2.631-.956 4.09-.664A11.956 11.956 0 0117 4.82z" clip-rule="evenodd"/>');
+var BIconBookHalfFill =
+/*#__PURE__*/
+makeIcon('BookHalfFill', '<path fill-rule="evenodd" d="M5.214 3.072c1.599-.32 3.702-.363 5.14 1.074a.5.5 0 01.146.354v11a.5.5 0 01-.854.354c-.843-.844-2.115-1.059-3.47-.92-1.344.14-2.66.617-3.452 1.013A.5.5 0 012 15.5v-11a.5.5 0 01.276-.447L2.5 4.5l-.224-.447.002-.001.004-.002.013-.006a5.116 5.116 0 01.22-.103 12.958 12.958 0 012.7-.869zM3 4.82v9.908c.846-.343 1.944-.672 3.074-.788 1.143-.118 2.387-.023 3.426.56V4.718c-1.063-.929-2.631-.956-4.09-.664A11.958 11.958 0 003 4.82z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.786 3.072c-1.598-.32-3.702-.363-5.14 1.074A.5.5 0 009.5 4.5v11a.5.5 0 00.854.354c.844-.844 2.115-1.059 3.47-.92 1.344.14 2.66.617 3.452 1.013A.5.5 0 0018 15.5v-11a.5.5 0 00-.276-.447L17.5 4.5l.224-.447-.002-.001-.004-.002-.013-.006-.047-.023a12.582 12.582 0 00-.799-.34 12.96 12.96 0 00-2.073-.609z" clip-rule="evenodd"/>');
+var BIconBookmark =
+/*#__PURE__*/
+makeIcon('Bookmark', '<path fill-rule="evenodd" d="M10 14l5 3V5a2 2 0 00-2-2H7a2 2 0 00-2 2v12l5-3zm-4 1.234l4-2.4 4 2.4V5a1 1 0 00-1-1H7a1 1 0 00-1 1v10.234z" clip-rule="evenodd"/>');
+var BIconBookmarkFill =
+/*#__PURE__*/
+makeIcon('BookmarkFill', '<path fill-rule="evenodd" d="M5 5a2 2 0 012-2h6a2 2 0 012 2v12l-5-3-5 3V5z" clip-rule="evenodd"/>');
+var BIconBootstrap =
+/*#__PURE__*/
+makeIcon('Bootstrap', '<path fill-rule="evenodd" d="M14 3H6a3 3 0 00-3 3v8a3 3 0 003 3h8a3 3 0 003-3V6a3 3 0 00-3-3zM6 2a4 4 0 00-4 4v8a4 4 0 004 4h8a4 4 0 004-4V6a4 4 0 00-4-4H6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.537 14H7.062V5.545h3.398c1.588 0 2.543.809 2.543 2.11 0 .884-.65 1.675-1.482 1.816v.1c1.143.117 1.904.931 1.904 2.033 0 1.488-1.084 2.396-2.888 2.396zM8.375 6.658v2.467h1.558c1.16 0 1.764-.428 1.764-1.23 0-.78-.568-1.237-1.541-1.237H8.375zm1.898 6.229H8.375v-2.725h1.822c1.236 0 1.887.463 1.887 1.348 0 .896-.627 1.377-1.811 1.377z" clip-rule="evenodd"/>');
+var BIconBootstrapFill =
+/*#__PURE__*/
+makeIcon('BootstrapFill', '<path fill-rule="evenodd" d="M6.002 2a4 4 0 00-4 4v8a4 4 0 004 4h8a4 4 0 004-4V6a4 4 0 00-4-4h-8zm1.06 12h3.475c1.804 0 2.888-.908 2.888-2.396 0-1.102-.761-1.916-1.904-2.034v-.1c.832-.14 1.482-.93 1.482-1.816 0-1.3-.955-2.11-2.543-2.11H7.063V14zm1.313-4.875V6.658h1.78c.974 0 1.542.457 1.542 1.237 0 .802-.604 1.23-1.764 1.23H8.375zm0 3.762h1.898c1.184 0 1.81-.48 1.81-1.377 0-.885-.65-1.348-1.886-1.348H8.375v2.725z" clip-rule="evenodd"/>');
+var BIconBootstrapReboot =
+/*#__PURE__*/
+makeIcon('BootstrapReboot', '<path fill-rule="evenodd" d="M3.161 10a6.84 6.84 0 106.842-6.84.58.58 0 110-1.16 8 8 0 11-6.556 3.412l-.663-.577a.58.58 0 01.227-.997l2.52-.69a.58.58 0 01.728.633l-.332 2.592a.58.58 0 01-.956.364l-.643-.56A6.812 6.812 0 003.16 10zm5.228-.079V7.277h1.57c.881 0 1.416.499 1.416 1.32 0 .84-.505 1.324-1.386 1.324h-1.6zm0 3.75v-2.828h1.57l1.498 2.828h1.314l-1.646-3.006c.897-.3 1.427-1.106 1.427-2.1 0-1.37-.943-2.246-2.456-2.246H7.248v7.352h1.141z" clip-rule="evenodd"/>');
+var BIconBoxArrowBottomLeft =
+/*#__PURE__*/
+makeIcon('BoxArrowBottomLeft', '<path fill-rule="evenodd" d="M15 3.5A1.5 1.5 0 0116.5 5v8a1.5 1.5 0 01-1.5 1.5h-4a.5.5 0 010-1h4a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H7a.5.5 0 00-.5.5v4a.5.5 0 01-1 0V5A1.5 1.5 0 017 3.5h8zm-11 7a.5.5 0 00-.5.5v5a.5.5 0 00.5.5h5a.5.5 0 000-1H4.5V11a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.646 16.354a.5.5 0 00.708 0l8-8a.5.5 0 00-.708-.708l-8 8a.5.5 0 000 .708z" clip-rule="evenodd"/>');
+var BIconBoxArrowBottomRight =
+/*#__PURE__*/
+makeIcon('BoxArrowBottomRight', '<path fill-rule="evenodd" d="M5 3.5A1.5 1.5 0 003.5 5v8A1.5 1.5 0 005 14.5h4a.5.5 0 000-1H5a.5.5 0 01-.5-.5V5a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v4a.5.5 0 001 0V5A1.5 1.5 0 0013 3.5H5zm11 7a.5.5 0 01.5.5v5a.5.5 0 01-.5.5h-5a.5.5 0 010-1h4.5V11a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M16.354 16.354a.5.5 0 01-.708 0l-8-8a.5.5 0 11.708-.708l8 8a.5.5 0 010 .708z" clip-rule="evenodd"/>');
+var BIconBoxArrowDown =
+/*#__PURE__*/
+makeIcon('BoxArrowDown', '<path fill-rule="evenodd" d="M6.646 13.646a.5.5 0 01.708 0L10 16.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 6.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V7a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 4A1.5 1.5 0 016 2.5h8A1.5 1.5 0 0115.5 4v7a1.5 1.5 0 01-1.5 1.5h-1.5a.5.5 0 010-1H14a.5.5 0 00.5-.5V4a.5.5 0 00-.5-.5H6a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h1.5a.5.5 0 010 1H6A1.5 1.5 0 014.5 11V4z" clip-rule="evenodd"/>');
+var BIconBoxArrowLeft =
+/*#__PURE__*/
+makeIcon('BoxArrowLeft', '<path fill-rule="evenodd" d="M6.354 13.354a.5.5 0 000-.708L3.707 10l2.647-2.646a.5.5 0 10-.708-.708l-3 3a.5.5 0 000 .708l3 3a.5.5 0 00.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13.5 10a.5.5 0 00-.5-.5H4a.5.5 0 000 1h9a.5.5 0 00.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M16 15.5a1.5 1.5 0 001.5-1.5V6A1.5 1.5 0 0016 4.5H9A1.5 1.5 0 007.5 6v1.5a.5.5 0 001 0V6a.5.5 0 01.5-.5h7a.5.5 0 01.5.5v8a.5.5 0 01-.5.5H9a.5.5 0 01-.5-.5v-1.5a.5.5 0 00-1 0V14A1.5 1.5 0 009 15.5h7z" clip-rule="evenodd"/>');
+var BIconBoxArrowRight =
+/*#__PURE__*/
+makeIcon('BoxArrowRight', '<path fill-rule="evenodd" d="M13.646 13.354a.5.5 0 010-.708L16.293 10l-2.647-2.646a.5.5 0 01.708-.708l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 10a.5.5 0 01.5-.5h9a.5.5 0 010 1H7a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4 15.5A1.5 1.5 0 012.5 14V6A1.5 1.5 0 014 4.5h7A1.5 1.5 0 0112.5 6v1.5a.5.5 0 01-1 0V6a.5.5 0 00-.5-.5H4a.5.5 0 00-.5.5v8a.5.5 0 00.5.5h7a.5.5 0 00.5-.5v-1.5a.5.5 0 011 0V14a1.5 1.5 0 01-1.5 1.5H4z" clip-rule="evenodd"/>');
+var BIconBoxArrowUp =
+/*#__PURE__*/
+makeIcon('BoxArrowUp', '<path fill-rule="evenodd" d="M6.646 6.354a.5.5 0 00.708 0L10 3.707l2.646 2.647a.5.5 0 00.708-.708l-3-3a.5.5 0 00-.708 0l-3 3a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 13.5a.5.5 0 00.5-.5V4a.5.5 0 00-1 0v9a.5.5 0 00.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 16A1.5 1.5 0 006 17.5h8a1.5 1.5 0 001.5-1.5V9A1.5 1.5 0 0014 7.5h-1.5a.5.5 0 000 1H14a.5.5 0 01.5.5v7a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5V9a.5.5 0 01.5-.5h1.5a.5.5 0 000-1H6A1.5 1.5 0 004.5 9v7z" clip-rule="evenodd"/>');
+var BIconBoxArrowUpLeft =
+/*#__PURE__*/
+makeIcon('BoxArrowUpLeft', '<path fill-rule="evenodd" d="M16.5 15a1.5 1.5 0 01-1.5 1.5H7A1.5 1.5 0 015.5 15v-4a.5.5 0 011 0v4a.5.5 0 00.5.5h8a.5.5 0 00.5-.5V7a.5.5 0 00-.5-.5h-4a.5.5 0 010-1h4A1.5 1.5 0 0116.5 7v8zm-7-11a.5.5 0 00-.5-.5H4a.5.5 0 00-.5.5v5a.5.5 0 001 0V4.5H9a.5.5 0 00.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.646 3.646a.5.5 0 000 .708l8 8a.5.5 0 00.708-.708l-8-8a.5.5 0 00-.708 0z" clip-rule="evenodd"/>');
+var BIconBoxArrowUpRight =
+/*#__PURE__*/
+makeIcon('BoxArrowUpRight', '<path fill-rule="evenodd" d="M3.5 15A1.5 1.5 0 005 16.5h8a1.5 1.5 0 001.5-1.5v-4a.5.5 0 00-1 0v4a.5.5 0 01-.5.5H5a.5.5 0 01-.5-.5V7a.5.5 0 01.5-.5h4a.5.5 0 000-1H5A1.5 1.5 0 003.5 7v8zm7-11a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V4.5H11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M16.354 3.646a.5.5 0 010 .708l-8 8a.5.5 0 01-.708-.708l8-8a.5.5 0 01.708 0z" clip-rule="evenodd"/>');
+var BIconBraces =
+/*#__PURE__*/
+makeIcon('Braces', '<path d="M4.114 10.063V9.9c1.005-.102 1.497-.615 1.497-1.6V6.503c0-1.094.39-1.538 1.354-1.538h.273V4h-.376C5.25 4 4.49 4.759 4.49 6.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538v-1.798c0-.984-.492-1.497-1.497-1.6zM15.886 9.9v.163c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456V9.332c-1.114 0-1.49-.362-1.49-1.456V6.352C15.51 4.759 14.75 4 13.138 4h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V8.3c0 .984.492 1.497 1.497 1.6z"/>');
+var BIconBrightnessFillHigh =
+/*#__PURE__*/
+makeIcon('BrightnessFillHigh', '<circle cx="10" cy="10" r="4"/><path fill-rule="evenodd" d="M10 2a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 0110 2zm0 13a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2a.5.5 0 01.5-.5zm8-5a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zM5 10a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zm10.657-5.657a.5.5 0 010 .707l-1.414 1.414a.5.5 0 01-.707-.707l1.414-1.414a.5.5 0 01.707 0zm-9.193 9.193a.5.5 0 010 .707L5.05 15.657a.5.5 0 01-.707-.707l1.414-1.414a.5.5 0 01.707 0zm9.193 2.121a.5.5 0 01-.707 0l-1.414-1.414a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .707zM6.464 6.464a.5.5 0 01-.707 0L4.343 5.05a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .707z" clip-rule="evenodd"/>');
+var BIconBrightnessFillLow =
+/*#__PURE__*/
+makeIcon('BrightnessFillLow', '<circle cx="10" cy="10" r="4"/><circle cx="10" cy="4.5" r=".5"/><circle cx="10" cy="15.5" r=".5"/><circle cx="15.5" cy="10" r=".5" transform="rotate(90 15.5 10)"/><circle cx="4.5" cy="10" r=".5" transform="rotate(90 4.5 10)"/><circle cx="13.889" cy="6.111" r=".5" transform="rotate(45 13.89 6.11)"/><circle cx="6.111" cy="13.889" r=".5" transform="rotate(45 6.11 13.89)"/><circle cx="13.889" cy="13.889" r=".5" transform="rotate(135 13.89 13.89)"/><circle cx="6.111" cy="6.111" r=".5" transform="rotate(135 6.11 6.11)"/>');
+var BIconBrightnessHigh =
+/*#__PURE__*/
+makeIcon('BrightnessHigh', '<path fill-rule="evenodd" d="M10 13a3 3 0 100-6 3 3 0 000 6zm0 1a4 4 0 100-8 4 4 0 000 8zm0-12a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 0110 2zm0 13a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2a.5.5 0 01.5-.5zm8-5a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zM5 10a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zm10.657-5.657a.5.5 0 010 .707l-1.414 1.414a.5.5 0 11-.707-.707l1.414-1.414a.5.5 0 01.707 0zm-9.193 9.193a.5.5 0 010 .707L5.05 15.657a.5.5 0 01-.707-.707l1.414-1.414a.5.5 0 01.707 0zm9.193 2.121a.5.5 0 01-.707 0l-1.414-1.414a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .707zM6.464 6.464a.5.5 0 01-.707 0L4.343 5.05a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .707z" clip-rule="evenodd"/>');
+var BIconBrightnessLow =
+/*#__PURE__*/
+makeIcon('BrightnessLow', '<path fill-rule="evenodd" d="M10 13a3 3 0 100-6 3 3 0 000 6zm0 1a4 4 0 100-8 4 4 0 000 8z" clip-rule="evenodd"/><circle cx="10" cy="4.5" r=".5"/><circle cx="10" cy="15.5" r=".5"/><circle cx="15.5" cy="10" r=".5" transform="rotate(90 15.5 10)"/><circle cx="4.5" cy="10" r=".5" transform="rotate(90 4.5 10)"/><circle cx="13.889" cy="6.111" r=".5" transform="rotate(45 13.89 6.11)"/><circle cx="6.111" cy="13.889" r=".5" transform="rotate(45 6.11 13.89)"/><circle cx="13.889" cy="13.889" r=".5" transform="rotate(135 13.89 13.89)"/><circle cx="6.111" cy="6.111" r=".5" transform="rotate(135 6.11 6.11)"/>');
+var BIconBrush =
+/*#__PURE__*/
+makeIcon('Brush', '<path d="M17.213 3.018a.572.572 0 01.755.05.57.57 0 01.058.746c-.941 1.268-3.982 5.293-6.426 7.736a12.89 12.89 0 01-1.952 1.596c-.508.339-1.167.234-1.599-.197-.416-.416-.53-1.047-.213-1.543.347-.542.888-1.273 1.643-1.977 2.521-2.35 6.476-5.44 7.734-6.411z"/><path d="M9 14a2 2 0 01-2 2c-1 0-2 0-3.5-.5s.5-1 1-1.5 1.395-2 2.5-2a2 2 0 012 2z"/>');
+var BIconBucket =
+/*#__PURE__*/
+makeIcon('Bucket', '<path fill-rule="evenodd" d="M10 3.5A4.5 4.5 0 005.5 8h-1a5.5 5.5 0 1111 0h-1A4.5 4.5 0 0010 3.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.61 7.687A.5.5 0 014 7.5h12a.5.5 0 01.488.608l-1.826 8.217a1.5 1.5 0 01-1.464 1.175H6.802a1.5 1.5 0 01-1.464-1.175L3.512 8.108a.5.5 0 01.098-.42zm1.013.813l1.691 7.608a.5.5 0 00.488.392h6.396a.5.5 0 00.488-.392l1.69-7.608H4.624z" clip-rule="evenodd"/>');
+var BIconBucketFill =
+/*#__PURE__*/
+makeIcon('BucketFill', '<path fill-rule="evenodd" d="M10 3.5A4.5 4.5 0 005.5 8h-1a5.5 5.5 0 1111 0h-1A4.5 4.5 0 0010 3.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.61 7.687A.5.5 0 014 7.5h12a.5.5 0 01.488.608l-1.826 8.217a1.5 1.5 0 01-1.464 1.175H6.802a1.5 1.5 0 01-1.464-1.175L3.512 8.108a.5.5 0 01.098-.42z" clip-rule="evenodd"/>');
+var BIconBuilding =
+/*#__PURE__*/
+makeIcon('Building', '<path fill-rule="evenodd" d="M17.285 2.089a.5.5 0 01.215.411v15a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V16h-1v1.5a.5.5 0 01-.5.5H3a.5.5 0 01-.5-.5v-6a.5.5 0 01.418-.493l5.582-.93V5.5a.5.5 0 01.324-.468l8-3a.5.5 0 01.46.057zM9.5 5.846V10.5a.5.5 0 01-.418.493l-5.582.93V17h8v-1.5a.5.5 0 01.5-.5h2a.5.5 0 01.5.5V17h2V3.221l-7 2.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.5 17.5v-7h1v7h-1z" clip-rule="evenodd"/><path d="M4.5 13h1v1h-1v-1zm2 0h1v1h-1v-1zm-2 2h1v1h-1v-1zm2 0h1v1h-1v-1zm6-10h1v1h-1V5zm2 0h1v1h-1V5zm-4 2h1v1h-1V7zm2 0h1v1h-1V7zm2 0h1v1h-1V7zm-2 2h1v1h-1V9zm2 0h1v1h-1V9zm-4 0h1v1h-1V9zm0 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm-4 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1z"/>');
+var BIconBullseye =
+/*#__PURE__*/
+makeIcon('Bullseye', '<path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm0 1a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 15a5 5 0 100-10 5 5 0 000 10zm0 1a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 13a3 3 0 100-6 3 3 0 000 6zm0 1a4 4 0 100-8 4 4 0 000 8z" clip-rule="evenodd"/><path d="M11.5 10a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>');
+var BIconCalendar =
+/*#__PURE__*/
+makeIcon('Calendar', '<path fill-rule="evenodd" d="M16 2H4a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2zM3 5.857C3 5.384 3.448 5 4 5h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H4c-.552 0-1-.384-1-.857V5.857z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.5 9a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm-9 3a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm-9 3a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>');
+var BIconCalendarFill =
+/*#__PURE__*/
+makeIcon('CalendarFill', '<path d="M2 4a2 2 0 012-2h12a2 2 0 012 2H2z"/><path fill-rule="evenodd" d="M2 5h16v11a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm6.5 4a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm-8 2a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm-8 2a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd"/>');
+var BIconCamera =
+/*#__PURE__*/
+makeIcon('Camera', '<path d="M11 7c-1.657 0-4 1.343-4 3a4 4 0 014-4v1z"/><path fill-rule="evenodd" d="M16.333 5h-2.015A5.97 5.97 0 0011 4a5.972 5.972 0 00-3.318 1H3.667C2.747 5 2 5.746 2 6.667v6.666C2 14.253 2.746 15 3.667 15h4.015c.95.632 2.091 1 3.318 1a5.973 5.973 0 003.318-1h2.015c.92 0 1.667-.746 1.667-1.667V6.667C18 5.747 17.254 5 16.333 5zM3.5 7a.5.5 0 100-1 .5.5 0 000 1zm7.5 8a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"/><path d="M4 5a1 1 0 011-1h1a1 1 0 010 2H5a1 1 0 01-1-1z"/>');
+var BIconCameraVideo =
+/*#__PURE__*/
+makeIcon('CameraVideo', '<path fill-rule="evenodd" d="M4.667 5.5c-.645 0-1.167.522-1.167 1.167v6.666c0 .645.522 1.167 1.167 1.167h6.666c.645 0 1.167-.522 1.167-1.167V6.667c0-.645-.522-1.167-1.167-1.167H4.667zM2.5 6.667C2.5 5.47 3.47 4.5 4.667 4.5h6.666c1.197 0 2.167.97 2.167 2.167v6.666c0 1.197-.97 2.167-2.167 2.167H4.667A2.167 2.167 0 012.5 13.333V6.667z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13.25 7.65l2.768-1.605a.318.318 0 01.482.263v7.384c0 .228-.26.393-.482.264l-2.767-1.605-.502.865 2.767 1.605c.859.498 1.984-.095 1.984-1.129V6.308c0-1.033-1.125-1.626-1.984-1.128L12.75 6.785l.502.865z" clip-rule="evenodd"/>');
+var BIconCameraVideoFill =
+/*#__PURE__*/
+makeIcon('CameraVideoFill', '<path d="M4.667 5h6.666C12.253 5 13 5.746 13 6.667v6.666c0 .92-.746 1.667-1.667 1.667H4.667C3.747 15 3 14.254 3 13.333V6.667C3 5.747 3.746 5 4.667 5z"/><path d="M9.404 10.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V6.308c0-.63-.692-1.01-1.233-.696L9.404 9.304a.802.802 0 000 1.393z"/>');
+var BIconCapslock =
+/*#__PURE__*/
+makeIcon('Capslock', '<path fill-rule="evenodd" d="M9.27 3.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H13.5v1a1 1 0 01-1 1h-5a1 1 0 01-1-1v-1H3.654c-.875 0-1.328-1.045-.73-1.684L9.27 3.047zm7.076 7.453L10 3.731 3.654 10.5H6.5a1 1 0 011 1v1h5v-1a1 1 0 011-1h2.846zm-9.846 5a1 1 0 011-1h5a1 1 0 011 1v1a1 1 0 01-1 1h-5a1 1 0 01-1-1v-1zm6 0h-5v1h5v-1z" clip-rule="evenodd"/>');
+var BIconCapslockFill =
+/*#__PURE__*/
+makeIcon('CapslockFill', '<path fill-rule="evenodd" d="M9.27 3.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H13.5v1a1 1 0 01-1 1h-5a1 1 0 01-1-1v-1H3.654c-.875 0-1.328-1.045-.73-1.684L9.27 3.047zM6.5 15.5a1 1 0 011-1h5a1 1 0 011 1v1a1 1 0 01-1 1h-5a1 1 0 01-1-1v-1z" clip-rule="evenodd"/>');
+var BIconChat =
+/*#__PURE__*/
+makeIcon('Chat', '<path fill-rule="evenodd" d="M8.207 13.293L7.5 14a5.5 5.5 0 110-11h5a5.5 5.5 0 110 11s-1.807 2.169-4.193 2.818C7.887 16.933 7.449 17 7 17c.291-.389.488-.74.617-1.052C8.149 14.649 7.5 14 7.5 14c.707-.707.708-.707.708-.706h.001l.002.003.004.004.01.01a1.184 1.184 0 01.074.084c.039.047.085.108.134.183.097.15.206.36.284.626.114.386.154.855.047 1.394.717-.313 1.37-.765 1.895-1.201a10.266 10.266 0 001.013-.969l.05-.056.01-.012m0 0A1 1 0 0112.5 13a4.5 4.5 0 100-9h-5a4.5 4.5 0 000 9 1 1 0 01.707.293" clip-rule="evenodd"/>');
+var BIconChatFill =
+/*#__PURE__*/
+makeIcon('ChatFill', '<path fill-rule="evenodd" d="M7.5 14s.65.65.117 1.948A4.821 4.821 0 017 17c.449 0 .887-.067 1.307-.181C10.692 16.169 12.5 14 12.5 14a5.5 5.5 0 100-11h-5a5.5 5.5 0 100 11z" clip-rule="evenodd"/>');
+var BIconCheck =
+/*#__PURE__*/
+makeIcon('Check', '<path fill-rule="evenodd" d="M15.854 5.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L8.5 12.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>');
+var BIconCheckBox =
+/*#__PURE__*/
+makeIcon('CheckBox', '<path fill-rule="evenodd" d="M17.354 4.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L10 11.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.5 15A1.5 1.5 0 005 16.5h10a1.5 1.5 0 001.5-1.5v-5a.5.5 0 00-1 0v5a.5.5 0 01-.5.5H5a.5.5 0 01-.5-.5V5a.5.5 0 01.5-.5h8a.5.5 0 000-1H5A1.5 1.5 0 003.5 5v10z" clip-rule="evenodd"/>');
+var BIconCheckCircle =
+/*#__PURE__*/
+makeIcon('CheckCircle', '<path fill-rule="evenodd" d="M17.354 4.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L10 11.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 4.5a5.5 5.5 0 105.5 5.5.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63.5.5 0 11-.5.865A5.472 5.472 0 0010 4.5z" clip-rule="evenodd"/>');
+var BIconChevronCompactDown =
+/*#__PURE__*/
+makeIcon('ChevronCompactDown', '<path fill-rule="evenodd" d="M3.553 8.776a.5.5 0 01.67-.223L10 11.44l5.776-2.888a.5.5 0 11.448.894l-6 3a.5.5 0 01-.448 0l-6-3a.5.5 0 01-.223-.67z" clip-rule="evenodd"/>');
+var BIconChevronCompactLeft =
+/*#__PURE__*/
+makeIcon('ChevronCompactLeft', '<path fill-rule="evenodd" d="M11.224 3.553a.5.5 0 01.223.67L8.56 10l2.888 5.776a.5.5 0 11-.894.448l-3-6a.5.5 0 010-.448l3-6a.5.5 0 01.67-.223z" clip-rule="evenodd"/>');
+var BIconChevronCompactRight =
+/*#__PURE__*/
+makeIcon('ChevronCompactRight', '<path fill-rule="evenodd" d="M8.776 3.553a.5.5 0 01.671.223l3 6a.5.5 0 010 .448l-3 6a.5.5 0 11-.894-.448L11.44 10 8.553 4.224a.5.5 0 01.223-.671z" clip-rule="evenodd"/>');
+var BIconChevronCompactUp =
+/*#__PURE__*/
+makeIcon('ChevronCompactUp', '<path fill-rule="evenodd" d="M9.776 7.553a.5.5 0 01.448 0l6 3a.5.5 0 11-.448.894L10 8.56l-5.776 2.888a.5.5 0 11-.448-.894l6-3z" clip-rule="evenodd"/>');
+var BIconChevronDown =
+/*#__PURE__*/
+makeIcon('ChevronDown', '<path fill-rule="evenodd" d="M3.646 6.646a.5.5 0 01.708 0L10 12.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/>');
+var BIconChevronLeft =
+/*#__PURE__*/
+makeIcon('ChevronLeft', '<path fill-rule="evenodd" d="M13.354 3.646a.5.5 0 010 .708L7.707 10l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>');
+var BIconChevronRight =
+/*#__PURE__*/
+makeIcon('ChevronRight', '<path fill-rule="evenodd" d="M6.646 3.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L12.293 10 6.646 4.354a.5.5 0 010-.708z" clip-rule="evenodd"/>');
+var BIconChevronUp =
+/*#__PURE__*/
+makeIcon('ChevronUp', '<path fill-rule="evenodd" d="M9.646 6.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L10 7.707l-5.646 5.647a.5.5 0 01-.708-.708l6-6z" clip-rule="evenodd"/>');
+var BIconCircle =
+/*#__PURE__*/
+makeIcon('Circle', '<path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm0 1a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"/>');
+var BIconCircleFill =
+/*#__PURE__*/
+makeIcon('CircleFill', '<circle cx="10" cy="10" r="8"/>');
+var BIconCircleHalf =
+/*#__PURE__*/
+makeIcon('CircleHalf', '<path fill-rule="evenodd" d="M10 17V3a7 7 0 000 14zm0 1a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"/>');
+var BIconCircleSlash =
+/*#__PURE__*/
+makeIcon('CircleSlash', '<path fill-rule="evenodd" d="M10 1.5a8.5 8.5 0 100 17 8.5 8.5 0 000-17zM5.071 4.347a7.5 7.5 0 0110.582 10.582L5.071 4.347zm-.724.724a7.5 7.5 0 0010.582 10.582L4.347 5.071z" clip-rule="evenodd"/>');
+var BIconClock =
+/*#__PURE__*/
+makeIcon('Clock', '<path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm8-7a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 4a.5.5 0 01.5.5V10a.5.5 0 01-.5.5H5.5a.5.5 0 010-1h4v-5A.5.5 0 0110 4z" clip-rule="evenodd"/>');
+var BIconClockFill =
+/*#__PURE__*/
+makeIcon('ClockFill', '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM5.5 9.5h4v-5a.5.5 0 011 0V10a.5.5 0 01-.5.5H5.5a.5.5 0 010-1z" clip-rule="evenodd"/>');
+var BIconCloud =
+/*#__PURE__*/
+makeIcon('Cloud', '<path fill-rule="evenodd" d="M6.887 9.2l-.964-.165A2.5 2.5 0 105.5 14h10a1.5 1.5 0 00.237-2.982l-1.038-.164.216-1.028a4 4 0 10-7.843-1.587l-.185.96zm9.084.341a5 5 0 00-9.88-1.492A3.5 3.5 0 105.5 15h9.999a2.5 2.5 0 00.394-4.968c.033-.16.06-.324.077-.49z" clip-rule="evenodd"/>');
+var BIconCloudDownload =
+/*#__PURE__*/
+makeIcon('CloudDownload', '<path d="M6.887 7.2l-.964-.165A2.5 2.5 0 105.5 12H8v1H5.5a3.5 3.5 0 11.59-6.95 5.002 5.002 0 119.804 1.98A2.501 2.501 0 0115.5 13H12v-1h3.5a1.5 1.5 0 00.237-2.981L14.7 8.854l.216-1.028a4 4 0 10-7.843-1.587l-.185.96z"/><path fill-rule="evenodd" d="M7 14.5a.5.5 0 01.707 0L10 16.793l2.293-2.293a.5.5 0 11.707.707l-2.646 2.647a.5.5 0 01-.708 0L7 15.207a.5.5 0 010-.707z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 8a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8A.5.5 0 0110 8z" clip-rule="evenodd"/>');
+var BIconCloudFill =
+/*#__PURE__*/
+makeIcon('CloudFill', '<path fill-rule="evenodd" d="M5.5 15a3.5 3.5 0 11.59-6.95 5.002 5.002 0 119.804 1.98A2.5 2.5 0 0115.5 15h-10z" clip-rule="evenodd"/>');
+var BIconCloudUpload =
+/*#__PURE__*/
+makeIcon('CloudUpload', '<path d="M6.887 8.2l-.964-.165A2.5 2.5 0 105.5 13H8v1H5.5a3.5 3.5 0 11.59-6.95 5.002 5.002 0 119.804 1.98A2.501 2.501 0 0115.5 14H12v-1h3.5a1.5 1.5 0 00.237-2.982L14.7 9.854l.216-1.028a4 4 0 10-7.843-1.587l-.185.96z"/><path fill-rule="evenodd" d="M7 10.854a.5.5 0 00.707 0L10 8.56l2.293 2.293a.5.5 0 00.707-.707L10.354 7.5a.5.5 0 00-.708 0L7 10.146a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 8a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8A.5.5 0 0110 8z" clip-rule="evenodd"/>');
+var BIconCode =
+/*#__PURE__*/
+makeIcon('Code', '<path fill-rule="evenodd" d="M7.854 6.146a.5.5 0 010 .708L4.707 10l3.147 3.146a.5.5 0 01-.708.708l-3.5-3.5a.5.5 0 010-.708l3.5-3.5a.5.5 0 01.708 0zm4.292 0a.5.5 0 000 .708L15.293 10l-3.147 3.146a.5.5 0 00.708.708l3.5-3.5a.5.5 0 000-.708l-3.5-3.5a.5.5 0 00-.708 0z" clip-rule="evenodd"/>');
+var BIconCodeSlash =
+/*#__PURE__*/
+makeIcon('CodeSlash', '<path fill-rule="evenodd" d="M6.854 6.146a.5.5 0 010 .708L3.707 10l3.147 3.146a.5.5 0 01-.708.708l-3.5-3.5a.5.5 0 010-.708l3.5-3.5a.5.5 0 01.708 0zm6.292 0a.5.5 0 000 .708L16.293 10l-3.147 3.146a.5.5 0 00.708.708l3.5-3.5a.5.5 0 000-.708l-3.5-3.5a.5.5 0 00-.708 0zm-.999-3.124a.5.5 0 01.33.625l-4 13a.5.5 0 11-.955-.294l4-13a.5.5 0 01.625-.33z" clip-rule="evenodd"/>');
+var BIconColumns =
+/*#__PURE__*/
+makeIcon('Columns', '<path fill-rule="evenodd" d="M17 4H3v12h14V4zM3 3a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.5 16V4h1v12h-1zm0-8H3V7h6.5v1zm7.5 5h-6.5v-1H17v1z" clip-rule="evenodd"/>');
+var BIconColumnsGutters =
+/*#__PURE__*/
+makeIcon('ColumnsGutters', '<path fill-rule="evenodd" d="M8 3H3v3h5V3zM3 2a1 1 0 00-1 1v3a1 1 0 001 1h5a1 1 0 001-1V3a1 1 0 00-1-1H3zm14 12h-5v3h5v-3zm-5-1a1 1 0 00-1 1v3a1 1 0 001 1h5a1 1 0 001-1v-3a1 1 0 00-1-1h-5zm-4-3H3v7h5v-7zM3 9a1 1 0 00-1 1v7a1 1 0 001 1h5a1 1 0 001-1v-7a1 1 0 00-1-1H3zm14-6h-5v7h5V3zm-5-1a1 1 0 00-1 1v7a1 1 0 001 1h5a1 1 0 001-1V3a1 1 0 00-1-1h-5z" clip-rule="evenodd"/>');
+var BIconCommand =
+/*#__PURE__*/
+makeIcon('Command', '<path fill-rule="evenodd" d="M4 5.5A1.5 1.5 0 005.5 7H7V5.5a1.5 1.5 0 10-3 0zM8 8V5.5A2.5 2.5 0 105.5 8H8zm8-2.5A1.5 1.5 0 0114.5 7H13V5.5a1.5 1.5 0 013 0zM12 8V5.5A2.5 2.5 0 1114.5 8H12zm-8 6.5A1.5 1.5 0 015.5 13H7v1.5a1.5 1.5 0 01-3 0zM8 12v2.5A2.5 2.5 0 115.5 12H8zm8 2.5a1.5 1.5 0 00-1.5-1.5H13v1.5a1.5 1.5 0 003 0zM12 12v2.5a2.5 2.5 0 102.5-2.5H12z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12 8H8v4h4V8zM7 7v6h6V7H7z" clip-rule="evenodd"/>');
+var BIconCompass =
+/*#__PURE__*/
+makeIcon('Compass', '<path fill-rule="evenodd" d="M10 17.016a6.5 6.5 0 100-13 6.5 6.5 0 000 13zm0 1a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" clip-rule="evenodd"/><rect width="4" height="2" x="8" y="2" rx="1"/><path d="M8.94 9.44l4.95-2.83-2.83 4.95-4.95 2.83 2.83-4.95z"/>');
+var BIconCone =
+/*#__PURE__*/
+makeIcon('Cone', '<path d="M9.03 3.88c.252-1.01 1.688-1.01 1.94 0L14 16H6L9.03 3.88z"/><path fill-rule="evenodd" d="M3.5 16a.5.5 0 01.5-.5h12a.5.5 0 010 1H4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconConeStriped =
+/*#__PURE__*/
+makeIcon('ConeStriped', '<path fill-rule="evenodd" d="M9.879 13.015a.5.5 0 01.242 0l6 1.5a.5.5 0 01.037.96l-6 2a.499.499 0 01-.316 0l-6-2a.5.5 0 01.037-.96l6-1.5z" clip-rule="evenodd"/><path d="M13.885 14.538l-.72-2.877c-.862.212-1.964.339-3.165.339s-2.303-.127-3.165-.339l-.72 2.877c-.073.292-.002.6.256.756.49.295 1.545.706 3.629.706s3.14-.411 3.63-.706c.257-.155.328-.464.255-.756zM11.97 6.88l.953 3.811C12.159 10.878 11.14 11 10 11c-1.14 0-2.159-.122-2.923-.309L8.03 6.88C8.635 6.957 9.3 7 10 7s1.365-.043 1.97-.12zm-.245-.978L10.97 2.88c-.252-1.01-1.688-1.01-1.94 0L8.275 5.9C8.8 5.965 9.382 6 10 6c.618 0 1.2-.036 1.725-.098z"/>');
+var BIconController =
+/*#__PURE__*/
+makeIcon('Controller', '<path fill-rule="evenodd" d="M13.119 4.693c.904.19 1.75.495 2.235.98.407.408.779 1.05 1.094 1.772.32.733.599 1.591.805 2.466.206.875.34 1.78.364 2.606.024.815-.059 1.602-.328 2.21a1.42 1.42 0 01-1.445.83c-.636-.067-1.115-.394-1.513-.773a11.307 11.307 0 01-.739-.809c-.126-.147-.25-.291-.368-.422-.728-.804-1.597-1.527-3.224-1.527-1.627 0-2.496.723-3.224 1.527-.119.131-.242.275-.368.422-.243.283-.494.576-.739.81-.398.378-.877.705-1.513.772a1.42 1.42 0 01-1.445-.83c-.27-.608-.352-1.395-.329-2.21.024-.826.16-1.73.365-2.606.206-.875.486-1.733.805-2.466.315-.722.687-1.364 1.094-1.772.486-.485 1.331-.79 2.235-.98.932-.196 2.03-.292 3.119-.292 1.089 0 2.187.096 3.119.292zm-6.032.979c-.877.185-1.469.443-1.733.708-.276.276-.587.783-.885 1.465a13.748 13.748 0 00-.748 2.295 12.35 12.35 0 00-.339 2.406c-.022.755.062 1.368.243 1.776a.42.42 0 00.426.24c.327-.034.61-.199.929-.502.212-.202.4-.423.615-.674.133-.156.276-.323.44-.505.826-.912 1.943-1.854 3.965-1.854s3.139.942 3.965 1.854c.164.182.307.35.44.505.214.25.403.472.615.674.318.303.601.468.929.503a.42.42 0 00.426-.241c.18-.408.265-1.02.243-1.776a12.353 12.353 0 00-.339-2.406 13.753 13.753 0 00-.748-2.295c-.298-.682-.61-1.19-.885-1.465-.264-.265-.856-.523-1.733-.708-.85-.179-1.877-.27-2.913-.27-1.036 0-2.063.091-2.913.27z" clip-rule="evenodd"/><path d="M13.5 8.026a.5.5 0 11-1 0 .5.5 0 011 0zm-1 1a.5.5 0 11-1 0 .5.5 0 011 0zm2 0a.5.5 0 11-1 0 .5.5 0 011 0zm-1 1.001a.5.5 0 11-1 0 .5.5 0 011 0zm-7-2.501h1v3h-1v-3z"/><path d="M5.5 8.526h3v1h-3v-1zM5.051 5.26a.5.5 0 01.354-.613l1.932-.518a.5.5 0 01.258.966l-1.932.518a.5.5 0 01-.612-.354zm9.976 0a.5.5 0 00-.353-.613l-1.932-.518a.5.5 0 10-.259.966l1.932.518a.5.5 0 00.612-.354z"/>');
+var BIconCreditCard =
+/*#__PURE__*/
+makeIcon('CreditCard', '<path fill-rule="evenodd" d="M16 5H4a1 1 0 00-1 1v8a1 1 0 001 1h12a1 1 0 001-1V6a1 1 0 00-1-1zM4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4z" clip-rule="evenodd"/><rect width="3" height="3" x="4" y="11" rx="1"/><path d="M3 7h14v2H3z"/>');
+var BIconCursor =
+/*#__PURE__*/
+makeIcon('Cursor', '<path fill-rule="evenodd" d="M16.081 4.182a.5.5 0 01.104.557l-5.657 12.727a.5.5 0 01-.917-.006L7.57 12.694l-4.766-2.042a.5.5 0 01-.006-.917L15.525 4.08a.5.5 0 01.556.103zM4.25 10.184l3.897 1.67a.5.5 0 01.262.263l1.67 3.897L14.743 5.52 4.25 10.184z" clip-rule="evenodd"/>');
+var BIconCursorFill =
+/*#__PURE__*/
+makeIcon('CursorFill', '<path fill-rule="evenodd" d="M16.081 4.182a.5.5 0 01.104.557l-5.657 12.727a.5.5 0 01-.917-.006L7.57 12.694l-4.766-2.042a.5.5 0 01-.006-.917L15.525 4.08a.5.5 0 01.556.103z" clip-rule="evenodd"/>');
+var BIconDash =
+/*#__PURE__*/
+makeIcon('Dash', '<path fill-rule="evenodd" d="M5.5 10a.5.5 0 01.5-.5h8a.5.5 0 010 1H6a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconDiamond =
+/*#__PURE__*/
+makeIcon('Diamond', '<path fill-rule="evenodd" d="M5.1 2.7a.5.5 0 01.4-.2h9a.5.5 0 01.4.2l2.976 3.974c.149.185.156.45.01.644L10.4 17.3a.5.5 0 01-.8 0l-7.5-10a.5.5 0 010-.6l3-4zm11.386 3.785l-1.806-2.41-.776 2.413 2.582-.003zm-3.633.004l.961-2.989H6.186l.963 2.995 5.704-.006zM7.47 7.495l5.062-.005L10 15.366 7.47 7.495zm-1.371-.999l-.78-2.422-1.818 2.425 2.598-.003zM3.499 7.5l2.92-.003 2.193 6.82L3.5 7.5zm7.889 6.817l2.194-6.828 2.929-.003-5.123 6.831z" clip-rule="evenodd"/>');
+var BIconDiamondHalf =
+/*#__PURE__*/
+makeIcon('DiamondHalf', '<path fill-rule="evenodd" d="M8.94 2.354a1.5 1.5 0 012.12 0l6.586 6.585a1.5 1.5 0 010 2.122l-6.585 6.585a1.5 1.5 0 01-2.122 0l-6.585-6.585a1.5 1.5 0 010-2.122l6.585-6.585zm1.06.56a.498.498 0 00-.354.147L3.061 9.646a.5.5 0 000 .707l6.585 6.586a.499.499 0 00.354.147V2.914z" clip-rule="evenodd"/>');
+var BIconDisplay =
+/*#__PURE__*/
+makeIcon('Display', '<path d="M7.75 15.5c.167-.333.25-.833.25-1.5h4c0 .667.083 1.167.25 1.5H13a.5.5 0 010 1H7a.5.5 0 010-1h.75z"/><path fill-rule="evenodd" d="M15.991 5H4c-.325 0-.502.078-.602.145a.758.758 0 00-.254.302A1.46 1.46 0 003 6.01V12c0 .325.078.502.145.602.07.105.17.188.302.254a1.464 1.464 0 00.538.143L4.01 13H16c.325 0 .502-.078.602-.145a.758.758 0 00.254-.302 1.464 1.464 0 00.143-.538L17 11.99V6c0-.325-.078-.502-.145-.602a.757.757 0 00-.302-.254A1.46 1.46 0 0015.99 5zM16 4H4C2 4 2 6 2 6v6c0 2 2 2 2 2h12c2 0 2-2 2-2V6c0-2-2-2-2-2z" clip-rule="evenodd"/>');
+var BIconDisplayFill =
+/*#__PURE__*/
+makeIcon('DisplayFill', '<path d="M7.75 15.5c.167-.333.25-.833.25-1.5h4c0 .667.083 1.167.25 1.5H13a.5.5 0 010 1H7a.5.5 0 010-1h.75z"/><path fill-rule="evenodd" d="M15.991 5H4c-.325 0-.502.078-.602.145a.758.758 0 00-.254.302A1.46 1.46 0 003 6.01V12c0 .325.078.502.145.602.07.105.17.188.302.254a1.464 1.464 0 00.538.143L4.01 13H16c.325 0 .502-.078.602-.145a.758.758 0 00.254-.302 1.464 1.464 0 00.143-.538L17 11.99V6c0-.325-.078-.502-.145-.602a.757.757 0 00-.302-.254A1.46 1.46 0 0015.99 5zM16 4H4C2 4 2 6 2 6v6c0 2 2 2 2 2h12c2 0 2-2 2-2V6c0-2-2-2-2-2z" clip-rule="evenodd"/><path d="M4 6h12v6H4z"/>');
+var BIconDocument =
+/*#__PURE__*/
+makeIcon('Document', '<path fill-rule="evenodd" d="M6 3h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H6z" clip-rule="evenodd"/>');
+var BIconDocumentCode =
+/*#__PURE__*/
+makeIcon('DocumentCode', '<path fill-rule="evenodd" d="M6 3h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.646 7.646a.5.5 0 01.708 0l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708L12.293 10l-1.647-1.646a.5.5 0 010-.708zm-1.292 0a.5.5 0 00-.708 0l-2 2a.5.5 0 000 .708l2 2a.5.5 0 00.708-.708L7.707 10l1.647-1.646a.5.5 0 000-.708z" clip-rule="evenodd"/>');
+var BIconDocumentDiff =
+/*#__PURE__*/
+makeIcon('DocumentDiff', '<path fill-rule="evenodd" d="M6 3h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 13a.5.5 0 01.5-.5h4a.5.5 0 010 1H8a.5.5 0 01-.5-.5zM10 6.5a.5.5 0 01.5.5v4a.5.5 0 01-1 0V7a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 9a.5.5 0 01.5-.5h4a.5.5 0 010 1H8a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconDocumentRichtext =
+/*#__PURE__*/
+makeIcon('DocumentRichtext', '<path fill-rule="evenodd" d="M6 3h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 14a.5.5 0 01.5-.5h3a.5.5 0 010 1H7a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h6a.5.5 0 010 1H7a.5.5 0 01-.5-.5zm1.639-3.958l1.33.886 1.854-1.855a.25.25 0 01.289-.047L13.5 8v1.75a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5v-.5s1.54-1.274 1.639-1.208zM8.25 7a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd"/>');
+var BIconDocumentSpreadsheet =
+/*#__PURE__*/
+makeIcon('DocumentSpreadsheet', '<path fill-rule="evenodd" d="M6 3h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15 8H5V7h10v1zm0 3H5v-1h10v1zm0 3H5v-1h10v1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7 16V8h1v8H7zm4 0V8h1v8h-1z" clip-rule="evenodd"/>');
+var BIconDocumentText =
+/*#__PURE__*/
+makeIcon('DocumentText', '<path fill-rule="evenodd" d="M6 3h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 14a.5.5 0 01.5-.5h3a.5.5 0 010 1H7a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h6a.5.5 0 010 1H7a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h6a.5.5 0 010 1H7a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h6a.5.5 0 010 1H7a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h6a.5.5 0 010 1H7a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconDocuments =
+/*#__PURE__*/
+makeIcon('Documents', '<path fill-rule="evenodd" d="M5 4h8a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6a1 1 0 00-1-1H5z" clip-rule="evenodd"/><path d="M7 2h8a2 2 0 012 2v10a2 2 0 01-2 2v-1a1 1 0 001-1V4a1 1 0 00-1-1H7a1 1 0 00-1 1H5a2 2 0 012-2z"/>');
+var BIconDocumentsAlt =
+/*#__PURE__*/
+makeIcon('DocumentsAlt', '<path fill-rule="evenodd" d="M5 3h8a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H5z" clip-rule="evenodd"/><path d="M15 6V5a2 2 0 012 2v6a2 2 0 01-2 2v-1a1 1 0 001-1V7a1 1 0 00-1-1z"/>');
+var BIconDot =
+/*#__PURE__*/
+makeIcon('Dot', '<path fill-rule="evenodd" d="M10 11.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/>');
+var BIconDownload =
+/*#__PURE__*/
+makeIcon('Download', '<path fill-rule="evenodd" d="M2.5 10a.5.5 0 01.5.5V14a1 1 0 001 1h12a1 1 0 001-1v-3.5a.5.5 0 011 0V14a2 2 0 01-2 2H4a2 2 0 01-2-2v-3.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7 9.5a.5.5 0 01.707 0L10 11.793 12.293 9.5a.5.5 0 01.707.707l-2.646 2.647a.5.5 0 01-.708 0L7 10.207A.5.5 0 017 9.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 3a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8A.5.5 0 0110 3z" clip-rule="evenodd"/>');
+var BIconEggFried =
+/*#__PURE__*/
+makeIcon('EggFried', '<path fill-rule="evenodd" d="M15.665 8.113a1 1 0 01-.667-.977L15 7a4 4 0 00-6.483-3.136 1 1 0 01-.8.2 4 4 0 00-3.693 6.61 1 1 0 01.2 1 4 4 0 006.67 4.087 1 1 0 011.262-.152 2.5 2.5 0 003.715-2.905 1 1 0 01.341-1.113 2.001 2.001 0 00-.547-3.478zM16 7c0 .057 0 .113-.003.17a3.001 3.001 0 01.822 5.216 3.5 3.5 0 01-5.201 4.065 5 5 0 01-8.336-5.109A5 5 0 017.896 3.08 5 5 0 0116 7z" clip-rule="evenodd"/><circle cx="10" cy="10" r="3"/>');
+var BIconEject =
+/*#__PURE__*/
+makeIcon('Eject', '<path fill-rule="evenodd" d="M9.27 3.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H3.656c-.876 0-1.33-1.045-.73-1.684L9.27 3.047zm7.076 7.453L10 3.731 3.654 10.5h12.692zM2.5 13.5a1 1 0 011-1h13a1 1 0 011 1v1a1 1 0 01-1 1h-13a1 1 0 01-1-1v-1zm14 0h-13v1h13v-1z" clip-rule="evenodd"/>');
+var BIconEjectFill =
+/*#__PURE__*/
+makeIcon('EjectFill', '<path fill-rule="evenodd" d="M9.27 3.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H3.656c-.876 0-1.33-1.045-.73-1.684L9.27 3.047zM2.5 13.5a1 1 0 011-1h13a1 1 0 011 1v1a1 1 0 01-1 1h-13a1 1 0 01-1-1v-1z" clip-rule="evenodd"/>');
+var BIconEnvelope =
+/*#__PURE__*/
+makeIcon('Envelope', '<path fill-rule="evenodd" d="M16 5H4a1 1 0 00-1 1v8a1 1 0 001 1h12a1 1 0 001-1V6a1 1 0 00-1-1zM4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.071 6.243a.5.5 0 01.686-.172L10 10.417l7.243-4.346a.5.5 0 11.514.858L10 11.583 2.243 6.93a.5.5 0 01-.172-.686z" clip-rule="evenodd"/>');
+var BIconEnvelopeFill =
+/*#__PURE__*/
+makeIcon('EnvelopeFill', '<path d="M2.05 5.555L10 10.414l7.95-4.859A2 2 0 0016 4H4a2 2 0 00-1.95 1.555zM18 6.697l-5.875 3.59L18 13.743V6.697zm-.168 8.108l-6.675-3.926-1.157.707-1.157-.707-6.675 3.926A2 2 0 004 16h12a2 2 0 001.832-1.195zM2 13.743l5.875-3.456L2 6.697v7.046z"/>');
+var BIconEnvelopeOpen =
+/*#__PURE__*/
+makeIcon('EnvelopeOpen', '<path fill-rule="evenodd" d="M2.243 8.929l.514-.858L10 12.417l7.243-4.346.514.858L10 13.583 2.243 8.93z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.184 12.68l-6.432 3.752-.504-.864 6.432-3.752.504.864zm1.632 0l6.432 3.752.504-.864-6.432-3.752-.504.864z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.47 3.318a1 1 0 00-.94 0l-6 3.2A1 1 0 003 7.4V16a1 1 0 001 1h12a1 1 0 001-1V7.4a1 1 0 00-.53-.882l-6-3.2zm-1.41-.883a2 2 0 011.882 0l6 3.2A2 2 0 0118 7.4V16a2 2 0 01-2 2H4a2 2 0 01-2-2V7.4a2 2 0 011.059-1.765l6-3.2z" clip-rule="evenodd"/>');
+var BIconEnvelopeOpenFill =
+/*#__PURE__*/
+makeIcon('EnvelopeOpenFill', '<path fill-rule="evenodd" d="M10.941 2.435a2 2 0 00-1.882 0l-6 3.2A2 2 0 002 7.4v.125l8 4.889 8-4.889V7.4a2 2 0 00-1.059-1.765l-6-3.2zM18 8.697l-5.875 3.59L18 15.743V8.697zm-.168 8.108l-6.586-3.874-.088-.052-.897.548-.261.159-.26-.16-.897-.547-.09.052-6.585 3.874A2 2 0 004 18h12a2 2 0 001.832-1.195zM2 15.743l5.875-3.456L2 8.697v7.046z" clip-rule="evenodd"/>');
+var BIconEye =
+/*#__PURE__*/
+makeIcon('Eye', '<path fill-rule="evenodd" d="M18 10s-3-5.5-8-5.5S2 10 2 10s3 5.5 8 5.5 8-5.5 8-5.5zM3.173 10a13.133 13.133 0 001.66 2.043C6.12 13.332 7.88 14.5 10 14.5c2.12 0 3.879-1.168 5.168-2.457A13.133 13.133 0 0016.828 10a13.133 13.133 0 00-1.66-2.043C13.879 6.668 12.119 5.5 10 5.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 003.172 10z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 7.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM6.5 10a3.5 3.5 0 117 0 3.5 3.5 0 01-7 0z" clip-rule="evenodd"/>');
+var BIconEyeFill =
+/*#__PURE__*/
+makeIcon('EyeFill', '<path d="M12.5 10a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/><path fill-rule="evenodd" d="M2 10s3-5.5 8-5.5 8 5.5 8 5.5-3 5.5-8 5.5S2 10 2 10zm8 3.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" clip-rule="evenodd"/>');
+var BIconEyeSlash =
+/*#__PURE__*/
+makeIcon('EyeSlash', '<path d="M15.359 13.238C17.06 11.72 18 10 18 10s-3-5.5-8-5.5a7.028 7.028 0 00-2.79.588l.77.771A5.944 5.944 0 0110 5.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0116.828 10c-.058.087-.122.183-.195.288a13.14 13.14 0 01-1.465 1.755c-.165.165-.337.328-.517.486l.708.709z"/><path d="M13.297 11.176a3.5 3.5 0 00-4.474-4.474l.823.823a2.5 2.5 0 012.829 2.829l.822.822zm-2.943 1.299l.822.822a3.5 3.5 0 01-4.474-4.474l.823.823a2.5 2.5 0 002.829 2.829z"/><path d="M5.35 7.47c-.18.16-.353.322-.518.487A13.134 13.134 0 003.172 10l.195.288c.335.48.83 1.12 1.465 1.755C6.121 13.332 7.881 14.5 10 14.5c.716 0 1.39-.133 2.02-.36l.77.772A7.027 7.027 0 0110 15.5c-5 0-8-5.5-8-5.5s.939-1.721 2.641-3.238l.708.709z"/><path fill-rule="evenodd" d="M15.646 16.354l-12-12 .708-.708 12 12-.708.707z" clip-rule="evenodd"/>');
+var BIconEyeSlashFill =
+/*#__PURE__*/
+makeIcon('EyeSlashFill', '<path d="M12.79 14.912l-1.614-1.615a3.5 3.5 0 01-4.474-4.474l-2.06-2.06C2.938 8.278 2 10 2 10s3 5.5 8 5.5a7.027 7.027 0 002.79-.588zM7.21 5.088A7.028 7.028 0 0110 4.5c5 0 8 5.5 8 5.5s-.939 1.72-2.641 3.238l-2.062-2.062a3.5 3.5 0 00-4.474-4.474L7.21 5.088z"/><path d="M7.525 9.646a2.5 2.5 0 002.829 2.829l-2.83-2.829zm4.95.708l-2.829-2.83a2.5 2.5 0 012.829 2.829z"/><path fill-rule="evenodd" d="M15.646 16.354l-12-12 .708-.708 12 12-.708.707z" clip-rule="evenodd"/>');
+var BIconFilter =
+/*#__PURE__*/
+makeIcon('Filter', '<path fill-rule="evenodd" d="M7.5 13a.5.5 0 01.5-.5h4a.5.5 0 010 1H8a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h8a.5.5 0 010 1H6a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h12a.5.5 0 010 1H4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconFlag =
+/*#__PURE__*/
+makeIcon('Flag', '<path fill-rule="evenodd" d="M5.5 3a.5.5 0 01.5.5v13a.5.5 0 01-1 0v-13a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.762 4.558C6.735 3.909 7.348 3.5 8.5 3.5c.653 0 1.139.325 1.495.562l.032.022c.392.26.646.416.973.416.168 0 .356-.042.587-.126.187-.068.376-.153.593-.25.058-.027.117-.053.18-.08.57-.255 1.278-.544 2.14-.544a.5.5 0 01.5.5v6a.5.5 0 01-.5.5c-.638 0-1.18.21-1.734.457l-.159.07c-.22.1-.453.205-.678.287A2.718 2.718 0 0111 11.5c-.653 0-1.139-.325-1.495-.563l-.032-.021c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916a.5.5 0 11-.515-.858C6.735 9.909 7.348 9.5 8.5 9.5c.653 0 1.139.325 1.495.563l.032.021c.392.26.646.416.973.416.168 0 .356-.042.587-.126.187-.068.376-.153.593-.25.058-.027.117-.053.18-.08.456-.204 1-.43 1.64-.512V4.543c-.433.074-.83.234-1.234.414l-.159.07c-.22.1-.453.205-.678.287A2.72 2.72 0 0111 5.5c-.653 0-1.139-.325-1.495-.562l-.032-.022c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916a.5.5 0 01-.554-.832l.04-.026z" clip-rule="evenodd"/>');
+var BIconFlagFill =
+/*#__PURE__*/
+makeIcon('FlagFill', '<path fill-rule="evenodd" d="M5.5 3a.5.5 0 01.5.5v13a.5.5 0 01-1 0v-13a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.762 4.558C6.735 3.909 7.348 3.5 8.5 3.5c.653 0 1.139.325 1.495.562l.032.022c.392.26.646.416.973.416.168 0 .356-.042.587-.126.187-.068.376-.153.593-.25.058-.027.117-.053.18-.08.57-.255 1.278-.544 2.14-.544a.5.5 0 01.5.5v6a.5.5 0 01-.5.5c-.638 0-1.18.21-1.734.457l-.159.07c-.22.1-.453.205-.678.287A2.718 2.718 0 0111 11.5c-.653 0-1.139-.325-1.495-.563l-.032-.021c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916A.5.5 0 015.5 11V5a.5.5 0 01.223-.416l.04-.026z" clip-rule="evenodd"/>');
+var BIconFolder =
+/*#__PURE__*/
+makeIcon('Folder', '<path d="M11.828 6a3 3 0 01-2.12-.879l-.83-.828A1 1 0 008.173 4H4.5a1 1 0 00-1 .981L3.546 6h-1L2.5 5a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 0011.828 5v1z"/><path fill-rule="evenodd" d="M15.81 6H4.19a1 1 0 00-.996 1.09l.637 7a1 1 0 00.995.91h10.348a1 1 0 00.995-.91l.637-7A1 1 0 0015.81 6zM4.19 5a2 2 0 00-1.992 2.181l.637 7A2 2 0 004.826 16h10.348a2 2 0 001.991-1.819l.637-7A2 2 0 0015.81 5H4.19z" clip-rule="evenodd"/>');
+var BIconFolderFill =
+/*#__PURE__*/
+makeIcon('FolderFill', '<path fill-rule="evenodd" d="M11.828 5h3.982a2 2 0 011.992 2.181l-.637 7A2 2 0 0115.174 16H4.826a2 2 0 01-1.991-1.819l-.637-7a1.99 1.99 0 01.342-1.31L2.5 5a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 0011.828 5zm-8.322.12C3.72 5.042 3.95 5 4.19 5h5.396l-.707-.707A1 1 0 008.172 4H4.5a1 1 0 00-1 .981l.006.139z" clip-rule="evenodd"/>');
+var BIconFolderSymlink =
+/*#__PURE__*/
+makeIcon('FolderSymlink', '<path d="M11.828 6a3 3 0 01-2.12-.879l-.83-.828A1 1 0 008.173 4H4.5a1 1 0 00-1 .981L3.546 6h-1L2.5 5a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 0011.828 5v1z"/><path fill-rule="evenodd" d="M15.81 6H4.19a1 1 0 00-.996 1.09l.637 7a1 1 0 00.995.91h10.348a1 1 0 00.995-.91l.637-7A1 1 0 0015.81 6zM4.19 5a2 2 0 00-1.992 2.181l.637 7A2 2 0 004.826 16h10.348a2 2 0 001.991-1.819l.637-7A2 2 0 0015.81 5H4.19z" clip-rule="evenodd"/><path d="M10.616 12.24l3.182-1.969a.442.442 0 000-.742l-3.182-1.97c-.27-.166-.616.036-.616.372V8.7c-.857 0-3.429 0-4 4.8 1.429-2.7 4-2.4 4-2.4v.769c0 .336.346.538.616.371z"/>');
+var BIconFolderSymlinkFill =
+/*#__PURE__*/
+makeIcon('FolderSymlinkFill', '<path fill-rule="evenodd" d="M15.81 5h-3.982a2 2 0 01-1.414-.586l-.828-.828A2 2 0 008.172 3H4.5a2 2 0 00-2 2l.04.87a1.99 1.99 0 00-.342 1.311l.637 7A2 2 0 004.826 16h10.348a2 2 0 001.991-1.819l.637-7A2 2 0 0015.81 5zM4.19 5c-.24 0-.47.042-.684.12L3.5 4.98a1 1 0 011-.98h3.672a1 1 0 01.707.293L9.586 5H4.19zm9.608 5.271l-3.182 1.97c-.27.166-.616-.036-.616-.372V11.1s-2.571-.3-4 2.4c.571-4.8 3.143-4.8 4-4.8v-.769c0-.336.346-.538.616-.371l3.182 1.969c.27.166.27.576 0 .742z" clip-rule="evenodd"/>');
+var BIconFonts =
+/*#__PURE__*/
+makeIcon('Fonts', '<path d="M14.258 5H5.747l-.082 2.46h.479c.26-1.544.758-1.783 2.693-1.845l.424-.013v7.827c0 .663-.144.82-1.3.923v.52h4.082v-.52c-1.162-.103-1.306-.26-1.306-.923V5.602l.43.013c1.935.062 2.434.301 2.694 1.846h.479L14.258 5z"/>');
+var BIconForward =
+/*#__PURE__*/
+makeIcon('Forward', '<path fill-rule="evenodd" d="M11.502 7.513a.144.144 0 00-.202.134V8.65a.5.5 0 01-.5.5H4.5v2.9h6.3a.5.5 0 01.5.5v1.003c0 .108.11.176.202.134l3.984-2.933a.522.522 0 01.042-.028.147.147 0 000-.252.523.523 0 01-.042-.028l-3.984-2.933zm-1.202.134a1.144 1.144 0 011.767-.96l3.994 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a1.144 1.144 0 01-1.767-.96v-.503H4a.5.5 0 01-.5-.5v-3.9a.5.5 0 01.5-.5h6.3v-.503z" clip-rule="evenodd"/>');
+var BIconForwardFill =
+/*#__PURE__*/
+makeIcon('ForwardFill', '<path d="M11.77 14.11l4.012-2.953a.647.647 0 000-1.114L11.771 7.09a.644.644 0 00-.971.557V8.65H4v3.9h6.8v1.003c0 .505.545.808.97.557z"/>');
+var BIconGear =
+/*#__PURE__*/
+makeIcon('Gear', '<path fill-rule="evenodd" d="M10.837 3.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 016.377 5.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 01-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 011.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 012.692 1.115l.094.319c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 012.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 011.115-2.693l.319-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 01-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159a1.873 1.873 0 01-2.693-1.115l-.094-.319zm-2.633-.283c.527-1.79 3.064-1.79 3.592 0l.094.319a.873.873 0 001.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 00.52 1.255l.319.094c1.79.527 1.79 3.064 0 3.592l-.319.094a.873.873 0 00-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 00-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 00-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 00-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 00.52-1.255l-.16-.292c-.892-1.64.901-3.433 2.541-2.54l.292.159a.873.873 0 001.255-.52l.094-.319z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 7.754a2.246 2.246 0 100 4.492 2.246 2.246 0 000-4.492zM6.754 10a3.246 3.246 0 116.492 0 3.246 3.246 0 01-6.492 0z" clip-rule="evenodd"/>');
+var BIconGearFill =
+/*#__PURE__*/
+makeIcon('GearFill', '<path fill-rule="evenodd" d="M11.405 3.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 01-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 01.872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 012.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 012.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 01.872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 01-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 01-2.105-.872l-.1-.34zM10 12.93a2.929 2.929 0 100-5.858 2.929 2.929 0 000 5.858z" clip-rule="evenodd"/>');
+var BIconGearWide =
+/*#__PURE__*/
+makeIcon('GearWide', '<path fill-rule="evenodd" d="M10.932 2.724c-.243-.97-1.621-.97-1.864 0l-.072.286a.96.96 0 01-1.622.434l-.205-.211c-.695-.72-1.889-.03-1.614.932l.08.283a.96.96 0 01-1.187 1.188l-.283-.081c-.962-.275-1.651.919-.932 1.614l.211.205a.96.96 0 01-.434 1.622l-.286.072c-.97.243-.97 1.621 0 1.864l.286.072a.96.96 0 01.434 1.622l-.211.205c-.72.695-.03 1.889.932 1.614l.283-.08a.96.96 0 011.188 1.187l-.081.283c-.275.962.919 1.651 1.614.932l.205-.211a.96.96 0 011.622.434l.072.286c.243.97 1.621.97 1.864 0l.072-.286a.96.96 0 011.622-.434l.205.211c.695.72 1.889.03 1.614-.932l-.08-.283a.96.96 0 011.187-1.188l.283.081c.962.275 1.651-.919.932-1.614l-.211-.205a.96.96 0 01.434-1.622l.286-.072c.97-.243.97-1.621 0-1.864l-.286-.072a.96.96 0 01-.434-1.622l.211-.205c.72-.695.03-1.889-.932-1.614l-.283.08a.96.96 0 01-1.188-1.187l.081-.283c.275-.962-.919-1.651-1.614-.932l-.205.211a.96.96 0 01-1.622-.434l-.072-.286zM10 15a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"/>');
+var BIconGearWideConnected =
+/*#__PURE__*/
+makeIcon('GearWideConnected', '<path fill-rule="evenodd" d="M10.932 2.724c-.243-.97-1.621-.97-1.864 0l-.072.286a.96.96 0 01-1.622.434l-.205-.211c-.695-.72-1.889-.03-1.614.932l.08.283a.96.96 0 01-1.187 1.188l-.283-.081c-.962-.275-1.651.919-.932 1.614l.211.205a.96.96 0 01-.434 1.622l-.286.072c-.97.243-.97 1.621 0 1.864l.286.072a.96.96 0 01.434 1.622l-.211.205c-.72.695-.03 1.889.932 1.614l.283-.08a.96.96 0 011.188 1.187l-.081.283c-.275.962.919 1.651 1.614.932l.205-.211a.96.96 0 011.622.434l.072.286c.243.97 1.621.97 1.864 0l.072-.286a.96.96 0 011.622-.434l.205.211c.695.72 1.889.03 1.614-.932l-.08-.283a.96.96 0 011.187-1.188l.283.081c.962.275 1.651-.919.932-1.614l-.211-.205a.96.96 0 01.434-1.622l.286-.072c.97-.243.97-1.621 0-1.864l-.286-.072a.96.96 0 01-.434-1.622l.211-.205c.72-.695.03-1.889-.932-1.614l-.283.08a.96.96 0 01-1.188-1.187l.081-.283c.275-.962-.919-1.651-1.614-.932l-.205.211a.96.96 0 01-1.622-.434l-.072-.286zM10 15a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.375 10L6.6 6.3l.8-.6 2.85 3.8H15v1h-4.75L7.4 14.3l-.8-.6L9.375 10z" clip-rule="evenodd"/>');
+var BIconGeo =
+/*#__PURE__*/
+makeIcon('Geo', '<path d="M13 6a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M9.5 6h1v9a.5.5 0 01-1 0V6z"/><path fill-rule="evenodd" d="M8.489 14.095a.5.5 0 01-.383.594c-.565.123-1.003.292-1.286.472-.302.192-.32.321-.32.339 0 .013.005.085.146.21.14.124.372.26.701.383.655.245 1.593.407 2.653.407s1.998-.162 2.653-.407c.329-.124.56-.259.701-.383.14-.125.146-.197.146-.21 0-.018-.018-.147-.32-.339-.283-.18-.721-.35-1.286-.472a.5.5 0 11.212-.977c.63.137 1.193.34 1.61.606.4.253.784.645.784 1.182 0 .402-.219.724-.483.958-.264.235-.618.423-1.013.57-.793.298-1.855.472-3.004.472s-2.21-.174-3.004-.471c-.395-.148-.749-.337-1.013-.571-.264-.234-.483-.556-.483-.958 0-.537.384-.929.783-1.182.418-.266.98-.47 1.611-.606a.5.5 0 01.595.383z" clip-rule="evenodd"/>');
+var BIconGraphDown =
+/*#__PURE__*/
+makeIcon('GraphDown', '<path d="M2 2h1v16H2V2zm1 15h15v1H3v-1z"/><path fill-rule="evenodd" d="M16.39 11.041l-4.349-5.436L9 8.646 5.354 5l-.708.707L9 10.061l2.959-2.959 3.65 4.564.781-.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12 11.854a.5.5 0 00.5.5h4a.5.5 0 00.5-.5v-4a.5.5 0 00-1 0v3.5h-3.5a.5.5 0 00-.5.5z" clip-rule="evenodd"/>');
+var BIconGraphUp =
+/*#__PURE__*/
+makeIcon('GraphUp', '<path d="M2 2h1v16H2V2zm1 15h15v1H3v-1z"/><path fill-rule="evenodd" d="M16.39 6.312l-4.349 5.437L9 8.707l-3.646 3.647-.708-.708L9 7.293l2.959 2.958 3.65-4.563.781.624z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12 5.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V6h-3.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconGrid =
+/*#__PURE__*/
+makeIcon('Grid', '<path fill-rule="evenodd" d="M9.5 4.5a1 1 0 00-1-1h-4a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1v-4zm-1 7h-4v4h4v-4zm7 0h-4v4h4v-4zm0-7h-4v4h4v-4zm-7 0h-4v4h4v-4zm2 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4zm-6 6a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1v-4a1 1 0 00-1-1h-4zm7 0a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1v-4a1 1 0 00-1-1h-4z" clip-rule="evenodd"/>');
+var BIconGridFill =
+/*#__PURE__*/
+makeIcon('GridFill', '<rect width="6" height="6" x="3.5" y="10.5" rx="1"/><rect width="6" height="6" x="10.5" y="10.5" rx="1"/><rect width="6" height="6" x="10.5" y="3.5" rx="1"/><rect width="6" height="6" x="3.5" y="3.5" rx="1"/>');
+var BIconHammer =
+/*#__PURE__*/
+makeIcon('Hammer', '<path d="M11.812 3.952a.5.5 0 01-.312.89c-1.671 0-2.852.596-3.616 1.185L6.857 7.073V8.21a.5.5 0 01-.146.354L5.426 9.853a.5.5 0 01-.709 0L2.146 7.274a.5.5 0 010-.706l1.286-1.29a.5.5 0 01.354-.146H4.84c1.664-1.904 3.375-2.27 4.716-2.091a5.008 5.008 0 012.076.782l.18.129z"/><path fill-rule="evenodd" d="M8.012 5.5a.5.5 0 01.359.165l9.146 8.646A.5.5 0 0117.5 15L16 16.5a.5.5 0 01-.756-.056L6.598 7.297a.5.5 0 01.048-.65l1-1a.5.5 0 01.366-.147z" clip-rule="evenodd"/>');
+var BIconHash =
+/*#__PURE__*/
+makeIcon('Hash', '<path d="M10.39 14.648a1.32 1.32 0 00-.015.18c0 .305.21.508.5.508.266 0 .492-.172.555-.477l.554-2.703h1.204c.421 0 .617-.234.617-.547 0-.312-.188-.53-.617-.53h-.985l.516-2.524h1.265c.43 0 .618-.227.618-.547 0-.313-.188-.524-.618-.524h-1.046l.476-2.304c.008-.04.016-.117.016-.164a.51.51 0 00-.516-.516.54.54 0 00-.539.43l-.523 2.554H9.617l.477-2.304c.008-.04.015-.117.015-.164a.512.512 0 00-.523-.516.539.539 0 00-.531.43L8.53 7.484H7.414c-.43 0-.617.22-.617.532 0 .312.187.539.617.539h.906l-.515 2.523H6.609c-.421 0-.609.219-.609.531 0 .313.188.547.61.547h.976l-.516 2.492c-.008.04-.015.125-.015.18 0 .305.21.508.5.508.265 0 .492-.172.554-.477l.555-2.703h2.242l-.515 2.492zm-1-6.109h2.266l-.515 2.563H8.859l.532-2.563z"/>');
+var BIconHeart =
+/*#__PURE__*/
+makeIcon('Heart', '<path fill-rule="evenodd" d="M10 4.748l-.717-.737C7.6 2.281 4.514 2.878 3.4 5.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.837-3.362.314-4.385-1.114-2.175-4.2-2.773-5.883-1.043L10 4.748zM10 17C-5.333 6.868 5.279-1.04 9.824 3.143c.06.055.119.112.176.171a3.12 3.12 0 01.176-.17C14.72-1.042 25.333 6.867 10 17z" clip-rule="evenodd"/>');
+var BIconHeartFill =
+/*#__PURE__*/
+makeIcon('HeartFill', '<path fill-rule="evenodd" d="M10 3.314C14.438-1.248 25.534 6.735 10 17-5.534 6.736 5.562-1.248 10 3.314z" clip-rule="evenodd"/>');
+var BIconHouse =
+/*#__PURE__*/
+makeIcon('House', '<path fill-rule="evenodd" d="M9.646 3.146a.5.5 0 01.708 0l6 6a.5.5 0 01.146.354v7a.5.5 0 01-.5.5h-4.5a.5.5 0 01-.5-.5v-4H9v4a.5.5 0 01-.5.5H4a.5.5 0 01-.5-.5v-7a.5.5 0 01.146-.354l6-6zM4.5 9.707V16H8v-4a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v4h3.5V9.707l-5.5-5.5-5.5 5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15 4.5V8l-2-2V4.5a.5.5 0 01.5-.5h1a.5.5 0 01.5.5z" clip-rule="evenodd"/>');
+var BIconHouseFill =
+/*#__PURE__*/
+makeIcon('HouseFill', '<path d="M8.5 12.995V16.5a.5.5 0 01-.5.5H4a.5.5 0 01-.5-.5v-7a.5.5 0 01.146-.354l6-6a.5.5 0 01.708 0l6 6a.5.5 0 01.146.354v7a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5V13c0-.25-.25-.5-.5-.5H9c-.25 0-.5.25-.5.495z"/><path fill-rule="evenodd" d="M15 4.5V8l-2-2V4.5a.5.5 0 01.5-.5h1a.5.5 0 01.5.5z" clip-rule="evenodd"/>');
+var BIconImage =
+/*#__PURE__*/
+makeIcon('Image', '<path fill-rule="evenodd" d="M16.002 4h-12a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1zm-12-1a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2h-12z" clip-rule="evenodd"/><path d="M12.648 9.646a.5.5 0 01.577-.093l3.777 1.947V16h-14v-2l2.646-2.354a.5.5 0 01.63-.062l2.66 1.773 3.71-3.71z"/><path fill-rule="evenodd" d="M6.502 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/>');
+var BIconImageAlt =
+/*#__PURE__*/
+makeIcon('ImageAlt', '<path d="M12.648 8.646a.5.5 0 01.577-.093l4.777 3.947V17a1 1 0 01-1 1h-14a1 1 0 01-1-1v-2l3.646-4.354a.5.5 0 01.63-.062l2.66 2.773 3.71-4.71z"/><path fill-rule="evenodd" d="M6.5 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clip-rule="evenodd"/>');
+var BIconImageFill =
+/*#__PURE__*/
+makeIcon('ImageFill', '<path fill-rule="evenodd" d="M2.002 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2h-12a2 2 0 01-2-2V5zm1 9l2.646-2.354a.5.5 0 01.63-.062l2.66 1.773 3.71-3.71a.5.5 0 01.577-.094l3.777 1.947V15a1 1 0 01-1 1h-12a1 1 0 01-1-1v-1zm5-6.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" clip-rule="evenodd"/>');
+var BIconImages =
+/*#__PURE__*/
+makeIcon('Images', '<path fill-rule="evenodd" d="M14.002 6h-10a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1zm-10-1a2 2 0 00-2 2v8a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-10z" clip-rule="evenodd"/><path d="M12.648 10.646a.5.5 0 01.577-.093l1.777 1.947V16h-12v-1l2.646-2.354a.5.5 0 01.63-.062l2.66 1.773 3.71-3.71z"/><path fill-rule="evenodd" d="M6.502 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM6 4h10a1 1 0 011 1v8a1 1 0 01-1 1v1a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2h1a1 1 0 011-1z" clip-rule="evenodd"/>');
+var BIconInbox =
+/*#__PURE__*/
+makeIcon('Inbox', '<path fill-rule="evenodd" d="M5.81 6.063A1.5 1.5 0 016.98 5.5h6.04a1.5 1.5 0 011.17.563l3.7 4.625a.5.5 0 11-.78.624l-3.7-4.624a.5.5 0 00-.39-.188H6.98a.5.5 0 00-.39.188l-3.7 4.624a.5.5 0 11-.78-.624l3.7-4.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.125 10.67a.5.5 0 01.375-.17H8a.5.5 0 01.5.5 1.5 1.5 0 003 0 .5.5 0 01.5-.5h5.5a.5.5 0 01.496.562l-.39 3.124a1.5 1.5 0 01-1.489 1.314H3.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393zm.941.83l.32 2.562a.5.5 0 00.497.438h12.234a.5.5 0 00.496-.438l.32-2.562H12.45a2.5 2.5 0 01-4.9 0H3.066z" clip-rule="evenodd"/>');
+var BIconInboxFill =
+/*#__PURE__*/
+makeIcon('InboxFill', '<path fill-rule="evenodd" d="M5.81 6.063A1.5 1.5 0 016.98 5.5h6.04a1.5 1.5 0 011.17.563l3.7 4.625a.5.5 0 11-.78.624l-3.7-4.624a.5.5 0 00-.39-.188H6.98a.5.5 0 00-.39.188l-3.7 4.624a.5.5 0 11-.78-.624l3.7-4.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.125 10.67a.5.5 0 01.375-.17h5a.5.5 0 01.5.5c0 .828.625 2 2 2s2-1.172 2-2a.5.5 0 01.5-.5h5a.5.5 0 01.496.562l-.39 3.124a1.5 1.5 0 01-1.489 1.314H3.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393z" clip-rule="evenodd"/>');
+var BIconInboxes =
+/*#__PURE__*/
+makeIcon('Inboxes', '<path fill-rule="evenodd" d="M2.125 13.17A.5.5 0 012.5 13H8a.5.5 0 01.5.5 1.5 1.5 0 003 0 .5.5 0 01.5-.5h5.5a.5.5 0 01.496.562l-.39 3.124A1.5 1.5 0 0116.117 18H3.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393zm.941.83l.32 2.562a.5.5 0 00.497.438h12.234a.5.5 0 00.496-.438l.32-2.562H12.45a2.5 2.5 0 01-4.9 0H3.066zM5.81 2.563A1.5 1.5 0 016.98 2h6.04a1.5 1.5 0 011.17.563l3.7 4.625a.5.5 0 11-.78.624l-3.7-4.624A.5.5 0 0013.02 3H6.98a.5.5 0 00-.39.188l-3.7 4.624a.5.5 0 11-.78-.624l3.7-4.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.125 7.17A.5.5 0 012.5 7H8a.5.5 0 01.5.5 1.5 1.5 0 003 0A.5.5 0 0112 7h5.5a.5.5 0 01.496.562l-.39 3.124A1.5 1.5 0 0116.117 12H3.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393zm.941.83l.32 2.562a.5.5 0 00.497.438h12.234a.5.5 0 00.496-.438L16.933 8H12.45a2.5 2.5 0 01-4.9 0H3.066z" clip-rule="evenodd"/>');
+var BIconInboxesFill =
+/*#__PURE__*/
+makeIcon('InboxesFill', '<path fill-rule="evenodd" d="M2.125 13.17A.5.5 0 012.5 13H8a.5.5 0 01.5.5 1.5 1.5 0 003 0 .5.5 0 01.5-.5h5.5a.5.5 0 01.496.562l-.39 3.124A1.5 1.5 0 0116.117 18H3.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393zM5.81 2.563A1.5 1.5 0 016.98 2h6.04a1.5 1.5 0 011.17.563l3.7 4.625a.5.5 0 11-.78.624l-3.7-4.624A.5.5 0 0013.02 3H6.98a.5.5 0 00-.39.188l-3.7 4.624a.5.5 0 11-.78-.624l3.7-4.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.125 7.17A.5.5 0 012.5 7H8a.5.5 0 01.5.5 1.5 1.5 0 003 0A.5.5 0 0112 7h5.5a.5.5 0 01.496.562l-.39 3.124A1.5 1.5 0 0116.117 12H3.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393z" clip-rule="evenodd"/>');
+var BIconInfo =
+/*#__PURE__*/
+makeIcon('Info', '<path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm8-7a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/><path d="M10.93 8.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533l1.002-4.705z"/><circle cx="10" cy="6.5" r="1"/>');
+var BIconInfoFill =
+/*#__PURE__*/
+makeIcon('InfoFill', '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533l1.002-4.705zM10 7.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>');
+var BIconInfoSquare =
+/*#__PURE__*/
+makeIcon('InfoSquare', '<path fill-rule="evenodd" d="M16 3H4a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path d="M10.93 8.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533l1.002-4.705z"/><circle cx="10" cy="6.5" r="1"/>');
+var BIconInfoSquareFill =
+/*#__PURE__*/
+makeIcon('InfoSquareFill', '<path fill-rule="evenodd" d="M2 4a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm8.93 4.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533l1.002-4.705zM10 7.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>');
+var BIconJustify =
+/*#__PURE__*/
+makeIcon('Justify', '<path fill-rule="evenodd" d="M4 14.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconJustifyLeft =
+/*#__PURE__*/
+makeIcon('JustifyLeft', '<path fill-rule="evenodd" d="M4 14.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconJustifyRight =
+/*#__PURE__*/
+makeIcon('JustifyRight', '<path fill-rule="evenodd" d="M8 14.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-4-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconKanban =
+/*#__PURE__*/
+makeIcon('Kanban', '<path fill-rule="evenodd" d="M15.5 3h-11a1 1 0 00-1 1v12a1 1 0 001 1h11a1 1 0 001-1V4a1 1 0 00-1-1zm-11-1a2 2 0 00-2 2v12a2 2 0 002 2h11a2 2 0 002-2V4a2 2 0 00-2-2h-11z" clip-rule="evenodd"/><rect width="3" height="5" x="8.5" y="4" rx="1"/><rect width="3" height="9" x="4.5" y="4" rx="1"/><rect width="3" height="12" x="12.5" y="4" rx="1"/>');
+var BIconKanbanFill =
+/*#__PURE__*/
+makeIcon('KanbanFill', '<path fill-rule="evenodd" d="M4.5 2a2 2 0 00-2 2v12a2 2 0 002 2h11a2 2 0 002-2V4a2 2 0 00-2-2h-11zm5 2a1 1 0 00-1 1v3a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1zm-5 1a1 1 0 011-1h1a1 1 0 011 1v7a1 1 0 01-1 1h-1a1 1 0 01-1-1V5zm9-1a1 1 0 00-1 1v10a1 1 0 001 1h1a1 1 0 001-1V5a1 1 0 00-1-1h-1z" clip-rule="evenodd"/>');
+var BIconLaptop =
+/*#__PURE__*/
+makeIcon('Laptop', '<path fill-rule="evenodd" d="M15.5 4h-11a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h11a.5.5 0 00.5-.5v-7a.5.5 0 00-.5-.5zm-11-1A1.5 1.5 0 003 4.5v7A1.5 1.5 0 004.5 13h11a1.5 1.5 0 001.5-1.5v-7A1.5 1.5 0 0015.5 3h-11z" clip-rule="evenodd"/><path d="M2.81 13.758A1 1 0 013.78 13h12.44a1 1 0 01.97.758l.5 2A1 1 0 0116.72 17H3.28a1 1 0 01-.97-1.242l.5-2z"/>');
+var BIconLayoutSidebar =
+/*#__PURE__*/
+makeIcon('LayoutSidebar', '<path fill-rule="evenodd" d="M16 4H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1zM4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 16V4h1v12H6z" clip-rule="evenodd"/>');
+var BIconLayoutSidebarReverse =
+/*#__PURE__*/
+makeIcon('LayoutSidebarReverse', '<path fill-rule="evenodd" d="M16 4H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1zM4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 16V4h1v12h-1z" clip-rule="evenodd"/>');
+var BIconLayoutSplit =
+/*#__PURE__*/
+makeIcon('LayoutSplit', '<path fill-rule="evenodd" d="M1.5 5A2.5 2.5 0 014 2.5h12A2.5 2.5 0 0118.5 5v10a2.5 2.5 0 01-2.5 2.5H4A2.5 2.5 0 011.5 15V5zM4 3.5A1.5 1.5 0 002.5 5v10A1.5 1.5 0 004 16.5h12a1.5 1.5 0 001.5-1.5V5A1.5 1.5 0 0016 3.5h-5.5v13h-1v-13H4z" clip-rule="evenodd"/>');
+var BIconList =
+/*#__PURE__*/
+makeIcon('List', '<path fill-rule="evenodd" d="M4.5 13.5A.5.5 0 015 13h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 9h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-4A.5.5 0 015 5h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconListCheck =
+/*#__PURE__*/
+makeIcon('ListCheck', '<path fill-rule="evenodd" d="M7 13.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM5.854 4.146a.5.5 0 010 .708l-1.5 1.5a.5.5 0 01-.708 0l-.5-.5a.5.5 0 11.708-.708L4 5.293l1.146-1.147a.5.5 0 01.708 0zm0 4a.5.5 0 010 .708l-1.5 1.5a.5.5 0 01-.708 0l-.5-.5a.5.5 0 11.708-.708L4 9.293l1.146-1.147a.5.5 0 01.708 0zm0 4a.5.5 0 010 .708l-1.5 1.5a.5.5 0 01-.708 0l-.5-.5a.5.5 0 01.708-.708l.146.147 1.146-1.147a.5.5 0 01.708 0z" clip-rule="evenodd"/>');
+var BIconListOl =
+/*#__PURE__*/
+makeIcon('ListOl', '<path fill-rule="evenodd" d="M7 13.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M3.713 13.865v-.474H4c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 01-.492.594v.033a.615.615 0 01.569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V11H3.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 00-.342.338v.041zM4.564 7h-.635V4.924h-.031l-.598.42v-.567l.629-.443h.635V7z"/>');
+var BIconListTask =
+/*#__PURE__*/
+makeIcon('ListTask', '<path fill-rule="evenodd" d="M4 4.5a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h1a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H4zM5 5H4v1h1V5z" clip-rule="evenodd"/><path d="M7 5.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM7.5 9a.5.5 0 000 1h9a.5.5 0 000-1h-9zm0 4a.5.5 0 000 1h9a.5.5 0 000-1h-9z"/><path fill-rule="evenodd" d="M3.5 9a.5.5 0 01.5-.5h1a.5.5 0 01.5.5v1a.5.5 0 01-.5.5H4a.5.5 0 01-.5-.5V9zM4 9h1v1H4V9zm0 3.5a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h1a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5H4zm1 .5H4v1h1v-1z" clip-rule="evenodd"/>');
+var BIconListUl =
+/*#__PURE__*/
+makeIcon('ListUl', '<path fill-rule="evenodd" d="M7 13.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm-3 1a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>');
+var BIconLock =
+/*#__PURE__*/
+makeIcon('Lock', '<path fill-rule="evenodd" d="M13.655 9H6.333c-.264 0-.398.068-.471.121a.73.73 0 00-.224.296 1.626 1.626 0 00-.138.59V15c0 .342.076.531.14.635.064.106.151.18.256.237a1.122 1.122 0 00.436.127l.013.001h7.322c.264 0 .398-.068.471-.121a.73.73 0 00.224-.296 1.627 1.627 0 00.138-.59V10c0-.342-.076-.531-.14-.635a.658.658 0 00-.255-.237 1.123 1.123 0 00-.45-.128zm.012-1H6.333C4.5 8 4.5 10 4.5 10v5c0 2 1.833 2 1.833 2h7.334c1.833 0 1.833-2 1.833-2v-5c0-2-1.833-2-1.833-2zM6.5 5a3.5 3.5 0 117 0v3h-1V5a2.5 2.5 0 00-5 0v3h-1V5z" clip-rule="evenodd"/>');
+var BIconLockFill =
+/*#__PURE__*/
+makeIcon('LockFill', '<rect width="11" height="9" x="4.5" y="8" rx="2"/><path fill-rule="evenodd" d="M6.5 5a3.5 3.5 0 117 0v3h-1V5a2.5 2.5 0 00-5 0v3h-1V5z" clip-rule="evenodd"/>');
+var BIconMap =
+/*#__PURE__*/
+makeIcon('Map', '<path fill-rule="evenodd" d="M17.817 2.613A.5.5 0 0118 3v13a.5.5 0 01-.402.49l-5 1a.502.502 0 01-.196 0L7.5 16.51l-4.902.98A.5.5 0 012 17V4a.5.5 0 01.402-.49l5-1a.5.5 0 01.196 0l4.902.98 4.902-.98a.5.5 0 01.415.103zM12 4.41l-4-.8v11.98l4 .8V4.41zm1 11.98l4-.8V3.61l-4 .8v11.98zm-6-.8V3.61l-4 .8v11.98l4-.8z" clip-rule="evenodd"/>');
+var BIconMic =
+/*#__PURE__*/
+makeIcon('Mic', '<path d="M7 5a3 3 0 016 0v5a3 3 0 11-6 0V5z"/><path fill-rule="evenodd" d="M5.5 8.5A.5.5 0 016 9v1a4 4 0 008 0V9a.5.5 0 011 0v1a5 5 0 01-4.5 4.975V17h3a.5.5 0 010 1h-7a.5.5 0 010-1h3v-2.025A5 5 0 015 10V9a.5.5 0 01.5-.5z" clip-rule="evenodd"/>');
+var BIconMoon =
+/*#__PURE__*/
+makeIcon('Moon', '<path d="M17.293 13.293A8 8 0 016.707 2.707a8.002 8.002 0 1010.586 10.586z"/>');
+var BIconMusicPlayer =
+/*#__PURE__*/
+makeIcon('MusicPlayer', '<path fill-rule="evenodd" d="M14 3H6a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1zM6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 5H7v3h6V5zM7 4a1 1 0 00-1 1v3a1 1 0 001 1h6a1 1 0 001-1V5a1 1 0 00-1-1H7zm3 11a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/><circle cx="10" cy="13" r="1"/>');
+var BIconMusicPlayerFill =
+/*#__PURE__*/
+makeIcon('MusicPlayerFill', '<path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 1a1 1 0 011-1h6a1 1 0 011 1v2.5a1 1 0 01-1 1H7a1 1 0 01-1-1V5zm7 8a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/><circle cx="10" cy="13" r="1"/>');
+var BIconOption =
+/*#__PURE__*/
+makeIcon('Option', '<path fill-rule="evenodd" d="M2.5 4.5A.5.5 0 013 4h4a.5.5 0 01.439.26L13.297 15H17a.5.5 0 010 1h-4a.5.5 0 01-.439-.26L6.703 5H3a.5.5 0 01-.5-.5zm10 0A.5.5 0 0113 4h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconOutlet =
+/*#__PURE__*/
+makeIcon('Outlet', '<path fill-rule="evenodd" d="M5.34 4.994c.275-.338.68-.494 1.074-.494h7.172c.393 0 .798.156 1.074.494.578.708 1.84 2.534 1.84 5.006 0 2.472-1.262 4.297-1.84 5.006-.276.338-.68.494-1.074.494H6.414c-.394 0-.799-.156-1.074-.494C4.762 14.297 3.5 12.472 3.5 10c0-2.472 1.262-4.298 1.84-5.006zm1.074.506a.376.376 0 00-.299.126C5.599 6.259 4.5 7.863 4.5 10c0 2.137 1.099 3.74 1.615 4.374.06.073.163.126.3.126h7.17c.137 0 .24-.053.3-.126.516-.633 1.615-2.237 1.615-4.374 0-2.137-1.099-3.74-1.615-4.374a.376.376 0 00-.3-.126h-7.17z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 7.5a.5.5 0 01.5.5v1.5a.5.5 0 01-1 0V8a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v1.5a.5.5 0 01-1 0V8a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path d="M9 12v1h2v-1a1 1 0 10-2 0z"/>');
+var BIconPause =
+/*#__PURE__*/
+makeIcon('Pause', '<path fill-rule="evenodd" d="M8 5.5a.5.5 0 01.5.5v8a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v8a.5.5 0 01-1 0V6a.5.5 0 01.5-.5z" clip-rule="evenodd"/>');
+var BIconPauseFill =
+/*#__PURE__*/
+makeIcon('PauseFill', '<path d="M7.5 5.5A1.5 1.5 0 019 7v6a1.5 1.5 0 01-3 0V7a1.5 1.5 0 011.5-1.5zm5 0A1.5 1.5 0 0114 7v6a1.5 1.5 0 01-3 0V7a1.5 1.5 0 011.5-1.5z"/>');
+var BIconPen =
+/*#__PURE__*/
+makeIcon('Pen', '<path fill-rule="evenodd" d="M7.707 15.707a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391L12.086 4.5a2 2 0 012.828 0l.586.586a2 2 0 010 2.828l-7.793 7.793zM5 13l7.793-7.793a1 1 0 011.414 0l.586.586a1 1 0 010 1.414L7 15l-3 1 1-3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.854 4.56a.5.5 0 00-.708 0L7.854 7.855a.5.5 0 11-.708-.708l3.293-3.292a1.5 1.5 0 012.122 0l.293.292a.5.5 0 11-.708.708l-.292-.293z" clip-rule="evenodd"/><path d="M15.293 3.207a1 1 0 011.414 0l.03.03a1 1 0 01.03 1.383L15.5 6 14 4.5l1.293-1.293z"/>');
+var BIconPencil =
+/*#__PURE__*/
+makeIcon('Pencil', '<path fill-rule="evenodd" d="M13.293 3.293a1 1 0 011.414 0l2 2a1 1 0 010 1.414l-9 9a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391l9-9zM14 4l2 2-9 9-3 1 1-3 9-9z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.146 8.354l-2.5-2.5.708-.708 2.5 2.5-.708.708zM5 12v.5a.5.5 0 00.5.5H6v.5a.5.5 0 00.5.5H7v.5a.5.5 0 00.5.5H8v-1.5a.5.5 0 00-.5-.5H7v-.5a.5.5 0 00-.5-.5H5z" clip-rule="evenodd"/>');
+var BIconPeople =
+/*#__PURE__*/
+makeIcon('People', '<path fill-rule="evenodd" d="M17 16s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.995-.944v-.002zM9.022 15h7.956a.274.274 0 00.014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C15.688 12.629 14.718 12 13 12c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 00.022.004zm7.973.056v-.002zM13 9a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0zm-7.064 4.28a5.873 5.873 0 00-1.23-.247A7.334 7.334 0 007 11c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 017 15c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM6.92 12c-1.668.02-2.615.64-3.16 1.276C3.163 13.97 3 14.739 3 15h3c0-1.045.323-2.086.92-3zM3.5 7.5a3 3 0 116 0 3 3 0 01-6 0zm3-2a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd"/>');
+var BIconPeopleFill =
+/*#__PURE__*/
+makeIcon('PeopleFill', '<path fill-rule="evenodd" d="M9 16s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H9zm4-6a3 3 0 100-6 3 3 0 000 6zm-5.784 6A2.238 2.238 0 017 15c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 007 11c-4 0-5 3-5 4s1 1 1 1h4.216zM6.5 10a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clip-rule="evenodd"/>');
+var BIconPerson =
+/*#__PURE__*/
+makeIcon('Person', '<path fill-rule="evenodd" d="M15 16s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002zM5.022 15h9.956a.274.274 0 00.014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C13.516 12.68 12.289 12 10 12c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 00.022.004zm9.974.056v-.002zM10 9a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/>');
+var BIconPersonFill =
+/*#__PURE__*/
+makeIcon('PersonFill', '<path fill-rule="evenodd" d="M5 16s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H5zm5-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>');
+var BIconPhone =
+/*#__PURE__*/
+makeIcon('Phone', '<path fill-rule="evenodd" d="M13 3H7a1 1 0 00-1 1v11a1 1 0 001 1h6a1 1 0 001-1V4a1 1 0 00-1-1zM7 2a2 2 0 00-2 2v11a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 15a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>');
+var BIconPhoneLandscape =
+/*#__PURE__*/
+makeIcon('PhoneLandscape', '<path fill-rule="evenodd" d="M3.5 6.5v6a1 1 0 001 1h11a1 1 0 001-1v-6a1 1 0 00-1-1h-11a1 1 0 00-1 1zm-1 6a2 2 0 002 2h11a2 2 0 002-2v-6a2 2 0 00-2-2h-11a2 2 0 00-2 2v6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15.5 9.5a1 1 0 10-2 0 1 1 0 002 0z" clip-rule="evenodd"/>');
+var BIconPieChart =
+/*#__PURE__*/
+makeIcon('PieChart', '<path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm0 1a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.5 9.793V3h1v6.5H17v1h-6.793l-4.853 4.854-.708-.708L9.5 9.793z" clip-rule="evenodd"/>');
+var BIconPieChartFill =
+/*#__PURE__*/
+makeIcon('PieChartFill', '<path d="M17.985 10.5h-7.778l-5.5 5.5a8 8 0 0013.277-5.5zM4 15.292A8 8 0 019.5 2.015v7.778l-5.5 5.5zm6.5-13.277V9.5h7.485A8.001 8.001 0 0010.5 2.015z"/>');
+var BIconPlay =
+/*#__PURE__*/
+makeIcon('Play', '<path fill-rule="evenodd" d="M12.804 10L7 6.633v6.734L12.804 10zm.792-.696a.802.802 0 010 1.392l-6.363 3.692C6.713 14.69 6 14.345 6 13.692V6.308c0-.653.713-.998 1.233-.696l6.363 3.692z" clip-rule="evenodd"/>');
+var BIconPlayFill =
+/*#__PURE__*/
+makeIcon('PlayFill', '<path d="M13.596 10.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V6.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"/>');
+var BIconPlug =
+/*#__PURE__*/
+makeIcon('Plug', '<path d="M6 7h8v3a4 4 0 01-8 0V7z"/><path fill-rule="evenodd" d="M8 3.5a.5.5 0 01.5.5v3a.5.5 0 01-1 0V4a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v3a.5.5 0 01-1 0V4a.5.5 0 01.5-.5zM9.115 15.651c.256-.511.385-1.408.385-2.651h1c0 1.257-.121 2.36-.49 3.099-.191.381-.47.707-.87.877-.401.17-.845.15-1.298-.002-.961-.32-1.534-.175-1.851.046-.33.23-.491.615-.491.98h-1c0-.635.278-1.353.918-1.8.653-.456 1.58-.561 2.74-.174.297.099.478.078.592.03.115-.05.244-.161.365-.405z" clip-rule="evenodd"/>');
+var BIconPlus =
+/*#__PURE__*/
+makeIcon('Plus', '<path fill-rule="evenodd" d="M10 5.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H6a.5.5 0 010-1h3.5V6a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.5 10a.5.5 0 01.5-.5h4a.5.5 0 010 1h-3.5V14a.5.5 0 01-1 0v-4z" clip-rule="evenodd"/>');
+var BIconPower =
+/*#__PURE__*/
+makeIcon('Power', '<path fill-rule="evenodd" d="M7.578 6.437a5 5 0 104.922.044l.5-.865a6 6 0 11-5.908-.053l.486.874z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.5 10V3h1v7h-1z" clip-rule="evenodd"/>');
+var BIconQuestion =
+/*#__PURE__*/
+makeIcon('Question', '<path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm8-7a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/><path d="M7.25 8.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>');
+var BIconQuestionFill =
+/*#__PURE__*/
+makeIcon('QuestionFill', '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM8.57 8.033H7.25C7.22 6.147 8.68 5.5 10.006 5.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H9.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z" clip-rule="evenodd"/>');
+var BIconQuestionSquare =
+/*#__PURE__*/
+makeIcon('QuestionSquare', '<path fill-rule="evenodd" d="M16 3H4a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path d="M7.25 8.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>');
+var BIconQuestionSquareFill =
+/*#__PURE__*/
+makeIcon('QuestionSquareFill', '<path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm4.57 6.033H7.25C7.22 6.147 8.68 5.5 10.006 5.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H9.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z" clip-rule="evenodd"/>');
+var BIconReply =
+/*#__PURE__*/
+makeIcon('Reply', '<path fill-rule="evenodd" d="M11.502 7.013a.144.144 0 00-.202.134V8.3a.5.5 0 01-.5.5c-.667 0-2.013.005-3.3.822-.984.624-1.99 1.76-2.595 3.876 1.02-.983 2.185-1.516 3.205-1.799a8.745 8.745 0 011.921-.306 7.468 7.468 0 01.798.008h.013l.005.001h.001l-.048.498.05-.498a.5.5 0 01.45.498v1.153c0 .108.11.176.202.134l3.984-2.933a.522.522 0 01.042-.028.147.147 0 000-.252.51.51 0 01-.042-.028l-3.984-2.933zM10.3 12.386a7.745 7.745 0 00-1.923.277c-1.326.368-2.896 1.201-3.94 3.08a.5.5 0 01-.933-.305c.464-3.71 1.886-5.662 3.46-6.66 1.245-.79 2.527-.942 3.336-.971v-.66a1.144 1.144 0 011.767-.96l3.994 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a1.144 1.144 0 01-1.767-.96v-.667z" clip-rule="evenodd"/>');
+var BIconReplyAll =
+/*#__PURE__*/
+makeIcon('ReplyAll', '<path fill-rule="evenodd" d="M10.002 7.013a.144.144 0 00-.202.134V8.3a.5.5 0 01-.5.5c-.667 0-2.013.005-3.3.822-.984.624-1.99 1.76-2.595 3.876 1.02-.983 2.185-1.516 3.205-1.799a8.745 8.745 0 011.921-.306 7.47 7.47 0 01.798.008h.013l.005.001h.001L9.3 11.9l.05-.498a.5.5 0 01.45.498v1.153c0 .108.11.176.202.134l3.984-2.933a.522.522 0 01.042-.028.147.147 0 000-.252.51.51 0 01-.042-.028l-3.984-2.933zM8.8 12.386a7.745 7.745 0 00-1.923.277c-1.326.368-2.896 1.201-3.94 3.08a.5.5 0 01-.933-.305c.464-3.71 1.886-5.662 3.46-6.66 1.245-.79 2.527-.942 3.336-.971v-.66a1.144 1.144 0 011.767-.96l3.994 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a1.144 1.144 0 01-1.767-.96v-.667z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.868 6.293a.5.5 0 01.7-.106l3.993 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a.5.5 0 11-.593-.805l4.012-2.954a.523.523 0 01.042-.028.147.147 0 000-.252.512.512 0 01-.042-.028l-4.012-2.954a.5.5 0 01-.106-.699z" clip-rule="evenodd"/>');
+var BIconReplyAllFill =
+/*#__PURE__*/
+makeIcon('ReplyAllFill', '<path d="M10.079 13.9l4.568-3.281a.719.719 0 000-1.238L10.079 6.1A.716.716 0 009 6.719V8c-1.5 0-6 0-7 8 2.5-4.5 7-4 7-4v1.281c0 .56.606.898 1.079.62z"/><path fill-rule="evenodd" d="M12.868 6.293a.5.5 0 01.7-.106l3.993 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a.5.5 0 11-.593-.805l4.012-2.954a.523.523 0 01.042-.028.147.147 0 000-.252.512.512 0 01-.042-.028l-4.012-2.954a.5.5 0 01-.106-.699z" clip-rule="evenodd"/>');
+var BIconReplyFill =
+/*#__PURE__*/
+makeIcon('ReplyFill', '<path d="M11.079 13.9l4.568-3.281a.719.719 0 000-1.238L11.079 6.1A.716.716 0 0010 6.719V8c-1.5 0-6 0-7 8 2.5-4.5 7-4 7-4v1.281c0 .56.606.898 1.079.62z"/>');
+var BIconScrewdriver =
+/*#__PURE__*/
+makeIcon('Screwdriver', '<path fill-rule="evenodd" d="M2 3l1-1 3.081 2.2a1 1 0 01.419.815v.07a1 1 0 00.293.708L12.5 11.5l.914-.305a1 1 0 011.023.242l3.356 3.356a1 1 0 010 1.414l-1.586 1.586a1 1 0 01-1.414 0l-3.356-3.356a1 1 0 01-.242-1.023l.305-.914-5.707-5.707a1 1 0 00-.707-.293h-.071a1 1 0 01-.814-.419L2 3zm11.354 9.646a.5.5 0 00-.708.708l3 3a.5.5 0 00.708-.708l-3-3z" clip-rule="evenodd"/>');
+var BIconSearch =
+/*#__PURE__*/
+makeIcon('Search', '<path fill-rule="evenodd" d="M12.442 12.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.5 14a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM15 8.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" clip-rule="evenodd"/>');
+var BIconShield =
+/*#__PURE__*/
+makeIcon('Shield', '<path fill-rule="evenodd" d="M7.443 3.991a60.17 60.17 0 00-2.725.802.454.454 0 00-.315.366C3.87 9.056 5.1 11.9 6.567 13.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 0010 16.5a.774.774 0 00.097-.023c.072-.022.166-.058.282-.111.23-.106.524-.272.857-.5a10.198 10.198 0 002.197-2.093C14.9 11.9 16.13 9.056 15.597 5.159a.454.454 0 00-.315-.366c-.626-.2-1.682-.526-2.725-.802C11.491 3.71 10.51 3.5 10 3.5c-.51 0-1.49.21-2.557.491zm-.256-.966C8.23 2.749 9.337 2.5 10 2.5c.662 0 1.77.249 2.813.525 1.066.282 2.14.614 2.772.815.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.192 11.192 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.527-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.418-2.3c-1.611-2.058-2.94-5.168-2.367-9.365A1.454 1.454 0 014.415 3.84a61.113 61.113 0 012.772-.815z" clip-rule="evenodd"/>');
+var BIconShieldFill =
+/*#__PURE__*/
+makeIcon('ShieldFill', '<path fill-rule="evenodd" d="M7.187 3.025C8.23 2.749 9.337 2.5 10 2.5c.662 0 1.77.249 2.813.525 1.066.282 2.14.614 2.772.815.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.192 11.192 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.527-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.418-2.3c-1.611-2.058-2.94-5.168-2.367-9.365A1.454 1.454 0 014.415 3.84a61.113 61.113 0 012.772-.815z" clip-rule="evenodd"/>');
+var BIconShieldLock =
+/*#__PURE__*/
+makeIcon('ShieldLock', '<path fill-rule="evenodd" d="M7.443 3.991a60.17 60.17 0 00-2.725.802.454.454 0 00-.315.366C3.87 9.056 5.1 11.9 6.567 13.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 0010 16.5a.774.774 0 00.097-.023c.072-.022.166-.058.282-.111.23-.106.524-.272.857-.5a10.198 10.198 0 002.197-2.093C14.9 11.9 16.13 9.056 15.597 5.159a.454.454 0 00-.315-.366c-.626-.2-1.682-.526-2.725-.802C11.491 3.71 10.51 3.5 10 3.5c-.51 0-1.49.21-2.557.491zm-.256-.966C8.23 2.749 9.337 2.5 10 2.5c.662 0 1.77.249 2.813.525 1.066.282 2.14.614 2.772.815.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.192 11.192 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.527-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.418-2.3c-1.611-2.058-2.94-5.168-2.367-9.365A1.454 1.454 0 014.415 3.84a61.113 61.113 0 012.772-.815z" clip-rule="evenodd"/><path d="M11.5 8.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M9.41 10.034a.5.5 0 01.494-.417h.156a.5.5 0 01.492.414l.347 2a.5.5 0 01-.493.585h-.835a.5.5 0 01-.493-.582l.333-2z"/>');
+var BIconShieldLockFill =
+/*#__PURE__*/
+makeIcon('ShieldLockFill', '<path fill-rule="evenodd" d="M7.187 3.025C8.23 2.749 9.337 2.5 10 2.5c.662 0 1.77.249 2.813.525a61.1 61.1 0 012.772.815c.527.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.368 9.365a11.19 11.19 0 01-2.417 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.527-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.418-2.3c-1.611-2.058-2.94-5.168-2.367-9.365A1.454 1.454 0 014.415 3.84a61.105 61.105 0 012.772-.815zm3.328 6.884a1.5 1.5 0 10-1.06-.011.5.5 0 00-.044.136l-.333 2a.5.5 0 00.493.582h.835a.5.5 0 00.493-.585l-.347-2a.501.501 0 00-.037-.122z" clip-rule="evenodd"/>');
+var BIconShieldShaded =
+/*#__PURE__*/
+makeIcon('ShieldShaded', '<path fill-rule="evenodd" d="M7.443 3.991a60.17 60.17 0 00-2.725.802.454.454 0 00-.315.366C3.87 9.056 5.1 11.9 6.567 13.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 0010 16.5a.774.774 0 00.097-.023c.072-.022.166-.058.282-.111a5.94 5.94 0 00.857-.5 10.198 10.198 0 002.197-2.093C14.9 11.9 16.13 9.056 15.597 5.159a.454.454 0 00-.315-.366c-.626-.2-1.682-.526-2.725-.802C11.491 3.71 10.51 3.5 10 3.5c-.51 0-1.49.21-2.557.491zm-.256-.966C8.23 2.749 9.337 2.5 10 2.5c.662 0 1.77.249 2.813.525 1.066.282 2.14.614 2.772.815.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.192 11.192 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.418-2.3c-1.611-2.058-2.94-5.168-2.367-9.365A1.454 1.454 0 014.415 3.84a61.105 61.105 0 012.772-.815z" clip-rule="evenodd"/><path d="M10 4.25c.909 0 3.188.685 4.254 1.022a.94.94 0 01.656.773c.814 6.424-4.13 9.452-4.91 9.452V4.25z"/>');
+var BIconShift =
+/*#__PURE__*/
+makeIcon('Shift', '<path fill-rule="evenodd" d="M9.27 4.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H13.5v3a1 1 0 01-1 1h-5a1 1 0 01-1-1v-3H3.654c-.875 0-1.328-1.045-.73-1.684L9.27 4.047zm7.076 7.453L10 4.731 3.654 11.5H6.5a1 1 0 011 1v3h5v-3a1 1 0 011-1h2.846z" clip-rule="evenodd"/>');
+var BIconShiftFill =
+/*#__PURE__*/
+makeIcon('ShiftFill', '<path fill-rule="evenodd" d="M9.27 4.047a1 1 0 011.46 0l6.345 6.769c.6.639.146 1.684-.73 1.684H13.5v3a1 1 0 01-1 1h-5a1 1 0 01-1-1v-3H3.654c-.875 0-1.328-1.045-.73-1.684L9.27 4.047z" clip-rule="evenodd"/>');
+var BIconSkipBackward =
+/*#__PURE__*/
+makeIcon('SkipBackward', '<path fill-rule="evenodd" d="M2.5 5.5A.5.5 0 013 6v3.248l6.267-3.636c.52-.302 1.233.043 1.233.696v2.94l6.267-3.636c.52-.302 1.233.043 1.233.696v7.384c0 .653-.713.998-1.233.696L10.5 10.752v2.94c0 .653-.713.998-1.233.696L3 10.752V14a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm7 1.133L3.696 10 9.5 13.367V6.633zm7.5 0L11.196 10 17 13.367V6.633z" clip-rule="evenodd"/>');
+var BIconSkipBackwardFill =
+/*#__PURE__*/
+makeIcon('SkipBackwardFill', '<path stroke="currentColor" stroke-linecap="round" d="M14 6v8"/><path d="M13.596 10.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V6.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"/>');
+var BIconSkipEnd =
+/*#__PURE__*/
+makeIcon('SkipEnd', '<path fill-rule="evenodd" d="M14 5.5a.5.5 0 01.5.5v8a.5.5 0 01-1 0V6a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.804 10L7 6.633v6.734L12.804 10zm.792-.696a.802.802 0 010 1.392l-6.363 3.692C6.713 14.69 6 14.345 6 13.692V6.308c0-.653.713-.998 1.233-.696l6.363 3.692z" clip-rule="evenodd"/>');
+var BIconSkipEndFill =
+/*#__PURE__*/
+makeIcon('SkipEndFill', '<path stroke="currentColor" stroke-linecap="round" d="M2.5 6v8"/><path d="M2.904 10.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V6.308c0-.63-.693-1.01-1.233-.696L2.904 9.304a.802.802 0 000 1.393z"/><path d="M10.404 10.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V6.308c0-.63-.692-1.01-1.233-.696l-6.363 3.692a.802.802 0 000 1.393z"/>');
+var BIconSkipForward =
+/*#__PURE__*/
+makeIcon('SkipForward', '<path fill-rule="evenodd" d="M17.5 5.5a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-3.248l-6.267 3.636c-.52.302-1.233-.043-1.233-.696v-2.94l-6.267 3.636C2.713 14.69 2 14.345 2 13.692V6.308c0-.653.713-.998 1.233-.696L9.5 9.248v-2.94c0-.653.713-.998 1.233-.696L17 9.248V6a.5.5 0 01.5-.5zM3 6.633v6.734L8.804 10 3 6.633zm7.5 0v6.734L16.304 10 10.5 6.633z" clip-rule="evenodd"/>');
+var BIconSkipForwardFill =
+/*#__PURE__*/
+makeIcon('SkipForwardFill', '<path stroke="currentColor" stroke-linecap="round" d="M17.5 6v8"/><path d="M9.596 10.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V6.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"/><path d="M17.096 10.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V6.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"/>');
+var BIconSkipStart =
+/*#__PURE__*/
+makeIcon('SkipStart', '<path fill-rule="evenodd" d="M6.5 5.5A.5.5 0 006 6v8a.5.5 0 001 0V6a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.696 10L13.5 6.633v6.734L7.696 10zm-.792-.696a.802.802 0 000 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V6.308c0-.653-.713-.998-1.233-.696L6.904 9.304z" clip-rule="evenodd"/>');
+var BIconSkipStartFill =
+/*#__PURE__*/
+makeIcon('SkipStartFill', '<path stroke="currentColor" stroke-linecap="round" d="M6.5 6v8"/><path d="M6.903 10.697l6.364 3.692c.54.313 1.232-.066 1.232-.697V6.308c0-.63-.692-1.01-1.232-.696L6.903 9.304a.802.802 0 000 1.393z"/>');
+var BIconSpeaker =
+/*#__PURE__*/
+makeIcon('Speaker', '<path d="M11 6a1 1 0 11-2 0 1 1 0 012 0zm-2.5 6.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"/><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm6 4a2 2 0 11-4 0 2 2 0 014 0zm-2 3a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" clip-rule="evenodd"/>');
+var BIconSquare =
+/*#__PURE__*/
+makeIcon('Square', '<path fill-rule="evenodd" d="M16 3H4a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z" clip-rule="evenodd"/>');
+var BIconSquareFill =
+/*#__PURE__*/
+makeIcon('SquareFill', '<rect width="16" height="16" x="2" y="2" rx="2"/>');
+var BIconSquareHalf =
+/*#__PURE__*/
+makeIcon('SquareHalf', '<path fill-rule="evenodd" d="M10 3H4a1 1 0 00-1 1v12a1 1 0 001 1h6V3zM4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z" clip-rule="evenodd"/>');
+var BIconStar =
+/*#__PURE__*/
+makeIcon('Star', '<path fill-rule="evenodd" d="M4.866 16.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696-2.184-4.327a.513.513 0 00-.927 0L7.354 7.12l-4.898.696c-.441.062-.612.636-.282.95l3.522 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 00-.163-.505L3.71 8.745l4.052-.576a.525.525 0 00.393-.288l1.847-3.658 1.846 3.658c.08.157.226.264.393.288l4.053.575-2.907 2.77a.564.564 0 00-.163.506l.694 3.957-3.686-1.894a.503.503 0 00-.461 0z" clip-rule="evenodd"/>');
+var BIconStarFill =
+/*#__PURE__*/
+makeIcon('StarFill', '<path d="M5.612 17.443c-.386.198-.824-.149-.746-.592l.83-4.73-3.522-3.356c-.33-.314-.16-.888.282-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L10 15.187l-4.389 2.256z"/>');
+var BIconStarHalf =
+/*#__PURE__*/
+makeIcon('StarHalf', '<path fill-rule="evenodd" d="M7.354 7.119l2.184-4.327A.516.516 0 0110 2.5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0118 8.32a.55.55 0 01-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L10 15.187l-4.389 2.256a.52.52 0 01-.146.05c-.341.06-.668-.254-.6-.642l.83-4.73-3.522-3.356a.55.55 0 01-.172-.403.59.59 0 01.084-.302.513.513 0 01.37-.245l4.898-.696zM10 14.027c.08 0 .16.018.232.056l3.686 1.894-.694-3.957a.564.564 0 01.163-.505l2.907-2.77-4.053-.576a.525.525 0 01-.393-.288l-1.847-3.658-.001.003v9.8z" clip-rule="evenodd"/>');
+var BIconStop =
+/*#__PURE__*/
+makeIcon('Stop', '<path fill-rule="evenodd" d="M5.5 7A1.5 1.5 0 017 5.5h6A1.5 1.5 0 0114.5 7v6a1.5 1.5 0 01-1.5 1.5H7A1.5 1.5 0 015.5 13V7zM7 6.5a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h6a.5.5 0 00.5-.5V7a.5.5 0 00-.5-.5H7z" clip-rule="evenodd"/>');
+var BIconStopFill =
+/*#__PURE__*/
+makeIcon('StopFill', '<path d="M7 5.5h6A1.5 1.5 0 0114.5 7v6a1.5 1.5 0 01-1.5 1.5H7A1.5 1.5 0 015.5 13V7A1.5 1.5 0 017 5.5z"/>');
+var BIconStopwatch =
+/*#__PURE__*/
+makeIcon('Stopwatch', '<path fill-rule="evenodd" d="M10 17a6 6 0 100-12 6 6 0 000 12zm0 1a7 7 0 100-14 7 7 0 000 14z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 6.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H6.5a.5.5 0 010-1h3V7a.5.5 0 01.5-.5zm-2.5-4A.5.5 0 018 2h4a.5.5 0 010 1H8a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M9 3h2v2H9V3z"/>');
+var BIconStopwatchFill =
+/*#__PURE__*/
+makeIcon('StopwatchFill', '<path fill-rule="evenodd" d="M7.5 2.5A.5.5 0 018 2h4a.5.5 0 010 1h-1v1.07A7.002 7.002 0 0110 18 7 7 0 019 4.07V3H8a.5.5 0 01-.5-.5zm3 4.5a.5.5 0 00-1 0v3.5h-3a.5.5 0 000 1H10a.5.5 0 00.5-.5V7z" clip-rule="evenodd"/>');
+var BIconSun =
+/*#__PURE__*/
+makeIcon('Sun', '<path d="M5.5 10a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0z"/><path fill-rule="evenodd" d="M10.202 2.28a.25.25 0 00-.404 0l-.91 1.255a.25.25 0 01-.334.067L7.232 2.79a.25.25 0 00-.374.155l-.36 1.508a.25.25 0 01-.282.189l-1.532-.244a.25.25 0 00-.286.286l.244 1.532a.25.25 0 01-.189.282l-1.508.36a.25.25 0 00-.155.374l.812 1.322a.25.25 0 01-.067.333l-1.256.91a.25.25 0 000 .405l1.256.91a.25.25 0 01.067.334l-.812 1.322a.25.25 0 00.155.374l1.508.36a.25.25 0 01.19.282l-.245 1.532a.25.25 0 00.286.286l1.532-.244a.25.25 0 01.282.189l.36 1.508a.25.25 0 00.374.155l1.322-.812a.25.25 0 01.333.067l.91 1.256a.25.25 0 00.405 0l.91-1.256a.25.25 0 01.334-.067l1.322.812a.25.25 0 00.374-.155l.36-1.508a.25.25 0 01.282-.19l1.532.245a.25.25 0 00.286-.286l-.244-1.532a.25.25 0 01.189-.282l1.508-.36a.25.25 0 00.155-.374l-.812-1.322a.25.25 0 01.067-.333l1.256-.91a.25.25 0 000-.405l-1.256-.91a.25.25 0 01-.067-.334l.812-1.322a.25.25 0 00-.155-.374l-1.508-.36a.25.25 0 01-.19-.282l.245-1.532a.25.25 0 00-.286-.286l-1.532.244a.25.25 0 01-.282-.189l-.36-1.509a.25.25 0 00-.374-.154l-1.322.812a.25.25 0 01-.333-.067l-.91-1.256zM10 4.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11z" clip-rule="evenodd"/>');
+var BIconTable =
+/*#__PURE__*/
+makeIcon('Table', '<path fill-rule="evenodd" d="M16 3H4a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M17 6H3V5h14v1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7 17.5v-14h1v14H7zm5 0v-14h1v14h-1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M17 10H3V9h14v1zm0 4H3v-1h14v1z" clip-rule="evenodd"/><path d="M2 4a2 2 0 012-2h12a2 2 0 012 2v2H2V4z"/>');
+var BIconTablet =
+/*#__PURE__*/
+makeIcon('Tablet', '<path fill-rule="evenodd" d="M14 3.5H6a1 1 0 00-1 1v11a1 1 0 001 1h8a1 1 0 001-1v-11a1 1 0 00-1-1zm-8-1a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2v-11a2 2 0 00-2-2H6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 15.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>');
+var BIconTabletLandscape =
+/*#__PURE__*/
+makeIcon('TabletLandscape', '<path fill-rule="evenodd" d="M3.5 6v8a1 1 0 001 1h11a1 1 0 001-1V6a1 1 0 00-1-1h-11a1 1 0 00-1 1zm-1 8a2 2 0 002 2h11a2 2 0 002-2V6a2 2 0 00-2-2h-11a2 2 0 00-2 2v8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15.5 10a1 1 0 10-2 0 1 1 0 002 0z" clip-rule="evenodd"/>');
+var BIconTag =
+/*#__PURE__*/
+makeIcon('Tag', '<path fill-rule="evenodd" d="M2.5 4A1.5 1.5 0 014 2.5h4.586a1.5 1.5 0 011.06.44l7 7a1.5 1.5 0 010 2.12l-4.585 4.586a1.5 1.5 0 01-2.122 0l-7-7a1.5 1.5 0 01-.439-1.06V4zM4 3.5a.5.5 0 00-.5.5v4.586a.5.5 0 00.146.353l7 7a.5.5 0 00.708 0l4.585-4.585a.5.5 0 000-.708l-7-7a.5.5 0 00-.353-.146H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 6.5a2 2 0 114 0 2 2 0 01-4 0zm2-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>');
+var BIconTagFill =
+/*#__PURE__*/
+makeIcon('TagFill', '<path fill-rule="evenodd" d="M4 3a1 1 0 00-1 1v4.586a1 1 0 00.293.707l7 7a1 1 0 001.414 0l4.586-4.586a1 1 0 000-1.414l-7-7A1 1 0 008.586 3H4zm4 3.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" clip-rule="evenodd"/>');
+var BIconTerminal =
+/*#__PURE__*/
+makeIcon('Terminal', '<path fill-rule="evenodd" d="M16 4H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1zM4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 11a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3A.5.5 0 018 11zM5.146 6.146a.5.5 0 01.708 0l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708L6.793 8.5 5.146 6.854a.5.5 0 010-.708z" clip-rule="evenodd"/>');
+var BIconTerminalFill =
+/*#__PURE__*/
+makeIcon('TerminalFill', '<path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm9.5 5.5h-3a.5.5 0 000 1h3a.5.5 0 000-1zm-6.354-.354L6.793 8.5 5.146 6.854a.5.5 0 11.708-.708l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708z" clip-rule="evenodd"/>');
+var BIconTextCenter =
+/*#__PURE__*/
+makeIcon('TextCenter', '<path fill-rule="evenodd" d="M6 14.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconTextIndentLeft =
+/*#__PURE__*/
+makeIcon('TextIndentLeft', '<path fill-rule="evenodd" d="M4 5.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm.646 2.146a.5.5 0 01.708 0l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708L6.293 10 4.646 8.354a.5.5 0 010-.708zM9 8.5a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm-5 3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconTextIndentRight =
+/*#__PURE__*/
+makeIcon('TextIndentRight', '<path fill-rule="evenodd" d="M4 5.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm10.646 2.146a.5.5 0 01.708.708L13.707 10l1.647 1.646a.5.5 0 01-.708.708l-2-2a.5.5 0 010-.708l2-2zM4 8.5a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconTextLeft =
+/*#__PURE__*/
+makeIcon('TextLeft', '<path fill-rule="evenodd" d="M4 14.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconTextRight =
+/*#__PURE__*/
+makeIcon('TextRight', '<path stroke="currentColor" stroke-linecap="round" d="M8.5 14.5h7m-11-3h11m-7-3h7m-11-3h11"/>');
+var BIconThreeDots =
+/*#__PURE__*/
+makeIcon('ThreeDots', '<path fill-rule="evenodd" d="M5 11.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" clip-rule="evenodd"/>');
+var BIconThreeDotsVertical =
+/*#__PURE__*/
+makeIcon('ThreeDotsVertical', '<path fill-rule="evenodd" d="M11.5 15a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm0-5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm0-5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" clip-rule="evenodd"/>');
+var BIconToggleOff =
+/*#__PURE__*/
+makeIcon('ToggleOff', '<path fill-rule="evenodd" d="M13 6a4 4 0 010 8h-3a4.992 4.992 0 002-4 4.992 4.992 0 00-2-4h3zm-6 8a4 4 0 110-8 4 4 0 010 8zm-5-4a5 5 0 005 5h6a5 5 0 000-10H7a5 5 0 00-5 5z" clip-rule="evenodd"/>');
+var BIconToggleOn =
+/*#__PURE__*/
+makeIcon('ToggleOn', '<path fill-rule="evenodd" d="M7 5a5 5 0 000 10h6a5 5 0 000-10H7zm6 9a4 4 0 100-8 4 4 0 000 8z" clip-rule="evenodd"/>');
+var BIconToggles =
+/*#__PURE__*/
+makeIcon('Toggles', '<path fill-rule="evenodd" d="M13.5 3h-7a2.5 2.5 0 000 5h7a2.5 2.5 0 000-5zm-7-1a3.5 3.5 0 100 7h7a3.5 3.5 0 100-7h-7zm0 9a3.5 3.5 0 100 7h7a3.5 3.5 0 100-7h-7zm7 6a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 5.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM6.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clip-rule="evenodd"/>');
+var BIconTools =
+/*#__PURE__*/
+makeIcon('Tools', '<path fill-rule="evenodd" d="M2 3l1-1 3.081 2.2a1 1 0 01.419.815v.07a1 1 0 00.293.708L12.5 11.5l.914-.305a1 1 0 011.023.242l3.356 3.356a1 1 0 010 1.414l-1.586 1.586a1 1 0 01-1.414 0l-3.356-3.356a1 1 0 01-.242-1.023l.305-.914-5.707-5.707a1 1 0 00-.707-.293h-.071a1 1 0 01-.814-.419L2 3zm11.354 9.646a.5.5 0 00-.708.708l3 3a.5.5 0 00.708-.708l-3-3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M17.898 4.223a3.003 3.003 0 01-3.679 3.674L7.878 14.15a3 3 0 11-2.027-2.027l6.252-6.341a3 3 0 013.675-3.68l-2.142 2.142L14 6l1.757.364 2.141-2.141zm-13.37 9.019L5 13l.471.242.529.026.287.445.445.287.026.529L7 15l-.242.471-.026.529-.445.287-.287.445-.529.026L5 17l-.471-.242L4 16.732l-.287-.445L3.268 16l-.026-.529L3 15l.242-.471.026-.529.445-.287.287-.445.529-.026z" clip-rule="evenodd"/>');
+var BIconTrash =
+/*#__PURE__*/
+makeIcon('Trash', '<path d="M7.5 7.5A.5.5 0 018 8v6a.5.5 0 01-1 0V8a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V8a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V8z"/><path fill-rule="evenodd" d="M16.5 5a1 1 0 01-1 1H15v9a2 2 0 01-2 2H7a2 2 0 01-2-2V6h-.5a1 1 0 01-1-1V4a1 1 0 011-1H8a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM6.118 6L6 6.059V15a1 1 0 001 1h6a1 1 0 001-1V6.059L13.882 6H6.118zM4.5 5V4h11v1h-11z" clip-rule="evenodd"/>');
+var BIconTrashFill =
+/*#__PURE__*/
+makeIcon('TrashFill', '<path fill-rule="evenodd" d="M4.5 3a1 1 0 00-1 1v1a1 1 0 001 1H5v9a2 2 0 002 2h6a2 2 0 002-2V6h.5a1 1 0 001-1V4a1 1 0 00-1-1H12a1 1 0 00-1-1H9a1 1 0 00-1 1H4.5zm3 4a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7a.5.5 0 01.5-.5zM10 7a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7A.5.5 0 0110 7zm3 .5a.5.5 0 00-1 0v7a.5.5 0 001 0v-7z" clip-rule="evenodd"/>');
+var BIconTriangle =
+/*#__PURE__*/
+makeIcon('Triangle', '<path fill-rule="evenodd" d="M9.938 4.016a.146.146 0 00-.054.057L3.027 15.74a.176.176 0 00-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 00.066-.017.163.163 0 00.055-.06.176.176 0 00-.003-.183L10.12 4.073a.146.146 0 00-.054-.057.13.13 0 00-.063-.016.13.13 0 00-.064.016zm1.043-.45a1.13 1.13 0 00-1.96 0L2.166 15.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L10.982 3.566z" clip-rule="evenodd"/>');
+var BIconTriangleFill =
+/*#__PURE__*/
+makeIcon('TriangleFill', '<path fill-rule="evenodd" d="M9.022 3.566a1.13 1.13 0 011.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H3.144c-.889 0-1.437-.99-.98-1.767L9.022 3.566z" clip-rule="evenodd"/>');
+var BIconTriangleHalf =
+/*#__PURE__*/
+makeIcon('TriangleHalf', '<path fill-rule="evenodd" d="M9.938 4.016a.146.146 0 00-.054.057L3.027 15.74a.176.176 0 00-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017l6.857-.017V4a.13.13 0 00-.064.016zm1.043-.45a1.13 1.13 0 00-1.96 0L2.166 15.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L10.982 3.566z" clip-rule="evenodd"/>');
+var BIconTrophy =
+/*#__PURE__*/
+makeIcon('Trophy', '<path d="M5 3h10c-.495 3.467-.5 10-5 10S5.495 6.467 5 3zm0 15a1 1 0 011-1h8a1 1 0 011 1H5zm2-1a1 1 0 011-1h4a1 1 0 011 1H7z"/><path fill-rule="evenodd" d="M14.5 5a2 2 0 100 4 2 2 0 000-4zm-3 2a3 3 0 116 0 3 3 0 01-6 0zm-6-2a2 2 0 100 4 2 2 0 000-4zm-3 2a3 3 0 116 0 3 3 0 01-6 0z" clip-rule="evenodd"/><path d="M9 12h2v4H9v-4z"/><path d="M12 13c0 .552-.895 1-2 1s-2-.448-2-1 .895-1 2-1 2 .448 2 1z"/>');
+var BIconTv =
+/*#__PURE__*/
+makeIcon('Tv', '<path fill-rule="evenodd" d="M2.216 6H1.5v-.04l.005-.083a2.957 2.957 0 01.298-1.102c.154-.309.394-.633.763-.88C2.94 3.648 3.413 3.5 4 3.5h12.039l.083.005a2.958 2.958 0 011.102.298c.309.154.633.394.88.763.248.373.396.847.396 1.434v6H18h.5v.039l-.005.083a2.957 2.957 0 01-.298 1.102 2.257 2.257 0 01-.763.88c-.373.248-.847.396-1.434.396H3.961l-.083-.005a2.956 2.956 0 01-1.102-.298 2.254 2.254 0 01-.88-.763C1.648 13.06 1.5 12.588 1.5 12V6h.716zm.284.002v-.008l.003-.044a1.959 1.959 0 01.195-.726c.095-.191.23-.367.423-.495.19-.127.466-.229.879-.229h12.006l.044.003a1.958 1.958 0 01.726.195c.191.095.367.23.495.423.127.19.229.466.229.879v6.006l-.003.044a1.959 1.959 0 01-.195.726c-.095.191-.23.367-.423.495-.19.127-.466.229-.879.229H3.994l-.044-.003a1.96 1.96 0 01-.726-.195 1.256 1.256 0 01-.495-.423c-.127-.19-.229-.466-.229-.879V6.002zM4.003 13.5zm.497 2A.5.5 0 015 15h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>');
+var BIconTvFill =
+/*#__PURE__*/
+makeIcon('TvFill', '<path fill-rule="evenodd" d="M4.5 15.5A.5.5 0 015 15h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zM4 4h12s2 0 2 2v6s0 2-2 2H4s-2 0-2-2V6s0-2 2-2z" clip-rule="evenodd"/>');
+var BIconType =
+/*#__PURE__*/
+makeIcon('Type', '<path d="M4.244 15.081l.944-2.803H8.66l.944 2.803h1.257L7.54 5.75H6.322L3 15.081h1.244zm2.7-7.923l1.395 4.157h-2.83L6.91 7.158h.034zm9.146 7.027h.035v.896h1.128v-4.956c0-1.51-1.114-2.345-2.646-2.345-1.736 0-2.59.916-2.666 2.174h1.108c.068-.718.595-1.19 1.517-1.19.971 0 1.518.52 1.518 1.463v.732H14.19c-1.647.007-2.522.8-2.522 2.058 0 1.319.957 2.18 2.345 2.18 1.06 0 1.716-.43 2.078-1.011zm-1.763.035c-.752 0-1.456-.397-1.456-1.244 0-.65.424-1.115 1.408-1.115h1.805v.834c0 .896-.752 1.525-1.757 1.525z"/>');
+var BIconTypeBold =
+/*#__PURE__*/
+makeIcon('TypeBold', '<path d="M10.21 15c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 001.852-2.14c0-1.51-1.162-2.46-3.014-2.46H5.843V15h4.368zM7.908 6.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H7.908V6.673zm0 6.788v-2.864h1.73c1.216 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H7.907z"/>');
+var BIconTypeH1 =
+/*#__PURE__*/
+makeIcon('TypeH1', '<path d="M10.637 15V5.669H9.379V9.62H4.758V5.67H3.5V15h1.258v-4.273h4.62V15h1.259zm5.329 0V5.669h-1.244L12.5 7.316v1.265l2.16-1.565h.062V15h1.244z"/>');
+var BIconTypeH2 =
+/*#__PURE__*/
+makeIcon('TypeH2', '<path d="M9.638 15V5.669H8.38V9.62H3.759V5.67H2.5V15h1.258v-4.273h4.62V15h1.259zm3.022-6.733v-.048c0-.889.63-1.668 1.716-1.668.957 0 1.675.608 1.675 1.572 0 .855-.554 1.504-1.067 2.085l-3.513 3.999V15H17.5v-1.094h-4.245v-.075l2.481-2.844c.875-.998 1.586-1.784 1.586-2.953 0-1.463-1.155-2.556-2.919-2.556-1.941 0-2.966 1.326-2.966 2.74v.049h1.223z"/>');
+var BIconTypeH3 =
+/*#__PURE__*/
+makeIcon('TypeH3', '<path d="M9.637 15V5.669H8.379V9.62H3.758V5.67H2.5V15h1.258v-4.273h4.62V15h1.259zm3.625-4.273h1.018c1.142 0 1.935.67 1.949 1.675.013 1.005-.78 1.737-2.01 1.73-1.08-.007-1.853-.588-1.935-1.32h-1.176c.069 1.327 1.224 2.386 3.083 2.386 1.935 0 3.343-1.155 3.309-2.789-.027-1.51-1.251-2.16-2.037-2.249v-.068c.704-.123 1.764-.91 1.723-2.229-.035-1.353-1.176-2.4-2.954-2.385-1.873.006-2.857 1.162-2.898 2.358h1.196c.062-.69.711-1.299 1.696-1.299.998 0 1.695.622 1.695 1.525.007.922-.718 1.592-1.695 1.592h-.964v1.073z"/>');
+var BIconTypeItalic =
+/*#__PURE__*/
+makeIcon('TypeItalic', '<path d="M9.991 13.674l1.538-7.219c.123-.595.246-.71 1.347-.807l.11-.52H9.211l-.11.52c1.06.096 1.128.212 1.005.807L8.57 13.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z"/>');
+var BIconTypeStrikethrough =
+/*#__PURE__*/
+makeIcon('TypeStrikethrough', '<path d="M10.527 15.164c-2.153 0-3.589-1.107-3.705-2.81h1.23c.144 1.06 1.129 1.703 2.544 1.703 1.34 0 2.31-.705 2.31-1.675 0-.827-.547-1.374-1.914-1.675l-.946-.207h3.45c.468.437.675.994.675 1.697 0 1.826-1.436 2.967-3.644 2.967zM8.602 8.5H7.167a2.776 2.776 0 01-.099-.76c0-1.627 1.436-2.768 3.48-2.768 1.969 0 3.39 1.175 3.445 2.85h-1.23c-.11-1.08-.964-1.743-2.25-1.743-1.23 0-2.18.602-2.18 1.607 0 .31.083.581.27.814z"/><path fill-rule="evenodd" d="M17 10.5H3v-1h14v1z" clip-rule="evenodd"/>');
+var BIconTypeUnderline =
+/*#__PURE__*/
+makeIcon('TypeUnderline', '<path d="M7.313 5.136h-1.23v6.405c0 2.105 1.47 3.623 3.917 3.623s3.917-1.518 3.917-3.623V5.136h-1.23v6.323c0 1.49-.978 2.57-2.687 2.57-1.709 0-2.687-1.08-2.687-2.57V5.136z"/><path fill-rule="evenodd" d="M14.5 17h-9v-1h9v1z" clip-rule="evenodd"/>');
+var BIconUnlock =
+/*#__PURE__*/
+makeIcon('Unlock', '<path fill-rule="evenodd" d="M11.655 9H4.333c-.264 0-.398.068-.471.121a.73.73 0 00-.224.296 1.626 1.626 0 00-.138.59V15c0 .342.076.531.14.635.064.106.151.18.256.237a1.122 1.122 0 00.436.127l.013.001h7.322c.264 0 .398-.068.471-.121a.73.73 0 00.224-.296 1.627 1.627 0 00.138-.59V10c0-.342-.076-.531-.14-.635a.658.658 0 00-.255-.237 1.123 1.123 0 00-.45-.128zm.012-1H4.333C2.5 8 2.5 10 2.5 10v5c0 2 1.833 2 1.833 2h7.334c1.833 0 1.833-2 1.833-2v-5c0-2-1.833-2-1.833-2zM10.5 5a3.5 3.5 0 117 0v3h-1V5a2.5 2.5 0 00-5 0v3h-1V5z" clip-rule="evenodd"/>');
+var BIconUnlockFill =
+/*#__PURE__*/
+makeIcon('UnlockFill', '<path d="M2.5 10a2 2 0 012-2h7a2 2 0 012 2v5a2 2 0 01-2 2h-7a2 2 0 01-2-2v-5z"/><path fill-rule="evenodd" d="M10.5 5a3.5 3.5 0 117 0v3h-1V5a2.5 2.5 0 00-5 0v3h-1V5z" clip-rule="evenodd"/>');
+var BIconUpload =
+/*#__PURE__*/
+makeIcon('Upload', '<path fill-rule="evenodd" d="M2.5 10a.5.5 0 01.5.5V14a1 1 0 001 1h12a1 1 0 001-1v-3.5a.5.5 0 011 0V14a2 2 0 01-2 2H4a2 2 0 01-2-2v-3.5a.5.5 0 01.5-.5zM7 6.854a.5.5 0 00.707 0L10 4.56l2.293 2.293A.5.5 0 1013 6.146L10.354 3.5a.5.5 0 00-.708 0L7 6.146a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 4a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8A.5.5 0 0110 4z" clip-rule="evenodd"/>');
+var BIconVolumeDown =
+/*#__PURE__*/
+makeIcon('VolumeDown', '<path fill-rule="evenodd" d="M10.717 5.55A.5.5 0 0111 6v8a.5.5 0 01-.812.39L7.825 12.5H5.5A.5.5 0 015 12V8a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06zM10 7.04L8.312 8.39A.5.5 0 018 8.5H6v3h2a.5.5 0 01.312.11L10 12.96V7.04z" clip-rule="evenodd"/><path d="M12.707 13.182A4.486 4.486 0 0014.025 10a4.486 4.486 0 00-1.318-3.182L12 7.525A3.489 3.489 0 0113.025 10c0 .966-.392 1.841-1.025 2.475l.707.707z"/>');
+var BIconVolumeDownFill =
+/*#__PURE__*/
+makeIcon('VolumeDownFill', '<path fill-rule="evenodd" d="M10.717 5.55A.5.5 0 0111 6v8a.5.5 0 01-.812.39L7.825 12.5H5.5A.5.5 0 015 12V8a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06z" clip-rule="evenodd"/><path d="M12.707 13.182A4.486 4.486 0 0014.025 10a4.486 4.486 0 00-1.318-3.182L12 7.525A3.489 3.489 0 0113.025 10c0 .966-.392 1.841-1.025 2.475l.707.707z"/>');
+var BIconVolumeMute =
+/*#__PURE__*/
+makeIcon('VolumeMute', '<path fill-rule="evenodd" d="M8.717 5.55A.5.5 0 019 6v8a.5.5 0 01-.812.39L5.825 12.5H3.5A.5.5 0 013 12V8a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06zM8 7.04L6.312 8.39A.5.5 0 016 8.5H4v3h2a.5.5 0 01.312.11L8 12.96V7.04zm7.854.606a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708l4-4a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.146 7.646a.5.5 0 000 .708l4 4a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0z" clip-rule="evenodd"/>');
+var BIconVolumeMuteFill =
+/*#__PURE__*/
+makeIcon('VolumeMuteFill', '<path fill-rule="evenodd" d="M8.717 5.55A.5.5 0 019 6v8a.5.5 0 01-.812.39L5.825 12.5H3.5A.5.5 0 013 12V8a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06zm7.137 1.596a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708l4-4a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.146 7.146a.5.5 0 000 .708l4 4a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0z" clip-rule="evenodd"/>');
+var BIconVolumeUp =
+/*#__PURE__*/
+makeIcon('VolumeUp', '<path fill-rule="evenodd" d="M8.717 5.55A.5.5 0 019 6v8a.5.5 0 01-.812.39L5.825 12.5H3.5A.5.5 0 013 12V8a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06zM8 7.04L6.312 8.39A.5.5 0 016 8.5H4v3h2a.5.5 0 01.312.11L8 12.96V7.04z" clip-rule="evenodd"/><path d="M13.536 16.01a8.473 8.473 0 002.49-6.01 8.473 8.473 0 00-2.49-6.01l-.708.707A7.476 7.476 0 0115.025 10c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M12.121 14.596A6.48 6.48 0 0014.025 10a6.48 6.48 0 00-1.904-4.596l-.707.707A5.483 5.483 0 0113.025 10a5.483 5.483 0 01-1.61 3.89l.706.706z"/><path d="M10.707 13.182A4.486 4.486 0 0012.025 10a4.486 4.486 0 00-1.318-3.182L10 7.525A3.489 3.489 0 0111.025 10c0 .966-.392 1.841-1.025 2.475l.707.707z"/>');
+var BIconVolumeUpFill =
+/*#__PURE__*/
+makeIcon('VolumeUpFill', '<path d="M13.536 16.01a8.473 8.473 0 002.49-6.01 8.473 8.473 0 00-2.49-6.01l-.708.707A7.476 7.476 0 0115.025 10c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M12.121 14.596A6.48 6.48 0 0014.025 10a6.48 6.48 0 00-1.904-4.596l-.707.707A5.483 5.483 0 0113.025 10a5.483 5.483 0 01-1.61 3.89l.706.706z"/><path d="M10.707 13.182A4.486 4.486 0 0012.025 10a4.486 4.486 0 00-1.318-3.182L10 7.525A3.489 3.489 0 0111.025 10c0 .966-.392 1.841-1.025 2.475l.707.707z"/><path fill-rule="evenodd" d="M8.717 5.55A.5.5 0 019 6v8a.5.5 0 01-.812.39L5.825 12.5H3.5A.5.5 0 013 12V8a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06z" clip-rule="evenodd"/>');
+var BIconWallet =
+/*#__PURE__*/
+makeIcon('Wallet', '<path fill-rule="evenodd" d="M3.5 5a.5.5 0 00-.5.5v2h5a.5.5 0 01.5.5c0 .253.08.644.306.958.207.288.557.542 1.194.542.637 0 .987-.254 1.194-.542.226-.314.306-.705.306-.958a.5.5 0 01.5-.5h5v-2a.5.5 0 00-.5-.5h-13zM17 8.5h-4.551a2.678 2.678 0 01-.443 1.042c-.393.546-1.043.958-2.006.958-.963 0-1.613-.412-2.006-.958A2.679 2.679 0 017.551 8.5H3v6a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-6zm-15-3A1.5 1.5 0 013.5 4h13A1.5 1.5 0 0118 5.5v9a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 012 14.5v-9z" clip-rule="evenodd"/>');
+var BIconWatch =
+/*#__PURE__*/
+makeIcon('Watch', '<path fill-rule="evenodd" d="M6 16.333v-1.86A5.985 5.985 0 014 10c0-1.777.772-3.374 2-4.472V3.667C6 2.747 6.746 2 7.667 2h4.666C13.253 2 14 2.746 14 3.667v1.86A5.985 5.985 0 0116 10a5.985 5.985 0 01-2 4.472v1.861c0 .92-.746 1.667-1.667 1.667H7.667C6.747 18 6 17.254 6 16.333zM15 10a5 5 0 10-10 0 5 5 0 0010 0z" clip-rule="evenodd"/><rect width="1" height="2" x="15.5" y="9" rx=".5"/><path fill-rule="evenodd" d="M10 6.5a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H8a.5.5 0 010-1h1.5V7a.5.5 0 01.5-.5z" clip-rule="evenodd"/>');
+var BIconWifi =
+/*#__PURE__*/
+makeIcon('Wifi', '<path fill-rule="evenodd" d="M8.858 13.858A1.991 1.991 0 0110 13.5c.425 0 .818.132 1.142.358L10 15l-1.142-1.142z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.731 14.024l.269.269.269-.269a1.506 1.506 0 00-.538 0zm-1.159-.576A2.49 2.49 0 0110 13c.53 0 1.023.165 1.428.448a.5.5 0 01.068.763l-1.143 1.143a.5.5 0 01-.707 0L8.504 14.21a.5.5 0 01.354-.853v.5l-.286-.41zM10 11.5a4.478 4.478 0 00-2.7.9.5.5 0 01-.6-.8c.919-.69 2.062-1.1 3.3-1.1s2.381.41 3.3 1.1a.5.5 0 01-.6.8 4.478 4.478 0 00-2.7-.9zm0-3c-1.833 0-3.51.657-4.814 1.748a.5.5 0 11-.642-.766A8.468 8.468 0 0110 7.5c2.076 0 3.98.745 5.456 1.982a.5.5 0 01-.642.766A7.468 7.468 0 0010 8.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 5.5c-2.657 0-5.082.986-6.932 2.613a.5.5 0 11-.66-.75A11.458 11.458 0 0110 4.5c2.91 0 5.567 1.08 7.592 2.862a.5.5 0 11-.66.751A10.458 10.458 0 0010 5.5z" clip-rule="evenodd"/>');
+var BIconWindow =
+/*#__PURE__*/
+makeIcon('Window', '<path fill-rule="evenodd" d="M16 4H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V5a1 1 0 00-1-1zM4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M17 8H3V7h14v1z" clip-rule="evenodd"/><path d="M5 5.5a.5.5 0 11-1 0 .5.5 0 011 0zm1.5 0a.5.5 0 11-1 0 .5.5 0 011 0zm1.5 0a.5.5 0 11-1 0 .5.5 0 011 0z"/>');
+var BIconWrench =
+/*#__PURE__*/
+makeIcon('Wrench', '<path fill-rule="evenodd" d="M2.102 4.223A3.004 3.004 0 005 8c.27 0 .532-.036.78-.103l6.342 6.252A3.003 3.003 0 0015 18a3 3 0 10-.851-5.878L7.897 5.781A3.004 3.004 0 004.223 2.1l2.141 2.142L6 6l-1.757.364-2.141-2.141zm13.37 9.019L15 13l-.471.242-.529.026-.287.445-.445.287-.026.529L13 15l.242.471.026.529.445.287.287.445.529.026L15 17l.471-.242.529-.026.287-.445.445-.287.026-.529L17 15l-.242-.471-.026-.529-.445-.287-.287-.445-.529-.026z" clip-rule="evenodd"/>');
+var BIconX =
+/*#__PURE__*/
+makeIcon('X', '<path fill-rule="evenodd" d="M5.646 5.646a.5.5 0 000 .708l8 8a.5.5 0 00.708-.708l-8-8a.5.5 0 00-.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.354 5.646a.5.5 0 010 .708l-8 8a.5.5 0 01-.708-.708l8-8a.5.5 0 01.708 0z" clip-rule="evenodd"/>');
+var BIconXCircle =
+/*#__PURE__*/
+makeIcon('XCircle', '<path fill-rule="evenodd" d="M10 17a7 7 0 100-14 7 7 0 000 14zm0 1a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.646 13.354l-6-6 .708-.708 6 6-.708.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.354 13.354l6-6-.708-.708-6 6 .708.708z" clip-rule="evenodd"/>');
+var BIconXCircleFill =
+/*#__PURE__*/
+makeIcon('XCircleFill', '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7.354 6.646L10 9.293l2.646-2.647a.5.5 0 01.708.708L10.707 10l2.647 2.646a.5.5 0 01-.708.708L10 10.707l-2.646 2.647a.5.5 0 01-.708-.708L9.293 10 6.646 7.354a.5.5 0 11.708-.708z" clip-rule="evenodd"/>');
+var BIconXOctagon =
+/*#__PURE__*/
+makeIcon('XOctagon', '<path fill-rule="evenodd" d="M6.54 2.146A.5.5 0 016.893 2h6.214a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H6.893a.5.5 0 01-.353-.146L2.146 13.46A.5.5 0 012 13.107V6.893a.5.5 0 01.146-.353L6.54 2.146zM7.1 3L3 7.1v5.8L7.1 17h5.8l4.1-4.1V7.1L12.9 3H7.1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.293 10L6.646 7.354l.708-.708L10 9.293l2.646-2.647.708.708L10.707 10l2.647 2.646-.707.708L10 10.707l-2.646 2.647-.708-.707L9.293 10z" clip-rule="evenodd"/>');
+var BIconXOctagonFill =
+/*#__PURE__*/
+makeIcon('XOctagonFill', '<path fill-rule="evenodd" d="M13.46 2.146A.5.5 0 0013.107 2H6.893a.5.5 0 00-.353.146L2.146 6.54A.5.5 0 002 6.893v6.214a.5.5 0 00.146.353l4.394 4.394a.5.5 0 00.353.146h6.214a.5.5 0 00.353-.146l4.394-4.394a.5.5 0 00.146-.353V6.893a.5.5 0 00-.146-.353L13.46 2.146zm-6.106 4.5L10 9.293l2.646-2.647a.5.5 0 01.708.708L10.707 10l2.647 2.646a.5.5 0 01-.708.708L10 10.707l-2.646 2.647a.5.5 0 01-.708-.708L9.293 10 6.646 7.354a.5.5 0 11.708-.708z" clip-rule="evenodd"/>');
+var BIconXSquare =
+/*#__PURE__*/
+makeIcon('XSquare', '<path fill-rule="evenodd" d="M16 3H4a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.293 10L6.646 7.354l.708-.708L10 9.293l2.646-2.647.708.708L10.707 10l2.647 2.646-.708.708L10 10.707l-2.646 2.647-.708-.707L9.293 10z" clip-rule="evenodd"/>');
+var BIconXSquareFill =
+/*#__PURE__*/
+makeIcon('XSquareFill', '<path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm3.354 4.646L10 9.293l2.646-2.647a.5.5 0 01.708.708L10.707 10l2.647 2.646a.5.5 0 01-.708.708L10 10.707l-2.646 2.647a.5.5 0 01-.708-.708L9.293 10 6.646 7.354a.5.5 0 11.708-.708z" clip-rule="evenodd"/>'); // --- END AUTO-GENERATED FILE ---
+
+var RX_ICON_PREFIX = /^BIcon/; // Helper BIcon component
+// Requires the requested icon component to be installed
+
+var BIcon =
+/*#__PURE__*/
+Vue.extend({
+  name: 'BIcon',
+  functional: true,
+  props: _objectSpread2({
+    icon: {
+      type: String,
+      default: null
+    }
+  }, commonIconProps),
+  render: function render(h, _ref) {
+    var data = _ref.data,
+        props = _ref.props,
+        parent = _ref.parent;
+    var icon = pascalCase(trim(props.icon || '')).replace(RX_ICON_PREFIX, '');
+    var iconName = "BIcon".concat(icon); // If parent context exists, we check to see if the icon has been registered
+    // Either locally in the parent component, or globally at the `$root` level
+    // If not registered, we render a blank icon
+
+    var components = ((parent || {}).$options || {}).components;
+    var componentRefOrName = icon && components ? components[iconName] || BIconBlank : icon ? iconName : BIconBlank;
+    return h(componentRefOrName, mergeData(data, {
+      props: _objectSpread2({}, props, {
+        icon: null
+      })
+    }));
+  }
+});
+
+// --- BEGIN AUTO-GENERATED FILE ---
+
+var IconsPlugin =
+/*#__PURE__*/
+pluginFactoryNoConfig({
+  components: {
+    // Icon helper component
+    BIcon: BIcon,
+    // BootstrapVue custom icon components
+    BIconBlank: BIconBlank,
+    // Bootstrap icon components
+    BIconAlarm: BIconAlarm,
+    BIconAlarmFill: BIconAlarmFill,
+    BIconAlertCircle: BIconAlertCircle,
+    BIconAlertCircleFill: BIconAlertCircleFill,
+    BIconAlertOctagon: BIconAlertOctagon,
+    BIconAlertOctagonFill: BIconAlertOctagonFill,
+    BIconAlertSquare: BIconAlertSquare,
+    BIconAlertSquareFill: BIconAlertSquareFill,
+    BIconAlertTriangle: BIconAlertTriangle,
+    BIconAlertTriangleFill: BIconAlertTriangleFill,
+    BIconArchive: BIconArchive,
+    BIconArchiveFill: BIconArchiveFill,
+    BIconArrowBarBottom: BIconArrowBarBottom,
+    BIconArrowBarLeft: BIconArrowBarLeft,
+    BIconArrowBarRight: BIconArrowBarRight,
+    BIconArrowBarUp: BIconArrowBarUp,
+    BIconArrowClockwise: BIconArrowClockwise,
+    BIconArrowCounterclockwise: BIconArrowCounterclockwise,
+    BIconArrowDown: BIconArrowDown,
+    BIconArrowDownLeft: BIconArrowDownLeft,
+    BIconArrowDownRight: BIconArrowDownRight,
+    BIconArrowDownShort: BIconArrowDownShort,
+    BIconArrowLeft: BIconArrowLeft,
+    BIconArrowLeftRight: BIconArrowLeftRight,
+    BIconArrowLeftShort: BIconArrowLeftShort,
+    BIconArrowRepeat: BIconArrowRepeat,
+    BIconArrowRight: BIconArrowRight,
+    BIconArrowRightShort: BIconArrowRightShort,
+    BIconArrowUp: BIconArrowUp,
+    BIconArrowUpDown: BIconArrowUpDown,
+    BIconArrowUpLeft: BIconArrowUpLeft,
+    BIconArrowUpRight: BIconArrowUpRight,
+    BIconArrowUpShort: BIconArrowUpShort,
+    BIconArrowsAngleContract: BIconArrowsAngleContract,
+    BIconArrowsAngleExpand: BIconArrowsAngleExpand,
+    BIconArrowsCollapse: BIconArrowsCollapse,
+    BIconArrowsExpand: BIconArrowsExpand,
+    BIconArrowsFullscreen: BIconArrowsFullscreen,
+    BIconAt: BIconAt,
+    BIconAward: BIconAward,
+    BIconBackspace: BIconBackspace,
+    BIconBackspaceFill: BIconBackspaceFill,
+    BIconBackspaceReverse: BIconBackspaceReverse,
+    BIconBackspaceReverseFill: BIconBackspaceReverseFill,
+    BIconBarChart: BIconBarChart,
+    BIconBarChartFill: BIconBarChartFill,
+    BIconBattery: BIconBattery,
+    BIconBatteryCharging: BIconBatteryCharging,
+    BIconBatteryFull: BIconBatteryFull,
+    BIconBell: BIconBell,
+    BIconBellFill: BIconBellFill,
+    BIconBlockquoteLeft: BIconBlockquoteLeft,
+    BIconBlockquoteRight: BIconBlockquoteRight,
+    BIconBook: BIconBook,
+    BIconBookHalfFill: BIconBookHalfFill,
+    BIconBookmark: BIconBookmark,
+    BIconBookmarkFill: BIconBookmarkFill,
+    BIconBootstrap: BIconBootstrap,
+    BIconBootstrapFill: BIconBootstrapFill,
+    BIconBootstrapReboot: BIconBootstrapReboot,
+    BIconBoxArrowBottomLeft: BIconBoxArrowBottomLeft,
+    BIconBoxArrowBottomRight: BIconBoxArrowBottomRight,
+    BIconBoxArrowDown: BIconBoxArrowDown,
+    BIconBoxArrowLeft: BIconBoxArrowLeft,
+    BIconBoxArrowRight: BIconBoxArrowRight,
+    BIconBoxArrowUp: BIconBoxArrowUp,
+    BIconBoxArrowUpLeft: BIconBoxArrowUpLeft,
+    BIconBoxArrowUpRight: BIconBoxArrowUpRight,
+    BIconBraces: BIconBraces,
+    BIconBrightnessFillHigh: BIconBrightnessFillHigh,
+    BIconBrightnessFillLow: BIconBrightnessFillLow,
+    BIconBrightnessHigh: BIconBrightnessHigh,
+    BIconBrightnessLow: BIconBrightnessLow,
+    BIconBrush: BIconBrush,
+    BIconBucket: BIconBucket,
+    BIconBucketFill: BIconBucketFill,
+    BIconBuilding: BIconBuilding,
+    BIconBullseye: BIconBullseye,
+    BIconCalendar: BIconCalendar,
+    BIconCalendarFill: BIconCalendarFill,
+    BIconCamera: BIconCamera,
+    BIconCameraVideo: BIconCameraVideo,
+    BIconCameraVideoFill: BIconCameraVideoFill,
+    BIconCapslock: BIconCapslock,
+    BIconCapslockFill: BIconCapslockFill,
+    BIconChat: BIconChat,
+    BIconChatFill: BIconChatFill,
+    BIconCheck: BIconCheck,
+    BIconCheckBox: BIconCheckBox,
+    BIconCheckCircle: BIconCheckCircle,
+    BIconChevronCompactDown: BIconChevronCompactDown,
+    BIconChevronCompactLeft: BIconChevronCompactLeft,
+    BIconChevronCompactRight: BIconChevronCompactRight,
+    BIconChevronCompactUp: BIconChevronCompactUp,
+    BIconChevronDown: BIconChevronDown,
+    BIconChevronLeft: BIconChevronLeft,
+    BIconChevronRight: BIconChevronRight,
+    BIconChevronUp: BIconChevronUp,
+    BIconCircle: BIconCircle,
+    BIconCircleFill: BIconCircleFill,
+    BIconCircleHalf: BIconCircleHalf,
+    BIconCircleSlash: BIconCircleSlash,
+    BIconClock: BIconClock,
+    BIconClockFill: BIconClockFill,
+    BIconCloud: BIconCloud,
+    BIconCloudDownload: BIconCloudDownload,
+    BIconCloudFill: BIconCloudFill,
+    BIconCloudUpload: BIconCloudUpload,
+    BIconCode: BIconCode,
+    BIconCodeSlash: BIconCodeSlash,
+    BIconColumns: BIconColumns,
+    BIconColumnsGutters: BIconColumnsGutters,
+    BIconCommand: BIconCommand,
+    BIconCompass: BIconCompass,
+    BIconCone: BIconCone,
+    BIconConeStriped: BIconConeStriped,
+    BIconController: BIconController,
+    BIconCreditCard: BIconCreditCard,
+    BIconCursor: BIconCursor,
+    BIconCursorFill: BIconCursorFill,
+    BIconDash: BIconDash,
+    BIconDiamond: BIconDiamond,
+    BIconDiamondHalf: BIconDiamondHalf,
+    BIconDisplay: BIconDisplay,
+    BIconDisplayFill: BIconDisplayFill,
+    BIconDocument: BIconDocument,
+    BIconDocumentCode: BIconDocumentCode,
+    BIconDocumentDiff: BIconDocumentDiff,
+    BIconDocumentRichtext: BIconDocumentRichtext,
+    BIconDocumentSpreadsheet: BIconDocumentSpreadsheet,
+    BIconDocumentText: BIconDocumentText,
+    BIconDocuments: BIconDocuments,
+    BIconDocumentsAlt: BIconDocumentsAlt,
+    BIconDot: BIconDot,
+    BIconDownload: BIconDownload,
+    BIconEggFried: BIconEggFried,
+    BIconEject: BIconEject,
+    BIconEjectFill: BIconEjectFill,
+    BIconEnvelope: BIconEnvelope,
+    BIconEnvelopeFill: BIconEnvelopeFill,
+    BIconEnvelopeOpen: BIconEnvelopeOpen,
+    BIconEnvelopeOpenFill: BIconEnvelopeOpenFill,
+    BIconEye: BIconEye,
+    BIconEyeFill: BIconEyeFill,
+    BIconEyeSlash: BIconEyeSlash,
+    BIconEyeSlashFill: BIconEyeSlashFill,
+    BIconFilter: BIconFilter,
+    BIconFlag: BIconFlag,
+    BIconFlagFill: BIconFlagFill,
+    BIconFolder: BIconFolder,
+    BIconFolderFill: BIconFolderFill,
+    BIconFolderSymlink: BIconFolderSymlink,
+    BIconFolderSymlinkFill: BIconFolderSymlinkFill,
+    BIconFonts: BIconFonts,
+    BIconForward: BIconForward,
+    BIconForwardFill: BIconForwardFill,
+    BIconGear: BIconGear,
+    BIconGearFill: BIconGearFill,
+    BIconGearWide: BIconGearWide,
+    BIconGearWideConnected: BIconGearWideConnected,
+    BIconGeo: BIconGeo,
+    BIconGraphDown: BIconGraphDown,
+    BIconGraphUp: BIconGraphUp,
+    BIconGrid: BIconGrid,
+    BIconGridFill: BIconGridFill,
+    BIconHammer: BIconHammer,
+    BIconHash: BIconHash,
+    BIconHeart: BIconHeart,
+    BIconHeartFill: BIconHeartFill,
+    BIconHouse: BIconHouse,
+    BIconHouseFill: BIconHouseFill,
+    BIconImage: BIconImage,
+    BIconImageAlt: BIconImageAlt,
+    BIconImageFill: BIconImageFill,
+    BIconImages: BIconImages,
+    BIconInbox: BIconInbox,
+    BIconInboxFill: BIconInboxFill,
+    BIconInboxes: BIconInboxes,
+    BIconInboxesFill: BIconInboxesFill,
+    BIconInfo: BIconInfo,
+    BIconInfoFill: BIconInfoFill,
+    BIconInfoSquare: BIconInfoSquare,
+    BIconInfoSquareFill: BIconInfoSquareFill,
+    BIconJustify: BIconJustify,
+    BIconJustifyLeft: BIconJustifyLeft,
+    BIconJustifyRight: BIconJustifyRight,
+    BIconKanban: BIconKanban,
+    BIconKanbanFill: BIconKanbanFill,
+    BIconLaptop: BIconLaptop,
+    BIconLayoutSidebar: BIconLayoutSidebar,
+    BIconLayoutSidebarReverse: BIconLayoutSidebarReverse,
+    BIconLayoutSplit: BIconLayoutSplit,
+    BIconList: BIconList,
+    BIconListCheck: BIconListCheck,
+    BIconListOl: BIconListOl,
+    BIconListTask: BIconListTask,
+    BIconListUl: BIconListUl,
+    BIconLock: BIconLock,
+    BIconLockFill: BIconLockFill,
+    BIconMap: BIconMap,
+    BIconMic: BIconMic,
+    BIconMoon: BIconMoon,
+    BIconMusicPlayer: BIconMusicPlayer,
+    BIconMusicPlayerFill: BIconMusicPlayerFill,
+    BIconOption: BIconOption,
+    BIconOutlet: BIconOutlet,
+    BIconPause: BIconPause,
+    BIconPauseFill: BIconPauseFill,
+    BIconPen: BIconPen,
+    BIconPencil: BIconPencil,
+    BIconPeople: BIconPeople,
+    BIconPeopleFill: BIconPeopleFill,
+    BIconPerson: BIconPerson,
+    BIconPersonFill: BIconPersonFill,
+    BIconPhone: BIconPhone,
+    BIconPhoneLandscape: BIconPhoneLandscape,
+    BIconPieChart: BIconPieChart,
+    BIconPieChartFill: BIconPieChartFill,
+    BIconPlay: BIconPlay,
+    BIconPlayFill: BIconPlayFill,
+    BIconPlug: BIconPlug,
+    BIconPlus: BIconPlus,
+    BIconPower: BIconPower,
+    BIconQuestion: BIconQuestion,
+    BIconQuestionFill: BIconQuestionFill,
+    BIconQuestionSquare: BIconQuestionSquare,
+    BIconQuestionSquareFill: BIconQuestionSquareFill,
+    BIconReply: BIconReply,
+    BIconReplyAll: BIconReplyAll,
+    BIconReplyAllFill: BIconReplyAllFill,
+    BIconReplyFill: BIconReplyFill,
+    BIconScrewdriver: BIconScrewdriver,
+    BIconSearch: BIconSearch,
+    BIconShield: BIconShield,
+    BIconShieldFill: BIconShieldFill,
+    BIconShieldLock: BIconShieldLock,
+    BIconShieldLockFill: BIconShieldLockFill,
+    BIconShieldShaded: BIconShieldShaded,
+    BIconShift: BIconShift,
+    BIconShiftFill: BIconShiftFill,
+    BIconSkipBackward: BIconSkipBackward,
+    BIconSkipBackwardFill: BIconSkipBackwardFill,
+    BIconSkipEnd: BIconSkipEnd,
+    BIconSkipEndFill: BIconSkipEndFill,
+    BIconSkipForward: BIconSkipForward,
+    BIconSkipForwardFill: BIconSkipForwardFill,
+    BIconSkipStart: BIconSkipStart,
+    BIconSkipStartFill: BIconSkipStartFill,
+    BIconSpeaker: BIconSpeaker,
+    BIconSquare: BIconSquare,
+    BIconSquareFill: BIconSquareFill,
+    BIconSquareHalf: BIconSquareHalf,
+    BIconStar: BIconStar,
+    BIconStarFill: BIconStarFill,
+    BIconStarHalf: BIconStarHalf,
+    BIconStop: BIconStop,
+    BIconStopFill: BIconStopFill,
+    BIconStopwatch: BIconStopwatch,
+    BIconStopwatchFill: BIconStopwatchFill,
+    BIconSun: BIconSun,
+    BIconTable: BIconTable,
+    BIconTablet: BIconTablet,
+    BIconTabletLandscape: BIconTabletLandscape,
+    BIconTag: BIconTag,
+    BIconTagFill: BIconTagFill,
+    BIconTerminal: BIconTerminal,
+    BIconTerminalFill: BIconTerminalFill,
+    BIconTextCenter: BIconTextCenter,
+    BIconTextIndentLeft: BIconTextIndentLeft,
+    BIconTextIndentRight: BIconTextIndentRight,
+    BIconTextLeft: BIconTextLeft,
+    BIconTextRight: BIconTextRight,
+    BIconThreeDots: BIconThreeDots,
+    BIconThreeDotsVertical: BIconThreeDotsVertical,
+    BIconToggleOff: BIconToggleOff,
+    BIconToggleOn: BIconToggleOn,
+    BIconToggles: BIconToggles,
+    BIconTools: BIconTools,
+    BIconTrash: BIconTrash,
+    BIconTrashFill: BIconTrashFill,
+    BIconTriangle: BIconTriangle,
+    BIconTriangleFill: BIconTriangleFill,
+    BIconTriangleHalf: BIconTriangleHalf,
+    BIconTrophy: BIconTrophy,
+    BIconTv: BIconTv,
+    BIconTvFill: BIconTvFill,
+    BIconType: BIconType,
+    BIconTypeBold: BIconTypeBold,
+    BIconTypeH1: BIconTypeH1,
+    BIconTypeH2: BIconTypeH2,
+    BIconTypeH3: BIconTypeH3,
+    BIconTypeItalic: BIconTypeItalic,
+    BIconTypeStrikethrough: BIconTypeStrikethrough,
+    BIconTypeUnderline: BIconTypeUnderline,
+    BIconUnlock: BIconUnlock,
+    BIconUnlockFill: BIconUnlockFill,
+    BIconUpload: BIconUpload,
+    BIconVolumeDown: BIconVolumeDown,
+    BIconVolumeDownFill: BIconVolumeDownFill,
+    BIconVolumeMute: BIconVolumeMute,
+    BIconVolumeMuteFill: BIconVolumeMuteFill,
+    BIconVolumeUp: BIconVolumeUp,
+    BIconVolumeUpFill: BIconVolumeUpFill,
+    BIconWallet: BIconWallet,
+    BIconWatch: BIconWatch,
+    BIconWifi: BIconWifi,
+    BIconWindow: BIconWindow,
+    BIconWrench: BIconWrench,
+    BIconX: BIconX,
+    BIconXCircle: BIconXCircle,
+    BIconXCircleFill: BIconXCircleFill,
+    BIconXOctagon: BIconXOctagon,
+    BIconXOctagonFill: BIconXOctagonFill,
+    BIconXSquare: BIconXSquare,
+    BIconXSquareFill: BIconXSquareFill
+  }
+}); // Export the BootstrapVueIcons plugin installer
+// Mainly for the stand-alone bootstrap-vue-icons.xxx.js builds
+
+var BootstrapVueIcons =
+/*#__PURE__*/
+pluginFactoryNoConfig({
+  plugins: {
+    IconsPlugin: IconsPlugin
+  }
+}, {
+  NAME: 'BootstrapVueIcons'
+}); // --- END AUTO-GENERATED FILE ---
+
+var NAME$B = 'BootstrapVue'; //
 // BootstrapVue installer
 //
 
@@ -22215,9 +25005,9 @@ var BootstrapVue =
 /*#__PURE__*/
 {
   install: install,
-  NAME: NAME$y
+  NAME: NAME$B
 }; //
 
 export default BootstrapVue;
-export { AlertPlugin, BAlert, BBadge, BBreadcrumb, BBreadcrumbItem, BButton, BButtonClose, BButtonGroup, BButtonToolbar, BCard, BCardBody, BCardFooter, BCardGroup, BCardHeader, BCardImg, BCardImgLazy, BCardSubTitle, BCardText, BCardTitle, BCarousel, BCarouselSlide, BCol, BCollapse, BContainer, BDropdown, BDropdownDivider, BDropdownForm, BDropdownGroup, BDropdownHeader, BDropdownItem, BDropdownItemButton, BDropdownText, BEmbed, BForm, BFormCheckbox, BFormCheckboxGroup, BFormDatalist, BFormFile, BFormGroup, BFormInput, BFormInvalidFeedback, BFormRadio, BFormRadioGroup, BFormRow, BFormSelect, BFormText, BFormTextarea, BFormValidFeedback, BImg, BImgLazy, BInputGroup, BInputGroupAddon, BInputGroupAppend, BInputGroupPrepend, BInputGroupText, BJumbotron, BLink, BListGroup, BListGroupItem, BMedia, BMediaAside, BMediaBody, BModal, BNav, BNavForm, BNavItem, BNavItemDropdown, BNavText, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BPagination, BPaginationNav, BPopover, BProgress, BProgressBar, BRow, BSpinner, BTab, BTable, BTableLite, BTableSimple, BTabs, BTbody, BTd, BTfoot, BTh, BThead, BToast, BToaster, BTooltip, BTr, BVConfigPlugin as BVConfig, BVConfigPlugin, BVModalPlugin, BVToastPlugin, BadgePlugin, BootstrapVue, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, ButtonToolbarPlugin, CardPlugin, CarouselPlugin, CollapsePlugin, DropdownPlugin, EmbedPlugin, FormCheckboxPlugin, FormFilePlugin, FormGroupPlugin, FormInputPlugin, FormPlugin, FormRadioPlugin, FormSelectPlugin, FormTextareaPlugin, ImagePlugin, InputGroupPlugin, JumbotronPlugin, LayoutPlugin, LinkPlugin, ListGroupPlugin, MediaPlugin, ModalPlugin, NAME$y as NAME, NavPlugin, NavbarPlugin, PaginationNavPlugin, PaginationPlugin, PopoverPlugin, ProgressPlugin, SpinnerPlugin, TableLitePlugin, TablePlugin, TableSimplePlugin, TabsPlugin, ToastPlugin, TooltipPlugin, VBModal, VBModalPlugin, VBPopover, VBPopoverPlugin, VBScrollspy, VBScrollspyPlugin, VBToggle, VBTogglePlugin, VBTooltip, VBTooltipPlugin, VBVisible, VBVisiblePlugin, install };
+export { AlertPlugin, BAlert, BBadge, BBreadcrumb, BBreadcrumbItem, BButton, BButtonClose, BButtonGroup, BButtonToolbar, BCard, BCardBody, BCardFooter, BCardGroup, BCardHeader, BCardImg, BCardImgLazy, BCardSubTitle, BCardText, BCardTitle, BCarousel, BCarouselSlide, BCol, BCollapse, BContainer, BDropdown, BDropdownDivider, BDropdownForm, BDropdownGroup, BDropdownHeader, BDropdownItem, BDropdownItemButton, BDropdownText, BEmbed, BForm, BFormCheckbox, BFormCheckboxGroup, BFormDatalist, BFormFile, BFormGroup, BFormInput, BFormInvalidFeedback, BFormRadio, BFormRadioGroup, BFormRow, BFormSelect, BFormSelectOption, BFormSelectOptionGroup, BFormTag, BFormTags, BFormText, BFormTextarea, BFormValidFeedback, BIcon, BIconAlarm, BIconAlarmFill, BIconAlertCircle, BIconAlertCircleFill, BIconAlertOctagon, BIconAlertOctagonFill, BIconAlertSquare, BIconAlertSquareFill, BIconAlertTriangle, BIconAlertTriangleFill, BIconArchive, BIconArchiveFill, BIconArrowBarBottom, BIconArrowBarLeft, BIconArrowBarRight, BIconArrowBarUp, BIconArrowClockwise, BIconArrowCounterclockwise, BIconArrowDown, BIconArrowDownLeft, BIconArrowDownRight, BIconArrowDownShort, BIconArrowLeft, BIconArrowLeftRight, BIconArrowLeftShort, BIconArrowRepeat, BIconArrowRight, BIconArrowRightShort, BIconArrowUp, BIconArrowUpDown, BIconArrowUpLeft, BIconArrowUpRight, BIconArrowUpShort, BIconArrowsAngleContract, BIconArrowsAngleExpand, BIconArrowsCollapse, BIconArrowsExpand, BIconArrowsFullscreen, BIconAt, BIconAward, BIconBackspace, BIconBackspaceFill, BIconBackspaceReverse, BIconBackspaceReverseFill, BIconBarChart, BIconBarChartFill, BIconBattery, BIconBatteryCharging, BIconBatteryFull, BIconBell, BIconBellFill, BIconBlank, BIconBlockquoteLeft, BIconBlockquoteRight, BIconBook, BIconBookHalfFill, BIconBookmark, BIconBookmarkFill, BIconBootstrap, BIconBootstrapFill, BIconBootstrapReboot, BIconBoxArrowBottomLeft, BIconBoxArrowBottomRight, BIconBoxArrowDown, BIconBoxArrowLeft, BIconBoxArrowRight, BIconBoxArrowUp, BIconBoxArrowUpLeft, BIconBoxArrowUpRight, BIconBraces, BIconBrightnessFillHigh, BIconBrightnessFillLow, BIconBrightnessHigh, BIconBrightnessLow, BIconBrush, BIconBucket, BIconBucketFill, BIconBuilding, BIconBullseye, BIconCalendar, BIconCalendarFill, BIconCamera, BIconCameraVideo, BIconCameraVideoFill, BIconCapslock, BIconCapslockFill, BIconChat, BIconChatFill, BIconCheck, BIconCheckBox, BIconCheckCircle, BIconChevronCompactDown, BIconChevronCompactLeft, BIconChevronCompactRight, BIconChevronCompactUp, BIconChevronDown, BIconChevronLeft, BIconChevronRight, BIconChevronUp, BIconCircle, BIconCircleFill, BIconCircleHalf, BIconCircleSlash, BIconClock, BIconClockFill, BIconCloud, BIconCloudDownload, BIconCloudFill, BIconCloudUpload, BIconCode, BIconCodeSlash, BIconColumns, BIconColumnsGutters, BIconCommand, BIconCompass, BIconCone, BIconConeStriped, BIconController, BIconCreditCard, BIconCursor, BIconCursorFill, BIconDash, BIconDiamond, BIconDiamondHalf, BIconDisplay, BIconDisplayFill, BIconDocument, BIconDocumentCode, BIconDocumentDiff, BIconDocumentRichtext, BIconDocumentSpreadsheet, BIconDocumentText, BIconDocuments, BIconDocumentsAlt, BIconDot, BIconDownload, BIconEggFried, BIconEject, BIconEjectFill, BIconEnvelope, BIconEnvelopeFill, BIconEnvelopeOpen, BIconEnvelopeOpenFill, BIconEye, BIconEyeFill, BIconEyeSlash, BIconEyeSlashFill, BIconFilter, BIconFlag, BIconFlagFill, BIconFolder, BIconFolderFill, BIconFolderSymlink, BIconFolderSymlinkFill, BIconFonts, BIconForward, BIconForwardFill, BIconGear, BIconGearFill, BIconGearWide, BIconGearWideConnected, BIconGeo, BIconGraphDown, BIconGraphUp, BIconGrid, BIconGridFill, BIconHammer, BIconHash, BIconHeart, BIconHeartFill, BIconHouse, BIconHouseFill, BIconImage, BIconImageAlt, BIconImageFill, BIconImages, BIconInbox, BIconInboxFill, BIconInboxes, BIconInboxesFill, BIconInfo, BIconInfoFill, BIconInfoSquare, BIconInfoSquareFill, BIconJustify, BIconJustifyLeft, BIconJustifyRight, BIconKanban, BIconKanbanFill, BIconLaptop, BIconLayoutSidebar, BIconLayoutSidebarReverse, BIconLayoutSplit, BIconList, BIconListCheck, BIconListOl, BIconListTask, BIconListUl, BIconLock, BIconLockFill, BIconMap, BIconMic, BIconMoon, BIconMusicPlayer, BIconMusicPlayerFill, BIconOption, BIconOutlet, BIconPause, BIconPauseFill, BIconPen, BIconPencil, BIconPeople, BIconPeopleFill, BIconPerson, BIconPersonFill, BIconPhone, BIconPhoneLandscape, BIconPieChart, BIconPieChartFill, BIconPlay, BIconPlayFill, BIconPlug, BIconPlus, BIconPower, BIconQuestion, BIconQuestionFill, BIconQuestionSquare, BIconQuestionSquareFill, BIconReply, BIconReplyAll, BIconReplyAllFill, BIconReplyFill, BIconScrewdriver, BIconSearch, BIconShield, BIconShieldFill, BIconShieldLock, BIconShieldLockFill, BIconShieldShaded, BIconShift, BIconShiftFill, BIconSkipBackward, BIconSkipBackwardFill, BIconSkipEnd, BIconSkipEndFill, BIconSkipForward, BIconSkipForwardFill, BIconSkipStart, BIconSkipStartFill, BIconSpeaker, BIconSquare, BIconSquareFill, BIconSquareHalf, BIconStar, BIconStarFill, BIconStarHalf, BIconStop, BIconStopFill, BIconStopwatch, BIconStopwatchFill, BIconSun, BIconTable, BIconTablet, BIconTabletLandscape, BIconTag, BIconTagFill, BIconTerminal, BIconTerminalFill, BIconTextCenter, BIconTextIndentLeft, BIconTextIndentRight, BIconTextLeft, BIconTextRight, BIconThreeDots, BIconThreeDotsVertical, BIconToggleOff, BIconToggleOn, BIconToggles, BIconTools, BIconTrash, BIconTrashFill, BIconTriangle, BIconTriangleFill, BIconTriangleHalf, BIconTrophy, BIconTv, BIconTvFill, BIconType, BIconTypeBold, BIconTypeH1, BIconTypeH2, BIconTypeH3, BIconTypeItalic, BIconTypeStrikethrough, BIconTypeUnderline, BIconUnlock, BIconUnlockFill, BIconUpload, BIconVolumeDown, BIconVolumeDownFill, BIconVolumeMute, BIconVolumeMuteFill, BIconVolumeUp, BIconVolumeUpFill, BIconWallet, BIconWatch, BIconWifi, BIconWindow, BIconWrench, BIconX, BIconXCircle, BIconXCircleFill, BIconXOctagon, BIconXOctagonFill, BIconXSquare, BIconXSquareFill, BImg, BImgLazy, BInputGroup, BInputGroupAddon, BInputGroupAppend, BInputGroupPrepend, BInputGroupText, BJumbotron, BLink, BListGroup, BListGroupItem, BMedia, BMediaAside, BMediaBody, BModal, BNav, BNavForm, BNavItem, BNavItemDropdown, BNavText, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BPagination, BPaginationNav, BPopover, BProgress, BProgressBar, BRow, BSpinner, BTab, BTable, BTableLite, BTableSimple, BTabs, BTbody, BTd, BTfoot, BTh, BThead, BToast, BToaster, BTooltip, BTr, BVConfigPlugin as BVConfig, BVConfigPlugin, BVModalPlugin, BVToastPlugin, BadgePlugin, BootstrapVue, BootstrapVueIcons, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, ButtonToolbarPlugin, CardPlugin, CarouselPlugin, CollapsePlugin, DropdownPlugin, EmbedPlugin, FormCheckboxPlugin, FormFilePlugin, FormGroupPlugin, FormInputPlugin, FormPlugin, FormRadioPlugin, FormSelectPlugin, FormTagsPlugin, FormTextareaPlugin, IconsPlugin, ImagePlugin, InputGroupPlugin, JumbotronPlugin, LayoutPlugin, LinkPlugin, ListGroupPlugin, MediaPlugin, ModalPlugin, NAME$B as NAME, NavPlugin, NavbarPlugin, PaginationNavPlugin, PaginationPlugin, PopoverPlugin, ProgressPlugin, SpinnerPlugin, TableLitePlugin, TablePlugin, TableSimplePlugin, TabsPlugin, ToastPlugin, TooltipPlugin, VBModal, VBModalPlugin, VBPopover, VBPopoverPlugin, VBScrollspy, VBScrollspyPlugin, VBToggle, VBTogglePlugin, VBTooltip, VBTooltipPlugin, VBVisible, VBVisiblePlugin, install };
 //# sourceMappingURL=bootstrap-vue.esm.js.map

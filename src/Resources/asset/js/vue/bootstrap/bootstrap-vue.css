@@ -1,6 +1,10 @@
 /*!
  * BootstrapVue Custom CSS (https://bootstrap-vue.js.org)
  */
+.bv-no-focus-ring:focus {
+  outline: none;
+}
+
 @media (max-width: 575.98px) {
   .bv-d-xs-down-none {
     display: none !important;
@@ -45,6 +49,10 @@
 
 .dropdown.dropleft .dropdown-toggle.dropdown-toggle-no-caret::before {
   display: none !important;
+}
+
+.dropdown .dropdown-menu:focus {
+  outline: none;
 }
 
 .b-dropdown-form {
@@ -572,6 +580,53 @@ input[type="color"].form-control:disabled {
   background: no-repeat 50% / 50% 50%;
 }
 
+.b-form-tags.focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.b-form-tags.focus.is-valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.b-form-tags.focus.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.b-form-tags.disabled {
+  background-color: #e9ecef;
+}
+
+.b-form-tag {
+  font-size: 75%;
+  font-weight: normal;
+  line-height: 1.5;
+}
+
+.b-form-tag.disabled {
+  opacity: 0.75;
+}
+
+.b-form-tag > button.b-form-tag-remove {
+  color: inherit;
+  font-size: 125%;
+  line-height: 1;
+  float: none;
+}
+
+.form-control-sm .b-form-tag {
+  line-height: 1.5;
+}
+
+.form-control-lg .b-form-tag {
+  line-height: 1.5;
+}
+
 .modal-backdrop {
   opacity: 0.5;
 }
@@ -589,6 +644,7 @@ input[type="color"].form-control:disabled {
 .popover.b-popover {
   display: block;
   opacity: 1;
+  outline: 0;
 }
 
 .popover.b-popover.fade:not(.show) {
@@ -1796,6 +1852,7 @@ input[type="color"].form-control:disabled {
 .tooltip.b-tooltip {
   display: block;
   opacity: 0.9;
+  outline: 0;
 }
 
 .tooltip.b-tooltip.fade:not(.show) {
@@ -1804,6 +1861,10 @@ input[type="color"].form-control:disabled {
 
 .tooltip.b-tooltip.show {
   opacity: 0.9;
+}
+
+.tooltip.b-tooltip.noninteractive {
+  pointer-events: none;
 }
 
 .tooltip.b-tooltip-primary.bs-tooltip-top .arrow::before, .tooltip.b-tooltip-primary.bs-tooltip-auto[x-placement^="top"] .arrow::before {
@@ -1972,5 +2033,20 @@ input[type="color"].form-control:disabled {
 .tooltip.b-tooltip-dark .tooltip-inner {
   color: #fff;
   background-color: #343a40;
+}
+
+.b-icon.bi {
+  display: inline-block;
+  overflow: visible;
+  vertical-align: -0.15em;
+}
+
+.btn .b-icon.bi,
+.nav-link .b-icon.bi,
+.dropdown-toggle .b-icon.bi,
+.dropdown-item .b-icon.bi,
+.input-group-text .b-icon.bi {
+  font-size: 125%;
+  vertical-align: text-bottom;
 }
 /*# sourceMappingURL=bootstrap-vue.css.map */
