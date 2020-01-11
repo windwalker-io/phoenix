@@ -299,7 +299,7 @@ JS;
      * @param string $selector
      * @param int    $time
      */
-    public static function tabState($selector = '#admin-form', $time = 100)
+    public static function tabState($selector = '#admin-form', $time = 30)
     {
         if (!static::inited(__METHOD__)) {
             JQueryScript::core();

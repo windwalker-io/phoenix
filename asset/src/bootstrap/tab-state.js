@@ -24,7 +24,7 @@
      * @constructor
      */
     constructor($element, time) {
-      time = time || 100;
+      time = time || 30;
 
       this.$element = $element;
       this.tabButtons = $element.find('a[data-toggle="tab"]');
@@ -74,7 +74,7 @@
      * @returns {boolean}
      */
     switchTab() {
-      if (localStorage.getItem('tab-href')) {
+      if (localStorage.getItem(this.storageKey)) {
         // When moving from tab area to a different view
         if (!this.hasTab(localStorage.getItem(this.storageKey))) {
           localStorage.removeItem(this.storageKey);

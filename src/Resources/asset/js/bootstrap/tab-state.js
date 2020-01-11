@@ -38,7 +38,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _classCallCheck(this, LoadTab);
 
-      time = time || 100;
+      time = time || 30;
       this.$element = $element;
       this.tabButtons = $element.find('a[data-toggle="tab"]');
       this.storageKey = 'tab-href-' + this.hashCode(location.href);
@@ -96,7 +96,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "switchTab",
       value: function switchTab() {
-        if (localStorage.getItem('tab-href')) {
+        if (localStorage.getItem(this.storageKey)) {
           // When moving from tab area to a different view
           if (!this.hasTab(localStorage.getItem(this.storageKey))) {
             localStorage.removeItem(this.storageKey);
