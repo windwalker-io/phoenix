@@ -87,7 +87,7 @@
       this.validators = [];
       this.handlers = {};
       this.theme = {};
-      this.inputs = this.form.find('input, select, textarea');
+      this.inputs = [];
 
       // Stop native validation
       if (this.form.length) {
@@ -96,6 +96,14 @@
 
       this.registerDefaultValidators();
       this.registerEvents();
+    }
+
+    getInputs() {
+      const inputs = this.form.find('input, select, textarea');
+
+      this.inputs.forEach(input => inputs.add(input));
+
+      return inputs;
     }
 
     /**
@@ -107,7 +115,7 @@
     addField(input) {
       this.registerInputEvents(input);
 
-      this.inputs = this.inputs.add(input);
+      this.inputs.push(input);
 
       return this;
     }
@@ -131,7 +139,7 @@
         this.form.addClass('was-validated');
       }
 
-      this.inputs.each((i, input) => {
+      this.getInputs().each((i, input) => {
         const result = this.validate(input);
 
         if (!result) {
@@ -311,7 +319,7 @@
         return true;
       });
 
-      this.registerInputEvents(this.inputs);
+      this.registerInputEvents(this.getInputs());
     }
 
     registerInputEvents($input) {

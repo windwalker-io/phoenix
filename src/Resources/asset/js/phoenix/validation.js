@@ -139,7 +139,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
       this.validators = [];
       this.handlers = {};
       this.theme = {};
-      this.inputs = this.form.find('input, select, textarea'); // Stop native validation
+      this.inputs = []; // Stop native validation
 
       if (this.form.length) {
         this.form.attr('novalidate', true);
@@ -148,19 +148,28 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
       this.registerDefaultValidators();
       this.registerEvents();
     }
-    /**
-     * Add field.
-     *
-     * @param {*} input
-     * @returns {PhoenixValidationElement}
-     */
-
 
     _createClass(PhoenixValidationElement, [{
+      key: "getInputs",
+      value: function getInputs() {
+        var inputs = this.form.find('input, select, textarea');
+        this.inputs.forEach(function (input) {
+          return inputs.add(input);
+        });
+        return inputs;
+      }
+      /**
+       * Add field.
+       *
+       * @param {*} input
+       * @returns {PhoenixValidationElement}
+       */
+
+    }, {
       key: "addField",
       value: function addField(input) {
         this.registerInputEvents(input);
-        this.inputs = this.inputs.add(input);
+        this.inputs.push(input);
         return this;
       }
     }, {
@@ -190,7 +199,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
           this.form.addClass('was-validated');
         }
 
-        this.inputs.each(function (i, input) {
+        this.getInputs().each(function (i, input) {
           var result = _this.validate(input);
 
           if (!result) {
@@ -372,7 +381,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
           return true;
         });
-        this.registerInputEvents(this.inputs);
+        this.registerInputEvents(this.getInputs());
       }
     }, {
       key: "registerInputEvents",
