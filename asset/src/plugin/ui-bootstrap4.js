@@ -98,7 +98,7 @@
         const feedback = `<span class="${icon}" aria-hidden="true"></span>`;
         const helpElement = $(`<small class="${color}-${this.options.feedbackContainer} form-control-${this.options.feedbackContainer}">${feedback} ${help}</small>`);
 
-        if (color === 'invalid' && !$input.is(':visible')) {
+        if (color === 'invalid' && !$control.is(':visible')) {
           this.renderMessage(`<strong>${$control.find('label').text()}:</strong> ${help}`, 'warning');
         } else {
           const tagName = $input.prop('tagName').toLowerCase();

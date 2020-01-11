@@ -119,7 +119,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
           var feedback = "<span class=\"".concat(icon, "\" aria-hidden=\"true\"></span>");
           var helpElement = $("<small class=\"".concat(color, "-").concat(this.options.feedbackContainer, " form-control-").concat(this.options.feedbackContainer, "\">").concat(feedback, " ").concat(help, "</small>"));
 
-          if (color === 'invalid' && !$input.is(':visible')) {
+          if (color === 'invalid' && !$control.is(':visible')) {
             this.renderMessage("<strong>".concat($control.find('label').text(), ":</strong> ").concat(help), 'warning');
           } else {
             var tagName = $input.prop('tagName').toLowerCase();
