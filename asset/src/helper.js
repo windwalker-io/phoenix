@@ -74,7 +74,7 @@
     }
 
     isDebug() {
-      return this.phoenix.data('windwalker.debug');
+      return Boolean(this.phoenix.data('windwalker.debug'));
     }
 
     /**
