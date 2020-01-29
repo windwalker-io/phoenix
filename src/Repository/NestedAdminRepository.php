@@ -83,7 +83,7 @@ class NestedAdminRepository extends AdminRepository
     {
         /** @var NestedRecord $record */
         if ($this->saveData->parent_id !== null) {
-            $record->rebuild();
+            $record->rebuildPath();
         }
     }
 
