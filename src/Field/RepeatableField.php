@@ -28,11 +28,15 @@ use function Windwalker\arr;
  * @method  mixed|$this  sortable(bool $value = null)
  * @method  mixed|$this  ensureFirstRow(bool $value = null)
  * @method  mixed|$this  singleArray(bool $value = null)
+ * @method  mixed|$this  placeholder(string $value = null)
  *
  * @since  1.4.2
  */
 class RepeatableField extends AbstractField
 {
+    public const LAYOUT_TABLE = 'phoenix.form.field.repeatable-table';
+    public const LAYOUT_FLEX = 'phoenix.form.field.repeatable-flex';
+
     /**
      * Property type.
      *
@@ -62,6 +66,7 @@ class RepeatableField extends AbstractField
         $attrs['class'] = $this->getAttribute('class');
         $attrs['readonly'] = $this->getAttribute('readonly');
         $attrs['disabled'] = $this->getAttribute('disabled');
+        $attrs['placeholder'] = $this->getAttribute('placeholder');
         $attrs['onchange'] = $this->getAttribute('onchange');
         $attrs['value'] = $this->getValue();
         $attrs['data-repeatable-store'] = true;
@@ -82,7 +87,7 @@ class RepeatableField extends AbstractField
 
         $this->prepareScript($attrs, $form);
 
-        return WidgetHelper::render($this->get('layout', 'phoenix.form.field.repeatable'), [
+        return WidgetHelper::render($this->get('layout', static::LAYOUT_TABLE), [
             'form' => $form,
             'attrs' => $attrs,
             'field' => $this,
@@ -244,6 +249,7 @@ JS;
             'sortable',
             'ensureFirstRow',
             'singleArray',
+            'placeholder',
         ]);
     }
 }
