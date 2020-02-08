@@ -116,6 +116,7 @@
   "b-button-close": {
     "description": "Use BootstrapVue's <b-button> component for actions in forms, dialogs, and more. Includes support for a handful of contextual variations, sizes, states, and more.",
     "attributes": [
+      "content",
       "disabled",
       "aria-label",
       "text-variant"
@@ -124,6 +125,7 @@
   "b-btn-close": {
     "description": "Use BootstrapVue's <b-button> component for actions in forms, dialogs, and more. Includes support for a handful of contextual variations, sizes, states, and more.\n\n*Alias for BButtonClose*",
     "attributes": [
+      "content",
       "disabled",
       "aria-label",
       "text-variant"
@@ -383,6 +385,7 @@
       "no-flip",
       "lazy",
       "popper-opts",
+      "boundary",
       "toggle-text",
       "size",
       "variant",
@@ -397,8 +400,7 @@
       "split-variant",
       "split-class",
       "split-button-type",
-      "role",
-      "boundary"
+      "role"
     ]
   },
   "b-dd": {
@@ -416,6 +418,7 @@
       "no-flip",
       "lazy",
       "popper-opts",
+      "boundary",
       "toggle-text",
       "size",
       "variant",
@@ -430,8 +433,7 @@
       "split-variant",
       "split-class",
       "split-button-type",
-      "role",
-      "boundary"
+      "role"
     ]
   },
   "b-dropdown-item": {
@@ -1147,6 +1149,7 @@
       "autofocus",
       "state",
       "size",
+      "input-type",
       "input-class",
       "input-attrs",
       "add-button-text",
@@ -1178,6 +1181,7 @@
       "autofocus",
       "state",
       "size",
+      "input-type",
       "input-class",
       "input-attrs",
       "add-button-text",
@@ -1524,6 +1528,7 @@
       "no-close-on-backdrop",
       "no-close-on-esc",
       "no-enforce-focus",
+      "ignore-enforce-focus-selector",
       "title",
       "title-html",
       "title-tag",
@@ -1554,6 +1559,7 @@
       "cancel-disabled",
       "visible",
       "return-focus",
+      "header-close-content",
       "header-close-label",
       "cancel-title",
       "cancel-title-html",
@@ -1630,6 +1636,7 @@
       "no-flip",
       "lazy",
       "popper-opts",
+      "boundary",
       "menu-class",
       "toggle-class",
       "no-caret",
@@ -1651,6 +1658,7 @@
       "no-flip",
       "lazy",
       "popper-opts",
+      "boundary",
       "menu-class",
       "toggle-class",
       "no-caret",
@@ -1672,6 +1680,7 @@
       "no-flip",
       "lazy",
       "popper-opts",
+      "boundary",
       "menu-class",
       "toggle-class",
       "no-caret",
@@ -1693,6 +1702,7 @@
       "no-flip",
       "lazy",
       "popper-opts",
+      "boundary",
       "menu-class",
       "toggle-class",
       "no-caret",
@@ -1767,15 +1777,23 @@
       "aria-label",
       "label-first-page",
       "first-text",
+      "first-number",
+      "first-class",
       "label-prev-page",
       "prev-text",
+      "prev-class",
       "label-next-page",
       "next-text",
+      "next-class",
       "label-last-page",
       "last-text",
+      "last-number",
+      "last-class",
       "label-page",
+      "page-class",
       "hide-ellipsis",
       "ellipsis-text",
+      "ellipsis-class",
       "size",
       "per-page",
       "total-rows",
@@ -1794,15 +1812,23 @@
       "aria-label",
       "label-first-page",
       "first-text",
+      "first-number",
+      "first-class",
       "label-prev-page",
       "prev-text",
+      "prev-class",
       "label-next-page",
       "next-text",
+      "next-class",
       "label-last-page",
       "last-text",
+      "last-number",
+      "last-class",
       "label-page",
+      "page-class",
       "hide-ellipsis",
       "ellipsis-text",
+      "ellipsis-class",
       "size",
       "number-of-pages",
       "base-url",
@@ -2171,6 +2197,20 @@
       "flip-h",
       "flip-v",
       "shift-h",
+      "shift-v",
+      "stacked"
+    ]
+  },
+  "b-iconstack": {
+    "description": "Bootstrap Icons are designed to work with Bootstrap components, from form controls to navigation. Bootstrap Icons are SVGs, so they scale quickly and easily and can be styled with CSS.",
+    "attributes": [
+      "variant",
+      "font-scale",
+      "scale",
+      "rotate",
+      "flip-h",
+      "flip-v",
+      "shift-h",
       "shift-v"
     ]
   },
@@ -2184,7 +2224,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alarm": {
@@ -2197,7 +2238,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alarm-fill": {
@@ -2210,7 +2252,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alert-circle": {
@@ -2223,7 +2266,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alert-circle-fill": {
@@ -2236,7 +2280,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alert-octagon": {
@@ -2249,7 +2294,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alert-octagon-fill": {
@@ -2262,7 +2308,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alert-square": {
@@ -2275,7 +2322,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alert-square-fill": {
@@ -2288,7 +2336,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alert-triangle": {
@@ -2301,7 +2350,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-alert-triangle-fill": {
@@ -2314,7 +2364,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-archive": {
@@ -2327,7 +2378,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-archive-fill": {
@@ -2340,7 +2392,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-bar-bottom": {
@@ -2353,7 +2406,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-bar-left": {
@@ -2366,7 +2420,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-bar-right": {
@@ -2379,7 +2434,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-bar-up": {
@@ -2392,7 +2448,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-clockwise": {
@@ -2405,7 +2462,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-counterclockwise": {
@@ -2418,7 +2476,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-down": {
@@ -2431,7 +2490,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-down-left": {
@@ -2444,7 +2504,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-down-right": {
@@ -2457,7 +2518,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-down-short": {
@@ -2470,7 +2532,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-left": {
@@ -2483,7 +2546,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-left-right": {
@@ -2496,7 +2560,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-left-short": {
@@ -2509,7 +2574,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-repeat": {
@@ -2522,7 +2588,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-right": {
@@ -2535,7 +2602,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-right-short": {
@@ -2548,7 +2616,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-up": {
@@ -2561,7 +2630,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-up-down": {
@@ -2574,7 +2644,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-up-left": {
@@ -2587,7 +2658,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-up-right": {
@@ -2600,7 +2672,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrow-up-short": {
@@ -2613,7 +2686,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrows-angle-contract": {
@@ -2626,7 +2700,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrows-angle-expand": {
@@ -2639,7 +2714,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrows-collapse": {
@@ -2652,7 +2728,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrows-expand": {
@@ -2665,7 +2742,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-arrows-fullscreen": {
@@ -2678,7 +2756,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-at": {
@@ -2691,7 +2770,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-award": {
@@ -2704,7 +2784,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-backspace": {
@@ -2717,7 +2798,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-backspace-fill": {
@@ -2730,7 +2812,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-backspace-reverse": {
@@ -2743,7 +2826,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-backspace-reverse-fill": {
@@ -2756,7 +2840,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bar-chart": {
@@ -2769,7 +2854,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bar-chart-fill": {
@@ -2782,7 +2868,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-battery": {
@@ -2795,7 +2882,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-battery-charging": {
@@ -2808,7 +2896,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-battery-full": {
@@ -2821,7 +2910,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bell": {
@@ -2834,7 +2924,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bell-fill": {
@@ -2847,7 +2938,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-blockquote-left": {
@@ -2860,7 +2952,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-blockquote-right": {
@@ -2873,7 +2966,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-book": {
@@ -2886,7 +2980,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-book-half-fill": {
@@ -2899,7 +2994,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bookmark": {
@@ -2912,7 +3008,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bookmark-fill": {
@@ -2925,7 +3022,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bootstrap": {
@@ -2938,7 +3036,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bootstrap-fill": {
@@ -2951,7 +3050,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bootstrap-reboot": {
@@ -2964,7 +3064,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-box-arrow-bottom-left": {
@@ -2977,7 +3078,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-box-arrow-bottom-right": {
@@ -2990,7 +3092,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-box-arrow-down": {
@@ -3003,7 +3106,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-box-arrow-left": {
@@ -3016,7 +3120,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-box-arrow-right": {
@@ -3029,7 +3134,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-box-arrow-up": {
@@ -3042,7 +3148,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-box-arrow-up-left": {
@@ -3055,7 +3162,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-box-arrow-up-right": {
@@ -3068,7 +3176,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-braces": {
@@ -3081,7 +3190,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-brightness-fill-high": {
@@ -3094,7 +3204,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-brightness-fill-low": {
@@ -3107,7 +3218,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-brightness-high": {
@@ -3120,7 +3232,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-brightness-low": {
@@ -3133,7 +3246,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-brush": {
@@ -3146,7 +3260,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bucket": {
@@ -3159,7 +3274,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bucket-fill": {
@@ -3172,7 +3288,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-building": {
@@ -3185,7 +3302,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-bullseye": {
@@ -3198,7 +3316,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-calendar": {
@@ -3211,7 +3330,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-calendar-fill": {
@@ -3224,7 +3344,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-camera": {
@@ -3237,7 +3358,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-camera-video": {
@@ -3250,7 +3372,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-camera-video-fill": {
@@ -3263,7 +3386,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-capslock": {
@@ -3276,7 +3400,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-capslock-fill": {
@@ -3289,7 +3414,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chat": {
@@ -3302,7 +3428,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chat-fill": {
@@ -3315,7 +3442,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-check": {
@@ -3328,7 +3456,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-check-box": {
@@ -3341,7 +3470,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-check-circle": {
@@ -3354,7 +3484,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chevron-compact-down": {
@@ -3367,7 +3498,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chevron-compact-left": {
@@ -3380,7 +3512,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chevron-compact-right": {
@@ -3393,7 +3526,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chevron-compact-up": {
@@ -3406,7 +3540,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chevron-down": {
@@ -3419,7 +3554,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chevron-left": {
@@ -3432,7 +3568,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chevron-right": {
@@ -3445,7 +3582,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-chevron-up": {
@@ -3458,7 +3596,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-circle": {
@@ -3471,7 +3610,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-circle-fill": {
@@ -3484,7 +3624,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-circle-half": {
@@ -3497,7 +3638,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-circle-slash": {
@@ -3510,7 +3652,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-clock": {
@@ -3523,7 +3666,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-clock-fill": {
@@ -3536,7 +3680,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-cloud": {
@@ -3549,7 +3694,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-cloud-download": {
@@ -3562,7 +3708,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-cloud-fill": {
@@ -3575,7 +3722,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-cloud-upload": {
@@ -3588,7 +3736,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-code": {
@@ -3601,7 +3750,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-code-slash": {
@@ -3614,7 +3764,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-columns": {
@@ -3627,7 +3778,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-columns-gutters": {
@@ -3640,7 +3792,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-command": {
@@ -3653,7 +3806,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-compass": {
@@ -3666,7 +3820,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-cone": {
@@ -3679,7 +3834,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-cone-striped": {
@@ -3692,7 +3848,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-controller": {
@@ -3705,7 +3862,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-credit-card": {
@@ -3718,7 +3876,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-cursor": {
@@ -3731,7 +3890,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-cursor-fill": {
@@ -3744,7 +3904,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-dash": {
@@ -3757,7 +3918,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-diamond": {
@@ -3770,7 +3932,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-diamond-half": {
@@ -3783,7 +3946,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-display": {
@@ -3796,7 +3960,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-display-fill": {
@@ -3809,7 +3974,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-document": {
@@ -3822,7 +3988,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-document-code": {
@@ -3835,7 +4002,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-document-diff": {
@@ -3848,7 +4016,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-document-richtext": {
@@ -3861,7 +4030,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-document-spreadsheet": {
@@ -3874,7 +4044,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-document-text": {
@@ -3887,7 +4058,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-documents": {
@@ -3900,7 +4072,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-documents-alt": {
@@ -3913,7 +4086,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-dot": {
@@ -3926,7 +4100,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-download": {
@@ -3939,7 +4114,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-egg-fried": {
@@ -3952,7 +4128,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-eject": {
@@ -3965,7 +4142,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-eject-fill": {
@@ -3978,7 +4156,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-envelope": {
@@ -3991,7 +4170,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-envelope-fill": {
@@ -4004,7 +4184,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-envelope-open": {
@@ -4017,7 +4198,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-envelope-open-fill": {
@@ -4030,7 +4212,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-eye": {
@@ -4043,7 +4226,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-eye-fill": {
@@ -4056,7 +4240,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-eye-slash": {
@@ -4069,7 +4254,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-eye-slash-fill": {
@@ -4082,7 +4268,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-filter": {
@@ -4095,7 +4282,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-flag": {
@@ -4108,7 +4296,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-flag-fill": {
@@ -4121,7 +4310,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-folder": {
@@ -4134,7 +4324,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-folder-fill": {
@@ -4147,7 +4338,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-folder-symlink": {
@@ -4160,7 +4352,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-folder-symlink-fill": {
@@ -4173,7 +4366,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-fonts": {
@@ -4186,7 +4380,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-forward": {
@@ -4199,7 +4394,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-forward-fill": {
@@ -4212,7 +4408,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-gear": {
@@ -4225,7 +4422,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-gear-fill": {
@@ -4238,7 +4436,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-gear-wide": {
@@ -4251,7 +4450,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-gear-wide-connected": {
@@ -4264,7 +4464,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-geo": {
@@ -4277,7 +4478,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-graph-down": {
@@ -4290,7 +4492,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-graph-up": {
@@ -4303,7 +4506,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-grid": {
@@ -4316,7 +4520,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-grid-fill": {
@@ -4329,7 +4534,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-hammer": {
@@ -4342,7 +4548,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-hash": {
@@ -4355,7 +4562,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-heart": {
@@ -4368,7 +4576,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-heart-fill": {
@@ -4381,7 +4590,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-house": {
@@ -4394,7 +4604,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-house-fill": {
@@ -4407,7 +4618,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-image": {
@@ -4420,7 +4632,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-image-alt": {
@@ -4433,7 +4646,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-image-fill": {
@@ -4446,7 +4660,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-images": {
@@ -4459,7 +4674,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-inbox": {
@@ -4472,7 +4688,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-inbox-fill": {
@@ -4485,7 +4702,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-inboxes": {
@@ -4498,7 +4716,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-inboxes-fill": {
@@ -4511,7 +4730,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-info": {
@@ -4524,7 +4744,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-info-fill": {
@@ -4537,7 +4758,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-info-square": {
@@ -4550,7 +4772,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-info-square-fill": {
@@ -4563,7 +4786,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-justify": {
@@ -4576,7 +4800,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-justify-left": {
@@ -4589,7 +4814,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-justify-right": {
@@ -4602,7 +4828,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-kanban": {
@@ -4615,7 +4842,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-kanban-fill": {
@@ -4628,7 +4856,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-laptop": {
@@ -4641,7 +4870,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-layout-sidebar": {
@@ -4654,7 +4884,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-layout-sidebar-reverse": {
@@ -4667,7 +4898,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-layout-split": {
@@ -4680,7 +4912,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-list": {
@@ -4693,7 +4926,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-list-check": {
@@ -4706,7 +4940,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-list-ol": {
@@ -4719,7 +4954,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-list-task": {
@@ -4732,7 +4968,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-list-ul": {
@@ -4745,7 +4982,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-lock": {
@@ -4758,7 +4996,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-lock-fill": {
@@ -4771,7 +5010,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-map": {
@@ -4784,7 +5024,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-mic": {
@@ -4797,7 +5038,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-moon": {
@@ -4810,7 +5052,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-music-player": {
@@ -4823,7 +5066,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-music-player-fill": {
@@ -4836,7 +5080,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-option": {
@@ -4849,7 +5094,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-outlet": {
@@ -4862,7 +5108,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-pause": {
@@ -4875,7 +5122,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-pause-fill": {
@@ -4888,7 +5136,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-pen": {
@@ -4901,7 +5150,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-pencil": {
@@ -4914,7 +5164,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-people": {
@@ -4927,7 +5178,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-people-fill": {
@@ -4940,7 +5192,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-person": {
@@ -4953,7 +5206,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-person-fill": {
@@ -4966,7 +5220,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-phone": {
@@ -4979,7 +5234,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-phone-landscape": {
@@ -4992,7 +5248,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-pie-chart": {
@@ -5005,7 +5262,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-pie-chart-fill": {
@@ -5018,7 +5276,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-play": {
@@ -5031,7 +5290,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-play-fill": {
@@ -5044,7 +5304,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-plug": {
@@ -5057,7 +5318,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-plus": {
@@ -5070,7 +5332,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-power": {
@@ -5083,7 +5346,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-question": {
@@ -5096,7 +5360,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-question-fill": {
@@ -5109,7 +5374,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-question-square": {
@@ -5122,7 +5388,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-question-square-fill": {
@@ -5135,7 +5402,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-reply": {
@@ -5148,7 +5416,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-reply-all": {
@@ -5161,7 +5430,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-reply-all-fill": {
@@ -5174,7 +5444,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-reply-fill": {
@@ -5187,7 +5458,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-screwdriver": {
@@ -5200,7 +5472,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-search": {
@@ -5213,7 +5486,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-shield": {
@@ -5226,7 +5500,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-shield-fill": {
@@ -5239,7 +5514,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-shield-lock": {
@@ -5252,7 +5528,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-shield-lock-fill": {
@@ -5265,7 +5542,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-shield-shaded": {
@@ -5278,7 +5556,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-shift": {
@@ -5291,7 +5570,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-shift-fill": {
@@ -5304,7 +5584,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-skip-backward": {
@@ -5317,7 +5598,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-skip-backward-fill": {
@@ -5330,7 +5612,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-skip-end": {
@@ -5343,7 +5626,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-skip-end-fill": {
@@ -5356,7 +5640,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-skip-forward": {
@@ -5369,7 +5654,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-skip-forward-fill": {
@@ -5382,7 +5668,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-skip-start": {
@@ -5395,7 +5682,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-skip-start-fill": {
@@ -5408,7 +5696,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-speaker": {
@@ -5421,7 +5710,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-square": {
@@ -5434,7 +5724,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-square-fill": {
@@ -5447,7 +5738,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-square-half": {
@@ -5460,7 +5752,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-star": {
@@ -5473,7 +5766,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-star-fill": {
@@ -5486,7 +5780,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-star-half": {
@@ -5499,7 +5794,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-stop": {
@@ -5512,7 +5808,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-stop-fill": {
@@ -5525,7 +5822,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-stopwatch": {
@@ -5538,7 +5836,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-stopwatch-fill": {
@@ -5551,7 +5850,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-sun": {
@@ -5564,7 +5864,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-table": {
@@ -5577,7 +5878,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-tablet": {
@@ -5590,7 +5892,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-tablet-landscape": {
@@ -5603,7 +5906,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-tag": {
@@ -5616,7 +5920,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-tag-fill": {
@@ -5629,7 +5934,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-terminal": {
@@ -5642,7 +5948,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-terminal-fill": {
@@ -5655,7 +5962,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-text-center": {
@@ -5668,7 +5976,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-text-indent-left": {
@@ -5681,7 +5990,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-text-indent-right": {
@@ -5694,7 +6004,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-text-left": {
@@ -5707,7 +6018,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-text-right": {
@@ -5720,7 +6032,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-three-dots": {
@@ -5733,7 +6046,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-three-dots-vertical": {
@@ -5746,7 +6060,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-toggle-off": {
@@ -5759,7 +6074,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-toggle-on": {
@@ -5772,7 +6088,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-toggles": {
@@ -5785,7 +6102,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-tools": {
@@ -5798,7 +6116,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-trash": {
@@ -5811,7 +6130,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-trash-fill": {
@@ -5824,7 +6144,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-triangle": {
@@ -5837,7 +6158,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-triangle-fill": {
@@ -5850,7 +6172,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-triangle-half": {
@@ -5863,7 +6186,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-trophy": {
@@ -5876,7 +6200,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-tv": {
@@ -5889,7 +6214,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-tv-fill": {
@@ -5902,7 +6228,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-type": {
@@ -5915,7 +6242,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-type-bold": {
@@ -5928,7 +6256,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-type-h1": {
@@ -5941,7 +6270,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-type-h2": {
@@ -5954,7 +6284,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-type-h3": {
@@ -5967,7 +6298,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-type-italic": {
@@ -5980,7 +6312,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-type-strikethrough": {
@@ -5993,7 +6326,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-type-underline": {
@@ -6006,7 +6340,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-unlock": {
@@ -6019,7 +6354,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-unlock-fill": {
@@ -6032,7 +6368,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-upload": {
@@ -6045,7 +6382,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-volume-down": {
@@ -6058,7 +6396,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-volume-down-fill": {
@@ -6071,7 +6410,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-volume-mute": {
@@ -6084,7 +6424,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-volume-mute-fill": {
@@ -6097,7 +6438,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-volume-up": {
@@ -6110,7 +6452,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-volume-up-fill": {
@@ -6123,7 +6466,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-wallet": {
@@ -6136,7 +6480,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-watch": {
@@ -6149,7 +6494,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-wifi": {
@@ -6162,7 +6508,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-window": {
@@ -6175,7 +6522,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-wrench": {
@@ -6188,7 +6536,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-x": {
@@ -6201,7 +6550,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-x-circle": {
@@ -6214,7 +6564,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-x-circle-fill": {
@@ -6227,7 +6578,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-x-octagon": {
@@ -6240,7 +6592,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-x-octagon-fill": {
@@ -6253,7 +6606,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-x-square": {
@@ -6266,7 +6620,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   },
   "b-icon-x-square-fill": {
@@ -6279,7 +6634,8 @@
       "flip-h",
       "flip-v",
       "shift-h",
-      "shift-v"
+      "shift-v",
+      "stacked"
     ]
   }
 }

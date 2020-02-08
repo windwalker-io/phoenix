@@ -1,5 +1,5 @@
 /*!
- * BootstrapVue 2.2.0
+ * BootstrapVue 2.4.0
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -62,12 +62,10 @@ function _objectSpread2(target) {
 
 //
 
-var identity = function identity(x) {
-  return x;
-};
-
 // --- Static ---
-var isArray = Array.isArray; // --- Instance ---
+var isArray = function isArray(val) {
+  return Array.isArray(val);
+}; // --- Instance ---
 
 /**
  * Strict object type check. Only returns true
@@ -169,6 +167,10 @@ var trim = function trim(str) {
   return toString(str).trim();
 }; // Lower case a string
 
+var identity = function identity(x) {
+  return x;
+};
+
 // Number utilities
 // Returns NaN if the value cannot be converted
 
@@ -221,61 +223,92 @@ var baseAttrs = {
 }; // Shared private base component to reduce bundle/runtime size
 // @vue/component
 
-var BVIconBase = {
+var BVIconBase =
+/*#__PURE__*/
+Vue.extend({
   name: 'BVIconBase',
   functional: true,
   props: _objectSpread2({
     content: {
       type: String
+    },
+    stacked: {
+      type: Boolean,
+      default: false
     }
   }, commonIconProps),
   render: function render(h, _ref) {
     var data = _ref.data,
-        props = _ref.props;
-    var fontScale = toFloat(props.fontScale) || 1;
-    var scale = toFloat(props.scale) || 1;
+        props = _ref.props,
+        children = _ref.children;
+    var fontScale = Math.max(toFloat(props.fontScale) || 1, 0) || 1;
+    var scale = Math.max(toFloat(props.scale) || 1, 0) || 1;
     var rotate = toFloat(props.rotate) || 0;
     var shiftH = toFloat(props.shiftH) || 0;
     var shiftV = toFloat(props.shiftV) || 0;
     var flipH = props.flipH;
-    var flipV = props.flipV; // Compute the transforms. Note that order is important
-    // CSS transforms are applied in order from right to left
-    // and we want flipping to occur before rotation, and
-    // shifting is applied last
+    var flipV = props.flipV; // Compute the transforms
+    // Note that order is important as SVG transforms are applied in order from
+    // left to right and we want flipping/scale to occur before rotation
+    // Note shifting is applied separately
+    // Assumes that the viewbox is `0 0 20 20` (`10 10` is the center)
 
-    var transforms = [shiftH ? "translateX(".concat(100 * shiftH / 16, "%)") : null, shiftV ? "translateY(".concat(-100 * shiftV / 16, "%)") : null, rotate ? "rotate(".concat(rotate, "deg)") : null, flipH || flipV || scale !== 1 ? "scale(".concat((flipH ? -1 : 1) * scale, ", ").concat((flipV ? -1 : 1) * scale, ")") : null].filter(identity); // We wrap the content in a `<g>` for handling the transforms
+    var hasScale = flipH || flipV || scale !== 1;
+    var hasTransforms = hasScale || rotate;
+    var hasShift = shiftH || shiftV;
+    var transforms = [hasTransforms ? 'translate(10 10)' : null, hasScale ? "scale(".concat((flipH ? -1 : 1) * scale, " ").concat((flipV ? -1 : 1) * scale, ")") : null, rotate ? "rotate(".concat(rotate, ")") : null, hasTransforms ? 'translate(-10 -10)' : null].filter(identity); // Handling stacked icons
+
+    var isStacked = props.stacked;
+    var hasContent = !isUndefinedOrNull(props.content); // We wrap the content in a `<g>` for handling the transforms (except shift)
 
     var $inner = h('g', {
-      style: {
-        transform: transforms.join(' ') || null,
-        transformOrigin: transforms.length > 0 ? 'center' : null
+      attrs: {
+        transform: transforms.join(' ') || null
       },
-      domProps: {
+      domProps: hasContent ? {
         innerHTML: props.content || ''
-      }
-    });
+      } : {}
+    }, children); // If needed, we wrap in an additional `<g>` in order to handle the shifting
+
+    if (hasShift) {
+      $inner = h('g', {
+        attrs: {
+          transform: "translate(".concat(20 * shiftH / 16, " ").concat(-20 * shiftV / 16, ")")
+        }
+      }, [$inner]);
+    }
+
     return h('svg', mergeData({
+      staticClass: 'b-icon bi',
       class: _defineProperty({}, "text-".concat(props.variant), !!props.variant),
       attrs: baseAttrs,
-      style: {
+      style: isStacked ? {} : {
         fontSize: fontScale === 1 ? null : "".concat(fontScale * 100, "%")
       }
     }, // Merge in user supplied data
-    data, // These cannot be overridden by users
-    {
-      staticClass: 'b-icon bi',
+    data, // If icon is stacked, null out some attrs
+    isStacked ? {
       attrs: {
-        xmlns: 'http://www.w3.org/2000/svg',
+        width: null,
+        height: null,
+        role: null,
+        alt: null
+      }
+    } : {}, // These cannot be overridden by users
+    {
+      attrs: {
+        xmlns: isStacked ? null : 'http://www.w3.org/2000/svg',
         fill: 'currentColor'
       }
     }), [$inner]);
   }
-};
+});
+
 /**
  * Icon component generator function
  *
  * @param {string} icon name (minus the leading `BIcon`)
- * @param {string} raw innerHTML for SVG
+ * @param {string} raw `innerHTML` for SVG
  * @return {VueComponent}
  */
 
@@ -286,21 +319,29 @@ var makeIcon = function makeIcon(name, content) {
   var iconNameClass = "bi-".concat(kebabCase(name));
   var svgContent = trim(content || ''); // Return the icon component definition
 
-  return Vue.extend({
-    name: iconName,
-    functional: true,
-    props: _objectSpread2({}, commonIconProps),
-    render: function render(h, _ref2) {
-      var data = _ref2.data,
-          props = _ref2.props;
-      return h(BVIconBase, mergeData(data, {
-        staticClass: iconNameClass,
-        props: _objectSpread2({}, props, {
-          content: svgContent
-        })
-      }));
-    }
-  });
+  return (
+    /*#__PURE__*/
+    Vue.extend({
+      name: iconName,
+      functional: true,
+      props: _objectSpread2({}, commonIconProps, {
+        stacked: {
+          type: Boolean,
+          default: false
+        }
+      }),
+      render: function render(h, _ref) {
+        var data = _ref.data,
+            props = _ref.props;
+        return h(BVIconBase, mergeData(data, {
+          staticClass: iconNameClass,
+          props: _objectSpread2({}, props, {
+            content: svgContent
+          })
+        }));
+      }
+    })
+  );
 };
 
 // --- BEGIN AUTO-GENERATED FILE ---
@@ -1268,7 +1309,12 @@ Vue.extend({
       type: String,
       default: null
     }
-  }, commonIconProps),
+  }, commonIconProps, {
+    stacked: {
+      type: Boolean,
+      default: false
+    }
+  }),
   render: function render(h, _ref) {
     var data = _ref.data,
         props = _ref.props,
@@ -1285,6 +1331,25 @@ Vue.extend({
         icon: null
       })
     }));
+  }
+});
+
+var BIconstack =
+/*#__PURE__*/
+Vue.extend({
+  name: 'BIconstack',
+  functional: true,
+  props: _objectSpread2({}, commonIconProps),
+  render: function render(h, _ref) {
+    var data = _ref.data,
+        props = _ref.props,
+        children = _ref.children;
+    return h(BVIconBase, mergeData(data, {
+      staticClass: 'b-iconstack',
+      props: _objectSpread2({}, props, {
+        stacked: false
+      })
+    }), children);
   }
 });
 
@@ -1438,6 +1503,8 @@ pluginFactoryNoConfig({
   components: {
     // Icon helper component
     BIcon: BIcon,
+    // Icon stacking component
+    BIconstack: BIconstack,
     // BootstrapVue custom icon components
     BIconBlank: BIconBlank,
     // Bootstrap icon components

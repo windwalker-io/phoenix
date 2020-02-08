@@ -1,5 +1,5 @@
 /*!
- * BootstrapVue 2.2.0
+ * BootstrapVue 2.4.0
  *
  * @link https://bootstrap-vue.js.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -14,6 +14,8 @@ import Popper from 'popper.js';
 import { Wormhole, PortalTarget, Portal } from 'portal-vue';
 
 function _typeof(obj) {
+  "@babel/helpers - typeof";
+
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
     _typeof = function (obj) {
       return typeof obj;
@@ -266,8 +268,12 @@ function _nonIterableSpread() {
 //
 
 // --- Static ---
-var from = Array.from;
-var isArray = Array.isArray; // --- Instance ---
+var from = function from() {
+  return Array.from.apply(Array, arguments);
+};
+var isArray = function isArray(val) {
+  return Array.isArray(val);
+}; // --- Instance ---
 
 var arrayIncludes = function arrayIncludes(array, value) {
   return array.indexOf(value) !== -1;
@@ -280,13 +286,27 @@ var concat = function concat() {
   return Array.prototype.concat.apply([], args);
 };
 
-var assign = Object.assign;
-var getOwnPropertyNames = Object.getOwnPropertyNames;
-var keys = Object.keys;
-var defineProperties = Object.defineProperties;
-var defineProperty = Object.defineProperty;
-var freeze = Object.freeze;
-var create = Object.create;
+var assign = function assign() {
+  return Object.assign.apply(Object, arguments);
+};
+var create = function create(proto, optionalProps) {
+  return Object.create(proto, optionalProps);
+};
+var defineProperties = function defineProperties(obj, props) {
+  return Object.defineProperties(obj, props);
+};
+var defineProperty = function defineProperty(obj, prop, descr) {
+  return Object.defineProperty(obj, prop, descr);
+};
+var freeze = function freeze(obj) {
+  return Object.freeze(obj);
+};
+var getOwnPropertyNames = function getOwnPropertyNames(obj) {
+  return Object.getOwnPropertyNames(obj);
+};
+var keys = function keys(obj) {
+  return Object.keys(obj);
+}; // --- "Instance" ---
 
 var hasOwnProperty = function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
@@ -706,6 +726,7 @@ var DEFAULTS = deepFreeze({
     variant: 'secondary'
   },
   BButtonClose: {
+    content: '&times;',
     // `textVariant` is `null` to inherit the current text color
     textVariant: null,
     ariaLabel: 'Close'
@@ -781,6 +802,7 @@ var DEFAULTS = deepFreeze({
     cancelVariant: 'secondary',
     okTitle: 'OK',
     okVariant: 'primary',
+    headerCloseContent: '&times;',
     headerCloseLabel: 'Close'
   },
   BNavbar: {
@@ -838,6 +860,7 @@ var DEFAULTS = deepFreeze({
   }
 });
 
+var NAME = 'BvConfig';
 var PROP_NAME = '$bvConfig'; // Config manager class
 
 var BvConfig =
@@ -877,7 +900,7 @@ function () {
       configKeys.forEach(function (cmpName) {
         /* istanbul ignore next */
         if (!hasOwnProperty(DEFAULTS, cmpName)) {
-          warn("config: unknown config property \"".concat(cmpName, "\""));
+          warn("Unknown config property \"".concat(cmpName, "\""), NAME);
           return;
         }
 
@@ -891,7 +914,7 @@ function () {
           if (!isArray(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
             return !isString(b) || b.length === 0;
           })) {
-            warn('config: "breakpoints" must be an array of at least 2 breakpoint names');
+            warn('"breakpoints" must be an array of at least 2 breakpoint names', NAME);
           } else {
             _this.$_config.breakpoints = cloneDeep(breakpoints);
           }
@@ -901,7 +924,7 @@ function () {
           props.forEach(function (prop) {
             /* istanbul ignore if */
             if (!hasOwnProperty(DEFAULTS[cmpName], prop)) {
-              warn("config: unknown config property \"".concat(cmpName, ".").concat(prop, "\""));
+              warn("Unknown config property \"".concat(cmpName, ".").concat(prop, "\""), NAME);
             } else {
               // TODO: If we pre-populate the config with defaults, we can skip this line
               _this.$_config[cmpName] = _this.$_config[cmpName] || {};
@@ -1251,11 +1274,13 @@ var removeNode = function removeNode(el) {
 }; // Determine if an element is an HTML element
 
 var isElement = function isElement(el) {
-  return Boolean(el && el.nodeType === Node.ELEMENT_NODE);
+  return !!(el && el.nodeType === Node.ELEMENT_NODE);
 }; // Determine if an HTML element is visible - Faster than CSS check
 
 var isVisible = function isVisible(el) {
-  if (!isElement(el) || !contains(d.body, el)) {
+  if (!isElement(el) || !el.parentNode || !contains(d.body, el)) {
+    // Note this can fail for shadow dom elements since they
+    // are not a direct descendant of document.body
     return false;
   }
 
@@ -1270,12 +1295,12 @@ var isVisible = function isVisible(el) {
 
 
   var bcr = getBCR(el);
-  return Boolean(bcr && bcr.height > 0 && bcr.width > 0);
+  return !!(bcr && bcr.height > 0 && bcr.width > 0);
 }; // Determine if an element is disabled
 
 var isDisabled = function isDisabled(el) {
   return !isElement(el) || el.disabled || hasAttr(el, 'disabled') || hasClass(el, 'disabled');
-}; // Cause/wait-for an element to reflow it's content (adjusting it's height/width)
+}; // Cause/wait-for an element to reflow its content (adjusting its height/width)
 
 var reflow = function reflow(el) {
   // Requesting an elements offsetHight will trigger a reflow of the element content
@@ -1293,11 +1318,7 @@ var select = function select(selector, root) {
 }; // Determine if an element matches a selector
 
 var matches = function matches(el, selector) {
-  if (!isElement(el)) {
-    return false;
-  }
-
-  return matchesEl.call(el, selector);
+  return isElement(el) ? matchesEl.call(el, selector) : false;
 }; // Finds closest element matching selector. Returns `null` if not found
 
 var closest = function closest(selector, root) {
@@ -1315,11 +1336,7 @@ var closest = function closest(selector, root) {
 }; // Returns true if the parent element contains the child element
 
 var contains = function contains(parent, child) {
-  if (!parent || !isFunction(parent.contains)) {
-    return false;
-  }
-
-  return parent.contains(child);
+  return parent && isFunction(parent.contains) ? parent.contains(child) : false;
 }; // Get an element given an ID
 
 var getById = function getById(id) {
@@ -1419,7 +1436,7 @@ var offset = function offset(el)
   }
 
   return _offset;
-}; // Return an element's offset with respect to to it's offsetParent
+}; // Return an element's offset with respect to to its offsetParent
 // https://j11y.io/jquery/#v=git&fn=jQuery.fn.position
 
 var position = function position(el)
@@ -1632,8 +1649,14 @@ var normalizeSlotMixin = {
   }
 };
 
-var NAME = 'BButtonClose';
+var NAME$1 = 'BButtonClose';
 var props = {
+  content: {
+    type: String,
+    default: function _default() {
+      return getComponentConfig(NAME$1, 'content');
+    }
+  },
   disabled: {
     type: Boolean,
     default: false
@@ -1641,13 +1664,13 @@ var props = {
   ariaLabel: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME, 'ariaLabel');
+      return getComponentConfig(NAME$1, 'ariaLabel');
     }
   },
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME, 'textVariant');
+      return getComponentConfig(NAME$1, 'textVariant');
     }
   }
 }; // @vue/component
@@ -1655,7 +1678,7 @@ var props = {
 var BButtonClose =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME,
+  name: NAME$1,
   functional: true,
   props: props,
   render: function render(h, _ref) {
@@ -1689,7 +1712,7 @@ Vue.extend({
 
     if (!hasNormalizedSlot('default', $scopedSlots, $slots)) {
       componentData.domProps = {
-        innerHTML: '&times;'
+        innerHTML: props.content
       };
     }
 
@@ -1697,7 +1720,7 @@ Vue.extend({
   }
 });
 
-var NAME$1 = 'BAlert'; // Convert `show` value to a number
+var NAME$2 = 'BAlert'; // Convert `show` value to a number
 
 var parseCountDown = function parseCountDown(show) {
   if (show === '' || isBoolean(show)) {
@@ -1731,7 +1754,7 @@ var isNumericLike = function isNumericLike(value) {
 var BAlert =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$1,
+  name: NAME$2,
   mixins: [normalizeSlotMixin],
   model: {
     prop: 'show',
@@ -1741,7 +1764,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$1, 'variant');
+        return getComponentConfig(NAME$2, 'variant');
       }
     },
     dismissible: {
@@ -1751,7 +1774,7 @@ Vue.extend({
     dismissLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$1, 'dismissLabel');
+        return getComponentConfig(NAME$2, 'dismissLabel');
       }
     },
     show: {
@@ -2225,14 +2248,14 @@ Vue.extend({
       if (evtIsEvent && this.disabled) {
         // Stop event from bubbling up
         evt.stopPropagation(); // Kill the event loop attached to this specific `EventTarget`
-        // Needed to prevent `vue-router` for doing it's thing
+        // Needed to prevent `vue-router` for doing its thing
 
         evt.stopImmediatePropagation();
       } else {
         /* istanbul ignore next: difficult to test, but we know it works */
         if (isRouterLink && evt.currentTarget.__vue__) {
           // Router links do not emit instance `click` events, so we
-          // add in an $emit('click', evt) on it's vue instance
+          // add in an `$emit('click', evt)` on its Vue instance
           evt.currentTarget.__vue__.$emit('click', evt);
         } // Call the suppliedHandler(s), if any provided
 
@@ -2241,7 +2264,7 @@ Vue.extend({
           return isFunction(h);
         }).forEach(function (handler) {
           handler.apply(void 0, _toConsumableArray(_arguments));
-        }); // Emit the global $root click event
+        }); // Emit the global `$root` click event
 
         this.$root.$emit('clicked::link', evt);
       } // Stop scroll-to-top behavior or navigation on
@@ -2301,7 +2324,7 @@ Vue.extend({
   }
 });
 
-var NAME$2 = 'BBadge';
+var NAME$3 = 'BBadge';
 var linkProps = propsFactory();
 delete linkProps.href.default;
 delete linkProps.to.default;
@@ -2313,7 +2336,7 @@ var props$1 = _objectSpread2({}, linkProps, {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$2, 'variant');
+      return getComponentConfig(NAME$3, 'variant');
     }
   },
   pill: {
@@ -2325,7 +2348,7 @@ var props$1 = _objectSpread2({}, linkProps, {
 var BBadge =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$2,
+  name: NAME$3,
   functional: true,
   props: props$1,
   render: function render(h, _ref) {
@@ -2499,7 +2522,7 @@ pluginFactory({
   }
 });
 
-var NAME$3 = 'BButton';
+var NAME$4 = 'BButton';
 var btnProps = {
   block: {
     type: Boolean,
@@ -2512,13 +2535,13 @@ var btnProps = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'size');
+      return getComponentConfig(NAME$4, 'size');
     }
   },
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$3, 'variant');
+      return getComponentConfig(NAME$4, 'variant');
     }
   },
   type: {
@@ -2589,7 +2612,7 @@ var isNonStandardTag = function isNonStandardTag(props) {
 var computeClass = function computeClass(props) {
   var _ref;
 
-  return ["btn-".concat(props.variant || getComponentConfig(NAME$3, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
+  return ["btn-".concat(props.variant || getComponentConfig(NAME$4, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
 }; // Compute the link props to pass to b-link (if required)
 
 
@@ -2637,7 +2660,7 @@ var computeAttrs = function computeAttrs(props, data) {
 var BButton =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$3,
+  name: NAME$4,
   functional: true,
   props: props$4,
   render: function render(h, _ref2) {
@@ -2693,7 +2716,7 @@ pluginFactory({
   }
 });
 
-var NAME$4 = 'BButtonGroup';
+var NAME$5 = 'BButtonGroup';
 var props$5 = {
   vertical: {
     type: Boolean,
@@ -2718,7 +2741,7 @@ var props$5 = {
 var BButtonGroup =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$4,
+  name: NAME$5,
   functional: true,
   props: props$5,
   render: function render(h, _ref) {
@@ -2991,7 +3014,7 @@ Vue.extend({
   }
 });
 
-var NAME$5 = 'BCardSubTitle';
+var NAME$6 = 'BCardSubTitle';
 var props$7 = {
   subTitle: {
     type: String,
@@ -3004,7 +3027,7 @@ var props$7 = {
   subTitleTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$5, 'subTitleTextVariant');
+      return getComponentConfig(NAME$6, 'subTitleTextVariant');
     }
   }
 }; // @vue/component
@@ -3012,7 +3035,7 @@ var props$7 = {
 var BCardSubTitle =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$5,
+  name: NAME$6,
   functional: true,
   props: props$7,
   render: function render(h, _ref) {
@@ -3553,7 +3576,7 @@ var VBVisible = {
   unbind: unbind
 };
 
-var NAME$6 = 'BImg'; // Blank image with fill template
+var NAME$7 = 'BImg'; // Blank image with fill template
 
 var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>';
 var props$d = {
@@ -3630,7 +3653,7 @@ var props$d = {
   blankColor: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$6, 'blankColor');
+      return getComponentConfig(NAME$7, 'blankColor');
     }
   }
 }; // --- Helper methods ---
@@ -3644,7 +3667,7 @@ var makeBlankImgSrc = function makeBlankImgSrc(width, height, color) {
 var BImg =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$6,
+  name: NAME$7,
   functional: true,
   props: props$d,
   render: function render(h, _ref) {
@@ -3707,7 +3730,7 @@ Vue.extend({
   }
 });
 
-var NAME$7 = 'BImgLazy';
+var NAME$8 = 'BImgLazy';
 var props$e = {
   src: {
     type: String,
@@ -3742,7 +3765,7 @@ var props$e = {
   blankColor: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$7, 'blankColor');
+      return getComponentConfig(NAME$8, 'blankColor');
     }
   },
   blankWidth: {
@@ -3800,7 +3823,7 @@ var props$e = {
 var BImgLazy =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$7,
+  name: NAME$8,
   directives: {
     bVisible: VBVisible
   },
@@ -4171,7 +4194,7 @@ var idMixin = {
   }
 };
 
-var NAME$8 = 'BCarousel'; // Slide directional classes
+var NAME$9 = 'BCarousel'; // Slide directional classes
 
 var DIRECTION = {
   next: {
@@ -4223,7 +4246,7 @@ var getTransitionEndEvent = function getTransitionEndEvent(el) {
 var BCarousel =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$8,
+  name: NAME$9,
   mixins: [idMixin, normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -4238,25 +4261,25 @@ Vue.extend({
     labelPrev: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelPrev');
+        return getComponentConfig(NAME$9, 'labelPrev');
       }
     },
     labelNext: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelNext');
+        return getComponentConfig(NAME$9, 'labelNext');
       }
     },
     labelGotoSlide: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelGotoSlide');
+        return getComponentConfig(NAME$9, 'labelGotoSlide');
       }
     },
     labelIndicators: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelIndicators');
+        return getComponentConfig(NAME$9, 'labelIndicators');
       }
     },
     interval: {
@@ -5563,7 +5586,7 @@ var handleUpdate = function handleUpdate(el, binding, vnode) {
     });
   } // Ensure the collapse class and aria-* attributes persist
   // after element is updated (either by parent re-rendering
-  // or changes to this element or it's contents
+  // or changes to this element or its contents
 
 
   if (el[BV_TOGGLE_STATE] === true) {
@@ -5760,7 +5783,7 @@ var clickOutMixin = {
     }
 
     if (!this.clickOutEventName) {
-      this.clickOutEventName = 'ontouchstart' in document.documentElement ? 'touchstart' : 'click';
+      this.clickOutEventName = 'click';
     }
 
     if (this.listenForClickOut) {
@@ -5840,9 +5863,7 @@ var filterVisibles = function filterVisibles(els) {
 
 var ROOT_DROPDOWN_PREFIX = 'bv::dropdown::';
 var ROOT_DROPDOWN_SHOWN = "".concat(ROOT_DROPDOWN_PREFIX, "shown");
-var ROOT_DROPDOWN_HIDDEN = "".concat(ROOT_DROPDOWN_PREFIX, "hidden"); // Delay when loosing focus before closing menu (in ms)
-
-var FOCUSOUT_DELAY = hasTouchSupport ? 450 : 150; // Dropdown item CSS selectors
+var ROOT_DROPDOWN_HIDDEN = "".concat(ROOT_DROPDOWN_PREFIX, "hidden"); // Dropdown item CSS selectors
 
 var Selector = {
   FORM_CHILD: '.dropdown form',
@@ -5876,6 +5897,11 @@ var dropdownMixin = {
     return {
       bvDropdown: this
     };
+  },
+  inject: {
+    bvNavbar: {
+      default: null
+    }
   },
   props: {
     disabled: {
@@ -5929,16 +5955,24 @@ var dropdownMixin = {
     popperOpts: {
       // type: Object,
       default: function _default() {}
+    },
+    boundary: {
+      // String: `scrollParent`, `window` or `viewport`
+      // HTMLElement: HTML Element reference
+      type: [String, HTMLElement],
+      default: 'scrollParent'
     }
   },
   data: function data() {
     return {
       visible: false,
-      inNavbar: null,
       visibleChangePrevented: false
     };
   },
   computed: {
+    inNavbar: function inNavbar() {
+      return !isNull(this.bvNavbar);
+    },
     toggler: function toggler() {
       var toggle = this.$refs.toggle;
       return toggle ? toggle.$el || toggle : null;
@@ -5976,7 +6010,7 @@ var dropdownMixin = {
         if (bvEvt.defaultPrevented) {
           // Reset value and exit if canceled
           this.visibleChangePrevented = true;
-          this.visible = oldValue; // Just in case a child element triggered this.hide(true)
+          this.visible = oldValue; // Just in case a child element triggered `this.hide(true)`
 
           this.$off('hidden', this.focusToggler);
           return;
@@ -5999,9 +6033,6 @@ var dropdownMixin = {
   created: function created() {
     // Create non-reactive property
     this.$_popper = null;
-    this.$_hideTimeout = null;
-
-    this.$_noop = function () {};
   },
   deactivated: function deactivated()
   /* istanbul ignore next: not easy to test */
@@ -6015,7 +6046,6 @@ var dropdownMixin = {
     this.visible = false;
     this.whileOpenListen(false);
     this.destroyPopper();
-    this.clearHideTimeout();
   },
   methods: {
     // Event emitter
@@ -6030,34 +6060,27 @@ var dropdownMixin = {
       if (this.disabled) {
         /* istanbul ignore next */
         return;
-      } // Are we in a navbar ?
-
-
-      if (isNull(this.inNavbar) && this.isNav) {
-        // We should use an injection for this
-
-        /* istanbul ignore next */
-        this.inNavbar = Boolean(closest('.navbar', this.$el));
-      } // Disable totally Popper.js for Dropdown in Navbar
+      } // Only instantiate Popper.js when dropdown is not in `<b-navbar>`
 
 
       if (!this.inNavbar) {
         if (typeof Popper === 'undefined') {
           /* istanbul ignore next */
-          warn('b-dropdown: Popper.js not found. Falling back to CSS positioning.');
+          warn('Popper.js not found. Falling back to CSS positioning', 'BDropdown');
         } else {
-          // for dropup with alignment we use the parent element as popper container
-          var element = this.dropup && this.right || this.split ? this.$el : this.$refs.toggle; // Make sure we have a reference to an element, not a component!
+          // For dropup with alignment we use the parent element as popper container
+          var el = this.dropup && this.right || this.split ? this.$el : this.$refs.toggle; // Make sure we have a reference to an element, not a component!
 
-          element = element.$el || element; // Instantiate popper.js
+          el = el.$el || el; // Instantiate Popper.js
 
-          this.createPopper(element);
+          this.createPopper(el);
         }
       } // Ensure other menus are closed
 
 
-      this.$root.$emit(ROOT_DROPDOWN_SHOWN, this);
-      this.whileOpenListen(true); // Wrap in nextTick to ensure menu is fully rendered/shown
+      this.$root.$emit(ROOT_DROPDOWN_SHOWN, this); // Enable listeners
+
+      this.whileOpenListen(true); // Wrap in `$nextTick()` to ensure menu is fully rendered/shown
 
       this.$nextTick(function () {
         // Focus on the menu container on show
@@ -6078,19 +6101,12 @@ var dropdownMixin = {
       this.$_popper = new Popper(element, this.$refs.menu, this.getPopperConfig());
     },
     destroyPopper: function destroyPopper() {
+      // Ensure popper event listeners are removed cleanly
       if (this.$_popper) {
-        // Ensure popper event listeners are removed cleanly
         this.$_popper.destroy();
       }
 
       this.$_popper = null;
-    },
-    clearHideTimeout: function clearHideTimeout() {
-      /* istanbul ignore next */
-      if (this.$_hideTimeout) {
-        clearTimeout(this.$_hideTimeout);
-        this.$_hideTimeout = null;
-      }
     },
     getPopperConfig: function getPopperConfig() {
       var placement = AttachmentMap.BOTTOM;
@@ -6146,7 +6162,7 @@ var dropdownMixin = {
       // Public method to show dropdown
       if (this.disabled) {
         return;
-      } // Wrap in a requestAnimationFrame to allow any previous
+      } // Wrap in a `requestAF()` to allow any previous
       // click handling to occur first
 
 
@@ -6172,13 +6188,13 @@ var dropdownMixin = {
     },
     // Called only by a button that toggles the menu
     toggle: function toggle(evt) {
-      evt = evt || {};
-      var type = evt.type;
-      var key = evt.keyCode;
+      evt = evt || {}; // Early exit when not a click event or ENTER, SPACE or DOWN were pressed
 
-      if (type !== 'click' && !(type === 'keydown' && (key === KEY_CODES.ENTER || key === KEY_CODES.SPACE || key === KEY_CODES.DOWN))) {
-        // We only toggle on Click, Enter, Space, and Arrow Down
+      var _evt = evt,
+          type = _evt.type,
+          keyCode = _evt.keyCode;
 
+      if (type !== 'click' && !(type === 'keydown' && [KEY_CODES.ENTER, KEY_CODES.SPACE, KEY_CODES.DOWN].indexOf(keyCode) !== -1)) {
         /* istanbul ignore next */
         return;
       }
@@ -6200,32 +6216,36 @@ var dropdownMixin = {
         this.show();
       }
     },
-    // Called only in split button mode, for the split button
-    click: function click(evt) {
-      /* istanbul ignore next */
-      if (this.disabled) {
-        this.visible = false;
-        return;
-      }
-
-      this.$emit('click', evt);
+    // Mousedown handler for the toggle
+    onMousedown: function onMousedown(evt)
+    /* istanbul ignore next */
+    {
+      // We prevent the 'mousedown' event for the toggle to stop the
+      // 'focusin' event from being fired
+      // The event would otherwise be picked up by the global 'focusin'
+      // listener and there is no cross-browser solution to detect it
+      // relates to the toggle click
+      // The 'click' event will still be fired and we handle closing
+      // other dropdowns there too
+      // See https://github.com/bootstrap-vue/bootstrap-vue/issues/4328
+      evt.preventDefault();
     },
     // Called from dropdown menu context
     onKeydown: function onKeydown(evt) {
-      var key = evt.keyCode;
+      var keyCode = evt.keyCode;
 
-      if (key === KEY_CODES.ESC) {
+      if (keyCode === KEY_CODES.ESC) {
         // Close on ESC
         this.onEsc(evt);
-      } else if (key === KEY_CODES.DOWN) {
+      } else if (keyCode === KEY_CODES.DOWN) {
         // Down Arrow
         this.focusNext(evt, false);
-      } else if (key === KEY_CODES.UP) {
+      } else if (keyCode === KEY_CODES.UP) {
         // Up Arrow
         this.focusNext(evt, true);
       }
     },
-    // If uses presses ESC to close menu
+    // If user presses ESC, close the menu
     onEsc: function onEsc(evt) {
       if (this.visible) {
         this.visible = false;
@@ -6235,38 +6255,40 @@ var dropdownMixin = {
         this.$once('hidden', this.focusToggler);
       }
     },
-    // Document click out listener
-    clickOutHandler: function clickOutHandler(evt) {
-      var _this3 = this;
+    // Called only in split button mode, for the split button
+    onSplitClick: function onSplitClick(evt) {
+      /* istanbul ignore next */
+      if (this.disabled) {
+        this.visible = false;
+        return;
+      }
 
+      this.$emit('click', evt);
+    },
+    // Shared hide handler between click-out and focus-in events
+    hideHandler: function hideHandler(evt) {
       var target = evt.target;
 
       if (this.visible && !contains(this.$refs.menu, target) && !contains(this.toggler, target)) {
-        var doHide = function doHide() {
-          _this3.visible = false;
-          return null;
-        }; // When we are in a navbar (which has been responsively stacked), we
-        // delay the dropdown's closing so that the next element has a chance
-        // to have it's click handler fired (in case it's position moves on
-        // the screen do to a navbar menu above it collapsing)
-        // https://github.com/bootstrap-vue/bootstrap-vue/issues/4113
-
-
-        this.clearHideTimeout();
-        this.$_hideTimeout = this.inNavbar ? setTimeout(doHide, FOCUSOUT_DELAY) : doHide();
+        this.hide();
       }
     },
-    // Document focusin listener
+    // Document click-out listener
+    clickOutHandler: function clickOutHandler(evt) {
+      this.hideHandler(evt);
+    },
+    // Document focus-in listener
     focusInHandler: function focusInHandler(evt) {
-      // Shared logic with click-out handler
-      this.clickOutHandler(evt);
+      this.hideHandler(evt);
     },
     // Keyboard nav
     focusNext: function focusNext(evt, up) {
-      var _this4 = this;
+      var _this3 = this;
 
       // Ignore key up/down on form elements
-      if (!this.visible || evt && closest(Selector.FORM_CHILD, evt.target)) {
+      var target = evt.target;
+
+      if (!this.visible || evt && closest(Selector.FORM_CHILD, target)) {
         /* istanbul ignore next: should never happen */
         return;
       }
@@ -6274,14 +6296,14 @@ var dropdownMixin = {
       evt.preventDefault();
       evt.stopPropagation();
       this.$nextTick(function () {
-        var items = _this4.getItems();
+        var items = _this3.getItems();
 
         if (items.length < 1) {
           /* istanbul ignore next: should never happen */
           return;
         }
 
-        var index = items.indexOf(evt.target);
+        var index = items.indexOf(target);
 
         if (up && index > 0) {
           index--;
@@ -6294,7 +6316,7 @@ var dropdownMixin = {
           index = 0;
         }
 
-        _this4.focusItem(index, items);
+        _this3.focusItem(index, items);
       });
     },
     focusItem: function focusItem(idx, items) {
@@ -6314,10 +6336,10 @@ var dropdownMixin = {
       this.$refs.menu.focus && this.$refs.menu.focus();
     },
     focusToggler: function focusToggler() {
-      var _this5 = this;
+      var _this4 = this;
 
       this.$nextTick(function () {
-        var toggler = _this5.toggler;
+        var toggler = _this4.toggler;
 
         if (toggler && toggler.focus) {
           toggler.focus();
@@ -6327,25 +6349,25 @@ var dropdownMixin = {
   }
 };
 
-var NAME$9 = 'BDropdown';
+var NAME$a = 'BDropdown';
 var props$j = {
   toggleText: {
     // This really should be toggleLabel
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$9, 'toggleText');
+      return getComponentConfig(NAME$a, 'toggleText');
     }
   },
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$9, 'size');
+      return getComponentConfig(NAME$a, 'size');
     }
   },
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$9, 'variant');
+      return getComponentConfig(NAME$a, 'variant');
     }
   },
   block: {
@@ -6353,7 +6375,7 @@ var props$j = {
     default: false
   },
   menuClass: {
-    type: [String, Array],
+    type: [String, Array, Object],
     default: null
   },
   toggleTag: {
@@ -6361,7 +6383,7 @@ var props$j = {
     default: 'button'
   },
   toggleClass: {
-    type: [String, Array],
+    type: [String, Array, Object],
     default: null
   },
   noCaret: {
@@ -6383,11 +6405,11 @@ var props$j = {
   splitVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$9, 'splitVariant');
+      return getComponentConfig(NAME$a, 'splitVariant');
     }
   },
   splitClass: {
-    type: [String, Array],
+    type: [String, Array, Object],
     default: null
   },
   splitButtonType: {
@@ -6400,19 +6422,13 @@ var props$j = {
   role: {
     type: String,
     default: 'menu'
-  },
-  boundary: {
-    // String: `scrollParent`, `window` or `viewport`
-    // HTMLElement: HTML Element reference
-    type: [String, HTMLElement],
-    default: 'scrollParent'
   }
 }; // @vue/component
 
 var BDropdown =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$9,
+  name: NAME$a,
   mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
   props: props$j,
   computed: {
@@ -6473,7 +6489,7 @@ Vue.extend({
           id: this.safeId('_BV_button_')
         },
         on: {
-          click: this.click
+          click: this.onSplitClick
         }
       }, [buttonContent]);
     }
@@ -6495,9 +6511,9 @@ Vue.extend({
         'aria-expanded': this.visible ? 'true' : 'false'
       },
       on: {
+        mousedown: this.onMousedown,
         click: this.toggle,
-        // click
-        keydown: this.toggle // enter, space, down
+        keydown: this.toggle // Handle ENTER, SPACE and DOWN
 
       }
     }, [this.split ? h('span', {
@@ -6513,7 +6529,7 @@ Vue.extend({
         'aria-labelledby': this.safeId(this.split ? '_BV_button_' : '_BV_toggle_')
       },
       on: {
-        keydown: this.onKeydown // up, down, esc
+        keydown: this.onKeydown // Handle UP, DOWN and ESC
 
       }
     }, !this.lazy || this.visible ? this.normalizeSlot('default', {
@@ -7096,7 +7112,7 @@ Vue.extend({
   }
 });
 
-var NAME$a = 'BFormText';
+var NAME$b = 'BFormText';
 var props$r = {
   id: {
     type: String,
@@ -7109,7 +7125,7 @@ var props$r = {
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$a, 'textVariant');
+      return getComponentConfig(NAME$b, 'textVariant');
     }
   },
   inline: {
@@ -7121,7 +7137,7 @@ var props$r = {
 var BFormText =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$a,
+  name: NAME$b,
   functional: true,
   props: props$r,
   render: function render(h, _ref) {
@@ -7492,7 +7508,7 @@ var BCol = {
   }
 };
 
-var NAME$b = 'BFormGroup'; // Selector for finding first input in the form-group
+var NAME$c = 'BFormGroup'; // Selector for finding first input in the form-group
 
 var SELECTOR = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])'; // Render helper functions (here rather than polluting the instance with more methods)
 
@@ -7701,7 +7717,7 @@ var generateProps$1 = function generateProps() {
 
 
 var BFormGroup = {
-  name: NAME$b,
+  name: NAME$c,
   mixins: [idMixin, formStateMixin, normalizeSlotMixin],
 
   get props() {
@@ -8624,17 +8640,17 @@ pluginFactory({
   }
 });
 
-var NAME$c = 'BFormTag';
+var NAME$d = 'BFormTag';
 var BFormTag =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$c,
+  name: NAME$d,
   mixins: [idMixin, normalizeSlotMixin],
   props: {
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'variant');
+        return getComponentConfig(NAME$d, 'variant');
       }
     },
     disabled: {
@@ -8652,7 +8668,7 @@ Vue.extend({
     removeLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'removeLabel');
+        return getComponentConfig(NAME$d, 'removeLabel');
       }
     },
     tag: {
@@ -8705,7 +8721,9 @@ Vue.extend({
   }
 });
 
-var NAME$d = 'BFormTags'; // --- Pre-compiled regular expressions for performance reasons ---
+var NAME$e = 'BFormTags'; // Supported input types (for built in input)
+
+var TYPES = ['text', 'email', 'tel', 'url', 'number']; // Pre-compiled regular expressions for performance reasons
 
 var RX_SPACES = /[\s\uFEFF\xA0]+/g; // --- Utility methods ---
 // Escape special chars in string and replace
@@ -8743,7 +8761,7 @@ var cleanTagsState = function cleanTagsState() {
 var BFormTags =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$d,
+  name: NAME$e,
   mixins: [idMixin, normalizeSlotMixin],
   model: {
     // Even though this is the default that Vue assumes, we need
@@ -8759,7 +8777,7 @@ Vue.extend({
     placeholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'placeholder');
+        return getComponentConfig(NAME$e, 'placeholder');
       }
     },
     disabled: {
@@ -8787,6 +8805,13 @@ Vue.extend({
       type: String,
       default: null
     },
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: function validator(type) {
+        return arrayIncludes(TYPES, type);
+      }
+    },
     inputClass: {
       type: [String, Array, Object],
       default: null
@@ -8801,19 +8826,19 @@ Vue.extend({
     addButtonText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'addButtonText');
+        return getComponentConfig(NAME$e, 'addButtonText');
       }
     },
     addButtonVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'addButtonVariant');
+        return getComponentConfig(NAME$e, 'addButtonVariant');
       }
     },
     tagVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'tagVariant');
+        return getComponentConfig(NAME$e, 'tagVariant');
       }
     },
     tagClass: {
@@ -8827,7 +8852,7 @@ Vue.extend({
     tagRemoveLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'tagRemoveLabel');
+        return getComponentConfig(NAME$e, 'tagRemoveLabel');
       }
     },
     tagValidator: {
@@ -8837,13 +8862,13 @@ Vue.extend({
     duplicateTagText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'duplicateTagText');
+        return getComponentConfig(NAME$e, 'duplicateTagText');
       }
     },
     invalidTagText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'invalidTagText');
+        return getComponentConfig(NAME$e, 'invalidTagText');
       }
     },
     separator: {
@@ -8893,6 +8918,10 @@ Vue.extend({
   computed: {
     computedInputId: function computedInputId() {
       return this.inputId || this.safeId('__input__');
+    },
+    computedInputType: function computedInputType() {
+      // We only allow certain types
+      return arrayIncludes(TYPES, this.inputType) ? this.inputType : 'text';
     },
     computedInputAttrs: function computedInputAttrs() {
       return _objectSpread2({}, this.inputAttrs, {
@@ -9200,6 +9229,7 @@ Vue.extend({
       var tags = _ref.tags,
           addTag = _ref.addTag,
           removeTag = _ref.removeTag,
+          inputType = _ref.inputType,
           inputAttrs = _ref.inputAttrs,
           inputHandlers = _ref.inputHandlers,
           inputClass = _ref.inputClass,
@@ -9264,7 +9294,7 @@ Vue.extend({
         },
         attrs: _objectSpread2({}, inputAttrs, {
           'aria-describedby': ariaDescribedby || null,
-          type: 'text',
+          type: inputType,
           placeholder: placeholder || null
         }),
         domProps: {
@@ -9382,6 +9412,8 @@ Vue.extend({
       // Methods
       removeTag: this.removeTag,
       addTag: this.addTag,
+      // We don't include this in the attrs, as users may want to override this
+      inputType: this.computedInputType,
       // <input> v-bind:inputAttrs
       inputAttrs: this.computedInputAttrs,
       // <input> v-on:inputHandlers
@@ -9530,10 +9562,6 @@ var formTextMixin = {
     };
   },
   computed: {
-    computedDebounce: function computedDebounce() {
-      // Ensure we have a positive number equal to or greater than 0
-      return Math.max(toInteger(this.debounce) || 0, 0);
-    },
     computedClass: function computedClass() {
       return [{
         // Range input needs class `custom-range`
@@ -9558,6 +9586,13 @@ var formTextMixin = {
 
 
       return this.ariaInvalid;
+    },
+    computedDebounce: function computedDebounce() {
+      // Ensure we have a positive number equal to or greater than 0
+      return Math.max(toInteger(this.debounce) || 0, 0);
+    },
+    hasFormatter: function hasFormatter() {
+      return isFunction(this.formatter);
     }
   },
   watch: {
@@ -9596,7 +9631,7 @@ var formTextMixin = {
       var force = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       value = toString$1(value);
 
-      if ((!this.lazyFormatter || force) && isFunction(this.formatter)) {
+      if (this.hasFormatter && (!this.lazyFormatter || force)) {
         value = this.formatter(value, evt);
       }
 
@@ -9621,7 +9656,6 @@ var formTextMixin = {
 
       var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var lazy = this.lazy;
-      var ms = this.computedDebounce;
 
       if (lazy && !force) {
         return;
@@ -9638,12 +9672,29 @@ var formTextMixin = {
           _this.$emit('update', value);
         };
 
-        if (ms > 0 && !lazy && !force) {
-          // Change/Blur/Force will not be debounced
-          this.$_inputDebounceTimer = setTimeout(doUpdate, ms);
+        var debounce = this.computedDebounce; // Only debounce the value update when a value greater than `0`
+        // is set and we are not in lazy mode or this is a forced update
+
+        if (debounce > 0 && !lazy && !force) {
+          this.$_inputDebounceTimer = setTimeout(doUpdate, debounce);
         } else {
           // Immediately update the v-model
           doUpdate();
+        }
+      } else if (this.hasFormatter) {
+        // When the `vModelValue` hasn't changed but the actual input value
+        // is out of sync, make sure to change it to the given one
+        // Usually caused by browser autocomplete and how it triggers the
+        // change or input event, or depending on the formatter function
+        // https://github.com/bootstrap-vue/bootstrap-vue/issues/2657
+        // https://github.com/bootstrap-vue/bootstrap-vue/issues/3498
+
+        /* istanbul ignore next: hard to test */
+        var $input = this.$refs.input;
+        /* istanbul ignore if: hard to test outof sync value */
+
+        if ($input && value !== $input.value) {
+          $input.value = value;
         }
       }
     },
@@ -9861,7 +9912,7 @@ var formValidityMixin = {
   }
 };
 
-var TYPES = ['text', 'password', 'email', 'number', 'url', 'tel', 'search', 'range', 'color', 'date', 'time', 'datetime', 'datetime-local', 'month', 'week']; // @vue/component
+var TYPES$1 = ['text', 'password', 'email', 'number', 'url', 'tel', 'search', 'range', 'color', 'date', 'time', 'datetime', 'datetime-local', 'month', 'week']; // @vue/component
 
 var BFormInput =
 /*#__PURE__*/
@@ -9875,7 +9926,7 @@ Vue.extend({
       type: String,
       default: 'text',
       validator: function validator(type) {
-        return arrayIncludes(TYPES, type);
+        return arrayIncludes(TYPES$1, type);
       }
     },
     noWheel: {
@@ -9903,7 +9954,7 @@ Vue.extend({
   computed: {
     localType: function localType() {
       // We only allow certain types
-      return arrayIncludes(TYPES, this.type) ? this.type : 'text';
+      return arrayIncludes(TYPES$1, this.type) ? this.type : 'text';
     }
   },
   watch: {
@@ -10220,13 +10271,13 @@ var formCustomMixin = {
   }
 };
 
-var NAME$e = 'BFormFile';
+var NAME$f = 'BFormFile';
 var VALUE_EMPTY_DEPRECATED_MSG = 'Setting "value"/"v-model" to an empty string for reset is deprecated. Set to "null" instead.'; // @vue/component
 
 var BFormFile =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$e,
+  name: NAME$f,
   mixins: [idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
   inheritAttrs: false,
   model: {
@@ -10246,7 +10297,7 @@ Vue.extend({
       validator: function validator(val) {
         /* istanbul ignore next */
         if (val === '') {
-          warn(VALUE_EMPTY_DEPRECATED_MSG, NAME$e);
+          warn(VALUE_EMPTY_DEPRECATED_MSG, NAME$f);
           return true;
         }
 
@@ -10265,19 +10316,19 @@ Vue.extend({
     placeholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$e, 'placeholder');
+        return getComponentConfig(NAME$f, 'placeholder');
       }
     },
     browseText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$e, 'browseText');
+        return getComponentConfig(NAME$f, 'browseText');
       }
     },
     dropPlaceholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$e, 'dropPlaceholder');
+        return getComponentConfig(NAME$f, 'dropPlaceholder');
       }
     },
     multiple: {
@@ -10628,7 +10679,7 @@ var optionsMixin = {
   }
 };
 
-var NAME$f = 'BFormSelectOption';
+var NAME$g = 'BFormSelectOption';
 var props$x = {
   value: {
     // type: [String, Number, Boolean, Object],
@@ -10643,7 +10694,7 @@ var props$x = {
 var BFormSelectOption =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$f,
+  name: NAME$g,
   functional: true,
   props: props$x,
   render: function render(h, _ref) {
@@ -10942,7 +10993,7 @@ Vue.extend({
   }
 });
 
-var NAME$g = 'BInputGroup';
+var NAME$h = 'BInputGroup';
 var props$z = {
   id: {
     type: String
@@ -10950,7 +11001,7 @@ var props$z = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$g, 'size');
+      return getComponentConfig(NAME$h, 'size');
     }
   },
   prepend: {
@@ -10974,7 +11025,7 @@ var props$z = {
 var BInputGroup =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$g,
+  name: NAME$h,
   functional: true,
   props: props$z,
   render: function render(h, _ref) {
@@ -11068,7 +11119,7 @@ Vue.extend({
   }
 });
 
-var NAME$h = 'BJumbotron';
+var NAME$i = 'BJumbotron';
 var props$B = {
   fluid: {
     type: Boolean,
@@ -11113,19 +11164,19 @@ var props$B = {
   bgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$h, 'bgVariant');
+      return getComponentConfig(NAME$i, 'bgVariant');
     }
   },
   borderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$h, 'borderVariant');
+      return getComponentConfig(NAME$i, 'borderVariant');
     }
   },
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$h, 'textVariant');
+      return getComponentConfig(NAME$i, 'textVariant');
     }
   }
 }; // @vue/component
@@ -11133,7 +11184,7 @@ var props$B = {
 var BJumbotron =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$h,
+  name: NAME$i,
   functional: true,
   props: props$B,
   render: function render(h, _ref) {
@@ -11362,7 +11413,7 @@ Vue.extend({
   }
 });
 
-var NAME$i = 'BListGroupItem';
+var NAME$j = 'BListGroupItem';
 var actionTags = ['a', 'router-link', 'button', 'b-link'];
 var linkProps$2 = propsFactory();
 delete linkProps$2.href.default;
@@ -11383,7 +11434,7 @@ var props$D = _objectSpread2({
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$i, 'variant');
+      return getComponentConfig(NAME$j, 'variant');
     }
   }
 }, linkProps$2); // @vue/component
@@ -11391,7 +11442,7 @@ var props$D = _objectSpread2({
 var BListGroupItem =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$i,
+  name: NAME$j,
   functional: true,
   props: props$D,
   render: function render(h, _ref) {
@@ -11568,7 +11619,7 @@ pluginFactory({
 
 //
 // Single root node portaling of content, which retains parent/child hierarchy
-// Unlike Portal-Vue where portaled content is no longer a descendent of it's
+// Unlike Portal-Vue where portaled content is no longer a descendent of its
 // intended parent components
 //
 // Private components for use by Tooltips, Popovers and Modals
@@ -11657,13 +11708,13 @@ Vue.extend({
     this.mountTarget();
   },
   updated: function updated() {
-    var _this = this;
-
-    // Placed in a nextTick to ensure that children have completed
-    // updating before rendering in the target
-    this.$nextTick(function () {
-      _this.updateTarget();
-    });
+    // We need to make sure that all children have completed updating
+    // before rendering in the target
+    // `vue-simple-portal` has the this in a `$nextTick()`,
+    // while `portal-vue` doesn't
+    // Just trying to see if the `$nextTick()` delay is required or not
+    // Since all slots in Vue 2.6.x are always functions
+    this.updateTarget();
   },
   beforeDestroy: function beforeDestroy() {
     this.unmountTarget();
@@ -12140,7 +12191,7 @@ function (_BvEvent) {
   return BvModalEvent;
 }(BvEvent); // Named exports
 
-var NAME$j = 'BModal'; // ObserveDom config to detect changes in modal content
+var NAME$k = 'BModal'; // ObserveDom config to detect changes in modal content
 // so that we can adjust the modal padding if needed
 
 var OBSERVER_CONFIG = {
@@ -12178,7 +12229,7 @@ var props$H = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'size');
+      return getComponentConfig(NAME$k, 'size');
     }
   },
   centered: {
@@ -12213,6 +12264,10 @@ var props$H = {
     type: Boolean,
     default: false
   },
+  ignoreEnforceFocusSelector: {
+    type: [Array, String],
+    default: ''
+  },
   title: {
     type: String,
     default: ''
@@ -12223,7 +12278,7 @@ var props$H = {
   titleTag: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'titleTag');
+      return getComponentConfig(NAME$k, 'titleTag');
     }
   },
   titleClass: {
@@ -12241,25 +12296,25 @@ var props$H = {
   headerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'headerBgVariant');
+      return getComponentConfig(NAME$k, 'headerBgVariant');
     }
   },
   headerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'headerBorderVariant');
+      return getComponentConfig(NAME$k, 'headerBorderVariant');
     }
   },
   headerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'headerTextVariant');
+      return getComponentConfig(NAME$k, 'headerTextVariant');
     }
   },
   headerCloseVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'headerCloseVariant');
+      return getComponentConfig(NAME$k, 'headerCloseVariant');
     }
   },
   headerClass: {
@@ -12269,13 +12324,13 @@ var props$H = {
   bodyBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'bodyBgVariant');
+      return getComponentConfig(NAME$k, 'bodyBgVariant');
     }
   },
   bodyTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'bodyTextVariant');
+      return getComponentConfig(NAME$k, 'bodyTextVariant');
     }
   },
   modalClass: {
@@ -12297,19 +12352,19 @@ var props$H = {
   footerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'footerBgVariant');
+      return getComponentConfig(NAME$k, 'footerBgVariant');
     }
   },
   footerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'footerBorderVariant');
+      return getComponentConfig(NAME$k, 'footerBorderVariant');
     }
   },
   footerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'footerTextVariant');
+      return getComponentConfig(NAME$k, 'footerTextVariant');
     }
   },
   footerClass: {
@@ -12353,16 +12408,22 @@ var props$H = {
     type: [HTMLElement, String, Object],
     default: null
   },
+  headerCloseContent: {
+    type: String,
+    default: function _default() {
+      return getComponentConfig(NAME$k, 'headerCloseContent');
+    }
+  },
   headerCloseLabel: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'headerCloseLabel');
+      return getComponentConfig(NAME$k, 'headerCloseLabel');
     }
   },
   cancelTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'cancelTitle');
+      return getComponentConfig(NAME$k, 'cancelTitle');
     }
   },
   cancelTitleHtml: {
@@ -12371,7 +12432,7 @@ var props$H = {
   okTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'okTitle');
+      return getComponentConfig(NAME$k, 'okTitle');
     }
   },
   okTitleHtml: {
@@ -12380,13 +12441,13 @@ var props$H = {
   cancelVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'cancelVariant');
+      return getComponentConfig(NAME$k, 'cancelVariant');
     }
   },
   okVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$j, 'okVariant');
+      return getComponentConfig(NAME$k, 'okVariant');
     }
   },
   lazy: {
@@ -12414,7 +12475,7 @@ var props$H = {
 var BModal =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$j,
+  name: NAME$k,
   mixins: [idMixin, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
   inheritAttrs: false,
   model: {
@@ -12506,6 +12567,10 @@ Vue.extend({
         hide: this.hide,
         visible: this.isVisible
       };
+    },
+    computeIgnoreEnforceFocusSelector: function computeIgnoreEnforceFocusSelector() {
+      // Normalize to an single selector with selectors separated by `,`
+      return concat(this.ignoreEnforceFocusSelector).filter(identity).join(',').trim();
     }
   },
   watch: {
@@ -12783,7 +12848,7 @@ Vue.extend({
     // Event emitter
     emitEvent: function emitEvent(bvModalEvt) {
       var type = bvModalEvt.type; // We emit on root first incase a global listener wants to cancel
-      // the event first before the instance emits it's event
+      // the event first before the instance emits its event
 
       this.emitOnRoot("bv::modal::".concat(type), bvModalEvt, bvModalEvt.componentId);
       this.$emit(type, bvModalEvt);
@@ -12846,30 +12911,35 @@ Vue.extend({
       var content = this.$refs.content;
       var target = evt.target;
 
-      if (!this.noEnforceFocus && this.isTop && this.isVisible && content && document !== target && !contains(content, target)) {
-        var tabables = this.getTabables();
-
-        if (this.$refs.bottomTrap && target === this.$refs.bottomTrap) {
-          // If user pressed TAB out of modal into our bottom trab trap element
-          // Find the first tabable element in the modal content and focus it
-          if (attemptFocus(tabables[0])) {
-            // Focus was successful
-            return;
-          }
-        } else if (this.$refs.topTrap && target === this.$refs.topTrap) {
-          // If user pressed CTRL-TAB out of modal and into our top tab trap element
-          // Find the last tabable element in the modal content and focus it
-          if (attemptFocus(tabables[tabables.length - 1])) {
-            // Focus was successful
-            return;
-          }
-        } // Otherwise focus the modal content container
-
-
-        content.focus({
-          preventScroll: true
-        });
+      if (this.noEnforceFocus || !this.isTop || !this.isVisible || !content || document === target || contains(content, target) || this.computeIgnoreEnforceFocusSelector && closest(this.computeIgnoreEnforceFocusSelector, target, true)) {
+        return;
       }
+
+      var tabables = this.getTabables();
+      var _this$$refs = this.$refs,
+          bottomTrap = _this$$refs.bottomTrap,
+          topTrap = _this$$refs.topTrap;
+
+      if (bottomTrap && target === bottomTrap) {
+        // If user pressed TAB out of modal into our bottom trab trap element
+        // Find the first tabable element in the modal content and focus it
+        if (attemptFocus(tabables[0])) {
+          // Focus was successful
+          return;
+        }
+      } else if (topTrap && target === topTrap) {
+        // If user pressed CTRL-TAB out of modal and into our top tab trap element
+        // Find the last tabable element in the modal content and focus it
+        if (attemptFocus(tabables[tabables.length - 1])) {
+          // Focus was successful
+          return;
+        }
+      } // Otherwise focus the modal content container
+
+
+      content.focus({
+        preventScroll: true
+      });
     },
     // Turn on/off focusin listener
     setEnforceFocus: function setEnforceFocus(on) {
@@ -12972,6 +13042,7 @@ Vue.extend({
             closeButton = h(BButtonClose, {
               ref: 'close-button',
               props: {
+                content: this.headerCloseContent,
                 disabled: this.isTransitioning,
                 ariaLabel: this.headerCloseLabel,
                 textVariant: this.headerCloseVariant || this.headerTextVariant
@@ -13200,7 +13271,7 @@ Vue.extend({
 
 var EVENT_SHOW = 'bv::show::modal'; // Prop name we use to store info on root element
 
-var HANDLER = '__bv_modal_directive__';
+var PROPERTY = '__bv_modal_directive__';
 var EVENT_OPTS = {
   passive: true
 };
@@ -13254,7 +13325,11 @@ var bind$1 = function bind(el, binding, vnode) {
       }
     };
 
-    el[HANDLER] = handler; // If element is not a button, we add `role="button"` for accessibility
+    el[PROPERTY] = {
+      handler: handler,
+      target: target,
+      trigger: trigger
+    }; // If element is not a button, we add `role="button"` for accessibility
 
     setRole(trigger); // Listen for click events
 
@@ -13269,21 +13344,34 @@ var bind$1 = function bind(el, binding, vnode) {
 };
 
 var unbind$1 = function unbind(el) {
-  var trigger = getTriggerElement(el);
-  var handler = el ? el[HANDLER] : null;
+  var oldProp = el[PROPERTY] || {};
+  var trigger = oldProp.trigger;
+  var handler = oldProp.handler;
 
   if (trigger && handler) {
     eventOff(trigger, 'click', handler, EVENT_OPTS);
     eventOff(trigger, 'keydown', handler, EVENT_OPTS);
+    eventOff(el, 'click', handler, EVENT_OPTS);
+    eventOff(el, 'keydown', handler, EVENT_OPTS);
   }
 
-  delete el[HANDLER];
+  delete el[PROPERTY];
 };
 
 var componentUpdated$1 = function componentUpdated(el, binding, vnode) {
-  // We bind and rebind just in case target changes
-  unbind$1(el);
-  bind$1(el, binding, vnode);
+  var oldProp = el[PROPERTY] || {};
+  var target = getTarget(binding);
+  var trigger = getTriggerElement(el);
+
+  if (target !== oldProp.target || trigger !== oldProp.trigger) {
+    // We bind and rebind if the target or trigger changes
+    unbind$1(el);
+    bind$1(el, binding, vnode);
+  } // If trigger element is not a button, ensure `role="button"`
+  // is still set for accessibility
+
+
+  setRole(trigger);
 };
 
 var updated = function updated() {};
@@ -13811,8 +13899,9 @@ Vue.extend({
         'aria-expanded': this.visible ? 'true' : 'false'
       },
       on: {
+        mousedown: this.onMousedown,
         click: this.toggle,
-        keydown: this.toggle // space, enter, down
+        keydown: this.toggle // Handle ENTER, SPACE and DOWN
 
       }
     }, [this.$slots['button-content'] || this.$slots.text || h('span', {
@@ -13827,7 +13916,7 @@ Vue.extend({
         'aria-labelledby': this.safeId('_BV_button_')
       },
       on: {
-        keydown: this.onKeydown // up, down, esc
+        keydown: this.onKeydown // Handle UP, DOWN and ESC
 
       }
     }, !this.lazy || this.visible ? this.normalizeSlot('default', {
@@ -13861,7 +13950,7 @@ pluginFactory({
   }
 });
 
-var NAME$k = 'BNavbar';
+var NAME$l = 'BNavbar';
 var props$N = {
   tag: {
     type: String,
@@ -13874,7 +13963,7 @@ var props$N = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$k, 'variant');
+      return getComponentConfig(NAME$l, 'variant');
     }
   },
   toggleable: {
@@ -13897,34 +13986,42 @@ var props$N = {
 var BNavbar =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$k,
-  functional: true,
+  name: NAME$l,
+  mixins: [normalizeSlotMixin],
   props: props$N,
-  render: function render(h, _ref) {
-    var _class;
+  provide: function provide() {
+    return {
+      bvNavbar: this
+    };
+  },
+  computed: {
+    breakpointClass: function breakpointClass() {
+      var breakpoint = null;
+      var xs = getBreakpoints()[0];
+      var toggleable = this.toggleable;
 
-    var props = _ref.props,
-        data = _ref.data,
-        children = _ref.children;
-    var breakpoint = '';
-    var xs = getBreakpoints()[0];
-
-    if (props.toggleable && isString(props.toggleable) && props.toggleable !== xs) {
-      breakpoint = "navbar-expand-".concat(props.toggleable);
-    } else if (props.toggleable === false) {
-      breakpoint = 'navbar-expand';
-    }
-
-    return h(props.tag, mergeData(data, {
-      staticClass: 'navbar',
-      class: (_class = {
-        'd-print': props.print,
-        'sticky-top': props.sticky
-      }, _defineProperty(_class, "navbar-".concat(props.type), props.type), _defineProperty(_class, "bg-".concat(props.variant), props.variant), _defineProperty(_class, "fixed-".concat(props.fixed), props.fixed), _defineProperty(_class, "".concat(breakpoint), breakpoint), _class),
-      attrs: {
-        role: props.tag === 'nav' ? null : 'navigation'
+      if (toggleable && isString(toggleable) && toggleable !== xs) {
+        breakpoint = "navbar-expand-".concat(toggleable);
+      } else if (toggleable === false) {
+        breakpoint = 'navbar-expand';
       }
-    }), children);
+
+      return breakpoint;
+    }
+  },
+  render: function render(h) {
+    var _ref;
+
+    return h(this.tag, {
+      staticClass: 'navbar',
+      class: [(_ref = {
+        'd-print': this.print,
+        'sticky-top': this.sticky
+      }, _defineProperty(_ref, "navbar-".concat(this.type), this.type), _defineProperty(_ref, "bg-".concat(this.variant), this.variant), _defineProperty(_ref, "fixed-".concat(this.fixed), this.fixed), _ref), this.breakpointClass],
+      attrs: {
+        role: this.tag === 'nav' ? null : 'navigation'
+      }
+    }, [this.normalizeSlot('default')]);
   }
 });
 
@@ -13988,7 +14085,7 @@ Vue.extend({
   }
 });
 
-var NAME$l = 'BNavbarToggle'; // TODO: Switch to using VBToggle directive, will reduce code footprint
+var NAME$m = 'BNavbarToggle'; // TODO: Switch to using VBToggle directive, will reduce code footprint
 // Events we emit on $root
 
 var EVENT_TOGGLE$2 = 'bv::toggle::collapse'; // Events we listen to on $root
@@ -14000,13 +14097,13 @@ var EVENT_STATE_SYNC$2 = 'bv::collapse::sync::state'; // @vue/component
 var BNavbarToggle =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$l,
+  name: NAME$m,
   mixins: [listenOnRootMixin, normalizeSlotMixin],
   props: {
     label: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$l, 'label');
+        return getComponentConfig(NAME$m, 'label');
       }
     },
     target: {
@@ -14082,12 +14179,14 @@ var range = function range(length) {
   });
 };
 
-// for <b-pagination> and <b-pagination-nav>
+// for `<b-pagination>` and `<b-pagination-nav>`
+// --- Constants ---
 // Threshold of limit size when we start/stop showing ellipsis
 
 var ELLIPSIS_THRESHOLD = 3; // Default # of buttons limit
 
-var DEFAULT_LIMIT = 5; // Make an array of N to N+X
+var DEFAULT_LIMIT = 5; // --- Helper methods ---
+// Make an array of N to N+X
 
 var makePageArray = function makePageArray(startNumber, numberOfPages) {
   return range(numberOfPages).map(function (val, i) {
@@ -14122,7 +14221,8 @@ var onSpaceKey = function onSpaceKey(evt) {
     evt.currentTarget.click();
     return false;
   }
-};
+}; // --- Props ---
+
 
 var props$Q = {
   disabled: {
@@ -14135,10 +14235,10 @@ var props$Q = {
     validator: function validator(value)
     /* istanbul ignore next */
     {
-      var num = toInteger(value);
+      var number = toInteger(value);
 
-      if (!isNull(value) && (isNaN(num) || num < 1)) {
-        warn('pagination: v-model value must be a number greater than 0');
+      if (!isNull(value) && (isNaN(number) || number < 1)) {
+        warn('"v-model" value must be a number greater than "0"', 'BPagination');
         return false;
       }
 
@@ -14151,10 +14251,10 @@ var props$Q = {
     validator: function validator(value)
     /* istanbul ignore next */
     {
-      var num = toInteger(value);
+      var number = toInteger(value);
 
-      if (isNaN(num) || num < 1) {
-        warn('pagination: prop "limit" must be a number greater than 0');
+      if (isNaN(number) || number < 1) {
+        warn('Prop "limit" must be a number greater than "0"', 'BPagination');
         return false;
       }
 
@@ -14186,6 +14286,14 @@ var props$Q = {
     default: "\xAB" // '«'
 
   },
+  firstNumber: {
+    type: Boolean,
+    default: false
+  },
+  firstClass: {
+    type: [String, Array, Object],
+    default: null
+  },
   labelPrevPage: {
     type: String,
     default: 'Go to previous page'
@@ -14194,6 +14302,10 @@ var props$Q = {
     type: String,
     default: "\u2039" // '‹'
 
+  },
+  prevClass: {
+    type: [String, Array, Object],
+    default: null
   },
   labelNextPage: {
     type: String,
@@ -14204,6 +14316,10 @@ var props$Q = {
     default: "\u203A" // '›'
 
   },
+  nextClass: {
+    type: [String, Array, Object],
+    default: null
+  },
   labelLastPage: {
     type: String,
     default: 'Go to last page'
@@ -14213,9 +14329,21 @@ var props$Q = {
     default: "\xBB" // '»'
 
   },
+  lastNumber: {
+    type: Boolean,
+    default: false
+  },
+  lastClass: {
+    type: [String, Array, Object],
+    default: null
+  },
   labelPage: {
     type: [String, Function],
     default: 'Go to page'
+  },
+  pageClass: {
+    type: [String, Array, Object],
+    default: null
   },
   hideEllipsis: {
     type: Boolean,
@@ -14225,6 +14353,10 @@ var props$Q = {
     type: String,
     default: "\u2026" // '…'
 
+  },
+  ellipsisClass: {
+    type: [String, Array, Object],
+    default: null
   }
 }; // @vue/component
 
@@ -14256,8 +14388,8 @@ var paginationMixin = {
       } else if (align === 'end' || align === 'right') {
         return 'justify-content-end';
       } else if (align === 'fill') {
-        // The page-items will also have 'flex-fill' added.
-        // We ad text centering to make the button appearance better in fill mode.
+        // The page-items will also have 'flex-fill' added
+        // We add text centering to make the button appearance better in fill mode
         return 'text-center';
       }
 
@@ -14271,50 +14403,80 @@ var paginationMixin = {
     },
     paginationParams: function paginationParams() {
       // Determine if we should show the the ellipsis
-      var limit = this.limit;
+      var limit = this.localLimit;
       var numberOfPages = this.localNumberOfPages;
       var currentPage = this.computedCurrentPage;
       var hideEllipsis = this.hideEllipsis;
+      var firstNumber = this.firstNumber;
+      var lastNumber = this.lastNumber;
       var showFirstDots = false;
       var showLastDots = false;
       var numberOfLinks = limit;
       var startNumber = 1;
 
       if (numberOfPages <= limit) {
-        // Special Case: Less pages available than the limit of displayed pages
+        // Special case: Less pages available than the limit of displayed pages
         numberOfLinks = numberOfPages;
       } else if (currentPage < limit - 1 && limit > ELLIPSIS_THRESHOLD) {
-        // We are near the beginning of the page list
-        if (!hideEllipsis) {
+        if (!hideEllipsis || lastNumber) {
           showLastDots = true;
-          numberOfLinks = limit - 1;
+          numberOfLinks = limit - (firstNumber ? 0 : 1);
         }
+
+        numberOfLinks = Math.min(numberOfLinks, limit);
       } else if (numberOfPages - currentPage + 2 < limit && limit > ELLIPSIS_THRESHOLD) {
-        // We are near the end of the list
-        if (!hideEllipsis) {
-          numberOfLinks = limit - 1;
+        if (!hideEllipsis || firstNumber) {
           showFirstDots = true;
+          numberOfLinks = limit - (lastNumber ? 0 : 1);
         }
 
         startNumber = numberOfPages - numberOfLinks + 1;
       } else {
         // We are somewhere in the middle of the page list
-        if (limit > ELLIPSIS_THRESHOLD && !hideEllipsis) {
+        if (limit > ELLIPSIS_THRESHOLD) {
           numberOfLinks = limit - 2;
-          showFirstDots = showLastDots = true;
+          showFirstDots = !!(!hideEllipsis || firstNumber);
+          showLastDots = !!(!hideEllipsis || lastNumber);
         }
 
         startNumber = currentPage - Math.floor(numberOfLinks / 2);
       } // Sanity checks
 
+      /* istanbul ignore if */
+
 
       if (startNumber < 1) {
-        /* istanbul ignore next */
         startNumber = 1;
+        showFirstDots = false;
       } else if (startNumber > numberOfPages - numberOfLinks) {
         startNumber = numberOfPages - numberOfLinks + 1;
+        showLastDots = false;
       }
 
+      if (showFirstDots && firstNumber && startNumber < 4) {
+        numberOfLinks = numberOfLinks + 2;
+        startNumber = 1;
+        showFirstDots = false;
+      }
+
+      var lastPageNumber = startNumber + numberOfLinks - 1;
+
+      if (showLastDots && lastNumber && lastPageNumber > numberOfPages - 3) {
+        numberOfLinks = numberOfLinks + (lastPageNumber === numberOfPages - 2 ? 2 : 3);
+        showLastDots = false;
+      } // Special handling for lower limits (where ellipsis are never shown)
+
+
+      if (limit <= ELLIPSIS_THRESHOLD) {
+        if (firstNumber && startNumber === 1) {
+          numberOfLinks = Math.min(numberOfLinks + 1, numberOfPages, limit + 1);
+        } else if (lastNumber && numberOfPages === startNumber + numberOfLinks - 1) {
+          startNumber = Math.max(startNumber - 1, 1);
+          numberOfLinks = Math.min(numberOfPages - startNumber + 1, numberOfPages, limit + 1);
+        }
+      }
+
+      numberOfLinks = Math.min(numberOfLinks, numberOfPages - startNumber + 1);
       return {
         showFirstDots: showFirstDots,
         showLastDots: showLastDots,
@@ -14396,15 +14558,15 @@ var paginationMixin = {
   },
   methods: {
     handleKeyNav: function handleKeyNav(evt) {
-      var keyCode = evt.keyCode;
-      var shift = evt.shiftKey;
+      var keyCode = evt.keyCode,
+          shiftKey = evt.shiftKey;
 
       if (keyCode === KEY_CODES.LEFT || keyCode === KEY_CODES.UP) {
         evt.preventDefault();
-        shift ? this.focusFirst() : this.focusPrev();
+        shiftKey ? this.focusFirst() : this.focusPrev();
       } else if (keyCode === KEY_CODES.RIGHT || keyCode === KEY_CODES.DOWN) {
         evt.preventDefault();
-        shift ? this.focusLast() : this.focusNext();
+        shiftKey ? this.focusLast() : this.focusNext();
       }
     },
     getButtons: function getButtons() {
@@ -14419,7 +14581,7 @@ var paginationMixin = {
     focusCurrent: function focusCurrent() {
       var _this2 = this;
 
-      // We do this in next tick to ensure buttons have finished rendering
+      // We do this in `$nextTick()` to ensure buttons have finished rendering
       this.$nextTick(function () {
         var btn = _this2.getButtons().find(function (el) {
           return toInteger(getAttr(el, 'aria-posinset')) === _this2.computedCurrentPage;
@@ -14436,7 +14598,7 @@ var paginationMixin = {
     focusFirst: function focusFirst() {
       var _this3 = this;
 
-      // We do this in next tick to ensure buttons have finished rendering
+      // We do this in `$nextTick()` to ensure buttons have finished rendering
       this.$nextTick(function () {
         var btn = _this3.getButtons().find(function (el) {
           return !isDisabled(el);
@@ -14450,7 +14612,7 @@ var paginationMixin = {
     focusLast: function focusLast() {
       var _this4 = this;
 
-      // We do this in next tick to ensure buttons have finished rendering
+      // We do this in `$nextTick()` to ensure buttons have finished rendering
       this.$nextTick(function () {
         var btn = _this4.getButtons().reverse().find(function (el) {
           return !isDisabled(el);
@@ -14464,7 +14626,7 @@ var paginationMixin = {
     focusPrev: function focusPrev() {
       var _this5 = this;
 
-      // We do this in next tick to ensure buttons have finished rendering
+      // We do this in `$nextTick()` to ensure buttons have finished rendering
       this.$nextTick(function () {
         var buttons = _this5.getButtons();
 
@@ -14478,7 +14640,7 @@ var paginationMixin = {
     focusNext: function focusNext() {
       var _this6 = this;
 
-      // We do this in next tick to ensure buttons have finished rendering
+      // We do this in `$nextTick()` to ensure buttons have finished rendering
       this.$nextTick(function () {
         var buttons = _this6.getButtons();
 
@@ -14496,6 +14658,9 @@ var paginationMixin = {
 
     var buttons = [];
     var numberOfPages = this.localNumberOfPages;
+    var pageNumbers = this.pageList.map(function (p) {
+      return p.number;
+    });
     var disabled = this.disabled;
     var _this$paginationParam2 = this.paginationParams,
         showFirstDots = _this$paginationParam2.showFirstDots,
@@ -14507,10 +14672,10 @@ var paginationMixin = {
       return pageNum === currentPage;
     };
 
-    var noCurrPage = this.currentPage < 1; // Factory function for prev/next/first/last buttons
+    var noCurrentPage = this.currentPage < 1; // Factory function for prev/next/first/last buttons
 
-    var makeEndBtn = function makeEndBtn(linkTo, ariaLabel, btnSlot, btnText, pageTest, key) {
-      var isDisabled = disabled || isActivePage(pageTest) || noCurrPage || linkTo < 1 || linkTo > numberOfPages;
+    var makeEndBtn = function makeEndBtn(linkTo, ariaLabel, btnSlot, btnText, btnClass, pageTest, key) {
+      var isDisabled = disabled || isActivePage(pageTest) || noCurrentPage || linkTo < 1 || linkTo > numberOfPages;
       var pageNum = linkTo < 1 ? 1 : linkTo > numberOfPages ? numberOfPages : linkTo;
       var scope = {
         disabled: isDisabled,
@@ -14538,10 +14703,10 @@ var paginationMixin = {
       return h('li', {
         key: key,
         staticClass: 'page-item',
-        class: {
+        class: [{
           disabled: isDisabled,
           'flex-fill': fill
-        },
+        }, btnClass],
         attrs: {
           role: 'presentation',
           'aria-hidden': isDisabled ? 'true' : null
@@ -14554,26 +14719,20 @@ var paginationMixin = {
       return h('li', {
         key: "ellipsis-".concat(isLast ? 'last' : 'first'),
         staticClass: 'page-item',
-        class: ['disabled', 'bv-d-xs-down-none', fill ? 'flex-fill' : ''],
+        class: ['disabled', 'bv-d-xs-down-none', fill ? 'flex-fill' : '', _this7.ellipsisClass],
         attrs: {
           role: 'separator'
         }
       }, [h('span', {
         staticClass: 'page-link'
       }, [_this7.normalizeSlot('ellipsis-text') || toString$1(_this7.ellipsisText) || h()])]);
-    }; // Goto First Page button bookend
+    }; // Page button factory
 
 
-    buttons.push(this.hideGotoEndButtons ? h() : makeEndBtn(1, this.labelFirstPage, 'first-text', this.firstText, 1, 'bookend-goto-first')); // Goto Previous page button bookend
+    var makePageButton = function makePageButton(page, idx) {
+      var active = isActivePage(page.number) && !noCurrentPage; // Active page will have tabindex of 0, or if no current page and first page button
 
-    buttons.push(makeEndBtn(currentPage - 1, this.labelPrevPage, 'prev-text', this.prevText, 1, 'bookend-goto-prev')); // First Ellipsis Bookend
-
-    buttons.push(showFirstDots ? makeEllipsis(false) : h()); // Individual Page links
-
-    this.pageList.forEach(function (page, idx) {
-      var active = isActivePage(page.number) && !noCurrPage; // Active page will have tabindex of 0, or if no current page and first page button
-
-      var tabIndex = disabled ? null : active || noCurrPage && idx === 0 ? '0' : '-1';
+      var tabIndex = disabled ? null : active || noCurrentPage && idx === 0 ? '0' : '-1';
       var attrs = {
         role: 'menuitemradio',
         'aria-disabled': disabled ? 'true' : null,
@@ -14604,27 +14763,61 @@ var paginationMixin = {
           keydown: onSpaceKey
         }
       }, [_this7.normalizeSlot('page', scope) || btnContent]);
-      buttons.push(h('li', {
+      return h('li', {
         key: "page-".concat(page.number),
         staticClass: 'page-item',
         class: [{
           disabled: disabled,
           active: active,
           'flex-fill': fill
-        }, page.classes],
+        }, page.classes, _this7.pageClass],
         attrs: {
           role: 'presentation'
         }
-      }, [inner]));
-    }); // Last Ellipsis Bookend
+      }, [inner]);
+    }; // Goto first page button
+    // Don't render button when `hideGotoEndButtons` or `firstNumber` is set
 
-    buttons.push(showLastDots ? makeEllipsis(true) : h()); // Goto Next page button bookend
 
-    buttons.push(makeEndBtn(currentPage + 1, this.labelNextPage, 'next-text', this.nextText, numberOfPages, 'bookend-goto-next')); // Goto Last Page button bookend
+    var $firstPageBtn = h();
 
-    buttons.push(this.hideGotoEndButtons ? h() : makeEndBtn(numberOfPages, this.labelLastPage, 'last-text', this.lastText, numberOfPages, 'bookend-goto-last')); // Assemble the pagination buttons
+    if (!this.firstNumber && !this.hideGotoEndButtons) {
+      $firstPageBtn = makeEndBtn(1, this.labelFirstPage, 'first-text', this.firstText, this.firstClass, 1, 'pagination-goto-first');
+    }
 
-    var pagination = h('ul', {
+    buttons.push($firstPageBtn); // Goto previous page button
+
+    buttons.push(makeEndBtn(currentPage - 1, this.labelPrevPage, 'prev-text', this.prevText, this.prevClass, 1, 'pagination-goto-prev')); // Show first (1) button?
+
+    buttons.push(this.firstNumber && pageNumbers[0] !== 1 ? makePageButton({
+      number: 1
+    }, 0) : h()); // First ellipsis
+
+    buttons.push(showFirstDots ? makeEllipsis(false) : h()); // Individual page links
+
+    this.pageList.forEach(function (page, idx) {
+      var offset = showFirstDots && _this7.firstNumber && pageNumbers[0] !== 1 ? 1 : 0;
+      buttons.push(makePageButton(page, idx + offset));
+    }); // Last ellipsis
+
+    buttons.push(showLastDots ? makeEllipsis(true) : h()); // Show last page button?
+
+    buttons.push(this.lastNumber && pageNumbers[pageNumbers.length - 1] !== numberOfPages ? makePageButton({
+      number: numberOfPages
+    }, -1) : h()); // Goto next page button
+
+    buttons.push(makeEndBtn(currentPage + 1, this.labelNextPage, 'next-text', this.nextText, this.nextClass, numberOfPages, 'pagination-goto-next')); // Goto last page button
+    // Don't render button when `hideGotoEndButtons` or `lastNumber` is set
+
+    var $lastPageBtn = h();
+
+    if (!this.lastNumber && !this.hideGotoEndButtons) {
+      $lastPageBtn = makeEndBtn(numberOfPages, this.labelLastPage, 'last-text', this.lastText, this.lastClass, numberOfPages, 'pagination-goto-last');
+    }
+
+    buttons.push($lastPageBtn); // Assemble the pagination buttons
+
+    var $pagination = h('ul', {
       ref: 'ul',
       staticClass: 'pagination',
       class: ['b-pagination', this.btnSize, this.alignment, this.styleClass],
@@ -14636,7 +14829,7 @@ var paginationMixin = {
       on: {
         keydown: this.handleKeyNav
       }
-    }, buttons); // if we are pagination-nav, wrap in '<nav>' wrapper
+    }, buttons); // If we are `<b-pagination-nav>`, wrap in `<nav>` wrapper
 
     if (this.isNav) {
       return h('nav', {
@@ -14644,21 +14837,21 @@ var paginationMixin = {
           'aria-disabled': disabled ? 'true' : null,
           'aria-hidden': disabled ? 'true' : 'false'
         }
-      }, [pagination]);
-    } else {
-      return pagination;
+      }, [$pagination]);
     }
+
+    return $pagination;
   }
 };
 
-var NAME$m = 'BPagination';
+var NAME$n = 'BPagination';
 var DEFAULT_PER_PAGE = 20;
 var DEFAULT_TOTAL_ROWS = 0;
 var props$R = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$m, 'size');
+      return getComponentConfig(NAME$n, 'size');
     }
   },
   perPage: {
@@ -14692,7 +14885,7 @@ var sanitizeTotalRows = function sanitizeTotalRows(val) {
 var BPagination =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$m,
+  name: NAME$n,
   mixins: [paginationMixin],
   props: props$R,
   computed: {
@@ -14797,7 +14990,7 @@ pluginFactory({
   }
 });
 
-var NAME$n = 'BPaginationNav'; // Sanitize the provided number of pages (converting to a number)
+var NAME$o = 'BPaginationNav'; // Sanitize the provided number of pages (converting to a number)
 
 var sanitizeNumberOfPages = function sanitizeNumberOfPages(value) {
   var numberOfPages = toInteger(value) || 1;
@@ -14807,7 +15000,7 @@ var props$S = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$n, 'size');
+      return getComponentConfig(NAME$o, 'size');
     }
   },
   numberOfPages: {
@@ -14819,7 +15012,7 @@ var props$S = {
       var num = toInteger(value);
 
       if (isNaN(num) || num < 1) {
-        warn('Prop "number-of-pages" must be a number greater than "0"', NAME$n);
+        warn('Prop "number-of-pages" must be a number greater than "0"', NAME$o);
         return false;
       }
 
@@ -14876,7 +15069,7 @@ var props$S = {
 var BPaginationNav =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$n,
+  name: NAME$o,
   mixins: [paginationMixin],
   props: props$S,
   computed: {
@@ -15150,7 +15343,7 @@ pluginFactory({
 });
 
 // Base on-demand component for tooltip / popover templates
-var NAME$o = 'BVPopper';
+var NAME$p = 'BVPopper';
 var AttachmentMap$1 = {
   AUTO: 'auto',
   TOP: 'top',
@@ -15185,7 +15378,7 @@ var OffsetMap = {
 var BVPopper =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$o,
+  name: NAME$p,
   props: {
     target: {
       // Element that the tooltip/popover is positioned relative to
@@ -15400,12 +15593,12 @@ Vue.extend({
   }
 });
 
-var NAME$p = 'BVTooltipTemplate'; // @vue/component
+var NAME$q = 'BVTooltipTemplate'; // @vue/component
 
 var BVTooltipTemplate =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$p,
+  name: NAME$q,
   extends: BVPopper,
   mixins: [scopedStyleAttrsMixin],
   props: {
@@ -15499,7 +15692,7 @@ Vue.extend({
   }
 });
 
-var NAME$q = 'BVTooltip'; // Modal container selector for appending tooltip/popover
+var NAME$r = 'BVTooltip'; // Modal container selector for appending tooltip/popover
 
 var MODAL_SELECTOR = '.modal-content'; // Modal `$root` hidden event
 
@@ -15563,7 +15756,7 @@ var templateData = {
 var BVTooltip =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$q,
+  name: NAME$r,
   props: {// None
   },
   data: function data() {
@@ -16237,7 +16430,7 @@ Vue.extend({
 
       if (!target || !this.$root || !this.isDropdown) {
         return;
-      } // We can listen for dropdown shown events on it's instance
+      } // We can listen for dropdown shown events on its instance
       // TODO:
       //   We could grab the ID from the dropdown, and listen for
       //   $root events for that particular dropdown id
@@ -16439,12 +16632,12 @@ Vue.extend({
   }
 });
 
-var NAME$r = 'BTooltip'; // @vue/component
+var NAME$s = 'BTooltip'; // @vue/component
 
 var BTooltip =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$r,
+  name: NAME$s,
   props: {
     title: {
       type: String // default: undefined
@@ -16482,19 +16675,19 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$r, 'variant');
+        return getComponentConfig(NAME$s, 'variant');
       }
     },
     customClass: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$r, 'customClass');
+        return getComponentConfig(NAME$s, 'customClass');
       }
     },
     delay: {
       type: [Number, Object, String],
       default: function _default() {
-        return getComponentConfig(NAME$r, 'delay');
+        return getComponentConfig(NAME$s, 'delay');
       }
     },
     boundary: {
@@ -16503,13 +16696,13 @@ Vue.extend({
       // Object: Vue component
       type: [String, HTMLElement, Object],
       default: function _default() {
-        return getComponentConfig(NAME$r, 'boundary');
+        return getComponentConfig(NAME$s, 'boundary');
       }
     },
     boundaryPadding: {
       type: [Number, String],
       default: function _default() {
-        return getComponentConfig(NAME$r, 'boundaryPadding');
+        return getComponentConfig(NAME$s, 'boundaryPadding');
       }
     },
     offset: {
@@ -16784,12 +16977,12 @@ Vue.extend({
   }
 });
 
-var NAME$s = 'BVPopoverTemplate'; // @vue/component
+var NAME$t = 'BVPopoverTemplate'; // @vue/component
 
 var BVPopoverTemplate =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$s,
+  name: NAME$t,
   extends: BVTooltipTemplate,
   computed: {
     templateType: function templateType() {
@@ -16828,12 +17021,12 @@ Vue.extend({
 });
 
 // Popover "Class" (Built as a renderless Vue instance)
-var NAME$t = 'BVPopover'; // @vue/component
+var NAME$u = 'BVPopover'; // @vue/component
 
 var BVPopover =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$t,
+  name: NAME$u,
   extends: BVTooltip,
   computed: {
     // Overwrites BVTooltip
@@ -16849,11 +17042,11 @@ Vue.extend({
   }
 });
 
-var NAME$u = 'BPopover';
+var NAME$v = 'BPopover';
 var BPopover =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$u,
+  name: NAME$v,
   extends: BTooltip,
   inheritAttrs: false,
   props: {
@@ -16876,19 +17069,19 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$u, 'variant');
+        return getComponentConfig(NAME$v, 'variant');
       }
     },
     customClass: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$u, 'customClass');
+        return getComponentConfig(NAME$v, 'customClass');
       }
     },
     delay: {
       type: [Number, Object, String],
       default: function _default() {
-        return getComponentConfig(NAME$u, 'delay');
+        return getComponentConfig(NAME$v, 'delay');
       }
     },
     boundary: {
@@ -16897,13 +17090,13 @@ Vue.extend({
       // Object: Vue component
       type: [String, HTMLElement, Object],
       default: function _default() {
-        return getComponentConfig(NAME$u, 'boundary');
+        return getComponentConfig(NAME$v, 'boundary');
       }
     },
     boundaryPadding: {
       type: [Number, String],
       default: function _default() {
-        return getComponentConfig(NAME$u, 'boundaryPadding');
+        return getComponentConfig(NAME$v, 'boundaryPadding');
       }
     }
   },
@@ -17196,12 +17389,12 @@ pluginFactory({
   }
 });
 
-var NAME$v = 'BProgressBar'; // @vue/component
+var NAME$w = 'BProgressBar'; // @vue/component
 
 var BProgressBar =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$v,
+  name: NAME$w,
   mixins: [normalizeSlotMixin],
   inject: {
     bvProgress: {
@@ -17237,7 +17430,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$v, 'variant');
+        return getComponentConfig(NAME$w, 'variant');
       }
     },
     striped: {
@@ -17334,12 +17527,12 @@ Vue.extend({
   }
 });
 
-var NAME$w = 'BProgress'; // @vue/component
+var NAME$x = 'BProgress'; // @vue/component
 
 var BProgress =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$w,
+  name: NAME$x,
   mixins: [normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -17351,7 +17544,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$w, 'variant');
+        return getComponentConfig(NAME$x, 'variant');
       }
     },
     striped: {
@@ -17429,12 +17622,12 @@ pluginFactory({
   }
 });
 
-var NAME$x = 'BSpinner'; // @vue/component
+var NAME$y = 'BSpinner'; // @vue/component
 
 var BSpinner =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$x,
+  name: NAME$y,
   functional: true,
   props: {
     type: {
@@ -17449,7 +17642,7 @@ Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$x, 'variant');
+        return getComponentConfig(NAME$y, 'variant');
       }
     },
     small: {
@@ -21306,7 +21499,7 @@ Vue.extend({
         return btn.tab === tab;
       });
     },
-    // Force a button to re-render it's content, given a <b-tab> instance
+    // Force a button to re-render its content, given a <b-tab> instance
     // Called by <b-tab> on `update()`
     updateButton: function updateButton(tab) {
       var button = this.getButtonForTab(tab);
@@ -21362,7 +21555,7 @@ Vue.extend({
 
       return false;
     },
-    // Focus a tab button given it's <b-tab> instance
+    // Focus a tab button given its <b-tab> instance
     focusButton: function focusButton(tab) {
       var _this8 = this;
 
@@ -21733,7 +21926,7 @@ pluginFactory({
   }
 });
 
-var NAME$y = 'BToaster';
+var NAME$z = 'BToaster';
 var props$Z = {
   name: {
     type: String,
@@ -21742,13 +21935,13 @@ var props$Z = {
   ariaLive: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$y, 'ariaLive');
+      return getComponentConfig(NAME$z, 'ariaLive');
     }
   },
   ariaAtomic: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$y, 'ariaAtomic');
+      return getComponentConfig(NAME$z, 'ariaAtomic');
     } // Allowed: 'true' or 'false' or null
 
   },
@@ -21756,7 +21949,7 @@ var props$Z = {
     // Aria role
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$y, 'role');
+      return getComponentConfig(NAME$z, 'role');
     }
   }
   /*
@@ -21805,7 +21998,7 @@ Vue.extend({
 var BToaster =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$y,
+  name: NAME$z,
   props: props$Z,
   data: function data() {
     return {
@@ -21878,7 +22071,7 @@ Vue.extend({
   }
 });
 
-var NAME$z = 'BToast';
+var NAME$A = 'BToast';
 var MIN_DURATION = 1000;
 var EVENT_OPTIONS = {
   passive: true,
@@ -21899,7 +22092,7 @@ var props$_ = {
   toaster: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$z, 'toaster');
+      return getComponentConfig(NAME$A, 'toaster');
     }
   },
   visible: {
@@ -21909,7 +22102,7 @@ var props$_ = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$z, 'variant');
+      return getComponentConfig(NAME$A, 'variant');
     }
   },
   isStatus: {
@@ -21928,7 +22121,7 @@ var props$_ = {
   autoHideDelay: {
     type: [Number, String],
     default: function _default() {
-      return getComponentConfig(NAME$z, 'autoHideDelay');
+      return getComponentConfig(NAME$A, 'autoHideDelay');
     }
   },
   noCloseButton: {
@@ -21950,19 +22143,19 @@ var props$_ = {
   toastClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$z, 'toastClass');
+      return getComponentConfig(NAME$A, 'toastClass');
     }
   },
   headerClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$z, 'headerClass');
+      return getComponentConfig(NAME$A, 'headerClass');
     }
   },
   bodyClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$z, 'bodyClass');
+      return getComponentConfig(NAME$A, 'bodyClass');
     }
   },
   href: {
@@ -21983,7 +22176,7 @@ var props$_ = {
 var BToast =
 /*#__PURE__*/
 Vue.extend({
-  name: NAME$z,
+  name: NAME$A,
   mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
   inheritAttrs: false,
   model: {
@@ -22876,7 +23069,7 @@ pluginFactory({
  * Constants / Defaults
  */
 
-var NAME$A = 'v-b-scrollspy';
+var NAME$B = 'v-b-scrollspy';
 var ACTIVATE_EVENT = 'bv::scrollspy::activate';
 var Default = {
   element: 'body',
@@ -23287,7 +23480,7 @@ function () {
       .join(','), this.$el);
       links.forEach(function (link) {
         if (hasClass(link, ClassName.DROPDOWN_ITEM)) {
-          // This is a dropdown item, so find the .dropdown-toggle and set it's state
+          // This is a dropdown item, so find the .dropdown-toggle and set its state
           var dropdown = closest(Selector$2.DROPDOWN, link);
 
           if (dropdown) {
@@ -23359,7 +23552,7 @@ function () {
   }], [{
     key: "Name",
     get: function get() {
-      return NAME$A;
+      return NAME$B;
     }
   }, {
     key: "Default",
@@ -23579,61 +23772,92 @@ var baseAttrs = {
 }; // Shared private base component to reduce bundle/runtime size
 // @vue/component
 
-var BVIconBase = {
+var BVIconBase =
+/*#__PURE__*/
+Vue.extend({
   name: 'BVIconBase',
   functional: true,
   props: _objectSpread2({
     content: {
       type: String
+    },
+    stacked: {
+      type: Boolean,
+      default: false
     }
   }, commonIconProps),
   render: function render(h, _ref) {
     var data = _ref.data,
-        props = _ref.props;
-    var fontScale = toFloat(props.fontScale) || 1;
-    var scale = toFloat(props.scale) || 1;
+        props = _ref.props,
+        children = _ref.children;
+    var fontScale = Math.max(toFloat(props.fontScale) || 1, 0) || 1;
+    var scale = Math.max(toFloat(props.scale) || 1, 0) || 1;
     var rotate = toFloat(props.rotate) || 0;
     var shiftH = toFloat(props.shiftH) || 0;
     var shiftV = toFloat(props.shiftV) || 0;
     var flipH = props.flipH;
-    var flipV = props.flipV; // Compute the transforms. Note that order is important
-    // CSS transforms are applied in order from right to left
-    // and we want flipping to occur before rotation, and
-    // shifting is applied last
+    var flipV = props.flipV; // Compute the transforms
+    // Note that order is important as SVG transforms are applied in order from
+    // left to right and we want flipping/scale to occur before rotation
+    // Note shifting is applied separately
+    // Assumes that the viewbox is `0 0 20 20` (`10 10` is the center)
 
-    var transforms = [shiftH ? "translateX(".concat(100 * shiftH / 16, "%)") : null, shiftV ? "translateY(".concat(-100 * shiftV / 16, "%)") : null, rotate ? "rotate(".concat(rotate, "deg)") : null, flipH || flipV || scale !== 1 ? "scale(".concat((flipH ? -1 : 1) * scale, ", ").concat((flipV ? -1 : 1) * scale, ")") : null].filter(identity); // We wrap the content in a `<g>` for handling the transforms
+    var hasScale = flipH || flipV || scale !== 1;
+    var hasTransforms = hasScale || rotate;
+    var hasShift = shiftH || shiftV;
+    var transforms = [hasTransforms ? 'translate(10 10)' : null, hasScale ? "scale(".concat((flipH ? -1 : 1) * scale, " ").concat((flipV ? -1 : 1) * scale, ")") : null, rotate ? "rotate(".concat(rotate, ")") : null, hasTransforms ? 'translate(-10 -10)' : null].filter(identity); // Handling stacked icons
+
+    var isStacked = props.stacked;
+    var hasContent = !isUndefinedOrNull(props.content); // We wrap the content in a `<g>` for handling the transforms (except shift)
 
     var $inner = h('g', {
-      style: {
-        transform: transforms.join(' ') || null,
-        transformOrigin: transforms.length > 0 ? 'center' : null
+      attrs: {
+        transform: transforms.join(' ') || null
       },
-      domProps: {
+      domProps: hasContent ? {
         innerHTML: props.content || ''
-      }
-    });
+      } : {}
+    }, children); // If needed, we wrap in an additional `<g>` in order to handle the shifting
+
+    if (hasShift) {
+      $inner = h('g', {
+        attrs: {
+          transform: "translate(".concat(20 * shiftH / 16, " ").concat(-20 * shiftV / 16, ")")
+        }
+      }, [$inner]);
+    }
+
     return h('svg', mergeData({
+      staticClass: 'b-icon bi',
       class: _defineProperty({}, "text-".concat(props.variant), !!props.variant),
       attrs: baseAttrs,
-      style: {
+      style: isStacked ? {} : {
         fontSize: fontScale === 1 ? null : "".concat(fontScale * 100, "%")
       }
     }, // Merge in user supplied data
-    data, // These cannot be overridden by users
-    {
-      staticClass: 'b-icon bi',
+    data, // If icon is stacked, null out some attrs
+    isStacked ? {
       attrs: {
-        xmlns: 'http://www.w3.org/2000/svg',
+        width: null,
+        height: null,
+        role: null,
+        alt: null
+      }
+    } : {}, // These cannot be overridden by users
+    {
+      attrs: {
+        xmlns: isStacked ? null : 'http://www.w3.org/2000/svg',
         fill: 'currentColor'
       }
     }), [$inner]);
   }
-};
+});
+
 /**
  * Icon component generator function
  *
  * @param {string} icon name (minus the leading `BIcon`)
- * @param {string} raw innerHTML for SVG
+ * @param {string} raw `innerHTML` for SVG
  * @return {VueComponent}
  */
 
@@ -23644,21 +23868,29 @@ var makeIcon = function makeIcon(name, content) {
   var iconNameClass = "bi-".concat(kebabCase(name));
   var svgContent = trim(content || ''); // Return the icon component definition
 
-  return Vue.extend({
-    name: iconName,
-    functional: true,
-    props: _objectSpread2({}, commonIconProps),
-    render: function render(h, _ref2) {
-      var data = _ref2.data,
-          props = _ref2.props;
-      return h(BVIconBase, mergeData(data, {
-        staticClass: iconNameClass,
-        props: _objectSpread2({}, props, {
-          content: svgContent
-        })
-      }));
-    }
-  });
+  return (
+    /*#__PURE__*/
+    Vue.extend({
+      name: iconName,
+      functional: true,
+      props: _objectSpread2({}, commonIconProps, {
+        stacked: {
+          type: Boolean,
+          default: false
+        }
+      }),
+      render: function render(h, _ref) {
+        var data = _ref.data,
+            props = _ref.props;
+        return h(BVIconBase, mergeData(data, {
+          staticClass: iconNameClass,
+          props: _objectSpread2({}, props, {
+            content: svgContent
+          })
+        }));
+      }
+    })
+  );
 };
 
 // --- BEGIN AUTO-GENERATED FILE ---
@@ -24626,7 +24858,12 @@ Vue.extend({
       type: String,
       default: null
     }
-  }, commonIconProps),
+  }, commonIconProps, {
+    stacked: {
+      type: Boolean,
+      default: false
+    }
+  }),
   render: function render(h, _ref) {
     var data = _ref.data,
         props = _ref.props,
@@ -24646,6 +24883,25 @@ Vue.extend({
   }
 });
 
+var BIconstack =
+/*#__PURE__*/
+Vue.extend({
+  name: 'BIconstack',
+  functional: true,
+  props: _objectSpread2({}, commonIconProps),
+  render: function render(h, _ref) {
+    var data = _ref.data,
+        props = _ref.props,
+        children = _ref.children;
+    return h(BVIconBase, mergeData(data, {
+      staticClass: 'b-iconstack',
+      props: _objectSpread2({}, props, {
+        stacked: false
+      })
+    }), children);
+  }
+});
+
 // --- BEGIN AUTO-GENERATED FILE ---
 
 var IconsPlugin =
@@ -24654,6 +24910,8 @@ pluginFactoryNoConfig({
   components: {
     // Icon helper component
     BIcon: BIcon,
+    // Icon stacking component
+    BIconstack: BIconstack,
     // BootstrapVue custom icon components
     BIconBlank: BIconBlank,
     // Bootstrap icon components
@@ -24986,9 +25244,7 @@ pluginFactoryNoConfig({
   NAME: 'BootstrapVueIcons'
 }); // --- END AUTO-GENERATED FILE ---
 
-var NAME$B = 'BootstrapVue'; //
-// BootstrapVue installer
-//
+var NAME$C = 'BootstrapVue'; // --- BootstrapVue installer ---
 
 var install =
 /*#__PURE__*/
@@ -24997,17 +25253,15 @@ installFactory({
     componentsPlugin: componentsPlugin,
     directivesPlugin: directivesPlugin
   }
-}); //
-// BootstrapVue plugin
-//
+}); // --- BootstrapVue plugin ---
 
 var BootstrapVue =
 /*#__PURE__*/
 {
   install: install,
-  NAME: NAME$B
-}; //
+  NAME: NAME$C
+}; // --- Named exports for BvConfigPlugin ---
 
 export default BootstrapVue;
-export { AlertPlugin, BAlert, BBadge, BBreadcrumb, BBreadcrumbItem, BButton, BButtonClose, BButtonGroup, BButtonToolbar, BCard, BCardBody, BCardFooter, BCardGroup, BCardHeader, BCardImg, BCardImgLazy, BCardSubTitle, BCardText, BCardTitle, BCarousel, BCarouselSlide, BCol, BCollapse, BContainer, BDropdown, BDropdownDivider, BDropdownForm, BDropdownGroup, BDropdownHeader, BDropdownItem, BDropdownItemButton, BDropdownText, BEmbed, BForm, BFormCheckbox, BFormCheckboxGroup, BFormDatalist, BFormFile, BFormGroup, BFormInput, BFormInvalidFeedback, BFormRadio, BFormRadioGroup, BFormRow, BFormSelect, BFormSelectOption, BFormSelectOptionGroup, BFormTag, BFormTags, BFormText, BFormTextarea, BFormValidFeedback, BIcon, BIconAlarm, BIconAlarmFill, BIconAlertCircle, BIconAlertCircleFill, BIconAlertOctagon, BIconAlertOctagonFill, BIconAlertSquare, BIconAlertSquareFill, BIconAlertTriangle, BIconAlertTriangleFill, BIconArchive, BIconArchiveFill, BIconArrowBarBottom, BIconArrowBarLeft, BIconArrowBarRight, BIconArrowBarUp, BIconArrowClockwise, BIconArrowCounterclockwise, BIconArrowDown, BIconArrowDownLeft, BIconArrowDownRight, BIconArrowDownShort, BIconArrowLeft, BIconArrowLeftRight, BIconArrowLeftShort, BIconArrowRepeat, BIconArrowRight, BIconArrowRightShort, BIconArrowUp, BIconArrowUpDown, BIconArrowUpLeft, BIconArrowUpRight, BIconArrowUpShort, BIconArrowsAngleContract, BIconArrowsAngleExpand, BIconArrowsCollapse, BIconArrowsExpand, BIconArrowsFullscreen, BIconAt, BIconAward, BIconBackspace, BIconBackspaceFill, BIconBackspaceReverse, BIconBackspaceReverseFill, BIconBarChart, BIconBarChartFill, BIconBattery, BIconBatteryCharging, BIconBatteryFull, BIconBell, BIconBellFill, BIconBlank, BIconBlockquoteLeft, BIconBlockquoteRight, BIconBook, BIconBookHalfFill, BIconBookmark, BIconBookmarkFill, BIconBootstrap, BIconBootstrapFill, BIconBootstrapReboot, BIconBoxArrowBottomLeft, BIconBoxArrowBottomRight, BIconBoxArrowDown, BIconBoxArrowLeft, BIconBoxArrowRight, BIconBoxArrowUp, BIconBoxArrowUpLeft, BIconBoxArrowUpRight, BIconBraces, BIconBrightnessFillHigh, BIconBrightnessFillLow, BIconBrightnessHigh, BIconBrightnessLow, BIconBrush, BIconBucket, BIconBucketFill, BIconBuilding, BIconBullseye, BIconCalendar, BIconCalendarFill, BIconCamera, BIconCameraVideo, BIconCameraVideoFill, BIconCapslock, BIconCapslockFill, BIconChat, BIconChatFill, BIconCheck, BIconCheckBox, BIconCheckCircle, BIconChevronCompactDown, BIconChevronCompactLeft, BIconChevronCompactRight, BIconChevronCompactUp, BIconChevronDown, BIconChevronLeft, BIconChevronRight, BIconChevronUp, BIconCircle, BIconCircleFill, BIconCircleHalf, BIconCircleSlash, BIconClock, BIconClockFill, BIconCloud, BIconCloudDownload, BIconCloudFill, BIconCloudUpload, BIconCode, BIconCodeSlash, BIconColumns, BIconColumnsGutters, BIconCommand, BIconCompass, BIconCone, BIconConeStriped, BIconController, BIconCreditCard, BIconCursor, BIconCursorFill, BIconDash, BIconDiamond, BIconDiamondHalf, BIconDisplay, BIconDisplayFill, BIconDocument, BIconDocumentCode, BIconDocumentDiff, BIconDocumentRichtext, BIconDocumentSpreadsheet, BIconDocumentText, BIconDocuments, BIconDocumentsAlt, BIconDot, BIconDownload, BIconEggFried, BIconEject, BIconEjectFill, BIconEnvelope, BIconEnvelopeFill, BIconEnvelopeOpen, BIconEnvelopeOpenFill, BIconEye, BIconEyeFill, BIconEyeSlash, BIconEyeSlashFill, BIconFilter, BIconFlag, BIconFlagFill, BIconFolder, BIconFolderFill, BIconFolderSymlink, BIconFolderSymlinkFill, BIconFonts, BIconForward, BIconForwardFill, BIconGear, BIconGearFill, BIconGearWide, BIconGearWideConnected, BIconGeo, BIconGraphDown, BIconGraphUp, BIconGrid, BIconGridFill, BIconHammer, BIconHash, BIconHeart, BIconHeartFill, BIconHouse, BIconHouseFill, BIconImage, BIconImageAlt, BIconImageFill, BIconImages, BIconInbox, BIconInboxFill, BIconInboxes, BIconInboxesFill, BIconInfo, BIconInfoFill, BIconInfoSquare, BIconInfoSquareFill, BIconJustify, BIconJustifyLeft, BIconJustifyRight, BIconKanban, BIconKanbanFill, BIconLaptop, BIconLayoutSidebar, BIconLayoutSidebarReverse, BIconLayoutSplit, BIconList, BIconListCheck, BIconListOl, BIconListTask, BIconListUl, BIconLock, BIconLockFill, BIconMap, BIconMic, BIconMoon, BIconMusicPlayer, BIconMusicPlayerFill, BIconOption, BIconOutlet, BIconPause, BIconPauseFill, BIconPen, BIconPencil, BIconPeople, BIconPeopleFill, BIconPerson, BIconPersonFill, BIconPhone, BIconPhoneLandscape, BIconPieChart, BIconPieChartFill, BIconPlay, BIconPlayFill, BIconPlug, BIconPlus, BIconPower, BIconQuestion, BIconQuestionFill, BIconQuestionSquare, BIconQuestionSquareFill, BIconReply, BIconReplyAll, BIconReplyAllFill, BIconReplyFill, BIconScrewdriver, BIconSearch, BIconShield, BIconShieldFill, BIconShieldLock, BIconShieldLockFill, BIconShieldShaded, BIconShift, BIconShiftFill, BIconSkipBackward, BIconSkipBackwardFill, BIconSkipEnd, BIconSkipEndFill, BIconSkipForward, BIconSkipForwardFill, BIconSkipStart, BIconSkipStartFill, BIconSpeaker, BIconSquare, BIconSquareFill, BIconSquareHalf, BIconStar, BIconStarFill, BIconStarHalf, BIconStop, BIconStopFill, BIconStopwatch, BIconStopwatchFill, BIconSun, BIconTable, BIconTablet, BIconTabletLandscape, BIconTag, BIconTagFill, BIconTerminal, BIconTerminalFill, BIconTextCenter, BIconTextIndentLeft, BIconTextIndentRight, BIconTextLeft, BIconTextRight, BIconThreeDots, BIconThreeDotsVertical, BIconToggleOff, BIconToggleOn, BIconToggles, BIconTools, BIconTrash, BIconTrashFill, BIconTriangle, BIconTriangleFill, BIconTriangleHalf, BIconTrophy, BIconTv, BIconTvFill, BIconType, BIconTypeBold, BIconTypeH1, BIconTypeH2, BIconTypeH3, BIconTypeItalic, BIconTypeStrikethrough, BIconTypeUnderline, BIconUnlock, BIconUnlockFill, BIconUpload, BIconVolumeDown, BIconVolumeDownFill, BIconVolumeMute, BIconVolumeMuteFill, BIconVolumeUp, BIconVolumeUpFill, BIconWallet, BIconWatch, BIconWifi, BIconWindow, BIconWrench, BIconX, BIconXCircle, BIconXCircleFill, BIconXOctagon, BIconXOctagonFill, BIconXSquare, BIconXSquareFill, BImg, BImgLazy, BInputGroup, BInputGroupAddon, BInputGroupAppend, BInputGroupPrepend, BInputGroupText, BJumbotron, BLink, BListGroup, BListGroupItem, BMedia, BMediaAside, BMediaBody, BModal, BNav, BNavForm, BNavItem, BNavItemDropdown, BNavText, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BPagination, BPaginationNav, BPopover, BProgress, BProgressBar, BRow, BSpinner, BTab, BTable, BTableLite, BTableSimple, BTabs, BTbody, BTd, BTfoot, BTh, BThead, BToast, BToaster, BTooltip, BTr, BVConfigPlugin as BVConfig, BVConfigPlugin, BVModalPlugin, BVToastPlugin, BadgePlugin, BootstrapVue, BootstrapVueIcons, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, ButtonToolbarPlugin, CardPlugin, CarouselPlugin, CollapsePlugin, DropdownPlugin, EmbedPlugin, FormCheckboxPlugin, FormFilePlugin, FormGroupPlugin, FormInputPlugin, FormPlugin, FormRadioPlugin, FormSelectPlugin, FormTagsPlugin, FormTextareaPlugin, IconsPlugin, ImagePlugin, InputGroupPlugin, JumbotronPlugin, LayoutPlugin, LinkPlugin, ListGroupPlugin, MediaPlugin, ModalPlugin, NAME$B as NAME, NavPlugin, NavbarPlugin, PaginationNavPlugin, PaginationPlugin, PopoverPlugin, ProgressPlugin, SpinnerPlugin, TableLitePlugin, TablePlugin, TableSimplePlugin, TabsPlugin, ToastPlugin, TooltipPlugin, VBModal, VBModalPlugin, VBPopover, VBPopoverPlugin, VBScrollspy, VBScrollspyPlugin, VBToggle, VBTogglePlugin, VBTooltip, VBTooltipPlugin, VBVisible, VBVisiblePlugin, install };
+export { AlertPlugin, BAlert, BBadge, BBreadcrumb, BBreadcrumbItem, BButton, BButtonClose, BButtonGroup, BButtonToolbar, BCard, BCardBody, BCardFooter, BCardGroup, BCardHeader, BCardImg, BCardImgLazy, BCardSubTitle, BCardText, BCardTitle, BCarousel, BCarouselSlide, BCol, BCollapse, BContainer, BDropdown, BDropdownDivider, BDropdownForm, BDropdownGroup, BDropdownHeader, BDropdownItem, BDropdownItemButton, BDropdownText, BEmbed, BForm, BFormCheckbox, BFormCheckboxGroup, BFormDatalist, BFormFile, BFormGroup, BFormInput, BFormInvalidFeedback, BFormRadio, BFormRadioGroup, BFormRow, BFormSelect, BFormSelectOption, BFormSelectOptionGroup, BFormTag, BFormTags, BFormText, BFormTextarea, BFormValidFeedback, BIcon, BIconAlarm, BIconAlarmFill, BIconAlertCircle, BIconAlertCircleFill, BIconAlertOctagon, BIconAlertOctagonFill, BIconAlertSquare, BIconAlertSquareFill, BIconAlertTriangle, BIconAlertTriangleFill, BIconArchive, BIconArchiveFill, BIconArrowBarBottom, BIconArrowBarLeft, BIconArrowBarRight, BIconArrowBarUp, BIconArrowClockwise, BIconArrowCounterclockwise, BIconArrowDown, BIconArrowDownLeft, BIconArrowDownRight, BIconArrowDownShort, BIconArrowLeft, BIconArrowLeftRight, BIconArrowLeftShort, BIconArrowRepeat, BIconArrowRight, BIconArrowRightShort, BIconArrowUp, BIconArrowUpDown, BIconArrowUpLeft, BIconArrowUpRight, BIconArrowUpShort, BIconArrowsAngleContract, BIconArrowsAngleExpand, BIconArrowsCollapse, BIconArrowsExpand, BIconArrowsFullscreen, BIconAt, BIconAward, BIconBackspace, BIconBackspaceFill, BIconBackspaceReverse, BIconBackspaceReverseFill, BIconBarChart, BIconBarChartFill, BIconBattery, BIconBatteryCharging, BIconBatteryFull, BIconBell, BIconBellFill, BIconBlank, BIconBlockquoteLeft, BIconBlockquoteRight, BIconBook, BIconBookHalfFill, BIconBookmark, BIconBookmarkFill, BIconBootstrap, BIconBootstrapFill, BIconBootstrapReboot, BIconBoxArrowBottomLeft, BIconBoxArrowBottomRight, BIconBoxArrowDown, BIconBoxArrowLeft, BIconBoxArrowRight, BIconBoxArrowUp, BIconBoxArrowUpLeft, BIconBoxArrowUpRight, BIconBraces, BIconBrightnessFillHigh, BIconBrightnessFillLow, BIconBrightnessHigh, BIconBrightnessLow, BIconBrush, BIconBucket, BIconBucketFill, BIconBuilding, BIconBullseye, BIconCalendar, BIconCalendarFill, BIconCamera, BIconCameraVideo, BIconCameraVideoFill, BIconCapslock, BIconCapslockFill, BIconChat, BIconChatFill, BIconCheck, BIconCheckBox, BIconCheckCircle, BIconChevronCompactDown, BIconChevronCompactLeft, BIconChevronCompactRight, BIconChevronCompactUp, BIconChevronDown, BIconChevronLeft, BIconChevronRight, BIconChevronUp, BIconCircle, BIconCircleFill, BIconCircleHalf, BIconCircleSlash, BIconClock, BIconClockFill, BIconCloud, BIconCloudDownload, BIconCloudFill, BIconCloudUpload, BIconCode, BIconCodeSlash, BIconColumns, BIconColumnsGutters, BIconCommand, BIconCompass, BIconCone, BIconConeStriped, BIconController, BIconCreditCard, BIconCursor, BIconCursorFill, BIconDash, BIconDiamond, BIconDiamondHalf, BIconDisplay, BIconDisplayFill, BIconDocument, BIconDocumentCode, BIconDocumentDiff, BIconDocumentRichtext, BIconDocumentSpreadsheet, BIconDocumentText, BIconDocuments, BIconDocumentsAlt, BIconDot, BIconDownload, BIconEggFried, BIconEject, BIconEjectFill, BIconEnvelope, BIconEnvelopeFill, BIconEnvelopeOpen, BIconEnvelopeOpenFill, BIconEye, BIconEyeFill, BIconEyeSlash, BIconEyeSlashFill, BIconFilter, BIconFlag, BIconFlagFill, BIconFolder, BIconFolderFill, BIconFolderSymlink, BIconFolderSymlinkFill, BIconFonts, BIconForward, BIconForwardFill, BIconGear, BIconGearFill, BIconGearWide, BIconGearWideConnected, BIconGeo, BIconGraphDown, BIconGraphUp, BIconGrid, BIconGridFill, BIconHammer, BIconHash, BIconHeart, BIconHeartFill, BIconHouse, BIconHouseFill, BIconImage, BIconImageAlt, BIconImageFill, BIconImages, BIconInbox, BIconInboxFill, BIconInboxes, BIconInboxesFill, BIconInfo, BIconInfoFill, BIconInfoSquare, BIconInfoSquareFill, BIconJustify, BIconJustifyLeft, BIconJustifyRight, BIconKanban, BIconKanbanFill, BIconLaptop, BIconLayoutSidebar, BIconLayoutSidebarReverse, BIconLayoutSplit, BIconList, BIconListCheck, BIconListOl, BIconListTask, BIconListUl, BIconLock, BIconLockFill, BIconMap, BIconMic, BIconMoon, BIconMusicPlayer, BIconMusicPlayerFill, BIconOption, BIconOutlet, BIconPause, BIconPauseFill, BIconPen, BIconPencil, BIconPeople, BIconPeopleFill, BIconPerson, BIconPersonFill, BIconPhone, BIconPhoneLandscape, BIconPieChart, BIconPieChartFill, BIconPlay, BIconPlayFill, BIconPlug, BIconPlus, BIconPower, BIconQuestion, BIconQuestionFill, BIconQuestionSquare, BIconQuestionSquareFill, BIconReply, BIconReplyAll, BIconReplyAllFill, BIconReplyFill, BIconScrewdriver, BIconSearch, BIconShield, BIconShieldFill, BIconShieldLock, BIconShieldLockFill, BIconShieldShaded, BIconShift, BIconShiftFill, BIconSkipBackward, BIconSkipBackwardFill, BIconSkipEnd, BIconSkipEndFill, BIconSkipForward, BIconSkipForwardFill, BIconSkipStart, BIconSkipStartFill, BIconSpeaker, BIconSquare, BIconSquareFill, BIconSquareHalf, BIconStar, BIconStarFill, BIconStarHalf, BIconStop, BIconStopFill, BIconStopwatch, BIconStopwatchFill, BIconSun, BIconTable, BIconTablet, BIconTabletLandscape, BIconTag, BIconTagFill, BIconTerminal, BIconTerminalFill, BIconTextCenter, BIconTextIndentLeft, BIconTextIndentRight, BIconTextLeft, BIconTextRight, BIconThreeDots, BIconThreeDotsVertical, BIconToggleOff, BIconToggleOn, BIconToggles, BIconTools, BIconTrash, BIconTrashFill, BIconTriangle, BIconTriangleFill, BIconTriangleHalf, BIconTrophy, BIconTv, BIconTvFill, BIconType, BIconTypeBold, BIconTypeH1, BIconTypeH2, BIconTypeH3, BIconTypeItalic, BIconTypeStrikethrough, BIconTypeUnderline, BIconUnlock, BIconUnlockFill, BIconUpload, BIconVolumeDown, BIconVolumeDownFill, BIconVolumeMute, BIconVolumeMuteFill, BIconVolumeUp, BIconVolumeUpFill, BIconWallet, BIconWatch, BIconWifi, BIconWindow, BIconWrench, BIconX, BIconXCircle, BIconXCircleFill, BIconXOctagon, BIconXOctagonFill, BIconXSquare, BIconXSquareFill, BIconstack, BImg, BImgLazy, BInputGroup, BInputGroupAddon, BInputGroupAppend, BInputGroupPrepend, BInputGroupText, BJumbotron, BLink, BListGroup, BListGroupItem, BMedia, BMediaAside, BMediaBody, BModal, BNav, BNavForm, BNavItem, BNavItemDropdown, BNavText, BNavbar, BNavbarBrand, BNavbarNav, BNavbarToggle, BPagination, BPaginationNav, BPopover, BProgress, BProgressBar, BRow, BSpinner, BTab, BTable, BTableLite, BTableSimple, BTabs, BTbody, BTd, BTfoot, BTh, BThead, BToast, BToaster, BTooltip, BTr, BVConfigPlugin as BVConfig, BVConfigPlugin, BVModalPlugin, BVToastPlugin, BadgePlugin, BootstrapVue, BootstrapVueIcons, BreadcrumbPlugin, ButtonGroupPlugin, ButtonPlugin, ButtonToolbarPlugin, CardPlugin, CarouselPlugin, CollapsePlugin, DropdownPlugin, EmbedPlugin, FormCheckboxPlugin, FormFilePlugin, FormGroupPlugin, FormInputPlugin, FormPlugin, FormRadioPlugin, FormSelectPlugin, FormTagsPlugin, FormTextareaPlugin, IconsPlugin, ImagePlugin, InputGroupPlugin, JumbotronPlugin, LayoutPlugin, LinkPlugin, ListGroupPlugin, MediaPlugin, ModalPlugin, NAME$C as NAME, NavPlugin, NavbarPlugin, PaginationNavPlugin, PaginationPlugin, PopoverPlugin, ProgressPlugin, SpinnerPlugin, TableLitePlugin, TablePlugin, TableSimplePlugin, TabsPlugin, ToastPlugin, TooltipPlugin, VBModal, VBModalPlugin, VBPopover, VBPopoverPlugin, VBScrollspy, VBScrollspyPlugin, VBToggle, VBTogglePlugin, VBTooltip, VBTooltipPlugin, VBVisible, VBVisiblePlugin, install };
 //# sourceMappingURL=bootstrap-vue.esm.js.map

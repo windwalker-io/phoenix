@@ -216,7 +216,7 @@
     "type": "boolean"
   },
   "b-button/block": {
-    "description": "Renders a 100% width button (expands to the width of it's parent container)",
+    "description": "Renders a 100% width button (expands to the width of its parent container)",
     "type": "boolean"
   },
   "b-button/size": {
@@ -304,7 +304,7 @@
     "type": "boolean"
   },
   "b-btn/block": {
-    "description": "Renders a 100% width button (expands to the width of it's parent container)",
+    "description": "Renders a 100% width button (expands to the width of its parent container)",
     "type": "boolean"
   },
   "b-btn/size": {
@@ -335,6 +335,10 @@
     "description": "When set to 'true', gives the button the appearance of being pressed. Syncable with the .sync modifier",
     "type": "boolean"
   },
+  "b-button-close/content": {
+    "description": "The content of the close button",
+    "type": "string"
+  },
   "b-button-close/disabled": {
     "description": "When set to 'true', disables the component's functionality and places it in a disabled state",
     "type": "boolean"
@@ -345,6 +349,10 @@
   },
   "b-button-close/text-variant": {
     "description": "Applies one of the Bootstrap theme color variants to the text",
+    "type": "string"
+  },
+  "b-btn-close/content": {
+    "description": "The content of the close button",
     "type": "string"
   },
   "b-btn-close/disabled": {
@@ -1023,6 +1031,10 @@
     "description": "Additional configuration to pass to Popper.js",
     "type": "any"
   },
+  "b-dropdown/boundary": {
+    "description": "The boundary constraint of the menu: 'scrollParent', 'window', 'viewport', or a reference to an HTMLElement",
+    "type": "string|HTMLElement"
+  },
   "b-dropdown/toggle-text": {
     "description": "ARIA label (sr-only) to set on the toggle when in split mode",
     "type": "string"
@@ -1036,12 +1048,12 @@
     "type": "string"
   },
   "b-dropdown/block": {
-    "description": "Renders a 100% width toggle button (expands to the width of it's parent container)",
+    "description": "Renders a 100% width toggle button (expands to the width of its parent container)",
     "type": "boolean"
   },
   "b-dropdown/menu-class": {
     "description": "CSS class (or classes) to add to the menu container",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-dropdown/toggle-tag": {
     "description": "Specify the HTML tag to render instead of the default tag. Use with caution",
@@ -1049,7 +1061,7 @@
   },
   "b-dropdown/toggle-class": {
     "description": "CSS class (or classes) to add to the toggle button",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-dropdown/no-caret": {
     "description": "Hide the caret indicator on the toggle button",
@@ -1073,7 +1085,7 @@
   },
   "b-dropdown/split-class": {
     "description": "CSS class (or classes) to add to the split button",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-dropdown/split-button-type": {
     "description": "Value to place in the 'type' attribute on the split button: 'button', 'submit', 'reset'",
@@ -1082,10 +1094,6 @@
   "b-dropdown/role": {
     "description": "Sets the ARIA attribute 'role' to a specific value",
     "type": "string"
-  },
-  "b-dropdown/boundary": {
-    "description": "The boundary constraint of the menu: 'scrollParent', 'window', 'viewport', or a reference to an HTMLElement",
-    "type": "string|HTMLElement"
   },
   "b-dd/id": {
     "description": "Used to set the 'id' attribute on the rendered content, and used as the base to generate any additional element IDs as needed",
@@ -1135,6 +1143,10 @@
     "description": "Additional configuration to pass to Popper.js",
     "type": "any"
   },
+  "b-dd/boundary": {
+    "description": "The boundary constraint of the menu: 'scrollParent', 'window', 'viewport', or a reference to an HTMLElement",
+    "type": "string|HTMLElement"
+  },
   "b-dd/toggle-text": {
     "description": "ARIA label (sr-only) to set on the toggle when in split mode",
     "type": "string"
@@ -1148,12 +1160,12 @@
     "type": "string"
   },
   "b-dd/block": {
-    "description": "Renders a 100% width toggle button (expands to the width of it's parent container)",
+    "description": "Renders a 100% width toggle button (expands to the width of its parent container)",
     "type": "boolean"
   },
   "b-dd/menu-class": {
     "description": "CSS class (or classes) to add to the menu container",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-dd/toggle-tag": {
     "description": "Specify the HTML tag to render instead of the default tag. Use with caution",
@@ -1161,7 +1173,7 @@
   },
   "b-dd/toggle-class": {
     "description": "CSS class (or classes) to add to the toggle button",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-dd/no-caret": {
     "description": "Hide the caret indicator on the toggle button",
@@ -1185,7 +1197,7 @@
   },
   "b-dd/split-class": {
     "description": "CSS class (or classes) to add to the split button",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-dd/split-button-type": {
     "description": "Value to place in the 'type' attribute on the split button: 'button', 'submit', 'reset'",
@@ -1194,10 +1206,6 @@
   "b-dd/role": {
     "description": "Sets the ARIA attribute 'role' to a specific value",
     "type": "string"
-  },
-  "b-dd/boundary": {
-    "description": "The boundary constraint of the menu: 'scrollParent', 'window', 'viewport', or a reference to an HTMLElement",
-    "type": "string|HTMLElement"
   },
   "b-dropdown-item/href": {
     "description": "Denotes the target URL of the link for standard a links",
@@ -3159,6 +3167,10 @@
     "description": "Set the size of the component's appearance. 'sm', 'md' (default), or 'lg'",
     "type": "string"
   },
+  "b-form-tags/input-type": {
+    "description": "Specifies the type of input to use: 'text', 'email', 'tel', 'url', or 'number'. Default is 'text'",
+    "type": "string"
+  },
   "b-form-tags/input-class": {
     "description": "Class (or classes) to apply to the new tag input element",
     "type": "string|any[]|object"
@@ -3261,6 +3273,10 @@
   },
   "b-tags/size": {
     "description": "Set the size of the component's appearance. 'sm', 'md' (default), or 'lg'",
+    "type": "string"
+  },
+  "b-tags/input-type": {
+    "description": "Specifies the type of input to use: 'text', 'email', 'tel', 'url', or 'number'. Default is 'text'",
     "type": "string"
   },
   "b-tags/input-class": {
@@ -3620,7 +3636,7 @@
     "type": "boolean"
   },
   "b-img/fluid-grow": {
-    "description": "Similar to the 'fluid' prop, but allows the image to scale up past it's native width",
+    "description": "Similar to the 'fluid' prop, but allows the image to scale up past its native width",
     "type": "boolean"
   },
   "b-img/rounded": {
@@ -3700,7 +3716,7 @@
     "type": "boolean"
   },
   "b-img-lazy/fluid-grow": {
-    "description": "Similar to the 'fluid' prop, but allows the image to scale up past it's native width",
+    "description": "Similar to the 'fluid' prop, but allows the image to scale up past its native width",
     "type": "boolean"
   },
   "b-img-lazy/block": {
@@ -4187,6 +4203,10 @@
     "description": "Disables the enforce focus routine which maintains focus inside the modal",
     "type": "boolean"
   },
+  "b-modal/ignore-enforce-focus-selector": {
+    "description": "Ignore certain elements from the enforce focus routine, specified by css selector(s)",
+    "type": "any[]|string"
+  },
   "b-modal/title": {
     "description": "Text content to place in the title",
     "type": "string"
@@ -4306,6 +4326,10 @@
   "b-modal/return-focus": {
     "description": "HTML Element reference, CSS selector, or component reference to return focus to when the modal closes. When not set, will return focus to the element that last had focus before the modal opened",
     "type": "HTMLElement|string|object"
+  },
+  "b-modal/header-close-content": {
+    "description": "Content of the header close button",
+    "type": "string"
   },
   "b-modal/header-close-label": {
     "description": "Value of the 'aria-label' on the header close button",
@@ -4515,13 +4539,17 @@
     "description": "Additional configuration to pass to Popper.js",
     "type": "any"
   },
+  "b-nav-item-dropdown/boundary": {
+    "description": "The boundary constraint of the menu: 'scrollParent', 'window', 'viewport', or a reference to an HTMLElement. Has no effect when dropdown is inside a b-navbar",
+    "type": "string|HTMLElement"
+  },
   "b-nav-item-dropdown/menu-class": {
     "description": "CSS class (or classes) to add to the menu container",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-nav-item-dropdown/toggle-class": {
     "description": "CSS class (or classes) to add to the toggle button",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-nav-item-dropdown/no-caret": {
     "description": "Hide the caret indicator on the toggle button",
@@ -4579,13 +4607,17 @@
     "description": "Additional configuration to pass to Popper.js",
     "type": "any"
   },
+  "b-nav-item-dd/boundary": {
+    "description": "The boundary constraint of the menu: 'scrollParent', 'window', 'viewport', or a reference to an HTMLElement. Has no effect when dropdown is inside a b-navbar",
+    "type": "string|HTMLElement"
+  },
   "b-nav-item-dd/menu-class": {
     "description": "CSS class (or classes) to add to the menu container",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-nav-item-dd/toggle-class": {
     "description": "CSS class (or classes) to add to the toggle button",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-nav-item-dd/no-caret": {
     "description": "Hide the caret indicator on the toggle button",
@@ -4643,13 +4675,17 @@
     "description": "Additional configuration to pass to Popper.js",
     "type": "any"
   },
+  "b-nav-dropdown/boundary": {
+    "description": "The boundary constraint of the menu: 'scrollParent', 'window', 'viewport', or a reference to an HTMLElement. Has no effect when dropdown is inside a b-navbar",
+    "type": "string|HTMLElement"
+  },
   "b-nav-dropdown/menu-class": {
     "description": "CSS class (or classes) to add to the menu container",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-nav-dropdown/toggle-class": {
     "description": "CSS class (or classes) to add to the toggle button",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-nav-dropdown/no-caret": {
     "description": "Hide the caret indicator on the toggle button",
@@ -4707,13 +4743,17 @@
     "description": "Additional configuration to pass to Popper.js",
     "type": "any"
   },
+  "b-nav-dd/boundary": {
+    "description": "The boundary constraint of the menu: 'scrollParent', 'window', 'viewport', or a reference to an HTMLElement. Has no effect when dropdown is inside a b-navbar",
+    "type": "string|HTMLElement"
+  },
   "b-nav-dd/menu-class": {
     "description": "CSS class (or classes) to add to the menu container",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-nav-dd/toggle-class": {
     "description": "CSS class (or classes) to add to the toggle button",
-    "type": "string|any[]"
+    "type": "string|any[]|object"
   },
   "b-nav-dd/no-caret": {
     "description": "Hide the caret indicator on the toggle button",
@@ -4883,6 +4923,14 @@
     "description": "Content to place in the goto first page button",
     "type": "string"
   },
+  "b-pagination/first-number": {
+    "description": "Display first page number instead of Goto First button",
+    "type": "boolean"
+  },
+  "b-pagination/first-class": {
+    "description": "Class(es) to apply to the 'Go to first page' button",
+    "type": "string|any[]|object"
+  },
   "b-pagination/label-prev-page": {
     "description": "Value to place in the 'aria-label' attribute of the goto previous page button",
     "type": "string"
@@ -4890,6 +4938,10 @@
   "b-pagination/prev-text": {
     "description": "Content to place in the goto previous page button",
     "type": "string"
+  },
+  "b-pagination/prev-class": {
+    "description": "Class(es) to apply to the 'Go to previous page' button",
+    "type": "string|any[]|object"
   },
   "b-pagination/label-next-page": {
     "description": "Value to place in the 'aria-label' attribute of the goto next page button",
@@ -4899,6 +4951,10 @@
     "description": "Content to place in the goto next page button",
     "type": "string"
   },
+  "b-pagination/next-class": {
+    "description": "Class(es) to apply to the 'Go to next page' button",
+    "type": "string|any[]|object"
+  },
   "b-pagination/label-last-page": {
     "description": "Value to place in the 'aria-label' attribute of the goto last page button",
     "type": "string"
@@ -4907,17 +4963,33 @@
     "description": "Content to place in the goto last page button",
     "type": "string"
   },
+  "b-pagination/last-number": {
+    "description": "Display last page number instead of Goto Last button",
+    "type": "boolean"
+  },
+  "b-pagination/last-class": {
+    "description": "Class(es) to apply to the 'Go to last page' button",
+    "type": "string|any[]|object"
+  },
   "b-pagination/label-page": {
     "description": "Value to place in the 'aria-label' attribute of the goto page button. Page number will be prepended automatically",
     "type": "string|function"
+  },
+  "b-pagination/page-class": {
+    "description": "Class(es) to apply to the 'Go to page #' buttons",
+    "type": "string|any[]|object"
   },
   "b-pagination/hide-ellipsis": {
     "description": "Do not show ellipsis buttons",
     "type": "boolean"
   },
   "b-pagination/ellipsis-text": {
-    "description": "One of: string",
+    "description": "Content to place in the ellipsis placeholder",
     "type": "string"
+  },
+  "b-pagination/ellipsis-class": {
+    "description": "Class(es) to apply to the 'ellipsis' placeholders",
+    "type": "string|any[]|object"
   },
   "b-pagination/size": {
     "description": "Size of the rendered buttons: 'sm', 'md' (default), or 'lg'",
@@ -4971,6 +5043,14 @@
     "description": "Content to place in the goto first page button",
     "type": "string"
   },
+  "b-pagination-nav/first-number": {
+    "description": "Display first page number instead of Goto First button",
+    "type": "boolean"
+  },
+  "b-pagination-nav/first-class": {
+    "description": "Class(es) to apply to the 'Go to first page' button",
+    "type": "string|any[]|object"
+  },
   "b-pagination-nav/label-prev-page": {
     "description": "Value to place in the 'aria-label' attribute of the goto previous page button",
     "type": "string"
@@ -4978,6 +5058,10 @@
   "b-pagination-nav/prev-text": {
     "description": "Content to place in the goto previous page button",
     "type": "string"
+  },
+  "b-pagination-nav/prev-class": {
+    "description": "Class(es) to apply to the 'Go to previous page' button",
+    "type": "string|any[]|object"
   },
   "b-pagination-nav/label-next-page": {
     "description": "Value to place in the 'aria-label' attribute of the goto next page button",
@@ -4987,6 +5071,10 @@
     "description": "Content to place in the goto next page button",
     "type": "string"
   },
+  "b-pagination-nav/next-class": {
+    "description": "Class(es) to apply to the 'Go to next page' button",
+    "type": "string|any[]|object"
+  },
   "b-pagination-nav/label-last-page": {
     "description": "Value to place in the 'aria-label' attribute of the goto last page button",
     "type": "string"
@@ -4995,17 +5083,33 @@
     "description": "Content to place in the goto last page button",
     "type": "string"
   },
+  "b-pagination-nav/last-number": {
+    "description": "Display last page number instead of Goto Last button",
+    "type": "boolean"
+  },
+  "b-pagination-nav/last-class": {
+    "description": "Class(es) to apply to the 'Go to last page' button",
+    "type": "string|any[]|object"
+  },
   "b-pagination-nav/label-page": {
     "description": "Value to place in the 'aria-label' attribute of the goto page button. Page number will be prepended automatically",
     "type": "string|function"
+  },
+  "b-pagination-nav/page-class": {
+    "description": "Class(es) to apply to the 'Go to page #' buttons",
+    "type": "string|any[]|object"
   },
   "b-pagination-nav/hide-ellipsis": {
     "description": "Do not show ellipsis buttons",
     "type": "boolean"
   },
   "b-pagination-nav/ellipsis-text": {
-    "description": "One of: string",
+    "description": "Content to place in the ellipsis placeholder",
     "type": "string"
+  },
+  "b-pagination-nav/ellipsis-class": {
+    "description": "Class(es) to apply to the 'ellipsis' placeholders",
+    "type": "string|any[]|object"
   },
   "b-pagination-nav/size": {
     "description": "Size of the rendered buttons: 'sm', 'md' (default), or 'lg'",
@@ -5484,7 +5588,7 @@
     "type": "string"
   },
   "b-table/empty-html": {
-    "description": "HTML string to show when the table has no items to show. Usw with caution",
+    "description": "HTML string to show when the table has no items to show. Use with caution",
     "type": "string"
   },
   "b-table/empty-filtered-text": {
@@ -6103,6 +6207,42 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
+  "b-iconstack/variant": {
+    "description": "Contextual color variant. By default the icon inherits the current text color",
+    "type": "string"
+  },
+  "b-iconstack/font-scale": {
+    "description": "Scale the icons current font size",
+    "type": "number|string"
+  },
+  "b-iconstack/scale": {
+    "description": "Scales the icon's SVG, without increasing the font size",
+    "type": "number|string"
+  },
+  "b-iconstack/rotate": {
+    "description": "Rotates the icon by the specified number of degrees. Positive values rotate clockwise, while negative values rotate counterclockwise",
+    "type": "number|string"
+  },
+  "b-iconstack/flip-h": {
+    "description": "Flips the icon horizontally",
+    "type": "boolean"
+  },
+  "b-iconstack/flip-v": {
+    "description": "Flips the icon vertically",
+    "type": "boolean"
+  },
+  "b-iconstack/shift-h": {
+    "description": "Moves the icon horizontally. Positive numbers will shift the icon right, negative left. Value is in 1/16em units",
+    "type": "number|string"
+  },
+  "b-iconstack/shift-v": {
+    "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
+    "type": "number|string"
+  },
   "b-icon-blank/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6134,6 +6274,10 @@
   "b-icon-blank/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-blank/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-alarm/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6167,6 +6311,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-alarm/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-alarm-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6198,6 +6346,10 @@
   "b-icon-alarm-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-alarm-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-alert-circle/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6231,6 +6383,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-alert-circle/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-alert-circle-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6262,6 +6418,10 @@
   "b-icon-alert-circle-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-alert-circle-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-alert-octagon/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6295,6 +6455,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-alert-octagon/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-alert-octagon-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6326,6 +6490,10 @@
   "b-icon-alert-octagon-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-alert-octagon-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-alert-square/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6359,6 +6527,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-alert-square/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-alert-square-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6390,6 +6562,10 @@
   "b-icon-alert-square-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-alert-square-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-alert-triangle/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6423,6 +6599,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-alert-triangle/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-alert-triangle-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6454,6 +6634,10 @@
   "b-icon-alert-triangle-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-alert-triangle-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-archive/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6487,6 +6671,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-archive/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-archive-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6518,6 +6706,10 @@
   "b-icon-archive-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-archive-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-bar-bottom/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6551,6 +6743,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-bar-bottom/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-bar-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6582,6 +6778,10 @@
   "b-icon-arrow-bar-left/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-bar-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-bar-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6615,6 +6815,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-bar-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-bar-up/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6646,6 +6850,10 @@
   "b-icon-arrow-bar-up/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-bar-up/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-clockwise/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6679,6 +6887,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-clockwise/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-counterclockwise/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6710,6 +6922,10 @@
   "b-icon-arrow-counterclockwise/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-counterclockwise/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-down/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6743,6 +6959,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-down/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-down-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6774,6 +6994,10 @@
   "b-icon-arrow-down-left/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-down-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-down-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6807,6 +7031,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-down-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-down-short/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6838,6 +7066,10 @@
   "b-icon-arrow-down-short/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-down-short/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6871,6 +7103,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-left-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6902,6 +7138,10 @@
   "b-icon-arrow-left-right/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-left-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-left-short/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6935,6 +7175,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-left-short/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-repeat/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -6966,6 +7210,10 @@
   "b-icon-arrow-repeat/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-repeat/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -6999,6 +7247,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-right-short/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7030,6 +7282,10 @@
   "b-icon-arrow-right-short/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-right-short/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-up/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7063,6 +7319,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-up/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-up-down/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7094,6 +7354,10 @@
   "b-icon-arrow-up-down/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-up-down/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-up-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7127,6 +7391,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-up-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrow-up-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7158,6 +7426,10 @@
   "b-icon-arrow-up-right/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrow-up-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrow-up-short/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7191,6 +7463,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrow-up-short/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrows-angle-contract/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7222,6 +7498,10 @@
   "b-icon-arrows-angle-contract/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrows-angle-contract/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrows-angle-expand/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7255,6 +7535,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrows-angle-expand/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrows-collapse/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7286,6 +7570,10 @@
   "b-icon-arrows-collapse/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrows-collapse/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-arrows-expand/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7319,6 +7607,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-arrows-expand/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-arrows-fullscreen/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7350,6 +7642,10 @@
   "b-icon-arrows-fullscreen/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-arrows-fullscreen/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-at/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7383,6 +7679,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-at/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-award/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7414,6 +7714,10 @@
   "b-icon-award/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-award/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-backspace/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7447,6 +7751,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-backspace/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-backspace-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7478,6 +7786,10 @@
   "b-icon-backspace-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-backspace-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-backspace-reverse/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7511,6 +7823,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-backspace-reverse/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-backspace-reverse-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7542,6 +7858,10 @@
   "b-icon-backspace-reverse-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-backspace-reverse-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-bar-chart/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7575,6 +7895,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-bar-chart/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-bar-chart-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7606,6 +7930,10 @@
   "b-icon-bar-chart-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-bar-chart-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-battery/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7639,6 +7967,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-battery/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-battery-charging/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7670,6 +8002,10 @@
   "b-icon-battery-charging/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-battery-charging/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-battery-full/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7703,6 +8039,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-battery-full/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-bell/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7734,6 +8074,10 @@
   "b-icon-bell/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-bell/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-bell-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7767,6 +8111,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-bell-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-blockquote-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7798,6 +8146,10 @@
   "b-icon-blockquote-left/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-blockquote-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-blockquote-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7831,6 +8183,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-blockquote-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-book/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7862,6 +8218,10 @@
   "b-icon-book/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-book/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-book-half-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7895,6 +8255,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-book-half-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-bookmark/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7926,6 +8290,10 @@
   "b-icon-bookmark/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-bookmark/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-bookmark-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -7959,6 +8327,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-bookmark-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-bootstrap/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -7990,6 +8362,10 @@
   "b-icon-bootstrap/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-bootstrap/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-bootstrap-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8023,6 +8399,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-bootstrap-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-bootstrap-reboot/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8054,6 +8434,10 @@
   "b-icon-bootstrap-reboot/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-bootstrap-reboot/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-box-arrow-bottom-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8087,6 +8471,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-box-arrow-bottom-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-box-arrow-bottom-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8118,6 +8506,10 @@
   "b-icon-box-arrow-bottom-right/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-box-arrow-bottom-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-box-arrow-down/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8151,6 +8543,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-box-arrow-down/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-box-arrow-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8182,6 +8578,10 @@
   "b-icon-box-arrow-left/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-box-arrow-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-box-arrow-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8215,6 +8615,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-box-arrow-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-box-arrow-up/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8246,6 +8650,10 @@
   "b-icon-box-arrow-up/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-box-arrow-up/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-box-arrow-up-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8279,6 +8687,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-box-arrow-up-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-box-arrow-up-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8310,6 +8722,10 @@
   "b-icon-box-arrow-up-right/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-box-arrow-up-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-braces/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8343,6 +8759,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-braces/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-brightness-fill-high/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8374,6 +8794,10 @@
   "b-icon-brightness-fill-high/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-brightness-fill-high/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-brightness-fill-low/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8407,6 +8831,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-brightness-fill-low/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-brightness-high/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8438,6 +8866,10 @@
   "b-icon-brightness-high/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-brightness-high/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-brightness-low/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8471,6 +8903,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-brightness-low/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-brush/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8502,6 +8938,10 @@
   "b-icon-brush/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-brush/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-bucket/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8535,6 +8975,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-bucket/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-bucket-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8566,6 +9010,10 @@
   "b-icon-bucket-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-bucket-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-building/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8599,6 +9047,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-building/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-bullseye/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8630,6 +9082,10 @@
   "b-icon-bullseye/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-bullseye/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-calendar/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8663,6 +9119,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-calendar/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-calendar-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8694,6 +9154,10 @@
   "b-icon-calendar-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-calendar-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-camera/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8727,6 +9191,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-camera/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-camera-video/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8758,6 +9226,10 @@
   "b-icon-camera-video/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-camera-video/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-camera-video-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8791,6 +9263,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-camera-video-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-capslock/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8822,6 +9298,10 @@
   "b-icon-capslock/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-capslock/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-capslock-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8855,6 +9335,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-capslock-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-chat/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8886,6 +9370,10 @@
   "b-icon-chat/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-chat/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-chat-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8919,6 +9407,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-chat-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-check/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -8950,6 +9442,10 @@
   "b-icon-check/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-check/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-check-box/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -8983,6 +9479,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-check-box/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-check-circle/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9014,6 +9514,10 @@
   "b-icon-check-circle/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-check-circle/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-chevron-compact-down/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9047,6 +9551,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-chevron-compact-down/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-chevron-compact-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9078,6 +9586,10 @@
   "b-icon-chevron-compact-left/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-chevron-compact-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-chevron-compact-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9111,6 +9623,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-chevron-compact-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-chevron-compact-up/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9142,6 +9658,10 @@
   "b-icon-chevron-compact-up/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-chevron-compact-up/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-chevron-down/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9175,6 +9695,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-chevron-down/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-chevron-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9206,6 +9730,10 @@
   "b-icon-chevron-left/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-chevron-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-chevron-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9239,6 +9767,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-chevron-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-chevron-up/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9270,6 +9802,10 @@
   "b-icon-chevron-up/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-chevron-up/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-circle/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9303,6 +9839,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-circle/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-circle-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9334,6 +9874,10 @@
   "b-icon-circle-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-circle-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-circle-half/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9367,6 +9911,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-circle-half/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-circle-slash/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9398,6 +9946,10 @@
   "b-icon-circle-slash/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-circle-slash/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-clock/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9431,6 +9983,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-clock/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-clock-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9462,6 +10018,10 @@
   "b-icon-clock-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-clock-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-cloud/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9495,6 +10055,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-cloud/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-cloud-download/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9526,6 +10090,10 @@
   "b-icon-cloud-download/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-cloud-download/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-cloud-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9559,6 +10127,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-cloud-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-cloud-upload/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9590,6 +10162,10 @@
   "b-icon-cloud-upload/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-cloud-upload/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-code/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9623,6 +10199,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-code/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-code-slash/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9654,6 +10234,10 @@
   "b-icon-code-slash/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-code-slash/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-columns/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9687,6 +10271,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-columns/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-columns-gutters/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9718,6 +10306,10 @@
   "b-icon-columns-gutters/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-columns-gutters/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-command/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9751,6 +10343,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-command/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-compass/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9782,6 +10378,10 @@
   "b-icon-compass/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-compass/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-cone/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9815,6 +10415,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-cone/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-cone-striped/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9846,6 +10450,10 @@
   "b-icon-cone-striped/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-cone-striped/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-controller/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9879,6 +10487,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-controller/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-credit-card/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9910,6 +10522,10 @@
   "b-icon-credit-card/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-credit-card/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-cursor/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -9943,6 +10559,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-cursor/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-cursor-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -9974,6 +10594,10 @@
   "b-icon-cursor-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-cursor-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-dash/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10007,6 +10631,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-dash/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-diamond/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10038,6 +10666,10 @@
   "b-icon-diamond/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-diamond/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-diamond-half/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10071,6 +10703,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-diamond-half/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-display/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10102,6 +10738,10 @@
   "b-icon-display/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-display/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-display-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10135,6 +10775,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-display-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-document/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10166,6 +10810,10 @@
   "b-icon-document/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-document/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-document-code/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10199,6 +10847,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-document-code/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-document-diff/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10230,6 +10882,10 @@
   "b-icon-document-diff/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-document-diff/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-document-richtext/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10263,6 +10919,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-document-richtext/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-document-spreadsheet/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10294,6 +10954,10 @@
   "b-icon-document-spreadsheet/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-document-spreadsheet/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-document-text/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10327,6 +10991,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-document-text/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-documents/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10358,6 +11026,10 @@
   "b-icon-documents/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-documents/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-documents-alt/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10391,6 +11063,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-documents-alt/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-dot/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10422,6 +11098,10 @@
   "b-icon-dot/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-dot/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-download/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10455,6 +11135,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-download/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-egg-fried/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10486,6 +11170,10 @@
   "b-icon-egg-fried/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-egg-fried/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-eject/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10519,6 +11207,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-eject/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-eject-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10550,6 +11242,10 @@
   "b-icon-eject-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-eject-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-envelope/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10583,6 +11279,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-envelope/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-envelope-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10614,6 +11314,10 @@
   "b-icon-envelope-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-envelope-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-envelope-open/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10647,6 +11351,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-envelope-open/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-envelope-open-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10678,6 +11386,10 @@
   "b-icon-envelope-open-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-envelope-open-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-eye/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10711,6 +11423,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-eye/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-eye-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10742,6 +11458,10 @@
   "b-icon-eye-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-eye-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-eye-slash/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10775,6 +11495,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-eye-slash/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-eye-slash-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10806,6 +11530,10 @@
   "b-icon-eye-slash-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-eye-slash-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-filter/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10839,6 +11567,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-filter/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-flag/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10870,6 +11602,10 @@
   "b-icon-flag/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-flag/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-flag-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10903,6 +11639,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-flag-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-folder/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10934,6 +11674,10 @@
   "b-icon-folder/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-folder/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-folder-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -10967,6 +11711,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-folder-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-folder-symlink/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -10998,6 +11746,10 @@
   "b-icon-folder-symlink/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-folder-symlink/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-folder-symlink-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11031,6 +11783,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-folder-symlink-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-fonts/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11062,6 +11818,10 @@
   "b-icon-fonts/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-fonts/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-forward/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11095,6 +11855,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-forward/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-forward-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11126,6 +11890,10 @@
   "b-icon-forward-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-forward-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-gear/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11159,6 +11927,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-gear/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-gear-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11190,6 +11962,10 @@
   "b-icon-gear-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-gear-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-gear-wide/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11223,6 +11999,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-gear-wide/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-gear-wide-connected/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11254,6 +12034,10 @@
   "b-icon-gear-wide-connected/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-gear-wide-connected/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-geo/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11287,6 +12071,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-geo/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-graph-down/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11318,6 +12106,10 @@
   "b-icon-graph-down/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-graph-down/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-graph-up/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11351,6 +12143,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-graph-up/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-grid/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11382,6 +12178,10 @@
   "b-icon-grid/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-grid/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-grid-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11415,6 +12215,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-grid-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-hammer/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11446,6 +12250,10 @@
   "b-icon-hammer/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-hammer/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-hash/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11479,6 +12287,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-hash/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-heart/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11510,6 +12322,10 @@
   "b-icon-heart/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-heart/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-heart-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11543,6 +12359,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-heart-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-house/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11574,6 +12394,10 @@
   "b-icon-house/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-house/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-house-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11607,6 +12431,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-house-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-image/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11638,6 +12466,10 @@
   "b-icon-image/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-image/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-image-alt/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11671,6 +12503,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-image-alt/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-image-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11702,6 +12538,10 @@
   "b-icon-image-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-image-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-images/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11735,6 +12575,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-images/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-inbox/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11766,6 +12610,10 @@
   "b-icon-inbox/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-inbox/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-inbox-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11799,6 +12647,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-inbox-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-inboxes/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11830,6 +12682,10 @@
   "b-icon-inboxes/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-inboxes/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-inboxes-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11863,6 +12719,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-inboxes-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-info/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11894,6 +12754,10 @@
   "b-icon-info/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-info/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-info-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11927,6 +12791,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-info-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-info-square/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -11958,6 +12826,10 @@
   "b-icon-info-square/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-info-square/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-info-square-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -11991,6 +12863,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-info-square-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-justify/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12022,6 +12898,10 @@
   "b-icon-justify/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-justify/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-justify-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12055,6 +12935,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-justify-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-justify-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12086,6 +12970,10 @@
   "b-icon-justify-right/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-justify-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-kanban/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12119,6 +13007,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-kanban/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-kanban-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12150,6 +13042,10 @@
   "b-icon-kanban-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-kanban-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-laptop/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12183,6 +13079,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-laptop/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-layout-sidebar/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12214,6 +13114,10 @@
   "b-icon-layout-sidebar/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-layout-sidebar/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-layout-sidebar-reverse/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12247,6 +13151,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-layout-sidebar-reverse/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-layout-split/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12278,6 +13186,10 @@
   "b-icon-layout-split/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-layout-split/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-list/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12311,6 +13223,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-list/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-list-check/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12342,6 +13258,10 @@
   "b-icon-list-check/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-list-check/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-list-ol/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12375,6 +13295,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-list-ol/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-list-task/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12406,6 +13330,10 @@
   "b-icon-list-task/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-list-task/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-list-ul/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12439,6 +13367,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-list-ul/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-lock/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12470,6 +13402,10 @@
   "b-icon-lock/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-lock/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-lock-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12503,6 +13439,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-lock-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-map/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12534,6 +13474,10 @@
   "b-icon-map/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-map/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-mic/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12567,6 +13511,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-mic/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-moon/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12598,6 +13546,10 @@
   "b-icon-moon/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-moon/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-music-player/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12631,6 +13583,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-music-player/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-music-player-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12662,6 +13618,10 @@
   "b-icon-music-player-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-music-player-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-option/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12695,6 +13655,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-option/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-outlet/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12726,6 +13690,10 @@
   "b-icon-outlet/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-outlet/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-pause/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12759,6 +13727,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-pause/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-pause-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12790,6 +13762,10 @@
   "b-icon-pause-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-pause-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-pen/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12823,6 +13799,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-pen/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-pencil/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12854,6 +13834,10 @@
   "b-icon-pencil/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-pencil/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-people/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12887,6 +13871,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-people/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-people-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12918,6 +13906,10 @@
   "b-icon-people-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-people-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-person/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -12951,6 +13943,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-person/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-person-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -12982,6 +13978,10 @@
   "b-icon-person-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-person-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-phone/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13015,6 +14015,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-phone/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-phone-landscape/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13046,6 +14050,10 @@
   "b-icon-phone-landscape/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-phone-landscape/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-pie-chart/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13079,6 +14087,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-pie-chart/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-pie-chart-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13110,6 +14122,10 @@
   "b-icon-pie-chart-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-pie-chart-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-play/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13143,6 +14159,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-play/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-play-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13174,6 +14194,10 @@
   "b-icon-play-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-play-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-plug/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13207,6 +14231,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-plug/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-plus/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13238,6 +14266,10 @@
   "b-icon-plus/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-plus/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-power/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13271,6 +14303,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-power/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-question/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13302,6 +14338,10 @@
   "b-icon-question/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-question/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-question-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13335,6 +14375,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-question-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-question-square/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13366,6 +14410,10 @@
   "b-icon-question-square/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-question-square/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-question-square-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13399,6 +14447,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-question-square-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-reply/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13430,6 +14482,10 @@
   "b-icon-reply/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-reply/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-reply-all/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13463,6 +14519,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-reply-all/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-reply-all-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13494,6 +14554,10 @@
   "b-icon-reply-all-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-reply-all-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-reply-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13527,6 +14591,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-reply-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-screwdriver/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13558,6 +14626,10 @@
   "b-icon-screwdriver/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-screwdriver/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-search/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13591,6 +14663,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-search/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-shield/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13622,6 +14698,10 @@
   "b-icon-shield/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-shield/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-shield-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13655,6 +14735,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-shield-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-shield-lock/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13686,6 +14770,10 @@
   "b-icon-shield-lock/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-shield-lock/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-shield-lock-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13719,6 +14807,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-shield-lock-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-shield-shaded/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13750,6 +14842,10 @@
   "b-icon-shield-shaded/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-shield-shaded/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-shift/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13783,6 +14879,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-shift/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-shift-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13814,6 +14914,10 @@
   "b-icon-shift-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-shift-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-skip-backward/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13847,6 +14951,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-skip-backward/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-skip-backward-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13878,6 +14986,10 @@
   "b-icon-skip-backward-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-skip-backward-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-skip-end/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13911,6 +15023,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-skip-end/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-skip-end-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -13942,6 +15058,10 @@
   "b-icon-skip-end-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-skip-end-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-skip-forward/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -13975,6 +15095,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-skip-forward/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-skip-forward-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14006,6 +15130,10 @@
   "b-icon-skip-forward-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-skip-forward-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-skip-start/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14039,6 +15167,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-skip-start/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-skip-start-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14070,6 +15202,10 @@
   "b-icon-skip-start-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-skip-start-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-speaker/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14103,6 +15239,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-speaker/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-square/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14134,6 +15274,10 @@
   "b-icon-square/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-square/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-square-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14167,6 +15311,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-square-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-square-half/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14198,6 +15346,10 @@
   "b-icon-square-half/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-square-half/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-star/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14231,6 +15383,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-star/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-star-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14262,6 +15418,10 @@
   "b-icon-star-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-star-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-star-half/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14295,6 +15455,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-star-half/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-stop/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14326,6 +15490,10 @@
   "b-icon-stop/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-stop/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-stop-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14359,6 +15527,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-stop-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-stopwatch/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14390,6 +15562,10 @@
   "b-icon-stopwatch/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-stopwatch/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-stopwatch-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14423,6 +15599,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-stopwatch-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-sun/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14454,6 +15634,10 @@
   "b-icon-sun/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-sun/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-table/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14487,6 +15671,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-table/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-tablet/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14518,6 +15706,10 @@
   "b-icon-tablet/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-tablet/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-tablet-landscape/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14551,6 +15743,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-tablet-landscape/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-tag/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14582,6 +15778,10 @@
   "b-icon-tag/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-tag/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-tag-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14615,6 +15815,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-tag-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-terminal/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14646,6 +15850,10 @@
   "b-icon-terminal/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-terminal/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-terminal-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14679,6 +15887,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-terminal-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-text-center/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14710,6 +15922,10 @@
   "b-icon-text-center/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-text-center/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-text-indent-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14743,6 +15959,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-text-indent-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-text-indent-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14774,6 +15994,10 @@
   "b-icon-text-indent-right/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-text-indent-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-text-left/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14807,6 +16031,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-text-left/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-text-right/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14838,6 +16066,10 @@
   "b-icon-text-right/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-text-right/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-three-dots/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14871,6 +16103,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-three-dots/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-three-dots-vertical/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14902,6 +16138,10 @@
   "b-icon-three-dots-vertical/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-three-dots-vertical/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-toggle-off/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14935,6 +16175,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-toggle-off/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-toggle-on/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -14966,6 +16210,10 @@
   "b-icon-toggle-on/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-toggle-on/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-toggles/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -14999,6 +16247,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-toggles/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-tools/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15030,6 +16282,10 @@
   "b-icon-tools/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-tools/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-trash/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15063,6 +16319,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-trash/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-trash-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15094,6 +16354,10 @@
   "b-icon-trash-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-trash-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-triangle/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15127,6 +16391,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-triangle/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-triangle-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15158,6 +16426,10 @@
   "b-icon-triangle-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-triangle-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-triangle-half/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15191,6 +16463,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-triangle-half/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-trophy/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15222,6 +16498,10 @@
   "b-icon-trophy/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-trophy/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-tv/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15255,6 +16535,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-tv/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-tv-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15286,6 +16570,10 @@
   "b-icon-tv-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-tv-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-type/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15319,6 +16607,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-type/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-type-bold/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15350,6 +16642,10 @@
   "b-icon-type-bold/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-type-bold/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-type-h1/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15383,6 +16679,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-type-h1/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-type-h2/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15414,6 +16714,10 @@
   "b-icon-type-h2/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-type-h2/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-type-h3/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15447,6 +16751,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-type-h3/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-type-italic/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15478,6 +16786,10 @@
   "b-icon-type-italic/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-type-italic/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-type-strikethrough/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15511,6 +16823,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-type-strikethrough/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-type-underline/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15542,6 +16858,10 @@
   "b-icon-type-underline/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-type-underline/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-unlock/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15575,6 +16895,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-unlock/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-unlock-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15606,6 +16930,10 @@
   "b-icon-unlock-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-unlock-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-upload/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15639,6 +16967,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-upload/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-volume-down/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15670,6 +17002,10 @@
   "b-icon-volume-down/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-volume-down/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-volume-down-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15703,6 +17039,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-volume-down-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-volume-mute/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15734,6 +17074,10 @@
   "b-icon-volume-mute/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-volume-mute/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-volume-mute-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15767,6 +17111,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-volume-mute-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-volume-up/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15798,6 +17146,10 @@
   "b-icon-volume-up/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-volume-up/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-volume-up-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15831,6 +17183,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-volume-up-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-wallet/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15862,6 +17218,10 @@
   "b-icon-wallet/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-wallet/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-watch/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15895,6 +17255,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-watch/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-wifi/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15926,6 +17290,10 @@
   "b-icon-wifi/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-wifi/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-window/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -15959,6 +17327,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-window/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-wrench/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -15990,6 +17362,10 @@
   "b-icon-wrench/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-wrench/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-x/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -16023,6 +17399,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-x/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-x-circle/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -16054,6 +17434,10 @@
   "b-icon-x-circle/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-x-circle/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-x-circle-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -16087,6 +17471,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-x-circle-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-x-octagon/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -16118,6 +17506,10 @@
   "b-icon-x-octagon/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-x-octagon/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "b-icon-x-octagon-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
@@ -16151,6 +17543,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-x-octagon-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-x-square/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -16183,6 +17579,10 @@
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
   },
+  "b-icon-x-square/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
+  },
   "b-icon-x-square-fill/variant": {
     "description": "Contextual color variant. By default the icon inherits the current text color",
     "type": "string"
@@ -16214,6 +17614,10 @@
   "b-icon-x-square-fill/shift-v": {
     "description": "Moves the icon vertically. Positive numbers will shift the icon up, negative down. Value is in 1/16em units",
     "type": "number|string"
+  },
+  "b-icon-x-square-fill/stacked": {
+    "description": "Set this prop to true when placing inside a BIconstack component",
+    "type": "boolean"
   },
   "v-b-toggle": {
     "global": true,
