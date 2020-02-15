@@ -408,6 +408,54 @@ JS;
     {
         if (!static::inited(__METHOD__)) {
             static::addCSS(static::phoenixName() . '/css/bootstrap/multi-level-menu.min.css');
+
+            $js = <<<JS
+$('.dropdown .dropdown-submenu > .dropdown-menu').each(function (i, e) {
+    var menu = $(e);
+    var navItem = menu.parents('.nav-item');
+
+    if (navItem.find('> .dropdown-toggle').attr('data-toggle') === 'dropdown') {
+        navItem.on('shown.bs.dropdown', function () {
+            setTimeout(setOffset, 0);
+        });
+    } else {
+        setOffset();
+    }
+    
+    function setOffset() {
+        if (menu.offset().left + menu.width() > $(window).width()) {
+            menu.css('left', 'auto');
+            menu.css('right', '100%');
+        }
+    }
+});
+$('.dropdown-toggle + .dropdown-menu').each(function (i, e) {
+    var menu = $(e);
+
+    if (menu.hasClass('dropdown-menu-right')) {
+        return;
+    }
+
+    if (menu.parent().find('> .dropdown-toggle').attr('data-toggle') === 'dropdown') {
+        menu.parent().on('shown.bs.dropdown', function () {
+            setTimeout(setOffset, 0);
+        });
+    } else {
+        setOffset();
+    }
+
+    function setOffset() {
+        var pos = menu.parents('.nav-item').offset().left + menu.width();
+        var winWidth = $(window).width();
+
+        if (pos > winWidth) {
+            menu.css('left', "-".concat(pos - winWidth + 15, "px"));
+        }
+    }
+});
+JS;
+
+            \Phoenix\Script\PhoenixScript::domready($js);
         }
     }
 }
