@@ -31,6 +31,11 @@ class NestedAdminRepository extends AdminRepository
     protected $saveData;
 
     /**
+     * @var array
+     */
+    protected $origin = [];
+
+    /**
      * prepareSave
      *
      * @param Record|NestedRecord $data
@@ -43,10 +48,13 @@ class NestedAdminRepository extends AdminRepository
     {
         parent::prepareSave($data);
 
-        // Auto set location for batch copy
+        // Auto set location for batch copy or changed parent_id
         $key = $data->getKeyName();
 
-        if (!$data->$key && !TestHelper::getValue($data, 'locationId')) {
+        if (
+            (!$data->$key && !TestHelper::getValue($data, 'locationId'))
+            || $this->origin['parent_id'] !== $data->parent_id
+        ) {
             $data->setLocation($data->parent_id, NestedRecord::LOCATION_LAST_CHILD);
         }
     }
@@ -69,6 +77,24 @@ class NestedAdminRepository extends AdminRepository
         } finally {
             $this->saveData = null;
         }
+    }
+
+    /**
+     * loadOrigin
+     *
+     * @param  array  $data
+     *
+     * @return  Record
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function loadOrigin(array $data, array &$conditions = null): Record
+    {
+        return tap(parent::loadOrigin($data, $conditions), function (Record $record) {
+            $this->origin = $record->dump(true);
+        });
     }
 
     /**

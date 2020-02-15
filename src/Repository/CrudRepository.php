@@ -35,6 +35,39 @@ class CrudRepository extends ItemRepository implements
     protected $updateNulls = true;
 
     /**
+     * loadOrigin
+     *
+     * @param  DataInterface  $data
+     *
+     * @return  Record
+     *
+     * @throws \Exception
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function loadOrigin(array $data, array &$conditions = null): Record
+    {
+        $conditions = $conditions ?? [];
+
+        // Prepare Record object, primary keys and dump input data
+        $record = $this->registerRecordEvents($this->getRecord());
+        $keys   = array_filter((array) $this->getKeyName(true)); // Fix because Record return empty string
+
+        // Let's check if primary exists, do action for update.
+        $conditions = array_intersect_key($data, array_flip($keys));
+
+        if (array_filter($conditions)) {
+            try {
+                $record->load($conditions);
+            } catch (NoResultException $e) {
+                throw new NoResultException('Try to update a non-exists record to database.', $e->getCode(), $e);
+            }
+        }
+
+        return $record;
+    }
+
+    /**
      * save
      *
      * @param DataInterface|Entity $data
@@ -45,21 +78,9 @@ class CrudRepository extends ItemRepository implements
      */
     public function save(DataInterface $data)
     {
-        // Prepare Record object, primary keys and dump input data
-        $record = $this->registerRecordEvents($this->getRecord());
-        $keys   = array_filter((array) $this->getKeyName(true)); // Fix because Record return empty string
         $dumped = $data->dump(true);
 
-        // Let's check if primary exists, do action for update.
-        $conditions = array_intersect_key($dumped, array_flip($keys));
-
-        if (array_filter($conditions)) {
-            try {
-                $record->load($conditions);
-            } catch (NoResultException $e) {
-                throw new NoResultException('Try to update a non-exists record to database.', $e->getCode(), $e);
-            }
-        }
+        $record = $this->loadOrigin($dumped, $conditions);
 
         $record->bind($dumped);
 
