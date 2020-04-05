@@ -173,20 +173,26 @@ CSS;
      * modal
      *
      * @param string $selector
+     * @param array  $options
      *
      * @return  void
      */
-    public static function modal($selector = '.hasModal')
+    public static function modal($selector = '.hasModal', array $options = [])
     {
         if (!static::inited(__METHOD__)) {
             static::script();
 
+            $size = $options['size'] ?? 'modal-xl';
+            $autoSize = ($options['auto_size'] ?? false)
+                ? 'onload="Phoenix.Modal.resize(this)"'
+                : '';
+
             $html = <<<HTML
 <div class="modal fade" id="phoenix-iframe-modal">
-    <div class="modal-dialog modal-lg modal-xs">
+    <div class="modal-dialog $size">
         <div class="modal-content">
             <div class="modal-body">
-                <iframe width="100%" src="" frameborder="0"></iframe>
+                <iframe width="100%" src="" frameborder="0" $autoSize></iframe>
             </div>
         </div>
     </div>
@@ -208,11 +214,23 @@ window.Phoenix.Modal = {
     });
   },
   open: function (href) {
+    this.iframe.css('height', '');
     this.iframe.attr('src', href);
     this.modal.modal('show');
   },
   close: function () {
     this.modal.modal('hide');
+  },
+  resize: function (obj) {
+    var height = obj.contentWindow.document.documentElement.scrollHeight;
+    
+    if (height < 500) {
+      return;
+    }
+    
+    obj.style.height = height + 'px';
+    
+    console.log(height, obj.style.height);
   }
 };
 window.Phoenix.Modal.init();
