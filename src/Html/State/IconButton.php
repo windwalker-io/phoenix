@@ -46,7 +46,7 @@ class IconButton
             'only_icon' => false,
             'disabled' => null,
             'options' => [
-                'button_color' => 'btn-default btn-light',
+                'button_color' => 'btn-default btn-light btn-sm',
                 'text' => null,
                 'text_color' => null,
             ],
