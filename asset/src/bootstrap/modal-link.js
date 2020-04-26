@@ -14,14 +14,16 @@ $(() => {
       modalSelector,
       options = []
     ) {
-      const self = this;
       this.modal = $(modalSelector);
       this.iframe = this.modal.find('iframe');
-
       this.options = $.extend(true, {}, this.options, options);
 
+      this.iframe[0].modalLink = () => {
+        return this;
+      };
+
       this.modal.on('hide.bs.modal', () => {
-        self.iframe.attr('src', '');
+        this.iframe.attr('src', '');
       });
 
       element.on('click', (event) => {
@@ -33,7 +35,6 @@ $(() => {
         options.size = event.currentTarget.dataset.size;
 
         options = $.extend(true, {}, this.options, options);
-        console.log(options, this.options);
         this.open(event.currentTarget.href, options);
       });
     }

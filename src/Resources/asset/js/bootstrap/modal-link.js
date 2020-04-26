@@ -25,12 +25,16 @@ $(function () {
 
       _defineProperty(this, "options", {});
 
-      var self = this;
       this.modal = $(modalSelector);
       this.iframe = this.modal.find('iframe');
       this.options = $.extend(true, {}, this.options, options);
+
+      this.iframe[0].modalLink = function () {
+        return _this;
+      };
+
       this.modal.on('hide.bs.modal', function () {
-        self.iframe.attr('src', '');
+        _this.iframe.attr('src', '');
       });
       element.on('click', function (event) {
         event.stopPropagation();
@@ -39,7 +43,6 @@ $(function () {
         options.resize = event.currentTarget.dataset.resize;
         options.size = event.currentTarget.dataset.size;
         options = $.extend(true, {}, _this.options, options);
-        console.log(options, _this.options);
 
         _this.open(event.currentTarget.href, options);
       });
