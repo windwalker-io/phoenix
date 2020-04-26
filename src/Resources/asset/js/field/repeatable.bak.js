@@ -13,9 +13,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * @license    __LICENSE__
  */
 $(function () {
-  Phoenix.plugin('repeatable',
-  /*#__PURE__*/
-  function () {
+  Phoenix.plugin('repeatable', /*#__PURE__*/function () {
     function RepeatableField($element) {
       var fields = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       var items = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];

@@ -1,32 +1,40 @@
 "use strict";
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _construct(Parent, args, Class) { if (_isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
 
-function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -301,15 +309,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return new MixinBuilder(superclass);
   };
 
-  var MixinBuilder =
-  /*#__PURE__*/
-  function () {
+  var MixinBuilder = /*#__PURE__*/function () {
     function MixinBuilder(superclass) {
       _classCallCheck(this, MixinBuilder);
 
-      this.superclass = superclass ||
-      /*#__PURE__*/
-      function () {
+      this.superclass = superclass || /*#__PURE__*/function () {
         function _class() {
           _classCallCheck(this, _class);
         }
@@ -380,14 +384,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   window.PhoenixEventMixin = Mixin(function (superclass) {
     var _temp;
 
-    return _temp =
-    /*#__PURE__*/
-    function (_superclass) {
+    return _temp = /*#__PURE__*/function (_superclass) {
       _inherits(_temp, _superclass);
 
-      function _temp() {
-        var _getPrototypeOf2;
+      var _super = _createSuper(_temp);
 
+      function _temp() {
         var _this;
 
         _classCallCheck(this, _temp);
@@ -396,8 +398,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           args[_key2] = arguments[_key2];
         }
 
-        _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(_temp)).call.apply(_getPrototypeOf2, [this].concat(args)));
-        _this._listeners = {};
+        _this = _super.call.apply(_super, [this].concat(args));
+
+        _defineProperty(_assertThisInitialized(_this), "_listeners", {});
+
         return _this;
       }
 
@@ -491,21 +495,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }(superclass), _temp;
   });
 
-  window.PhoenixEvent =
-  /*#__PURE__*/
-  function (_PhoenixEventMixin) {
+  window.PhoenixEvent = /*#__PURE__*/function (_PhoenixEventMixin) {
     _inherits(PhoenixEvent, _PhoenixEventMixin);
+
+    var _super2 = _createSuper(PhoenixEvent);
 
     function PhoenixEvent() {
       _classCallCheck(this, PhoenixEvent);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(PhoenixEvent).apply(this, arguments));
+      return _super2.apply(this, arguments);
     }
 
     return PhoenixEvent;
-  }(PhoenixEventMixin(
-  /*#__PURE__*/
-  function () {
+  }(PhoenixEventMixin( /*#__PURE__*/function () {
     function _class3() {
       _classCallCheck(this, _class3);
     }
@@ -522,10 +524,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 (function ($) {
-  var PhoenixCore =
-  /*#__PURE__*/
-  function (_mix$with) {
+  var PhoenixCore = /*#__PURE__*/function (_mix$with) {
     _inherits(PhoenixCore, _mix$with);
+
+    var _super3 = _createSuper(PhoenixCore);
 
     _createClass(PhoenixCore, null, [{
       key: "defaultOptions",
@@ -546,7 +548,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _classCallCheck(this, PhoenixCore);
 
-      _this5 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixCore).call(this));
+      _this5 = _super3.call(this);
       _this5.options = $.extend(true, {}, _this5.constructor.defaultOptions, options);
       _this5._listeners = {};
       _this5.waits = []; // Wait dom ready
@@ -698,9 +700,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }]);
 
     return PhoenixCore;
-  }(mix(
-  /*#__PURE__*/
-  function () {
+  }(mix( /*#__PURE__*/function () {
     function _class4() {
       _classCallCheck(this, _class4);
     }
@@ -719,9 +719,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 (function ($) {
-  var PhoenixPlugin =
-  /*#__PURE__*/
-  function () {
+  var PhoenixPlugin = /*#__PURE__*/function () {
     _createClass(PhoenixPlugin, [{
       key: "options",
       get: function get() {
@@ -866,15 +864,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return PhoenixPlugin;
   }();
 
-  var PhoenixJQueryPlugin =
-  /*#__PURE__*/
-  function (_PhoenixPlugin) {
+  var PhoenixJQueryPlugin = /*#__PURE__*/function (_PhoenixPlugin) {
     _inherits(PhoenixJQueryPlugin, _PhoenixPlugin);
+
+    var _super4 = _createSuper(PhoenixJQueryPlugin);
 
     function PhoenixJQueryPlugin() {
       _classCallCheck(this, PhoenixJQueryPlugin);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(PhoenixJQueryPlugin).apply(this, arguments));
+      return _super4.apply(this, arguments);
     }
 
     _createClass(PhoenixJQueryPlugin, [{
@@ -931,10 +929,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 (function ($) {
-  var PhoenixHelper =
-  /*#__PURE__*/
-  function (_PhoenixPlugin2) {
+  var PhoenixHelper = /*#__PURE__*/function (_PhoenixPlugin2) {
     _inherits(PhoenixHelper, _PhoenixPlugin2);
+
+    var _super5 = _createSuper(PhoenixHelper);
 
     _createClass(PhoenixHelper, null, [{
       key: "is",
@@ -972,7 +970,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _classCallCheck(this, PhoenixHelper);
 
-      _this9 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixHelper).call(this));
+      _this9 = _super5.call(this);
       _this9.aliveHandle = null;
       return _this9;
     }
@@ -1461,10 +1459,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 (function ($) {
-  var PhoenixUI =
-  /*#__PURE__*/
-  function (_PhoenixPlugin3) {
+  var PhoenixUI = /*#__PURE__*/function (_PhoenixPlugin3) {
     _inherits(PhoenixUI, _PhoenixPlugin3);
+
+    var _super6 = _createSuper(PhoenixUI);
 
     _createClass(PhoenixUI, null, [{
       key: "is",
@@ -1492,7 +1490,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _classCallCheck(this, PhoenixUI);
 
-      _this11 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixUI).call(this));
+      _this11 = _super6.call(this);
       _this11.aliveHandle = null;
       return _this11;
     }
@@ -1673,15 +1671,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 (function ($) {
   'use strict';
 
-  var PhoenixRouter =
-  /*#__PURE__*/
-  function (_PhoenixPlugin4) {
+  var PhoenixRouter = /*#__PURE__*/function (_PhoenixPlugin4) {
     _inherits(PhoenixRouter, _PhoenixPlugin4);
+
+    var _super7 = _createSuper(PhoenixRouter);
 
     function PhoenixRouter() {
       _classCallCheck(this, PhoenixRouter);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(PhoenixRouter).apply(this, arguments));
+      return _super7.apply(this, arguments);
     }
 
     _createClass(PhoenixRouter, [{
@@ -1825,10 +1823,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 (function ($) {
   'use strict';
 
-  var PhoenixAjax =
-  /*#__PURE__*/
-  function (_PhoenixPlugin5) {
+  var PhoenixAjax = /*#__PURE__*/function (_PhoenixPlugin5) {
     _inherits(PhoenixAjax, _PhoenixPlugin5);
+
+    var _super8 = _createSuper(PhoenixAjax);
 
     _createClass(PhoenixAjax, null, [{
       key: "is",
@@ -1852,7 +1850,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _classCallCheck(this, PhoenixAjax);
 
-      _this14 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixAjax).call(this));
+      _this14 = _super8.call(this);
       _this14.$ = $;
       _this14.config = {
         customMethod: false
@@ -2122,15 +2120,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
   var globalSerial = 1;
 
-  var PhoenixCrypto =
-  /*#__PURE__*/
-  function (_PhoenixPlugin6) {
+  var PhoenixCrypto = /*#__PURE__*/function (_PhoenixPlugin6) {
     _inherits(PhoenixCrypto, _PhoenixPlugin6);
+
+    var _super9 = _createSuper(PhoenixCrypto);
 
     function PhoenixCrypto() {
       _classCallCheck(this, PhoenixCrypto);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(PhoenixCrypto).apply(this, arguments));
+      return _super9.apply(this, arguments);
     }
 
     _createClass(PhoenixCrypto, [{
@@ -2621,10 +2619,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 (function () {
   "use strict";
 
-  var PhoenixTranslator =
-  /*#__PURE__*/
-  function (_PhoenixPlugin7) {
+  var PhoenixTranslator = /*#__PURE__*/function (_PhoenixPlugin7) {
     _inherits(PhoenixTranslator, _PhoenixPlugin7);
+
+    var _super10 = _createSuper(PhoenixTranslator);
 
     _createClass(PhoenixTranslator, null, [{
       key: "is",
@@ -2647,7 +2645,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _classCallCheck(this, PhoenixTranslator);
 
-      _this17 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixTranslator).call(this));
+      _this17 = _super10.call(this);
       _this17.keys = {};
       return _this17;
     }
@@ -2785,10 +2783,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 (function () {
   "use strict";
 
-  var PhoenixStack =
-  /*#__PURE__*/
-  function (_PhoenixPlugin8) {
+  var PhoenixStack = /*#__PURE__*/function (_PhoenixPlugin8) {
     _inherits(PhoenixStack, _PhoenixPlugin8);
+
+    var _super11 = _createSuper(PhoenixStack);
 
     _createClass(PhoenixStack, null, [{
       key: "is",
@@ -2809,8 +2807,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _classCallCheck(this, PhoenixStack);
 
-      _this18 = _possibleConstructorReturn(this, _getPrototypeOf(PhoenixStack).call(this));
-      _this18.stacks = {};
+      _this18 = _super11.call(this);
+
+      _defineProperty(_assertThisInitialized(_this18), "stacks", {});
+
       return _this18;
     }
 
@@ -2866,17 +2866,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     return PhoenixStack;
   }(PhoenixPlugin);
 
-  var Stack =
-  /*#__PURE__*/
-  function () {
+  var Stack = /*#__PURE__*/function () {
     function Stack(name) {
       var store = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
       _classCallCheck(this, Stack);
 
-      this.name = '';
-      this.store = [];
-      this.observers = [];
+      _defineProperty(this, "name", '');
+
+      _defineProperty(this, "store", []);
+
+      _defineProperty(this, "observers", []);
+
       this.name = name;
       this.store = store;
     }
@@ -2976,15 +2977,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   var formInited = false;
   var gridInited = false;
 
-  var PhoenixLegacy =
-  /*#__PURE__*/
-  function (_PhoenixPlugin9) {
+  var PhoenixLegacy = /*#__PURE__*/function (_PhoenixPlugin9) {
     _inherits(PhoenixLegacy, _PhoenixPlugin9);
+
+    var _super12 = _createSuper(PhoenixLegacy);
 
     function PhoenixLegacy() {
       _classCallCheck(this, PhoenixLegacy);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(PhoenixLegacy).apply(this, arguments));
+      return _super12.apply(this, arguments);
     }
 
     _createClass(PhoenixLegacy, [{

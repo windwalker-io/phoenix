@@ -22,9 +22,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 (function () {
   'use strict';
 
-  var LoadTab =
-  /*#__PURE__*/
-  function () {
+  var LoadTab = /*#__PURE__*/function () {
     /**
      * Class init.
      *

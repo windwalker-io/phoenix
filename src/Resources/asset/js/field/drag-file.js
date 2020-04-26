@@ -20,9 +20,7 @@ $(function () {
     alert(title + ' / ' + message);
   };
 
-  Phoenix.plugin('dragFile',
-  /*#__PURE__*/
-  function () {
+  Phoenix.plugin('dragFile', /*#__PURE__*/function () {
     function _class($element, $options) {
       var _this = this;
 

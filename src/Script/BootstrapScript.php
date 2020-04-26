@@ -10,6 +10,7 @@ namespace Phoenix\Script;
 
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Language\Translator;
+use Windwalker\Core\Widget\WidgetHelper;
 
 /**
  * The BootstrapScript class.
@@ -180,78 +181,42 @@ CSS;
     public static function modal(
         string $selector = '.hasModal, .has-modal, [data-toggle=modal-link]',
         array $options = []
-    ) {
+    ): void {
         if (!static::inited(__METHOD__)) {
             static::script();
+            PhoenixScript::phoenix();
 
-            $size     = $options['size'] ?? 'modal-xl';
-            $autoSize = ($options['auto_size'] ?? false)
-                ? 'onload="Phoenix.Modal.resize(this)"'
-                : '';
-
-            $html = <<<HTML
-<div class="modal fade" id="phoenix-iframe-modal">
-    <div class="modal-dialog $size">
-        <div class="modal-content">
-            <div class="modal-body">
-                <iframe width="100%" src="" frameborder="0" $autoSize></iframe>
-            </div>
-        </div>
-    </div>
-</div>
-HTML;
-
-            Asset::getTemplate()->addTemplate('phoenix.iframe.modal', $html);
-
-            $js = <<<JS
-window.Phoenix = window.Phoenix || {};
-window.Phoenix.Modal = {
-  init: function () {
-    var self = this;
-    this.modal = $('#phoenix-iframe-modal');
-    this.iframe = this.modal.find('iframe');
-
-    this.modal.on('hide.bs.modal', function () {
-      self.iframe.attr('src', '');
-    });
-  },
-  open: function (href) {
-    this.iframe.css('height', '');
-    this.iframe.attr('src', href);
-    this.modal.modal('show');
-  },
-  close: function () {
-    this.modal.modal('hide');
-  },
-  resize: function (obj) {
-    var height = obj.contentWindow.document.documentElement.scrollHeight;
-    
-    if (height < 500) {
-      return;
-    }
-    
-    obj.style.height = height + 'px';
-    
-    console.log(height, obj.style.height);
-  }
-};
-window.Phoenix.Modal.init();
-JS;
-
-            PhoenixScript::domready($js);
+            static::addJS(static::phoenixName() . '/js/bootstrap/modal-link.min.js');
         }
 
         if (!static::inited(__METHOD__, get_defined_vars())) {
+            $id = $options['id'] ?? 'phoenix-iframe-modal';
+
+            $jsOptions = static::getJSObject(
+                [
+                    'size' => $options['size'] ?? 'modal-xl',
+                    'resize' => $options['auto_size'] ?? null
+                ]
+            );
+
             $js = <<<JS
 // Modal task
-$('{$selector}').on('click', function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    window.Phoenix.Modal.open($(this).attr('href'));
-});
+$('{$selector}').modalLink('#$id', $jsOptions);
 JS;
 
             PhoenixScript::domready($js);
+
+            Asset::getTemplate()->addTemplate(
+                'phoenix.iframe.modal.' . $id,
+                WidgetHelper::render(
+                    $options['template'] ?? 'phoenix.bootstrap.modal.iframe',
+                    array_merge(
+                        compact('id'),
+                        $options['data'] ?? []
+                    ),
+                    $options['engine'] ?? 'edge'
+                )
+            );
         }
     }
 

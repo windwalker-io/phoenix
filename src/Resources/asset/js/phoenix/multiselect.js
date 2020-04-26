@@ -27,9 +27,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
    *
    * @constructor
    */
-  var PhoenixMultiSelect =
-  /*#__PURE__*/
-  function () {
+  var PhoenixMultiSelect = /*#__PURE__*/function () {
     _createClass(PhoenixMultiSelect, null, [{
       key: "pluginName",
       get: function get() {
