@@ -156,7 +156,7 @@ function getValue() {
     var _iteratorError = undefined;
 
     try {
-        for (var _iterator = arguments[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = args[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             var arg = _step.value;
 
             if (arg !== undefined && arg === arg) {
@@ -319,7 +319,7 @@ function calcBezier(aT, aA1, aA2) {
 function getSlope(aT, aA1, aA2) {
     return 3 * A(aA1, aA2) * aT * aT + 2 * B(aA1, aA2) * aT + C(aA1);
 }
-function generateBezier(mX1, mY1, mX2, mY2) {
+function generateBezier() {
     var NEWTON_ITERATIONS = 4,
         NEWTON_MIN_SLOPE = 0.001,
         SUBDIVISION_PRECISION = 0.0000001,
@@ -327,19 +327,26 @@ function generateBezier(mX1, mY1, mX2, mY2) {
         kSplineTableSize = 11,
         kSampleStepSize = 1 / (kSplineTableSize - 1),
         float32ArraySupported = "Float32Array" in window;
-    /* Must contain four arguments. */
-    if (arguments.length !== 4) {
+    /* Must contain four args. */
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+    }
+
+    if (args.length !== 4) {
         return;
     }
-    /* Arguments must be numbers. */
+    /* Args must be numbers. */
     for (var i = 0; i < 4; ++i) {
-        if (typeof arguments[i] !== "number" || isNaN(arguments[i]) || !isFinite(arguments[i])) {
+        if (typeof args[i] !== "number" || isNaN(args[i]) || !isFinite(args[i])) {
             return;
         }
     }
     /* X values must be in the [0, 1] range. */
-    mX1 = fixRange(mX1);
-    mX2 = fixRange(mX2);
+    var mX1 = fixRange(args[0]);
+    var mY1 = args[1];
+    var mX2 = fixRange(args[2]);
+    var mY2 = args[3];
     var mSampleValues = float32ArraySupported ? new Float32Array(kSplineTableSize) : new Array(kSplineTableSize);
     function newtonRaphsonIterate(aX, aGuessT) {
         for (var _i = 0; _i < NEWTON_ITERATIONS; ++_i) {
@@ -1451,6 +1458,34 @@ function setPropertyValue(element, propertyName, propertyValue, fn) {
 }
 
 /**
+ * Remove nested `calc(0px + *)` or `calc(* + (0px + *))` correctly.
+ */
+function removeNestedCalc(value) {
+    if (value.indexOf("calc(") >= 0) {
+        var tokens = value.split(/([\(\)])/);
+        var depth = 0;
+        for (var i = 0; i < tokens.length; i++) {
+            var token = tokens[i];
+            switch (token) {
+                case "(":
+                    depth++;
+                    break;
+                case ")":
+                    depth--;
+                    break;
+                default:
+                    if (depth && token[0] === "0") {
+                        tokens[i] = token.replace(/^0[a-z%]+ \+ /, "");
+                    }
+                    break;
+            }
+        }
+        return tokens.join("").replace(/(?:calc)?\(([0-9\.]+[a-z%]+)\)/g, "$1");
+    }
+    return value;
+}
+
+/**
  * Cache every camelCase match to avoid repeating lookups.
  */
 var cache$2 = {};
@@ -2053,6 +2088,9 @@ function progressCall(activeCall) {
         }
     }
 }
+/**
+ * Call callbacks, potentially run async with the main animation thread.
+ */
 function asyncCallbacks() {
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
@@ -2385,8 +2423,9 @@ function tick(timestamp) {
                         }
                         var tweenFrom = sequence[best],
                             tweenTo = sequence[best + 1] || tweenFrom,
-                            tweenPercent = (percentComplete - tweenFrom.percent) / (tweenTo.percent - tweenFrom.percent),
-                            easing = tweenTo.easing || linearEasing;
+                            rawPercent = (percentComplete - tweenFrom.percent) / (tweenTo.percent - tweenFrom.percent),
+                            tweenPercent = reverse ? 1 - rawPercent : rawPercent,
+                            easing = tweenTo.easing || activeEasing || linearEasing;
                         for (; i < pattern.length; i++) {
                             var startValue = tweenFrom[i];
                             if (startValue == null) {
@@ -2397,14 +2436,14 @@ function tick(timestamp) {
                                     currentValue += startValue;
                                 } else {
                                     // All easings must deal with numbers except for our internal ones.
-                                    var result = easing(reverse ? 1 - tweenPercent : tweenPercent, startValue, endValue, property);
-                                    currentValue += pattern[i] === true ? Math.round(result) : result;
+                                    var result = easing(tweenPercent, startValue, endValue, property);
+                                    currentValue += pattern[i] !== true ? result : Math.round(result);
                                 }
                             }
                         }
                         if (property !== "tween") {
-                            if (percentComplete === 1 && currentValue.startsWith("calc(0 + ")) {
-                                currentValue = currentValue.replace(/^calc\(0[^\d]* \+ ([^\(\)]+)\)$/, "$1");
+                            if (percentComplete === 1) {
+                                currentValue = removeNestedCalc(currentValue);
                             }
                             // TODO: To solve an IE<=8 positioning bug, the unit type must be dropped when setting a property value of 0 - add normalisations to legacy
                             setPropertyValue(activeCall.element, property, currentValue, tween.fn);
@@ -3853,7 +3892,7 @@ function getSetTween(element, propertyValue) {
 registerNormalization(["Element", "tween", getSetTween]);
 
 // Automatically generated
-var VERSION = "2.0.5";
+var VERSION = "2.0.6";
 
 // Project
 var Velocity$$1 = Velocity$1;
@@ -4258,10 +4297,6 @@ function patchPromise(promiseObject, result) {
 }
 /* tslint:enable:max-line-length */
 function Velocity$1() {
-    for (var _len = arguments.length, argsList = Array(_len), _key = 0; _key < _len; _key++) {
-        argsList[_key] = arguments[_key];
-    }
-
     var
     /**
      * A shortcut to the default options.
@@ -4269,14 +4304,9 @@ function Velocity$1() {
     defaults$$1 = defaults$1,
 
     /**
-     * Shortcut to arguments for file size.
-     */
-    args = arguments,
-
-    /**
      * Cache of the first argument - this is used often enough to be saved.
      */
-    args0 = args[0],
+    args0 = arguments.length <= 0 ? undefined : arguments[0],
 
     /**
      * To allow for expressive CoffeeScript code, Velocity supports an
@@ -4336,7 +4366,7 @@ function Velocity$1() {
 
     // Used when there was an issue with one or more of the Velocity arguments
     rejecter = void 0;
-    //console.log(`Velocity`, _arguments)
+    //console.log(`Velocity`, args)
     // First get the elements, and the animations connected to the last call if
     // this is chained.
     // TODO: Clean this up a bit
@@ -4372,15 +4402,17 @@ function Velocity$1() {
     if (syntacticSugar) {
         propertiesMap = getValue(args0.properties, args0.p);
     } else {
+        var _ref;
+
         // TODO: Should be possible to call Velocity("pauseAll") - currently not possible
-        propertiesMap = args[argumentIndex++];
+        propertiesMap = (_ref = argumentIndex++, arguments.length <= _ref ? undefined : arguments[_ref]);
     }
     // Get any options map passed in as arguments first, expand any direct
     // options if possible.
     var isReverse = propertiesMap === "reverse",
         isAction = !isReverse && isString(propertiesMap),
         maybeSequence = isAction && SequencesObject[propertiesMap],
-        opts = syntacticSugar ? getValue(args0.options, args0.o) : args[argumentIndex];
+        opts = syntacticSugar ? getValue(args0.options, args0.o) : arguments.length <= argumentIndex ? undefined : arguments[argumentIndex];
     if (isPlainObject(opts)) {
         optionsMap = opts;
     }
@@ -4440,8 +4472,10 @@ function Velocity$1() {
             _resolver: resolver,
             _rejecter: rejecter
         };
-        while (argumentIndex < args.length) {
-            actionArgs.push(args[argumentIndex++]);
+        while (argumentIndex < arguments.length) {
+            var _ref2;
+
+            actionArgs.push((_ref2 = argumentIndex++, arguments.length <= _ref2 ? undefined : arguments[_ref2]));
         }
         // Velocity's behavior is categorized into "actions". If a string is
         // passed in instead of a propertiesMap then that will call a function
@@ -4541,22 +4575,22 @@ function Velocity$1() {
         } else if (!syntacticSugar) {
             // Expand any direct options if possible.
             var offset = 0;
-            options.duration = validateDuration(args[argumentIndex], true);
+            options.duration = validateDuration(arguments.length <= argumentIndex ? undefined : arguments[argumentIndex], true);
             if (options.duration === undefined) {
                 options.duration = defaults$$1.duration;
             } else {
                 hasValidDuration = true;
                 offset++;
             }
-            if (!isFunction(args[argumentIndex + offset])) {
+            if (!isFunction(arguments.length <= argumentIndex + offset ? undefined : arguments[argumentIndex + offset])) {
                 // Despite coming before Complete, we can't pass a fn easing
-                var easing = validateEasing(args[argumentIndex + offset], getValue(options && validateDuration(options.duration), defaults$$1.duration), true);
+                var easing = validateEasing(arguments.length <= argumentIndex + offset ? undefined : arguments[argumentIndex + offset], getValue(options && validateDuration(options.duration), defaults$$1.duration), true);
                 if (easing !== undefined) {
                     offset++;
                     options.easing = easing;
                 }
             }
-            var complete = validateComplete(args[argumentIndex + offset], true);
+            var complete = validateComplete(arguments.length <= argumentIndex + offset ? undefined : arguments[argumentIndex + offset], true);
             if (complete !== undefined) {
                 options.complete = complete;
             }

@@ -177,12 +177,14 @@ CSS;
      *
      * @return  void
      */
-    public static function modal($selector = '.hasModal', array $options = [])
-    {
+    public static function modal(
+        string $selector = '.hasModal, .has-modal, [data-toggle=modal-link]',
+        array $options = []
+    ) {
         if (!static::inited(__METHOD__)) {
             static::script();
 
-            $size = $options['size'] ?? 'modal-xl';
+            $size     = $options['size'] ?? 'modal-xl';
             $autoSize = ($options['auto_size'] ?? false)
                 ? 'onload="Phoenix.Modal.resize(this)"'
                 : '';
@@ -408,7 +410,7 @@ JS;
      *
      * @deprecated Use multiLevelMenu()
      *
-     * @since  1.8.13
+     * @since      1.8.13
      */
     public static function multiLevelDropdown(): void
     {

@@ -1,7 +1,7 @@
 /*!
- * BootstrapVue 2.10.1
+ * BootstrapVue 2.12.0
  *
- * @link https://bootstrap-vue.js.org
+ * @link https://bootstrap-vue.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
  * @copyright (c) 2016-2020 BootstrapVue
  * @license MIT
@@ -1514,7 +1514,7 @@ var warn = function warn(message)
 
 var checkMultipleVue = function () {
   var checkMultipleVueWarned = false;
-  var MULTIPLE_VUE_WARNING = ['Multiple instances of Vue detected!', 'You may need to set up an alias for Vue in your bundler config.', 'See: https://bootstrap-vue.js.org/docs#using-module-bundlers'].join('\n');
+  var MULTIPLE_VUE_WARNING = ['Multiple instances of Vue detected!', 'You may need to set up an alias for Vue in your bundler config.', 'See: https://bootstrap-vue.org/docs#using-module-bundlers'].join('\n');
   return function (Vue$1) {
     /* istanbul ignore next */
     if (!checkMultipleVueWarned && Vue !== Vue$1 && !isJSDOM) {

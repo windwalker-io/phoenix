@@ -1,5 +1,5 @@
 /**
- * vuex v3.1.3
+ * vuex v3.3.0
  * (c) 2020 Evan You
  * @license MIT
  */
@@ -65,7 +65,11 @@
 
     store.subscribe(function (mutation, state) {
       devtoolHook.emit('vuex:mutation', mutation, state);
-    });
+    }, { prepend: true });
+
+    store.subscribeAction(function (action, state) {
+      devtoolHook.emit('vuex:action', action, state);
+    }, { prepend: true });
   }
 
   /**
@@ -131,6 +135,10 @@
 
   Module.prototype.getChild = function getChild (key) {
     return this._children[key]
+  };
+
+  Module.prototype.hasChild = function hasChild (key) {
+    return key in this._children
   };
 
   Module.prototype.update = function update (rawModule) {
@@ -223,6 +231,13 @@
     if (!parent.getChild(key).runtime) { return }
 
     parent.removeChild(key);
+  };
+
+  ModuleCollection.prototype.isRegistered = function isRegistered (path) {
+    var parent = this.get(path.slice(0, -1));
+    var key = path[path.length - 1];
+
+    return parent.hasChild(key)
   };
 
   function update (path, targetModule, newModule) {
@@ -461,13 +476,13 @@
     })
   };
 
-  Store.prototype.subscribe = function subscribe (fn) {
-    return genericSubscribe(fn, this._subscribers)
+  Store.prototype.subscribe = function subscribe (fn, options) {
+    return genericSubscribe(fn, this._subscribers, options)
   };
 
-  Store.prototype.subscribeAction = function subscribeAction (fn) {
+  Store.prototype.subscribeAction = function subscribeAction (fn, options) {
     var subs = typeof fn === 'function' ? { before: fn } : fn;
-    return genericSubscribe(subs, this._actionSubscribers)
+    return genericSubscribe(subs, this._actionSubscribers, options)
   };
 
   Store.prototype.watch = function watch (getter, cb, options) {
@@ -520,6 +535,16 @@
     resetStore(this);
   };
 
+  Store.prototype.hasModule = function hasModule (path) {
+    if (typeof path === 'string') { path = [path]; }
+
+    {
+      assert(Array.isArray(path), "module path must be a string or an Array.");
+    }
+
+    return this._modules.isRegistered(path)
+  };
+
   Store.prototype.hotUpdate = function hotUpdate (newOptions) {
     this._modules.update(newOptions);
     resetStore(this, true);
@@ -534,9 +559,11 @@
 
   Object.defineProperties( Store.prototype, prototypeAccessors$1 );
 
-  function genericSubscribe (fn, subs) {
+  function genericSubscribe (fn, subs, options) {
     if (subs.indexOf(fn) < 0) {
-      subs.push(fn);
+      options && options.prepend
+        ? subs.unshift(fn)
+        : subs.push(fn);
     }
     return function () {
       var i = subs.indexOf(fn);
@@ -1044,7 +1071,7 @@
   var index = {
     Store: Store,
     install: install,
-    version: '3.1.3',
+    version: '3.3.0',
     mapState: mapState,
     mapMutations: mapMutations,
     mapGetters: mapGetters,
