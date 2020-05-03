@@ -37,6 +37,11 @@ $(() => {
         options = $.extend(true, {}, this.options, options);
         this.open(event.currentTarget.href, options);
       });
+
+      // B/C
+      if (modalSelector === '#phoenix-iframe-modal') {
+        Phoenix.Modal = this;
+      }
     }
 
     open(href, options = {}) {

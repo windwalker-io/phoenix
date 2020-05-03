@@ -45,7 +45,11 @@ $(function () {
         options = $.extend(true, {}, _this.options, options);
 
         _this.open(event.currentTarget.href, options);
-      });
+      }); // B/C
+
+      if (modalSelector === '#phoenix-iframe-modal') {
+        Phoenix.Modal = this;
+      }
     }
 
     _createClass(ModalLink, [{
