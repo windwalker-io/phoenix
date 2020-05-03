@@ -7,7 +7,9 @@
 
 ($ => {
   class PhoenixForm extends PhoenixJQueryPlugin {
-    static get is() { return 'Form'; }
+    static get is() {
+      return 'Form';
+    }
 
     static get proxies() {
       return {
@@ -19,15 +21,21 @@
      * Plugin name.
      * @returns {string}
      */
-    static get pluginName() { return 'form' }
+    static get pluginName() {
+      return 'form';
+    }
 
-    static get pluginClass() { return PhoenixFormElement }
+    static get pluginClass() {
+      return PhoenixFormElement;
+    }
 
     /**
      * Default options.
      * @returns {Object}
      */
-    static get defaultOptions() { return {} }
+    static get defaultOptions() {
+      return {};
+    }
   }
 
   class PhoenixFormElement {
@@ -60,7 +68,7 @@
 
         $('body').append($form);
       }
-      
+
       options = $.extend(true, {}, this.constructor.defaultOptions, options);
 
       this.form = $form;
@@ -116,11 +124,14 @@
       if (queries) {
         let input;
 
-        $.each(queries, function(key, value) {
-          input = form.find('input[name="' + key + '"]');
+        const flatted = this.constructor.flattenObject(queries);
+
+        $.each(flatted, (key, value) => {
+          const fieldName = this.constructor.buildFieldName(key);
+          input = form.find('input[name="' + fieldName + '"]');
 
           if (!input.length) {
-            input = $('<input name="' + key + '" type="hidden">');
+            input = $('<input name="' + fieldName + '" type="hidden">');
 
             form.append(input);
           }
@@ -216,6 +227,45 @@
      */
     delete(url, queries) {
       return this.post(url, queries, 'DELETE');
+    }
+
+    /**
+     * @see https://stackoverflow.com/a/53739792
+     *
+     * @param {Object} ob
+     * @returns {Object}
+     */
+    static flattenObject(ob) {
+      const toReturn = {};
+
+      for (let i in ob) {
+        if (!ob.hasOwnProperty(i)) {
+          continue;
+        }
+
+        if ((typeof ob[i]) === 'object' && ob[i] != null) {
+          const flatObject = this.flattenObject(ob[i]);
+
+          for (let x in flatObject) {
+            if (!flatObject.hasOwnProperty(x)) {
+              continue;
+            }
+
+            toReturn[i + '/' + x] = flatObject[x];
+          }
+        } else {
+          toReturn[i] = ob[i];
+        }
+      }
+      return toReturn;
+    }
+
+    static buildFieldName(field) {
+      const names = field.split('/');
+
+      const first = names.shift();
+
+      return first + names.map(name => `[${name}]`).join('');
     }
   }
 

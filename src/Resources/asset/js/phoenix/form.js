@@ -153,6 +153,8 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
     }, {
       key: "submit",
       value: function submit(url, queries, method, customMethod) {
+        var _this2 = this;
+
         var form = this.form;
 
         if (customMethod) {
@@ -169,11 +171,14 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
         if (queries) {
           var input;
-          $.each(queries, function (key, value) {
-            input = form.find('input[name="' + key + '"]');
+          var flatted = this.constructor.flattenObject(queries);
+          $.each(flatted, function (key, value) {
+            var fieldName = _this2.constructor.buildFieldName(key);
+
+            input = form.find('input[name="' + fieldName + '"]');
 
             if (!input.length) {
-              input = $('<input name="' + key + '" type="hidden">');
+              input = $('<input name="' + fieldName + '" type="hidden">');
               form.append(input);
             }
 
@@ -278,6 +283,49 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
       key: "delete",
       value: function _delete(url, queries) {
         return this.post(url, queries, 'DELETE');
+      }
+      /**
+       * @see https://stackoverflow.com/a/53739792
+       *
+       * @param {Object} ob
+       * @returns {Object}
+       */
+
+    }], [{
+      key: "flattenObject",
+      value: function flattenObject(ob) {
+        var toReturn = {};
+
+        for (var i in ob) {
+          if (!ob.hasOwnProperty(i)) {
+            continue;
+          }
+
+          if (_typeof(ob[i]) === 'object' && ob[i] != null) {
+            var flatObject = this.flattenObject(ob[i]);
+
+            for (var x in flatObject) {
+              if (!flatObject.hasOwnProperty(x)) {
+                continue;
+              }
+
+              toReturn[i + '/' + x] = flatObject[x];
+            }
+          } else {
+            toReturn[i] = ob[i];
+          }
+        }
+
+        return toReturn;
+      }
+    }, {
+      key: "buildFieldName",
+      value: function buildFieldName(field) {
+        var names = field.split('/');
+        var first = names.shift();
+        return first + names.map(function (name) {
+          return "[".concat(name, "]");
+        }).join('');
       }
     }]);
 
