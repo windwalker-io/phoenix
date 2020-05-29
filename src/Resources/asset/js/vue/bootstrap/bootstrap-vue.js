@@ -1,5 +1,5 @@
 /*!
- * BootstrapVue 2.12.0
+ * BootstrapVue 2.15.0
  *
  * @link https://bootstrap-vue.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -219,11 +219,13 @@
   }
 
   function _createSuper(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
     return function () {
       var Super = _getPrototypeOf(Derived),
           result;
 
-      if (_isNativeReflectConstruct()) {
+      if (hasNativeReflectConstruct) {
         var NewTarget = _getPrototypeOf(this).constructor;
 
         result = Reflect.construct(Super, arguments, NewTarget);
@@ -317,7 +319,7 @@
     if (typeof o === "string") return _arrayLikeToArray(o, minLen);
     var n = Object.prototype.toString.call(o).slice(8, -1);
     if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Map" || n === "Set") return Array.from(o);
     if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
   }
 
@@ -336,8 +338,6 @@
   function _nonIterableRest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
-
-  //
 
   // --- Static ---
   var from = function from() {
@@ -422,7 +422,7 @@
     return keys(obj).filter(function (key) {
       return props.indexOf(key) !== -1;
     }).reduce(function (result, key) {
-      return _objectSpread2({}, result, _defineProperty({}, key, obj[key]));
+      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
     }, {});
   };
   /**
@@ -434,7 +434,7 @@
     return keys(obj).filter(function (key) {
       return props.indexOf(key) === -1;
     }).reduce(function (result, key) {
-      return _objectSpread2({}, result, _defineProperty({}, key, obj[key]));
+      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
     }, {});
   };
   /**
@@ -643,7 +643,7 @@
 
     if (isPlainObject(obj)) {
       return keys(obj).reduce(function (result, key) {
-        return _objectSpread2({}, result, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
+        return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
       }, {});
     }
 
@@ -778,7 +778,7 @@
   //
   // The global config SHALL NOT be used to set defaults for Boolean props, as the props
   // would loose their semantic meaning, and force people writing 3rd party components to
-  // explicity set a true or false value using the v-bind syntax on boolean props
+  // explicitly set a true or false value using the v-bind syntax on boolean props
   //
   // Supported config values (depending on the prop's supported type(s)):
   // `String`, `Array`, `Object`, `null` or `undefined`
@@ -951,6 +951,9 @@
       borderVariant: undefined,
       textVariant: undefined
     },
+    BLink: {
+      routerComponentName: undefined
+    },
     BListGroupItem: {
       variant: undefined
     },
@@ -1006,7 +1009,8 @@
       textVariant: 'dark',
       shadow: false,
       width: undefined,
-      tag: 'div'
+      tag: 'div',
+      backdropVariant: 'dark'
     },
     BTable: {
       selectedVariant: 'active',
@@ -1236,7 +1240,7 @@
   var pluginFactory = function pluginFactory() {
     var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var extend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    return _objectSpread2({}, extend, {
+    return _objectSpread2(_objectSpread2({}, extend), {}, {
       install: installFactory(options)
     });
   };
@@ -1395,6 +1399,58 @@
     return toFloat(val).toFixed(toInteger(precision, 0));
   };
 
+  // String utilities
+
+  var RX_TRIM_LEFT = /^\s+/;
+  var RX_REGEXP_REPLACE = /[-/\\^$*+?.()|[\]{}]/g;
+  var RX_UN_KEBAB = /-(\w)/g;
+  var RX_HYPHENATE = /\B([A-Z])/g; // --- Utilities ---
+  // Converts PascalCase or camelCase to kebab-case
+
+  var kebabCase = function kebabCase(str) {
+    return str.replace(RX_HYPHENATE, '-$1').toLowerCase();
+  }; // Converts a kebab-case or camelCase string to PascalCase
+
+  var pascalCase = function pascalCase(str) {
+    str = kebabCase(str).replace(RX_UN_KEBAB, function (_, c) {
+      return c ? c.toUpperCase() : '';
+    });
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }; // Lowercases the first letter of a string and returns a new string
+
+  var lowerFirst = function lowerFirst(str) {
+    str = isString(str) ? str.trim() : String(str);
+    return str.charAt(0).toLowerCase() + str.slice(1);
+  }; // Uppercases the first letter of a string and returns a new string
+
+  var upperFirst = function upperFirst(str) {
+    str = isString(str) ? str.trim() : String(str);
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }; // Escape characters to be used in building a regular expression
+
+  var escapeRegExp = function escapeRegExp(str) {
+    return str.replace(RX_REGEXP_REPLACE, '\\$&');
+  }; // Convert a value to a string that can be rendered
+  // `undefined`/`null` will be converted to `''`
+  // Plain objects and arrays will be JSON stringified
+
+  var toString$1 = function toString(val) {
+    var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+    return isUndefinedOrNull(val) ? '' : isArray(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
+  }; // Remove leading white space from a string
+
+  var trimLeft = function trimLeft(str) {
+    return toString$1(str).replace(RX_TRIM_LEFT, '');
+  }; // Remove Trailing white space from a string
+
+  var trim = function trim(str) {
+    return toString$1(str).trim();
+  }; // Lower case a string
+
+  var lowerCase = function lowerCase(str) {
+    return toString$1(str).toLowerCase();
+  }; // Upper case a string
+
   var TABABLE_SELECTOR = ['button', '[href]:not(.disabled)', 'input', 'select', 'textarea', '[tabindex]', '[contenteditable]'].map(function (s) {
     return "".concat(s, ":not(:disabled):not([disabled])");
   }).join(', ');
@@ -1444,6 +1500,22 @@
 
   var isElement = function isElement(el) {
     return !!(el && el.nodeType === Node.ELEMENT_NODE);
+  }; // Get the currently active HTML element
+
+  var getActiveElement = function getActiveElement() {
+    var excludes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    var activeElement = d.activeElement;
+    return activeElement && !excludes.some(function (el) {
+      return el === activeElement;
+    }) ? activeElement : null;
+  }; // Returns `true` if a tag's name equals `name`
+
+  var isTag = function isTag(tag, name) {
+    return toString$1(tag).toLowerCase() === toString$1(name).toLowerCase();
+  }; // Determine if an HTML element is the currently active element
+
+  var isActiveElement = function isActiveElement(el) {
+    return isElement(el) && el === getActiveElement();
   }; // Determine if an HTML element is visible - Faster than CSS check
 
   var isVisible = function isVisible(el) {
@@ -1653,10 +1725,28 @@
   // Assumes users have not used `tabindex` > `0` on elements
 
   var getTabables = function getTabables() {
-    var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document;
-    return selectAll(TABABLE_SELECTOR, el).filter(isVisible).filter(function (i) {
-      return i.tabIndex > -1 && !i.disabled;
+    var rootEl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document;
+    return selectAll(TABABLE_SELECTOR, rootEl).filter(isVisible).filter(function (el) {
+      return el.tabIndex > -1 && !el.disabled;
     });
+  }; // Attempt to focus an element, and return `true` if successful
+
+  var attemptFocus = function attemptFocus(el) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    try {
+      el.focus(options);
+    } catch (_unused) {}
+
+    return isActiveElement(el);
+  }; // Attempt to blur an element, and return `true` if successful
+
+  var attemptBlur = function attemptBlur(el) {
+    try {
+      el.blur();
+    } catch (_unused2) {}
+
+    return !isActiveElement(el);
   };
 
   var e=function(){return (e=Object.assign||function(e){for(var t,r=1,s=arguments.length;r<s;r++)for(var a in t=arguments[r])Object.prototype.hasOwnProperty.call(t,a)&&(e[a]=t[a]);return e}).apply(this,arguments)},t={kebab:/-(\w)/g,styleProp:/:(.*)/,styleList:/;(?![^(]*\))/g};function r(e,t){return t?t.toUpperCase():""}function s(e){for(var s,a={},c=0,o=e.split(t.styleList);c<o.length;c++){var n=o[c].split(t.styleProp),i=n[0],l=n[1];(i=i.trim())&&("string"==typeof l&&(l=l.trim()),a[(s=i,s.replace(t.kebab,r))]=l);}return a}function a(){for(var t,r,a={},c=arguments.length;c--;)for(var o=0,n=Object.keys(arguments[c]);o<n.length;o++)switch(t=n[o]){case"class":case"style":case"directives":if(Array.isArray(a[t])||(a[t]=[]),"style"===t){var i=void 0;i=Array.isArray(arguments[c].style)?arguments[c].style:[arguments[c].style];for(var l=0;l<i.length;l++){var y=i[l];"string"==typeof y&&(i[l]=s(y));}arguments[c].style=i;}a[t]=a[t].concat(arguments[c][t]);break;case"staticClass":if(!arguments[c][t])break;void 0===a[t]&&(a[t]=""),a[t]&&(a[t]+=" "),a[t]+=arguments[c][t].trim();break;case"on":case"nativeOn":a[t]||(a[t]={});for(var p=0,f=Object.keys(arguments[c][t]||{});p<f.length;p++)r=f[p],a[t][r]?a[t][r]=[].concat(a[t][r],arguments[c][t][r]):a[t][r]=arguments[c][t][r];break;case"attrs":case"props":case"domProps":case"scopedSlots":case"staticStyle":case"hook":case"transition":a[t]||(a[t]={}),a[t]=e({},arguments[c][t],a[t]);break;case"slot":case"key":case"ref":case"tag":case"show":case"keepAlive":default:a[t]||(a[t]=arguments[c][t]);}return a}
@@ -1671,7 +1761,7 @@
     leaveToClass: ''
   };
 
-  var FADE_PROPS = _objectSpread2({}, NO_FADE_PROPS, {
+  var FADE_PROPS = _objectSpread2(_objectSpread2({}, NO_FADE_PROPS), {}, {
     enterActiveClass: 'fade',
     leaveActiveClass: 'fade'
   }); // @vue/component
@@ -1714,7 +1804,7 @@
 
         if (props.appear) {
           // Default the appear classes to equal the enter classes
-          transProps = _objectSpread2({}, transProps, {
+          transProps = _objectSpread2(_objectSpread2({}, transProps), {}, {
             appear: true,
             appearClass: transProps.enterClass,
             appearActiveClass: transProps.enterActiveClass,
@@ -1723,9 +1813,9 @@
         }
       }
 
-      transProps = _objectSpread2({
+      transProps = _objectSpread2(_objectSpread2({
         mode: props.mode
-      }, transProps, {
+      }, transProps), {}, {
         // We always need `css` true
         css: true
       });
@@ -2064,6 +2154,15 @@
     }
   });
 
+  // Math utilty functions
+  var mathMin = Math.min;
+  var mathMax = Math.max;
+  var mathAbs = Math.abs;
+  var mathCeil = Math.ceil;
+  var mathFloor = Math.floor;
+  var mathPow = Math.pow;
+  var mathRound = Math.round;
+
   var NAME$3 = 'BAspect';
   var CLASS_NAME = 'b-aspect';
   var RX_ASPECT = /^\d+(\.\d*)?[/:]\d+(\.\d*)?$/;
@@ -2104,7 +2203,7 @@
           ratio = toFloat(aspect) || 1;
         }
 
-        return "".concat(100 / Math.abs(ratio), "%");
+        return "".concat(100 / mathAbs(ratio), "%");
       }
     },
     render: function render(h) {
@@ -2133,16 +2232,45 @@
     }
   });
 
-  /**
-   * Given an array of properties or an object of property keys,
-   * plucks all the values off the target object, returning a new object
-   * that has props that reference the original prop values
-   *
-   * @param {{}|string[]} keysToPluck
-   * @param {{}} objToPluck
-   * @param {Function} transformFn
-   * @return {{}}
-   */
+  var prefixPropName = function prefixPropName(prefix, value) {
+    return prefix + upperFirst(value);
+  }; // Remove a prefix from a property
+
+  var unprefixPropName = function unprefixPropName(prefix, value) {
+    return lowerFirst(value.replace(prefix, ''));
+  }; // Suffix can be a falsey value so nothing is appended to string
+  // (helps when looping over props & some shouldn't change)
+  // Use data last parameters to allow for currying
+
+  var suffixPropName = function suffixPropName(suffix, str) {
+    return str + (suffix ? upperFirst(suffix) : '');
+  }; // Copies props from one array/object to a new array/object
+  // Prop values are also cloned as new references to prevent possible
+  // mutation of original prop object values
+  // Optionally accepts a function to transform the prop name
+
+  var copyProps = function copyProps(props) {
+    var transformFn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : identity;
+
+    if (isArray(props)) {
+      return props.map(transformFn);
+    }
+
+    var copied = {};
+
+    for (var prop in props) {
+      /* istanbul ignore else */
+      if (hasOwnProperty(props, prop)) {
+        // If the prop value is an object, do a shallow clone
+        // to prevent potential mutations to the original object
+        copied[transformFn(prop)] = isObject(props[prop]) ? clone(props[prop]) : props[prop];
+      }
+    }
+
+    return copied;
+  }; // Given an array of properties or an object of property keys,
+  // plucks all the values off the target object, returning a new object
+  // that has props that reference the original prop values
 
   var pluckProps = function pluckProps(keysToPluck, objToPluck) {
     var transformFn = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : identity;
@@ -2151,85 +2279,6 @@
       return memo;
     }, {});
   };
-
-  /*
-   * Key Codes (events)
-   */
-  var KEY_CODES = freeze({
-    SPACE: 32,
-    ENTER: 13,
-    ESC: 27,
-    LEFT: 37,
-    UP: 38,
-    RIGHT: 39,
-    DOWN: 40,
-    PAGEUP: 33,
-    PAGEDOWN: 34,
-    HOME: 36,
-    END: 35,
-    TAB: 9,
-    SHIFT: 16,
-    CTRL: 17,
-    BACKSPACE: 8,
-    ALT: 18,
-    PAUSE: 19,
-    BREAK: 19,
-    INSERT: 45,
-    INS: 45,
-    DELETE: 46
-  });
-
-  // String utilities
-
-  var RX_TRIM_LEFT = /^\s+/;
-  var RX_REGEXP_REPLACE = /[-/\\^$*+?.()|[\]{}]/g;
-  var RX_UN_KEBAB = /-(\w)/g;
-  var RX_HYPHENATE = /\B([A-Z])/g; // --- Utilities ---
-  // Converts PascalCase or camelCase to kebab-case
-
-  var kebabCase = function kebabCase(str) {
-    return str.replace(RX_HYPHENATE, '-$1').toLowerCase();
-  }; // Converts a kebab-case or camelCase string to PascalCase
-
-  var pascalCase = function pascalCase(str) {
-    str = kebabCase(str).replace(RX_UN_KEBAB, function (_, c) {
-      return c ? c.toUpperCase() : '';
-    });
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }; // Lowercases the first letter of a string and returns a new string
-
-  var lowerFirst = function lowerFirst(str) {
-    str = isString(str) ? str.trim() : String(str);
-    return str.charAt(0).toLowerCase() + str.slice(1);
-  }; // Uppercases the first letter of a string and returns a new string
-
-  var upperFirst = function upperFirst(str) {
-    str = isString(str) ? str.trim() : String(str);
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }; // Escape characters to be used in building a regular expression
-
-  var escapeRegExp = function escapeRegExp(str) {
-    return str.replace(RX_REGEXP_REPLACE, '\\$&');
-  }; // Convert a value to a string that can be rendered
-  // `undefined`/`null` will be converted to `''`
-  // Plain objects and arrays will be JSON stringified
-
-  var toString$1 = function toString(val) {
-    var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-    return isUndefinedOrNull(val) ? '' : isArray(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
-  }; // Remove leading white space from a string
-
-  var trimLeft = function trimLeft(str) {
-    return toString$1(str).replace(RX_TRIM_LEFT, '');
-  }; // Remove Trailing white space from a string
-
-  var trim = function trim(str) {
-    return toString$1(str).trim();
-  }; // Lower case a string
-
-  var lowerCase = function lowerCase(str) {
-    return toString$1(str).toLowerCase();
-  }; // Upper case a string
 
   var ANCHOR_TAG = 'a'; // Precompile RegExp
 
@@ -2309,16 +2358,34 @@
     });
     return parsed;
   };
+  var isLink = function isLink(props) {
+    return !!(props.href || props.to);
+  };
   var isRouterLink = function isRouterLink(tag) {
-    return toString$1(tag).toLowerCase() !== ANCHOR_TAG;
+    return !isTag(tag, ANCHOR_TAG);
   };
   var computeTag = function computeTag() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         to = _ref.to,
-        disabled = _ref.disabled;
+        disabled = _ref.disabled,
+        routerComponentName = _ref.routerComponentName;
 
     var thisOrParent = arguments.length > 1 ? arguments[1] : undefined;
-    return thisOrParent.$router && to && !disabled ? thisOrParent.$nuxt ? 'nuxt-link' : 'router-link' : ANCHOR_TAG;
+    var hasRouter = thisOrParent.$router;
+
+    if (!hasRouter || hasRouter && disabled || hasRouter && !to) {
+      return ANCHOR_TAG;
+    } // TODO:
+    //   Check registered components for existence of user supplied router link component name
+    //   We would need to check PascalCase, kebab-case, and camelCase versions of name:
+    //   const name = routerComponentName
+    //   const names = [name, PascalCase(name), KebabCase(name), CamelCase(name)]
+    //   exists = names.some(name => !!thisOrParent.$options.components[name])
+    //   And may want to cache the result for performance or we just let the render fail
+    //   if the component is not registered
+
+
+    return routerComponentName || (thisOrParent.$nuxt ? 'nuxt-link' : 'router-link');
   };
   var computeRel = function computeRel() {
     var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -2373,92 +2440,170 @@
     return fallback;
   };
 
-  /**
-   * The Link component is used in many other BV components.
-   * As such, sharing its props makes supporting all its features easier.
-   * However, some components need to modify the defaults for their own purpose.
-   * Prefer sharing a fresh copy of the props to ensure mutations
-   * do not affect other component references to the props.
-   *
-   * https://github.com/vuejs/vue-router/blob/dev/src/components/link.js
-   * @return {{}}
+  /*
+   * Key Codes (events)
    */
+  var KEY_CODES = freeze({
+    SPACE: 32,
+    ENTER: 13,
+    ESC: 27,
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    PAGEUP: 33,
+    PAGEDOWN: 34,
+    HOME: 36,
+    END: 35,
+    TAB: 9,
+    SHIFT: 16,
+    CTRL: 17,
+    BACKSPACE: 8,
+    ALT: 18,
+    PAUSE: 19,
+    BREAK: 19,
+    INSERT: 45,
+    INS: 45,
+    DELETE: 46
+  });
 
-  var propsFactory = function propsFactory() {
+  var makePropWatcher = function makePropWatcher(propName) {
     return {
-      href: {
-        type: String,
-        default: null
-      },
-      rel: {
-        type: String,
-        // Must be `null` if no value provided
-        default: null
-      },
-      target: {
-        type: String,
-        default: '_self'
-      },
-      active: {
-        type: Boolean,
-        default: false
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      // router-link specific props
-      to: {
-        type: [String, Object],
-        default: null
-      },
-      append: {
-        type: Boolean,
-        default: false
-      },
-      replace: {
-        type: Boolean,
-        default: false
-      },
-      event: {
-        type: [String, Array],
-        default: 'click'
-      },
-      activeClass: {
-        type: String // default: undefined
+      handler: function handler(newVal, oldVal) {
+        for (var key in oldVal) {
+          if (!hasOwnProperty(newVal, key)) {
+            this.$delete(this.$data[propName], key);
+          }
+        }
 
+        for (var _key in newVal) {
+          this.$set(this.$data[propName], _key, newVal[_key]);
+        }
+      }
+    };
+  };
+  var makePropCacheMixin = function makePropCacheMixin(propName, proxyPropName) {
+    return {
+      data: function data() {
+        return _defineProperty({}, proxyPropName, {});
       },
-      exact: {
-        type: Boolean,
-        default: false
-      },
-      exactActiveClass: {
-        type: String // default: undefined
-
-      },
-      routerTag: {
-        type: String,
-        default: 'a'
-      },
-      // nuxt-link specific prop(s)
-      noPrefetch: {
-        type: Boolean,
-        default: false
+      watch: _defineProperty({}, propName, makePropWatcher(proxyPropName)),
+      created: function created() {
+        this[proxyPropName] = _objectSpread2({}, this[propName]);
       }
     };
   };
 
+  var attrsMixin = makePropCacheMixin('$attrs', 'bvAttrs');
+
+  var listenersMixin = makePropCacheMixin('$listeners', 'bvListeners');
+
+  var NAME$4 = 'BLink'; // --- Props ---
+  // <router-link> specific props
+
+  var routerLinkProps = {
+    to: {
+      type: [String, Object],
+      default: null
+    },
+    append: {
+      type: Boolean,
+      default: false
+    },
+    replace: {
+      type: Boolean,
+      default: false
+    },
+    event: {
+      type: [String, Array],
+      default: 'click'
+    },
+    activeClass: {
+      type: String // default: undefined
+
+    },
+    exact: {
+      type: Boolean,
+      default: false
+    },
+    exactActiveClass: {
+      type: String // default: undefined
+
+    },
+    routerTag: {
+      type: String,
+      default: 'a'
+    }
+  }; // <nuxt-link> specific props
+
+  var nuxtLinkProps = {
+    prefetch: {
+      type: Boolean,
+      // Must be `null` to fall back to the value defined in the
+      // `nuxt.config.js` configuration file for `router.prefetchLinks`
+      // We convert `null` to `undefined`, so that Nuxt.js will use the
+      // compiled default. Vue treats `undefined` as default of `false`
+      // for Boolean props, so we must set it as `null` here to be a
+      // true tri-state prop
+      default: null
+    },
+    noPrefetch: {
+      type: Boolean,
+      default: false
+    }
+  };
+  var props$1 = _objectSpread2(_objectSpread2(_objectSpread2({
+    href: {
+      type: String,
+      default: null
+    },
+    rel: {
+      type: String,
+      // Must be `null` if no value provided
+      default: null
+    },
+    target: {
+      type: String,
+      default: '_self'
+    },
+    active: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  }, routerLinkProps), nuxtLinkProps), {}, {
+    // To support 3rd party router links based on `<router-link>` (i.e. `g-link` for Gridsome)
+    // Default is to auto choose between `<router-link>` and `<nuxt-link>`
+    // Gridsome doesn't provide a mechanism to auto detect and has caveats
+    // such as not supporting FQDN URLs or hash only URLs
+    routerComponentName: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$4, 'routerComponentName');
+      }
+    }
+  }); // --- Main component ---
+  // @vue/component
+
   var BLink = /*#__PURE__*/Vue.extend({
     name: 'BLink',
-    mixins: [normalizeSlotMixin],
+    // Mixin order is important!
+    mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    props: propsFactory(),
+    props: props$1,
     computed: {
       computedTag: function computedTag() {
         // We don't pass `this` as the first arg as we need reactivity of the props
+        var to = this.to,
+            disabled = this.disabled,
+            routerComponentName = this.routerComponentName;
         return computeTag({
-          to: this.to,
-          disabled: this.disabled
+          to: to,
+          disabled: disabled,
+          routerComponentName: routerComponentName
         }, this);
       },
       isRouterLink: function isRouterLink$1() {
@@ -2479,9 +2624,38 @@
         }, this.computedTag);
       },
       computedProps: function computedProps() {
-        return this.isRouterLink ? _objectSpread2({}, this.$props, {
+        var prefetch = this.prefetch;
+        return this.isRouterLink ? _objectSpread2(_objectSpread2({}, pluckProps(_objectSpread2(_objectSpread2({}, routerLinkProps), nuxtLinkProps), this)), {}, {
+          // Coerce `prefetch` value `null` to be `undefined`
+          prefetch: isBoolean(prefetch) ? prefetch : undefined,
+          // Pass `router-tag` as `tag` prop
           tag: this.routerTag
         }) : {};
+      },
+      computedAttrs: function computedAttrs() {
+        var bvAttrs = this.bvAttrs,
+            href = this.computedHref,
+            rel = this.computedRel,
+            disabled = this.disabled,
+            target = this.target,
+            routerTag = this.routerTag,
+            isRouterLink = this.isRouterLink;
+        return _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, bvAttrs), href ? {
+          href: href
+        } : {}), isRouterLink && routerTag !== 'a' && routerTag !== 'area' ? {} : {
+          rel: rel,
+          target: target
+        }), {}, {
+          tabindex: disabled ? '-1' : isUndefined(bvAttrs.tabindex) ? null : bvAttrs.tabindex,
+          'aria-disabled': disabled ? 'true' : null
+        });
+      },
+      computedListeners: function computedListeners() {
+        return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+          // We want to overwrite any click handler since our callback
+          // will invoke the user supplied handler(s) if `!this.disabled`
+          click: this.onClick
+        });
       }
     },
     methods: {
@@ -2489,7 +2663,7 @@
         var _arguments = arguments;
         var evtIsEvent = isEvent(evt);
         var isRouterLink = this.isRouterLink;
-        var suppliedHandler = this.$listeners.click;
+        var suppliedHandler = this.bvListeners.click;
 
         if (evtIsEvent && this.disabled) {
           // Stop event from bubbling up
@@ -2522,60 +2696,31 @@
         }
       },
       focus: function focus() {
-        if (this.$el && this.$el.focus) {
-          this.$el.focus();
-        }
+        attemptFocus(this.$el);
       },
       blur: function blur() {
-        if (this.$el && this.$el.blur) {
-          this.$el.blur();
-        }
+        attemptBlur(this.$el);
       }
     },
     render: function render(h) {
       var active = this.active,
-          disabled = this.disabled,
-          target = this.target,
-          routerTag = this.routerTag,
-          isRouterLink = this.isRouterLink;
-      var tag = this.computedTag;
-      var rel = this.computedRel;
-      var href = this.computedHref;
-      var componentData = {
+          disabled = this.disabled;
+      return h(this.computedTag, _defineProperty({
         class: {
           active: active,
           disabled: disabled
         },
-        attrs: _objectSpread2({}, this.$attrs, {}, isRouterLink && routerTag !== 'a' && routerTag !== 'area' ? {} : {
-          rel: rel,
-          target: target
-        }, {
-          tabindex: disabled ? '-1' : isUndefined(this.$attrs.tabindex) ? null : this.$attrs.tabindex,
-          'aria-disabled': disabled ? 'true' : null
-        }),
+        attrs: this.computedAttrs,
         props: this.computedProps
-      }; // Add the event handlers. We must use `nativeOn` for
-      // `<router-link>`/`<nuxt-link>` instead of `on`
-
-      componentData[isRouterLink ? 'nativeOn' : 'on'] = _objectSpread2({}, this.$listeners, {
-        // We want to overwrite any click handler since our callback
-        // will invoke the user supplied handler(s) if `!this.disabled`
-        click: this.onClick
-      }); // If href attribute exists on <router-link> (even undefined or null) it fails working on
-      // SSR, so we explicitly add it here if needed (i.e. if computedHref() is truthy)
-
-      if (href) {
-        componentData.attrs.href = href;
-      } else {
-        // Ensure the prop HREF does not exist for router links
-        delete componentData.props.href;
-      }
-
-      return h(tag, componentData, this.normalizeSlot('default'));
+      }, this.isRouterLink ? 'nativeOn' : 'on', this.computedListeners), this.normalizeSlot('default'));
     }
   });
 
-  var NAME$4 = 'BButton';
+  var NAME$5 = 'BButton'; // --- Props ---
+
+  var linkProps = omit(props$1, ['event', 'routerTag']);
+  delete linkProps.href.default;
+  delete linkProps.to.default;
   var btnProps = {
     block: {
       type: Boolean,
@@ -2588,13 +2733,13 @@
     size: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$4, 'size');
+        return getComponentConfig(NAME$5, 'size');
       }
     },
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$4, 'variant');
+        return getComponentConfig(NAME$5, 'variant');
       }
     },
     type: {
@@ -2620,18 +2765,9 @@
       default: null
     }
   };
-  var linkProps = propsFactory();
-  delete linkProps.href.default;
-  delete linkProps.to.default;
-  var linkPropKeys = keys(linkProps);
-  var props$1 = _objectSpread2({}, linkProps, {}, btnProps); // --- Helper methods ---
-  // Returns `true` if a tag's name equals `name`
-
-  var tagIs = function tagIs(tag, name) {
-    return toString$1(tag).toLowerCase() === toString$1(name).toLowerCase();
-  }; // Focus handler for toggle buttons
+  var props$2 = _objectSpread2(_objectSpread2({}, btnProps), linkProps); // --- Helper methods ---
+  // Focus handler for toggle buttons
   // Needs class of 'focus' when focused
-
 
   var handleFocus = function handleFocus(evt) {
     if (evt.type === 'focusin') {
@@ -2643,8 +2779,8 @@
   // If tag prop is set to `a`, we use a <b-link> to get proper disabled handling
 
 
-  var isLink = function isLink(props) {
-    return props.href || props.to || tagIs(props.tag, 'a');
+  var isLink$1 = function isLink$1(props) {
+    return isLink(props) || isTag(props.tag, 'a');
   }; // Is the button to be a toggle button?
 
 
@@ -2654,30 +2790,30 @@
 
 
   var isButton = function isButton(props) {
-    return !(isLink(props) || props.tag && !tagIs(props.tag, 'button'));
+    return !(isLink$1(props) || props.tag && !isTag(props.tag, 'button'));
   }; // Is the requested tag not a button or link?
 
 
   var isNonStandardTag = function isNonStandardTag(props) {
-    return !isLink(props) && !isButton(props);
+    return !isLink$1(props) && !isButton(props);
   }; // Compute required classes (non static classes)
 
 
   var computeClass = function computeClass(props) {
     var _ref;
 
-    return ["btn-".concat(props.variant || getComponentConfig(NAME$4, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
+    return ["btn-".concat(props.variant || getComponentConfig(NAME$5, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
   }; // Compute the link props to pass to b-link (if required)
 
 
   var computeLinkProps = function computeLinkProps(props) {
-    return isLink(props) ? pluckProps(linkPropKeys, props) : null;
+    return isLink$1(props) ? pluckProps(linkProps, props) : {};
   }; // Compute the attributes for a button
 
 
   var computeAttrs = function computeAttrs(props, data) {
     var button = isButton(props);
-    var link = isLink(props);
+    var link = isLink$1(props);
     var toggle = isToggle(props);
     var nonStandardTag = isNonStandardTag(props);
     var hashLink = link && props.href === '#';
@@ -2710,20 +2846,21 @@
       // when disabled, and adding a `tabindex="0"` to non buttons or non links
       tabindex: props.disabled && !button ? '-1' : tabindex
     };
-  }; // @vue/component
+  }; // --- Main component ---
+  // @vue/component
 
 
   var BButton = /*#__PURE__*/Vue.extend({
-    name: NAME$4,
+    name: NAME$5,
     functional: true,
-    props: props$1,
+    props: props$2,
     render: function render(h, _ref2) {
       var props = _ref2.props,
           data = _ref2.data,
           listeners = _ref2.listeners,
           children = _ref2.children;
       var toggle = isToggle(props);
-      var link = isLink(props);
+      var link = isLink$1(props);
       var nonStandardTag = isNonStandardTag(props);
       var hashLink = link && props.href === '#';
       var on = {
@@ -2853,8 +2990,8 @@
       var data = _ref.data,
           props = _ref.props,
           children = _ref.children;
-      var fontScale = Math.max(toFloat(props.fontScale, 1), 0) || 1;
-      var scale = Math.max(toFloat(props.scale, 1), 0) || 1;
+      var fontScale = mathMax(toFloat(props.fontScale, 1), 0) || 1;
+      var scale = mathMax(toFloat(props.scale, 1), 0) || 1;
       var rotate = toFloat(props.rotate, 0);
       var shiftH = toFloat(props.shiftH, 0);
       var shiftV = toFloat(props.shiftV, 0);
@@ -2936,7 +3073,7 @@
     return /*#__PURE__*/Vue.extend({
       name: iconName,
       functional: true,
-      props: _objectSpread2({}, commonIconProps, {
+      props: _objectSpread2(_objectSpread2({}, commonIconProps), {}, {
         stacked: {
           type: Boolean,
           default: false
@@ -2947,7 +3084,7 @@
             props = _ref.props;
         return h(BVIconBase, a(data, {
           staticClass: iconNameClass,
-          props: _objectSpread2({}, props, {
+          props: _objectSpread2(_objectSpread2({}, props), {}, {
             content: svgContent
           })
         }));
@@ -2959,39 +3096,39 @@
 
   var BIconBlank = /*#__PURE__*/makeIcon('Blank', ''); // --- Bootstrap Icons ---
 
-  var BIconCalendar = /*#__PURE__*/makeIcon('Calendar', '<path fill-rule="evenodd" d="M14 0H2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 7a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm-9 3a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm-9 3a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconCalendar = /*#__PURE__*/makeIcon('Calendar', '<path fill-rule="evenodd" d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-  var BIconCalendarFill = /*#__PURE__*/makeIcon('CalendarFill', '<path d="M0 2a2 2 0 012-2h12a2 2 0 012 2H0z"/><path fill-rule="evenodd" d="M0 3h16v11a2 2 0 01-2 2H2a2 2 0 01-2-2V3zm6.5 4a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm-8 2a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm-8 2a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconCalendarFill = /*#__PURE__*/makeIcon('CalendarFill', '<path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2 1a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2H2zm14 4H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5z"/>'); // eslint-disable-next-line
 
-  var BIconChevronBarLeft = /*#__PURE__*/makeIcon('ChevronBarLeft', '<path fill-rule="evenodd" d="M11.854 3.646a.5.5 0 010 .708L8.207 8l3.647 3.646a.5.5 0 01-.708.708l-4-4a.5.5 0 010-.708l4-4a.5.5 0 01.708 0zM4.5 1a.5.5 0 00-.5.5v13a.5.5 0 001 0v-13a.5.5 0 00-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconChevronBarLeft = /*#__PURE__*/makeIcon('ChevronBarLeft', '<path fill-rule="evenodd" d="M11.854 3.646a.5.5 0 0 1 0 .708L8.207 8l3.647 3.646a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708 0zM4.5 1a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 1 0v-13a.5.5 0 0 0-.5-.5z"/>'); // eslint-disable-next-line
 
-  var BIconChevronDoubleLeft = /*#__PURE__*/makeIcon('ChevronDoubleLeft', '<path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 010 .708L2.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 010 .708L6.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconChevronDoubleLeft = /*#__PURE__*/makeIcon('ChevronDoubleLeft', '<path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-  var BIconChevronDown = /*#__PURE__*/makeIcon('ChevronDown', '<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 01.708 0L8 10.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconChevronDown = /*#__PURE__*/makeIcon('ChevronDown', '<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
 
-  var BIconChevronLeft = /*#__PURE__*/makeIcon('ChevronLeft', '<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconChevronLeft = /*#__PURE__*/makeIcon('ChevronLeft', '<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-  var BIconChevronUp = /*#__PURE__*/makeIcon('ChevronUp', '<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L8 5.707l-5.646 5.647a.5.5 0 01-.708-.708l6-6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconChevronUp = /*#__PURE__*/makeIcon('ChevronUp', '<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>'); // eslint-disable-next-line
 
   var BIconCircleFill = /*#__PURE__*/makeIcon('CircleFill', '<circle cx="8" cy="8" r="8"/>'); // eslint-disable-next-line
 
-  var BIconClock = /*#__PURE__*/makeIcon('Clock', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm8-7A8 8 0 110 8a8 8 0 0116 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 3a.5.5 0 01.5.5v5.21l3.248 1.856a.5.5 0 01-.496.868l-3.5-2A.5.5 0 017 9V3.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconClock = /*#__PURE__*/makeIcon('Clock', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm8-7A8 8 0 1 1 0 8a8 8 0 0 1 16 0z"/><path fill-rule="evenodd" d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-  var BIconClockFill = /*#__PURE__*/makeIcon('ClockFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zM8 3.5a.5.5 0 00-1 0V9a.5.5 0 00.252.434l3.5 2a.5.5 0 00.496-.868L8 8.71V3.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconClockFill = /*#__PURE__*/makeIcon('ClockFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>'); // eslint-disable-next-line
 
-  var BIconDash = /*#__PURE__*/makeIcon('Dash', '<path fill-rule="evenodd" d="M3.5 8a.5.5 0 01.5-.5h8a.5.5 0 010 1H4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconDash = /*#__PURE__*/makeIcon('Dash', '<path fill-rule="evenodd" d="M3.5 8a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-  var BIconPersonFill = /*#__PURE__*/makeIcon('PersonFill', '<path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconPersonFill = /*#__PURE__*/makeIcon('PersonFill', '<path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>'); // eslint-disable-next-line
 
-  var BIconPlus = /*#__PURE__*/makeIcon('Plus', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H4a.5.5 0 010-1h3.5V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 8a.5.5 0 01.5-.5h4a.5.5 0 010 1H8.5V12a.5.5 0 01-1 0V8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconPlus = /*#__PURE__*/makeIcon('Plus', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/>'); // eslint-disable-next-line
 
-  var BIconStar = /*#__PURE__*/makeIcon('Star', '<path fill-rule="evenodd" d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 00-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 00-.163-.505L1.71 6.745l4.052-.576a.525.525 0 00.393-.288l1.847-3.658 1.846 3.658a.525.525 0 00.393.288l4.052.575-2.906 2.77a.564.564 0 00-.163.506l.694 3.957-3.686-1.894a.503.503 0 00-.461 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconStar = /*#__PURE__*/makeIcon('Star', '<path fill-rule="evenodd" d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>'); // eslint-disable-next-line
 
   var BIconStarFill = /*#__PURE__*/makeIcon('StarFill', '<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>'); // eslint-disable-next-line
 
-  var BIconStarHalf = /*#__PURE__*/makeIcon('StarHalf', '<path fill-rule="evenodd" d="M5.354 5.119L7.538.792A.516.516 0 018 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0116 6.32a.55.55 0 01-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.519.519 0 01-.146.05c-.341.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 01-.171-.403.59.59 0 01.084-.302.513.513 0 01.37-.245l4.898-.696zM8 12.027c.08 0 .16.018.232.056l3.686 1.894-.694-3.957a.564.564 0 01.163-.505l2.906-2.77-4.052-.576a.525.525 0 01-.393-.288L8.002 2.223 8 2.226v9.8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconStarHalf = /*#__PURE__*/makeIcon('StarHalf', '<path fill-rule="evenodd" d="M5.354 5.119L7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.55.55 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.519.519 0 0 1-.146.05c-.341.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.171-.403.59.59 0 0 1 .084-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027c.08 0 .16.018.232.056l3.686 1.894-.694-3.957a.564.564 0 0 1 .163-.505l2.906-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.002 2.223 8 2.226v9.8z"/>'); // eslint-disable-next-line
 
-  var BIconX = /*#__PURE__*/makeIcon('X', '<path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 000 .708l7 7a.5.5 0 00.708-.708l-7-7a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+  var BIconX = /*#__PURE__*/makeIcon('X', '<path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
    // --- END AUTO-GENERATED FILE ---
 
   var RX_ICON_PREFIX = /^BIcon/; // Helper BIcon component
@@ -3000,12 +3137,12 @@
   var BIcon = /*#__PURE__*/Vue.extend({
     name: 'BIcon',
     functional: true,
-    props: _objectSpread2({
+    props: _objectSpread2(_objectSpread2({
       icon: {
         type: String,
         default: null
       }
-    }, commonIconProps, {
+    }, commonIconProps), {}, {
       stacked: {
         type: Boolean,
         default: false
@@ -3023,14 +3160,14 @@
       var components = ((parent || {}).$options || {}).components;
       var componentRefOrName = icon && components ? components[iconName] || BIconBlank : icon ? iconName : BIconBlank;
       return h(componentRefOrName, a(data, {
-        props: _objectSpread2({}, props, {
+        props: _objectSpread2(_objectSpread2({}, props), {}, {
           icon: null
         })
       }));
     }
   });
 
-  var NAME$5 = 'BAvatar';
+  var NAME$6 = 'BAvatar';
   var CLASS_NAME$1 = 'b-avatar';
   var RX_NUMBER = /^[0-9]*\.?[0-9]+$/;
   var FONT_SIZE_SCALE = 0.4;
@@ -3041,54 +3178,9 @@
     lg: '3.5em'
   }; // --- Props ---
 
-  var linkProps$1 = {
-    href: {
-      type: String // default: null
+  var linkProps$1 = omit(props$1, ['active', 'event', 'routerTag']);
 
-    },
-    to: {
-      type: [String, Object] // default: null
-
-    },
-    append: {
-      type: Boolean,
-      default: false
-    },
-    replace: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    rel: {
-      type: String // default: null
-
-    },
-    target: {
-      type: String // default: null
-
-    },
-    activeClass: {
-      type: String // default: null
-
-    },
-    exact: {
-      type: Boolean,
-      default: false
-    },
-    exactActiveClass: {
-      type: String // default: null
-
-    },
-    noPrefetch: {
-      type: Boolean,
-      default: false
-    }
-  };
-
-  var props$2 = _objectSpread2({
+  var props$3 = _objectSpread2(_objectSpread2({
     src: {
       type: String // default: null
 
@@ -3108,7 +3200,7 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$5, 'variant');
+        return getComponentConfig(NAME$6, 'variant');
       }
     },
     size: {
@@ -3138,7 +3230,7 @@
     badgeVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$5, 'badgeVariant');
+        return getComponentConfig(NAME$6, 'badgeVariant');
       }
     },
     badgeTop: {
@@ -3153,7 +3245,7 @@
       type: String,
       default: '0px'
     }
-  }, linkProps$1, {
+  }, linkProps$1), {}, {
     ariaLabel: {
       type: String // default: null
 
@@ -3164,7 +3256,7 @@
   var computeSize = function computeSize(value) {
     // Default to `md` size when `null`, or parse to
     // number when value is a float-like string
-    value = value === null ? 'md' : isString(value) && RX_NUMBER.test(value) ? toFloat(value, 0) : value; // Convert all numbers to pixel values
+    value = isUndefinedOrNull(value) || value === '' ? 'md' : isString(value) && RX_NUMBER.test(value) ? toFloat(value, 0) : value; // Convert all numbers to pixel values
     // Handle default sizes when `sm`, `md` or `lg`
     // Or use value as is
 
@@ -3172,11 +3264,15 @@
   }; // --- Main component ---
   // @vue/component
 
-
   var BAvatar = /*#__PURE__*/Vue.extend({
-    name: NAME$5,
+    name: NAME$6,
     mixins: [normalizeSlotMixin],
-    props: props$2,
+    inject: {
+      bvAvatarGroup: {
+        default: null
+      }
+    },
+    props: props$3,
     data: function data() {
       return {
         localSrc: this.src || null
@@ -3184,11 +3280,36 @@
     },
     computed: {
       computedSize: function computedSize() {
-        return computeSize(this.size);
+        // Always use the avatar group size
+        return computeSize(this.bvAvatarGroup ? this.bvAvatarGroup.size : this.size);
       },
-      fontSize: function fontSize() {
+      computedVariant: function computedVariant() {
+        // Prefer avatar-group variant if provided
+        var avatarGroup = this.bvAvatarGroup;
+        return avatarGroup && avatarGroup.variant ? avatarGroup.variant : this.variant;
+      },
+      computedRounded: function computedRounded() {
+        var avatarGroup = this.bvAvatarGroup;
+        var square = avatarGroup && avatarGroup.square ? true : this.square;
+        var rounded = avatarGroup && avatarGroup.rounded ? avatarGroup.rounded : this.rounded;
+        return square ? '0' : rounded === '' ? true : rounded || 'circle';
+      },
+      fontStyle: function fontStyle() {
+        var fontSize = this.computedSize;
+        fontSize = fontSize ? "calc(".concat(fontSize, " * ").concat(FONT_SIZE_SCALE, ")") : null;
+        return fontSize ? {
+          fontSize: fontSize
+        } : {};
+      },
+      marginStyle: function marginStyle() {
+        var avatarGroup = this.bvAvatarGroup;
+        var overlapScale = avatarGroup ? avatarGroup.overlapScale : 0;
         var size = this.computedSize;
-        return size ? "calc(".concat(size, " * ").concat(FONT_SIZE_SCALE, ")") : null;
+        var value = size && overlapScale ? "calc(".concat(size, " * -").concat(overlapScale, ")") : null;
+        return value ? {
+          marginLeft: value,
+          marginRight: value
+        } : {};
       },
       badgeStyle: function badgeStyle() {
         var size = this.computedSize,
@@ -3224,22 +3345,22 @@
     render: function render(h) {
       var _class2;
 
-      var variant = this.variant,
+      var variant = this.computedVariant,
           disabled = this.disabled,
-          square = this.square,
+          rounded = this.computedRounded,
           icon = this.icon,
           src = this.localSrc,
           text = this.text,
-          fontSize = this.fontSize,
+          fontStyle = this.fontStyle,
+          marginStyle = this.marginStyle,
           size = this.computedSize,
-          isButton = this.button,
+          button = this.button,
           type = this.buttonType,
           badge = this.badge,
           badgeVariant = this.badgeVariant,
           badgeStyle = this.badgeStyle;
-      var isBLink = !isButton && (this.href || this.to);
-      var tag = isButton ? BButton : isBLink ? BLink : 'span';
-      var rounded = square ? false : this.rounded === '' ? true : this.rounded || 'circle';
+      var link = !button && isLink(this);
+      var tag = button ? BButton : link ? BLink : 'span';
       var alt = this.alt || null;
       var ariaLabel = this.ariaLabel || null;
       var $content = null;
@@ -3263,6 +3384,9 @@
             error: this.onImgError
           }
         });
+        $content = h('span', {
+          staticClass: 'b-avatar-img'
+        }, [$content]);
       } else if (icon) {
         $content = h(BIcon, {
           props: {
@@ -3276,9 +3400,7 @@
       } else if (text) {
         $content = h('span', {
           staticClass: 'b-avatar-text',
-          style: {
-            fontSize: fontSize
-          }
+          style: fontStyle
         }, [h('span', text)]);
       } else {
         // Fallback default avatar content
@@ -3304,20 +3426,20 @@
 
       var componentData = {
         staticClass: CLASS_NAME$1,
-        class: (_class2 = {}, _defineProperty(_class2, "badge-".concat(variant), !isButton && variant), _defineProperty(_class2, "rounded", rounded === true), _defineProperty(_class2, 'rounded-0', square), _defineProperty(_class2, "rounded-".concat(rounded), rounded && rounded !== true), _defineProperty(_class2, "disabled", disabled), _class2),
-        style: {
+        class: (_class2 = {}, _defineProperty(_class2, "badge-".concat(variant), !button && variant), _defineProperty(_class2, "rounded", rounded === true), _defineProperty(_class2, "rounded-".concat(rounded), rounded && rounded !== true), _defineProperty(_class2, "disabled", disabled), _class2),
+        style: _objectSpread2({
           width: size,
           height: size
-        },
+        }, marginStyle),
         attrs: {
           'aria-label': ariaLabel || null
         },
-        props: isButton ? {
+        props: button ? {
           variant: variant,
           disabled: disabled,
           type: type
-        } : isBLink ? pluckProps(linkProps$1, this) : {},
-        on: isBLink || isButton ? {
+        } : link ? pluckProps(linkProps$1, this) : {},
+        on: button || link ? {
           click: this.onClick
         } : {}
       };
@@ -3325,17 +3447,90 @@
     }
   });
 
-  var AvatarPlugin = /*#__PURE__*/pluginFactory({
-    components: {
-      BAvatar: BAvatar
+  var NAME$7 = 'BAvatarGroup'; // --- Main component ---
+  // @vue/component
+
+  var BAvatarGroup = /*#__PURE__*/Vue.extend({
+    name: NAME$7,
+    mixins: [normalizeSlotMixin],
+    provide: function provide() {
+      return {
+        bvAvatarGroup: this
+      };
+    },
+    props: {
+      variant: {
+        // Child avatars will prefer this variant over their own
+        type: String,
+        default: null
+      },
+      size: {
+        // Child avatars will always use this over their own size
+        type: String,
+        default: null
+      },
+      overlap: {
+        type: [Number, String],
+        default: 0.3
+      },
+      square: {
+        // Child avatars will prefer this prop (if set) over their own
+        type: Boolean,
+        default: false
+      },
+      rounded: {
+        // Child avatars will prefer this prop (if set) over their own
+        type: [Boolean, String],
+        default: false
+      },
+      tag: {
+        type: String,
+        default: 'div'
+      }
+    },
+    computed: {
+      computedSize: function computedSize() {
+        return computeSize(this.size);
+      },
+      overlapScale: function overlapScale() {
+        return mathMin(mathMax(toFloat(this.overlap, 0), 0), 1) / 2;
+      },
+      paddingStyle: function paddingStyle() {
+        var value = this.computedSize;
+        value = value ? "calc(".concat(value, " * ").concat(this.overlapScale, ")") : null;
+        return value ? {
+          paddingLeft: value,
+          paddingRight: value
+        } : {};
+      }
+    },
+    render: function render(h) {
+      var $inner = h('div', {
+        staticClass: 'b-avatar-group-inner',
+        style: this.paddingStyle
+      }, [this.normalizeSlot('default')]);
+      return h(this.tag, {
+        staticClass: 'b-avatar-group',
+        attrs: {
+          role: 'group'
+        }
+      }, [$inner]);
     }
   });
 
-  var NAME$6 = 'BBadge';
-  var linkProps$2 = propsFactory();
+  var AvatarPlugin = /*#__PURE__*/pluginFactory({
+    components: {
+      BAvatar: BAvatar,
+      BAvatarGroup: BAvatarGroup
+    }
+  });
+
+  var NAME$8 = 'BBadge'; // --- Props ---
+
+  var linkProps$2 = omit(props$1, ['event', 'routerTag']);
   delete linkProps$2.href.default;
   delete linkProps$2.to.default;
-  var props$3 = _objectSpread2({}, linkProps$2, {
+  var props$4 = _objectSpread2({
     tag: {
       type: String,
       default: 'span'
@@ -3343,25 +3538,26 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$6, 'variant');
+        return getComponentConfig(NAME$8, 'variant');
       }
     },
     pill: {
       type: Boolean,
       default: false
     }
-  }); // @vue/component
+  }, linkProps$2); // --- Main component ---
+  // @vue/component
 
   var BBadge = /*#__PURE__*/Vue.extend({
-    name: NAME$6,
+    name: NAME$8,
     functional: true,
-    props: props$3,
+    props: props$4,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      var isBLink = props.href || props.to;
-      var tag = isBLink ? BLink : props.tag;
+      var link = isLink(props);
+      var tag = link ? BLink : props.tag;
       var componentData = {
         staticClass: 'badge',
         class: [props.variant ? "badge-".concat(props.variant) : 'badge-secondary', {
@@ -3369,7 +3565,7 @@
           active: props.active,
           disabled: props.disabled
         }],
-        props: isBLink ? pluckProps(linkProps$2, props) : {}
+        props: link ? pluckProps(linkProps$2, props) : {}
       };
       return h(tag, a(data, componentData), children);
     }
@@ -3381,12 +3577,12 @@
     }
   });
 
-  var stripTagsRegex = /(<([^>]+)>)/gi; // Removes any thing that looks like an HTML tag from the supplied string
+  var RX_HTML_TAGS = /(<([^>]+)>)/gi; // Removes anything that looks like an HTML tag from the supplied string
 
   var stripTags = function stripTags() {
     var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    return String(text).replace(stripTagsRegex, '');
-  }; // Generate a domProps object for either innerHTML, textContent or nothing
+    return String(text).replace(RX_HTML_TAGS, '');
+  }; // Generate a `domProps` object for either `innerHTML`, `textContent` or an empty object
 
   var htmlOrText = function htmlOrText(innerHTML, textContent) {
     return innerHTML ? {
@@ -3396,7 +3592,7 @@
     } : {};
   };
 
-  var props$4 = _objectSpread2({}, propsFactory(), {
+  var props$5 = _objectSpread2({
     text: {
       type: String,
       default: null
@@ -3409,26 +3605,25 @@
       type: String,
       default: 'location'
     }
-  }); // @vue/component
+  }, omit(props$1, ['event', 'routerTag'])); // --- Main component ---
+  // @vue/component
 
   var BBreadcrumbLink = /*#__PURE__*/Vue.extend({
     name: 'BBreadcrumbLink',
     functional: true,
-    props: props$4,
+    props: props$5,
     render: function render(h, _ref) {
       var suppliedProps = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      var tag = suppliedProps.active ? 'span' : BLink;
+      var active = suppliedProps.active;
+      var tag = active ? 'span' : BLink;
       var componentData = {
-        props: pluckProps(props$4, suppliedProps)
+        attrs: {
+          'aria-current': active ? suppliedProps.ariaCurrent : null
+        },
+        props: pluckProps(props$5, suppliedProps)
       };
-
-      if (suppliedProps.active) {
-        componentData.attrs = {
-          'aria-current': suppliedProps.ariaCurrent
-        };
-      }
 
       if (!children) {
         componentData.domProps = htmlOrText(suppliedProps.html, suppliedProps.text);
@@ -3441,7 +3636,7 @@
   var BBreadcrumbItem = /*#__PURE__*/Vue.extend({
     name: 'BBreadcrumbItem',
     functional: true,
-    props: props$4,
+    props: props$5,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -3457,7 +3652,7 @@
     }
   });
 
-  var props$5 = {
+  var props$6 = {
     items: {
       type: Array,
       default: null
@@ -3467,7 +3662,7 @@
   var BBreadcrumb = /*#__PURE__*/Vue.extend({
     name: 'BBreadcrumb',
     functional: true,
-    props: props$5,
+    props: props$6,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -3496,7 +3691,7 @@
           }
 
           return h(BBreadcrumbItem, {
-            props: _objectSpread2({}, item, {
+            props: _objectSpread2(_objectSpread2({}, item), {}, {
               active: active
             })
           });
@@ -3526,8 +3721,8 @@
     }
   });
 
-  var NAME$7 = 'BButtonGroup';
-  var props$6 = {
+  var NAME$9 = 'BButtonGroup';
+  var props$7 = {
     vertical: {
       type: Boolean,
       default: false
@@ -3549,9 +3744,9 @@
   }; // @vue/component
 
   var BButtonGroup = /*#__PURE__*/Vue.extend({
-    name: NAME$7,
+    name: NAME$9,
     functional: true,
-    props: props$6,
+    props: props$7,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -3625,12 +3820,9 @@
           shift ? this.focusLast(evt) : this.focusNext(evt);
         }
       },
-      setItemFocus: function setItemFocus(item) {
-        item && item.focus && item.focus();
-      },
       focusFirst: function focusFirst() {
         var items = this.getItems();
-        this.setItemFocus(items[0]);
+        attemptFocus(items[0]);
       },
       focusPrev: function focusPrev(evt) {
         var items = this.getItems();
@@ -3638,7 +3830,7 @@
 
         if (index > -1) {
           items = items.slice(0, index).reverse();
-          this.setItemFocus(items[0]);
+          attemptFocus(items[0]);
         }
       },
       focusNext: function focusNext(evt) {
@@ -3647,12 +3839,12 @@
 
         if (index > -1) {
           items = items.slice(index + 1);
-          this.setItemFocus(items[0]);
+          attemptFocus(items[0]);
         }
       },
       focusLast: function focusLast() {
         var items = this.getItems().reverse();
-        this.setItemFocus(items[0]);
+        attemptFocus(items[0]);
       },
       getItems: function getItems() {
         var items = selectAll(ITEM_SELECTOR, this.$el);
@@ -3762,7 +3954,12 @@
     return String(a) === String(b);
   };
 
-  var RX_DATE = /^\d+-\d+-\d+$/; // --- Date utility methods ---
+  // Loose YYYY-MM-DD matching, ignores any appended time inforation
+  // Matches '1999-12-20', '1999-1-1', '1999-01-20T22:51:49.118Z', '1999-01-02 13:00:00'
+
+  var RX_DATE = /^\d+-\d\d?-\d\d?(?:\s|T|$)/; // Used to split off the date parts of the YYYY-MM-DD string
+
+  var RX_DATE_SPLIT = /-|\s|T/; // --- Date utility methods ---
   // Create or clone a date (`new Date(...)` shortcut)
 
   var createDate = function createDate() {
@@ -3775,7 +3972,9 @@
 
   var parseYMD = function parseYMD(date) {
     if (isString(date) && RX_DATE.test(date.trim())) {
-      var _date$split$map = date.split('-').map(toInteger),
+      var _date$split$map = date.split(RX_DATE_SPLIT).map(function (v) {
+        return toInteger(v, 1);
+      }),
           _date$split$map2 = _slicedToArray(_date$split$map, 3),
           year = _date$split$map2[0],
           month = _date$split$map2[1],
@@ -3911,11 +4110,9 @@
     return arrayIncludes(RTL_LANGS, locale1) || arrayIncludes(RTL_LANGS, locale2);
   };
 
-  /*
-   * SSR Safe Client Side ID attribute generation
-   * id's can only be generated client side, after mount.
-   * this._uid is not synched between server and client.
-   */
+  // SSR safe client-side ID attribute generation
+  // ID's can only be generated client-side, after mount
+  // `this._uid` is not synched between server and client
   // @vue/component
   var idMixin = {
     props: {
@@ -3931,11 +4128,11 @@
     },
     computed: {
       safeId: function safeId() {
-        // Computed property that returns a dynamic function for creating the ID.
-        // Reacts to changes in both .id and .localId_ And regens a new function
+        // Computed property that returns a dynamic function for creating the ID
+        // Reacts to changes in both `.id` and `.localId_` and regenerates a new function
         var id = this.id || this.localId_; // We return a function that accepts an optional suffix string
-        // So this computed prop looks and works like a method!!!
-        // But benefits from Vue's Computed prop caching
+        // So this computed prop looks and works like a method
+        // but benefits from Vue's computed prop caching
 
         var fn = function fn(suffix) {
           if (!id) {
@@ -3952,16 +4149,16 @@
     mounted: function mounted() {
       var _this = this;
 
-      // mounted only occurs client side
+      // `mounted()` only occurs client-side
       this.$nextTick(function () {
-        // Update dom with auto ID after dom loaded to prevent
-        // SSR hydration errors.
+        // Update DOM with auto-generated ID after mount
+        // to prevent SSR hydration errors
         _this.localId_ = "__BVID__".concat(_this._uid);
       });
     }
   };
 
-  var NAME$8 = 'BCalendar'; // Key Codes
+  var NAME$a = 'BCalendar'; // Key Codes
 
   var UP = KEY_CODES.UP,
       DOWN = KEY_CODES.DOWN,
@@ -3983,8 +4180,9 @@
   // @vue/component
 
   var BCalendar = Vue.extend({
-    name: NAME$8,
-    mixins: [idMixin, normalizeSlotMixin],
+    name: NAME$a,
+    // Mixin order is important!
+    mixins: [attrsMixin, idMixin, normalizeSlotMixin],
     model: {
       // Even though this is the default that Vue assumes, we need
       // to add it for the docs to reflect that this is the model
@@ -4110,79 +4308,79 @@
       labelPrevDecade: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelPrevDecade');
+          return getComponentConfig(NAME$a, 'labelPrevDecade');
         }
       },
       labelPrevYear: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelPrevYear');
+          return getComponentConfig(NAME$a, 'labelPrevYear');
         }
       },
       labelPrevMonth: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelPrevMonth');
+          return getComponentConfig(NAME$a, 'labelPrevMonth');
         }
       },
       labelCurrentMonth: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelCurrentMonth');
+          return getComponentConfig(NAME$a, 'labelCurrentMonth');
         }
       },
       labelNextMonth: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelNextMonth');
+          return getComponentConfig(NAME$a, 'labelNextMonth');
         }
       },
       labelNextYear: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelNextYear');
+          return getComponentConfig(NAME$a, 'labelNextYear');
         }
       },
       labelNextDecade: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelNextDecade');
+          return getComponentConfig(NAME$a, 'labelNextDecade');
         }
       },
       labelToday: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelToday');
+          return getComponentConfig(NAME$a, 'labelToday');
         }
       },
       labelSelected: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelSelected');
+          return getComponentConfig(NAME$a, 'labelSelected');
         }
       },
       labelNoDateSelected: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelNoDateSelected');
+          return getComponentConfig(NAME$a, 'labelNoDateSelected');
         }
       },
       labelCalendar: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelCalendar');
+          return getComponentConfig(NAME$a, 'labelCalendar');
         }
       },
       labelNav: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelNav');
+          return getComponentConfig(NAME$a, 'labelNav');
         }
       },
       labelHelp: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$8, 'labelHelp');
+          return getComponentConfig(NAME$a, 'labelHelp');
         }
       },
       dateFormatOptions: {
@@ -4227,6 +4425,27 @@
       };
     },
     computed: {
+      valueId: function valueId() {
+        return this.safeId();
+      },
+      widgetId: function widgetId() {
+        return this.safeId('_calendar-wrapper_');
+      },
+      navId: function navId() {
+        return this.safeId('_calendar-nav_');
+      },
+      gridId: function gridId() {
+        return this.safeId('_calendar-grid_');
+      },
+      gridCaptionId: function gridCaptionId() {
+        return this.safeId('_calendar-grid-caption_');
+      },
+      gridHelpId: function gridHelpId() {
+        return this.safeId('_calendar-grid-help_');
+      },
+      activeId: function activeId() {
+        return this.activeYMD ? this.safeId("_cell-".concat(this.activeYMD, "_")) : null;
+      },
       // TODO: Use computed props to convert `YYYY-MM-DD` to `Date` object
       selectedDate: function selectedDate() {
         // Selected as a `Date` object
@@ -4244,7 +4463,7 @@
       },
       computedWeekStarts: function computedWeekStarts() {
         // `startWeekday` is a prop (constrained to `0` through `6`)
-        return Math.max(toInteger(this.startWeekday, 0), 0) % 7;
+        return mathMax(toInteger(this.startWeekday, 0), 0) % 7;
       },
       computedLocale: function computedLocale() {
         // Returns the resolved locale used by the calendar
@@ -4330,7 +4549,7 @@
       },
       // Computed props that return a function reference
       dateOutOfRange: function dateOutOfRange() {
-        // Check wether a date is within the min/max range
+        // Check whether a date is within the min/max range
         // returns a new function ref if the pops change
         // We do this as we need to trigger the calendar computed prop
         // to update when these props update
@@ -4363,14 +4582,14 @@
       // Computed props that return date formatter functions
       formatDateString: function formatDateString() {
         // Returns a date formatter function
-        return createDateFormatter(this.calendarLocale, _objectSpread2({
+        return createDateFormatter(this.calendarLocale, _objectSpread2(_objectSpread2({
           // Ensure we have year, month, day shown for screen readers/ARIA
           // If users really want to leave one of these out, they can
           // pass `undefined` for the property value
           year: STR_NUMERIC,
           month: STR_2_DIGIT,
           day: STR_2_DIGIT
-        }, this.dateFormatOptions, {
+        }, this.dateFormatOptions), {}, {
           // Ensure hours/minutes/seconds are not shown
           // As we do not support the time portion (yet)
           hour: undefined,
@@ -4577,15 +4796,13 @@
       // Public method(s)
       focus: function focus() {
         if (!this.disabled) {
-          try {
-            this.$refs.grid.focus();
-          } catch (_unused) {}
+          attemptFocus(this.$refs.grid);
         }
       },
       blur: function blur() {
-        try {
-          this.$refs.grid.blur();
-        } catch (_unused2) {}
+        if (!this.disabled) {
+          attemptBlur(this.$refs.grid);
+        }
       },
       // Private methods
       setLive: function setLive(on) {
@@ -4765,28 +4982,26 @@
     render: function render(h) {
       var _this5 = this;
 
-      // If hidden prop is set, render just a placeholder node
+      // If `hidden` prop is set, render just a placeholder node
       if (this.hidden) {
         return h();
       }
 
-      var isLive = this.isLive,
+      var valueId = this.valueId,
+          widgetId = this.widgetId,
+          navId = this.navId,
+          gridId = this.gridId,
+          gridCaptionId = this.gridCaptionId,
+          gridHelpId = this.gridHelpId,
+          activeId = this.activeId,
+          isLive = this.isLive,
           isRTL = this.isRTL,
           activeYMD = this.activeYMD,
           selectedYMD = this.selectedYMD,
           safeId = this.safeId;
       var hideDecadeNav = !this.showDecadeNav;
       var todayYMD = formatYMD(this.getToday());
-      var highlightToday = !this.noHighlightToday; // Pre-compute some IDs
-      // This should be computed props
-
-      var idValue = safeId();
-      var idWidget = safeId('_calendar-wrapper_');
-      var idNav = safeId('_calendar-nav_');
-      var idGrid = safeId('_calendar-grid_');
-      var idGridCaption = safeId('_calendar-grid-caption_');
-      var idGridHelp = safeId('_calendar-grid-help_');
-      var idActive = activeYMD ? safeId("_cell-".concat(activeYMD, "_")) : null; // Header showing current selected date
+      var highlightToday = !this.noHighlightToday; // Header showing current selected date
 
       var $header = h('output', {
         staticClass: 'form-control form-control-sm text-center',
@@ -4795,8 +5010,8 @@
           readonly: this.readonly || this.disabled
         },
         attrs: {
-          id: idValue,
-          for: idGrid,
+          id: valueId,
+          for: gridId,
           role: 'status',
           tabindex: this.disabled ? null : '-1',
           // Mainly for testing purposes, as we do not know
@@ -4836,11 +5051,11 @@
         shiftV: 0.5
       };
 
-      var navPrevProps = _objectSpread2({}, navProps, {
+      var navPrevProps = _objectSpread2(_objectSpread2({}, navProps), {}, {
         flipH: isRTL
       });
 
-      var navNextProps = _objectSpread2({}, navProps, {
+      var navNextProps = _objectSpread2(_objectSpread2({}, navProps), {}, {
         flipH: !isRTL
       });
 
@@ -4893,11 +5108,11 @@
       var $nav = h('div', {
         staticClass: 'b-calendar-nav d-flex',
         attrs: {
-          id: idNav,
+          id: navId,
           role: 'group',
           'aria-hidden': this.disabled ? 'true' : null,
           'aria-label': this.labelNav || null,
-          'aria-controls': idGrid
+          'aria-controls': gridId
         }
       }, [hideDecadeNav ? h() : makeNavBtn($prevDecadeIcon, this.labelPrevDecade, this.gotoPrevDecade, this.prevDecadeDisabled, 'Ctrl+Alt+PageDown'), makeNavBtn($prevYearIcon, this.labelPrevYear, this.gotoPrevYear, this.prevYearDisabled, 'Alt+PageDown'), makeNavBtn($prevMonthIcon, this.labelPrevMonth, this.gotoPrevMonth, this.prevMonthDisabled, 'PageDown'), makeNavBtn($thisMonthIcon, this.labelCurrentMonth, this.gotoCurrentMonth, this.thisMonthDisabled, 'Home'), makeNavBtn($nextMonthIcon, this.labelNextMonth, this.gotoNextMonth, this.nextMonthDisabled, 'PageUp'), makeNavBtn($nextYearIcon, this.labelNextYear, this.gotoNextYear, this.nextYearDisabled, 'Alt+PageUp'), hideDecadeNav ? h() : makeNavBtn($nextDecadeIcon, this.labelNextDecade, this.gotoNextDecade, this.nextDecadeDisabled, 'Ctrl+Alt+PageUp')]); // Caption for calendar grid
 
@@ -4908,7 +5123,7 @@
           'text-muted': this.disabled
         },
         attrs: {
-          id: idGridCaption,
+          id: gridCaptionId,
           'aria-live': isLive ? 'polite' : null,
           'aria-atomic': isLive ? 'true' : null
         }
@@ -4999,7 +5214,7 @@
       var $gridHelp = h('footer', {
         staticClass: 'b-calendar-grid-help border-top small text-muted text-center bg-light',
         attrs: {
-          id: idGridHelp
+          id: gridHelpId
         }
       }, [h('div', {
         staticClass: 'small'
@@ -5008,19 +5223,19 @@
         ref: 'grid',
         staticClass: 'b-calendar-grid form-control h-auto text-center',
         attrs: {
-          id: idGrid,
+          id: gridId,
           role: 'application',
           tabindex: this.disabled ? null : '0',
           'data-month': activeYMD.slice(0, -3),
           // `YYYY-MM`, mainly for testing
           'aria-roledescription': this.labelCalendar || null,
-          'aria-labelledby': idGridCaption,
-          'aria-describedby': idGridHelp,
+          'aria-labelledby': gridCaptionId,
+          'aria-describedby': gridHelpId,
           // `aria-readonly` is not considered valid on `role="application"`
           // https://www.w3.org/TR/wai-aria-1.1/#aria-readonly
           // 'aria-readonly': this.readonly && !this.disabled ? 'true' : null,
           'aria-disabled': this.disabled ? 'true' : null,
-          'aria-activedescendant': idActive
+          'aria-activedescendant': activeId
         },
         on: {
           keydown: this.onKeydownGrid,
@@ -5039,7 +5254,7 @@
           width: this.width
         },
         attrs: {
-          id: idWidget,
+          id: widgetId,
           dir: isRTL ? 'rtl' : 'ltr',
           lang: this.computedLocale || null,
           role: 'group',
@@ -5050,7 +5265,7 @@
           'aria-roledescription': this.roleDescription || null,
           'aria-describedby': [// Should the attr (if present) go last?
           // Or should this attr be a prop?
-          this.$attrs['aria-describedby'], idValue, idGridHelp].filter(identity).join(' ')
+          this.bvAttrs['aria-describedby'], valueId, gridHelpId].filter(identity).join(' ')
         },
         on: {
           keydown: this.onKeydownWrapper
@@ -5071,56 +5286,6 @@
       BCalendar: BCalendar
     }
   });
-
-  /**
-   * @param {string} prefix
-   * @param {string} value
-   */
-
-  var prefixPropName = function prefixPropName(prefix, value) {
-    return prefix + upperFirst(value);
-  };
-
-  /**
-   * @param {string} prefix
-   * @param {string} value
-   */
-
-  var unprefixPropName = function unprefixPropName(prefix, value) {
-    return lowerFirst(value.replace(prefix, ''));
-  };
-
-  /**
-   * Copies props from one array/object to a new array/object. Prop values
-   * are also cloned as new references to prevent possible mutation of original
-   * prop object values. Optionally accepts a function to transform the prop name.
-   *
-   * @param {[]|{}} props
-   * @param {Function} transformFn
-   */
-
-  var copyProps = function copyProps(props) {
-    var transformFn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : identity;
-
-    if (isArray(props)) {
-      return props.map(transformFn);
-    } // Props as an object.
-
-
-    var copied = {};
-
-    for (var prop in props) {
-      /* istanbul ignore else */
-      // eslint-disable-next-line no-prototype-builtins
-      if (props.hasOwnProperty(prop)) {
-        // If the prop value is an object, do a shallow clone to prevent
-        // potential mutations to the original object.
-        copied[transformFn(prop)] = isObject(props[prop]) ? clone(props[prop]) : props[prop];
-      }
-    }
-
-    return copied;
-  };
 
   // @vue/component
   var cardMixin = {
@@ -5144,7 +5309,7 @@
     }
   };
 
-  var props$7 = {
+  var props$8 = {
     title: {
       type: String // default: null
 
@@ -5158,7 +5323,7 @@
   var BCardTitle = /*#__PURE__*/Vue.extend({
     name: 'BCardTitle',
     functional: true,
-    props: props$7,
+    props: props$8,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -5169,8 +5334,8 @@
     }
   });
 
-  var NAME$9 = 'BCardSubTitle';
-  var props$8 = {
+  var NAME$b = 'BCardSubTitle';
+  var props$9 = {
     subTitle: {
       type: String // default: null
 
@@ -5182,15 +5347,15 @@
     subTitleTextVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$9, 'subTitleTextVariant');
+        return getComponentConfig(NAME$b, 'subTitleTextVariant');
       }
     }
   }; // @vue/component
 
   var BCardSubTitle = /*#__PURE__*/Vue.extend({
-    name: NAME$9,
+    name: NAME$b,
     functional: true,
-    props: props$8,
+    props: props$9,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -5202,12 +5367,12 @@
     }
   });
 
-  var props$9 = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'body')), {
+  var props$a = _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'body'))), {}, {
     bodyClass: {
       type: [String, Object, Array] // default: null
 
     }
-  }, props$7, {}, props$8, {
+  }, props$8), props$9), {}, {
     overlay: {
       type: Boolean,
       default: false
@@ -5217,7 +5382,7 @@
   var BCardBody = /*#__PURE__*/Vue.extend({
     name: 'BCardBody',
     functional: true,
-    props: props$9,
+    props: props$a,
     render: function render(h, _ref) {
       var _ref2;
 
@@ -5230,13 +5395,13 @@
 
       if (props.title) {
         cardTitle = h(BCardTitle, {
-          props: pluckProps(props$7, props)
+          props: pluckProps(props$8, props)
         });
       }
 
       if (props.subTitle) {
         cardSubTitle = h(BCardSubTitle, {
-          props: pluckProps(props$8, props),
+          props: pluckProps(props$9, props),
           class: ['mb-2']
         });
       }
@@ -5250,7 +5415,7 @@
     }
   });
 
-  var props$a = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'header')), {
+  var props$b = _objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'header'))), {}, {
     header: {
       type: String // default: null
 
@@ -5263,28 +5428,31 @@
       type: [String, Object, Array] // default: null
 
     }
-  }); // @vue/component
+  }); // --- Main component ---
+  // @vue/component
 
   var BCardHeader = /*#__PURE__*/Vue.extend({
     name: 'BCardHeader',
     functional: true,
-    props: props$a,
+    props: props$b,
     render: function render(h, _ref) {
       var _ref2;
 
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var headerBgVariant = props.headerBgVariant,
+          headerBorderVariant = props.headerBorderVariant,
+          headerTextVariant = props.headerTextVariant;
       return h(props.headerTag, a(data, {
         staticClass: 'card-header',
-        class: [props.headerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.headerBgVariant), props.headerBgVariant), _defineProperty(_ref2, "border-".concat(props.headerBorderVariant), props.headerBorderVariant), _defineProperty(_ref2, "text-".concat(props.headerTextVariant), props.headerTextVariant), _ref2)]
-      }), children || [h('div', {
-        domProps: htmlOrText(props.headerHtml, props.header)
-      })]);
+        class: [props.headerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(headerBgVariant), headerBgVariant), _defineProperty(_ref2, "border-".concat(headerBorderVariant), headerBorderVariant), _defineProperty(_ref2, "text-".concat(headerTextVariant), headerTextVariant), _ref2)],
+        domProps: children ? {} : htmlOrText(props.headerHtml, props.header)
+      }), children);
     }
   });
 
-  var props$b = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'footer')), {
+  var props$c = _objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'footer'))), {}, {
     footer: {
       type: String // default: null
 
@@ -5297,28 +5465,31 @@
       type: [String, Object, Array] // default: null
 
     }
-  }); // @vue/component
+  }); // --- Main component ---
+  // @vue/component
 
   var BCardFooter = /*#__PURE__*/Vue.extend({
     name: 'BCardFooter',
     functional: true,
-    props: props$b,
+    props: props$c,
     render: function render(h, _ref) {
       var _ref2;
 
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var footerBgVariant = props.footerBgVariant,
+          footerBorderVariant = props.footerBorderVariant,
+          footerTextVariant = props.footerTextVariant;
       return h(props.footerTag, a(data, {
         staticClass: 'card-footer',
-        class: [props.footerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.footerBgVariant), props.footerBgVariant), _defineProperty(_ref2, "border-".concat(props.footerBorderVariant), props.footerBorderVariant), _defineProperty(_ref2, "text-".concat(props.footerTextVariant), props.footerTextVariant), _ref2)]
-      }), children || [h('div', {
-        domProps: htmlOrText(props.footerHtml, props.footer)
-      })]);
+        class: [props.footerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(footerBgVariant), footerBgVariant), _defineProperty(_ref2, "border-".concat(footerBorderVariant), footerBorderVariant), _defineProperty(_ref2, "text-".concat(footerTextVariant), footerTextVariant), _ref2)],
+        domProps: children ? {} : htmlOrText(props.footerHtml, props.footer)
+      }), children);
     }
   });
 
-  var props$c = {
+  var props$d = {
     src: {
       type: String,
       required: true
@@ -5366,7 +5537,7 @@
   var BCardImg = /*#__PURE__*/Vue.extend({
     name: 'BCardImg',
     functional: true,
-    props: props$c,
+    props: props$d,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
@@ -5394,9 +5565,9 @@
     }
   });
 
-  var cardImgProps = copyProps(props$c, prefixPropName.bind(null, 'img'));
+  var cardImgProps = copyProps(props$d, prefixPropName.bind(null, 'img'));
   cardImgProps.imgSrc.required = false;
-  var props$d = _objectSpread2({}, props$9, {}, props$a, {}, props$b, {}, cardImgProps, {}, copyProps(cardMixin.props), {
+  var props$e = _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$a), props$b), props$c), cardImgProps), copyProps(cardMixin.props)), {}, {
     align: {
       type: String // default: null
 
@@ -5410,7 +5581,7 @@
   var BCard = /*#__PURE__*/Vue.extend({
     name: 'BCard',
     functional: true,
-    props: props$d,
+    props: props$e,
     render: function render(h, _ref) {
       var _class;
 
@@ -5418,61 +5589,76 @@
           data = _ref.data,
           slots = _ref.slots,
           scopedSlots = _ref.scopedSlots;
-      var $slots = slots(); // Vue < 2.6.x may return undefined for scopedSlots
-
-      var $scopedSlots = scopedSlots || {}; // Create placeholder elements for each section
-
-      var imgFirst = h();
-      var header = h();
-      var content = h();
-      var footer = h();
-      var imgLast = h();
+      var imgLeft = props.imgLeft,
+          imgRight = props.imgRight,
+          imgStart = props.imgStart,
+          imgEnd = props.imgEnd,
+          header = props.header,
+          headerHtml = props.headerHtml,
+          footer = props.footer,
+          footerHtml = props.footerHtml,
+          align = props.align,
+          textVariant = props.textVariant,
+          bgVariant = props.bgVariant,
+          borderVariant = props.borderVariant;
+      var $scopedSlots = scopedSlots || {};
+      var $slots = slots();
+      var slotScope = {};
+      var $imgFirst = h();
+      var $imgLast = h();
 
       if (props.imgSrc) {
-        var img = h(BCardImg, {
+        var $img = h(BCardImg, {
           props: pluckProps(cardImgProps, props, unprefixPropName.bind(null, 'img'))
         });
 
         if (props.imgBottom) {
-          imgLast = img;
+          $imgLast = $img;
         } else {
-          imgFirst = img;
+          $imgFirst = $img;
         }
       }
 
-      if (props.header || props.headerHtml || hasNormalizedSlot('header', $scopedSlots, $slots)) {
-        header = h(BCardHeader, {
-          props: pluckProps(props$a, props)
-        }, normalizeSlot('header', {}, $scopedSlots, $slots));
+      var $header = h();
+      var hasHeaderSlot = hasNormalizedSlot('header', $scopedSlots, $slots);
+
+      if (hasHeaderSlot || header || headerHtml) {
+        $header = h(BCardHeader, {
+          props: pluckProps(props$b, props),
+          domProps: hasHeaderSlot ? {} : htmlOrText(headerHtml, header)
+        }, normalizeSlot('header', slotScope, $scopedSlots, $slots));
       }
 
-      content = normalizeSlot('default', {}, $scopedSlots, $slots) || [];
+      var $content = normalizeSlot('default', slotScope, $scopedSlots, $slots); // Wrap content in <card-body> when `noBody` prop set
 
       if (!props.noBody) {
-        // Wrap content in card-body
-        content = [h(BCardBody, {
-          props: pluckProps(props$9, props)
-        }, _toConsumableArray(content))];
+        $content = h(BCardBody, {
+          props: pluckProps(props$a, props)
+        }, $content);
       }
 
-      if (props.footer || props.footerHtml || hasNormalizedSlot('footer', $scopedSlots, $slots)) {
-        footer = h(BCardFooter, {
-          props: pluckProps(props$b, props)
-        }, normalizeSlot('footer', {}, $scopedSlots, $slots));
+      var $footer = h();
+      var hasFooterSlot = hasNormalizedSlot('footer', $scopedSlots, $slots);
+
+      if (hasFooterSlot || footer || footerHtml) {
+        $footer = h(BCardFooter, {
+          props: pluckProps(props$c, props),
+          domProps: hasHeaderSlot ? {} : htmlOrText(footerHtml, footer)
+        }, normalizeSlot('footer', slotScope, $scopedSlots, $slots));
       }
 
       return h(props.tag, a(data, {
         staticClass: 'card',
         class: (_class = {
-          'flex-row': props.imgLeft || props.imgStart,
-          'flex-row-reverse': (props.imgRight || props.imgEnd) && !(props.imgLeft || props.imgStart)
-        }, _defineProperty(_class, "text-".concat(props.align), props.align), _defineProperty(_class, "bg-".concat(props.bgVariant), props.bgVariant), _defineProperty(_class, "border-".concat(props.borderVariant), props.borderVariant), _defineProperty(_class, "text-".concat(props.textVariant), props.textVariant), _class)
-      }), [imgFirst, header].concat(_toConsumableArray(content), [footer, imgLast]));
+          'flex-row': imgLeft || imgStart,
+          'flex-row-reverse': (imgRight || imgEnd) && !(imgLeft || imgStart)
+        }, _defineProperty(_class, "text-".concat(align), align), _defineProperty(_class, "bg-".concat(bgVariant), bgVariant), _defineProperty(_class, "border-".concat(borderVariant), borderVariant), _defineProperty(_class, "text-".concat(textVariant), textVariant), _class)
+      }), [$imgFirst, $header, $content, $footer, $imgLast]);
     }
   });
 
   var OBSERVER_PROP_NAME = '__bv__visibility_observer';
-  var onlyDgitsRE = /^\d+$/;
+  var RX_ONLY_DIGITS = /^\d+$/;
 
   var VisibilityObserver = /*#__PURE__*/function () {
     function VisibilityObserver(el, options, vnode) {
@@ -5562,13 +5748,8 @@
     }, {
       key: "stop",
       value: function stop() {
-        var observer = this.observer;
         /* istanbul ignore next */
-
-        if (observer && observer.disconnect) {
-          observer.disconnect();
-        }
-
+        this.observer && this.observer.disconnect();
         this.observer = null;
       }
     }]);
@@ -5598,7 +5779,7 @@
 
     keys(modifiers).forEach(function (mod) {
       /* istanbul ignore else: Until <b-img-lazy> is switched to use this directive */
-      if (onlyDgitsRE.test(mod)) {
+      if (RX_ONLY_DIGITS.test(mod)) {
         options.margin = "".concat(mod, "px");
       } else if (mod.toLowerCase() === 'once') {
         options.once = true;
@@ -5646,10 +5827,10 @@
     unbind: unbind
   };
 
-  var NAME$a = 'BImg'; // Blank image with fill template
+  var NAME$c = 'BImg'; // Blank image with fill template
 
   var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>';
-  var props$e = {
+  var props$f = {
     src: {
       type: String // default: null
 
@@ -5723,7 +5904,7 @@
     blankColor: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$a, 'blankColor');
+        return getComponentConfig(NAME$c, 'blankColor');
       }
     }
   }; // --- Helper methods ---
@@ -5735,9 +5916,9 @@
 
 
   var BImg = /*#__PURE__*/Vue.extend({
-    name: NAME$a,
+    name: NAME$c,
     functional: true,
-    props: props$e,
+    props: props$f,
     render: function render(h, _ref) {
       var _class;
 
@@ -5798,8 +5979,8 @@
     }
   });
 
-  var NAME$b = 'BImgLazy';
-  var props$f = {
+  var NAME$d = 'BImgLazy';
+  var props$g = {
     src: {
       type: String,
       required: true
@@ -5832,7 +6013,7 @@
     blankColor: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$b, 'blankColor');
+        return getComponentConfig(NAME$d, 'blankColor');
       }
     },
     blankWidth: {
@@ -5888,11 +6069,11 @@
   }; // @vue/component
 
   var BImgLazy = /*#__PURE__*/Vue.extend({
-    name: NAME$b,
+    name: NAME$d,
     directives: {
       bVisible: VBVisible
     },
-    props: props$f,
+    props: props$g,
     data: function data() {
       return {
         isShown: this.show
@@ -6001,8 +6182,8 @@
 
   // The `omit()` util creates a new object, so we can just pass the original props
 
-  var lazyProps = omit(props$f, ['left', 'right', 'center', 'block', 'rounded', 'thumbnail', 'fluid', 'fluidGrow']);
-  var props$g = _objectSpread2({}, lazyProps, {
+  var lazyProps = omit(props$g, ['left', 'right', 'center', 'block', 'rounded', 'thumbnail', 'fluid', 'fluidGrow']);
+  var props$h = _objectSpread2(_objectSpread2({}, lazyProps), {}, {
     top: {
       type: Boolean,
       default: false
@@ -6034,7 +6215,7 @@
   var BCardImgLazy = /*#__PURE__*/Vue.extend({
     name: 'BCardImgLazy',
     functional: true,
-    props: props$g,
+    props: props$h,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
@@ -6051,7 +6232,7 @@
       } // False out the left/center/right props before passing to b-img-lazy
 
 
-      var lazyProps = _objectSpread2({}, props, {
+      var lazyProps = _objectSpread2(_objectSpread2({}, props), {}, {
         left: false,
         right: false,
         center: false
@@ -6064,7 +6245,7 @@
     }
   });
 
-  var props$h = {
+  var props$i = {
     textTag: {
       type: String,
       default: 'p'
@@ -6074,7 +6255,7 @@
   var BCardText = /*#__PURE__*/Vue.extend({
     name: 'BCardText',
     functional: true,
-    props: props$h,
+    props: props$i,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -6085,7 +6266,7 @@
     }
   });
 
-  var props$i = {
+  var props$j = {
     tag: {
       type: String,
       default: 'div'
@@ -6103,7 +6284,7 @@
   var BCardGroup = /*#__PURE__*/Vue.extend({
     name: 'BCardGroup',
     functional: true,
-    props: props$i,
+    props: props$j,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -6183,7 +6364,7 @@
           changed = true;
         }
       } // We only call the callback if a change that could affect
-      // layout/size truely happened
+      // layout/size truly happened
 
 
       if (changed) {
@@ -6246,7 +6427,7 @@
     method.apply(void 0, args);
   };
 
-  var NAME$c = 'BCarousel'; // Slide directional classes
+  var NAME$e = 'BCarousel'; // Slide directional classes
 
   var DIRECTION = {
     next: {
@@ -6292,7 +6473,7 @@
 
 
   var BCarousel = /*#__PURE__*/Vue.extend({
-    name: NAME$c,
+    name: NAME$e,
     mixins: [idMixin, normalizeSlotMixin],
     provide: function provide() {
       return {
@@ -6307,25 +6488,25 @@
       labelPrev: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$c, 'labelPrev');
+          return getComponentConfig(NAME$e, 'labelPrev');
         }
       },
       labelNext: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$c, 'labelNext');
+          return getComponentConfig(NAME$e, 'labelNext');
         }
       },
       labelGotoSlide: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$c, 'labelGotoSlide');
+          return getComponentConfig(NAME$e, 'labelGotoSlide');
         }
       },
       labelIndicators: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$c, 'labelIndicators');
+          return getComponentConfig(NAME$e, 'labelIndicators');
         }
       },
       interval: {
@@ -6439,9 +6620,10 @@
     },
     created: function created() {
       // Create private non-reactive props
-      this._intervalId = null;
-      this._animationTimeout = null;
-      this._touchTimeout = null; // Set initial paused state
+      this.$_interval = null;
+      this.$_animationTimeout = null;
+      this.$_touchTimeout = null;
+      this.$_observer = null; // Set initial paused state
 
       this.isPaused = !(toInteger(this.interval, 0) > 0);
     },
@@ -6451,22 +6633,51 @@
 
       this.updateSlides(); // Observe child changes so we can update slide list
 
-      observeDom(this.$refs.inner, this.updateSlides.bind(this), {
-        subtree: false,
-        childList: true,
-        attributes: true,
-        attributeFilter: ['id']
-      });
+      this.setObserver(true);
     },
     beforeDestroy: function beforeDestroy() {
-      clearTimeout(this._animationTimeout);
-      clearTimeout(this._touchTimeout);
-      clearInterval(this._intervalId);
-      this._intervalId = null;
-      this._animationTimeout = null;
-      this._touchTimeout = null;
+      this.clearInterval();
+      this.clearAnimationTimeout();
+      this.clearTouchTimeout();
+      this.setObserver(false);
     },
     methods: {
+      clearInterval: function (_clearInterval) {
+        function clearInterval() {
+          return _clearInterval.apply(this, arguments);
+        }
+
+        clearInterval.toString = function () {
+          return _clearInterval.toString();
+        };
+
+        return clearInterval;
+      }(function () {
+        clearInterval(this.$_interval);
+        this.$_interval = null;
+      }),
+      clearAnimationTimeout: function clearAnimationTimeout() {
+        clearTimeout(this.$_animationTimeout);
+        this.$_animationTimeout = null;
+      },
+      clearTouchTimeout: function clearTouchTimeout() {
+        clearTimeout(this.$_touchTimeout);
+        this.$_touchTimeout = null;
+      },
+      setObserver: function setObserver() {
+        var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        this.$_observer && this.$_observer.disconnect();
+        this.$_observer = null;
+
+        if (on) {
+          this.$_observer = observeDom(this.$refs.inner, this.updateSlides.bind(this), {
+            subtree: false,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['id']
+          });
+        }
+      },
       // Set slide
       setSlide: function setSlide(slide) {
         var _this = this;
@@ -6483,7 +6694,7 @@
         var noWrap = this.noWrap;
         var numSlides = this.numSlides; // Make sure we have an integer (you never know!)
 
-        slide = Math.floor(slide); // Don't do anything if nothing to slide to
+        slide = mathFloor(slide); // Don't do anything if nothing to slide to
 
         if (numSlides === 0) {
           return;
@@ -6522,10 +6733,7 @@
           this.isPaused = true;
         }
 
-        if (this._intervalId) {
-          clearInterval(this._intervalId);
-          this._intervalId = null;
-        }
+        this.clearInterval();
       },
       // Start auto rotate slides
       start: function start(evt) {
@@ -6535,14 +6743,10 @@
         /* istanbul ignore next: most likely will never happen, but just in case */
 
 
-        if (this._intervalId) {
-          clearInterval(this._intervalId);
-          this._intervalId = null;
-        } // Don't start if no interval, or less than 2 slides
-
+        this.clearInterval(); // Don't start if no interval, or less than 2 slides
 
         if (this.interval && this.numSlides > 1) {
-          this._intervalId = setInterval(this.next, Math.max(1000, this.interval));
+          this.$_interval = setInterval(this.next, mathMax(1000, this.interval));
         }
       },
       // Restart auto rotate slides when focus/hover leaves the carousel
@@ -6551,7 +6755,7 @@
       restart: function restart()
       /* istanbul ignore next: difficult to test */
       {
-        if (!this.$el.contains(document.activeElement)) {
+        if (!this.$el.contains(getActiveElement())) {
           this.start();
         }
       },
@@ -6617,7 +6821,8 @@
               });
             }
 
-            _this2._animationTimeout = null;
+            _this2.clearAnimationTimeout();
+
             removeClass(nextSlide, dirClass);
             removeClass(nextSlide, overlayClass);
             addClass(nextSlide, 'active');
@@ -6647,7 +6852,7 @@
           } // Fallback to setTimeout()
 
 
-          this._animationTimeout = setTimeout(onceTransEnd, TRANS_DURATION);
+          this.$_animationTimeout = setTimeout(onceTransEnd, TRANS_DURATION);
         }
 
         if (isCycling) {
@@ -6661,7 +6866,7 @@
         this.slides = selectAll('.carousel-item', this.$refs.inner);
         var numSlides = this.slides.length; // Keep slide number in range
 
-        var index = Math.max(0, Math.min(Math.floor(this.index), numSlides - 1));
+        var index = mathMax(0, mathMin(mathFloor(this.index), numSlides - 1));
         this.slides.forEach(function (slide, idx) {
           var n = idx + 1;
 
@@ -6705,7 +6910,7 @@
       handleSwipe: function handleSwipe()
       /* istanbul ignore next: JSDOM doesn't support touch events */
       {
-        var absDeltaX = Math.abs(this.touchDeltaX);
+        var absDeltaX = mathAbs(this.touchDeltaX);
 
         if (absDeltaX <= SWIPE_THRESHOLD) {
           return;
@@ -6765,12 +6970,8 @@
         // events to fire) we explicitly restart cycling
 
         this.pause(false);
-
-        if (this._touchTimeout) {
-          clearTimeout(this._touchTimeout);
-        }
-
-        this._touchTimeout = setTimeout(this.start, TOUCH_EVENT_COMPAT_WAIT + Math.max(1000, this.interval));
+        this.clearTouchTimeout();
+        this.$_touchTimeout = setTimeout(this.start, TOUCH_EVENT_COMPAT_WAIT + mathMax(1000, this.interval));
       }
     },
     render: function render(h) {
@@ -6949,7 +7150,7 @@
     }
   });
 
-  var props$j = {
+  var imgProps = {
     imgSrc: {
       type: String // default: undefined
 
@@ -6973,7 +7174,9 @@
     imgBlankColor: {
       type: String,
       default: 'transparent'
-    },
+    }
+  };
+  var props$k = _objectSpread2(_objectSpread2({}, imgProps), {}, {
     contentVisibleUp: {
       type: String
     },
@@ -7004,7 +7207,8 @@
     background: {
       type: String
     }
-  }; // @vue/component
+  }); // --- Main component ---
+  // @vue/component
 
   var BCarouselSlide = /*#__PURE__*/Vue.extend({
     name: 'BCarouselSlide',
@@ -7019,7 +7223,7 @@
         }
       }
     },
-    props: props$j,
+    props: props$k,
     computed: {
       contentClasses: function contentClasses() {
         return [this.contentVisibleUp ? 'd-none' : '', this.contentVisibleUp ? "d-".concat(this.contentVisibleUp, "-block") : ''];
@@ -7034,52 +7238,46 @@
       }
     },
     render: function render(h) {
-      var noDrag = !this.bvCarousel.noTouch && hasTouchSupport;
-      var img = this.normalizeSlot('img');
+      var $img = this.normalizeSlot('img');
 
-      if (!img && (this.imgSrc || this.imgBlank)) {
-        img = h(BImg, {
-          props: {
-            fluidGrow: true,
-            block: true,
-            src: this.imgSrc,
-            blank: this.imgBlank,
-            blankColor: this.imgBlankColor,
+      if (!$img && (this.imgSrc || this.imgBlank)) {
+        var on = {}; // Touch support event handler
+
+        /* istanbul ignore if: difficult to test in JSDOM */
+
+        if (!this.bvCarousel.noTouch && hasTouchSupport) {
+          on.dragstart = function (evt) {
+            evt.preventDefault();
+          };
+        }
+
+        $img = h(BImg, {
+          props: _objectSpread2(_objectSpread2({}, pluckProps(imgProps, this.$props, unprefixPropName.bind(null, 'img'))), {}, {
             width: this.computedWidth,
             height: this.computedHeight,
-            alt: this.imgAlt
-          },
-          // Touch support event handler
-          on: noDrag ?
-          /* istanbul ignore next */
-          {
-            dragstart
-            /* istanbul ignore next */
-            : function dragstart(e) {
-              /* istanbul ignore next: difficult to test in JSDOM */
-              e.preventDefault();
-            }
-          } : {}
+            fluidGrow: true,
+            block: true
+          }),
+          on: on
         });
       }
 
-      if (!img) {
-        img = h();
-      }
-
-      var content = h();
-      var contentChildren = [this.caption || this.captionHtml ? h(this.captionTag, {
+      var $contentChildren = [// Caption
+      this.caption || this.captionHtml ? h(this.captionTag, {
         domProps: htmlOrText(this.captionHtml, this.caption)
-      }) : false, this.text || this.textHtml ? h(this.textTag, {
+      }) : false, // Text
+      this.text || this.textHtml ? h(this.textTag, {
         domProps: htmlOrText(this.textHtml, this.text)
-      }) : false, this.normalizeSlot('default') || false];
+      }) : false, // Children
+      this.normalizeSlot('default') || false];
+      var $content = h();
 
-      if (contentChildren.some(Boolean)) {
-        content = h(this.contentTag, {
+      if ($contentChildren.some(Boolean)) {
+        $content = h(this.contentTag, {
           staticClass: 'carousel-caption',
           class: this.contentClasses
-        }, contentChildren.map(function (i) {
-          return i || h();
+        }, $contentChildren.map(function ($child) {
+          return $child || h();
         }));
       }
 
@@ -7092,7 +7290,7 @@
           id: this.safeId(),
           role: 'listitem'
         }
-      }, [img, content]);
+      }, [$img, $content]);
     }
   });
 
@@ -7108,7 +7306,7 @@
   // Generic collapse transion helper component
 
   var onEnter = function onEnter(el) {
-    el.style.height = 0; // Animaton frame delay neeeded for `appear` to work
+    el.style.height = 0; // Animaton frame delay needed for `appear` to work
 
     requestAF(function () {
       reflow(el);
@@ -7172,7 +7370,7 @@
         on: TRANSITION_HANDLERS
       }, {
         props: props
-      }), // Note: `<tranition>` supports a single root element only
+      }), // Note: `<transition>` supports a single root element only
       children);
     }
   });
@@ -7244,71 +7442,29 @@
     }
   };
 
-  var allListenTypes = {
-    hover: true,
-    click: true,
-    focus: true
-  };
-  var BVBoundListeners = '__BV_boundEventListeners__';
+  var ENTER$1 = KEY_CODES.ENTER,
+      SPACE$1 = KEY_CODES.SPACE; // Classes to apply to trigger element
 
-  var getTargets = function getTargets(binding) {
-    var targets = keys(binding.modifiers || {}).filter(function (t) {
-      return !allListenTypes[t];
-    });
+  var CLASS_BV_TOGGLE_COLLAPSED = 'collapsed';
+  var CLASS_BV_TOGGLE_NOT_COLLAPSED = 'not-collapsed'; // Property key for handler storage
 
-    if (binding.value) {
-      targets.push(binding.value);
-    }
+  var BV_BASE = '__BV_toggle'; // Root event listener property (Function)
 
-    return targets;
-  };
+  var BV_TOGGLE_ROOT_HANDLER = "".concat(BV_BASE, "_HANDLER__"); // Trigger element click handler property (Function)
 
-  var bindTargets = function bindTargets(vnode, binding, listenTypes, fn) {
-    var targets = getTargets(binding);
+  var BV_TOGGLE_CLICK_HANDLER = "".concat(BV_BASE, "_CLICK__"); // Target visibility state property (Boolean)
 
-    var listener = function listener() {
-      fn({
-        targets: targets,
-        vnode: vnode
-      });
-    };
+  var BV_TOGGLE_STATE = "".concat(BV_BASE, "_STATE__"); // Target ID list property (Array)
 
-    keys(allListenTypes).forEach(function (type) {
-      if (listenTypes[type] || binding.modifiers[type]) {
-        eventOn(vnode.elm, type, listener);
-        var boundListeners = vnode.elm[BVBoundListeners] || {};
-        boundListeners[type] = boundListeners[type] || [];
-        boundListeners[type].push(listener);
-        vnode.elm[BVBoundListeners] = boundListeners;
-      }
-    }); // Return the list of targets
+  var BV_TOGGLE_TARGETS = "".concat(BV_BASE, "_TARGETS__"); // Commonly used strings
 
-    return targets;
-  };
+  var STRING_FALSE = 'false';
+  var STRING_TRUE = 'true'; // Commonly used attribute names
 
-  var unbindTargets = function unbindTargets(vnode, binding, listenTypes) {
-    keys(allListenTypes).forEach(function (type) {
-      if (listenTypes[type] || binding.modifiers[type]) {
-        var boundListeners = vnode.elm[BVBoundListeners] && vnode.elm[BVBoundListeners][type];
-
-        if (boundListeners) {
-          boundListeners.forEach(function (listener) {
-            return eventOff(vnode.elm, type, listener);
-          });
-          delete vnode.elm[BVBoundListeners][type];
-        }
-      }
-    });
-  };
-
-  var listenTypes = {
-    click: true
-  }; // Property key for handler storage
-
-  var BV_TOGGLE = '__BV_toggle__';
-  var BV_TOGGLE_STATE = '__BV_toggle_STATE__';
-  var BV_TOGGLE_CONTROLS = '__BV_toggle_CONTROLS__';
-  var BV_TOGGLE_TARGETS = '__BV_toggle_TARGETS__'; // Emitted control event for collapse (emitted to collapse)
+  var ATTR_ARIA_CONTROLS = 'aria-controls';
+  var ATTR_ARIA_EXPANDED = 'aria-expanded';
+  var ATTR_ROLE = 'role';
+  var ATTR_TABINDEX = 'tabindex'; // Emitted control event for collapse (emitted to collapse)
 
   var EVENT_TOGGLE = 'bv::toggle::collapse'; // Listen to event for toggle state update (emitted by collapse)
 
@@ -7318,59 +7474,173 @@
 
   var EVENT_STATE_SYNC = 'bv::collapse::sync::state'; // Private event we send to collapse to request state update sync event
 
-  var EVENT_STATE_REQUEST = 'bv::request::collapse::state'; // Reset and remove a property from the provided element
+  var EVENT_STATE_REQUEST = 'bv::request::collapse::state';
+  var KEYDOWN_KEY_CODES = [ENTER$1, SPACE$1];
+  var RX_HASH = /^#/;
+  var RX_HASH_ID = /^#[A-Za-z]+[\w\-:.]*$/;
+  var RX_SPLIT_SEPARATOR = /\s+/; // --- Helper methods ---
+
+  var isNonStandardTag$1 = function isNonStandardTag(el) {
+    return !arrayIncludes(['button', 'a'], el.tagName.toLowerCase());
+  };
+
+  var getTargets = function getTargets(_ref, el) {
+    var modifiers = _ref.modifiers,
+        arg = _ref.arg,
+        value = _ref.value;
+    // Any modifiers are considered target IDs
+    var targets = keys(modifiers || {}); // If value is a string, split out individual targets (if space delimited)
+
+    value = isString(value) ? value.split(RX_SPLIT_SEPARATOR) : value; // Support target ID as link href (`href="#id"`)
+
+    if (isTag(el.tagName, 'a')) {
+      var href = getAttr(el, 'href') || '';
+
+      if (RX_HASH_ID.test(href)) {
+        targets.push(href.replace(RX_HASH, ''));
+      }
+    } // Add ID from `arg` (if provided), and support value
+    // as a single string ID or an array of string IDs
+    // If `value` is not an array or string, then it gets filtered out
+
+
+    concat(arg, value).forEach(function (t) {
+      return isString(t) && targets.push(t);
+    }); // Return only unique and truthy target IDs
+
+    return targets.filter(function (t, index, arr) {
+      return t && arr.indexOf(t) === index;
+    });
+  };
+
+  var removeClickListener = function removeClickListener(el) {
+    var handler = el[BV_TOGGLE_CLICK_HANDLER];
+
+    if (handler) {
+      eventOff(el, 'click', handler);
+      eventOff(el, 'keydown', handler);
+    }
+
+    el[BV_TOGGLE_CLICK_HANDLER] = null;
+  };
+
+  var addClickListener = function addClickListener(el, vnode) {
+    removeClickListener(el);
+
+    if (vnode.context) {
+      var handler = function handler(evt) {
+        if (!(evt.type === 'keydown' && !arrayIncludes(KEYDOWN_KEY_CODES, evt.keyCode)) && !isDisabled(el)) {
+          var targets = el[BV_TOGGLE_TARGETS] || [];
+          targets.forEach(function (target) {
+            vnode.context.$root.$emit(EVENT_TOGGLE, target);
+          });
+        }
+      };
+
+      el[BV_TOGGLE_CLICK_HANDLER] = handler;
+      eventOn(el, 'click', handler);
+
+      if (isNonStandardTag$1(el)) {
+        eventOn(el, 'keydown', handler);
+      }
+    }
+  };
+
+  var removeRootListeners = function removeRootListeners(el, vnode) {
+    if (el[BV_TOGGLE_ROOT_HANDLER] && vnode.context) {
+      vnode.context.$root.$off([EVENT_STATE, EVENT_STATE_SYNC], el[BV_TOGGLE_ROOT_HANDLER]);
+    }
+
+    el[BV_TOGGLE_ROOT_HANDLER] = null;
+  };
+
+  var addRootListeners = function addRootListeners(el, vnode) {
+    removeRootListeners(el, vnode);
+
+    if (vnode.context) {
+      var handler = function handler(id, state) {
+        // `state` will be `true` if target is expanded
+        if (arrayIncludes(el[BV_TOGGLE_TARGETS] || [], id)) {
+          // Set/Clear 'collapsed' visibility class state
+          el[BV_TOGGLE_STATE] = state; // Set `aria-expanded` and class state on trigger element
+
+          setToggleState(el, state);
+        }
+      };
+
+      el[BV_TOGGLE_ROOT_HANDLER] = handler; // Listen for toggle state changes (public) and sync (private)
+
+      vnode.context.$root.$on([EVENT_STATE, EVENT_STATE_SYNC], handler);
+    }
+  };
+
+  var setToggleState = function setToggleState(el, state) {
+    // State refers to the visibility of the collapse/sidebar
+    if (state) {
+      removeClass(el, CLASS_BV_TOGGLE_COLLAPSED);
+      addClass(el, CLASS_BV_TOGGLE_NOT_COLLAPSED);
+      setAttr(el, ATTR_ARIA_EXPANDED, STRING_TRUE);
+    } else {
+      removeClass(el, CLASS_BV_TOGGLE_NOT_COLLAPSED);
+      addClass(el, CLASS_BV_TOGGLE_COLLAPSED);
+      setAttr(el, ATTR_ARIA_EXPANDED, STRING_FALSE);
+    }
+  }; // Reset and remove a property from the provided element
+
 
   var resetProp = function resetProp(el, prop) {
     el[prop] = null;
     delete el[prop];
-  }; // Handle targets update
-
-
-  var handleTargets = function handleTargets(_ref) {
-    var targets = _ref.targets,
-        vnode = _ref.vnode;
-    targets.forEach(function (target) {
-      vnode.context.$root.$emit(EVENT_TOGGLE, target);
-    });
   }; // Handle directive updates
-
-  /* istanbul ignore next: not easy to test */
 
 
   var handleUpdate = function handleUpdate(el, binding, vnode) {
-    if (!isBrowser) {
+    /* istanbul ignore next: should never happen */
+    if (!isBrowser || !vnode.context) {
       return;
-    }
+    } // If element is not a button or link, we add `role="button"`
+    // and `tabindex="0"` for accessibility reasons
 
-    if (!looseEqual(getTargets(binding), el[BV_TOGGLE_TARGETS])) {
-      // Targets have changed, so update accordingly
-      unbindTargets(vnode, binding, listenTypes);
-      var targets = bindTargets(vnode, binding, listenTypes, handleTargets); // Update targets array to element
 
-      el[BV_TOGGLE_TARGETS] = targets; // Add aria attributes to element
+    if (isNonStandardTag$1(el)) {
+      if (!hasAttr(el, ATTR_ROLE)) {
+        setAttr(el, ATTR_ROLE, 'button');
+      }
 
-      el[BV_TOGGLE_CONTROLS] = targets.join(' '); // ensure aria-controls is up to date
+      if (!hasAttr(el, ATTR_TABINDEX)) {
+        setAttr(el, ATTR_TABINDEX, '0');
+      }
+    } // Ensure the collapse class and `aria-*` attributes persist
+    // after element is updated (either by parent re-rendering
+    // or changes to this element or its contents)
 
-      setAttr(el, 'aria-controls', el[BV_TOGGLE_CONTROLS]); // Request a state update from targets so that we can ensure
-      // expanded state is correct
+
+    setToggleState(el, el[BV_TOGGLE_STATE]); // Parse list of target IDs
+
+    var targets = getTargets(binding, el);
+    /* istanbul ignore else */
+    // Ensure the `aria-controls` hasn't been overwritten
+    // or removed when vnode updates
+
+    if (targets.length) {
+      setAttr(el, ATTR_ARIA_CONTROLS, targets.join(' '));
+    } else {
+      removeAttr(el, ATTR_ARIA_CONTROLS);
+    } // Add/Update our click listener(s)
+
+
+    addClickListener(el, vnode); // If targets array has changed, update
+
+    if (!looseEqual(targets, el[BV_TOGGLE_TARGETS])) {
+      // Update targets array to element storage
+      el[BV_TOGGLE_TARGETS] = targets; // Ensure `aria-controls` is up to date
+      // Request a state update from targets so that we can
+      // ensure expanded state is correct (in most cases)
 
       targets.forEach(function (target) {
         vnode.context.$root.$emit(EVENT_STATE_REQUEST, target);
       });
-    } // Ensure the collapse class and aria-* attributes persist
-    // after element is updated (either by parent re-rendering
-    // or changes to this element or its contents
-
-
-    if (el[BV_TOGGLE_STATE] === true) {
-      addClass(el, 'collapsed');
-      setAttr(el, 'aria-expanded', 'true');
-    } else if (el[BV_TOGGLE_STATE] === false) {
-      removeClass(el, 'collapsed');
-      setAttr(el, 'aria-expanded', 'false');
     }
-
-    setAttr(el, 'aria-controls', el[BV_TOGGLE_CONTROLS]);
   };
   /*
    * Export our directive
@@ -7379,70 +7649,32 @@
 
   var VBToggle = {
     bind: function bind(el, binding, vnode) {
-      var targets = bindTargets(vnode, binding, listenTypes, handleTargets);
+      // State is initially collapsed until we receive a state event
+      el[BV_TOGGLE_STATE] = false; // Assume no targets initially
 
-      if (isBrowser && vnode.context && targets.length > 0) {
-        // Add targets array to element
-        el[BV_TOGGLE_TARGETS] = targets; // Add aria attributes to element
+      el[BV_TOGGLE_TARGETS] = []; // Add our root listeners
 
-        el[BV_TOGGLE_CONTROLS] = targets.join(' '); // State is initially collapsed until we receive a state event
+      addRootListeners(el, vnode); // Initial update of trigger
 
-        el[BV_TOGGLE_STATE] = false;
-        setAttr(el, 'aria-controls', el[BV_TOGGLE_CONTROLS]);
-        setAttr(el, 'aria-expanded', 'false'); // If element is not a button, we add `role="button"` for accessibility
-
-        if (el.tagName !== 'BUTTON' && !hasAttr(el, 'role')) {
-          setAttr(el, 'role', 'button');
-        } // Toggle state handler
-
-
-        var toggleDirectiveHandler = function toggleDirectiveHandler(id, state) {
-          var targets = el[BV_TOGGLE_TARGETS] || [];
-
-          if (targets.indexOf(id) !== -1) {
-            // Set aria-expanded state
-            setAttr(el, 'aria-expanded', state ? 'true' : 'false'); // Set/Clear 'collapsed' class state
-
-            el[BV_TOGGLE_STATE] = state;
-
-            if (state) {
-              removeClass(el, 'collapsed');
-            } else {
-              addClass(el, 'collapsed');
-            }
-          }
-        }; // Store the toggle handler on the element
-
-
-        el[BV_TOGGLE] = toggleDirectiveHandler; // Listen for toggle state changes (public)
-
-        vnode.context.$root.$on(EVENT_STATE, el[BV_TOGGLE]); // Listen for toggle state sync (private)
-
-        vnode.context.$root.$on(EVENT_STATE_SYNC, el[BV_TOGGLE]);
-      }
+      handleUpdate(el, binding, vnode);
     },
     componentUpdated: handleUpdate,
     updated: handleUpdate,
-    unbind: function unbind(el, binding, vnode)
-    /* istanbul ignore next */
-    {
-      unbindTargets(vnode, binding, listenTypes); // Remove our $root listener
+    unbind: function unbind(el, binding, vnode) {
+      removeClickListener(el); // Remove our $root listener
 
-      if (el[BV_TOGGLE]) {
-        vnode.context.$root.$off(EVENT_STATE, el[BV_TOGGLE]);
-        vnode.context.$root.$off(EVENT_STATE_SYNC, el[BV_TOGGLE]);
-      } // Reset custom  props
+      removeRootListeners(el, vnode); // Reset custom props
 
-
-      resetProp(el, BV_TOGGLE);
+      resetProp(el, BV_TOGGLE_ROOT_HANDLER);
+      resetProp(el, BV_TOGGLE_CLICK_HANDLER);
       resetProp(el, BV_TOGGLE_STATE);
-      resetProp(el, BV_TOGGLE_CONTROLS);
       resetProp(el, BV_TOGGLE_TARGETS); // Reset classes/attrs
 
-      removeClass(el, 'collapsed');
-      removeAttr(el, 'aria-expanded');
-      removeAttr(el, 'aria-controls');
-      removeAttr(el, 'role');
+      removeClass(el, CLASS_BV_TOGGLE_COLLAPSED);
+      removeClass(el, CLASS_BV_TOGGLE_NOT_COLLAPSED);
+      removeAttr(el, ATTR_ARIA_EXPANDED);
+      removeAttr(el, ATTR_ARIA_CONTROLS);
+      removeAttr(el, ATTR_ROLE);
     }
   };
 
@@ -7707,12 +7939,18 @@
     }
   });
 
+  var VBTogglePlugin = /*#__PURE__*/pluginFactory({
+    directives: {
+      VBToggle: VBToggle
+    }
+  });
+
   var CollapsePlugin = /*#__PURE__*/pluginFactory({
     components: {
       BCollapse: BCollapse
     },
-    directives: {
-      VBToggle: VBToggle
+    plugins: {
+      VBTogglePlugin: VBTogglePlugin
     }
   });
 
@@ -10653,7 +10891,7 @@
       }
     },
     created: function created() {
-      // Create non-reactive property
+      // Create private non-reactive props
       this.$_popper = null;
     },
 
@@ -10724,19 +10962,16 @@
         this.destroyPopper();
         this.$_popper = new Popper(element, this.$refs.menu, this.getPopperConfig());
       },
+      // Ensure popper event listeners are removed cleanly
       destroyPopper: function destroyPopper() {
-        // Ensure popper event listeners are removed cleanly
-        if (this.$_popper) {
-          this.$_popper.destroy();
-        }
-
+        this.$_popper && this.$_popper.destroy();
         this.$_popper = null;
       },
+      // Instructs popper to re-computes the dropdown position
+      // useful if the content changes size
       updatePopper: function updatePopper()
       /* istanbul ignore next: not easy to test */
       {
-        // Instructs popper to re-computes the dropdown position
-        // usefull if the content changes size
         try {
           this.$_popper.scheduleUpdate();
         } catch (_unused) {}
@@ -10772,7 +11007,7 @@
           };
         }
 
-        return _objectSpread2({}, popperConfig, {}, this.popperOpts || {});
+        return _objectSpread2(_objectSpread2({}, popperConfig), this.popperOpts || {});
       },
       // Turn listeners on/off while open
       whileOpenListen: function whileOpenListen(isOpen) {
@@ -10954,40 +11189,32 @@
           _this3.focusItem(index, items);
         });
       },
-      focusItem: function focusItem(idx, items) {
+      focusItem: function focusItem(index, items) {
         var el = items.find(function (el, i) {
-          return i === idx;
+          return i === index;
         });
-
-        if (el && el.focus) {
-          el.focus();
-        }
+        attemptFocus(el);
       },
       getItems: function getItems() {
         // Get all items
         return filterVisibles(selectAll(Selector.ITEM_SELECTOR, this.$refs.menu));
       },
       focusMenu: function focusMenu() {
-        try {
-          this.$refs.menu.focus();
-        } catch (_unused2) {}
+        attemptFocus(this.$refs.menu);
       },
       focusToggler: function focusToggler() {
         var _this4 = this;
 
         this.$nextTick(function () {
-          var toggler = _this4.toggler;
-
-          if (toggler && toggler.focus) {
-            toggler.focus();
-          }
+          attemptFocus(_this4.toggler);
         });
       }
     }
   };
 
-  var NAME$d = 'BDropdown';
-  var props$k = {
+  var NAME$f = 'BDropdown'; // --- Props ---
+
+  var props$l = {
     text: {
       // Button label
       type: String,
@@ -10998,16 +11225,16 @@
       type: String // default: undefined
 
     },
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME$d, 'size');
-      }
-    },
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'variant');
+        return getComponentConfig(NAME$f, 'variant');
+      }
+    },
+    size: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$f, 'size');
       }
     },
     block: {
@@ -11026,7 +11253,7 @@
       // This really should be toggleLabel
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'toggleText');
+        return getComponentConfig(NAME$f, 'toggleText');
       }
     },
     toggleClass: {
@@ -11052,7 +11279,7 @@
     splitVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$d, 'splitVariant');
+        return getComponentConfig(NAME$f, 'splitVariant');
       }
     },
     splitClass: {
@@ -11075,27 +11302,31 @@
       type: String,
       default: 'menu'
     }
-  }; // @vue/component
+  }; // --- Main component ---
+  // @vue/component
 
   var BDropdown = /*#__PURE__*/Vue.extend({
-    name: NAME$d,
+    name: NAME$f,
     mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
-    props: props$k,
+    props: props$l,
     computed: {
       dropdownClasses: function dropdownClasses() {
+        var block = this.block,
+            split = this.split,
+            boundary = this.boundary;
         return [this.directionClass, {
           show: this.visible,
           // The 'btn-group' class is required in `split` mode for button alignment
           // It needs also to be applied when `block` is disabled to allow multiple
           // dropdowns to be aligned one line
-          'btn-group': this.split || !this.block,
+          'btn-group': split || !block,
           // When `block` is enabled and we are in `split` mode the 'd-flex' class
           // needs to be applied to allow the buttons to stretch to full width
-          'd-flex': this.block && this.split,
+          'd-flex': block && split,
           // Position `static` is needed to allow menu to "breakout" of the `scrollParent`
           // boundaries when boundary is anything other than `scrollParent`
           // See: https://github.com/twbs/bootstrap/issues/24251#issuecomment-341413786
-          'position-static': this.boundary !== 'scrollParent' || !this.boundary
+          'position-static': boundary !== 'scrollParent' || !boundary
         }];
       },
       menuClasses: function menuClasses() {
@@ -11105,83 +11336,99 @@
         }];
       },
       toggleClasses: function toggleClasses() {
+        var split = this.split;
         return [this.toggleClass, {
-          'dropdown-toggle-split': this.split,
-          'dropdown-toggle-no-caret': this.noCaret && !this.split
+          'dropdown-toggle-split': split,
+          'dropdown-toggle-no-caret': this.noCaret && !split
         }];
       }
     },
     render: function render(h) {
-      var split = h();
-      var buttonContent = this.normalizeSlot('button-content') || this.html || stripTags(this.text);
+      var variant = this.variant,
+          size = this.size,
+          block = this.block,
+          disabled = this.disabled,
+          split = this.split,
+          role = this.role;
+      var commonProps = {
+        variant: variant,
+        size: size,
+        block: block,
+        disabled: disabled
+      };
+      var $buttonContent = this.normalizeSlot('button-content');
+      var buttonContentProps = this.hasNormalizedSlot('button-content') ? {} : htmlOrText(this.html, this.text);
+      var $split = h();
 
-      if (this.split) {
-        var btnProps = {
-          variant: this.splitVariant || this.variant,
-          size: this.size,
-          block: this.block,
-          disabled: this.disabled
-        }; // We add these as needed due to router-link issues with defined property with undefined/null values
+      if (split) {
+        var splitTo = this.splitTo,
+            splitHref = this.splitHref,
+            splitButtonType = this.splitButtonType;
 
-        if (this.splitTo) {
-          btnProps.to = this.splitTo;
-        } else if (this.splitHref) {
-          btnProps.href = this.splitHref;
-        } else if (this.splitButtonType) {
-          btnProps.type = this.splitButtonType;
+        var btnProps = _objectSpread2(_objectSpread2({}, commonProps), {}, {
+          variant: this.splitVariant || this.variant
+        }); // We add these as needed due to <router-link> issues with
+        // defined property with `undefined`/`null` values
+
+
+        if (splitTo) {
+          btnProps.to = splitTo;
+        } else if (splitHref) {
+          btnProps.href = splitHref;
+        } else if (splitButtonType) {
+          btnProps.type = splitButtonType;
         }
 
-        split = h(BButton, {
-          ref: 'button',
-          props: btnProps,
+        $split = h(BButton, {
           class: this.splitClass,
           attrs: {
             id: this.safeId('_BV_button_')
           },
+          props: btnProps,
+          domProps: buttonContentProps,
           on: {
             click: this.onSplitClick
-          }
-        }, [buttonContent]);
+          },
+          ref: 'button'
+        }, [$buttonContent]);
       }
 
-      var toggle = h(BButton, {
-        ref: 'toggle',
+      var $toggle = h(BButton, {
         staticClass: 'dropdown-toggle',
         class: this.toggleClasses,
-        props: {
-          tag: this.toggleTag,
-          variant: this.variant,
-          size: this.size,
-          block: this.block && !this.split,
-          disabled: this.disabled
-        },
         attrs: {
           id: this.safeId('_BV_toggle_'),
           'aria-haspopup': 'true',
           'aria-expanded': this.visible ? 'true' : 'false'
         },
+        props: _objectSpread2(_objectSpread2({}, commonProps), {}, {
+          tag: this.toggleTag,
+          block: block && !split
+        }),
+        domProps: split ? {} : buttonContentProps,
         on: {
           mousedown: this.onMousedown,
           click: this.toggle,
           keydown: this.toggle // Handle ENTER, SPACE and DOWN
 
-        }
-      }, [this.split ? h('span', {
+        },
+        ref: 'toggle'
+      }, [split ? h('span', {
         class: ['sr-only']
-      }, [this.toggleText]) : buttonContent]);
-      var menu = h('ul', {
-        ref: 'menu',
+      }, [this.toggleText]) : $buttonContent]);
+      var $menu = h('ul', {
         staticClass: 'dropdown-menu',
         class: this.menuClasses,
         attrs: {
-          role: this.role,
+          role: role,
           tabindex: '-1',
-          'aria-labelledby': this.safeId(this.split ? '_BV_button_' : '_BV_toggle_')
+          'aria-labelledby': this.safeId(split ? '_BV_button_' : '_BV_toggle_')
         },
         on: {
           keydown: this.onKeydown // Handle UP, DOWN and ESC
 
-        }
+        },
+        ref: 'menu'
       }, !this.lazy || this.visible ? this.normalizeSlot('default', {
         hide: this.hide
       }) : [h()]);
@@ -11191,22 +11438,22 @@
         attrs: {
           id: this.safeId()
         }
-      }, [split, toggle, menu]);
+      }, [$split, $toggle, $menu]);
     }
   });
 
-  var props$l = propsFactory(); // @vue/component
+  var props$m = omit(props$1, ['event', 'routerTag']); // @vue/component
 
   var BDropdownItem = /*#__PURE__*/Vue.extend({
     name: 'BDropdownItem',
-    mixins: [normalizeSlotMixin],
+    mixins: [attrsMixin, normalizeSlotMixin],
     inheritAttrs: false,
     inject: {
       bvDropdown: {
         default: null
       }
     },
-    props: _objectSpread2({}, props$l, {
+    props: _objectSpread2(_objectSpread2({}, props$m), {}, {
       linkClass: {
         type: [String, Array, Object],
         default: null
@@ -11216,6 +11463,13 @@
         default: null
       }
     }),
+    computed: {
+      computedAttrs: function computedAttrs() {
+        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+          role: 'menuitem'
+        });
+      }
+    },
     methods: {
       closeDropdown: function closeDropdown() {
         var _this = this;
@@ -11241,9 +11495,7 @@
         props: this.$props,
         staticClass: 'dropdown-item',
         class: [this.linkClass, _defineProperty({}, "text-".concat(this.variant), this.variant && !(this.active || this.disabled))],
-        attrs: _objectSpread2({}, this.$attrs, {
-          role: 'menuitem'
-        }),
+        attrs: this.computedAttrs,
         on: {
           click: this.onClick
         },
@@ -11252,7 +11504,7 @@
     }
   });
 
-  var props$m = {
+  var props$n = {
     active: {
       type: Boolean,
       default: false
@@ -11277,14 +11529,23 @@
 
   var BDropdownItemButton = /*#__PURE__*/Vue.extend({
     name: 'BDropdownItemButton',
-    mixins: [normalizeSlotMixin],
+    mixins: [attrsMixin, normalizeSlotMixin],
     inheritAttrs: false,
     inject: {
       bvDropdown: {
         default: null
       }
     },
-    props: props$m,
+    props: props$n,
+    computed: {
+      computedAttrs: function computedAttrs() {
+        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+          role: 'menuitem',
+          type: 'button',
+          disabled: this.disabled
+        });
+      }
+    },
     methods: {
       closeDropdown: function closeDropdown() {
         if (this.bvDropdown) {
@@ -11306,11 +11567,7 @@
       }, [h('button', {
         staticClass: 'dropdown-item',
         class: [this.buttonClass, (_ref = {}, _defineProperty(_ref, this.activeClass, this.active), _defineProperty(_ref, "text-".concat(this.variant), this.variant && !(this.active || this.disabled)), _ref)],
-        attrs: _objectSpread2({}, this.$attrs, {
-          role: 'menuitem',
-          type: 'button',
-          disabled: this.disabled
-        }),
+        attrs: this.computedAttrs,
         on: {
           click: this.onClick
         },
@@ -11319,7 +11576,7 @@
     }
   });
 
-  var props$n = {
+  var props$o = {
     id: {
       type: String // default: null
 
@@ -11337,7 +11594,7 @@
   var BDropdownHeader = /*#__PURE__*/Vue.extend({
     name: 'BDropdownHeader',
     functional: true,
-    props: props$n,
+    props: props$o,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11351,7 +11608,7 @@
       }), [h(props.tag, {
         staticClass: 'dropdown-header',
         class: _defineProperty({}, "text-".concat(props.variant), props.variant),
-        attrs: _objectSpread2({}, $attrs, {
+        attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
           id: props.id || null,
           role: 'heading'
         }),
@@ -11360,7 +11617,7 @@
     }
   });
 
-  var props$o = {
+  var props$p = {
     tag: {
       type: String,
       default: 'hr'
@@ -11370,7 +11627,7 @@
   var BDropdownDivider = /*#__PURE__*/Vue.extend({
     name: 'BDropdownDivider',
     functional: true,
-    props: props$o,
+    props: props$p,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
@@ -11382,7 +11639,7 @@
         }
       }), [h(props.tag, {
         staticClass: 'dropdown-divider',
-        attrs: _objectSpread2({}, $attrs, {
+        attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
           role: 'separator',
           'aria-orientation': 'horizontal'
         }),
@@ -11391,7 +11648,7 @@
     }
   });
 
-  var props$p = {
+  var props$q = {
     id: {
       type: String // default: null
 
@@ -11413,7 +11670,7 @@
   var BForm = /*#__PURE__*/Vue.extend({
     name: 'BForm',
     functional: true,
-    props: props$p,
+    props: props$q,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11434,7 +11691,7 @@
   var BDropdownForm = /*#__PURE__*/Vue.extend({
     name: 'BDropdownForm',
     functional: true,
-    props: _objectSpread2({}, props$p, {
+    props: _objectSpread2(_objectSpread2({}, props$q), {}, {
       disabled: {
         type: Boolean,
         default: false
@@ -11463,7 +11720,7 @@
           disabled: props.disabled
         }],
         props: props,
-        attrs: _objectSpread2({}, $attrs, {
+        attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
           disabled: props.disabled,
           // Tab index of -1 for keyboard navigation
           tabindex: props.disabled ? null : '-1'
@@ -11506,7 +11763,7 @@
     }
   });
 
-  var props$q = {
+  var props$r = {
     id: {
       type: String // default: null
 
@@ -11536,7 +11793,7 @@
   var BDropdownGroup = /*#__PURE__*/Vue.extend({
     name: 'BDropdownGroup',
     functional: true,
-    props: props$q,
+    props: props$r,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11568,7 +11825,7 @@
         }
       }), [header || h(), h('ul', {
         staticClass: 'list-unstyled',
-        attrs: _objectSpread2({}, $attrs, {
+        attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
           id: props.id || null,
           role: 'group',
           'aria-describedby': adb || null
@@ -11600,7 +11857,7 @@
     }
   });
 
-  var props$r = {
+  var props$s = {
     type: {
       type: String,
       default: 'iframe',
@@ -11621,7 +11878,7 @@
   var BEmbed = /*#__PURE__*/Vue.extend({
     name: 'BEmbed',
     functional: true,
-    props: props$r,
+    props: props$s,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11672,27 +11929,7 @@
     },
     computed: {
       formOptions: function formOptions() {
-        var _this = this;
-
-        var options = this.options; // Normalize the given options array
-
-        if (isArray(options)) {
-          return options.map(function (option) {
-            return _this.normalizeOption(option);
-          });
-        } else if (isPlainObject(options)) {
-          // Deprecate the object options format
-          warn(OPTIONS_OBJECT_DEPRECATED_MSG, this.$options.name); // Normalize a `options` object to an array of options
-
-          return keys(options).map(function (key) {
-            return _this.normalizeOption(options[key] || {}, key);
-          });
-        } // If not an array or object, return an empty array
-
-        /* istanbul ignore next */
-
-
-        return [];
+        return this.normalizeOptions(this.options);
       }
     },
     methods: {
@@ -11717,6 +11954,28 @@
           text: stripTags(String(option)),
           disabled: false
         };
+      },
+      normalizeOptions: function normalizeOptions(options) {
+        var _this = this;
+
+        // Normalize the given options array
+        if (isArray(options)) {
+          return options.map(function (option) {
+            return _this.normalizeOption(option);
+          });
+        } else if (isPlainObject(options)) {
+          // Deprecate the object options format
+          warn(OPTIONS_OBJECT_DEPRECATED_MSG, this.$options.name); // Normalize a `options` object to an array of options
+
+          return keys(options).map(function (key) {
+            return _this.normalizeOption(options[key] || {}, key);
+          });
+        } // If not an array or object, return an empty array
+
+        /* istanbul ignore next */
+
+
+        return [];
       }
     }
   };
@@ -11731,27 +11990,30 @@
       }
     },
     render: function render(h) {
-      var options = this.formOptions.map(function (option, index) {
+      var $options = this.formOptions.map(function (option, index) {
+        var value = option.value,
+            text = option.text,
+            html = option.html,
+            disabled = option.disabled;
         return h('option', {
-          key: "option_".concat(index, "_opt"),
           attrs: {
-            disabled: option.disabled
+            value: value,
+            disabled: disabled
           },
-          domProps: _objectSpread2({}, htmlOrText(option.html, option.text), {
-            value: option.value
-          })
+          domProps: htmlOrText(html, text),
+          key: "option_".concat(index)
         });
       });
       return h('datalist', {
         attrs: {
           id: this.id
         }
-      }, [options, this.normalizeSlot('default')]);
+      }, [$options, this.normalizeSlot('default')]);
     }
   });
 
-  var NAME$e = 'BFormText';
-  var props$s = {
+  var NAME$g = 'BFormText';
+  var props$t = {
     id: {
       type: String // default: null
 
@@ -11763,7 +12025,7 @@
     textVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$e, 'textVariant');
+        return getComponentConfig(NAME$g, 'textVariant');
       }
     },
     inline: {
@@ -11773,9 +12035,9 @@
   }; // @vue/component
 
   var BFormText = /*#__PURE__*/Vue.extend({
-    name: NAME$e,
+    name: NAME$g,
     functional: true,
-    props: props$s,
+    props: props$t,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11791,7 +12053,7 @@
     }
   });
 
-  var props$t = {
+  var props$u = {
     id: {
       type: String // default: null
 
@@ -11826,7 +12088,7 @@
   var BFormInvalidFeedback = /*#__PURE__*/Vue.extend({
     name: 'BFormInvalidFeedback',
     functional: true,
-    props: props$t,
+    props: props$u,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11848,7 +12110,7 @@
     }
   });
 
-  var props$u = {
+  var props$v = {
     id: {
       type: String // default: null
 
@@ -11883,7 +12145,7 @@
   var BFormValidFeedback = /*#__PURE__*/Vue.extend({
     name: 'BFormValidFeedback',
     functional: true,
-    props: props$u,
+    props: props$v,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11905,7 +12167,7 @@
     }
   });
 
-  var props$v = {
+  var props$w = {
     tag: {
       type: String,
       default: 'div'
@@ -11915,7 +12177,7 @@
   var BFormRow = /*#__PURE__*/Vue.extend({
     name: 'BFormRow',
     functional: true,
-    props: props$v,
+    props: props$w,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -12000,7 +12262,7 @@
                 el = select(SELECTOR, el);
               }
 
-              el && el.focus && el.focus();
+              attemptFocus(el);
             }
           });
         });
@@ -12009,7 +12271,7 @@
   };
 
   var formRadioCheckMixin = {
-    mixins: [normalizeSlotMixin],
+    mixins: [attrsMixin, normalizeSlotMixin],
     inheritAttrs: false,
     model: {
       prop: 'checked',
@@ -12132,6 +12394,20 @@
 
         // Same for radio & check
         return ['btn', "btn-".concat(this.getButtonVariant), (_ref = {}, _defineProperty(_ref, "btn-".concat(this.getSize), this.getSize), _defineProperty(_ref, "disabled", this.isDisabled), _defineProperty(_ref, "active", this.isChecked), _defineProperty(_ref, "focus", this.hasFocus), _ref)];
+      },
+      computedAttrs: function computedAttrs() {
+        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+          id: this.safeId(),
+          type: this.isRadio ? 'radio' : 'checkbox',
+          name: this.getName,
+          form: this.getForm,
+          disabled: this.isDisabled,
+          required: this.isRequired,
+          autocomplete: 'off',
+          'aria-required': this.isRequired || null,
+          'aria-label': this.ariaLabel || null,
+          'aria-labelledby': this.ariaLabelledby || null
+        });
       }
     },
     watch: {
@@ -12153,13 +12429,13 @@
       },
       // Convenience methods for focusing the input
       focus: function focus() {
-        if (!this.isDisabled && this.$refs.input && this.$refs.input.focus) {
-          this.$refs.input.focus();
+        if (!this.isDisabled) {
+          attemptFocus(this.$refs.input);
         }
       },
       blur: function blur() {
-        if (!this.isDisabled && this.$refs.input && this.$refs.input.blur) {
-          this.$refs.input.blur();
+        if (!this.isDisabled) {
+          attemptBlur(this.$refs.input);
         }
       }
     },
@@ -12193,18 +12469,7 @@
           value: this.computedLocalChecked,
           expression: 'computedLocalChecked'
         }],
-        attrs: _objectSpread2({}, this.$attrs, {
-          id: this.safeId(),
-          type: this.isRadio ? 'radio' : 'checkbox',
-          name: this.getName,
-          form: this.getForm,
-          disabled: this.isDisabled,
-          required: this.isRequired,
-          autocomplete: 'off',
-          'aria-required': this.isRequired || null,
-          'aria-label': this.ariaLabel || null,
-          'aria-labelledby': this.ariaLabelledby || null
-        }),
+        attrs: this.computedAttrs,
         domProps: {
           value: this.value,
           checked: this.isChecked
@@ -12550,12 +12815,11 @@
     render: function render(h) {
       var _this = this;
 
-      var inputs = this.formOptions.map(function (option, idx) {
-        var uid = "_BV_option_".concat(idx, "_");
+      var $inputs = this.formOptions.map(function (option, index) {
+        var key = "BV_option_".concat(index);
         return h(_this.isRadioGroup ? BFormRadio : BFormCheckbox, {
-          key: uid,
           props: {
-            id: _this.safeId(uid),
+            id: _this.safeId(key),
             value: option.value,
             // Individual radios or checks can be disabled in a group
             disabled: option.disabled || false // We don't need to include these, since the input's will know they are inside here
@@ -12563,7 +12827,8 @@
             // form: this.form || null,
             // required: Boolean(this.name && this.required)
 
-          }
+          },
+          key: key
         }, [h('span', {
           domProps: htmlOrText(option.html, option.text)
         })]);
@@ -12573,17 +12838,16 @@
         attrs: {
           id: this.safeId(),
           role: this.isRadioGroup ? 'radiogroup' : 'group',
-          // Tabindex to allow group to be focused
-          // if needed by screen readers
+          // Add `tabindex="-1"` to allow group to be focused if needed by screen readers
           tabindex: '-1',
           'aria-required': this.required ? 'true' : null,
           'aria-invalid': this.computedAriaInvalid
         }
-      }, [this.normalizeSlot('first'), inputs, this.normalizeSlot('default')]);
+      }, [this.normalizeSlot('first'), $inputs, this.normalizeSlot('default')]);
     }
   };
 
-  var props$w = {
+  var props$x = {
     switches: {
       // Custom switch styling
       type: Boolean,
@@ -12604,7 +12868,7 @@
         bvCheckGroup: this
       };
     },
-    props: props$w,
+    props: props$x,
     data: function data() {
       return {
         localChecked: this.checked || []
@@ -12795,16 +13059,12 @@
     methods: {
       focus: function focus() {
         if (!this.disabled) {
-          try {
-            this.$refs.toggle.focus();
-          } catch (_unused) {}
+          attemptFocus(this.$refs.toggle);
         }
       },
       blur: function blur() {
         if (!this.disabled) {
-          try {
-            this.$refs.toggle.blur();
-          } catch (_unused2) {}
+          attemptBlur(this.$refs.toggle);
         }
       },
       setFocus: function setFocus(evt) {
@@ -12944,10 +13204,9 @@
       }, labelSelected) : '']); // Return the custom form control wrapper
 
       return h('div', {
-        staticClass: 'dropdown',
+        staticClass: 'b-form-btn-label-control dropdown',
         class: [this.directionClass, (_ref = {
           'btn-group': buttonOnly,
-          'b-form-btn-label-control': !buttonOnly,
           'form-control': !buttonOnly
         }, _defineProperty(_ref, "form-control-".concat(size), !!size && !buttonOnly), _defineProperty(_ref, 'd-flex', !buttonOnly), _defineProperty(_ref, 'h-auto', !buttonOnly), _defineProperty(_ref, 'align-items-stretch', !buttonOnly), _defineProperty(_ref, "focus", hasFocus && !buttonOnly), _defineProperty(_ref, "show", visible), _defineProperty(_ref, 'is-valid', state === true), _defineProperty(_ref, 'is-invalid', state === false), _ref)],
         attrs: {
@@ -12965,10 +13224,10 @@
     }
   });
 
-  var NAME$f = 'BFormDatepicker'; // Fallback to BCalendar prop if no value found
+  var NAME$h = 'BFormDatepicker'; // Fallback to BCalendar prop if no value found
 
   var getConfigFallback = function getConfigFallback(prop) {
-    return getComponentConfig(NAME$f, prop) || getComponentConfig('BCalendar', prop);
+    return getComponentConfig(NAME$h, prop) || getComponentConfig('BCalendar', prop);
   }; // We create our props as a mixin so that we can control
   // where they appear in the props listing reference section
 
@@ -13105,7 +13364,7 @@
       labelTodayButton: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$f, 'labelTodayButton');
+          return getComponentConfig(NAME$h, 'labelTodayButton');
         }
       },
       todayButtonVariant: {
@@ -13119,7 +13378,7 @@
       labelResetButton: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$f, 'labelResetButton');
+          return getComponentConfig(NAME$h, 'labelResetButton');
         }
       },
       resetButtonVariant: {
@@ -13133,7 +13392,7 @@
       labelCloseButton: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$f, 'labelCloseButton');
+          return getComponentConfig(NAME$h, 'labelCloseButton');
         }
       },
       closeButtonVariant: {
@@ -13266,7 +13525,7 @@
   // @vue/component
 
   var BFormDatepicker = /*#__PURE__*/Vue.extend({
-    name: NAME$f,
+    name: NAME$h,
     // The mixins order determines the order of appearance in the props reference section
     mixins: [idMixin, propsMixin],
     model: {
@@ -13366,16 +13625,12 @@
       // Public methods
       focus: function focus() {
         if (!this.disabled) {
-          try {
-            this.$refs.control.focus();
-          } catch (_unused2) {}
+          attemptFocus(this.$refs.control);
         }
       },
       blur: function blur() {
         if (!this.disabled) {
-          try {
-            this.$refs.control.blur();
-          } catch (_unused3) {}
+          attemptBlur(this.$refs.control);
         }
       },
       // Private methods
@@ -13434,9 +13689,7 @@
         var _this3 = this;
 
         this.$nextTick(function () {
-          try {
-            _this3.$refs.calendar.focus();
-          } catch (_unused4) {}
+          attemptFocus(_this3.$refs.calendar);
 
           _this3.$emit('shown');
         });
@@ -13529,7 +13782,7 @@
       var $calendar = h(BCalendar, {
         key: 'calendar',
         ref: 'calendar',
-        staticClass: 'b-form-date-calendar',
+        staticClass: 'b-form-date-calendar w-100',
         props: this.calendarProps,
         on: {
           selected: this.onSelected,
@@ -13541,7 +13794,7 @@
       return h(BVFormBtnLabelControl, {
         ref: 'control',
         staticClass: 'b-form-datepicker',
-        props: _objectSpread2({}, this.$props, {
+        props: _objectSpread2(_objectSpread2({}, this.$props), {}, {
           // Overridden / computed props
           id: this.safeId(),
           rtl: this.isRTL,
@@ -13588,7 +13841,7 @@
     }
   };
 
-  var NAME$g = 'BFormFile';
+  var NAME$i = 'BFormFile';
   var VALUE_EMPTY_DEPRECATED_MSG = 'Setting "value"/"v-model" to an empty string for reset is deprecated. Set to "null" instead.'; // --- Helper methods ---
 
   var isValidValue = function isValidValue(value) {
@@ -13599,8 +13852,8 @@
 
 
   var BFormFile = /*#__PURE__*/Vue.extend({
-    name: NAME$g,
-    mixins: [idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
+    name: NAME$i,
+    mixins: [attrsMixin, idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
     inheritAttrs: false,
     model: {
       prop: 'value',
@@ -13619,7 +13872,7 @@
         validator: function validator(value) {
           /* istanbul ignore next */
           if (value === '') {
-            warn(VALUE_EMPTY_DEPRECATED_MSG, NAME$g);
+            warn(VALUE_EMPTY_DEPRECATED_MSG, NAME$i);
             return true;
           }
 
@@ -13638,19 +13891,19 @@
       placeholder: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$g, 'placeholder');
+          return getComponentConfig(NAME$i, 'placeholder');
         }
       },
       browseText: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$g, 'browseText');
+          return getComponentConfig(NAME$i, 'browseText');
         }
       },
       dropPlaceholder: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$g, 'dropPlaceholder');
+          return getComponentConfig(NAME$i, 'dropPlaceholder');
         }
       },
       multiple: {
@@ -13710,6 +13963,21 @@
             return file.name;
           }).join(', ');
         }
+      },
+      computedAttrs: function computedAttrs() {
+        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+          type: 'file',
+          id: this.safeId(),
+          name: this.name,
+          disabled: this.disabled,
+          required: this.required,
+          form: this.form || null,
+          capture: this.capture || null,
+          accept: this.accept || null,
+          multiple: this.multiple,
+          webkitdirectory: this.directory,
+          'aria-required': this.required ? 'true' : null
+        });
       }
     },
     watch: {
@@ -13894,19 +14162,7 @@
           'custom-file-input': this.custom,
           focus: this.custom && this.hasFocus
         }, this.stateClass],
-        attrs: _objectSpread2({}, this.$attrs, {
-          type: 'file',
-          id: this.safeId(),
-          name: this.name,
-          disabled: this.disabled,
-          required: this.required,
-          form: this.form || null,
-          capture: this.capture || null,
-          accept: this.accept || null,
-          multiple: this.multiple,
-          webkitdirectory: this.directory,
-          'aria-required': this.required ? 'true' : null
-        }),
+        attrs: this.computedAttrs,
         on: {
           change: this.onFileChange,
           focusin: this.focusHandler,
@@ -13950,18 +14206,6 @@
       BFile: BFormFile
     }
   });
-
-  /**
-   * Suffix can be a falsey value so nothing is appended to string.
-   * (helps when looping over props & some shouldn't change)
-   * Use data last parameters to allow for currying.
-   * @param {string} suffix
-   * @param {string} str
-   */
-
-  var suffixPropName = function suffixPropName(suffix, str) {
-    return str + (suffix ? upperFirst(suffix) : '');
-  };
 
   var RX_COL_CLASS = /^col-/; // Generates a prop object with a type of `[Boolean, String, Number]`
 
@@ -14041,7 +14285,7 @@
       order: keys(breakpointOrder)
     }); // Return the generated props
 
-    return _objectSpread2({
+    return _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({
       // Generic flexbox .col (xs)
       col: {
         type: Boolean,
@@ -14049,11 +14293,11 @@
       },
       // .col-[1-12]|auto  (xs)
       cols: strNum()
-    }, breakpointCol, {
+    }, breakpointCol), {}, {
       offset: strNum()
-    }, breakpointOffset, {
+    }, breakpointOffset), {}, {
       order: strNum()
-    }, breakpointOrder, {
+    }, breakpointOrder), {}, {
       // Flex alignment
       alignSelf: {
         type: String,
@@ -14122,7 +14366,7 @@
 
   // Component name
 
-  var NAME$h = 'BFormGroup'; // Selector for finding first input in the form-group
+  var NAME$j = 'BFormGroup'; // Selector for finding first input in the form-group
 
   var SELECTOR$1 = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])'; // --- Render methods ---
 
@@ -14273,7 +14517,7 @@
       };
       return props;
     }, create(null));
-    return _objectSpread2({
+    return _objectSpread2(_objectSpread2(_objectSpread2({
       label: {
         type: String // default: null
 
@@ -14290,7 +14534,7 @@
         type: Boolean,
         default: false
       }
-    }, bpLabelColProps, {}, bpLabelAlignProps, {
+    }, bpLabelColProps), bpLabelAlignProps), {}, {
       labelClass: {
         type: [String, Array, Object] // default: null
 
@@ -14331,7 +14575,7 @@
 
 
   var BFormGroup = {
-    name: NAME$h,
+    name: NAME$j,
     mixins: [idMixin, formStateMixin, normalizeSlotMixin],
 
     get props() {
@@ -14456,13 +14700,10 @@
           return;
         }
 
-        var inputs = selectAll(SELECTOR$1, this.$refs.content).filter(isVisible);
+        var inputs = selectAll(SELECTOR$1, this.$refs.content).filter(isVisible); // If only a single input, focus it, emulating label behaviour
 
-        if (inputs && inputs.length === 1 && inputs[0].focus) {
-          // if only a single input, focus it, emulating label behaviour
-          try {
-            inputs[0].focus();
-          } catch (_unused) {}
+        if (inputs && inputs.length === 1) {
+          attemptFocus(inputs[0]);
         }
       },
       setInputDescribedBy: function setInputDescribedBy(add, remove) {
@@ -14483,7 +14724,7 @@
               return !arrayIncludes(remove, id);
             }).concat(add).filter(Boolean);
             ids = keys(ids.reduce(function (memo, id) {
-              return _objectSpread2({}, memo, _defineProperty({}, id, true));
+              return _objectSpread2(_objectSpread2({}, memo), {}, _defineProperty({}, id, true));
             }, {})).join(' ').trim();
 
             if (ids) {
@@ -14543,6 +14784,79 @@
     }
   });
 
+  // @vue/component
+  var formSelectionMixin = {
+    computed: {
+      selectionStart: {
+        // Expose selectionStart for formatters, etc
+        cache: false,
+
+        /* istanbul ignore next */
+        get: function get() {
+          return this.$refs.input.selectionStart;
+        },
+
+        /* istanbul ignore next */
+        set: function set(val) {
+          this.$refs.input.selectionStart = val;
+        }
+      },
+      selectionEnd: {
+        // Expose selectionEnd for formatters, etc
+        cache: false,
+
+        /* istanbul ignore next */
+        get: function get() {
+          return this.$refs.input.selectionEnd;
+        },
+
+        /* istanbul ignore next */
+        set: function set(val) {
+          this.$refs.input.selectionEnd = val;
+        }
+      },
+      selectionDirection: {
+        // Expose selectionDirection for formatters, etc
+        cache: false,
+
+        /* istanbul ignore next */
+        get: function get() {
+          return this.$refs.input.selectionDirection;
+        },
+
+        /* istanbul ignore next */
+        set: function set(val) {
+          this.$refs.input.selectionDirection = val;
+        }
+      }
+    },
+    methods: {
+      /* istanbul ignore next */
+      select: function select() {
+        var _this$$refs$input;
+
+        // For external handler that may want a select() method
+        (_this$$refs$input = this.$refs.input).select.apply(_this$$refs$input, arguments);
+      },
+
+      /* istanbul ignore next */
+      setSelectionRange: function setSelectionRange() {
+        var _this$$refs$input2;
+
+        // For external handler that may want a setSelectionRange(a,b,c) method
+        (_this$$refs$input2 = this.$refs.input).setSelectionRange.apply(_this$$refs$input2, arguments);
+      },
+
+      /* istanbul ignore next */
+      setRangeText: function setRangeText() {
+        var _this$$refs$input3;
+
+        // For external handler that may want a setRangeText(a,b,c) method
+        (_this$$refs$input3 = this.$refs.input).setRangeText.apply(_this$$refs$input3, arguments);
+      }
+    }
+  };
+
   var formTextMixin = {
     model: {
       prop: 'value',
@@ -14595,7 +14909,7 @@
         default: false
       },
       debounce: {
-        // Debounce timout (in ms). Not applicable with `lazy` prop
+        // Debounce timeout (in ms). Not applicable with `lazy` prop
         type: [Number, String],
         default: 0
       }
@@ -14634,7 +14948,7 @@
       },
       computedDebounce: function computedDebounce() {
         // Ensure we have a positive number equal to or greater than 0
-        return Math.max(toInteger(this.debounce, 0), 0);
+        return mathMax(toInteger(this.debounce, 0), 0);
       },
       hasFormatter: function hasFormatter() {
         return isFunction(this.formatter);
@@ -14653,9 +14967,12 @@
         }
       }
     },
-    mounted: function mounted() {
-      // Create non-reactive property and set up destroy handler
+    created: function created() {
+      // Create private non-reactive props
       this.$_inputDebounceTimer = null;
+    },
+    mounted: function mounted() {
+      // Set up destroy handler
       this.$on('hook:beforeDestroy', this.clearDebounce); // Preset the internal state
 
       var value = this.value;
@@ -14804,87 +15121,14 @@
       focus: function focus() {
         // For external handler that may want a focus method
         if (!this.disabled) {
-          this.$el.focus();
+          attemptFocus(this.$el);
         }
       },
       blur: function blur() {
         // For external handler that may want a blur method
         if (!this.disabled) {
-          this.$el.blur();
+          attemptBlur(this.$el);
         }
-      }
-    }
-  };
-
-  // @vue/component
-  var formSelectionMixin = {
-    computed: {
-      selectionStart: {
-        // Expose selectionStart for formatters, etc
-        cache: false,
-
-        /* istanbul ignore next */
-        get: function get() {
-          return this.$refs.input.selectionStart;
-        },
-
-        /* istanbul ignore next */
-        set: function set(val) {
-          this.$refs.input.selectionStart = val;
-        }
-      },
-      selectionEnd: {
-        // Expose selectionEnd for formatters, etc
-        cache: false,
-
-        /* istanbul ignore next */
-        get: function get() {
-          return this.$refs.input.selectionEnd;
-        },
-
-        /* istanbul ignore next */
-        set: function set(val) {
-          this.$refs.input.selectionEnd = val;
-        }
-      },
-      selectionDirection: {
-        // Expose selectionDirection for formatters, etc
-        cache: false,
-
-        /* istanbul ignore next */
-        get: function get() {
-          return this.$refs.input.selectionDirection;
-        },
-
-        /* istanbul ignore next */
-        set: function set(val) {
-          this.$refs.input.selectionDirection = val;
-        }
-      }
-    },
-    methods: {
-      /* istanbul ignore next */
-      select: function select() {
-        var _this$$refs$input;
-
-        // For external handler that may want a select() method
-        (_this$$refs$input = this.$refs.input).select.apply(_this$$refs$input, arguments);
-      },
-
-      /* istanbul ignore next */
-      setSelectionRange: function setSelectionRange() {
-        var _this$$refs$input2;
-
-        // For external handler that may want a setSelectionRange(a,b,c) method
-        (_this$$refs$input2 = this.$refs.input).setSelectionRange.apply(_this$$refs$input2, arguments);
-      },
-
-      /* istanbul ignore next */
-      setRangeText: function setRangeText() {
-        var _this$$refs$input3;
-
-        // For external handler that may want a setRangeText(a,b,c) method
-        (_this$$refs$input3 = this.$refs.input).setRangeText.apply(_this$$refs$input3, arguments);
       }
     }
   };
@@ -14951,10 +15195,10 @@
 
   var BFormInput = /*#__PURE__*/Vue.extend({
     name: 'BFormInput',
-    mixins: [idMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
+    // Mixin order is important!
+    mixins: [listenersMixin, idMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
     props: {
-      // value prop defined in form-text mixin
-      // value: { },
+      // `value` prop is defined in form-text mixin
       type: {
         type: String,
         default: 'text',
@@ -14963,7 +15207,8 @@
         }
       },
       noWheel: {
-        // Disable mousewheel to prevent wheel from changing values (i.e. number/date).
+        // Disable mousewheel to prevent wheel from
+        // changing values (i.e. number/date)
         type: Boolean,
         default: false
       },
@@ -14988,6 +15233,39 @@
       localType: function localType() {
         // We only allow certain types
         return arrayIncludes(TYPES, this.type) ? this.type : 'text';
+      },
+      computedAttrs: function computedAttrs() {
+        var type = this.localType,
+            disabled = this.disabled,
+            placeholder = this.placeholder,
+            required = this.required,
+            min = this.min,
+            max = this.max,
+            step = this.step;
+        return {
+          id: this.safeId(),
+          name: this.name || null,
+          form: this.form || null,
+          type: type,
+          disabled: disabled,
+          placeholder: placeholder,
+          required: required,
+          autocomplete: this.autocomplete || null,
+          readonly: this.readonly || this.plaintext,
+          min: min,
+          max: max,
+          step: step,
+          list: type !== 'password' ? this.list : null,
+          'aria-required': required ? 'true' : null,
+          'aria-invalid': this.computedAriaInvalid
+        };
+      },
+      computedListeners: function computedListeners() {
+        return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+          input: this.onInput,
+          change: this.onChange,
+          blur: this.onBlur
+        });
       }
     },
     watch: {
@@ -15037,45 +15315,18 @@
       },
       stopWheel: function stopWheel(evt) {
         evt.preventDefault();
-        this.$el.blur();
+        attemptBlur(this.$el);
       }
     },
     render: function render(h) {
-      var self = this;
       return h('input', {
         ref: 'input',
-        class: self.computedClass,
-        directives: [{
-          name: 'model',
-          rawName: 'v-model',
-          value: self.localValue,
-          expression: 'localValue'
-        }],
-        attrs: {
-          id: self.safeId(),
-          name: self.name,
-          form: self.form || null,
-          type: self.localType,
-          disabled: self.disabled,
-          placeholder: self.placeholder,
-          required: self.required,
-          autocomplete: self.autocomplete || null,
-          readonly: self.readonly || self.plaintext,
-          min: self.min,
-          max: self.max,
-          step: self.step,
-          list: self.localType !== 'password' ? self.list : null,
-          'aria-required': self.required ? 'true' : null,
-          'aria-invalid': self.computedAriaInvalid
-        },
+        class: this.computedClass,
+        attrs: this.computedAttrs,
         domProps: {
-          value: self.localValue
+          value: this.localValue
         },
-        on: _objectSpread2({}, self.$listeners, {
-          input: self.onInput,
-          change: self.onChange,
-          blur: self.onBlur
-        })
+        on: this.computedListeners
       });
     }
   });
@@ -15087,7 +15338,7 @@
     }
   });
 
-  var props$x = {
+  var props$y = {
     checked: {
       // type: [String, Number, Boolean, Object],
       default: null
@@ -15103,7 +15354,7 @@
         bvRadioGroup: this
       };
     },
-    props: props$x,
+    props: props$y,
     data: function data() {
       return {
         localChecked: this.checked
@@ -15125,7 +15376,7 @@
     }
   });
 
-  var NAME$i = 'BFormRating';
+  var NAME$k = 'BFormRating';
   var MIN_STARS = 3;
   var DEFAULT_STARS = 5;
   var LEFT$1 = KEY_CODES.LEFT,
@@ -15214,17 +15465,17 @@
   }); // --- Utility methods ---
 
   var computeStars = function computeStars(stars) {
-    return Math.max(MIN_STARS, toInteger(stars, DEFAULT_STARS));
+    return mathMax(MIN_STARS, toInteger(stars, DEFAULT_STARS));
   };
 
   var clampValue = function clampValue(value, min, max) {
-    return Math.max(Math.min(value, max), min);
+    return mathMax(mathMin(value, max), min);
   }; // --- BFormRating ---
   // @vue/component
 
 
   var BFormRating = /*#__PURE__*/Vue.extend({
-    name: NAME$i,
+    name: NAME$k,
     components: {
       BIconStar: BIconStar,
       BIconStarHalf: BIconStarHalf,
@@ -15251,17 +15502,21 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$i, 'variant');
+          return getComponentConfig(NAME$k, 'variant');
         }
       },
       color: {
         // CSS color string (overrides variant)
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$i, 'color');
+          return getComponentConfig(NAME$k, 'color');
         }
       },
       showValue: {
+        type: Boolean,
+        default: false
+      },
+      showValueMax: {
         type: Boolean,
         default: false
       },
@@ -15354,13 +15609,18 @@
         return isLocaleRTL(this.computedLocale);
       },
       formattedRating: function formattedRating() {
-        var value = this.localValue;
         var precision = toInteger(this.precision);
-        return isNull(value) ? '' : value.toLocaleString(this.computedLocale, {
+        var showValueMax = this.showValueMax;
+        var locale = this.computedLocale;
+        var formatOptions = {
           notation: 'standard',
           minimumFractionDigits: isNaN(precision) ? 0 : precision,
           maximumFractionDigits: isNaN(precision) ? 3 : precision
-        });
+        };
+        var stars = this.computedStars.toLocaleString(locale);
+        var value = this.localValue;
+        value = isNull(value) ? showValueMax ? '-' : '' : value.toLocaleString(locale, formatOptions);
+        return showValueMax ? "".concat(value, "/").concat(stars) : value;
       }
     },
     watch: {
@@ -15386,16 +15646,12 @@
       // --- Public methods ---
       focus: function focus() {
         if (!this.disabled) {
-          try {
-            this.$el.focus();
-          } catch (_unused) {}
+          attemptFocus(this.$el);
         }
       },
       blur: function blur() {
         if (!this.disabled) {
-          try {
-            this.$el.blur();
-          } catch (_unused2) {}
+          attemptBlur(this.$el);
         }
       },
       // --- Private methods ---
@@ -15601,12 +15857,12 @@
         if (isPlainObject(option)) {
           var value = get(option, this.valueField);
           var text = get(option, this.textField);
-          var options = get(option, this.optionsField); // When it has options, create an `<optgroup>` object
+          var options = get(option, this.optionsField, null); // When it has options, create an `<optgroup>` object
 
-          if (isArray(options)) {
+          if (!isNull(options)) {
             return {
               label: String(get(option, this.labelField) || text),
-              options: options
+              options: this.normalizeOptions(options)
             };
           } // Otherwise create an `<option>` object
 
@@ -15629,8 +15885,8 @@
     }
   };
 
-  var NAME$j = 'BFormSelectOption';
-  var props$y = {
+  var NAME$l = 'BFormSelectOption';
+  var props$z = {
     value: {
       // type: [String, Number, Boolean, Object],
       required: true
@@ -15642,9 +15898,9 @@
   }; // @vue/component
 
   var BFormSelectOption = /*#__PURE__*/Vue.extend({
-    name: NAME$j,
+    name: NAME$l,
     functional: true,
-    props: props$y,
+    props: props$z,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -15672,20 +15928,25 @@
       }
     },
     render: function render(h) {
+      var $options = this.formOptions.map(function (option, index) {
+        var value = option.value,
+            text = option.text,
+            html = option.html,
+            disabled = option.disabled;
+        return h(BFormSelectOption, {
+          attrs: {
+            value: value,
+            disabled: disabled
+          },
+          domProps: htmlOrText(html, text),
+          key: "option_".concat(index)
+        });
+      });
       return h('optgroup', {
         attrs: {
           label: this.label
         }
-      }, [this.normalizeSlot('first'), this.formOptions.map(function (option, index) {
-        return h(BFormSelectOption, {
-          props: {
-            value: option.value,
-            disabled: option.disabled
-          },
-          domProps: htmlOrText(option.html, option.text),
-          key: "option_".concat(index, "_opt")
-        });
-      }), this.normalizeSlot('default')]);
+      }, [this.normalizeSlot('first'), $options, this.normalizeSlot('default')]);
     }
   });
 
@@ -15747,68 +16008,75 @@
     },
     methods: {
       focus: function focus() {
-        this.$refs.input.focus();
+        attemptFocus(this.$refs.input);
       },
       blur: function blur() {
-        this.$refs.input.blur();
+        attemptBlur(this.$refs.input);
+      },
+      onChange: function onChange(evt) {
+        var _this = this;
+
+        var target = evt.target;
+        var selectedVal = from(target.options).filter(function (o) {
+          return o.selected;
+        }).map(function (o) {
+          return '_value' in o ? o._value : o.value;
+        });
+        this.localValue = target.multiple ? selectedVal : selectedVal[0];
+        this.$nextTick(function () {
+          _this.$emit('change', _this.localValue);
+        });
       }
     },
     render: function render(h) {
-      var _this = this;
-
-      return h('select', {
-        ref: 'input',
-        class: this.inputClass,
-        directives: [{
-          name: 'model',
-          rawName: 'v-model',
-          value: this.localValue,
-          expression: 'localValue'
-        }],
-        attrs: {
-          id: this.safeId(),
-          name: this.name,
-          form: this.form || null,
-          multiple: this.multiple || null,
-          size: this.computedSelectSize,
-          disabled: this.disabled,
-          required: this.required,
-          'aria-required': this.required ? 'true' : null,
-          'aria-invalid': this.computedAriaInvalid
-        },
-        on: {
-          change: function change(evt) {
-            var target = evt.target;
-            var selectedVal = from(target.options).filter(function (o) {
-              return o.selected;
-            }).map(function (o) {
-              return '_value' in o ? o._value : o.value;
-            });
-            _this.localValue = target.multiple ? selectedVal : selectedVal[0];
-
-            _this.$nextTick(function () {
-              _this.$emit('change', _this.localValue);
-            });
-          }
-        }
-      }, [this.normalizeSlot('first'), this.formOptions.map(function (option, index) {
-        var key = "option_".concat(index, "_opt");
-        var options = option.options;
+      var name = this.name,
+          disabled = this.disabled,
+          required = this.required,
+          size = this.computedSelectSize,
+          value = this.localValue;
+      var $options = this.formOptions.map(function (option, index) {
+        var value = option.value,
+            label = option.label,
+            options = option.options,
+            disabled = option.disabled;
+        var key = "option_".concat(index);
         return isArray(options) ? h(BFormSelectOptionGroup, {
           props: {
-            label: option.label,
+            label: label,
             options: options
           },
           key: key
         }) : h(BFormSelectOption, {
           props: {
-            value: option.value,
-            disabled: option.disabled
+            value: value,
+            disabled: disabled
           },
           domProps: htmlOrText(option.html, option.text),
           key: key
         });
-      }), this.normalizeSlot('default')]);
+      });
+      return h('select', {
+        class: this.inputClass,
+        attrs: {
+          id: this.safeId(),
+          name: name,
+          form: this.form || null,
+          multiple: this.multiple || null,
+          size: size,
+          disabled: disabled,
+          required: required,
+          'aria-required': required ? 'true' : null,
+          'aria-invalid': this.computedAriaInvalid
+        },
+        on: {
+          change: this.onChange
+        },
+        directives: [{
+          name: 'model',
+          value: value
+        }],
+        ref: 'input'
+      }, [this.normalizeSlot('first'), $options, this.normalizeSlot('default')]);
     }
   });
 
@@ -15823,7 +16091,7 @@
     }
   });
 
-  var NAME$k = 'BFormSpinbutton';
+  var NAME$m = 'BFormSpinbutton';
   var UP$2 = KEY_CODES.UP,
       DOWN$2 = KEY_CODES.DOWN,
       HOME$1 = KEY_CODES.HOME,
@@ -15845,8 +16113,9 @@
   // @vue/component
 
   var BFormSpinbutton = /*#__PURE__*/Vue.extend({
-    name: NAME$k,
-    mixins: [idMixin, normalizeSlotMixin],
+    name: NAME$m,
+    // Mixin order is important!
+    mixins: [attrsMixin, idMixin, normalizeSlotMixin],
     inheritAttrs: false,
     props: {
       value: {
@@ -15927,13 +16196,13 @@
       labelDecrement: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$k, 'labelDecrement');
+          return getComponentConfig(NAME$m, 'labelDecrement');
         }
       },
       labelIncrement: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$k, 'labelIncrement');
+          return getComponentConfig(NAME$m, 'labelIncrement');
         }
       },
       locale: {
@@ -15964,6 +16233,18 @@
       };
     },
     computed: {
+      spinId: function spinId() {
+        return this.safeId();
+      },
+      computedInline: function computedInline() {
+        return this.inline && !this.vertical;
+      },
+      computedReadonly: function computedReadonly() {
+        return this.readonly && !this.disabled;
+      },
+      computedRequired: function computedRequired() {
+        return this.required && !this.computedReadonly && !this.disabled;
+      },
       computedStep: function computedStep() {
         return toFloat(this.step, DEFAULT_STEP);
       },
@@ -15975,7 +16256,7 @@
         var max = toFloat(this.max, DEFAULT_MAX);
         var step = this.computedStep;
         var min = this.computedMin;
-        return Math.floor((max - min) / step) * step + min;
+        return mathFloor((max - min) / step) * step + min;
       },
       computedDelay: function computedDelay() {
         var delay = toInteger(this.repeatDelay, 0);
@@ -15986,18 +16267,18 @@
         return interval > 0 ? interval : DEFAULT_REPEAT_INTERVAL;
       },
       computedThreshold: function computedThreshold() {
-        return Math.max(toInteger(this.repeatThreshold, DEFAULT_REPEAT_THRESHOLD), 1);
+        return mathMax(toInteger(this.repeatThreshold, DEFAULT_REPEAT_THRESHOLD), 1);
       },
       computedStepMultiplier: function computedStepMultiplier() {
-        return Math.max(toInteger(this.repeatStepMultiplier, DEFAULT_REPEAT_MULTIPLIER), 1);
+        return mathMax(toInteger(this.repeatStepMultiplier, DEFAULT_REPEAT_MULTIPLIER), 1);
       },
       computedPrecision: function computedPrecision() {
         // Quick and dirty way to get the number of decimals
         var step = this.computedStep;
-        return Math.floor(step) === step ? 0 : (step.toString().split('.')[1] || '').length;
+        return mathFloor(step) === step ? 0 : (step.toString().split('.')[1] || '').length;
       },
       computedMultiplier: function computedMultiplier() {
-        return Math.pow(10, this.computedPrecision || 0);
+        return mathPow(10, this.computedPrecision || 0);
       },
       valueAsFixed: function valueAsFixed() {
         var value = this.localValue;
@@ -16024,6 +16305,46 @@
         }); // Return the format method reference
 
         return nf.format;
+      },
+      computedFormatter: function computedFormatter() {
+        return isFunction(this.formatterFn) ? this.formatterFn : this.defaultFormatter;
+      },
+      computedAttrs: function computedAttrs() {
+        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+          role: 'group',
+          lang: this.computedLocale,
+          tabindex: this.disabled ? null : '-1',
+          title: this.ariaLabel
+        });
+      },
+      computedSpinAttrs: function computedSpinAttrs() {
+        var spinId = this.spinId,
+            value = this.localValue,
+            required = this.computedRequired,
+            disabled = this.disabled,
+            state = this.state,
+            computedFormatter = this.computedFormatter;
+        var hasValue = !isNull(value);
+        return _objectSpread2(_objectSpread2({
+          dir: this.computedRTL ? 'rtl' : 'ltr'
+        }, this.bvAttrs), {}, {
+          id: spinId,
+          role: 'spinbutton',
+          tabindex: disabled ? null : '0',
+          'aria-live': 'off',
+          'aria-label': this.ariaLabel || null,
+          'aria-controls': this.ariaControls || null,
+          // TODO: May want to check if the value is in range
+          'aria-invalid': state === false || !hasValue && required ? 'true' : null,
+          'aria-required': required ? 'true' : null,
+          // These attrs are required for role spinbutton
+          'aria-valuemin': toString$1(this.computedMin),
+          'aria-valuemax': toString$1(this.computedMax),
+          // These should be `null` if the value is out of range
+          // They must also be non-existent attrs if the value is out of range or `null`
+          'aria-valuenow': hasValue ? value : null,
+          'aria-valuetext': hasValue ? computedFormatter(value) : null
+        });
       }
     },
     watch: {
@@ -16064,16 +16385,12 @@
       // --- Public methods ---
       focus: function focus() {
         if (!this.disabled) {
-          try {
-            this.$refs.spinner.focus();
-          } catch (_unused) {}
+          attemptFocus(this.$refs.spinner);
         }
       },
       blur: function blur() {
         if (!this.disabled) {
-          try {
-            this.$refs.spinner.blur();
-          } catch (_unused2) {}
+          attemptBlur(this.$refs.spinner);
         }
       },
       // --- Private methods ---
@@ -16092,9 +16409,9 @@
           var multiplier = this.computedMultiplier;
           var wrap = this.wrap; // We ensure that the value steps like a native input
 
-          value = Math.round((value - min) / step) * step + min + step; // We ensure that precision is maintained (decimals)
+          value = mathRound((value - min) / step) * step + min + step; // We ensure that precision is maintained (decimals)
 
-          value = Math.round(value * multiplier) / multiplier; // Handle if wrapping is enabled
+          value = mathRound(value * multiplier) / multiplier; // Handle if wrapping is enabled
 
           this.localValue = value > max ? wrap ? min : max : value < min ? wrap ? max : min : value;
         }
@@ -16251,11 +16568,13 @@
         try {
           eventOnOff(on, document.body, 'mouseup', this.onMouseup, false);
           eventOnOff(on, document.body, 'touchend', this.onMouseup, false);
-        } catch (_unused3) {}
+        } catch (_unused) {}
       },
       resetTimers: function resetTimers() {
         clearTimeout(this.$_autoDelayTimer);
         clearInterval(this.$_autoRepeatTimer);
+        this.$_autoDelayTimer = null;
+        this.$_autoRepeatTimer = null;
       },
       clearRepeat: function clearRepeat() {
         this.resetTimers();
@@ -16267,17 +16586,16 @@
       var _this2 = this,
           _class;
 
-      var spinId = this.safeId();
-      var value = this.localValue;
-      var isVertical = this.vertical;
-      var isInline = this.inline && !isVertical;
-      var isDisabled = this.disabled;
-      var isReadonly = this.readonly && !isDisabled;
-      var isRequired = this.required && !isReadonly && !isDisabled;
-      var state = this.state;
-      var size = this.size;
+      var spinId = this.spinId,
+          value = this.localValue,
+          inline = this.computedInline,
+          readonly = this.computedReadonly,
+          vertical = this.vertical,
+          disabled = this.disabled,
+          state = this.state,
+          size = this.size,
+          computedFormatter = this.computedFormatter;
       var hasValue = !isNull(value);
-      var formatter = isFunction(this.formatterFn) ? this.formatterFn : this.defaultFormatter;
 
       var makeButton = function makeButton(stepper, label, IconCmp, keyRef, shortcut, btnDisabled, slotName) {
         var $icon = h(IconCmp, {
@@ -16293,15 +16611,13 @@
         };
 
         var handler = function handler(evt) {
-          if (!isDisabled && !isReadonly) {
+          if (!disabled && !readonly) {
             evt.preventDefault();
 
-            _this2.setMouseup(true);
+            _this2.setMouseup(true); // Since we `preventDefault()`, we must manually focus the button
 
-            try {
-              // Since we `preventDefault()`, we must manually focus the button
-              evt.currentTarget.focus();
-            } catch (_unused4) {}
+
+            attemptFocus(evt.currentTarget);
 
             _this2.handleStepRepeat(evt, stepper);
           }
@@ -16312,13 +16628,13 @@
           ref: keyRef,
           staticClass: 'btn btn-sm border-0 rounded-0',
           class: {
-            'py-0': !isVertical
+            'py-0': !vertical
           },
           attrs: {
             tabindex: '-1',
             type: 'button',
-            disabled: isDisabled || isReadonly || btnDisabled,
-            'aria-disabled': isDisabled || isReadonly || btnDisabled ? 'true' : null,
+            disabled: disabled || readonly || btnDisabled,
+            'aria-disabled': disabled || readonly || btnDisabled ? 'true' : null,
             'aria-controls': spinId,
             'aria-label': label || null,
             'aria-keyshortcuts': shortcut || null
@@ -16335,7 +16651,7 @@
       var $decrement = makeButton(this.stepDown, this.labelDecrement, BIconDash, 'dec', 'ArrowDown', false, 'decrement');
       var $hidden = h();
 
-      if (this.name && !isDisabled) {
+      if (this.name && !disabled) {
         $hidden = h('input', {
           key: 'hidden',
           attrs: {
@@ -16354,48 +16670,24 @@
         key: 'output',
         staticClass: 'flex-grow-1',
         class: {
-          'd-flex': isVertical,
-          'align-self-center': !isVertical,
-          'align-items-center': isVertical,
-          'border-top': isVertical,
-          'border-bottom': isVertical,
-          'border-left': !isVertical,
-          'border-right': !isVertical
+          'd-flex': vertical,
+          'align-self-center': !vertical,
+          'align-items-center': vertical,
+          'border-top': vertical,
+          'border-bottom': vertical,
+          'border-left': !vertical,
+          'border-right': !vertical
         },
-        attrs: _objectSpread2({
-          dir: this.computedRTL ? 'rtl' : 'ltr'
-        }, this.$attrs, {
-          id: spinId,
-          role: 'spinbutton',
-          tabindex: isDisabled ? null : '0',
-          'aria-live': 'off',
-          'aria-label': this.ariaLabel || null,
-          'aria-controls': this.ariaControls || null,
-          // TODO: May want to check if the value is in range
-          'aria-invalid': state === false || !hasValue && isRequired ? 'true' : null,
-          'aria-required': isRequired ? 'true' : null,
-          // These attrs are required for role spinbutton
-          'aria-valuemin': toString$1(this.computedMin),
-          'aria-valuemax': toString$1(this.computedMax),
-          // These should be `null` if the value is out of range
-          // They must also be non-existent attrs if the value is out of range or `null`
-          'aria-valuenow': hasValue ? value : null,
-          'aria-valuetext': hasValue ? formatter(value) : null
-        })
-      }, [h('bdi', hasValue ? formatter(value) : this.placeholder || '')]);
+        attrs: this.computedSpinAttrs
+      }, [h('bdi', hasValue ? computedFormatter(value) : this.placeholder || '')]);
       return h('div', {
         staticClass: 'b-form-spinbutton form-control',
         class: (_class = {
-          disabled: isDisabled,
-          readonly: isReadonly,
+          disabled: disabled,
+          readonly: readonly,
           focus: this.hasFocus
-        }, _defineProperty(_class, "form-control-".concat(size), !!size), _defineProperty(_class, 'd-inline-flex', isInline || isVertical), _defineProperty(_class, 'd-flex', !isInline && !isVertical), _defineProperty(_class, 'align-items-stretch', !isVertical), _defineProperty(_class, 'flex-column', isVertical), _defineProperty(_class, 'is-valid', state === true), _defineProperty(_class, 'is-invalid', state === false), _class),
-        attrs: {
-          role: 'group',
-          lang: this.computedLocale,
-          tabindex: isDisabled ? null : '-1',
-          title: this.ariaLabel
-        },
+        }, _defineProperty(_class, "form-control-".concat(size), !!size), _defineProperty(_class, 'd-inline-flex', inline || vertical), _defineProperty(_class, 'd-flex', !inline && !vertical), _defineProperty(_class, 'align-items-stretch', !vertical), _defineProperty(_class, 'flex-column', vertical), _defineProperty(_class, 'is-valid', state === true), _defineProperty(_class, 'is-invalid', state === false), _class),
+        attrs: this.computedAttrs,
         on: {
           keydown: this.onKeydown,
           keyup: this.onKeyup,
@@ -16403,7 +16695,7 @@
           '!focus': this.onFocusBlur,
           '!blur': this.onFocusBlur
         }
-      }, isVertical ? [$increment, $hidden, $spin, $decrement] : [$decrement, $hidden, $spin, $increment]);
+      }, vertical ? [$increment, $hidden, $spin, $decrement] : [$decrement, $hidden, $spin, $increment]);
     }
   });
 
@@ -16414,15 +16706,15 @@
     }
   });
 
-  var NAME$l = 'BFormTag';
+  var NAME$n = 'BFormTag';
   var BFormTag = /*#__PURE__*/Vue.extend({
-    name: NAME$l,
+    name: NAME$n,
     mixins: [idMixin, normalizeSlotMixin],
     props: {
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$l, 'variant');
+          return getComponentConfig(NAME$n, 'variant');
         }
       },
       disabled: {
@@ -16440,7 +16732,7 @@
       removeLabel: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$l, 'removeLabel');
+          return getComponentConfig(NAME$n, 'removeLabel');
         }
       },
       tag: {
@@ -16506,13 +16798,13 @@
     }
   });
 
-  var NAME$m = 'BFormTags'; // Supported input types (for built in input)
+  var NAME$o = 'BFormTags'; // Supported input types (for built in input)
 
   var TYPES$1 = ['text', 'email', 'tel', 'url', 'number']; // Pre-compiled regular expressions for performance reasons
 
   var RX_SPACES = /[\s\uFEFF\xA0]+/g; // KeyCode constants
 
-  var ENTER$1 = KEY_CODES.ENTER,
+  var ENTER$2 = KEY_CODES.ENTER,
       BACKSPACE = KEY_CODES.BACKSPACE,
       DELETE = KEY_CODES.DELETE; // --- Utility methods ---
   // Escape special chars in string and replace
@@ -16548,7 +16840,7 @@
 
 
   var BFormTags = /*#__PURE__*/Vue.extend({
-    name: NAME$m,
+    name: NAME$o,
     mixins: [idMixin, normalizeSlotMixin],
     model: {
       // Even though this is the default that Vue assumes, we need
@@ -16564,7 +16856,7 @@
       placeholder: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$m, 'placeholder');
+          return getComponentConfig(NAME$o, 'placeholder');
         }
       },
       disabled: {
@@ -16613,19 +16905,19 @@
       addButtonText: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$m, 'addButtonText');
+          return getComponentConfig(NAME$o, 'addButtonText');
         }
       },
       addButtonVariant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$m, 'addButtonVariant');
+          return getComponentConfig(NAME$o, 'addButtonVariant');
         }
       },
       tagVariant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$m, 'tagVariant');
+          return getComponentConfig(NAME$o, 'tagVariant');
         }
       },
       tagClass: {
@@ -16639,13 +16931,13 @@
       tagRemoveLabel: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$m, 'tagRemoveLabel');
+          return getComponentConfig(NAME$o, 'tagRemoveLabel');
         }
       },
       tagRemovedLabel: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$m, 'tagRemovedLabel');
+          return getComponentConfig(NAME$o, 'tagRemovedLabel');
         }
       },
       tagValidator: {
@@ -16655,13 +16947,13 @@
       duplicateTagText: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$m, 'duplicateTagText');
+          return getComponentConfig(NAME$o, 'duplicateTagText');
         }
       },
       invalidTagText: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$m, 'invalidTagText');
+          return getComponentConfig(NAME$o, 'invalidTagText');
         }
       },
       separator: {
@@ -16719,7 +17011,7 @@
         return arrayIncludes(TYPES$1, this.inputType) ? this.inputType : 'text';
       },
       computedInputAttrs: function computedInputAttrs() {
-        return _objectSpread2({}, this.inputAttrs, {
+        return _objectSpread2(_objectSpread2({}, this.inputAttrs), {}, {
           // Must have attributes
           id: this.computedInputId,
           value: this.newTag,
@@ -16935,7 +17227,7 @@
         var value = evt.target.value || '';
         /* istanbul ignore else: testing to be added later */
 
-        if (!this.noAddOnEnter && keyCode === ENTER$1) {
+        if (!this.noAddOnEnter && keyCode === ENTER$2) {
           // Attempt to add the tag when user presses enter
           evt.preventDefault();
           this.addTag();
@@ -16975,15 +17267,13 @@
       // --- Public methods ---
       focus: function focus() {
         if (!this.disabled) {
-          try {
-            this.getInput().focus();
-          } catch (_unused) {}
+          attemptFocus(this.getInput());
         }
       },
       blur: function blur() {
-        try {
-          this.getInput().blur();
-        } catch (_unused2) {}
+        if (!this.disabled) {
+          attemptBlur(this.getInput());
+        }
       },
       // --- Private methods ---
       splitTags: function splitTags(newTag) {
@@ -17103,7 +17393,7 @@
             outline: 0,
             minWidth: '5rem'
           },
-          attrs: _objectSpread2({}, inputAttrs, {
+          attrs: _objectSpread2(_objectSpread2({}, inputAttrs), {}, {
             'aria-describedby': ariaDescribedby || null,
             type: inputType,
             placeholder: placeholder || null
@@ -17333,7 +17623,8 @@
     directives: {
       'b-visible': VBVisible
     },
-    mixins: [idMixin, listenOnRootMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
+    // Mixin order is important!
+    mixins: [listenersMixin, idMixin, listenOnRootMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
     props: {
       rows: {
         type: [Number, String],
@@ -17387,15 +17678,40 @@
         // Ensure rows is at least 2 and positive (2 is the native textarea value)
         // A value of 1 can cause issues in some browsers, and most browsers
         // only support 2 as the smallest value
-        return Math.max(toInteger(this.rows, 2), 2);
+        return mathMax(toInteger(this.rows, 2), 2);
       },
       computedMaxRows: function computedMaxRows() {
-        return Math.max(this.computedMinRows, toInteger(this.maxRows, 0));
+        return mathMax(this.computedMinRows, toInteger(this.maxRows, 0));
       },
       computedRows: function computedRows() {
         // This is used to set the attribute 'rows' on the textarea
         // If auto-height is enabled, then we return `null` as we use CSS to control height
         return this.computedMinRows === this.computedMaxRows ? this.computedMinRows : null;
+      },
+      computedAttrs: function computedAttrs() {
+        var disabled = this.disabled,
+            required = this.required;
+        return {
+          id: this.safeId(),
+          name: this.name || null,
+          form: this.form || null,
+          disabled: disabled,
+          placeholder: this.placeholder || null,
+          required: required,
+          autocomplete: this.autocomplete || null,
+          readonly: this.readonly || this.plaintext,
+          rows: this.computedRows,
+          wrap: this.wrap || null,
+          'aria-required': this.required ? 'true' : null,
+          'aria-invalid': this.computedAriaInvalid
+        };
+      },
+      computedListeners: function computedListeners() {
+        return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+          input: this.onInput,
+          change: this.onChange,
+          blur: this.onBlur
+        });
       }
     },
     watch: {
@@ -17460,11 +17776,11 @@
 
         el.style.height = oldHeight; // Calculate content height in 'rows' (scrollHeight includes padding but not border)
 
-        var contentRows = Math.max((scrollHeight - padding) / lineHeight, 2); // Calculate number of rows to display (limited within min/max rows)
+        var contentRows = mathMax((scrollHeight - padding) / lineHeight, 2); // Calculate number of rows to display (limited within min/max rows)
 
-        var rows = Math.min(Math.max(contentRows, this.computedMinRows), this.computedMaxRows); // Calculate the required height of the textarea including border and padding (in pixels)
+        var rows = mathMin(mathMax(contentRows, this.computedMinRows), this.computedMaxRows); // Calculate the required height of the textarea including border and padding (in pixels)
 
-        var height = Math.max(Math.ceil(rows * lineHeight + offset), minHeight); // Computed height remains the larger of `oldHeight` and new `height`,
+        var height = mathMax(mathCeil(rows * lineHeight + offset), minHeight); // Computed height remains the larger of `oldHeight` and new `height`,
         // when height is in `sticky` mode (prop `no-auto-shrink` is true)
 
         if (this.noAutoShrink && toFloat(oldHeight, 0) > height) {
@@ -17476,16 +17792,11 @@
       }
     },
     render: function render(h) {
-      // Using self instead of this helps reduce code size during minification
-      var self = this;
       return h('textarea', {
         ref: 'input',
-        class: self.computedClass,
-        style: self.computedStyle,
+        class: this.computedClass,
+        style: this.computedStyle,
         directives: [{
-          name: 'model',
-          value: self.localValue
-        }, {
           name: 'b-visible',
           value: this.visibleCallback,
           // If textarea is within 640px of viewport, consider it visible
@@ -17493,28 +17804,11 @@
             '640': true
           }
         }],
-        attrs: {
-          id: self.safeId(),
-          name: self.name || null,
-          form: self.form || null,
-          disabled: self.disabled,
-          placeholder: self.placeholder || null,
-          required: self.required,
-          autocomplete: self.autocomplete || null,
-          readonly: self.readonly || self.plaintext,
-          rows: self.computedRows,
-          wrap: self.wrap || null,
-          'aria-required': self.required ? 'true' : null,
-          'aria-invalid': self.computedAriaInvalid
-        },
+        attrs: this.computedAttrs,
         domProps: {
-          value: self.localValue
+          value: this.localValue
         },
-        on: _objectSpread2({}, self.$listeners, {
-          input: self.onInput,
-          change: self.onChange,
-          blur: self.onBlur
-        })
+        on: this.computedListeners
       });
     }
   });
@@ -17526,7 +17820,7 @@
     }
   });
 
-  var NAME$n = 'BTime';
+  var NAME$p = 'BTime';
   var NUMERIC = 'numeric';
   var LEFT$2 = KEY_CODES.LEFT,
       RIGHT$2 = KEY_CODES.RIGHT; // Time string RegExpr (optional seconds)
@@ -17535,7 +17829,7 @@
   // Fallback to BFormSpinbutton prop if no value found
 
   var getConfigFallback$1 = function getConfigFallback(prop) {
-    return getComponentConfig(NAME$n, prop) || getComponentConfig('BFormSpinbutton', prop);
+    return getComponentConfig(NAME$p, prop) || getComponentConfig('BFormSpinbutton', prop);
   };
 
   var padLeftZeros = function padLeftZeros(num) {
@@ -17585,7 +17879,7 @@
 
 
   var BTime = /*#__PURE__*/Vue.extend({
-    name: NAME$n,
+    name: NAME$p,
     mixins: [idMixin, normalizeSlotMixin],
     model: {
       prop: 'value',
@@ -17640,49 +17934,49 @@
       labelNoTimeSelected: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'labelNoTimeSelected');
+          return getComponentConfig(NAME$p, 'labelNoTimeSelected');
         }
       },
       labelSelected: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'labelSelected');
+          return getComponentConfig(NAME$p, 'labelSelected');
         }
       },
       labelHours: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'labelHours');
+          return getComponentConfig(NAME$p, 'labelHours');
         }
       },
       labelMinutes: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'labelMinutes');
+          return getComponentConfig(NAME$p, 'labelMinutes');
         }
       },
       labelSeconds: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'labelSeconds');
+          return getComponentConfig(NAME$p, 'labelSeconds');
         }
       },
       labelAmpm: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'labelAmpm');
+          return getComponentConfig(NAME$p, 'labelAmpm');
         }
       },
       labelAm: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'labelAm');
+          return getComponentConfig(NAME$p, 'labelAm');
         }
       },
       labelPm: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$n, 'labelPm');
+          return getComponentConfig(NAME$p, 'labelPm');
         }
       },
       // Passed to the spin buttons
@@ -17943,19 +18237,17 @@
       // Public methods
       focus: function focus() {
         if (!this.disabled) {
-          try {
-            // We focus the first spin button
-            this.$refs.spinners[0].focus();
-          } catch (_unused) {}
+          // We focus the first spin button
+          attemptFocus(this.$refs.spinners[0]);
         }
       },
       blur: function blur() {
         if (!this.disabled) {
-          try {
-            if (contains(this.$el, document.activeElement)) {
-              document.activeElement.blur();
-            }
-          } catch (_unused2) {}
+          var activeElement = getActiveElement();
+
+          if (contains(this.$el, activeElement)) {
+            attemptBlur(activeElement);
+          }
         }
       },
       // Formatters for the spin buttons
@@ -18009,10 +18301,7 @@
           }).indexOf(true);
           index = index + (keyCode === LEFT$2 ? -1 : 1);
           index = index >= spinners.length ? 0 : index < 0 ? spinners.length - 1 : index;
-
-          try {
-            spinners[index].focus();
-          } catch (_unused3) {}
+          attemptFocus(spinners[index]);
         }
       },
       setLive: function setLive(on) {
@@ -18215,10 +18504,10 @@
     }
   });
 
-  var NAME$o = 'BFormTimepicker'; // Fallback to BTime/BFormSpinbutton prop if no value found
+  var NAME$q = 'BFormTimepicker'; // Fallback to BTime/BFormSpinbutton prop if no value found
 
   var getConfigFallback$2 = function getConfigFallback(prop) {
-    return getComponentConfig(NAME$o, prop) || getComponentConfig('BTime', prop) || getComponentConfig('BFormSpinbutton', prop);
+    return getComponentConfig(NAME$q, prop) || getComponentConfig('BTime', prop) || getComponentConfig('BFormSpinbutton', prop);
   }; // We create our props as a mixin so that we can control
   // where they appear in the props listing reference section
 
@@ -18309,7 +18598,7 @@
       labelNowButton: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$o, 'labelNowButton');
+          return getComponentConfig(NAME$q, 'labelNowButton');
         }
       },
       nowButtonVariant: {
@@ -18323,7 +18612,7 @@
       labelResetButton: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$o, 'labelResetButton');
+          return getComponentConfig(NAME$q, 'labelResetButton');
         }
       },
       resetButtonVariant: {
@@ -18337,7 +18626,7 @@
       labelCloseButton: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$o, 'labelCloseButton');
+          return getComponentConfig(NAME$q, 'labelCloseButton');
         }
       },
       closeButtonVariant: {
@@ -18417,7 +18706,7 @@
   // @vue/component
 
   var BFormTimepicker = /*#__PURE__*/Vue.extend({
-    name: NAME$o,
+    name: NAME$q,
     // The mixins order determines the order of appearance in the props reference section
     mixins: [idMixin, propsMixin$1],
     model: {
@@ -18487,16 +18776,12 @@
       // Public methods
       focus: function focus() {
         if (!this.disabled) {
-          try {
-            this.$refs.control.focus();
-          } catch (_unused) {}
+          attemptFocus(this.$refs.control);
         }
       },
       blur: function blur() {
         if (!this.disabled) {
-          try {
-            this.$refs.control.blur();
-          } catch (_unused2) {}
+          attemptBlur(this.$refs.control);
         }
       },
       // Private methods
@@ -18548,9 +18833,7 @@
         var _this2 = this;
 
         this.$nextTick(function () {
-          try {
-            _this2.$refs.time.focus();
-          } catch (_unused3) {}
+          attemptFocus(_this2.$refs.time);
 
           _this2.$emit('shown');
         });
@@ -18598,7 +18881,7 @@
 
       if (this.resetButton) {
         if ($footer.length > 0) {
-          // Add a "spacer" betwen buttons ('&nbsp;')
+          // Add a "spacer" between buttons ('&nbsp;')
           $footer.push(h('span', "\xA0"));
         }
 
@@ -18621,7 +18904,7 @@
 
       if (!this.noCloseButton) {
         if ($footer.length > 0) {
-          // Add a "spacer" betwen buttons ('&nbsp;')
+          // Add a "spacer" between buttons ('&nbsp;')
           $footer.push(h('span', "\xA0"));
         }
 
@@ -18664,7 +18947,7 @@
       return h(BVFormBtnLabelControl, {
         ref: 'control',
         staticClass: 'b-form-timepicker',
-        props: _objectSpread2({}, this.$props, {
+        props: _objectSpread2(_objectSpread2({}, this.$props), {}, {
           // Overridden / computed props
           id: this.safeId(),
           rtl: this.isRTL,
@@ -18699,7 +18982,7 @@
     }
   });
 
-  var props$z = {
+  var props$A = {
     tag: {
       type: String,
       default: 'div'
@@ -18709,7 +18992,7 @@
   var BInputGroupText = /*#__PURE__*/Vue.extend({
     name: 'BInputGroupText',
     functional: true,
-    props: props$z,
+    props: props$A,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -18738,7 +19021,7 @@
   var BInputGroupAddon = /*#__PURE__*/Vue.extend({
     name: 'BInputGroupAddon',
     functional: true,
-    props: _objectSpread2({}, commonProps$1, {
+    props: _objectSpread2(_objectSpread2({}, commonProps$1), {}, {
       append: {
         type: Boolean,
         default: false
@@ -18760,6 +19043,23 @@
     }
   });
 
+  var BInputGroupAppend = /*#__PURE__*/Vue.extend({
+    name: 'BInputGroupAppend',
+    functional: true,
+    props: commonProps$1,
+    render: function render(h, _ref) {
+      var props = _ref.props,
+          data = _ref.data,
+          children = _ref.children;
+      // Pass all our data down to child, and set `append` to `true`
+      return h(BInputGroupAddon, a(data, {
+        props: _objectSpread2(_objectSpread2({}, props), {}, {
+          append: true
+        })
+      }), children);
+    }
+  });
+
   var BInputGroupPrepend = /*#__PURE__*/Vue.extend({
     name: 'BInputGroupPrepend',
     functional: true,
@@ -18770,39 +19070,23 @@
           children = _ref.children;
       // pass all our props/attrs down to child, and set`append` to false
       return h(BInputGroupAddon, a(data, {
-        props: _objectSpread2({}, props, {
+        props: _objectSpread2(_objectSpread2({}, props), {}, {
           append: false
         })
       }), children);
     }
   });
 
-  var BInputGroupAppend = /*#__PURE__*/Vue.extend({
-    name: 'BInputGroupAppend',
-    functional: true,
-    props: commonProps$1,
-    render: function render(h, _ref) {
-      var props = _ref.props,
-          data = _ref.data,
-          children = _ref.children;
-      // pass all our props/attrs down to child, and set`append` to true
-      return h(BInputGroupAddon, a(data, {
-        props: _objectSpread2({}, props, {
-          append: true
-        })
-      }), children);
-    }
-  });
+  var NAME$r = 'BInputGroup'; // --- Props ---
 
-  var NAME$p = 'BInputGroup';
-  var props$A = {
+  var props$B = {
     id: {
       type: String
     },
     size: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$p, 'size');
+        return getComponentConfig(NAME$r, 'size');
       }
     },
     prepend: {
@@ -18821,57 +19105,52 @@
       type: String,
       default: 'div'
     }
-  }; // @vue/component
+  }; // --- Main component ---
+  // @vue/component
 
   var BInputGroup = /*#__PURE__*/Vue.extend({
-    name: NAME$p,
+    name: NAME$r,
     functional: true,
-    props: props$A,
+    props: props$B,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           slots = _ref.slots,
           scopedSlots = _ref.scopedSlots;
-      var $slots = slots();
+      var prepend = props.prepend,
+          prependHtml = props.prependHtml,
+          append = props.append,
+          appendHtml = props.appendHtml,
+          size = props.size;
       var $scopedSlots = scopedSlots || {};
-      var childNodes = []; // Prepend prop/slot
+      var $slots = slots();
+      var slotScope = {};
+      var $prepend = h();
+      var hasPrependSlot = hasNormalizedSlot('prepend', $scopedSlots, $slots);
 
-      if (props.prepend || props.prependHtml || hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
-        childNodes.push(h(BInputGroupPrepend, [// Prop
-        props.prepend || props.prependHtml ? h(BInputGroupText, {
-          domProps: htmlOrText(props.prependHtml, props.prepend)
-        }) : h(), // Slot
-        normalizeSlot('prepend', {}, $scopedSlots, $slots) || h()]));
-      } else {
-        childNodes.push(h());
-      } // Default slot
+      if (hasPrependSlot || prepend || prependHtml) {
+        $prepend = h(BInputGroupPrepend, [hasPrependSlot ? normalizeSlot('prepend', slotScope, $scopedSlots, $slots) : h(BInputGroupText, {
+          domProps: htmlOrText(prependHtml, prepend)
+        })]);
+      }
 
+      var $append = h();
+      var hasAppendSlot = hasNormalizedSlot('append', $scopedSlots, $slots);
 
-      if (hasNormalizedSlot('default', $scopedSlots, $slots)) {
-        childNodes.push.apply(childNodes, _toConsumableArray(normalizeSlot('default', {}, $scopedSlots, $slots)));
-      } else {
-        childNodes.push(h());
-      } // Append prop
-
-
-      if (props.append || props.appendHtml || hasNormalizedSlot('append', $scopedSlots, $slots)) {
-        childNodes.push(h(BInputGroupAppend, [// prop
-        props.append || props.appendHtml ? h(BInputGroupText, {
-          domProps: htmlOrText(props.appendHtml, props.append)
-        }) : h(), // Slot
-        normalizeSlot('append', {}, $scopedSlots, $slots) || h()]));
-      } else {
-        childNodes.push(h());
+      if (hasAppendSlot || append || appendHtml) {
+        $append = h(BInputGroupAppend, [hasAppendSlot ? normalizeSlot('append', slotScope, $scopedSlots, $slots) : h(BInputGroupText, {
+          domProps: htmlOrText(appendHtml, append)
+        })]);
       }
 
       return h(props.tag, a(data, {
         staticClass: 'input-group',
-        class: _defineProperty({}, "input-group-".concat(props.size), props.size),
+        class: _defineProperty({}, "input-group-".concat(size), size),
         attrs: {
           id: props.id || null,
           role: 'group'
         }
-      }), childNodes);
+      }), [$prepend, normalizeSlot('default', slotScope, $scopedSlots, $slots), $append]);
     }
   });
 
@@ -18885,7 +19164,7 @@
     }
   });
 
-  var props$B = {
+  var props$C = {
     tag: {
       type: String,
       default: 'div'
@@ -18900,7 +19179,7 @@
   var BContainer = /*#__PURE__*/Vue.extend({
     name: 'BContainer',
     functional: true,
-    props: props$B,
+    props: props$C,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -18914,8 +19193,9 @@
     }
   });
 
-  var NAME$q = 'BJumbotron';
-  var props$C = {
+  var NAME$s = 'BJumbotron'; // --- Props ---
+
+  var props$D = {
     fluid: {
       type: Boolean,
       default: false
@@ -18959,27 +19239,28 @@
     bgVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$q, 'bgVariant');
+        return getComponentConfig(NAME$s, 'bgVariant');
       }
     },
     borderVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$q, 'borderVariant');
+        return getComponentConfig(NAME$s, 'borderVariant');
       }
     },
     textVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$q, 'textVariant');
+        return getComponentConfig(NAME$s, 'textVariant');
       }
     }
-  }; // @vue/component
+  }; // --- Main component ---
+  // @vue/component
 
   var BJumbotron = /*#__PURE__*/Vue.extend({
-    name: NAME$q,
+    name: NAME$s,
     functional: true,
-    props: props$C,
+    props: props$D,
     render: function render(h, _ref) {
       var _class2;
 
@@ -18987,47 +19268,53 @@
           data = _ref.data,
           slots = _ref.slots,
           scopedSlots = _ref.scopedSlots;
-      // The order of the conditionals matter.
-      // We are building the component markup in order.
-      var childNodes = [];
+      var header = props.header,
+          headerHtml = props.headerHtml,
+          lead = props.lead,
+          leadHtml = props.leadHtml,
+          textVariant = props.textVariant,
+          bgVariant = props.bgVariant,
+          borderVariant = props.borderVariant;
+      var $scopedSlots = scopedSlots || {};
       var $slots = slots();
-      var $scopedSlots = scopedSlots || {}; // Header
+      var slotScope = {};
+      var $header = h();
+      var hasHeaderSlot = hasNormalizedSlot('header', $scopedSlots, $slots);
 
-      if (props.header || hasNormalizedSlot('header', $scopedSlots, $slots) || props.headerHtml) {
-        childNodes.push(h(props.headerTag, {
-          class: _defineProperty({}, "display-".concat(props.headerLevel), props.headerLevel)
-        }, normalizeSlot('header', {}, $scopedSlots, $slots) || props.headerHtml || stripTags(props.header)));
-      } // Lead
+      if (hasHeaderSlot || header || headerHtml) {
+        var headerLevel = props.headerLevel;
+        $header = h(props.headerTag, {
+          class: _defineProperty({}, "display-".concat(headerLevel), headerLevel),
+          domProps: hasHeaderSlot ? {} : htmlOrText(headerHtml, header)
+        }, normalizeSlot('header', slotScope, $scopedSlots, $slots));
+      }
 
+      var $lead = h();
+      var hasLeadSlot = hasNormalizedSlot('lead', $scopedSlots, $slots);
 
-      if (props.lead || hasNormalizedSlot('lead', $scopedSlots, $slots) || props.leadHtml) {
-        childNodes.push(h(props.leadTag, {
-          staticClass: 'lead'
-        }, normalizeSlot('lead', {}, $scopedSlots, $slots) || props.leadHtml || stripTags(props.lead)));
-      } // Default slot
+      if (hasLeadSlot || lead || leadHtml) {
+        $lead = h(props.leadTag, {
+          staticClass: 'lead',
+          domProps: hasLeadSlot ? {} : htmlOrText(leadHtml, lead)
+        }, normalizeSlot('lead', slotScope, $scopedSlots, $slots));
+      }
 
-
-      if (hasNormalizedSlot('default', $scopedSlots, $slots)) {
-        childNodes.push(normalizeSlot('default', {}, $scopedSlots, $slots));
-      } // If fluid, wrap content in a container/container-fluid
-
+      var $children = [$header, $lead, normalizeSlot('default', slotScope, $scopedSlots, $slots)]; // If fluid, wrap content in a container
 
       if (props.fluid) {
-        // Children become a child of a container
-        childNodes = [h(BContainer, {
+        $children = [h(BContainer, {
           props: {
             fluid: props.containerFluid
           }
-        }, childNodes)];
-      } // Return the jumbotron
-
+        }, $children)];
+      }
 
       return h(props.tag, a(data, {
         staticClass: 'jumbotron',
         class: (_class2 = {
           'jumbotron-fluid': props.fluid
-        }, _defineProperty(_class2, "text-".concat(props.textVariant), props.textVariant), _defineProperty(_class2, "bg-".concat(props.bgVariant), props.bgVariant), _defineProperty(_class2, "border-".concat(props.borderVariant), props.borderVariant), _defineProperty(_class2, "border", props.borderVariant), _class2)
-      }), childNodes);
+        }, _defineProperty(_class2, "text-".concat(textVariant), textVariant), _defineProperty(_class2, "bg-".concat(bgVariant), bgVariant), _defineProperty(_class2, "border-".concat(borderVariant), borderVariant), _defineProperty(_class2, "border", borderVariant), _class2)
+      }), $children);
     }
   });
 
@@ -19086,21 +19373,21 @@
         type: String,
         default: null,
         validator: function validator(str) {
-          return arrayIncludes(COMMON_ALIGNMENT.concat(['baseline', 'stretch']), str);
+          return arrayIncludes(concat(COMMON_ALIGNMENT, 'baseline', 'stretch'), str);
         }
       },
       alignH: {
         type: String,
         default: null,
         validator: function validator(str) {
-          return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around']), str);
+          return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around'), str);
         }
       },
       alignContent: {
         type: String,
         default: null,
         validator: function validator(str) {
-          return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around', 'stretch']), str);
+          return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around', 'stretch'), str);
         }
       }
     }, rowColsProps);
@@ -19162,7 +19449,7 @@
     }
   });
 
-  var props$D = {
+  var props$E = {
     tag: {
       type: String,
       default: 'div'
@@ -19180,7 +19467,7 @@
   var BListGroup = /*#__PURE__*/Vue.extend({
     name: 'BListGroup',
     functional: true,
-    props: props$D,
+    props: props$E,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19198,12 +19485,13 @@
     }
   });
 
-  var NAME$r = 'BListGroupItem';
-  var actionTags = ['a', 'router-link', 'button', 'b-link'];
-  var linkProps$3 = propsFactory();
+  var NAME$t = 'BListGroupItem';
+  var actionTags = ['a', 'router-link', 'button', 'b-link']; // --- Props ---
+
+  var linkProps$3 = omit(props$1, ['event', 'routerTag']);
   delete linkProps$3.href.default;
   delete linkProps$3.to.default;
-  var props$E = _objectSpread2({
+  var props$F = _objectSpread2({
     tag: {
       type: String,
       default: 'div'
@@ -19219,27 +19507,33 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$r, 'variant');
+        return getComponentConfig(NAME$t, 'variant');
       }
     }
-  }, linkProps$3); // @vue/component
+  }, linkProps$3); // --- Main component ---
+  // @vue/component
 
   var BListGroupItem = /*#__PURE__*/Vue.extend({
-    name: NAME$r,
+    name: NAME$t,
     functional: true,
-    props: props$E,
+    props: props$F,
     render: function render(h, _ref) {
       var _class;
 
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      var tag = props.button ? 'button' : !props.href && !props.to ? props.tag : BLink;
-      var isAction = Boolean(props.href || props.to || props.action || props.button || arrayIncludes(actionTags, props.tag));
+      var button = props.button,
+          variant = props.variant,
+          active = props.active,
+          disabled = props.disabled;
+      var link = isLink(props);
+      var tag = button ? 'button' : !link ? props.tag : BLink;
+      var action = !!(props.action || link || button || arrayIncludes(actionTags, props.tag));
       var attrs = {};
       var itemProps = {};
 
-      if (tag === 'button') {
+      if (isTag(tag, 'button')) {
         if (!data.attrs || !data.attrs.type) {
           // Add a type for button is one not provided in passed attributes
           attrs.type = 'button';
@@ -19253,13 +19547,12 @@
         itemProps = pluckProps(linkProps$3, props);
       }
 
-      var componentData = {
+      return h(tag, a(data, {
         attrs: attrs,
         props: itemProps,
         staticClass: 'list-group-item',
-        class: (_class = {}, _defineProperty(_class, "list-group-item-".concat(props.variant), props.variant), _defineProperty(_class, 'list-group-item-action', isAction), _defineProperty(_class, "active", props.active), _defineProperty(_class, "disabled", props.disabled), _class)
-      };
-      return h(tag, a(data, componentData), children);
+        class: (_class = {}, _defineProperty(_class, "list-group-item-".concat(variant), variant), _defineProperty(_class, 'list-group-item-action', action), _defineProperty(_class, "active", active), _defineProperty(_class, "disabled", disabled), _class)
+      }), children);
     }
   });
 
@@ -19270,7 +19563,7 @@
     }
   });
 
-  var props$F = {
+  var props$G = {
     tag: {
       type: String,
       default: 'div'
@@ -19280,7 +19573,7 @@
   var BMediaBody = /*#__PURE__*/Vue.extend({
     name: 'BMediaBody',
     functional: true,
-    props: props$F,
+    props: props$G,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19291,7 +19584,7 @@
     }
   });
 
-  var props$G = {
+  var props$H = {
     tag: {
       type: String,
       default: 'div'
@@ -19305,7 +19598,7 @@
   var BMediaAside = /*#__PURE__*/Vue.extend({
     name: 'BMediaAside',
     functional: true,
-    props: props$G,
+    props: props$H,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19320,7 +19613,7 @@
     }
   });
 
-  var props$H = {
+  var props$I = {
     tag: {
       type: String,
       default: 'div'
@@ -19342,7 +19635,7 @@
   var BMedia = /*#__PURE__*/Vue.extend({
     name: 'BMedia',
     functional: true,
-    props: props$H,
+    props: props$I,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19472,8 +19765,9 @@
       }
     },
     created: function created() {
-      this._bv_defaultFn = null;
-      this._bv_target = null;
+      // Create private non-reactive props
+      this.$_defaultFn = null;
+      this.$_target = null;
     },
     beforeMount: function beforeMount() {
       this.mountTarget();
@@ -19489,7 +19783,7 @@
     },
     beforeDestroy: function beforeDestroy() {
       this.unmountTarget();
-      this._bv_defaultFn = null;
+      this.$_defaultFn = null;
     },
     methods: {
       // Get the element which the target should be appended to
@@ -19504,13 +19798,13 @@
       },
       // Mount the target
       mountTarget: function mountTarget() {
-        if (!this._bv_target) {
+        if (!this.$_target) {
           var container = this.getContainer();
 
           if (container) {
             var el = document.createElement('div');
             container.appendChild(el);
-            this._bv_target = new BTransporterTargetSingle({
+            this.$_target = new BTransporterTargetSingle({
               el: el,
               parent: this,
               propsData: {
@@ -19523,33 +19817,30 @@
       },
       // Update the content of the target
       updateTarget: function updateTarget() {
-        if (isBrowser && this._bv_target) {
+        if (isBrowser && this.$_target) {
           var defaultFn = this.$scopedSlots.default;
 
           if (!this.disabled) {
             /* istanbul ignore else: only applicable in Vue 2.5.x */
-            if (defaultFn && this._bv_defaultFn !== defaultFn) {
+            if (defaultFn && this.$_defaultFn !== defaultFn) {
               // We only update the target component if the scoped slot
               // function is a fresh one. The new slot syntax (since Vue 2.6)
               // can cache unchanged slot functions and we want to respect that here
-              this._bv_target.updatedNodes = defaultFn;
+              this.$_target.updatedNodes = defaultFn;
             } else if (!defaultFn) {
               // We also need to be back compatible with non-scoped default slot (i.e. 2.5.x)
-              this._bv_target.updatedNodes = this.$slots.default;
+              this.$_target.updatedNodes = this.$slots.default;
             }
           } // Update the scoped slot function cache
 
 
-          this._bv_defaultFn = defaultFn;
+          this.$_defaultFn = defaultFn;
         }
       },
       // Unmount the target
       unmountTarget: function unmountTarget() {
-        if (this._bv_target) {
-          this._bv_target.$destroy();
-
-          this._bv_target = null;
-        }
+        this.$_target && this.$_target.$destroy();
+        this.$_target = null;
       }
     },
     render: function render(h) {
@@ -19939,7 +20230,7 @@
     _createClass(BvModalEvent, null, [{
       key: "Defaults",
       get: function get() {
-        return _objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this), {
+        return _objectSpread2(_objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this)), {}, {
           trigger: null
         });
       }
@@ -19948,7 +20239,7 @@
     return BvModalEvent;
   }(BvEvent); // Named exports
 
-  var NAME$s = 'BModal'; // ObserveDom config to detect changes in modal content
+  var NAME$u = 'BModal'; // ObserveDom config to detect changes in modal content
   // so that we can adjust the modal padding if needed
 
   var OBSERVER_CONFIG = {
@@ -19957,26 +20248,13 @@
     characterData: true,
     attributes: true,
     attributeFilter: ['style', 'class']
-  }; // --- Utility methods ---
-  // Attempt to focus an element, and return true if successful
-
-  var attemptFocus = function attemptFocus(el) {
-    if (el && isVisible(el) && el.focus) {
-      try {
-        el.focus();
-      } catch (_unused) {}
-    } // If the element has focus, then return true
-
-
-    return document.activeElement === el;
   }; // --- Props ---
 
-
-  var props$I = {
+  var props$J = {
     size: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'size');
+        return getComponentConfig(NAME$u, 'size');
       }
     },
     centered: {
@@ -20025,7 +20303,7 @@
     titleTag: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'titleTag');
+        return getComponentConfig(NAME$u, 'titleTag');
       }
     },
     titleClass: {
@@ -20043,25 +20321,25 @@
     headerBgVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'headerBgVariant');
+        return getComponentConfig(NAME$u, 'headerBgVariant');
       }
     },
     headerBorderVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'headerBorderVariant');
+        return getComponentConfig(NAME$u, 'headerBorderVariant');
       }
     },
     headerTextVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'headerTextVariant');
+        return getComponentConfig(NAME$u, 'headerTextVariant');
       }
     },
     headerCloseVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'headerCloseVariant');
+        return getComponentConfig(NAME$u, 'headerCloseVariant');
       }
     },
     headerClass: {
@@ -20071,13 +20349,13 @@
     bodyBgVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'bodyBgVariant');
+        return getComponentConfig(NAME$u, 'bodyBgVariant');
       }
     },
     bodyTextVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'bodyTextVariant');
+        return getComponentConfig(NAME$u, 'bodyTextVariant');
       }
     },
     modalClass: {
@@ -20099,19 +20377,19 @@
     footerBgVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'footerBgVariant');
+        return getComponentConfig(NAME$u, 'footerBgVariant');
       }
     },
     footerBorderVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'footerBorderVariant');
+        return getComponentConfig(NAME$u, 'footerBorderVariant');
       }
     },
     footerTextVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'footerTextVariant');
+        return getComponentConfig(NAME$u, 'footerTextVariant');
       }
     },
     footerClass: {
@@ -20162,19 +20440,19 @@
     headerCloseContent: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'headerCloseContent');
+        return getComponentConfig(NAME$u, 'headerCloseContent');
       }
     },
     headerCloseLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'headerCloseLabel');
+        return getComponentConfig(NAME$u, 'headerCloseLabel');
       }
     },
     cancelTitle: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'cancelTitle');
+        return getComponentConfig(NAME$u, 'cancelTitle');
       }
     },
     cancelTitleHtml: {
@@ -20183,7 +20461,7 @@
     okTitle: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'okTitle');
+        return getComponentConfig(NAME$u, 'okTitle');
       }
     },
     okTitleHtml: {
@@ -20192,13 +20470,13 @@
     cancelVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'cancelVariant');
+        return getComponentConfig(NAME$u, 'cancelVariant');
       }
     },
     okVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$s, 'okVariant');
+        return getComponentConfig(NAME$u, 'okVariant');
       }
     },
     lazy: {
@@ -20226,14 +20504,14 @@
   }; // @vue/component
 
   var BModal = /*#__PURE__*/Vue.extend({
-    name: NAME$s,
-    mixins: [idMixin, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
+    name: NAME$u,
+    mixins: [attrsMixin, idMixin, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
     inheritAttrs: false,
     model: {
       prop: 'visible',
       event: 'change'
     },
-    props: props$I,
+    props: props$J,
     data: function data() {
       return {
         isHidden: true,
@@ -20262,6 +20540,30 @@
       };
     },
     computed: {
+      modalId: function modalId() {
+        return this.safeId();
+      },
+      modalOuterId: function modalOuterId() {
+        return this.safeId('__BV_modal_outer_');
+      },
+      modalHeaderId: function modalHeaderId() {
+        return this.safeId('__BV_modal_header_');
+      },
+      modalBodyId: function modalBodyId() {
+        return this.safeId('__BV_modal_body_');
+      },
+      modalTitleId: function modalTitleId() {
+        return this.safeId('__BV_modal_title_');
+      },
+      modalContentId: function modalContentId() {
+        return this.safeId('__BV_modal_content_');
+      },
+      modalFooterId: function modalFooterId() {
+        return this.safeId('__BV_modal_footer_');
+      },
+      modalBackdropId: function modalBackdropId() {
+        return this.safeId('__BV_modal_backdrop_');
+      },
       modalClasses: function modalClasses() {
         return [{
           fade: !this.noFade,
@@ -20322,6 +20624,28 @@
       computeIgnoreEnforceFocusSelector: function computeIgnoreEnforceFocusSelector() {
         // Normalize to an single selector with selectors separated by `,`
         return concat(this.ignoreEnforceFocusSelector).filter(identity).join(',').trim();
+      },
+      computedAttrs: function computedAttrs() {
+        // If the parent has a scoped style attribute, and the modal
+        // is portalled, add the scoped attribute to the modal wrapper
+        var scopedStyleAttrs = !this.static ? this.scopedStyleAttrs : {};
+        return _objectSpread2(_objectSpread2(_objectSpread2({}, scopedStyleAttrs), this.bvAttrs), {}, {
+          id: this.modalOuterId
+        });
+      },
+      computedModalAttrs: function computedModalAttrs() {
+        var isVisible = this.isVisible,
+            ariaLabel = this.ariaLabel;
+        return {
+          id: this.modalId,
+          role: 'dialog',
+          'aria-hidden': isVisible ? null : 'true',
+          'aria-modal': isVisible ? 'true' : null,
+          'aria-label': ariaLabel,
+          'aria-labelledby': this.hideHeader || ariaLabel || // TODO: Rename slot to `title` and deprecate `modal-title`
+          !(this.hasNormalizedSlot('modal-title') || this.titleHtml || this.title) ? null : this.modalTitleId,
+          'aria-describedby': this.modalBodyId
+        };
       }
     },
     watch: {
@@ -20333,7 +20657,7 @@
     },
     created: function created() {
       // Define non-reactive properties
-      this._observer = null;
+      this.$_observer = null;
     },
     mounted: function mounted() {
       // Set initial z-index as queried from the DOM
@@ -20353,11 +20677,7 @@
     },
     beforeDestroy: function beforeDestroy() {
       // Ensure everything is back to normal
-      if (this._observer) {
-        this._observer.disconnect();
-
-        this._observer = null;
-      }
+      this.setObserver(false);
 
       if (this.isVisible) {
         this.isVisible = false;
@@ -20366,6 +20686,15 @@
       }
     },
     methods: {
+      setObserver: function setObserver() {
+        var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        this.$_observer && this.$_observer.disconnect();
+        this.$_observer = null;
+
+        if (on) {
+          this.$_observer = observeDom(this.$refs.content, this.checkModalOverflow.bind(this), OBSERVER_CONFIG);
+        }
+      },
       // Private method to update the v-model
       updateModel: function updateModel(val) {
         if (val !== this.visible) {
@@ -20375,16 +20704,16 @@
       // Private method to create a BvModalEvent object
       buildEvent: function buildEvent(type) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        return new BvModalEvent(type, _objectSpread2({
+        return new BvModalEvent(type, _objectSpread2(_objectSpread2({
           // Default options
           cancelable: false,
           target: this.$refs.modal || this.$el || null,
           relatedTarget: null,
           trigger: null
-        }, options, {
+        }, options), {}, {
           // Options that can't be overridden
           vueTarget: this,
-          componentId: this.safeId()
+          componentId: this.modalId
         }));
       },
       // Public method to show modal
@@ -20459,12 +20788,7 @@
         } // Stop observing for content changes
 
 
-        if (this._observer) {
-          this._observer.disconnect();
-
-          this._observer = null;
-        } // Trigger the hide transition
-
+        this.setObserver(false); // Trigger the hide transition
 
         this.isVisible = false; // Update the v-model
 
@@ -20483,24 +20807,19 @@
         }
       },
       // Private method to get the current document active element
-      getActiveElement: function getActiveElement() {
-        if (isBrowser) {
-          var activeElement = document.activeElement; // Note: On IE 11, `document.activeElement` may be null.
-          // So we test it for truthiness first.
-          // https://github.com/bootstrap-vue/bootstrap-vue/issues/3206
-          // Returning focus to document.body may cause unwanted scrolls, so we
-          // exclude setting focus on body
+      getActiveElement: function getActiveElement$1() {
+        // Returning focus to `document.body` may cause unwanted scrolls,
+        // so we exclude setting focus on body
+        var activeElement = getActiveElement(isBrowser ? [document.body] : []); // Preset the fallback return focus value if it is not set
+        // `document.activeElement` should be the trigger element that was clicked or
+        // in the case of using the v-model, which ever element has current focus
+        // Will be overridden by some commands such as toggle, etc.
+        // Note: On IE 11, `document.activeElement` may be `null`
+        // So we test it for truthiness first
+        // https://github.com/bootstrap-vue/bootstrap-vue/issues/3206
 
-          if (activeElement && activeElement !== document.body && activeElement.focus) {
-            // Preset the fallback return focus value if it is not set
-            // `document.activeElement` should be the trigger element that was clicked or
-            // in the case of using the v-model, which ever element has current focus
-            // Will be overridden by some commands such as toggle, etc.
-            return activeElement;
-          }
-        }
 
-        return null;
+        return activeElement && activeElement.focus ? activeElement : null;
       },
       // Private method to finish showing modal
       doShow: function doShow() {
@@ -20525,9 +20844,9 @@
           _this.updateModel(true);
 
           _this.$nextTick(function () {
-            // In a nextTick in case modal content is lazy
             // Observe changes in modal content and adjust if necessary
-            _this._observer = observeDom(_this.$refs.content, _this.checkModalOverflow.bind(_this), OBSERVER_CONFIG);
+            // In a `$nextTick()` in case modal content is lazy
+            _this.setObserver(true);
           });
         });
       },
@@ -20689,7 +21008,7 @@
         } // Otherwise focus the modal content container
 
 
-        content.focus({
+        attemptFocus(content, {
           preventScroll: true
         });
       },
@@ -20704,18 +21023,18 @@
       },
       // Root listener handlers
       showHandler: function showHandler(id, triggerEl) {
-        if (id === this.safeId()) {
+        if (id === this.modalId) {
           this.return_focus = triggerEl || this.getActiveElement();
           this.show();
         }
       },
       hideHandler: function hideHandler(id) {
-        if (id === this.safeId()) {
+        if (id === this.modalId) {
           this.hide('event');
         }
       },
       toggleHandler: function toggleHandler(id, triggerEl) {
-        if (id === this.safeId()) {
+        if (id === this.modalId) {
           this.toggle(triggerEl);
         }
       },
@@ -20784,18 +21103,17 @@
       },
       makeModal: function makeModal(h) {
         // Modal header
-        var header = h();
+        var $header = h();
 
         if (!this.hideHeader) {
           // TODO: Rename slot to `header` and deprecate `modal-header`
-          var modalHeader = this.normalizeSlot('modal-header', this.slotScope);
+          var $modalHeader = this.normalizeSlot('modal-header', this.slotScope);
 
-          if (!modalHeader) {
-            var closeButton = h();
+          if (!$modalHeader) {
+            var $closeButton = h();
 
             if (!this.hideHeaderClose) {
-              closeButton = h(BButtonClose, {
-                ref: 'close-button',
+              $closeButton = h(BButtonClose, {
                 props: {
                   content: this.headerCloseContent,
                   disabled: this.isTransitioning,
@@ -20804,129 +21122,120 @@
                 },
                 on: {
                   click: this.onClose
-                }
+                },
+                ref: 'close-button'
               }, // TODO: Rename slot to `header-close` and deprecate `modal-header-close`
               [this.normalizeSlot('modal-header-close')]);
             }
 
-            var domProps = // TODO: Rename slot to `title` and deprecate `modal-title`
-            !this.hasNormalizedSlot('modal-title') && this.titleHtml ? {
-              innerHTML: this.titleHtml
-            } : {};
-            modalHeader = [h(this.titleTag, {
+            $modalHeader = [h(this.titleTag, {
               staticClass: 'modal-title',
               class: this.titleClasses,
               attrs: {
-                id: this.safeId('__BV_modal_title_')
+                id: this.modalTitleId
               },
-              domProps: domProps
+              // TODO: Rename slot to `title` and deprecate `modal-title`
+              domProps: this.hasNormalizedSlot('modal-title') ? {} : htmlOrText(this.titleHtml, this.title)
             }, // TODO: Rename slot to `title` and deprecate `modal-title`
-            [this.normalizeSlot('modal-title', this.slotScope) || stripTags(this.title)]), closeButton];
+            [this.normalizeSlot('modal-title', this.slotScope)]), $closeButton];
           }
 
-          header = h('header', {
-            ref: 'header',
+          $header = h('header', {
             staticClass: 'modal-header',
             class: this.headerClasses,
             attrs: {
-              id: this.safeId('__BV_modal_header_')
-            }
-          }, [modalHeader]);
+              id: this.modalHeaderId
+            },
+            ref: 'header'
+          }, [$modalHeader]);
         } // Modal body
 
 
-        var body = h('div', {
-          ref: 'body',
+        var $body = h('div', {
           staticClass: 'modal-body',
           class: this.bodyClasses,
           attrs: {
-            id: this.safeId('__BV_modal_body_')
-          }
+            id: this.modalBodyId
+          },
+          ref: 'body'
         }, this.normalizeSlot('default', this.slotScope)); // Modal footer
 
-        var footer = h();
+        var $footer = h();
 
         if (!this.hideFooter) {
           // TODO: Rename slot to `footer` and deprecate `modal-footer`
-          var modalFooter = this.normalizeSlot('modal-footer', this.slotScope);
+          var $modalFooter = this.normalizeSlot('modal-footer', this.slotScope);
 
-          if (!modalFooter) {
-            var cancelButton = h();
+          if (!$modalFooter) {
+            var $cancelButton = h();
 
             if (!this.okOnly) {
-              var cancelHtml = this.cancelTitleHtml ? {
-                innerHTML: this.cancelTitleHtml
-              } : null;
-              cancelButton = h(BButton, {
-                ref: 'cancel-button',
+              $cancelButton = h(BButton, {
                 props: {
                   variant: this.cancelVariant,
                   size: this.buttonSize,
                   disabled: this.cancelDisabled || this.busy || this.isTransitioning
                 },
+                // TODO: Rename slot to `cancel-button` and deprecate `modal-cancel`
+                domProps: this.hasNormalizedSlot('modal-cancel') ? {} : htmlOrText(this.cancelTitleHtml, this.cancelTitle),
                 on: {
                   click: this.onCancel
-                }
-              }, [// TODO: Rename slot to `cancel-button` and deprecate `modal-cancel`
-              this.normalizeSlot('modal-cancel') || (cancelHtml ? h('span', {
-                domProps: cancelHtml
-              }) : stripTags(this.cancelTitle))]);
+                },
+                ref: 'cancel-button'
+              }, // TODO: Rename slot to `cancel-button` and deprecate `modal-cancel`
+              this.normalizeSlot('modal-cancel'));
             }
 
-            var okHtml = this.okTitleHtml ? {
-              innerHTML: this.okTitleHtml
-            } : null;
-            var okButton = h(BButton, {
-              ref: 'ok-button',
+            var $okButton = h(BButton, {
               props: {
                 variant: this.okVariant,
                 size: this.buttonSize,
                 disabled: this.okDisabled || this.busy || this.isTransitioning
               },
+              // TODO: Rename slot to `ok-button` and deprecate `modal-ok`
+              domProps: this.hasNormalizedSlot('modal-ok') ? {} : htmlOrText(this.okTitleHtml, this.okTitle),
               on: {
                 click: this.onOk
-              }
-            }, [// TODO: Rename slot to `ok-button` and deprecate `modal-ok`
-            this.normalizeSlot('modal-ok') || (okHtml ? h('span', {
-              domProps: okHtml
-            }) : stripTags(this.okTitle))]);
-            modalFooter = [cancelButton, okButton];
+              },
+              ref: 'ok-button'
+            }, // TODO: Rename slot to `ok-button` and deprecate `modal-ok`
+            this.normalizeSlot('modal-ok'));
+            $modalFooter = [$cancelButton, $okButton];
           }
 
-          footer = h('footer', {
-            ref: 'footer',
+          $footer = h('footer', {
             staticClass: 'modal-footer',
             class: this.footerClasses,
             attrs: {
-              id: this.safeId('__BV_modal_footer_')
-            }
-          }, [modalFooter]);
+              id: this.modalFooterId
+            },
+            ref: 'footer'
+          }, [$modalFooter]);
         } // Assemble modal content
 
 
-        var modalContent = h('div', {
-          ref: 'content',
+        var $modalContent = h('div', {
           staticClass: 'modal-content',
           class: this.contentClass,
           attrs: {
-            role: 'document',
-            id: this.safeId('__BV_modal_content_'),
+            id: this.modalContentId,
             tabindex: '-1'
-          }
-        }, [header, body, footer]); // Tab trap to prevent page from scrolling to next element in
-        // tab index during enforce focus tab cycle
+          },
+          ref: 'content'
+        }, [$header, $body, $footer]); // Tab traps to prevent page from scrolling to next element in
+        // tab index during enforce-focus tab cycle
 
-        var tabTrapTop = h();
-        var tabTrapBottom = h();
+        var $tabTrapTop = h();
+        var $tabTrapBottom = h();
 
         if (this.isVisible && !this.noEnforceFocus) {
-          tabTrapTop = h('span', {
+          $tabTrapTop = h('span', {
             ref: 'topTrap',
             attrs: {
               tabindex: '0'
             }
           });
-          tabTrapBottom = h('span', {
+          $tabTrapBottom = h('span', {
             ref: 'bottomTrap',
             attrs: {
               tabindex: '0'
@@ -20935,46 +21244,35 @@
         } // Modal dialog wrapper
 
 
-        var modalDialog = h('div', {
-          ref: 'dialog',
+        var $modalDialog = h('div', {
           staticClass: 'modal-dialog',
           class: this.dialogClasses,
           on: {
             mousedown: this.onDialogMousedown
-          }
-        }, [tabTrapTop, modalContent, tabTrapBottom]); // Modal
+          },
+          ref: 'dialog'
+        }, [$tabTrapTop, $modalContent, $tabTrapBottom]); // Modal
 
-        var modal = h('div', {
-          ref: 'modal',
+        var $modal = h('div', {
           staticClass: 'modal',
           class: this.modalClasses,
           style: this.modalStyles,
-          directives: [{
-            name: 'show',
-            rawName: 'v-show',
-            value: this.isVisible,
-            expression: 'isVisible'
-          }],
-          attrs: {
-            id: this.safeId(),
-            role: 'dialog',
-            'aria-hidden': this.isVisible ? null : 'true',
-            'aria-modal': this.isVisible ? 'true' : null,
-            'aria-label': this.ariaLabel,
-            'aria-labelledby': this.hideHeader || this.ariaLabel || // TODO: Rename slot to `title` and deprecate `modal-title`
-            !(this.hasNormalizedSlot('modal-title') || this.titleHtml || this.title) ? null : this.safeId('__BV_modal_title_'),
-            'aria-describedby': this.safeId('__BV_modal_body_')
-          },
+          attrs: this.computedModalAttrs,
           on: {
             keydown: this.onEsc,
             click: this.onClickOut
-          }
-        }, [modalDialog]); // Wrap modal in transition
-        // Sadly, we can't use BVTransition here due to the differences in
-        // transition durations for .modal and .modal-dialog. Not until
-        // issue https://github.com/vuejs/vue/issues/9986 is resolved
+          },
+          directives: [{
+            name: 'show',
+            value: this.isVisible
+          }],
+          ref: 'modal'
+        }, [$modalDialog]); // Wrap modal in transition
+        // Sadly, we can't use `BVTransition` here due to the differences in
+        // transition durations for `.modal` and `.modal-dialog`
+        // At least until https://github.com/vuejs/vue/issues/9986 is resolved
 
-        modal = h('transition', {
+        $modal = h('transition', {
           props: {
             enterClass: '',
             enterToClass: '',
@@ -20991,36 +21289,31 @@
             leave: this.onLeave,
             afterLeave: this.onAfterLeave
           }
-        }, [modal]); // Modal backdrop
+        }, [$modal]); // Modal backdrop
 
-        var backdrop = h();
+        var $backdrop = h();
 
         if (!this.hideBackdrop && this.isVisible) {
-          backdrop = h('div', {
+          $backdrop = h('div', {
             staticClass: 'modal-backdrop',
             attrs: {
-              id: this.safeId('__BV_modal_backdrop_')
+              id: this.modalBackdropId
             }
           }, // TODO: Rename slot to `backdrop` and deprecate `modal-backdrop`
-          [this.normalizeSlot('modal-backdrop')]);
+          this.normalizeSlot('modal-backdrop'));
         }
 
-        backdrop = h(BVTransition, {
+        $backdrop = h(BVTransition, {
           props: {
             noFade: this.noFade
           }
-        }, [backdrop]); // If the parent has a scoped style attribute, and the modal
-        // is portalled, add the scoped attribute to the modal wrapper
-
-        var scopedStyleAttrs = !this.static ? this.scopedStyleAttrs : {}; // Assemble modal and backdrop in an outer <div>
+        }, [$backdrop]); // Assemble modal and backdrop in an outer <div>
 
         return h('div', {
-          key: "modal-outer-".concat(this._uid),
           style: this.modalOuterStyle,
-          attrs: _objectSpread2({}, scopedStyleAttrs, {}, this.$attrs, {
-            id: this.safeId('__BV_modal_outer_')
-          })
-        }, [modal, backdrop]);
+          attrs: this.computedAttrs,
+          key: "modal-outer-".concat(this._uid)
+        }, [$modal, $backdrop]);
       }
     },
     render: function render(h) {
@@ -21153,7 +21446,7 @@
   // Prop ID is allowed, but really only should be used for testing
   // We need to add it in explicitly as it comes from the `idMixin`
 
-  var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$I, ['busy', 'lazy', 'noStacking', "static", 'visible'])))); // Fallback event resolver (returns undefined)
+  var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$J, ['busy', 'lazy', 'noStacking', "static", 'visible'])))); // Fallback event resolver (returns undefined)
 
   var defaultResolver = function defaultResolver() {}; // Map prop names to modal slot names
 
@@ -21240,11 +21533,11 @@
         // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
         parent: $parent,
         // Preset the prop values
-        propsData: _objectSpread2({}, filterOptions(getComponentConfig('BModal') || {}), {
+        propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions(getComponentConfig('BModal') || {})), {}, {
           // Defaults that user can override
           hideHeaderClose: true,
           hideHeader: !(props.title || props.titleHtml)
-        }, omit(props, keys(propsToSlots)), {
+        }, omit(props, keys(propsToSlots))), {}, {
           // Props that can't be overridden
           lazy: false,
           busy: false,
@@ -21298,7 +21591,7 @@
         return;
       }
 
-      return asyncMsgBox($parent, _objectSpread2({}, filterOptions(options), {
+      return asyncMsgBox($parent, _objectSpread2(_objectSpread2({}, filterOptions(options)), {}, {
         msgBoxContent: content
       }), resolver);
     }; // BvModal instance class
@@ -21359,7 +21652,7 @@
           var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
           // Pick the modal props we support from options
-          var props = _objectSpread2({}, options, {
+          var props = _objectSpread2(_objectSpread2({}, options), {}, {
             // Add in overrides and our content prop
             okOnly: true,
             okDisabled: false,
@@ -21380,7 +21673,7 @@
           var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
           // Set the modal props we support from options
-          var props = _objectSpread2({}, options, {
+          var props = _objectSpread2(_objectSpread2({}, options), {}, {
             // Add in overrides and our content prop
             okOnly: false,
             okDisabled: false,
@@ -21407,9 +21700,8 @@
       }
     }); // Define our read-only `$bvModal` instance property
     // Placed in an if just in case in HMR mode
-    // eslint-disable-next-line no-prototype-builtins
 
-    if (!Vue.prototype.hasOwnProperty(PROP_NAME$2)) {
+    if (!hasOwnProperty(Vue.prototype, PROP_NAME$2)) {
       defineProperty(Vue.prototype, PROP_NAME$2, {
         get: function get() {
           /* istanbul ignore next */
@@ -21442,7 +21734,7 @@
     }
   });
 
-  var props$J = {
+  var props$K = {
     tag: {
       type: String,
       default: 'ul'
@@ -21492,7 +21784,7 @@
   var BNav = /*#__PURE__*/Vue.extend({
     name: 'BNav',
     functional: true,
-    props: props$J,
+    props: props$K,
     render: function render(h, _ref) {
       var _class;
 
@@ -21514,12 +21806,13 @@
     }
   });
 
-  var props$K = propsFactory(); // @vue/component
+  var props$L = omit(props$1, ['event', 'routerTag']); // --- Main component ---
+  // @vue/component
 
   var BNavItem = /*#__PURE__*/Vue.extend({
     name: 'BNavItem',
     functional: true,
-    props: _objectSpread2({}, props$K, {
+    props: _objectSpread2(_objectSpread2({}, props$L), {}, {
       linkAttrs: {
         type: Object,
         default: function _default() {}
@@ -21548,12 +21841,12 @@
     }
   });
 
-  var props$L = {}; // @vue/component
+  var props$M = {}; // @vue/component
 
   var BNavText = /*#__PURE__*/Vue.extend({
     name: 'BNavText',
     functional: true,
-    props: props$L,
+    props: props$M,
     render: function render(h, _ref) {
       var data = _ref.data,
           children = _ref.children;
@@ -21563,7 +21856,7 @@
     }
   });
 
-  var props$M = _objectSpread2({}, omit(props$p, ['inline']), {
+  var props$N = _objectSpread2(_objectSpread2({}, omit(props$q, ['inline'])), {}, {
     formClass: {
       type: [String, Array, Object] // default: null
 
@@ -21573,7 +21866,7 @@
   var BNavForm = /*#__PURE__*/Vue.extend({
     name: 'BNavForm',
     functional: true,
-    props: props$M,
+    props: props$N,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -21587,7 +21880,7 @@
       data.on = {};
       var $form = h(BForm, {
         class: props.formClass,
-        props: _objectSpread2({}, props, {
+        props: _objectSpread2(_objectSpread2({}, props), {}, {
           inline: true
         }),
         attrs: attrs,
@@ -21599,13 +21892,17 @@
     }
   });
 
-  var props$N = pluckProps(['text', 'html', 'menuClass', 'toggleClass', 'noCaret', 'role', 'lazy'], props$k); // @vue/component
+  var props$O = pluckProps(['text', 'html', 'menuClass', 'toggleClass', 'noCaret', 'role', 'lazy'], props$l); // --- Main component ---
+  // @vue/component
 
   var BNavItemDropdown = /*#__PURE__*/Vue.extend({
     name: 'BNavItemDropdown',
     mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
-    props: props$N,
+    props: props$O,
     computed: {
+      toggleId: function toggleId() {
+        return this.safeId('_BV_toggle_');
+      },
       isNav: function isNav() {
         // Signal to dropdown mixin that we are in a navbar
         return true;
@@ -21628,41 +21925,45 @@
       }
     },
     render: function render(h) {
-      var button = h(BLink, {
-        ref: 'toggle',
+      var toggleId = this.toggleId,
+          visible = this.visible;
+      var $toggle = h(BLink, {
         staticClass: 'nav-link dropdown-toggle',
         class: this.toggleClasses,
         props: {
-          href: '#',
+          href: "#".concat(this.id || ''),
           disabled: this.disabled
         },
         attrs: {
-          id: this.safeId('_BV_button_'),
+          id: toggleId,
+          role: 'button',
           'aria-haspopup': 'true',
-          'aria-expanded': this.visible ? 'true' : 'false'
+          'aria-expanded': visible ? 'true' : 'false'
         },
         on: {
           mousedown: this.onMousedown,
           click: this.toggle,
           keydown: this.toggle // Handle ENTER, SPACE and DOWN
 
-        }
-      }, [this.$slots['button-content'] || this.$slots.text || h('span', {
+        },
+        ref: 'toggle'
+      }, [// TODO: The `text` slot is deprecated in favor of the `button-content` slot
+      this.normalizeSlot(['button-content', 'text']) || h('span', {
         domProps: htmlOrText(this.html, this.text)
       })]);
-      var menu = h('ul', {
+      var $menu = h('ul', {
         staticClass: 'dropdown-menu',
         class: this.menuClasses,
-        ref: 'menu',
         attrs: {
           tabindex: '-1',
-          'aria-labelledby': this.safeId('_BV_button_')
+          'aria-labelledby': toggleId
         },
         on: {
           keydown: this.onKeydown // Handle UP, DOWN and ESC
 
-        }
-      }, !this.lazy || this.visible ? this.normalizeSlot('default', {
+        },
+        ref: 'menu'
+      }, !this.lazy || visible ? this.normalizeSlot('default', {
         hide: this.hide
       }) : [h()]);
       return h('li', {
@@ -21671,7 +21972,7 @@
         attrs: {
           id: this.safeId()
         }
-      }, [button, menu]);
+      }, [$toggle, $menu]);
     }
   });
 
@@ -21691,8 +21992,9 @@
     }
   });
 
-  var NAME$t = 'BNavbar';
-  var props$O = {
+  var NAME$v = 'BNavbar'; // --- Props ---
+
+  var props$P = {
     tag: {
       type: String,
       default: 'nav'
@@ -21704,7 +22006,7 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$t, 'variant');
+        return getComponentConfig(NAME$v, 'variant');
       }
     },
     toggleable: {
@@ -21722,12 +22024,13 @@
       type: Boolean,
       default: false
     }
-  }; // @vue/component
+  }; // --- Main component ---
+  // @vue/component
 
   var BNavbar = /*#__PURE__*/Vue.extend({
-    name: NAME$t,
+    name: NAME$v,
     mixins: [normalizeSlotMixin],
-    props: props$O,
+    props: props$P,
     provide: function provide() {
       return {
         bvNavbar: this
@@ -21758,13 +22061,13 @@
           'sticky-top': this.sticky
         }, _defineProperty(_ref, "navbar-".concat(this.type), this.type), _defineProperty(_ref, "bg-".concat(this.variant), this.variant), _defineProperty(_ref, "fixed-".concat(this.fixed), this.fixed), _ref), this.breakpointClass],
         attrs: {
-          role: this.tag === 'nav' ? null : 'navigation'
+          role: isTag(this.tag, 'nav') ? null : 'navigation'
         }
       }, [this.normalizeSlot('default')]);
     }
   });
 
-  var props$P = pluckProps(['tag', 'fill', 'justified', 'align', 'small'], props$J); // -- Utils --
+  var props$Q = pluckProps(['tag', 'fill', 'justified', 'align', 'small'], props$K); // -- Utils --
 
   var computeJustifyContent$1 = function computeJustifyContent(value) {
     // Normalize value
@@ -21776,7 +22079,7 @@
   var BNavbarNav = /*#__PURE__*/Vue.extend({
     name: 'BNavbarNav',
     functional: true,
-    props: props$P,
+    props: props$Q,
     render: function render(h, _ref) {
       var _class;
 
@@ -21793,20 +22096,21 @@
     }
   });
 
-  var linkProps$4 = propsFactory();
+  var linkProps$4 = omit(props$1, ['event', 'routerTag']);
   linkProps$4.href.default = undefined;
   linkProps$4.to.default = undefined;
-  var props$Q = _objectSpread2({}, linkProps$4, {
+  var props$R = _objectSpread2({
     tag: {
       type: String,
       default: 'div'
     }
-  }); // @vue/component
+  }, linkProps$4); // --- Main component ---
+  // @vue/component
 
   var BNavbarBrand = /*#__PURE__*/Vue.extend({
     name: 'BNavbarBrand',
     functional: true,
-    props: props$Q,
+    props: props$R,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -21820,29 +22124,30 @@
     }
   });
 
-  //   Switch to using `VBToggle` directive, will reduce code footprint
-  //   Although the `click` event will no longer be cancellable
-  //   Instead add `disabled` prop, and have `VBToggle` check element
-  //   disabled state
-  // --- Constants ---
-
-  var NAME$u = 'BNavbarToggle';
+  var NAME$w = 'BNavbarToggle';
   var CLASS_NAME$2 = 'navbar-toggler'; // --- Main component ---
   // @vue/component
 
   var BNavbarToggle = /*#__PURE__*/Vue.extend({
-    name: NAME$u,
+    name: NAME$w,
+    directives: {
+      BToggle: VBToggle
+    },
     mixins: [listenOnRootMixin, normalizeSlotMixin],
     props: {
       label: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$u, 'label');
+          return getComponentConfig(NAME$w, 'label');
         }
       },
       target: {
         type: String,
         required: true
+      },
+      disabled: {
+        type: Boolean,
+        default: false
       }
     },
     data: function data() {
@@ -21856,33 +22161,40 @@
     },
     methods: {
       onClick: function onClick(evt) {
-        this.$emit('click', evt);
-
-        if (!evt.defaultPrevented) {
-          this.emitOnRoot(EVENT_TOGGLE, this.target);
+        if (!this.disabled) {
+          // Emit courtesy `click` event
+          this.$emit('click', evt);
         }
       },
       handleStateEvt: function handleStateEvt(id, state) {
+        // We listen for state events so that we can pass the
+        // boolean expanded state to the default scoped slot
         if (id === this.target) {
           this.toggleState = state;
         }
       }
     },
     render: function render(h) {
-      var expanded = this.toggleState;
+      var disabled = this.disabled;
       return h('button', {
         staticClass: CLASS_NAME$2,
+        class: {
+          disabled: disabled
+        },
+        directives: [{
+          name: 'BToggle',
+          value: this.target
+        }],
         attrs: {
           type: 'button',
-          'aria-label': this.label,
-          'aria-controls': this.target,
-          'aria-expanded': toString$1(expanded)
+          disabled: disabled,
+          'aria-label': this.label
         },
         on: {
           click: this.onClick
         }
       }, [this.normalizeSlot('default', {
-        expanded: expanded
+        expanded: this.toggleState
       }) || h('span', {
         staticClass: "".concat(CLASS_NAME$2, "-icon")
       })]);
@@ -21904,10 +22216,10 @@
     }
   });
 
-  var NAME$v = 'BSpinner'; // @vue/component
+  var NAME$x = 'BSpinner'; // @vue/component
 
   var BSpinner = /*#__PURE__*/Vue.extend({
-    name: NAME$v,
+    name: NAME$x,
     functional: true,
     props: {
       type: {
@@ -21922,7 +22234,7 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$v, 'variant');
+          return getComponentConfig(NAME$x, 'variant');
         }
       },
       small: {
@@ -22089,7 +22401,7 @@
         var $background = h('div', {
           staticClass: 'position-absolute',
           class: [this.computedVariant, this.computedRounded],
-          style: _objectSpread2({}, positionCover, {
+          style: _objectSpread2(_objectSpread2({}, positionCover), {}, {
             opacity: this.opacity,
             backgroundColor: this.bgColor || null,
             backdropFilter: this.blur ? "blur(".concat(this.blur, ")") : null
@@ -22114,9 +22426,14 @@
             'position-absolute': !this.noWrap || this.noWrap && !this.fixed,
             'position-fixed': this.noWrap && this.fixed
           },
-          style: _objectSpread2({}, positionCover, {
+          style: _objectSpread2(_objectSpread2({}, positionCover), {}, {
             zIndex: this.zIndex || 10
-          })
+          }),
+          on: {
+            click: function click(evt) {
+              return _this.$emit('click', evt);
+            }
+          }
         }, [$background, $content]);
       } // Wrap in a fade transition
 
@@ -22210,7 +22527,7 @@
   }; // --- Props ---
 
 
-  var props$R = {
+  var props$S = {
     disabled: {
       type: Boolean,
       default: false
@@ -22348,7 +22665,7 @@
       prop: 'value',
       event: 'input'
     },
-    props: props$R,
+    props: props$S,
     data: function data() {
       // `-1` signifies no page initially selected
       var currentPage = toInteger(this.value, 0);
@@ -22406,7 +22723,7 @@
             numberOfLinks = limit - (firstNumber ? 0 : 1);
           }
 
-          numberOfLinks = Math.min(numberOfLinks, limit);
+          numberOfLinks = mathMin(numberOfLinks, limit);
         } else if (numberOfPages - currentPage + 2 < limit && limit > ELLIPSIS_THRESHOLD) {
           if (!hideEllipsis || firstNumber) {
             showFirstDots = true;
@@ -22422,7 +22739,7 @@
             showLastDots = !!(!hideEllipsis || lastNumber);
           }
 
-          startNumber = currentPage - Math.floor(numberOfLinks / 2);
+          startNumber = currentPage - mathFloor(numberOfLinks / 2);
         } // Sanity checks
 
         /* istanbul ignore if */
@@ -22452,14 +22769,14 @@
 
         if (limit <= ELLIPSIS_THRESHOLD) {
           if (firstNumber && startNumber === 1) {
-            numberOfLinks = Math.min(numberOfLinks + 1, numberOfPages, limit + 1);
+            numberOfLinks = mathMin(numberOfLinks + 1, numberOfPages, limit + 1);
           } else if (lastNumber && numberOfPages === startNumber + numberOfLinks - 1) {
-            startNumber = Math.max(startNumber - 1, 1);
-            numberOfLinks = Math.min(numberOfPages - startNumber + 1, numberOfPages, limit + 1);
+            startNumber = mathMax(startNumber - 1, 1);
+            numberOfLinks = mathMin(numberOfPages - startNumber + 1, numberOfPages, limit + 1);
           }
         }
 
-        numberOfLinks = Math.min(numberOfLinks, numberOfPages - startNumber + 1);
+        numberOfLinks = mathMin(numberOfLinks, numberOfPages - startNumber + 1);
         return {
           showFirstDots: showFirstDots,
           showLastDots: showLastDots,
@@ -22564,9 +22881,6 @@
           return isVisible(btn);
         });
       },
-      setBtnFocus: function setBtnFocus(btn) {
-        btn.focus();
-      },
       focusCurrent: function focusCurrent() {
         var _this2 = this;
 
@@ -22576,9 +22890,7 @@
             return toInteger(getAttr(el, 'aria-posinset'), 0) === _this2.computedCurrentPage;
           });
 
-          if (btn && btn.focus) {
-            _this2.setBtnFocus(btn);
-          } else {
+          if (!attemptFocus(btn)) {
             // Fallback if current page is not in button list
             _this2.focusFirst();
           }
@@ -22593,9 +22905,7 @@
             return !isDisabled(el);
           });
 
-          if (btn && btn.focus && btn !== document.activeElement) {
-            _this3.setBtnFocus(btn);
-          }
+          attemptFocus(btn);
         });
       },
       focusLast: function focusLast() {
@@ -22607,9 +22917,7 @@
             return !isDisabled(el);
           });
 
-          if (btn && btn.focus && btn !== document.activeElement) {
-            _this4.setBtnFocus(btn);
-          }
+          attemptFocus(btn);
         });
       },
       focusPrev: function focusPrev() {
@@ -22619,10 +22927,10 @@
         this.$nextTick(function () {
           var buttons = _this5.getButtons();
 
-          var idx = buttons.indexOf(document.activeElement);
+          var index = buttons.indexOf(getActiveElement());
 
-          if (idx > 0 && !isDisabled(buttons[idx - 1]) && buttons[idx - 1].focus) {
-            _this5.setBtnFocus(buttons[idx - 1]);
+          if (index > 0 && !isDisabled(buttons[index - 1])) {
+            attemptFocus(buttons[index - 1]);
           }
         });
       },
@@ -22633,11 +22941,10 @@
         this.$nextTick(function () {
           var buttons = _this6.getButtons();
 
-          var idx = buttons.indexOf(document.activeElement);
-          var cnt = buttons.length - 1;
+          var index = buttons.indexOf(getActiveElement());
 
-          if (idx < cnt && !isDisabled(buttons[idx + 1]) && buttons[idx + 1].focus) {
-            _this6.setBtnFocus(buttons[idx + 1]);
+          if (index < buttons.length - 1 && !isDisabled(buttons[index + 1])) {
+            attemptFocus(buttons[index + 1]);
           }
         });
       }
@@ -22850,14 +23157,14 @@
     }
   };
 
-  var NAME$w = 'BPagination';
+  var NAME$y = 'BPagination';
   var DEFAULT_PER_PAGE = 20;
   var DEFAULT_TOTAL_ROWS = 0;
-  var props$S = {
+  var props$T = {
     size: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$w, 'size');
+        return getComponentConfig(NAME$y, 'size');
       }
     },
     perPage: {
@@ -22876,23 +23183,23 @@
   // Sanitize the provided per page number (converting to a number)
 
   var sanitizePerPage = function sanitizePerPage(val) {
-    return Math.max(toInteger(val) || DEFAULT_PER_PAGE, 1);
+    return mathMax(toInteger(val) || DEFAULT_PER_PAGE, 1);
   }; // Sanitize the provided total rows number (converting to a number)
 
 
   var sanitizeTotalRows = function sanitizeTotalRows(val) {
-    return Math.max(toInteger(val) || DEFAULT_TOTAL_ROWS, 0);
+    return mathMax(toInteger(val) || DEFAULT_TOTAL_ROWS, 0);
   }; // The render function is brought in via the `paginationMixin`
   // @vue/component
 
 
   var BPagination = /*#__PURE__*/Vue.extend({
-    name: NAME$w,
+    name: NAME$y,
     mixins: [paginationMixin],
-    props: props$S,
+    props: props$T,
     computed: {
       numberOfPages: function numberOfPages() {
-        var result = Math.ceil(sanitizeTotalRows(this.totalRows) / sanitizePerPage(this.perPage));
+        var result = mathCeil(sanitizeTotalRows(this.totalRows) / sanitizePerPage(this.perPage));
         return result < 1 ? 1 : result;
       },
       pageSizeNumberOfPages: function pageSizeNumberOfPages() {
@@ -22965,8 +23272,8 @@
           // Keep the current button focused if possible
           var target = evt.target;
 
-          if (isVisible(target) && _this2.$el.contains(target) && target.focus) {
-            target.focus();
+          if (isVisible(target) && _this2.$el.contains(target)) {
+            attemptFocus(target);
           } else {
             _this2.focusCurrent();
           }
@@ -22992,16 +23299,15 @@
     }
   });
 
-  var NAME$x = 'BPaginationNav'; // Sanitize the provided number of pages (converting to a number)
+  var NAME$z = 'BPaginationNav'; // --- Props ---
 
-  var sanitizeNumberOfPages = function sanitizeNumberOfPages(value) {
-    return Math.max(toInteger(value, 0), 1);
-  };
-  var props$T = {
+  var _linkProps = omit(props$1, ['event', 'routerTag']);
+
+  var props$U = _objectSpread2({
     size: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$x, 'size');
+        return getComponentConfig(NAME$z, 'size');
       }
     },
     numberOfPages: {
@@ -23013,7 +23319,7 @@
         var number = toInteger(value, 0);
 
         if (number < 1) {
-          warn('Prop "number-of-pages" must be a number greater than "0"', NAME$x);
+          warn('Prop "number-of-pages" must be a number greater than "0"', NAME$z);
           return false;
         }
 
@@ -23045,32 +23351,21 @@
       // Disable auto page number detection if true
       type: Boolean,
       default: false
-    },
-    // router-link specific props
-    activeClass: {
-      type: String // default: undefined
-
-    },
-    exact: {
-      type: Boolean,
-      default: false
-    },
-    exactActiveClass: {
-      type: String // default: undefined
-
-    },
-    // nuxt-link specific prop(s)
-    noPrefetch: {
-      type: Boolean,
-      default: false
     }
-  }; // The render function is brought in via the pagination mixin
+  }, _linkProps); // --- Utility methods ---
+  // Sanitize the provided number of pages (converting to a number)
+
+
+  var sanitizeNumberOfPages = function sanitizeNumberOfPages(value) {
+    return mathMax(toInteger(value, 0), 1);
+  }; // --- Main component ---
+  // The render function is brought in via the pagination mixin
   // @vue/component
 
   var BPaginationNav = /*#__PURE__*/Vue.extend({
-    name: NAME$x,
+    name: NAME$z,
     mixins: [paginationMixin],
-    props: props$T,
+    props: props$U,
     computed: {
       // Used by render function to trigger wrapping in '<nav>' element
       isNav: function isNav() {
@@ -23146,13 +23441,11 @@
           _this5.$emit('change', pageNum);
         });
         this.$nextTick(function () {
-          // Done in a nextTick() to ensure rendering complete
-          try {
-            // Emulate native link click page reloading behaviour by blurring the
-            // paginator and returning focus to the document
-            var target = evt.currentTarget || evt.target;
-            target.blur();
-          } catch (e) {}
+          // Emulate native link click page reloading behaviour by blurring the
+          // paginator and returning focus to the document
+          // Done in a `nextTick()` to ensure rendering complete
+          var target = evt.currentTarget || evt.target;
+          attemptBlur(target);
         });
       },
       getPageInfo: function getPageInfo(pageNum) {
@@ -23204,20 +23497,8 @@
         return info.link;
       },
       linkProps: function linkProps(pageNum) {
+        var props = pluckProps(_linkProps, this);
         var link = this.makeLink(pageNum);
-        var props = {
-          target: this.target || null,
-          rel: this.rel || null,
-          disabled: this.disabled,
-          // The following props are only used if BLink detects router
-          exact: this.exact,
-          activeClass: this.activeClass,
-          exactActiveClass: this.exactActiveClass,
-          append: this.append,
-          replace: this.replace,
-          // nuxt-link specific prop
-          noPrefetch: this.noPrefetch
-        };
 
         if (this.useRouter || isObject(link)) {
           props.to = link;
@@ -23342,7 +23623,7 @@
   });
 
   // Base on-demand component for tooltip / popover templates
-  var NAME$y = 'BVPopper';
+  var NAME$A = 'BVPopper';
   var AttachmentMap$1 = {
     AUTO: 'auto',
     TOP: 'top',
@@ -23375,7 +23656,7 @@
   }; // @vue/component
 
   var BVPopper = /*#__PURE__*/Vue.extend({
-    name: NAME$y,
+    name: NAME$A,
     props: {
       target: {
         // Element that the tooltip/popover is positioned relative to
@@ -23495,10 +23776,10 @@
     updated: function updated() {
       // Update popper if needed
       // TODO: Should this be a watcher on `this.popperConfig` instead?
-      this.popperUpdate();
+      this.updatePopper();
     },
     beforeDestroy: function beforeDestroy() {
-      this.popperDestroy();
+      this.destroyPopper();
     },
     destroyed: function destroyed() {
       // Make sure template is removed from DOM
@@ -23542,16 +23823,16 @@
         return this.offset;
       },
       popperCreate: function popperCreate(el) {
-        this.popperDestroy(); // We use `el` rather than `this.$el` just in case the original
+        this.destroyPopper(); // We use `el` rather than `this.$el` just in case the original
         // mountpoint root element type was changed by the template
 
         this.$_popper = new Popper(this.target, el, this.popperConfig);
       },
-      popperDestroy: function popperDestroy() {
+      destroyPopper: function destroyPopper() {
         this.$_popper && this.$_popper.destroy();
         this.$_popper = null;
       },
-      popperUpdate: function popperUpdate() {
+      updatePopper: function updatePopper() {
         this.$_popper && this.$_popper.scheduleUpdate();
       },
       popperPlacementChange: function popperPlacementChange(data) {
@@ -23596,10 +23877,10 @@
     }
   });
 
-  var NAME$z = 'BVTooltipTemplate'; // @vue/component
+  var NAME$B = 'BVTooltipTemplate'; // @vue/component
 
   var BVTooltipTemplate = /*#__PURE__*/Vue.extend({
-    name: NAME$z,
+    name: NAME$B,
     extends: BVPopper,
     mixins: [scopedStyleAttrsMixin],
     props: {
@@ -23703,7 +23984,7 @@
     }
   });
 
-  var NAME$A = 'BVTooltip'; // Modal container selector for appending tooltip/popover
+  var NAME$C = 'BVTooltip'; // Modal container selector for appending tooltip/popover
 
   var MODAL_SELECTOR = '.modal-content'; // Modal `$root` hidden event
 
@@ -23764,11 +24045,11 @@
   }; // @vue/component
 
   var BVTooltip = /*#__PURE__*/Vue.extend({
-    name: NAME$A,
+    name: NAME$C,
     props: {// None
     },
     data: function data() {
-      return _objectSpread2({}, templateData, {
+      return _objectSpread2(_objectSpread2({}, templateData), {}, {
         // State management data
         activeTrigger: {
           // manual: false,
@@ -23795,10 +24076,10 @@
         };
 
         if (isPlainObject(this.delay)) {
-          delay.show = Math.max(toInteger(this.delay.show, 0), 0);
-          delay.hide = Math.max(toInteger(this.delay.hide, 0), 0);
+          delay.show = mathMax(toInteger(this.delay.show, 0), 0);
+          delay.hide = mathMax(toInteger(this.delay.hide, 0), 0);
         } else if (isNumber(this.delay) || isString(this.delay)) {
-          delay.show = delay.hide = Math.max(toInteger(this.delay, 0), 0);
+          delay.show = delay.hide = mathMax(toInteger(this.delay, 0), 0);
         }
 
         return delay;
@@ -24014,7 +24295,7 @@
         this.localPlacementTarget = null;
 
         try {
-          this.$_tip && this.$_tip.$destroy();
+          this.$_tip.$destroy();
         } catch (_unused) {}
 
         this.$_tip = null;
@@ -24239,16 +24520,12 @@
         return this.isDropdown() && target && select(DROPDOWN_OPEN_SELECTOR, target);
       },
       clearHoverTimeout: function clearHoverTimeout() {
-        if (this.$_hoverTimeout) {
-          clearTimeout(this.$_hoverTimeout);
-          this.$_hoverTimeout = null;
-        }
+        clearTimeout(this.$_hoverTimeout);
+        this.$_hoverTimeout = null;
       },
       clearVisibilityInterval: function clearVisibilityInterval() {
-        if (this.$_visibleInterval) {
-          clearInterval(this.$_visibleInterval);
-          this.$_visibleInterval = null;
-        }
+        clearInterval(this.$_visibleInterval);
+        this.$_visibleInterval = null;
       },
       clearActiveTriggers: function clearActiveTriggers() {
         for (var trigger in this.activeTrigger) {
@@ -24477,13 +24754,13 @@
           this.enter(evt);
         } else if (type === 'focusin' && arrayIncludes(triggers, 'focus')) {
           // `focusin` is a bubbling event
-          // `evt` includes `relatedTarget` (element loosing focus)
+          // `evt` includes `relatedTarget` (element losing focus)
           this.enter(evt);
         } else if (type === 'focusout' && (arrayIncludes(triggers, 'focus') || arrayIncludes(triggers, 'blur')) || type === 'mouseleave' && arrayIncludes(triggers, 'hover')) {
           // `focusout` is a bubbling event
           // `mouseleave` is a non-bubbling event
           // `tip` is the template (will be null if not open)
-          var tip = this.getTemplateElement(); // `evtTarget` is the element which is loosing focus/hover and
+          var tip = this.getTemplateElement(); // `evtTarget` is the element which is losing focus/hover and
 
           var evtTarget = evt.target; // `relatedTarget` is the element gaining focus/hover
 
@@ -24543,18 +24820,15 @@
         if (!this.$_enabled || this.dropdownOpen()) {
           /* istanbul ignore next */
           return;
-        }
+        } // Get around a WebKit bug where `click` does not trigger focus events
+        // On most browsers, `click` triggers a `focusin`/`focus` event first
+        // Needed so that trigger 'click blur' works on iOS
+        // https://github.com/bootstrap-vue/bootstrap-vue/issues/5099
+        // We use `currentTarget` rather than `target` to trigger on the
+        // element, not the inner content
 
-        try {
-          // Get around a WebKit bug where `click` does not trigger focus events
-          // On most browsers, `click` triggers a `focusin`/`focus` event first
-          // Needed so that trigger 'click blur' works on iOS
-          // https://github.com/bootstrap-vue/bootstrap-vue/issues/5099
-          // We use `currentTarget` rather than `target` to trigger on the
-          // element, not the inner content
-          evt.currentTarget.focus();
-        } catch (_unused2) {}
 
+        attemptFocus(evt.currentTarget);
         this.activeTrigger.click = !this.activeTrigger.click;
 
         if (this.isWithActiveTrigger) {
@@ -24659,10 +24933,10 @@
     }
   });
 
-  var NAME$B = 'BTooltip'; // @vue/component
+  var NAME$D = 'BTooltip'; // @vue/component
 
   var BTooltip = /*#__PURE__*/Vue.extend({
-    name: NAME$B,
+    name: NAME$D,
     props: {
       title: {
         type: String // default: undefined
@@ -24699,19 +24973,19 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$B, 'variant');
+          return getComponentConfig(NAME$D, 'variant');
         }
       },
       customClass: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$B, 'customClass');
+          return getComponentConfig(NAME$D, 'customClass');
         }
       },
       delay: {
         type: [Number, Object, String],
         default: function _default() {
-          return getComponentConfig(NAME$B, 'delay');
+          return getComponentConfig(NAME$D, 'delay');
         }
       },
       boundary: {
@@ -24720,13 +24994,13 @@
         // Object: Vue component
         type: [String, HTMLElement, Object],
         default: function _default() {
-          return getComponentConfig(NAME$B, 'boundary');
+          return getComponentConfig(NAME$D, 'boundary');
         }
       },
       boundaryPadding: {
         type: [Number, String],
         default: function _default() {
-          return getComponentConfig(NAME$B, 'boundaryPadding');
+          return getComponentConfig(NAME$D, 'boundaryPadding');
         }
       },
       offset: {
@@ -24805,12 +25079,12 @@
     },
     watch: {
       show: function show(_show, oldVal) {
-        if (_show !== oldVal && _show !== this.localShow && this.$_bv_toolpop) {
+        if (_show !== oldVal && _show !== this.localShow && this.$_toolpop) {
           if (_show) {
-            this.$_bv_toolpop.show();
+            this.$_toolpop.show();
           } else {
             // We use `forceHide()` to override any active triggers
-            this.$_bv_toolpop.forceHide();
+            this.$_toolpop.forceHide();
           }
         }
       },
@@ -24829,8 +25103,8 @@
         var _this = this;
 
         this.$nextTick(function () {
-          if (_this.$_bv_toolpop) {
-            _this.$_bv_toolpop.updateData(_this.templateData);
+          if (_this.$_toolpop) {
+            _this.$_toolpop.updateData(_this.templateData);
           }
         });
       },
@@ -24840,8 +25114,8 @@
       }
     },
     created: function created() {
-      // Non reactive properties
-      this.$_bv_toolpop = null;
+      // Create private non-reactive props
+      this.$_toolpop = null;
     },
     updated: function updated() {
       // Update the `propData` object
@@ -24855,8 +25129,10 @@
       this.$off('disable', this.doDisable);
       this.$off('enable', this.doEnable); // Destroy the tip instance
 
-      this.$_bv_toolpop && this.$_bv_toolpop.$destroy();
-      this.$_bv_toolpop = null;
+      if (this.$_toolpop) {
+        this.$_toolpop.$destroy();
+        this.$_toolpop = null;
+      }
     },
     mounted: function mounted() {
       var _this2 = this;
@@ -24874,7 +25150,7 @@
 
         var scopeId = getScopeId(_this2) || getScopeId(_this2.$parent); // Create the instance
 
-        var $toolpop = _this2.$_bv_toolpop = new Component({
+        var $toolpop = _this2.$_toolpop = new Component({
           parent: _this2,
           // Pass down the scoped style ID
           _scopeId: scopeId || undefined
@@ -24908,7 +25184,7 @@
 
 
         if (_this2.localShow) {
-          _this2.$_bv_toolpop && _this2.$_bv_toolpop.show();
+          $toolpop.show();
         }
       });
     },
@@ -24980,16 +25256,16 @@
       },
       // --- Local event listeners ---
       doOpen: function doOpen() {
-        !this.localShow && this.$_bv_toolpop && this.$_bv_toolpop.show();
+        !this.localShow && this.$_toolpop && this.$_toolpop.show();
       },
       doClose: function doClose() {
-        this.localShow && this.$_bv_toolpop && this.$_bv_toolpop.hide();
+        this.localShow && this.$_toolpop && this.$_toolpop.hide();
       },
       doDisable: function doDisable() {
-        this.$_bv_toolpop && this.$_bv_toolpop.disable();
+        this.$_toolpop && this.$_toolpop.disable();
       },
       doEnable: function doEnable() {
-        this.$_bv_toolpop && this.$_bv_toolpop.enable();
+        this.$_toolpop && this.$_toolpop.enable();
       }
     },
     render: function render(h) {
@@ -25001,10 +25277,10 @@
     }
   });
 
-  var NAME$C = 'BVPopoverTemplate'; // @vue/component
+  var NAME$E = 'BVPopoverTemplate'; // @vue/component
 
   var BVPopoverTemplate = /*#__PURE__*/Vue.extend({
-    name: NAME$C,
+    name: NAME$E,
     extends: BVTooltipTemplate,
     computed: {
       templateType: function templateType() {
@@ -25047,10 +25323,10 @@
   });
 
   // Popover "Class" (Built as a renderless Vue instance)
-  var NAME$D = 'BVPopover'; // @vue/component
+  var NAME$F = 'BVPopover'; // @vue/component
 
   var BVPopover = /*#__PURE__*/Vue.extend({
-    name: NAME$D,
+    name: NAME$F,
     extends: BVTooltip,
     computed: {
       // Overwrites BVTooltip
@@ -25066,9 +25342,9 @@
     }
   });
 
-  var NAME$E = 'BPopover';
+  var NAME$G = 'BPopover';
   var BPopover = /*#__PURE__*/Vue.extend({
-    name: NAME$E,
+    name: NAME$G,
     extends: BTooltip,
     inheritAttrs: false,
     props: {
@@ -25091,19 +25367,19 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$E, 'variant');
+          return getComponentConfig(NAME$G, 'variant');
         }
       },
       customClass: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$E, 'customClass');
+          return getComponentConfig(NAME$G, 'customClass');
         }
       },
       delay: {
         type: [Number, Object, String],
         default: function _default() {
-          return getComponentConfig(NAME$E, 'delay');
+          return getComponentConfig(NAME$G, 'delay');
         }
       },
       boundary: {
@@ -25112,13 +25388,13 @@
         // Object: Vue component
         type: [String, HTMLElement, Object],
         default: function _default() {
-          return getComponentConfig(NAME$E, 'boundary');
+          return getComponentConfig(NAME$G, 'boundary');
         }
       },
       boundaryPadding: {
         type: [Number, String],
         default: function _default() {
-          return getComponentConfig(NAME$E, 'boundaryPadding');
+          return getComponentConfig(NAME$G, 'boundaryPadding');
         }
       }
     },
@@ -25197,7 +25473,7 @@
       config.content = bindings.value;
     } else if (isPlainObject(bindings.value)) {
       // Value is config object, so merge
-      config = _objectSpread2({}, config, {}, bindings.value);
+      config = _objectSpread2(_objectSpread2({}, config), bindings.value);
     } // If argument, assume element ID of container element
 
 
@@ -25409,10 +25685,11 @@
     }
   });
 
-  var NAME$F = 'BProgressBar'; // @vue/component
+  var NAME$H = 'BProgressBar'; // --- Main component ---
+  // @vue/component
 
   var BProgressBar = /*#__PURE__*/Vue.extend({
-    name: NAME$F,
+    name: NAME$H,
     mixins: [normalizeSlotMixin],
     inject: {
       bvProgress: {
@@ -25448,7 +25725,7 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$F, 'variant');
+          return getComponentConfig(NAME$H, 'variant');
         }
       },
       striped: {
@@ -25489,11 +25766,11 @@
       computedPrecision: function computedPrecision() {
         // Prefer our precision over parent setting
         // Default to `0` for invalid values (`-x`, `NaN`)
-        return Math.max(toInteger(this.precision, toInteger(this.bvProgress.precision, 0)), 0);
+        return mathMax(toInteger(this.precision, toInteger(this.bvProgress.precision, 0)), 0);
       },
       computedProgress: function computedProgress() {
         var precision = this.computedPrecision;
-        var p = Math.pow(10, precision);
+        var p = mathPow(10, precision);
         return toFixed(100 * p * this.computedValue / this.computedMax / p, precision);
       },
       computedVariant: function computedVariant() {
@@ -25518,18 +25795,21 @@
       }
     },
     render: function render(h) {
-      var childNodes = h();
+      var label = this.label,
+          labelHtml = this.labelHtml,
+          computedValue = this.computedValue,
+          computedPrecision = this.computedPrecision;
+      var $content = h();
+      var domProps = {};
 
       if (this.hasNormalizedSlot('default')) {
-        childNodes = this.normalizeSlot('default');
-      } else if (this.label || this.labelHtml) {
-        childNodes = h('span', {
-          domProps: htmlOrText(this.labelHtml, this.label)
-        });
+        $content = this.normalizeSlot('default');
+      } else if (label || labelHtml) {
+        domProps = htmlOrText(labelHtml, label);
       } else if (this.computedShowProgress) {
-        childNodes = this.computedProgress;
+        $content = this.computedProgress;
       } else if (this.computedShowValue) {
-        childNodes = toFixed(this.computedValue, this.computedPrecision);
+        $content = toFixed(computedValue, computedPrecision);
       }
 
       return h('div', {
@@ -25540,16 +25820,17 @@
           role: 'progressbar',
           'aria-valuemin': '0',
           'aria-valuemax': toString$1(this.computedMax),
-          'aria-valuenow': toFixed(this.computedValue, this.computedPrecision)
-        }
-      }, [childNodes]);
+          'aria-valuenow': toFixed(computedValue, computedPrecision)
+        },
+        domProps: domProps
+      }, [$content]);
     }
   });
 
-  var NAME$G = 'BProgress'; // @vue/component
+  var NAME$I = 'BProgress'; // @vue/component
 
   var BProgress = /*#__PURE__*/Vue.extend({
-    name: NAME$G,
+    name: NAME$I,
     mixins: [normalizeSlotMixin],
     provide: function provide() {
       return {
@@ -25561,7 +25842,7 @@
       variant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$G, 'variant');
+          return getComponentConfig(NAME$I, 'variant');
         }
       },
       striped: {
@@ -25637,7 +25918,7 @@
     }
   });
 
-  var NAME$H = 'BSidebar';
+  var NAME$J = 'BSidebar';
   var CLASS_NAME$3 = 'b-sidebar'; // --- Render methods ---
 
   var renderHeaderTitle = function renderHeaderTitle(h, ctx) {
@@ -25727,12 +26008,14 @@
       return h();
     }
 
+    var backdropVariant = ctx.backdropVariant;
     return h('div', {
       directives: [{
         name: 'show',
         value: ctx.localShow
       }],
       staticClass: 'b-sidebar-backdrop',
+      class: _defineProperty({}, "bg-".concat(backdropVariant), !!backdropVariant),
       on: {
         click: ctx.onBackdropClick
       }
@@ -25742,8 +26025,9 @@
 
 
   var BSidebar = /*#__PURE__*/Vue.extend({
-    name: NAME$H,
-    mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
+    name: NAME$J,
+    // Mixin order is important!
+    mixins: [attrsMixin, idMixin, listenOnRootMixin, normalizeSlotMixin],
     inheritAttrs: false,
     model: {
       prop: 'visible',
@@ -25761,25 +26045,25 @@
       bgVariant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$H, 'bgVariant');
+          return getComponentConfig(NAME$J, 'bgVariant');
         }
       },
       textVariant: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$H, 'textVariant');
+          return getComponentConfig(NAME$J, 'textVariant');
         }
       },
       shadow: {
         type: [Boolean, String],
         default: function _default() {
-          return getComponentConfig(NAME$H, 'shadow');
+          return getComponentConfig(NAME$J, 'shadow');
         }
       },
       width: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$H, 'width');
+          return getComponentConfig(NAME$J, 'width');
         }
       },
       zIndex: {
@@ -25803,7 +26087,7 @@
       tag: {
         type: String,
         default: function _default() {
-          return getComponentConfig(NAME$H, 'tag');
+          return getComponentConfig(NAME$J, 'tag');
         }
       },
       sidebarClass: {
@@ -25823,9 +26107,15 @@
 
       },
       backdrop: {
-        // If true, shows a basic backdrop
+        // If `true`, shows a basic backdrop
         type: Boolean,
         default: false
+      },
+      backdropVariant: {
+        type: String,
+        default: function _default() {
+          return getComponentConfig(NAME$J, 'backdropVariant');
+        }
       },
       noSlide: {
         type: Boolean,
@@ -25890,6 +26180,23 @@
           right: this.right,
           hide: this.hide
         };
+      },
+      computedTile: function computedTile() {
+        return this.normalizeSlot('title', this.slotScope) || toString$1(this.title) || null;
+      },
+      titleId: function titleId() {
+        return this.computedTile ? this.safeId('__title__') : null;
+      },
+      computedAttrs: function computedAttrs() {
+        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+          id: this.safeId(),
+          tabindex: '-1',
+          role: 'dialog',
+          'aria-modal': this.backdrop ? 'true' : 'false',
+          'aria-hidden': this.localShow ? null : 'true',
+          'aria-label': this.ariaLabel || null,
+          'aria-labelledby': this.ariaLabelledby || this.titleId || null
+        });
       }
     },
     watch: {
@@ -25989,10 +26296,7 @@
       /* istanbul ignore next */
       {
         var tabables = getTabables(this.$refs.content);
-
-        try {
-          tabables.reverse()[0].focus();
-        } catch (_unused) {}
+        attemptFocus(tabables.reverse()[0]);
       },
 
       /* istanbul ignore next */
@@ -26000,35 +26304,24 @@
       /* istanbul ignore next */
       {
         var tabables = getTabables(this.$refs.content);
-
-        try {
-          tabables[0].focus();
-        } catch (_unused2) {}
+        attemptFocus(tabables[0]);
       },
       onBeforeEnter: function onBeforeEnter() {
-        this.$_returnFocusEl = null;
-
-        try {
-          this.$_returnFocusEl = document.activeElement || null;
-        } catch (_unused3) {} // Trigger lazy render
-
+        // Returning focus to `document.body` may cause unwanted scrolls,
+        // so we exclude setting focus on body
+        this.$_returnFocusEl = getActiveElement(isBrowser ? [document.body] : []); // Trigger lazy render
 
         this.isOpen = true;
       },
       onAfterEnter: function onAfterEnter(el) {
-        try {
-          if (!contains(el, document.activeElement)) {
-            el.focus();
-          }
-        } catch (_unused4) {}
+        if (!contains(el, getActiveElement())) {
+          attemptFocus(el);
+        }
 
         this.$emit('shown');
       },
       onAfterLeave: function onAfterLeave() {
-        try {
-          this.$_returnFocusEl.focus();
-        } catch (_unused5) {}
-
+        attemptFocus(this.$_returnFocusEl);
         this.$_returnFocusEl = null; // Trigger lazy render
 
         this.isOpen = false;
@@ -26040,11 +26333,6 @@
 
       var localShow = this.localShow;
       var shadow = this.shadow === '' ? true : this.shadow;
-      var title = this.normalizeSlot('title', this.slotScope) || toString$1(this.title) || null;
-      var titleId = title ? this.safeId('__title__') : null;
-      var ariaLabel = this.ariaLabel || null; // `ariaLabel` takes precedence over `ariaLabelledby`
-
-      var ariaLabelledby = this.ariaLabelledby || titleId || null;
       var $sidebar = h(this.tag, {
         ref: 'content',
         directives: [{
@@ -26055,15 +26343,7 @@
         class: [(_ref = {
           shadow: shadow === true
         }, _defineProperty(_ref, "shadow-".concat(shadow), shadow && shadow !== true), _defineProperty(_ref, "".concat(CLASS_NAME$3, "-right"), this.right), _defineProperty(_ref, "bg-".concat(this.bgVariant), !!this.bgVariant), _defineProperty(_ref, "text-".concat(this.textVariant), !!this.textVariant), _ref), this.sidebarClass],
-        attrs: _objectSpread2({}, this.$attrs, {
-          id: this.safeId(),
-          tabindex: '-1',
-          role: 'dialog',
-          'aria-modal': this.backdrop ? 'true' : 'false',
-          'aria-hidden': localShow ? null : 'true',
-          'aria-label': ariaLabel,
-          'aria-labelledby': ariaLabelledby
-        }),
+        attrs: this.computedAttrs,
         style: {
           width: this.width
         }
@@ -26118,12 +26398,6 @@
     }
   });
 
-  var VBTogglePlugin = /*#__PURE__*/pluginFactory({
-    directives: {
-      VBToggle: VBToggle
-    }
-  });
-
   var SidebarPlugin = /*#__PURE__*/pluginFactory({
     components: {
       BSidebar: BSidebar
@@ -26144,8 +26418,8 @@
   var hasListenerMixin = {
     methods: {
       hasListener: function hasListener(name) {
-        // Only includes listeners registerd via `v-on:name`
-        var $listeners = this.$listeners || {}; // Includes `v-on:name` and `this.$on('name')` registerd listeners
+        // Only includes listeners registered via `v-on:name`
+        var $listeners = this.$listeners || {}; // Includes `v-on:name` and `this.$on('name')` registered listeners
         // Note this property is not part of the public Vue API, but it is
         // the only way to determine if a listener was added via `vm.$on`
 
@@ -26371,8 +26645,8 @@
           filter: this.localFilter,
           sortBy: this.localSortBy,
           sortDesc: this.localSortDesc,
-          perPage: Math.max(toInteger(this.perPage, 0), 0),
-          currentPage: Math.max(toInteger(this.currentPage, 0), 1),
+          perPage: mathMax(toInteger(this.perPage, 0), 0),
+          currentPage: mathMax(toInteger(this.currentPage, 0), 1),
           apiUrl: this.apiUrl
         };
       }
@@ -26592,8 +26866,7 @@
       // Watch for debounce being set to 0
       computedFilterDebounce: function computedFilterDebounce(newVal) {
         if (!newVal && this.$_filterTimer) {
-          clearTimeout(this.$_filterTimer);
-          this.$_filterTimer = null;
+          this.clearFilterTimer();
           this.localFilter = this.filterSanitize(this.filter);
         }
       },
@@ -26606,8 +26879,7 @@
           var _this = this;
 
           var timeout = this.computedFilterDebounce;
-          clearTimeout(this.$_filterTimer);
-          this.$_filterTimer = null;
+          this.clearFilterTimer();
 
           if (timeout && timeout > 0) {
             // If we have a debounce time, delay the update of `localFilter`
@@ -26656,7 +26928,7 @@
     created: function created() {
       var _this2 = this;
 
-      // Create non-reactive prop where we store the debounce timer id
+      // Create private non-reactive props
       this.$_filterTimer = null; // If filter is "pre-set", set the criteria
       // This will trigger any watchers/dependents
       // this.localFilter = this.filterSanitize(this.filter)
@@ -26670,10 +26942,13 @@
     beforeDestroy: function beforeDestroy()
     /* istanbul ignore next */
     {
-      clearTimeout(this.$_filterTimer);
-      this.$_filterTimer = null;
+      this.clearFilterTimer();
     },
     methods: {
+      clearFilterTimer: function clearFilterTimer() {
+        clearTimeout(this.$_filterTimer);
+        this.$_filterTimer = null;
+      },
       filterSanitize: function filterSanitize(criteria) {
         // Sanitizes filter criteria based on internal or external filtering
         if (this.localFiltering && !this.localFilterFn && !(isString(criteria) || isRegExp(criteria))) {
@@ -26927,7 +27202,7 @@
         var sortCompare = this.sortCompare;
         var localSorting = this.localSorting;
 
-        var sortOptions = _objectSpread2({}, this.sortCompareOptions, {
+        var sortOptions = _objectSpread2(_objectSpread2({}, this.sortCompareOptions), {}, {
           usage: 'sort'
         });
 
@@ -27140,8 +27415,8 @@
       },
       paginatedItems: function paginatedItems() {
         var items = this.sortedItems || this.filteredItems || this.localItems || [];
-        var currentPage = Math.max(toInteger(this.currentPage, 1), 1);
-        var perPage = Math.max(toInteger(this.perPage, 0), 0); // Apply local pagination
+        var currentPage = mathMax(toInteger(this.currentPage, 1), 1);
+        var perPage = mathMax(toInteger(this.perPage, 0), 0); // Apply local pagination
 
         if (this.localPaging && !!perPage) {
           // Grab the current page of data (which may be past filtered items limit)
@@ -27156,7 +27431,7 @@
 
   var captionMixin = {
     props: {
-      // `caption-top` is part of table-redere mixin (styling)
+      // `caption-top` is part of table-render mixin (styling)
       // captionTop: {
       //   type: Boolean,
       //   default: false
@@ -27178,24 +27453,20 @@
     },
     methods: {
       renderCaption: function renderCaption() {
-        var h = this.$createElement; // Build the caption
-
-        var $captionSlot = this.normalizeSlot('table-caption');
+        var caption = this.caption,
+            captionHtml = this.captionHtml;
+        var h = this.$createElement;
         var $caption = h();
+        var hasCaptionSlot = this.hasNormalizedSlot('table-caption');
 
-        if ($captionSlot || this.caption || this.captionHtml) {
-          var data = {
+        if (hasCaptionSlot || caption || captionHtml) {
+          $caption = h('caption', {
             key: 'caption',
             attrs: {
               id: this.captionId
-            }
-          };
-
-          if (!$captionSlot) {
-            data.domProps = htmlOrText(this.captionHtml, this.caption);
-          }
-
-          $caption = h('caption', data, [$captionSlot]);
+            },
+            domProps: hasCaptionSlot ? {} : htmlOrText(captionHtml, caption)
+          }, this.normalizeSlot('table-caption'));
         }
 
         return $caption;
@@ -27277,18 +27548,22 @@
     sel.containsNode(el, true) : false;
   };
 
-  var props$U = {
+  var props$V = {
     headVariant: {
       // Also sniffed by <b-tr> / <b-td> / <b-th>
       type: String,
-      // supported values: 'lite', 'dark', or null
+      // Supported values: 'lite', 'dark', or null
       default: null
     }
-  }; // @vue/component
+  }; // TODO:
+  //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+  //   to the child elements, so this can be converted to a functional component
+  // @vue/component
 
   var BThead = /*#__PURE__*/Vue.extend({
     name: 'BThead',
-    mixins: [normalizeSlotMixin],
+    // Mixin order is important!
+    mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     inheritAttrs: false,
     provide: function provide() {
       return {
@@ -27307,7 +27582,7 @@
         }
       }
     },
-    props: props$U,
+    props: props$V,
     computed: {
       isThead: function isThead() {
         // Sniffed by <b-tr> / <b-td> / <b-th>
@@ -27348,7 +27623,7 @@
       theadAttrs: function theadAttrs() {
         return _objectSpread2({
           role: 'rowgroup'
-        }, this.$attrs);
+        }, this.bvAttrs);
       }
     },
     render: function render(h) {
@@ -27356,22 +27631,26 @@
         class: this.theadClasses,
         attrs: this.theadAttrs,
         // Pass down any native listeners
-        on: this.$listeners
+        on: this.bvListeners
       }, this.normalizeSlot('default'));
     }
   });
 
-  var props$V = {
+  var props$W = {
     footVariant: {
       type: String,
-      // supported values: 'lite', 'dark', or null
+      // Supported values: 'lite', 'dark', or null
       default: null
     }
-  }; // @vue/component
+  }; // TODO:
+  //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+  //   to the child elements, so this can be converted to a functional component
+  // @vue/component
 
   var BTfoot = /*#__PURE__*/Vue.extend({
     name: 'BTfoot',
-    mixins: [normalizeSlotMixin],
+    // Mixin order is important!
+    mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     inheritAttrs: false,
     provide: function provide() {
       return {
@@ -27390,15 +27669,13 @@
         }
       }
     },
-    props: props$V,
+    props: props$W,
     computed: {
       isTfoot: function isTfoot() {
         // Sniffed by <b-tr> / <b-td> / <b-th>
         return true;
       },
-      isDark: function isDark()
-      /* istanbul ignore next: Not currently sniffed in tests */
-      {
+      isDark: function isDark() {
         // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.dark;
       },
@@ -27421,9 +27698,7 @@
         // background color inheritance with Bootstrap v4 table CSS
         return !this.isStacked && this.bvTable.stickyHeader;
       },
-      tableVariant: function tableVariant()
-      /* istanbul ignore next: Not currently sniffed in tests */
-      {
+      tableVariant: function tableVariant() {
         // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.tableVariant;
       },
@@ -27433,7 +27708,7 @@
       tfootAttrs: function tfootAttrs() {
         return _objectSpread2({
           role: 'rowgroup'
-        }, this.$attrs);
+        }, this.bvAttrs);
       }
     },
     render: function render(h) {
@@ -27441,23 +27716,27 @@
         class: this.tfootClasses,
         attrs: this.tfootAttrs,
         // Pass down any native listeners
-        on: this.$listeners
+        on: this.bvListeners
       }, this.normalizeSlot('default'));
     }
   });
 
-  var props$W = {
+  var props$X = {
     variant: {
       type: String,
       default: null
     }
   };
   var LIGHT = 'light';
-  var DARK = 'dark'; // @vue/component
+  var DARK = 'dark'; // TODO:
+  //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+  //   to the child elements, so this can be converted to a functional component
+  // @vue/component
 
   var BTr = /*#__PURE__*/Vue.extend({
     name: 'BTr',
-    mixins: [normalizeSlotMixin],
+    // Mixin order is important!
+    mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     inheritAttrs: false,
     provide: function provide() {
       return {
@@ -27474,7 +27753,7 @@
         }
       }
     },
-    props: props$W,
+    props: props$X,
     computed: {
       inTbody: function inTbody() {
         // Sniffed by <b-td> / <b-th>
@@ -27536,7 +27815,7 @@
       trAttrs: function trAttrs() {
         return _objectSpread2({
           role: 'row'
-        }, this.$attrs);
+        }, this.bvAttrs);
       }
     },
     render: function render(h) {
@@ -27544,10 +27823,12 @@
         class: this.trClasses,
         attrs: this.trAttrs,
         // Pass native listeners to child
-        on: this.$listeners
+        on: this.bvListeners
       }, this.normalizeSlot('default'));
     }
   });
+
+  // Parse a rowspan or colspan into a digit (or `null` if < `1` )
 
   var parseSpan = function parseSpan(value) {
     value = toInteger(value, 0);
@@ -27558,9 +27839,10 @@
 
   var spanValidator = function spanValidator(val) {
     return isUndefinedOrNull(val) || parseSpan(val) > 0;
-  };
+  }; // --- Props ---
 
-  var props$X = {
+
+  var props$Y = {
     variant: {
       type: String,
       default: null
@@ -27583,11 +27865,16 @@
       type: Boolean,
       default: false
     }
-  }; // @vue/component
+  }; // --- Main component ---
+  // TODO:
+  //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+  //   to the child elements, so this can be converted to a functional component
+  // @vue/component
 
   var BTd = /*#__PURE__*/Vue.extend({
     name: 'BTableCell',
-    mixins: [normalizeSlotMixin],
+    // Mixin order is important!
+    mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     inheritAttrs: false,
     inject: {
       bvTableTr: {
@@ -27599,7 +27886,7 @@
         }
       }
     },
-    props: props$X,
+    props: props$Y,
     computed: {
       tag: function tag() {
         // Overridden by <b-th>
@@ -27652,11 +27939,7 @@
       headVariant: function headVariant() {
         return this.bvTableTr.headVariant;
       },
-
-      /* istanbul ignore next: need to add in tests for footer variant */
-      footVariant: function footVariant()
-      /* istanbul ignore next: need to add in tests for footer variant */
-      {
+      footVariant: function footVariant() {
         return this.bvTableTr.footVariant;
       },
       tableVariant: function tableVariant() {
@@ -27671,10 +27954,9 @@
       cellClasses: function cellClasses() {
         // We use computed props here for improved performance by caching
         // the results of the string interpolation
-        // TODO: need to add handling for footVariant
         var variant = this.variant;
 
-        if (!variant && this.isStickyHeader && !this.headVariant || !variant && this.isStickyColumn) {
+        if (!variant && this.isStickyHeader && !this.headVariant || !variant && this.isStickyColumn && this.inTfoot && !this.footVariant || !variant && this.isStickyColumn && this.inThead && !this.headVariant || !variant && this.isStickyColumn && this.inTbody) {
           // Needed for sticky-header mode as Bootstrap v4 table cells do
           // not inherit parent's background-color. Boo!
           variant = this.rowVariant || this.tableVariant || 'b-table-default';
@@ -27698,18 +27980,18 @@
           // Header or footer cells
           role = 'columnheader';
           scope = colspan > 0 ? 'colspan' : 'col';
-        } else if (this.tag === 'th') {
+        } else if (isTag(this.tag, 'th')) {
           // th's in tbody
           role = 'rowheader';
           scope = rowspan > 0 ? 'rowgroup' : 'row';
         }
 
-        return _objectSpread2({
+        return _objectSpread2(_objectSpread2({
           colspan: colspan,
           rowspan: rowspan,
           role: role,
           scope: scope
-        }, this.$attrs, {
+        }, this.bvAttrs), {}, {
           // Add in the stacked cell label data-attribute if in
           // stacked mode (if a stacked heading label is provided)
           'data-label': this.isStackedCell && !isUndefinedOrNull(this.stackedHeading) ?
@@ -27724,10 +28006,14 @@
         class: this.cellClasses,
         attrs: this.cellAttrs,
         // Transfer any native listeners
-        on: this.$listeners
+        on: this.bvListeners
       }, [this.isStackedCell ? h('div', [content]) : content]);
     }
   });
+
+  //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+  //   to the child elements, so this can be converted to a functional component
+  // @vue/component
 
   var BTh = /*#__PURE__*/Vue.extend({
     name: 'BTh',
@@ -27790,19 +28076,30 @@
 
         var isFoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
         var h = this.$createElement;
-        var fields = this.computedFields || [];
+        var fields = this.computedFields || []; // In always stacked mode, we don't bother rendering the head/foot
+        // Or if no field headings (empty table)
 
         if (this.isStackedAlways || fields.length === 0) {
-          // In always stacked mode, we don't bother rendering the head/foot
-          // Or if no field headings (empty table)
           return h();
-        } // Reference to `selectAllRows` and `clearSelected()`, if table is selectable
+        }
 
+        var isSortable = this.isSortable,
+            isSelectable = this.isSelectable,
+            headVariant = this.headVariant,
+            footVariant = this.footVariant,
+            headRowVariant = this.headRowVariant,
+            footRowVariant = this.footRowVariant;
+        var hasHeadClickListener = isSortable || this.hasListener('head-clicked'); // Reference to `selectAllRows` and `clearSelected()`, if table is selectable
 
-        var selectAllRows = this.isSelectable ? this.selectAllRows : function () {};
-        var clearSelected = this.isSelectable ? this.clearSelected : function () {}; // Helper function to generate a field <th> cell
+        var selectAllRows = isSelectable ? this.selectAllRows : noop;
+        var clearSelected = isSelectable ? this.clearSelected : noop; // Helper function to generate a field <th> cell
 
         var makeCell = function makeCell(field, colIndex) {
+          var label = field.label,
+              labelHtml = field.labelHtml,
+              variant = field.variant,
+              stickyColumn = field.stickyColumn,
+              key = field.key;
           var ariaLabel = null;
 
           if (!field.label.trim() && !field.headerTitle) {
@@ -27813,16 +28110,14 @@
             ariaLabel = startCase(field.key);
           }
 
-          var hasHeadClickListener = _this.hasListener('head-clicked') || _this.isSortable;
-
-          var handlers = {};
+          var on = {};
 
           if (hasHeadClickListener) {
-            handlers.click = function (evt) {
+            on.click = function (evt) {
               _this.headClicked(evt, field, isFoot);
             };
 
-            handlers.keydown = function (evt) {
+            on.keydown = function (evt) {
               var keyCode = evt.keyCode;
 
               if (keyCode === KEY_CODES.ENTER || keyCode === KEY_CODES.SPACE) {
@@ -27831,72 +28126,70 @@
             };
           }
 
-          var sortAttrs = _this.isSortable ? _this.sortTheadThAttrs(field.key, field, isFoot) : {};
-          var sortClass = _this.isSortable ? _this.sortTheadThClasses(field.key, field, isFoot) : null;
-          var sortLabel = _this.isSortable ? _this.sortTheadThLabel(field.key, field, isFoot) : null;
+          var sortAttrs = isSortable ? _this.sortTheadThAttrs(key, field, isFoot) : {};
+          var sortClass = isSortable ? _this.sortTheadThClasses(key, field, isFoot) : null;
+          var sortLabel = isSortable ? _this.sortTheadThLabel(key, field, isFoot) : null;
           var data = {
-            key: field.key,
             class: [_this.fieldClasses(field), sortClass],
             props: {
-              variant: field.variant,
-              stickyColumn: field.stickyColumn
+              variant: variant,
+              stickyColumn: stickyColumn
             },
             style: field.thStyle || {},
-            attrs: _objectSpread2({
+            attrs: _objectSpread2(_objectSpread2({
               // We only add a tabindex of 0 if there is a head-clicked listener
               tabindex: hasHeadClickListener ? '0' : null,
               abbr: field.headerAbbr || null,
               title: field.headerTitle || null,
               'aria-colindex': colIndex + 1,
               'aria-label': ariaLabel
-            }, _this.getThValues(null, field.key, field.thAttr, isFoot ? 'foot' : 'head', {}), {}, sortAttrs),
-            on: handlers
+            }, _this.getThValues(null, key, field.thAttr, isFoot ? 'foot' : 'head', {})), sortAttrs),
+            on: on,
+            key: key
           }; // Handle edge case where in-document templates are used with new
           // `v-slot:name` syntax where the browser lower-cases the v-slot's
           // name (attributes become lower cased when parsed by the browser)
           // We have replaced the square bracket syntax with round brackets
           // to prevent confusion with dynamic slot names
 
-          var slotNames = ["head(".concat(field.key, ")"), "head(".concat(field.key.toLowerCase(), ")"), 'head()'];
+          var slotNames = ["head(".concat(key, ")"), "head(".concat(key.toLowerCase(), ")"), 'head()']; // Footer will fallback to header slot names
 
           if (isFoot) {
-            // Footer will fallback to header slot names
-            slotNames = ["foot(".concat(field.key, ")"), "foot(".concat(field.key.toLowerCase(), ")"), 'foot()'].concat(_toConsumableArray(slotNames));
+            slotNames = ["foot(".concat(key, ")"), "foot(".concat(key.toLowerCase(), ")"), 'foot()'].concat(_toConsumableArray(slotNames));
           }
 
           var scope = {
-            label: field.label,
-            column: field.key,
+            label: label,
+            column: key,
             field: field,
             isFoot: isFoot,
             // Add in row select methods
             selectAllRows: selectAllRows,
             clearSelected: clearSelected
           };
-          var content = _this.normalizeSlot(slotNames, scope) || (field.labelHtml ? h('div', {
-            domProps: htmlOrText(field.labelHtml)
-          }) : field.label);
-          var srLabel = sortLabel ? h('span', {
+          var $content = _this.normalizeSlot(slotNames, scope) || h('div', {
+            domProps: htmlOrText(labelHtml, label)
+          });
+          var $srLabel = sortLabel ? h('span', {
             staticClass: 'sr-only'
           }, " (".concat(sortLabel, ")")) : null; // Return the header cell
 
-          return h(BTh, data, [content, srLabel].filter(identity));
+          return h(BTh, data, [$content, $srLabel].filter(identity));
         }; // Generate the array of <th> cells
 
 
-        var $cells = fields.map(makeCell).filter(identity); // Genrate the row(s)
+        var $cells = fields.map(makeCell).filter(identity); // Generate the row(s)
 
         var $trs = [];
 
         if (isFoot) {
-          var trProps = {
-            variant: isUndefinedOrNull(this.footRowVariant) ? this.headRowVariant :
-            /* istanbul ignore next */
-            this.footRowVariant
-          };
           $trs.push(h(BTr, {
             class: this.tfootTrClass,
-            props: trProps
+            props: {
+              variant: isUndefinedOrNull(footRowVariant) ? headRowVariant :
+              /* istanbul ignore next */
+              footRowVariant
+            }
           }, $cells));
         } else {
           var scope = {
@@ -27910,7 +28203,7 @@
           $trs.push(h(BTr, {
             class: this.theadTrClass,
             props: {
-              variant: this.headRowVariant
+              variant: headRowVariant
             }
           }, $cells));
         }
@@ -27919,9 +28212,9 @@
           key: isFoot ? 'bv-tfoot' : 'bv-thead',
           class: (isFoot ? this.tfootClass : this.theadClass) || null,
           props: isFoot ? {
-            footVariant: this.footVariant || this.headVariant || null
+            footVariant: footVariant || headVariant || null
           } : {
-            headVariant: this.headVariant || null
+            headVariant: headVariant || null
           }
         }, $trs);
       }
@@ -27982,7 +28275,7 @@
     }
   };
 
-  var props$Y = {
+  var props$Z = {
     tbodyTransitionProps: {
       type: Object // default: undefined
 
@@ -27991,11 +28284,15 @@
       type: Object // default: undefined
 
     }
-  }; // @vue/component
+  }; // TODO:
+  //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+  //   to the child elements, so this can be converted to a functional component
+  // @vue/component
 
   var BTbody = /*#__PURE__*/Vue.extend({
     name: 'BTbody',
-    mixins: [normalizeSlotMixin],
+    // Mixin order is important!
+    mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     inheritAttrs: false,
     provide: function provide() {
       return {
@@ -28014,7 +28311,7 @@
         }
       }
     },
-    props: props$Y,
+    props: props$Z,
     computed: {
       isTbody: function isTbody() {
         // Sniffed by <b-tr> / <b-td> / <b-th>
@@ -28043,9 +28340,7 @@
         // background color inheritance with Bootstrap v4 table CSS
         return !this.isStacked && this.bvTable.stickyHeader;
       },
-      tableVariant: function tableVariant()
-      /* istanbul ignore next: Not currently sniffed in tests */
-      {
+      tableVariant: function tableVariant() {
         // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.tableVariant;
       },
@@ -28055,10 +28350,10 @@
       tbodyAttrs: function tbodyAttrs() {
         return _objectSpread2({
           role: 'rowgroup'
-        }, this.$attrs);
+        }, this.bvAttrs);
       },
       tbodyProps: function tbodyProps() {
-        return this.tbodyTransitionProps ? _objectSpread2({}, this.tbodyTransitionProps, {
+        return this.tbodyTransitionProps ? _objectSpread2(_objectSpread2({}, this.tbodyTransitionProps), {}, {
           tag: 'tbody'
         }) : {};
       }
@@ -28070,13 +28365,12 @@
       };
 
       if (this.isTransitionGroup) {
-        // We use native listeners if a transition group
-        // for any delegated events
+        // We use native listeners if a transition group for any delegated events
         data.on = this.tbodyTransitionHandlers || {};
-        data.nativeOn = this.$listeners || {};
+        data.nativeOn = this.bvListeners;
       } else {
         // Otherwise we place any listeners on the tbody element
-        data.on = this.$listeners || {};
+        data.on = this.bvListeners;
       }
 
       return h(this.isTransitionGroup ? 'transition-group' : 'tbody', data, this.normalizeSlot('default'));
@@ -28318,9 +28612,9 @@
           props: {
             variant: item._rowVariant || null
           },
-          attrs: _objectSpread2({
+          attrs: _objectSpread2(_objectSpread2({
             id: rowId
-          }, userTrAttrs, {
+          }, userTrAttrs), {}, {
             // Users cannot override the following attributes
             tabindex: hasRowClickHandler ? '0' : null,
             'data-pk': primaryKeyValue || null,
@@ -28391,7 +28685,7 @@
             props: {
               variant: item._rowVariant || null
             },
-            attrs: _objectSpread2({}, userDetailsTrAttrs, {
+            attrs: _objectSpread2(_objectSpread2({}, userDetailsTrAttrs), {}, {
               // Users cannot override the following attributes
               id: detailsId,
               tabindex: '-1'
@@ -28413,7 +28707,7 @@
     }
   };
 
-  var props$Z = _objectSpread2({}, props$Y, {
+  var props$_ = _objectSpread2(_objectSpread2({}, props$Z), {}, {
     tbodyClass: {
       type: [String, Array, Object] // default: undefined
 
@@ -28422,7 +28716,10 @@
 
   var tbodyMixin = {
     mixins: [tbodyRowMixin],
-    props: props$Z,
+    props: props$_,
+    beforeDestroy: function beforeDestroy() {
+      this.$_bodyFieldSlotNameCache = null;
+    },
     methods: {
       // Helper methods
       getTbodyTrs: function getTbodyTrs() {
@@ -28473,7 +28770,7 @@
         // Keyboard navigation and row click emulation
         var target = evt.target;
 
-        if (this.tbodyRowEvtStopped(evt) || target.tagName !== 'TR' || target !== document.activeElement || target.tabIndex !== 0) {
+        if (this.tbodyRowEvtStopped(evt) || target.tagName !== 'TR' || !isActiveElement(target) || target.tabIndex !== 0) {
           // Early exit if not an item row TR
           return;
         }
@@ -28497,16 +28794,16 @@
 
             if (keyCode === KEY_CODES.HOME || shift && keyCode === KEY_CODES.UP) {
               // Focus first row
-              trs[0].focus();
+              attemptFocus(trs[0]);
             } else if (keyCode === KEY_CODES.END || shift && keyCode === KEY_CODES.DOWN) {
               // Focus last row
-              trs[trs.length - 1].focus();
+              attemptFocus(trs[trs.length - 1]);
             } else if (keyCode === KEY_CODES.UP && rowIndex > 0) {
               // Focus previous row
-              trs[rowIndex - 1].focus();
+              attemptFocus(trs[rowIndex - 1]);
             } else if (keyCode === KEY_CODES.DOWN && rowIndex < trs.length - 1) {
               // Focus next row
-              trs[rowIndex + 1].focus();
+              attemptFocus(trs[rowIndex + 1]);
             }
           }
         }
@@ -28653,15 +28950,23 @@
       renderEmpty: function renderEmpty() {
         var h = this.$createElement;
         var items = this.computedItems;
-        var $empty;
+        var $empty = h();
 
         if (this.showEmpty && (!items || items.length === 0) && !(this.computedBusy && this.hasNormalizedSlot('table-busy'))) {
+          var isFiltered = this.isFiltered,
+              emptyText = this.emptyText,
+              emptyHtml = this.emptyHtml,
+              emptyFilteredText = this.emptyFilteredText,
+              emptyFilteredHtml = this.emptyFilteredHtml,
+              computedFields = this.computedFields,
+              tbodyTrClass = this.tbodyTrClass,
+              tbodyTrAttr = this.tbodyTrAttr;
           $empty = this.normalizeSlot(this.isFiltered ? 'emptyfiltered' : 'empty', {
-            emptyFilteredHtml: this.emptyFilteredHtml,
-            emptyFilteredText: this.emptyFilteredText,
-            emptyHtml: this.emptyHtml,
-            emptyText: this.emptyText,
-            fields: this.computedFields,
+            emptyFilteredHtml: emptyFilteredHtml,
+            emptyFilteredText: emptyFilteredText,
+            emptyHtml: emptyHtml,
+            emptyText: emptyText,
+            fields: computedFields,
             // Not sure why this is included, as it will always be an empty array
             items: this.computedItems
           });
@@ -28669,13 +28974,13 @@
           if (!$empty) {
             $empty = h('div', {
               class: ['text-center', 'my-2'],
-              domProps: this.isFiltered ? htmlOrText(this.emptyFilteredHtml, this.emptyFilteredText) : htmlOrText(this.emptyHtml, this.emptyText)
+              domProps: isFiltered ? htmlOrText(emptyFilteredHtml, emptyFilteredText) : htmlOrText(emptyHtml, emptyText)
             });
           }
 
           $empty = h(BTd, {
             props: {
-              colspan: this.computedFields.length || null
+              colspan: computedFields.length || null
             }
           }, [h('div', {
             attrs: {
@@ -28684,18 +28989,18 @@
             }
           }, [$empty])]);
           $empty = h(BTr, {
-            key: this.isFiltered ? 'b-empty-filtered-row' : 'b-empty-row',
             staticClass: 'b-table-empty-row',
-            class: [isFunction(this.tbodyTrClass) ?
+            class: [isFunction(tbodyTrClass) ?
             /* istanbul ignore next */
-            this.tbodyTrClass(null, 'row-empty') : this.tbodyTrClass],
-            attrs: isFunction(this.tbodyTrAttr) ?
+            this.tbodyTrClass(null, 'row-empty') : tbodyTrClass],
+            attrs: isFunction(tbodyTrAttr) ?
             /* istanbul ignore next */
-            this.tbodyTrAttr(null, 'row-empty') : this.tbodyTrAttr
+            this.tbodyTrAttr(null, 'row-empty') : tbodyTrAttr,
+            key: isFiltered ? 'b-empty-filtered-row' : 'b-empty-row'
           }, [$empty]);
         }
 
-        return $empty || h();
+        return $empty;
       }
     }
   };
@@ -29015,7 +29320,7 @@
         } else if (selectMode === 'range') {
           if (this.selectedLastRow > -1 && evt.shiftKey) {
             // range
-            for (var idx = Math.min(this.selectedLastRow, index); idx <= Math.max(this.selectedLastRow, index); idx++) {
+            for (var idx = mathMin(this.selectedLastRow, index); idx <= mathMax(this.selectedLastRow, index); idx++) {
               selectedRows[idx] = true;
             }
 
@@ -29236,6 +29541,8 @@
     // Don't place attributes on root element automatically,
     // as table could be wrapped in responsive `<div>`
     inheritAttrs: false,
+    // Mixin order is important!
+    mixins: [attrsMixin],
     provide: function provide() {
       return {
         bvTable: this
@@ -29340,7 +29647,7 @@
       },
       tableAttrs: function tableAttrs() {
         // Preserve user supplied aria-describedby, if provided in `$attrs`
-        var adb = [(this.$attrs || {})['aria-describedby'], this.captionId].filter(identity).join(' ') || null;
+        var adb = [(this.bvAttrs || {})['aria-describedby'], this.captionId].filter(identity).join(' ') || null;
         var items = this.computedItems;
         var filteredItems = this.filteredItems;
         var fields = this.computedFields;
@@ -29351,15 +29658,15 @@
           'aria-describedby': adb
         };
         var rowCount = items && filteredItems && filteredItems.length > items.length ? toString$1(filteredItems.length) : null;
-        return _objectSpread2({
+        return _objectSpread2(_objectSpread2(_objectSpread2({
           // We set `aria-rowcount` before merging in `$attrs`,
           // in case user has supplied their own
           'aria-rowcount': rowCount
-        }, this.$attrs, {
+        }, this.bvAttrs), {}, {
           // Now we can override any `$attrs` here
           id: this.safeId(),
           role: 'table'
-        }, ariaAttrs, {}, selectableAttrs);
+        }, ariaAttrs), selectableAttrs);
       }
     },
     render: function render(h) {
@@ -29401,10 +29708,11 @@
   var BTable = /*#__PURE__*/Vue.extend({
     name: 'BTable',
     // Order of mixins is important!
-    // They are merged from first to last, followed by this component.
-    mixins: [// Required Mixins
-    hasListenerMixin, idMixin, normalizeSlotMixin, itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Features Mixins
-    stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin] // render function provided by table-renderer mixin
+    // They are merged from first to last, followed by this component
+    mixins: [// General mixins
+    attrsMixin, hasListenerMixin, idMixin, normalizeSlotMixin, // Required table mixins
+    itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Table features mixins
+    stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin] // Render function is provided by table-renderer mixin
 
   });
 
@@ -29466,7 +29774,7 @@
     }
   });
 
-  var navProps = omit(props$J, ['tabs', 'isNavBar', 'cardHeader']); // -- Utils --
+  var navProps = omit(props$K, ['tabs', 'isNavBar', 'cardHeader']); // -- Utils --
   // Filter function to filter out disabled tabs
 
   var notDisabled = function notDisabled(tab) {
@@ -29529,9 +29837,7 @@
     },
     methods: {
       focus: function focus() {
-        if (this.$refs && this.$refs.link && this.$refs.link.focus) {
-          this.$refs.link.focus();
-        }
+        attemptFocus(this.$refs.link);
       },
       handleEvt: function handleEvt(evt) {
         var stop = function stop() {
@@ -29591,7 +29897,7 @@
         props: {
           disabled: this.tab.disabled
         },
-        attrs: _objectSpread2({}, this.tab.titleLinkAttributes, {
+        attrs: _objectSpread2(_objectSpread2({}, this.tab.titleLinkAttributes), {}, {
           role: 'tab',
           id: this.id,
           // Roving tab index when keynav enabled
@@ -29628,7 +29934,7 @@
       prop: 'value',
       event: 'input'
     },
-    props: _objectSpread2({}, navProps, {
+    props: _objectSpread2(_objectSpread2({}, navProps), {}, {
       tag: {
         type: String,
         default: 'div'
@@ -29796,8 +30102,9 @@
     created: function created() {
       var _this4 = this;
 
-      this.currentTab = toInteger(this.value, -1);
-      this._bvObserver = null; // For SSR and to make sure only a single tab is shown on mount
+      // Create private non-reactive props
+      this.$_observer = null;
+      this.currentTab = toInteger(this.value, -1); // For SSR and to make sure only a single tab is shown on mount
       // We wrap this in a `$nextTick()` to ensure the child tabs have been created
 
       this.$nextTick(function () {
@@ -29861,11 +30168,12 @@
           return t !== tab;
         });
       },
+      // DOM observer is needed to detect changes in order of tabs
       setObserver: function setObserver(on) {
-        // DOM observer is needed to detect changes in order of tabs
+        this.$_observer && this.$_observer.disconnect();
+        this.$_observer = null;
+
         if (on) {
-          // Make sure no existing observer running
-          this.setObserver(false);
           var self = this;
           /* istanbul ignore next: difficult to test mutation observer in JSDOM */
 
@@ -29880,18 +30188,12 @@
           }; // Watch for changes to <b-tab> sub components
 
 
-          this._bvObserver = observeDom(this.$refs.tabsContainer, handler, {
+          this.$_observer = observeDom(this.$refs.tabsContainer, handler, {
             childList: true,
             subtree: false,
             attributes: true,
             attributeFilter: ['id']
           });
-        } else {
-          if (this._bvObserver && this._bvObserver.disconnect) {
-            this._bvObserver.disconnect();
-          }
-
-          this._bvObserver = null;
         }
       },
       getTabs: function getTabs() {
@@ -30035,11 +30337,7 @@
 
         // Wrap in `$nextTick()` to ensure DOM has completed rendering/updating before focusing
         this.$nextTick(function () {
-          var button = _this8.getButtonForTab(tab);
-
-          if (button && button.focus) {
-            button.focus();
-          }
+          attemptFocus(_this8.getButtonForTab(tab));
         });
       },
       // Emit a click event on a specified <b-tab> component instance
@@ -30064,7 +30362,7 @@
       },
       // Move to previous non-disabled tab
       previousTab: function previousTab(focus) {
-        var currentIndex = Math.max(this.currentTab, 0);
+        var currentIndex = mathMax(this.currentTab, 0);
         var tab = this.tabs.slice(0, currentIndex).reverse().find(notDisabled);
 
         if (this.activateTab(tab) && focus) {
@@ -30074,7 +30372,7 @@
       },
       // Move to next non-disabled tab
       nextTab: function nextTab(focus) {
-        var currentIndex = Math.max(this.currentTab, -1);
+        var currentIndex = mathMax(this.currentTab, -1);
         var tab = this.tabs.slice(currentIndex + 1).find(notDisabled);
 
         if (this.activateTab(tab) && focus) {
@@ -30985,8 +31283,8 @@
     }
   });
 
-  var NAME$I = 'BToaster';
-  var props$_ = {
+  var NAME$K = 'BToaster';
+  var props$$ = {
     name: {
       type: String,
       required: true
@@ -30994,13 +31292,13 @@
     ariaLive: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$I, 'ariaLive');
+        return getComponentConfig(NAME$K, 'ariaLive');
       }
     },
     ariaAtomic: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$I, 'ariaAtomic');
+        return getComponentConfig(NAME$K, 'ariaAtomic');
       } // Allowed: 'true' or 'false' or null
 
     },
@@ -31008,7 +31306,7 @@
       // Aria role
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$I, 'role');
+        return getComponentConfig(NAME$K, 'role');
       }
     }
     /*
@@ -31053,8 +31351,8 @@
   }); // @vue/component
 
   var BToaster = /*#__PURE__*/Vue.extend({
-    name: NAME$I,
-    props: props$_,
+    name: NAME$K,
+    props: props$$,
     data: function data() {
       return {
         // We don't render on SSR or if a an existing target found
@@ -31126,10 +31424,11 @@
     }
   });
 
-  var NAME$J = 'BToast';
+  var NAME$L = 'BToast';
   var MIN_DURATION = 1000; // --- Props ---
 
-  var props$$ = {
+  var linkProps$5 = pick(props$1, ['href', 'to']);
+  var props$10 = _objectSpread2({
     id: {
       // Even though the ID prop is provided by idMixin, we
       // add it here for $bvToast props filtering
@@ -31143,7 +31442,7 @@
     toaster: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$J, 'toaster');
+        return getComponentConfig(NAME$L, 'toaster');
       }
     },
     visible: {
@@ -31153,7 +31452,7 @@
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$J, 'variant');
+        return getComponentConfig(NAME$L, 'variant');
       }
     },
     isStatus: {
@@ -31172,7 +31471,7 @@
     autoHideDelay: {
       type: [Number, String],
       default: function _default() {
-        return getComponentConfig(NAME$J, 'autoHideDelay');
+        return getComponentConfig(NAME$L, 'autoHideDelay');
       }
     },
     noCloseButton: {
@@ -31194,45 +31493,37 @@
     toastClass: {
       type: [String, Object, Array],
       default: function _default() {
-        return getComponentConfig(NAME$J, 'toastClass');
+        return getComponentConfig(NAME$L, 'toastClass');
       }
     },
     headerClass: {
       type: [String, Object, Array],
       default: function _default() {
-        return getComponentConfig(NAME$J, 'headerClass');
+        return getComponentConfig(NAME$L, 'headerClass');
       }
     },
     bodyClass: {
       type: [String, Object, Array],
       default: function _default() {
-        return getComponentConfig(NAME$J, 'bodyClass');
+        return getComponentConfig(NAME$L, 'bodyClass');
       }
-    },
-    href: {
-      type: String // default: null
-
-    },
-    to: {
-      type: [String, Object] // default: null
-
     },
     static: {
       // Render the toast in place, rather than in a portal-target
       type: Boolean,
       default: false
     }
-  }; // @vue/component
+  }, linkProps$5); // @vue/component
 
   var BToast = /*#__PURE__*/Vue.extend({
-    name: NAME$J,
-    mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
+    name: NAME$L,
+    mixins: [attrsMixin, idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
     inheritAttrs: false,
     model: {
       prop: 'visible',
       event: 'change'
     },
-    props: props$$,
+    props: props$10,
     data: function data() {
       return {
         isMounted: false,
@@ -31261,7 +31552,7 @@
       },
       computedDuration: function computedDuration() {
         // Minimum supported duration is 1 second
-        return Math.max(toInteger(this.autoHideDelay, 0), MIN_DURATION);
+        return mathMax(toInteger(this.autoHideDelay, 0), MIN_DURATION);
       },
       computedToaster: function computedToaster() {
         return String(this.toaster);
@@ -31273,6 +31564,12 @@
           beforeLeave: this.onBeforeLeave,
           afterLeave: this.onAfterLeave
         };
+      },
+      computedAttrs: function computedAttrs() {
+        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+          id: this.safeId(),
+          tabindex: '0'
+        });
       }
     },
     watch: {
@@ -31379,11 +31676,11 @@
       },
       buildEvent: function buildEvent(type) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        return new BvEvent(type, _objectSpread2({
+        return new BvEvent(type, _objectSpread2(_objectSpread2({
           cancelable: false,
           target: this.$el || null,
           relatedTarget: null
-        }, options, {
+        }, options), {}, {
           vueTarget: this,
           componentId: this.safeId()
         }));
@@ -31438,7 +31735,7 @@
 
         if (passed > 0) {
           this.clearDismissTimer();
-          this.resumeDismiss = Math.max(this.computedDuration - passed, MIN_DURATION);
+          this.resumeDismiss = mathMax(this.computedDuration - passed, MIN_DURATION);
         }
       },
       onUnPause: function onUnPause() {
@@ -31520,15 +31817,12 @@
         } // Toast body
 
 
-        var isLink = this.href || this.to;
-        var $body = h(isLink ? BLink : 'div', {
+        var link = isLink(this);
+        var $body = h(link ? BLink : 'div', {
           staticClass: 'toast-body',
           class: this.bodyClass,
-          props: isLink ? {
-            to: this.to,
-            href: this.href
-          } : {},
-          on: isLink ? {
+          props: link ? pluckProps(linkProps$5, this) : {},
+          on: link ? {
             click: this.onLinkClick
           } : {}
         }, [this.normalizeSlot('default', this.slotScope) || h()]); // Build the toast
@@ -31538,10 +31832,7 @@
           ref: 'toast',
           staticClass: 'toast',
           class: this.toastClass,
-          attrs: _objectSpread2({}, this.$attrs, {
-            tabindex: '0',
-            id: this.safeId()
-          })
+          attrs: this.computedAttrs
         }, [$header, $body]);
         return $toast;
       }
@@ -31568,7 +31859,7 @@
         ref: 'b-toast',
         staticClass: 'b-toast',
         class: this.bToastClasses,
-        attrs: _objectSpread2({}, scopedStyleAttrs, {
+        attrs: _objectSpread2(_objectSpread2({}, scopedStyleAttrs), {}, {
           id: this.safeId('_toast_outer'),
           role: this.isHiding ? null : this.isStatus ? 'status' : 'alert',
           'aria-live': this.isHiding ? null : this.isStatus ? 'polite' : 'assertive',
@@ -31589,7 +31880,7 @@
   // Prop ID is allowed, but really only should be used for testing
   // We need to add it in explicitly as it comes from the `idMixin`
 
-  var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$$, ['static', 'visible'])))); // Map prop names to toast slot names
+  var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$10, ['static', 'visible'])))); // Map prop names to toast slot names
 
   var propsToSlots$1 = {
     toastContent: 'default',
@@ -31664,7 +31955,7 @@
         // We set parent as the local VM so these toasts can emit events on the
         // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
         parent: $parent,
-        propsData: _objectSpread2({}, filterOptions$1(getComponentConfig('BToast') || {}), {}, omit(props, keys(propsToSlots$1)), {
+        propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions$1(getComponentConfig('BToast') || {})), omit(props, keys(propsToSlots$1))), {}, {
           // Props that can't be overridden
           static: false,
           visible: true
@@ -31721,7 +32012,7 @@
             return;
           }
 
-          makeToast(_objectSpread2({}, filterOptions$1(options), {
+          makeToast(_objectSpread2(_objectSpread2({}, filterOptions$1(options)), {}, {
             toastContent: content
           }), this._vm);
         } // shows a `<b-toast>` component with the specified ID
@@ -31755,9 +32046,8 @@
       }
     }); // Define our read-only `$bvToast` instance property
     // Placed in an if just in case in HMR mode
-    // eslint-disable-next-line no-prototype-builtins
 
-    if (!Vue.prototype.hasOwnProperty(PROP_NAME$3)) {
+    if (!hasOwnProperty(Vue.prototype, PROP_NAME$3)) {
       defineProperty(Vue.prototype, PROP_NAME$3, {
         get: function get() {
           /* istanbul ignore next */
@@ -31848,7 +32138,7 @@
       config.title = bindings.value;
     } else if (isPlainObject(bindings.value)) {
       // Value is config object, so merge
-      config = _objectSpread2({}, config, {}, bindings.value);
+      config = _objectSpread2(_objectSpread2({}, config), bindings.value);
     } // If title is not provided, try title attribute
 
 
@@ -32123,7 +32413,7 @@
    * Constants / Defaults
    */
 
-  var NAME$K = 'v-b-scrollspy';
+  var NAME$M = 'v-b-scrollspy';
   var ACTIVATE_EVENT = 'bv::scrollspy::activate';
   var Default = {
     element: 'body',
@@ -32179,7 +32469,7 @@
   /* istanbul ignore next: not easy to test */
   {
     for (var property in configTypes) {
-      if (Object.prototype.hasOwnProperty.call(configTypes, property)) {
+      if (hasOwnProperty(configTypes, property)) {
         var expectedTypes = configTypes[property];
         var value = config[property];
         var valueType = value && isElement(value) ? 'element' : toType$1(value); // handle Vue instances
@@ -32217,8 +32507,8 @@
       this.$activeTarget = null;
       this.$scrollHeight = 0;
       this.$resizeTimeout = null;
-      this.$obs_scroller = null;
-      this.$obs_targets = null;
+      this.$scrollerObserver = null;
+      this.$targetsObserver = null;
       this.$root = $root || null;
       this.$config = null;
       this.updateConfig(config);
@@ -32233,7 +32523,7 @@
           this.$scroller = null;
         }
 
-        var cfg = _objectSpread2({}, this.constructor.Default, {}, config);
+        var cfg = _objectSpread2(_objectSpread2({}, this.constructor.Default), config);
 
         if ($root) {
           this.$root = $root;
@@ -32312,18 +32602,13 @@
         var _this3 = this;
 
         // We observe both the scroller for content changes, and the target links
-        if (this.$obs_scroller) {
-          this.$obs_scroller.disconnect();
-          this.$obs_scroller = null;
-        }
-
-        if (this.$obs_targets) {
-          this.$obs_targets.disconnect();
-          this.$obs_targets = null;
-        }
+        this.$scrollerObserver && this.$scrollerObserver.disconnect();
+        this.$targetsObserver && this.$targetsObserver.disconnect();
+        this.$scrollerObserver = null;
+        this.$targetsObserver = null;
 
         if (on) {
-          this.$obs_targets = observeDom(this.$el, function () {
+          this.$targetsObserver = observeDom(this.$el, function () {
             _this3.handleEvent('mutation');
           }, {
             subtree: true,
@@ -32331,7 +32616,7 @@
             attributes: true,
             attributeFilter: ['href']
           });
-          this.$obs_scroller = observeDom(this.getScroller(), function () {
+          this.$scrollerObserver = observeDom(this.getScroller(), function () {
             _this3.handleEvent('mutation');
           }, {
             subtree: true,
@@ -32360,7 +32645,7 @@
         };
 
         if (type === 'scroll') {
-          if (!this.$obs_scroller) {
+          if (!this.$scrollerObserver) {
             // Just in case we are added to the DOM before the scroll target is
             // We re-instantiate our listeners, just in case
             this.listen();
@@ -32505,7 +32790,7 @@
     }, {
       key: "getScrollHeight",
       value: function getScrollHeight() {
-        return this.getScroller().scrollHeight || Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        return this.getScroller().scrollHeight || mathMax(document.body.scrollHeight, document.documentElement.scrollHeight);
       }
     }, {
       key: "getOffsetHeight",
@@ -32601,7 +32886,7 @@
     }], [{
       key: "Name",
       get: function get() {
-        return NAME$K;
+        return NAME$M;
       }
     }, {
       key: "Default",
@@ -32653,7 +32938,7 @@
       config.element = bindings.value;
     } else if (isNumber(bindings.value)) {
       // Value is offset
-      config.offset = Math.round(bindings.value);
+      config.offset = mathRound(bindings.value);
     } else if (isObject(bindings.value)) {
       // Value is config object
       // Filter the object based on our supported config options
@@ -32777,14 +33062,14 @@
           children = _ref.children;
       return h(BVIconBase, a(data, {
         staticClass: 'b-iconstack',
-        props: _objectSpread2({}, props, {
+        props: _objectSpread2(_objectSpread2({}, props), {}, {
           stacked: false
         })
       }), children);
     }
   });
 
-  var NAME$L = 'BootstrapVue'; // --- BootstrapVue installer ---
+  var NAME$N = 'BootstrapVue'; // --- BootstrapVue installer ---
 
   var install = /*#__PURE__*/installFactory({
     plugins: {
@@ -32795,7 +33080,7 @@
 
   var BootstrapVue = /*#__PURE__*/{
     install: install,
-    NAME: NAME$L
+    NAME: NAME$N
   }; // --- Named exports for BvConfigPlugin ---
 
   // Main entry point for the browser build

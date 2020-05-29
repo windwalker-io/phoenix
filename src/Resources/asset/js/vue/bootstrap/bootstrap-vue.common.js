@@ -1,5 +1,5 @@
 /*!
- * BootstrapVue 2.12.0
+ * BootstrapVue 2.15.0
  *
  * @link https://bootstrap-vue.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
@@ -222,11 +222,13 @@ function _possibleConstructorReturn(self, call) {
 }
 
 function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
   return function () {
     var Super = _getPrototypeOf(Derived),
         result;
 
-    if (_isNativeReflectConstruct()) {
+    if (hasNativeReflectConstruct) {
       var NewTarget = _getPrototypeOf(this).constructor;
 
       result = Reflect.construct(Super, arguments, NewTarget);
@@ -320,7 +322,7 @@ function _unsupportedIterableToArray(o, minLen) {
   if (typeof o === "string") return _arrayLikeToArray(o, minLen);
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(n);
+  if (n === "Map" || n === "Set") return Array.from(o);
   if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
 }
 
@@ -339,8 +341,6 @@ function _nonIterableSpread() {
 function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
-
-//
 
 // --- Static ---
 var from = function from() {
@@ -425,7 +425,7 @@ var pick = function pick(obj, props) {
   return keys(obj).filter(function (key) {
     return props.indexOf(key) !== -1;
   }).reduce(function (result, key) {
-    return _objectSpread2({}, result, _defineProperty({}, key, obj[key]));
+    return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
   }, {});
 };
 /**
@@ -437,7 +437,7 @@ var omit = function omit(obj, props) {
   return keys(obj).filter(function (key) {
     return props.indexOf(key) === -1;
   }).reduce(function (result, key) {
-    return _objectSpread2({}, result, _defineProperty({}, key, obj[key]));
+    return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
   }, {});
 };
 /**
@@ -646,7 +646,7 @@ var cloneDeep = function cloneDeep(obj) {
 
   if (isPlainObject(obj)) {
     return keys(obj).reduce(function (result, key) {
-      return _objectSpread2({}, result, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
+      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
     }, {});
   }
 
@@ -781,7 +781,7 @@ var warnNoMutationObserverSupport = function warnNoMutationObserverSupport(sourc
 //
 // The global config SHALL NOT be used to set defaults for Boolean props, as the props
 // would loose their semantic meaning, and force people writing 3rd party components to
-// explicity set a true or false value using the v-bind syntax on boolean props
+// explicitly set a true or false value using the v-bind syntax on boolean props
 //
 // Supported config values (depending on the prop's supported type(s)):
 // `String`, `Array`, `Object`, `null` or `undefined`
@@ -954,6 +954,9 @@ var DEFAULTS = deepFreeze({
     borderVariant: undefined,
     textVariant: undefined
   },
+  BLink: {
+    routerComponentName: undefined
+  },
   BListGroupItem: {
     variant: undefined
   },
@@ -1009,7 +1012,8 @@ var DEFAULTS = deepFreeze({
     textVariant: 'dark',
     shadow: false,
     width: undefined,
-    tag: 'div'
+    tag: 'div',
+    backdropVariant: 'dark'
   },
   BTable: {
     selectedVariant: 'active',
@@ -1267,7 +1271,7 @@ var installFactoryNoConfig = function installFactoryNoConfig() {
 var pluginFactory = function pluginFactory() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var extend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  return _objectSpread2({}, extend, {
+  return _objectSpread2(_objectSpread2({}, extend), {}, {
     install: installFactory(options)
   });
 };
@@ -1280,7 +1284,7 @@ var pluginFactory = function pluginFactory() {
 var pluginFactoryNoConfig = function pluginFactoryNoConfig() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var extend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  return _objectSpread2({}, extend, {
+  return _objectSpread2(_objectSpread2({}, extend), {}, {
     install: installFactoryNoConfig(options)
   });
 };
@@ -1422,6 +1426,58 @@ var toFixed = function toFixed(val, precision) {
   return toFloat(val).toFixed(toInteger(precision, 0));
 };
 
+// String utilities
+
+var RX_TRIM_LEFT = /^\s+/;
+var RX_REGEXP_REPLACE = /[-/\\^$*+?.()|[\]{}]/g;
+var RX_UN_KEBAB = /-(\w)/g;
+var RX_HYPHENATE = /\B([A-Z])/g; // --- Utilities ---
+// Converts PascalCase or camelCase to kebab-case
+
+var kebabCase = function kebabCase(str) {
+  return str.replace(RX_HYPHENATE, '-$1').toLowerCase();
+}; // Converts a kebab-case or camelCase string to PascalCase
+
+var pascalCase = function pascalCase(str) {
+  str = kebabCase(str).replace(RX_UN_KEBAB, function (_, c) {
+    return c ? c.toUpperCase() : '';
+  });
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}; // Lowercases the first letter of a string and returns a new string
+
+var lowerFirst = function lowerFirst(str) {
+  str = isString(str) ? str.trim() : String(str);
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}; // Uppercases the first letter of a string and returns a new string
+
+var upperFirst = function upperFirst(str) {
+  str = isString(str) ? str.trim() : String(str);
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}; // Escape characters to be used in building a regular expression
+
+var escapeRegExp = function escapeRegExp(str) {
+  return str.replace(RX_REGEXP_REPLACE, '\\$&');
+}; // Convert a value to a string that can be rendered
+// `undefined`/`null` will be converted to `''`
+// Plain objects and arrays will be JSON stringified
+
+var toString$1 = function toString(val) {
+  var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+  return isUndefinedOrNull(val) ? '' : isArray(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
+}; // Remove leading white space from a string
+
+var trimLeft = function trimLeft(str) {
+  return toString$1(str).replace(RX_TRIM_LEFT, '');
+}; // Remove Trailing white space from a string
+
+var trim = function trim(str) {
+  return toString$1(str).trim();
+}; // Lower case a string
+
+var lowerCase = function lowerCase(str) {
+  return toString$1(str).toLowerCase();
+}; // Upper case a string
+
 var TABABLE_SELECTOR = ['button', '[href]:not(.disabled)', 'input', 'select', 'textarea', '[tabindex]', '[contenteditable]'].map(function (s) {
   return "".concat(s, ":not(:disabled):not([disabled])");
 }).join(', ');
@@ -1471,6 +1527,22 @@ var removeNode = function removeNode(el) {
 
 var isElement = function isElement(el) {
   return !!(el && el.nodeType === Node.ELEMENT_NODE);
+}; // Get the currently active HTML element
+
+var getActiveElement = function getActiveElement() {
+  var excludes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var activeElement = d.activeElement;
+  return activeElement && !excludes.some(function (el) {
+    return el === activeElement;
+  }) ? activeElement : null;
+}; // Returns `true` if a tag's name equals `name`
+
+var isTag = function isTag(tag, name) {
+  return toString$1(tag).toLowerCase() === toString$1(name).toLowerCase();
+}; // Determine if an HTML element is the currently active element
+
+var isActiveElement = function isActiveElement(el) {
+  return isElement(el) && el === getActiveElement();
 }; // Determine if an HTML element is visible - Faster than CSS check
 
 var isVisible = function isVisible(el) {
@@ -1680,10 +1752,28 @@ var position = function position(el)
 // Assumes users have not used `tabindex` > `0` on elements
 
 var getTabables = function getTabables() {
-  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document;
-  return selectAll(TABABLE_SELECTOR, el).filter(isVisible).filter(function (i) {
-    return i.tabIndex > -1 && !i.disabled;
+  var rootEl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : document;
+  return selectAll(TABABLE_SELECTOR, rootEl).filter(isVisible).filter(function (el) {
+    return el.tabIndex > -1 && !el.disabled;
   });
+}; // Attempt to focus an element, and return `true` if successful
+
+var attemptFocus = function attemptFocus(el) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  try {
+    el.focus(options);
+  } catch (_unused) {}
+
+  return isActiveElement(el);
+}; // Attempt to blur an element, and return `true` if successful
+
+var attemptBlur = function attemptBlur(el) {
+  try {
+    el.blur();
+  } catch (_unused2) {}
+
+  return !isActiveElement(el);
 };
 
 var NO_FADE_PROPS = {
@@ -1696,7 +1786,7 @@ var NO_FADE_PROPS = {
   leaveToClass: ''
 };
 
-var FADE_PROPS = _objectSpread2({}, NO_FADE_PROPS, {
+var FADE_PROPS = _objectSpread2(_objectSpread2({}, NO_FADE_PROPS), {}, {
   enterActiveClass: 'fade',
   leaveActiveClass: 'fade'
 }); // @vue/component
@@ -1739,7 +1829,7 @@ var BVTransition = /*#__PURE__*/Vue.extend({
 
       if (props.appear) {
         // Default the appear classes to equal the enter classes
-        transProps = _objectSpread2({}, transProps, {
+        transProps = _objectSpread2(_objectSpread2({}, transProps), {}, {
           appear: true,
           appearClass: transProps.enterClass,
           appearActiveClass: transProps.enterActiveClass,
@@ -1748,9 +1838,9 @@ var BVTransition = /*#__PURE__*/Vue.extend({
       }
     }
 
-    transProps = _objectSpread2({
+    transProps = _objectSpread2(_objectSpread2({
       mode: props.mode
-    }, transProps, {
+    }, transProps), {}, {
       // We always need `css` true
       css: true
     });
@@ -2089,6 +2179,15 @@ var AlertPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
+// Math utilty functions
+var mathMin = Math.min;
+var mathMax = Math.max;
+var mathAbs = Math.abs;
+var mathCeil = Math.ceil;
+var mathFloor = Math.floor;
+var mathPow = Math.pow;
+var mathRound = Math.round;
+
 var NAME$3 = 'BAspect';
 var CLASS_NAME = 'b-aspect';
 var RX_ASPECT = /^\d+(\.\d*)?[/:]\d+(\.\d*)?$/;
@@ -2129,7 +2228,7 @@ var BAspect = /*#__PURE__*/Vue.extend({
         ratio = toFloat(aspect) || 1;
       }
 
-      return "".concat(100 / Math.abs(ratio), "%");
+      return "".concat(100 / mathAbs(ratio), "%");
     }
   },
   render: function render(h) {
@@ -2158,16 +2257,45 @@ var AspectPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-/**
- * Given an array of properties or an object of property keys,
- * plucks all the values off the target object, returning a new object
- * that has props that reference the original prop values
- *
- * @param {{}|string[]} keysToPluck
- * @param {{}} objToPluck
- * @param {Function} transformFn
- * @return {{}}
- */
+var prefixPropName = function prefixPropName(prefix, value) {
+  return prefix + upperFirst(value);
+}; // Remove a prefix from a property
+
+var unprefixPropName = function unprefixPropName(prefix, value) {
+  return lowerFirst(value.replace(prefix, ''));
+}; // Suffix can be a falsey value so nothing is appended to string
+// (helps when looping over props & some shouldn't change)
+// Use data last parameters to allow for currying
+
+var suffixPropName = function suffixPropName(suffix, str) {
+  return str + (suffix ? upperFirst(suffix) : '');
+}; // Copies props from one array/object to a new array/object
+// Prop values are also cloned as new references to prevent possible
+// mutation of original prop object values
+// Optionally accepts a function to transform the prop name
+
+var copyProps = function copyProps(props) {
+  var transformFn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : identity;
+
+  if (isArray(props)) {
+    return props.map(transformFn);
+  }
+
+  var copied = {};
+
+  for (var prop in props) {
+    /* istanbul ignore else */
+    if (hasOwnProperty(props, prop)) {
+      // If the prop value is an object, do a shallow clone
+      // to prevent potential mutations to the original object
+      copied[transformFn(prop)] = isObject(props[prop]) ? clone(props[prop]) : props[prop];
+    }
+  }
+
+  return copied;
+}; // Given an array of properties or an object of property keys,
+// plucks all the values off the target object, returning a new object
+// that has props that reference the original prop values
 
 var pluckProps = function pluckProps(keysToPluck, objToPluck) {
   var transformFn = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : identity;
@@ -2176,85 +2304,6 @@ var pluckProps = function pluckProps(keysToPluck, objToPluck) {
     return memo;
   }, {});
 };
-
-/*
- * Key Codes (events)
- */
-var KEY_CODES = freeze({
-  SPACE: 32,
-  ENTER: 13,
-  ESC: 27,
-  LEFT: 37,
-  UP: 38,
-  RIGHT: 39,
-  DOWN: 40,
-  PAGEUP: 33,
-  PAGEDOWN: 34,
-  HOME: 36,
-  END: 35,
-  TAB: 9,
-  SHIFT: 16,
-  CTRL: 17,
-  BACKSPACE: 8,
-  ALT: 18,
-  PAUSE: 19,
-  BREAK: 19,
-  INSERT: 45,
-  INS: 45,
-  DELETE: 46
-});
-
-// String utilities
-
-var RX_TRIM_LEFT = /^\s+/;
-var RX_REGEXP_REPLACE = /[-/\\^$*+?.()|[\]{}]/g;
-var RX_UN_KEBAB = /-(\w)/g;
-var RX_HYPHENATE = /\B([A-Z])/g; // --- Utilities ---
-// Converts PascalCase or camelCase to kebab-case
-
-var kebabCase = function kebabCase(str) {
-  return str.replace(RX_HYPHENATE, '-$1').toLowerCase();
-}; // Converts a kebab-case or camelCase string to PascalCase
-
-var pascalCase = function pascalCase(str) {
-  str = kebabCase(str).replace(RX_UN_KEBAB, function (_, c) {
-    return c ? c.toUpperCase() : '';
-  });
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}; // Lowercases the first letter of a string and returns a new string
-
-var lowerFirst = function lowerFirst(str) {
-  str = isString(str) ? str.trim() : String(str);
-  return str.charAt(0).toLowerCase() + str.slice(1);
-}; // Uppercases the first letter of a string and returns a new string
-
-var upperFirst = function upperFirst(str) {
-  str = isString(str) ? str.trim() : String(str);
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}; // Escape characters to be used in building a regular expression
-
-var escapeRegExp = function escapeRegExp(str) {
-  return str.replace(RX_REGEXP_REPLACE, '\\$&');
-}; // Convert a value to a string that can be rendered
-// `undefined`/`null` will be converted to `''`
-// Plain objects and arrays will be JSON stringified
-
-var toString$1 = function toString(val) {
-  var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
-  return isUndefinedOrNull(val) ? '' : isArray(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
-}; // Remove leading white space from a string
-
-var trimLeft = function trimLeft(str) {
-  return toString$1(str).replace(RX_TRIM_LEFT, '');
-}; // Remove Trailing white space from a string
-
-var trim = function trim(str) {
-  return toString$1(str).trim();
-}; // Lower case a string
-
-var lowerCase = function lowerCase(str) {
-  return toString$1(str).toLowerCase();
-}; // Upper case a string
 
 var ANCHOR_TAG = 'a'; // Precompile RegExp
 
@@ -2334,16 +2383,34 @@ var parseQuery = function parseQuery(query) {
   });
   return parsed;
 };
+var isLink = function isLink(props) {
+  return !!(props.href || props.to);
+};
 var isRouterLink = function isRouterLink(tag) {
-  return toString$1(tag).toLowerCase() !== ANCHOR_TAG;
+  return !isTag(tag, ANCHOR_TAG);
 };
 var computeTag = function computeTag() {
   var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
       to = _ref.to,
-      disabled = _ref.disabled;
+      disabled = _ref.disabled,
+      routerComponentName = _ref.routerComponentName;
 
   var thisOrParent = arguments.length > 1 ? arguments[1] : undefined;
-  return thisOrParent.$router && to && !disabled ? thisOrParent.$nuxt ? 'nuxt-link' : 'router-link' : ANCHOR_TAG;
+  var hasRouter = thisOrParent.$router;
+
+  if (!hasRouter || hasRouter && disabled || hasRouter && !to) {
+    return ANCHOR_TAG;
+  } // TODO:
+  //   Check registered components for existence of user supplied router link component name
+  //   We would need to check PascalCase, kebab-case, and camelCase versions of name:
+  //   const name = routerComponentName
+  //   const names = [name, PascalCase(name), KebabCase(name), CamelCase(name)]
+  //   exists = names.some(name => !!thisOrParent.$options.components[name])
+  //   And may want to cache the result for performance or we just let the render fail
+  //   if the component is not registered
+
+
+  return routerComponentName || (thisOrParent.$nuxt ? 'nuxt-link' : 'router-link');
 };
 var computeRel = function computeRel() {
   var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
@@ -2398,92 +2465,170 @@ var computeHref = function computeHref() {
   return fallback;
 };
 
-/**
- * The Link component is used in many other BV components.
- * As such, sharing its props makes supporting all its features easier.
- * However, some components need to modify the defaults for their own purpose.
- * Prefer sharing a fresh copy of the props to ensure mutations
- * do not affect other component references to the props.
- *
- * https://github.com/vuejs/vue-router/blob/dev/src/components/link.js
- * @return {{}}
+/*
+ * Key Codes (events)
  */
+var KEY_CODES = freeze({
+  SPACE: 32,
+  ENTER: 13,
+  ESC: 27,
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  PAGEUP: 33,
+  PAGEDOWN: 34,
+  HOME: 36,
+  END: 35,
+  TAB: 9,
+  SHIFT: 16,
+  CTRL: 17,
+  BACKSPACE: 8,
+  ALT: 18,
+  PAUSE: 19,
+  BREAK: 19,
+  INSERT: 45,
+  INS: 45,
+  DELETE: 46
+});
 
-var propsFactory = function propsFactory() {
+var makePropWatcher = function makePropWatcher(propName) {
   return {
-    href: {
-      type: String,
-      default: null
-    },
-    rel: {
-      type: String,
-      // Must be `null` if no value provided
-      default: null
-    },
-    target: {
-      type: String,
-      default: '_self'
-    },
-    active: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    // router-link specific props
-    to: {
-      type: [String, Object],
-      default: null
-    },
-    append: {
-      type: Boolean,
-      default: false
-    },
-    replace: {
-      type: Boolean,
-      default: false
-    },
-    event: {
-      type: [String, Array],
-      default: 'click'
-    },
-    activeClass: {
-      type: String // default: undefined
+    handler: function handler(newVal, oldVal) {
+      for (var key in oldVal) {
+        if (!hasOwnProperty(newVal, key)) {
+          this.$delete(this.$data[propName], key);
+        }
+      }
 
+      for (var _key in newVal) {
+        this.$set(this.$data[propName], _key, newVal[_key]);
+      }
+    }
+  };
+};
+var makePropCacheMixin = function makePropCacheMixin(propName, proxyPropName) {
+  return {
+    data: function data() {
+      return _defineProperty({}, proxyPropName, {});
     },
-    exact: {
-      type: Boolean,
-      default: false
-    },
-    exactActiveClass: {
-      type: String // default: undefined
-
-    },
-    routerTag: {
-      type: String,
-      default: 'a'
-    },
-    // nuxt-link specific prop(s)
-    noPrefetch: {
-      type: Boolean,
-      default: false
+    watch: _defineProperty({}, propName, makePropWatcher(proxyPropName)),
+    created: function created() {
+      this[proxyPropName] = _objectSpread2({}, this[propName]);
     }
   };
 };
 
+var attrsMixin = makePropCacheMixin('$attrs', 'bvAttrs');
+
+var listenersMixin = makePropCacheMixin('$listeners', 'bvListeners');
+
+var NAME$4 = 'BLink'; // --- Props ---
+// <router-link> specific props
+
+var routerLinkProps = {
+  to: {
+    type: [String, Object],
+    default: null
+  },
+  append: {
+    type: Boolean,
+    default: false
+  },
+  replace: {
+    type: Boolean,
+    default: false
+  },
+  event: {
+    type: [String, Array],
+    default: 'click'
+  },
+  activeClass: {
+    type: String // default: undefined
+
+  },
+  exact: {
+    type: Boolean,
+    default: false
+  },
+  exactActiveClass: {
+    type: String // default: undefined
+
+  },
+  routerTag: {
+    type: String,
+    default: 'a'
+  }
+}; // <nuxt-link> specific props
+
+var nuxtLinkProps = {
+  prefetch: {
+    type: Boolean,
+    // Must be `null` to fall back to the value defined in the
+    // `nuxt.config.js` configuration file for `router.prefetchLinks`
+    // We convert `null` to `undefined`, so that Nuxt.js will use the
+    // compiled default. Vue treats `undefined` as default of `false`
+    // for Boolean props, so we must set it as `null` here to be a
+    // true tri-state prop
+    default: null
+  },
+  noPrefetch: {
+    type: Boolean,
+    default: false
+  }
+};
+var props$1 = _objectSpread2(_objectSpread2(_objectSpread2({
+  href: {
+    type: String,
+    default: null
+  },
+  rel: {
+    type: String,
+    // Must be `null` if no value provided
+    default: null
+  },
+  target: {
+    type: String,
+    default: '_self'
+  },
+  active: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  }
+}, routerLinkProps), nuxtLinkProps), {}, {
+  // To support 3rd party router links based on `<router-link>` (i.e. `g-link` for Gridsome)
+  // Default is to auto choose between `<router-link>` and `<nuxt-link>`
+  // Gridsome doesn't provide a mechanism to auto detect and has caveats
+  // such as not supporting FQDN URLs or hash only URLs
+  routerComponentName: {
+    type: String,
+    default: function _default() {
+      return getComponentConfig(NAME$4, 'routerComponentName');
+    }
+  }
+}); // --- Main component ---
+// @vue/component
+
 var BLink = /*#__PURE__*/Vue.extend({
   name: 'BLink',
-  mixins: [normalizeSlotMixin],
+  // Mixin order is important!
+  mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
   inheritAttrs: false,
-  props: propsFactory(),
+  props: props$1,
   computed: {
     computedTag: function computedTag() {
       // We don't pass `this` as the first arg as we need reactivity of the props
+      var to = this.to,
+          disabled = this.disabled,
+          routerComponentName = this.routerComponentName;
       return computeTag({
-        to: this.to,
-        disabled: this.disabled
+        to: to,
+        disabled: disabled,
+        routerComponentName: routerComponentName
       }, this);
     },
     isRouterLink: function isRouterLink$1() {
@@ -2504,9 +2649,38 @@ var BLink = /*#__PURE__*/Vue.extend({
       }, this.computedTag);
     },
     computedProps: function computedProps() {
-      return this.isRouterLink ? _objectSpread2({}, this.$props, {
+      var prefetch = this.prefetch;
+      return this.isRouterLink ? _objectSpread2(_objectSpread2({}, pluckProps(_objectSpread2(_objectSpread2({}, routerLinkProps), nuxtLinkProps), this)), {}, {
+        // Coerce `prefetch` value `null` to be `undefined`
+        prefetch: isBoolean(prefetch) ? prefetch : undefined,
+        // Pass `router-tag` as `tag` prop
         tag: this.routerTag
       }) : {};
+    },
+    computedAttrs: function computedAttrs() {
+      var bvAttrs = this.bvAttrs,
+          href = this.computedHref,
+          rel = this.computedRel,
+          disabled = this.disabled,
+          target = this.target,
+          routerTag = this.routerTag,
+          isRouterLink = this.isRouterLink;
+      return _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, bvAttrs), href ? {
+        href: href
+      } : {}), isRouterLink && routerTag !== 'a' && routerTag !== 'area' ? {} : {
+        rel: rel,
+        target: target
+      }), {}, {
+        tabindex: disabled ? '-1' : isUndefined(bvAttrs.tabindex) ? null : bvAttrs.tabindex,
+        'aria-disabled': disabled ? 'true' : null
+      });
+    },
+    computedListeners: function computedListeners() {
+      return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+        // We want to overwrite any click handler since our callback
+        // will invoke the user supplied handler(s) if `!this.disabled`
+        click: this.onClick
+      });
     }
   },
   methods: {
@@ -2514,7 +2688,7 @@ var BLink = /*#__PURE__*/Vue.extend({
       var _arguments = arguments;
       var evtIsEvent = isEvent(evt);
       var isRouterLink = this.isRouterLink;
-      var suppliedHandler = this.$listeners.click;
+      var suppliedHandler = this.bvListeners.click;
 
       if (evtIsEvent && this.disabled) {
         // Stop event from bubbling up
@@ -2547,60 +2721,31 @@ var BLink = /*#__PURE__*/Vue.extend({
       }
     },
     focus: function focus() {
-      if (this.$el && this.$el.focus) {
-        this.$el.focus();
-      }
+      attemptFocus(this.$el);
     },
     blur: function blur() {
-      if (this.$el && this.$el.blur) {
-        this.$el.blur();
-      }
+      attemptBlur(this.$el);
     }
   },
   render: function render(h) {
     var active = this.active,
-        disabled = this.disabled,
-        target = this.target,
-        routerTag = this.routerTag,
-        isRouterLink = this.isRouterLink;
-    var tag = this.computedTag;
-    var rel = this.computedRel;
-    var href = this.computedHref;
-    var componentData = {
+        disabled = this.disabled;
+    return h(this.computedTag, _defineProperty({
       class: {
         active: active,
         disabled: disabled
       },
-      attrs: _objectSpread2({}, this.$attrs, {}, isRouterLink && routerTag !== 'a' && routerTag !== 'area' ? {} : {
-        rel: rel,
-        target: target
-      }, {
-        tabindex: disabled ? '-1' : isUndefined(this.$attrs.tabindex) ? null : this.$attrs.tabindex,
-        'aria-disabled': disabled ? 'true' : null
-      }),
+      attrs: this.computedAttrs,
       props: this.computedProps
-    }; // Add the event handlers. We must use `nativeOn` for
-    // `<router-link>`/`<nuxt-link>` instead of `on`
-
-    componentData[isRouterLink ? 'nativeOn' : 'on'] = _objectSpread2({}, this.$listeners, {
-      // We want to overwrite any click handler since our callback
-      // will invoke the user supplied handler(s) if `!this.disabled`
-      click: this.onClick
-    }); // If href attribute exists on <router-link> (even undefined or null) it fails working on
-    // SSR, so we explicitly add it here if needed (i.e. if computedHref() is truthy)
-
-    if (href) {
-      componentData.attrs.href = href;
-    } else {
-      // Ensure the prop HREF does not exist for router links
-      delete componentData.props.href;
-    }
-
-    return h(tag, componentData, this.normalizeSlot('default'));
+    }, this.isRouterLink ? 'nativeOn' : 'on', this.computedListeners), this.normalizeSlot('default'));
   }
 });
 
-var NAME$4 = 'BButton';
+var NAME$5 = 'BButton'; // --- Props ---
+
+var linkProps = omit(props$1, ['event', 'routerTag']);
+delete linkProps.href.default;
+delete linkProps.to.default;
 var btnProps = {
   block: {
     type: Boolean,
@@ -2613,13 +2758,13 @@ var btnProps = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$4, 'size');
+      return getComponentConfig(NAME$5, 'size');
     }
   },
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$4, 'variant');
+      return getComponentConfig(NAME$5, 'variant');
     }
   },
   type: {
@@ -2645,18 +2790,9 @@ var btnProps = {
     default: null
   }
 };
-var linkProps = propsFactory();
-delete linkProps.href.default;
-delete linkProps.to.default;
-var linkPropKeys = keys(linkProps);
-var props$1 = _objectSpread2({}, linkProps, {}, btnProps); // --- Helper methods ---
-// Returns `true` if a tag's name equals `name`
-
-var tagIs = function tagIs(tag, name) {
-  return toString$1(tag).toLowerCase() === toString$1(name).toLowerCase();
-}; // Focus handler for toggle buttons
+var props$2 = _objectSpread2(_objectSpread2({}, btnProps), linkProps); // --- Helper methods ---
+// Focus handler for toggle buttons
 // Needs class of 'focus' when focused
-
 
 var handleFocus = function handleFocus(evt) {
   if (evt.type === 'focusin') {
@@ -2668,8 +2804,8 @@ var handleFocus = function handleFocus(evt) {
 // If tag prop is set to `a`, we use a <b-link> to get proper disabled handling
 
 
-var isLink = function isLink(props) {
-  return props.href || props.to || tagIs(props.tag, 'a');
+var isLink$1 = function isLink$1(props) {
+  return isLink(props) || isTag(props.tag, 'a');
 }; // Is the button to be a toggle button?
 
 
@@ -2679,30 +2815,30 @@ var isToggle = function isToggle(props) {
 
 
 var isButton = function isButton(props) {
-  return !(isLink(props) || props.tag && !tagIs(props.tag, 'button'));
+  return !(isLink$1(props) || props.tag && !isTag(props.tag, 'button'));
 }; // Is the requested tag not a button or link?
 
 
 var isNonStandardTag = function isNonStandardTag(props) {
-  return !isLink(props) && !isButton(props);
+  return !isLink$1(props) && !isButton(props);
 }; // Compute required classes (non static classes)
 
 
 var computeClass = function computeClass(props) {
   var _ref;
 
-  return ["btn-".concat(props.variant || getComponentConfig(NAME$4, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
+  return ["btn-".concat(props.variant || getComponentConfig(NAME$5, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
 }; // Compute the link props to pass to b-link (if required)
 
 
 var computeLinkProps = function computeLinkProps(props) {
-  return isLink(props) ? pluckProps(linkPropKeys, props) : null;
+  return isLink$1(props) ? pluckProps(linkProps, props) : {};
 }; // Compute the attributes for a button
 
 
 var computeAttrs = function computeAttrs(props, data) {
   var button = isButton(props);
-  var link = isLink(props);
+  var link = isLink$1(props);
   var toggle = isToggle(props);
   var nonStandardTag = isNonStandardTag(props);
   var hashLink = link && props.href === '#';
@@ -2735,20 +2871,21 @@ var computeAttrs = function computeAttrs(props, data) {
     // when disabled, and adding a `tabindex="0"` to non buttons or non links
     tabindex: props.disabled && !button ? '-1' : tabindex
   };
-}; // @vue/component
+}; // --- Main component ---
+// @vue/component
 
 
 var BButton = /*#__PURE__*/Vue.extend({
-  name: NAME$4,
+  name: NAME$5,
   functional: true,
-  props: props$1,
+  props: props$2,
   render: function render(h, _ref2) {
     var props = _ref2.props,
         data = _ref2.data,
         listeners = _ref2.listeners,
         children = _ref2.children;
     var toggle = isToggle(props);
-    var link = isLink(props);
+    var link = isLink$1(props);
     var nonStandardTag = isNonStandardTag(props);
     var hashLink = link && props.href === '#';
     var on = {
@@ -2878,8 +3015,8 @@ var BVIconBase = /*#__PURE__*/Vue.extend({
     var data = _ref.data,
         props = _ref.props,
         children = _ref.children;
-    var fontScale = Math.max(toFloat(props.fontScale, 1), 0) || 1;
-    var scale = Math.max(toFloat(props.scale, 1), 0) || 1;
+    var fontScale = mathMax(toFloat(props.fontScale, 1), 0) || 1;
+    var scale = mathMax(toFloat(props.scale, 1), 0) || 1;
     var rotate = toFloat(props.rotate, 0);
     var shiftH = toFloat(props.shiftH, 0);
     var shiftV = toFloat(props.shiftV, 0);
@@ -2961,7 +3098,7 @@ var makeIcon = function makeIcon(name, content) {
   return /*#__PURE__*/Vue.extend({
     name: iconName,
     functional: true,
-    props: _objectSpread2({}, commonIconProps, {
+    props: _objectSpread2(_objectSpread2({}, commonIconProps), {}, {
       stacked: {
         type: Boolean,
         default: false
@@ -2972,7 +3109,7 @@ var makeIcon = function makeIcon(name, content) {
           props = _ref.props;
       return h(BVIconBase, vueFunctionalDataMerge.mergeData(data, {
         staticClass: iconNameClass,
-        props: _objectSpread2({}, props, {
+        props: _objectSpread2(_objectSpread2({}, props), {}, {
           content: svgContent
         })
       }));
@@ -2985,1011 +3122,1275 @@ var makeIcon = function makeIcon(name, content) {
 var BIconBlank = /*#__PURE__*/makeIcon('Blank', ''); // --- Bootstrap Icons ---
 // eslint-disable-next-line
 
-var BIconAlarm = /*#__PURE__*/makeIcon('Alarm', '<path fill-rule="evenodd" d="M8 15A6 6 0 108 3a6 6 0 000 12zm0 1A7 7 0 108 2a7 7 0 000 14z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 01.5.5v4a.5.5 0 01-.053.224l-1.5 3a.5.5 0 11-.894-.448L7.5 8.882V5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path d="M.86 5.387A2.5 2.5 0 114.387 1.86 8.035 8.035 0 00.86 5.387zM11.613 1.86a2.5 2.5 0 113.527 3.527 8.035 8.035 0 00-3.527-3.527z"/><path fill-rule="evenodd" d="M11.646 14.146a.5.5 0 01.708 0l1 1a.5.5 0 01-.708.708l-1-1a.5.5 0 010-.708zm-7.292 0a.5.5 0 00-.708 0l-1 1a.5.5 0 00.708.708l1-1a.5.5 0 000-.708zM5.5.5A.5.5 0 016 0h4a.5.5 0 010 1H6a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M7 1h2v2H7V1z"/>'); // eslint-disable-next-line
+var BIconAlarm = /*#__PURE__*/makeIcon('Alarm', '<path fill-rule="evenodd" d="M8 15A6 6 0 1 0 8 3a6 6 0 0 0 0 12zm0 1A7 7 0 1 0 8 2a7 7 0 0 0 0 14z"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.053.224l-1.5 3a.5.5 0 1 1-.894-.448L7.5 8.882V5a.5.5 0 0 1 .5-.5z"/><path d="M.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM11.613 1.86a2.5 2.5 0 1 1 3.527 3.527 8.035 8.035 0 0 0-3.527-3.527z"/><path fill-rule="evenodd" d="M11.646 14.146a.5.5 0 0 1 .708 0l1 1a.5.5 0 0 1-.708.708l-1-1a.5.5 0 0 1 0-.708zm-7.292 0a.5.5 0 0 0-.708 0l-1 1a.5.5 0 0 0 .708.708l1-1a.5.5 0 0 0 0-.708zM5.5.5A.5.5 0 0 1 6 0h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/><path d="M7 1h2v2H7V1z"/>'); // eslint-disable-next-line
 
-var BIconAlarmFill = /*#__PURE__*/makeIcon('AlarmFill', '<path fill-rule="evenodd" d="M5.5.5A.5.5 0 016 0h4a.5.5 0 010 1H9v1.07a7.002 7.002 0 013.537 12.26l.817.816a.5.5 0 01-.708.708l-.924-.925A6.967 6.967 0 018 16a6.967 6.967 0 01-3.722-1.07l-.924.924a.5.5 0 01-.708-.708l.817-.816A7.002 7.002 0 017 2.07V1H5.999a.5.5 0 01-.5-.5zM.86 5.387A2.5 2.5 0 114.387 1.86 8.035 8.035 0 00.86 5.387zM13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 013.527 3.527A2.5 2.5 0 0013.5 1zm-5 4a.5.5 0 00-1 0v3.882l-1.447 2.894a.5.5 0 10.894.448l1.5-3A.5.5 0 008.5 9V5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconAlarmFill = /*#__PURE__*/makeIcon('AlarmFill', '<path fill-rule="evenodd" d="M5.5.5A.5.5 0 0 1 6 0h4a.5.5 0 0 1 0 1H9v1.07a7.002 7.002 0 0 1 3.537 12.26l.817.816a.5.5 0 0 1-.708.708l-.924-.925A6.967 6.967 0 0 1 8 16a6.967 6.967 0 0 1-3.722-1.07l-.924.924a.5.5 0 0 1-.708-.708l.817-.816A7.002 7.002 0 0 1 7 2.07V1H5.999a.5.5 0 0 1-.5-.5zM.86 5.387A2.5 2.5 0 1 1 4.387 1.86 8.035 8.035 0 0 0 .86 5.387zM13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1zm-5 4a.5.5 0 0 0-1 0v3.882l-1.447 2.894a.5.5 0 1 0 .894.448l1.5-3A.5.5 0 0 0 8.5 9V5z"/>'); // eslint-disable-next-line
 
-var BIconAlt = /*#__PURE__*/makeIcon('Alt', '<path fill-rule="evenodd" d="M1 13.5a.5.5 0 00.5.5h3.797a.5.5 0 00.439-.26L11 3h3.5a.5.5 0 000-1h-3.797a.5.5 0 00-.439.26L5 13H1.5a.5.5 0 00-.5.5zm10 0a.5.5 0 00.5.5h3a.5.5 0 000-1h-3a.5.5 0 00-.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconAlt = /*#__PURE__*/makeIcon('Alt', '<path fill-rule="evenodd" d="M1 13.5a.5.5 0 0 0 .5.5h3.797a.5.5 0 0 0 .439-.26L11 3h3.5a.5.5 0 0 0 0-1h-3.797a.5.5 0 0 0-.439.26L5 13H1.5a.5.5 0 0 0-.5.5zm10 0a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconApp = /*#__PURE__*/makeIcon('App', '<path fill-rule="evenodd" d="M11 2H5a3 3 0 00-3 3v6a3 3 0 003 3h6a3 3 0 003-3V5a3 3 0 00-3-3zM5 1a4 4 0 00-4 4v6a4 4 0 004 4h6a4 4 0 004-4V5a4 4 0 00-4-4H5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconApp = /*#__PURE__*/makeIcon('App', '<path fill-rule="evenodd" d="M11 2H5a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3zM5 1a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4V5a4 4 0 0 0-4-4H5z"/>'); // eslint-disable-next-line
 
-var BIconAppIndicator = /*#__PURE__*/makeIcon('AppIndicator', '<path fill-rule="evenodd" d="M5.5 2A3.5 3.5 0 002 5.5v5A3.5 3.5 0 005.5 14h5a3.5 3.5 0 003.5-3.5V8a.5.5 0 011 0v2.5a4.5 4.5 0 01-4.5 4.5h-5A4.5 4.5 0 011 10.5v-5A4.5 4.5 0 015.5 1H8a.5.5 0 010 1H5.5z" clip-rule="evenodd"/><path d="M16 3a3 3 0 11-6 0 3 3 0 016 0z"/>'); // eslint-disable-next-line
+var BIconAppIndicator = /*#__PURE__*/makeIcon('AppIndicator', '<path fill-rule="evenodd" d="M5.5 2A3.5 3.5 0 0 0 2 5.5v5A3.5 3.5 0 0 0 5.5 14h5a3.5 3.5 0 0 0 3.5-3.5V8a.5.5 0 0 1 1 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-5A4.5 4.5 0 0 1 1 10.5v-5A4.5 4.5 0 0 1 5.5 1H8a.5.5 0 0 1 0 1H5.5z"/><path d="M16 3a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>'); // eslint-disable-next-line
 
-var BIconArchive = /*#__PURE__*/makeIcon('Archive', '<path fill-rule="evenodd" d="M2 5v7.5c0 .864.642 1.5 1.357 1.5h9.286c.715 0 1.357-.636 1.357-1.5V5h1v7.5c0 1.345-1.021 2.5-2.357 2.5H3.357C2.021 15 1 13.845 1 12.5V5h1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.5 7.5A.5.5 0 016 7h4a.5.5 0 010 1H6a.5.5 0 01-.5-.5zM15 2H1v2h14V2zM1 1a1 1 0 00-1 1v2a1 1 0 001 1h14a1 1 0 001-1V2a1 1 0 00-1-1H1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArchive = /*#__PURE__*/makeIcon('Archive', '<path fill-rule="evenodd" d="M2 5v7.5c0 .864.642 1.5 1.357 1.5h9.286c.715 0 1.357-.636 1.357-1.5V5h1v7.5c0 1.345-1.021 2.5-2.357 2.5H3.357C2.021 15 1 13.845 1 12.5V5h1z"/><path fill-rule="evenodd" d="M5.5 7.5A.5.5 0 0 1 6 7h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5zM15 2H1v2h14V2zM1 1a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H1z"/>'); // eslint-disable-next-line
 
-var BIconArchiveFill = /*#__PURE__*/makeIcon('ArchiveFill', '<path fill-rule="evenodd" d="M12.643 15C13.979 15 15 13.845 15 12.5V5H1v7.5C1 13.845 2.021 15 3.357 15h9.286zM6 7a.5.5 0 000 1h4a.5.5 0 000-1H6zM.8 1a.8.8 0 00-.8.8V3a.8.8 0 00.8.8h14.4A.8.8 0 0016 3V1.8a.8.8 0 00-.8-.8H.8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArchiveFill = /*#__PURE__*/makeIcon('ArchiveFill', '<path fill-rule="evenodd" d="M12.643 15C13.979 15 15 13.845 15 12.5V5H1v7.5C1 13.845 2.021 15 3.357 15h9.286zM6 7a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H6zM.8 1a.8.8 0 0 0-.8.8V3a.8.8 0 0 0 .8.8h14.4A.8.8 0 0 0 16 3V1.8a.8.8 0 0 0-.8-.8H.8z"/>'); // eslint-disable-next-line
 
-var BIconArrow90degDown = /*#__PURE__*/makeIcon('Arrow90degDown', '<path fill-rule="evenodd" d="M2.646 9.646a.5.5 0 01.708 0L6 12.293l2.646-2.647a.5.5 0 11.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 13a.5.5 0 01-.5-.5V6A2.5 2.5 0 018 3.5h5.5a.5.5 0 010 1H8A1.5 1.5 0 006.5 6v6.5a.5.5 0 01-.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrow90degDown = /*#__PURE__*/makeIcon('Arrow90degDown', '<path fill-rule="evenodd" d="M2.646 9.646a.5.5 0 0 1 .708 0L6 12.293l2.646-2.647a.5.5 0 1 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M6 13a.5.5 0 0 1-.5-.5V6A2.5 2.5 0 0 1 8 3.5h5.5a.5.5 0 0 1 0 1H8A1.5 1.5 0 0 0 6.5 6v6.5a.5.5 0 0 1-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconArrow90degLeft = /*#__PURE__*/makeIcon('Arrow90degLeft', '<path fill-rule="evenodd" d="M6.104 2.396a.5.5 0 010 .708L3.457 5.75l2.647 2.646a.5.5 0 11-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.75 5.75a.5.5 0 01.5-.5h6.5a2.5 2.5 0 012.5 2.5v5.5a.5.5 0 01-1 0v-5.5a1.5 1.5 0 00-1.5-1.5h-6.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrow90degLeft = /*#__PURE__*/makeIcon('Arrow90degLeft', '<path fill-rule="evenodd" d="M6.104 2.396a.5.5 0 0 1 0 .708L3.457 5.75l2.647 2.646a.5.5 0 1 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M2.75 5.75a.5.5 0 0 1 .5-.5h6.5a2.5 2.5 0 0 1 2.5 2.5v5.5a.5.5 0 0 1-1 0v-5.5a1.5 1.5 0 0 0-1.5-1.5h-6.5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrow90degRight = /*#__PURE__*/makeIcon('Arrow90degRight', '<path fill-rule="evenodd" d="M9.896 2.396a.5.5 0 000 .708l2.647 2.646-2.647 2.646a.5.5 0 10.708.708l3-3a.5.5 0 000-.708l-3-3a.5.5 0 00-.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13.25 5.75a.5.5 0 00-.5-.5h-6.5a2.5 2.5 0 00-2.5 2.5v5.5a.5.5 0 001 0v-5.5a1.5 1.5 0 011.5-1.5h6.5a.5.5 0 00.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrow90degRight = /*#__PURE__*/makeIcon('Arrow90degRight', '<path fill-rule="evenodd" d="M9.896 2.396a.5.5 0 0 0 0 .708l2.647 2.646-2.647 2.646a.5.5 0 1 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z"/><path fill-rule="evenodd" d="M13.25 5.75a.5.5 0 0 0-.5-.5h-6.5a2.5 2.5 0 0 0-2.5 2.5v5.5a.5.5 0 0 0 1 0v-5.5a1.5 1.5 0 0 1 1.5-1.5h6.5a.5.5 0 0 0 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrow90degUp = /*#__PURE__*/makeIcon('Arrow90degUp', '<path fill-rule="evenodd" d="M2.646 6.854a.5.5 0 00.708 0L6 4.207l2.646 2.647a.5.5 0 10.708-.708l-3-3a.5.5 0 00-.708 0l-3 3a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 3.5a.5.5 0 00-.5.5v6.5A2.5 2.5 0 008 13h5.5a.5.5 0 000-1H8a1.5 1.5 0 01-1.5-1.5V4a.5.5 0 00-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrow90degUp = /*#__PURE__*/makeIcon('Arrow90degUp', '<path fill-rule="evenodd" d="M2.646 6.854a.5.5 0 0 0 .708 0L6 4.207l2.646 2.647a.5.5 0 1 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 0-.5.5v6.5A2.5 2.5 0 0 0 8 13h5.5a.5.5 0 0 0 0-1H8a1.5 1.5 0 0 1-1.5-1.5V4a.5.5 0 0 0-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowBarDown = /*#__PURE__*/makeIcon('ArrowBarDown', '<path fill-rule="evenodd" d="M11.354 10.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 01.708-.708L8 12.793l2.646-2.647a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 6a.5.5 0 01.5.5V13a.5.5 0 01-1 0V6.5A.5.5 0 018 6zM2 3.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowBarDown = /*#__PURE__*/makeIcon('ArrowBarDown', '<path fill-rule="evenodd" d="M11.354 10.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L8 12.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M8 6a.5.5 0 0 1 .5.5V13a.5.5 0 0 1-1 0V6.5A.5.5 0 0 1 8 6zM2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowBarLeft = /*#__PURE__*/makeIcon('ArrowBarLeft', '<path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 00-.708 0l-3 3a.5.5 0 000 .708l3 3a.5.5 0 00.708-.708L3.207 8l2.647-2.646a.5.5 0 000-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 8a.5.5 0 00-.5-.5H3a.5.5 0 000 1h6.5A.5.5 0 0010 8zm2.5 6a.5.5 0 01-.5-.5v-11a.5.5 0 011 0v11a.5.5 0 01-.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowBarLeft = /*#__PURE__*/makeIcon('ArrowBarLeft', '<path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 0 0-.708 0l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L3.207 8l2.647-2.646a.5.5 0 0 0 0-.708z"/><path fill-rule="evenodd" d="M10 8a.5.5 0 0 0-.5-.5H3a.5.5 0 0 0 0 1h6.5A.5.5 0 0 0 10 8zm2.5 6a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 1 0v11a.5.5 0 0 1-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowBarRight = /*#__PURE__*/makeIcon('ArrowBarRight', '<path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H6.5A.5.5 0 016 8zm-2.5 6a.5.5 0 01-.5-.5v-11a.5.5 0 011 0v11a.5.5 0 01-.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowBarRight = /*#__PURE__*/makeIcon('ArrowBarRight', '<path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L12.793 8l-2.647-2.646a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M6 8a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H6.5A.5.5 0 0 1 6 8zm-2.5 6a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 1 0v11a.5.5 0 0 1-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowBarUp = /*#__PURE__*/makeIcon('ArrowBarUp', '<path fill-rule="evenodd" d="M11.354 5.854a.5.5 0 000-.708l-3-3a.5.5 0 00-.708 0l-3 3a.5.5 0 10.708.708L8 3.207l2.646 2.647a.5.5 0 00.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 10a.5.5 0 00.5-.5V3a.5.5 0 00-1 0v6.5a.5.5 0 00.5.5zm-4.8 1.6c0-.22.18-.4.4-.4h8.8a.4.4 0 010 .8H3.6a.4.4 0 01-.4-.4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowBarUp = /*#__PURE__*/makeIcon('ArrowBarUp', '<path fill-rule="evenodd" d="M11.354 5.854a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L8 3.207l2.646 2.647a.5.5 0 0 0 .708 0z"/><path fill-rule="evenodd" d="M8 10a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-1 0v6.5a.5.5 0 0 0 .5.5zm-4.8 1.6c0-.22.18-.4.4-.4h8.8a.4.4 0 0 1 0 .8H3.6a.4.4 0 0 1-.4-.4z"/>'); // eslint-disable-next-line
 
-var BIconArrowClockwise = /*#__PURE__*/makeIcon('ArrowClockwise', '<path fill-rule="evenodd" d="M3.17 6.706a5 5 0 017.103-3.16.5.5 0 10.454-.892A6 6 0 1013.455 5.5a.5.5 0 00-.91.417 5 5 0 11-9.375.789z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.147.146a.5.5 0 01.707 0l2.5 2.5a.5.5 0 010 .708l-2.5 2.5a.5.5 0 11-.707-.708L10.293 3 8.147.854a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowClockwise = /*#__PURE__*/makeIcon('ArrowClockwise', '<path fill-rule="evenodd" d="M3.17 6.706a5 5 0 0 1 7.103-3.16.5.5 0 1 0 .454-.892A6 6 0 1 0 13.455 5.5a.5.5 0 0 0-.91.417 5 5 0 1 1-9.375.789z"/><path fill-rule="evenodd" d="M8.147.146a.5.5 0 0 1 .707 0l2.5 2.5a.5.5 0 0 1 0 .708l-2.5 2.5a.5.5 0 1 1-.707-.708L10.293 3 8.147.854a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
 
-var BIconArrowCounterclockwise = /*#__PURE__*/makeIcon('ArrowCounterclockwise', '<path fill-rule="evenodd" d="M12.83 6.706a5 5 0 00-7.103-3.16.5.5 0 11-.454-.892A6 6 0 112.545 5.5a.5.5 0 11.91.417 5 5 0 109.375.789z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.854.146a.5.5 0 00-.708 0l-2.5 2.5a.5.5 0 000 .708l2.5 2.5a.5.5 0 10.708-.708L5.707 3 7.854.854a.5.5 0 000-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowCounterclockwise = /*#__PURE__*/makeIcon('ArrowCounterclockwise', '<path fill-rule="evenodd" d="M12.83 6.706a5 5 0 0 0-7.103-3.16.5.5 0 1 1-.454-.892A6 6 0 1 1 2.545 5.5a.5.5 0 1 1 .91.417 5 5 0 1 0 9.375.789z"/><path fill-rule="evenodd" d="M7.854.146a.5.5 0 0 0-.708 0l-2.5 2.5a.5.5 0 0 0 0 .708l2.5 2.5a.5.5 0 1 0 .708-.708L5.707 3 7.854.854a.5.5 0 0 0 0-.708z"/>'); // eslint-disable-next-line
 
-var BIconArrowDown = /*#__PURE__*/makeIcon('ArrowDown', '<path fill-rule="evenodd" d="M4.646 9.646a.5.5 0 01.708 0L8 12.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 2.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V3a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDown = /*#__PURE__*/makeIcon('ArrowDown', '<path fill-rule="evenodd" d="M4.646 9.646a.5.5 0 0 1 .708 0L8 12.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M8 2.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0V3a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowDownLeft = /*#__PURE__*/makeIcon('ArrowDownLeft', '<path fill-rule="evenodd" d="M3 7.5a.5.5 0 01.5.5v4.5H8a.5.5 0 010 1H3a.5.5 0 01-.5-.5V8a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.354 3.646a.5.5 0 010 .708l-9 9a.5.5 0 01-.708-.708l9-9a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownCircle = /*#__PURE__*/makeIcon('ArrowDownCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M4.646 7.646a.5.5 0 0 1 .708 0L8 10.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowDownRight = /*#__PURE__*/makeIcon('ArrowDownRight', '<path fill-rule="evenodd" d="M12 7.5a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H7a.5.5 0 010-1h4.5V8a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.646 3.646a.5.5 0 01.708 0l9 9a.5.5 0 01-.708.708l-9-9a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownCircleFill = /*#__PURE__*/makeIcon('ArrowDownCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 5a.5.5 0 0 0-1 0v4.793L5.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 9.793V5z"/>'); // eslint-disable-next-line
 
-var BIconArrowDownShort = /*#__PURE__*/makeIcon('ArrowDownShort', '<path fill-rule="evenodd" d="M4.646 7.646a.5.5 0 01.708 0L8 10.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V5a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownLeft = /*#__PURE__*/makeIcon('ArrowDownLeft', '<path fill-rule="evenodd" d="M3 7.5a.5.5 0 0 1 .5.5v4.5H8a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5V8a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M12.354 3.646a.5.5 0 0 1 0 .708l-9 9a.5.5 0 0 1-.708-.708l9-9a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconArrowLeft = /*#__PURE__*/makeIcon('ArrowLeft', '<path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.5 8a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownLeftCircle = /*#__PURE__*/makeIcon('ArrowDownLeftCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M5.5 11h4a.5.5 0 0 0 0-1H6.707l4.147-4.146a.5.5 0 0 0-.708-.708L6 9.293V6.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 .5.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowLeftRight = /*#__PURE__*/makeIcon('ArrowLeftRight', '<path fill-rule="evenodd" d="M10.146 7.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 11l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2 11a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 11zm3.854-9.354a.5.5 0 010 .708L3.207 5l2.647 2.646a.5.5 0 11-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.5 5a.5.5 0 01.5-.5h10.5a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownLeftCircleFill = /*#__PURE__*/makeIcon('ArrowDownLeftCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-6.5 3h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 1 0v2.793l4.146-4.147a.5.5 0 0 1 .708.708L6.707 10H9.5a.5.5 0 0 1 0 1z"/>'); // eslint-disable-next-line
 
-var BIconArrowLeftShort = /*#__PURE__*/makeIcon('ArrowLeftShort', '<path fill-rule="evenodd" d="M7.854 4.646a.5.5 0 010 .708L5.207 8l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 8a.5.5 0 01.5-.5h6.5a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownLeftSquare = /*#__PURE__*/makeIcon('ArrowDownLeftSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M5.5 11h4a.5.5 0 0 0 0-1H6.707l4.147-4.146a.5.5 0 0 0-.708-.708L6 9.293V6.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 .5.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowRepeat = /*#__PURE__*/makeIcon('ArrowRepeat', '<path fill-rule="evenodd" d="M2.854 7.146a.5.5 0 00-.708 0l-2 2a.5.5 0 10.708.708L2.5 8.207l1.646 1.647a.5.5 0 00.708-.708l-2-2zm13-1a.5.5 0 00-.708 0L13.5 7.793l-1.646-1.647a.5.5 0 00-.708.708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 000-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 3a4.995 4.995 0 00-4.192 2.273.5.5 0 01-.837-.546A6 6 0 0114 8a.5.5 0 01-1.001 0 5 5 0 00-5-5zM2.5 7.5A.5.5 0 013 8a5 5 0 009.192 2.727.5.5 0 11.837.546A6 6 0 012 8a.5.5 0 01.501-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownLeftSquareFill = /*#__PURE__*/makeIcon('ArrowDownLeftSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm7.5 11h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 1 0v2.793l4.146-4.147a.5.5 0 0 1 .708.708L6.707 10H9.5a.5.5 0 0 1 0 1z"/>'); // eslint-disable-next-line
 
-var BIconArrowReturnLeft = /*#__PURE__*/makeIcon('ArrowReturnLeft', '<path fill-rule="evenodd" d="M5.854 5.646a.5.5 0 010 .708L3.207 9l2.647 2.646a.5.5 0 01-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13.5 2.5a.5.5 0 01.5.5v4a2.5 2.5 0 01-2.5 2.5H3a.5.5 0 010-1h8.5A1.5 1.5 0 0013 7V3a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownRight = /*#__PURE__*/makeIcon('ArrowDownRight', '<path fill-rule="evenodd" d="M12 7.5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-.5.5H7a.5.5 0 0 1 0-1h4.5V8a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M2.646 3.646a.5.5 0 0 1 .708 0l9 9a.5.5 0 0 1-.708.708l-9-9a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
 
-var BIconArrowReturnRight = /*#__PURE__*/makeIcon('ArrowReturnRight', '<path fill-rule="evenodd" d="M10.146 5.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 9l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3 2.5a.5.5 0 00-.5.5v4A2.5 2.5 0 005 9.5h8.5a.5.5 0 000-1H5A1.5 1.5 0 013.5 7V3a.5.5 0 00-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownRightCircle = /*#__PURE__*/makeIcon('ArrowDownRightCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M10.5 11h-4a.5.5 0 0 1 0-1h2.793L5.146 5.854a.5.5 0 1 1 .708-.708L10 9.293V6.5a.5.5 0 0 1 1 0v4a.5.5 0 0 1-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowRight = /*#__PURE__*/makeIcon('ArrowRight', '<path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.793 8l-2.647-2.646a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5H13a.5.5 0 010 1H2.5A.5.5 0 012 8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownRightCircleFill = /*#__PURE__*/makeIcon('ArrowDownRightCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-9.5 3h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-1 0v2.793L5.854 5.146a.5.5 0 1 0-.708.708L9.293 10H6.5a.5.5 0 0 0 0 1z"/>'); // eslint-disable-next-line
 
-var BIconArrowRightShort = /*#__PURE__*/makeIcon('ArrowRightShort', '<path fill-rule="evenodd" d="M8.146 4.646a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L10.793 8 8.146 5.354a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4 8a.5.5 0 01.5-.5H11a.5.5 0 010 1H4.5A.5.5 0 014 8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownRightSquare = /*#__PURE__*/makeIcon('ArrowDownRightSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M10.5 11h-4a.5.5 0 0 1 0-1h2.793L5.146 5.854a.5.5 0 1 1 .708-.708L10 9.293V6.5a.5.5 0 0 1 1 0v4a.5.5 0 0 1-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowUp = /*#__PURE__*/makeIcon('ArrowUp', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L8 3.707 5.354 6.354a.5.5 0 11-.708-.708l3-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownRightSquareFill = /*#__PURE__*/makeIcon('ArrowDownRightSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm4.5 11h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-1 0v2.793L5.854 5.146a.5.5 0 1 0-.708.708L9.293 10H6.5a.5.5 0 0 0 0 1z"/>'); // eslint-disable-next-line
 
-var BIconArrowUpDown = /*#__PURE__*/makeIcon('ArrowUpDown', '<path fill-rule="evenodd" d="M11 3.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.646 2.646a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L11 3.707 8.354 6.354a.5.5 0 11-.708-.708l3-3zm-9 7a.5.5 0 01.708 0L5 12.293l2.646-2.647a.5.5 0 11.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 2.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V3a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownShort = /*#__PURE__*/makeIcon('ArrowDownShort', '<path fill-rule="evenodd" d="M4.646 7.646a.5.5 0 0 1 .708 0L8 10.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowUpLeft = /*#__PURE__*/makeIcon('ArrowUpLeft', '<path fill-rule="evenodd" d="M2.5 4a.5.5 0 01.5-.5h5a.5.5 0 010 1H3.5V9a.5.5 0 01-1 0V4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.646 3.646a.5.5 0 01.708 0l9 9a.5.5 0 01-.708.708l-9-9a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownSquare = /*#__PURE__*/makeIcon('ArrowDownSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M4.646 7.646a.5.5 0 0 1 .708 0L8 10.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowUpRight = /*#__PURE__*/makeIcon('ArrowUpRight', '<path fill-rule="evenodd" d="M6.5 4a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V4.5H7a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.354 3.646a.5.5 0 010 .708l-9 9a.5.5 0 01-.708-.708l9-9a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownSquareFill = /*#__PURE__*/makeIcon('ArrowDownSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 5a.5.5 0 0 0-1 0v4.793L5.354 7.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 9.793V5z"/>'); // eslint-disable-next-line
 
-var BIconArrowUpShort = /*#__PURE__*/makeIcon('ArrowUpShort', '<path fill-rule="evenodd" d="M8 5.5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V6a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L8 5.707 5.354 8.354a.5.5 0 11-.708-.708l3-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowDownUp = /*#__PURE__*/makeIcon('ArrowDownUp', '<path fill-rule="evenodd" d="M11 3.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M10.646 2.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L11 3.707 8.354 6.354a.5.5 0 1 1-.708-.708l3-3zm-9 7a.5.5 0 0 1 .708 0L5 12.293l2.646-2.647a.5.5 0 1 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M5 2.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0V3a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowsAngleContract = /*#__PURE__*/makeIcon('ArrowsAngleContract', '<path fill-rule="evenodd" d="M9.5 2.036a.5.5 0 01.5.5v3.5h3.5a.5.5 0 010 1h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.354 1.646a.5.5 0 010 .708l-4.5 4.5a.5.5 0 11-.708-.708l4.5-4.5a.5.5 0 01.708 0zm-7.5 7.5a.5.5 0 010 .708l-4.5 4.5a.5.5 0 01-.708-.708l4.5-4.5a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.036 9.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V10h-3.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowLeft = /*#__PURE__*/makeIcon('ArrowLeft', '<path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 0 1 0 .708L3.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M2.5 8a.5.5 0 0 1 .5-.5h10.5a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowsAngleExpand = /*#__PURE__*/makeIcon('ArrowsAngleExpand', '<path fill-rule="evenodd" d="M1.5 10.036a.5.5 0 01.5.5v3.5h3.5a.5.5 0 010 1h-4a.5.5 0 01-.5-.5v-4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.354 9.646a.5.5 0 010 .708l-4.5 4.5a.5.5 0 01-.708-.708l4.5-4.5a.5.5 0 01.708 0zm8.5-8.5a.5.5 0 010 .708l-4.5 4.5a.5.5 0 01-.708-.708l4.5-4.5a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.036 1.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 11-1 0V2h-3.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowLeftCircle = /*#__PURE__*/makeIcon('ArrowLeftCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M8.354 11.354a.5.5 0 0 0 0-.708L5.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/><path fill-rule="evenodd" d="M11.5 8a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowsCollapse = /*#__PURE__*/makeIcon('ArrowsCollapse', '<path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 012 8zm6-7a.5.5 0 01.5.5V6a.5.5 0 01-1 0V1.5A.5.5 0 018 1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.354 3.646a.5.5 0 010 .708l-2 2a.5.5 0 01-.708 0l-2-2a.5.5 0 11.708-.708L8 5.293l1.646-1.647a.5.5 0 01.708 0zM8 15a.5.5 0 00.5-.5V10a.5.5 0 00-1 0v4.5a.5.5 0 00.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.354 12.354a.5.5 0 000-.708l-2-2a.5.5 0 00-.708 0l-2 2a.5.5 0 00.708.708L8 10.707l1.646 1.647a.5.5 0 00.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowLeftCircleFill = /*#__PURE__*/makeIcon('ArrowLeftCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-7.646 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L6.207 7.5H11a.5.5 0 0 1 0 1H6.207l2.147 2.146z"/>'); // eslint-disable-next-line
 
-var BIconArrowsExpand = /*#__PURE__*/makeIcon('ArrowsExpand', '<path fill-rule="evenodd" d="M2 8a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 012 8zm6-1.5a.5.5 0 00.5-.5V1.5a.5.5 0 00-1 0V6a.5.5 0 00.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.354 3.854a.5.5 0 000-.708l-2-2a.5.5 0 00-.708 0l-2 2a.5.5 0 10.708.708L8 2.207l1.646 1.647a.5.5 0 00.708 0zM8 9.5a.5.5 0 01.5.5v4.5a.5.5 0 01-1 0V10a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.354 12.146a.5.5 0 010 .708l-2 2a.5.5 0 01-.708 0l-2-2a.5.5 0 01.708-.708L8 13.793l1.646-1.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowLeftRight = /*#__PURE__*/makeIcon('ArrowLeftRight', '<path fill-rule="evenodd" d="M10.146 7.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L12.793 11l-2.647-2.646a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M2 11a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 11zm3.854-9.354a.5.5 0 0 1 0 .708L3.207 5l2.647 2.646a.5.5 0 1 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M2.5 5a.5.5 0 0 1 .5-.5h10.5a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowsFullscreen = /*#__PURE__*/makeIcon('ArrowsFullscreen', '<path fill-rule="evenodd" d="M1.464 10.536a.5.5 0 01.5.5v3h3a.5.5 0 010 1h-3.5a.5.5 0 01-.5-.5v-3.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.964 10a.5.5 0 010 .707l-4.146 4.147a.5.5 0 01-.707-.708L5.257 10a.5.5 0 01.707 0zm8.854-8.854a.5.5 0 010 .708L10.672 6a.5.5 0 01-.708-.707l4.147-4.147a.5.5 0 01.707 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.5 1.5A.5.5 0 0111 1h3.5a.5.5 0 01.5.5V5a.5.5 0 01-1 0V2h-3a.5.5 0 01-.5-.5zm4 9a.5.5 0 00-.5.5v3h-3a.5.5 0 000 1h3.5a.5.5 0 00.5-.5V11a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 9.964a.5.5 0 000 .708l4.146 4.146a.5.5 0 00.708-.707l-4.147-4.147a.5.5 0 00-.707 0zM1.182 1.146a.5.5 0 000 .708L5.328 6a.5.5 0 00.708-.707L1.889 1.146a.5.5 0 00-.707 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.5 1.5A.5.5 0 005 1H1.5a.5.5 0 00-.5.5V5a.5.5 0 001 0V2h3a.5.5 0 00.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowLeftShort = /*#__PURE__*/makeIcon('ArrowLeftShort', '<path fill-rule="evenodd" d="M7.854 4.646a.5.5 0 0 1 0 .708L5.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h6.5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconArrowsMove = /*#__PURE__*/makeIcon('ArrowsMove', '<path fill-rule="evenodd" d="M6.5 8a.5.5 0 00-.5-.5H1.5a.5.5 0 000 1H6a.5.5 0 00.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.854 5.646a.5.5 0 00-.708 0l-2 2a.5.5 0 000 .708l2 2a.5.5 0 00.708-.708L2.207 8l1.647-1.646a.5.5 0 000-.708zM9.5 8a.5.5 0 01.5-.5h4.5a.5.5 0 010 1H10a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.146 5.646a.5.5 0 01.708 0l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708L13.793 8l-1.647-1.646a.5.5 0 010-.708zM8 9.5a.5.5 0 00-.5.5v4.5a.5.5 0 001 0V10a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.646 12.146a.5.5 0 000 .708l2 2a.5.5 0 00.708 0l2-2a.5.5 0 00-.708-.708L8 13.793l-1.646-1.647a.5.5 0 00-.708 0zM8 6.5a.5.5 0 01-.5-.5V1.5a.5.5 0 011 0V6a.5.5 0 01-.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.646 3.854a.5.5 0 010-.708l2-2a.5.5 0 01.708 0l2 2a.5.5 0 01-.708.708L8 2.207 6.354 3.854a.5.5 0 01-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowLeftSquare = /*#__PURE__*/makeIcon('ArrowLeftSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M8.354 11.354a.5.5 0 0 0 0-.708L5.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/><path fill-rule="evenodd" d="M11.5 8a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconAspectRatio = /*#__PURE__*/makeIcon('AspectRatio', '<path fill-rule="evenodd" d="M0 3.5A1.5 1.5 0 011.5 2h13A1.5 1.5 0 0116 3.5v9a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 010 12.5v-9zM1.5 3a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5h-13z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2 4.5a.5.5 0 01.5-.5h3a.5.5 0 010 1H3v2.5a.5.5 0 01-1 0v-3zm12 7a.5.5 0 01-.5.5h-3a.5.5 0 010-1H13V8.5a.5.5 0 011 0v3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowLeftSquareFill = /*#__PURE__*/makeIcon('ArrowLeftSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.354 10.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L6.207 7.5H11a.5.5 0 0 1 0 1H6.207l2.147 2.146z"/>'); // eslint-disable-next-line
 
-var BIconAspectRatioFill = /*#__PURE__*/makeIcon('AspectRatioFill', '<path fill-rule="evenodd" d="M1.5 2A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13zm1 2a.5.5 0 00-.5.5v3a.5.5 0 001 0V5h2.5a.5.5 0 000-1h-3zm11 8a.5.5 0 00.5-.5v-3a.5.5 0 00-1 0V11h-2.5a.5.5 0 000 1h3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowRepeat = /*#__PURE__*/makeIcon('ArrowRepeat', '<path fill-rule="evenodd" d="M2.854 7.146a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L2.5 8.207l1.646 1.647a.5.5 0 0 0 .708-.708l-2-2zm13-1a.5.5 0 0 0-.708 0L13.5 7.793l-1.646-1.647a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0 0-.708z"/><path fill-rule="evenodd" d="M8 3a4.995 4.995 0 0 0-4.192 2.273.5.5 0 0 1-.837-.546A6 6 0 0 1 14 8a.5.5 0 0 1-1.001 0 5 5 0 0 0-5-5zM2.5 7.5A.5.5 0 0 1 3 8a5 5 0 0 0 9.192 2.727.5.5 0 1 1 .837.546A6 6 0 0 1 2 8a.5.5 0 0 1 .501-.5z"/>'); // eslint-disable-next-line
 
-var BIconAt = /*#__PURE__*/makeIcon('At', '<path fill-rule="evenodd" d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconArrowReturnLeft = /*#__PURE__*/makeIcon('ArrowReturnLeft', '<path fill-rule="evenodd" d="M5.854 5.646a.5.5 0 0 1 0 .708L3.207 9l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M13.5 2.5a.5.5 0 0 1 .5.5v4a2.5 2.5 0 0 1-2.5 2.5H3a.5.5 0 0 1 0-1h8.5A1.5 1.5 0 0 0 13 7V3a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconAward = /*#__PURE__*/makeIcon('Award', '<path fill-rule="evenodd" d="M9.669.864L8 0 6.331.864l-1.858.282-.842 1.68-1.337 1.32L2.6 6l-.306 1.854 1.337 1.32.842 1.68 1.858.282L8 12l1.669-.864 1.858-.282.842-1.68 1.337-1.32L13.4 6l.306-1.854-1.337-1.32-.842-1.68L9.669.864zm1.196 1.193l-1.51-.229L8 1.126l-1.355.702-1.51.229-.684 1.365-1.086 1.072L3.614 6l-.25 1.506 1.087 1.072.684 1.365 1.51.229L8 10.874l1.356-.702 1.509-.229.684-1.365 1.086-1.072L12.387 6l.248-1.506-1.086-1.072-.684-1.365z" clip-rule="evenodd"/><path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>'); // eslint-disable-next-line
+var BIconArrowReturnRight = /*#__PURE__*/makeIcon('ArrowReturnRight', '<path fill-rule="evenodd" d="M10.146 5.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L12.793 9l-2.647-2.646a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M3 2.5a.5.5 0 0 0-.5.5v4A2.5 2.5 0 0 0 5 9.5h8.5a.5.5 0 0 0 0-1H5A1.5 1.5 0 0 1 3.5 7V3a.5.5 0 0 0-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowRight = /*#__PURE__*/makeIcon('ArrowRight', '<path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L12.793 8l-2.647-2.646a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M2 8a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 8z"/>'); // eslint-disable-next-line
+
+var BIconArrowRightCircle = /*#__PURE__*/makeIcon('ArrowRightCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/><path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowRightCircleFill = /*#__PURE__*/makeIcon('ArrowRightCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-8.354 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L9.793 7.5H5a.5.5 0 0 0 0 1h4.793l-2.147 2.146z"/>'); // eslint-disable-next-line
+
+var BIconArrowRightShort = /*#__PURE__*/makeIcon('ArrowRightShort', '<path fill-rule="evenodd" d="M8.146 4.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.793 8 8.146 5.354a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5H11a.5.5 0 0 1 0 1H4.5A.5.5 0 0 1 4 8z"/>'); // eslint-disable-next-line
+
+var BIconArrowRightSquare = /*#__PURE__*/makeIcon('ArrowRightSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/><path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowRightSquareFill = /*#__PURE__*/makeIcon('ArrowRightSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm5.646 10.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L9.793 7.5H5a.5.5 0 0 0 0 1h4.793l-2.147 2.146z"/>'); // eslint-disable-next-line
+
+var BIconArrowUp = /*#__PURE__*/makeIcon('ArrowUp', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8 3.707 5.354 6.354a.5.5 0 1 1-.708-.708l3-3z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpCircle = /*#__PURE__*/makeIcon('ArrowUpCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M4.646 8.354a.5.5 0 0 0 .708 0L8 5.707l2.646 2.647a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M8 11.5a.5.5 0 0 0 .5-.5V6a.5.5 0 0 0-1 0v5a.5.5 0 0 0 .5.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpCircleFill = /*#__PURE__*/makeIcon('ArrowUpCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-10.646.354a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 6.207V11a.5.5 0 0 1-1 0V6.207L5.354 8.354z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpLeft = /*#__PURE__*/makeIcon('ArrowUpLeft', '<path fill-rule="evenodd" d="M2.5 4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H3.5V9a.5.5 0 0 1-1 0V4z"/><path fill-rule="evenodd" d="M2.646 3.646a.5.5 0 0 1 .708 0l9 9a.5.5 0 0 1-.708.708l-9-9a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpLeftCircle = /*#__PURE__*/makeIcon('ArrowUpLeftCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M5.5 5h4a.5.5 0 0 1 0 1H6.707l4.147 4.146a.5.5 0 0 1-.708.708L6 6.707V9.5a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpLeftCircleFill = /*#__PURE__*/makeIcon('ArrowUpLeftCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM9.5 5h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 1 0V6.707l4.146 4.147a.5.5 0 0 0 .708-.708L6.707 6H9.5a.5.5 0 0 0 0-1z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpLeftSquare = /*#__PURE__*/makeIcon('ArrowUpLeftSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M5.5 5h4a.5.5 0 0 1 0 1H6.707l4.147 4.146a.5.5 0 0 1-.708.708L6 6.707V9.5a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpLeftSquareFill = /*#__PURE__*/makeIcon('ArrowUpLeftSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm7.5 5h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 1 0V6.707l4.146 4.147a.5.5 0 0 0 .708-.708L6.707 6H9.5a.5.5 0 0 0 0-1z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpRight = /*#__PURE__*/makeIcon('ArrowUpRight', '<path fill-rule="evenodd" d="M6.5 4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V4.5H7a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M12.354 3.646a.5.5 0 0 1 0 .708l-9 9a.5.5 0 0 1-.708-.708l9-9a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpRightCircle = /*#__PURE__*/makeIcon('ArrowUpRightCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M10.5 5h-4a.5.5 0 0 0 0 1h2.793l-4.147 4.146a.5.5 0 0 0 .708.708L10 6.707V9.5a.5.5 0 0 0 1 0v-4a.5.5 0 0 0-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpRightCircleFill = /*#__PURE__*/makeIcon('ArrowUpRightCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.5 5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6.707l-4.146 4.147a.5.5 0 0 1-.708-.708L9.293 6H6.5a.5.5 0 0 1 0-1z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpRightSquare = /*#__PURE__*/makeIcon('ArrowUpRightSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M10.5 5h-4a.5.5 0 0 0 0 1h2.793l-4.147 4.146a.5.5 0 0 0 .708.708L10 6.707V9.5a.5.5 0 0 0 1 0v-4a.5.5 0 0 0-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpRightSquareFill = /*#__PURE__*/makeIcon('ArrowUpRightSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm4.5 5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6.707l-4.146 4.147a.5.5 0 0 1-.708-.708L9.293 6H6.5a.5.5 0 0 1 0-1z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpShort = /*#__PURE__*/makeIcon('ArrowUpShort', '<path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8 5.707 5.354 8.354a.5.5 0 1 1-.708-.708l3-3z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpSquare = /*#__PURE__*/makeIcon('ArrowUpSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M4.646 8.354a.5.5 0 0 0 .708 0L8 5.707l2.646 2.647a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M8 11.5a.5.5 0 0 0 .5-.5V6a.5.5 0 0 0-1 0v5a.5.5 0 0 0 .5.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowUpSquareFill = /*#__PURE__*/makeIcon('ArrowUpSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3.354 8.354a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 6.207V11a.5.5 0 0 1-1 0V6.207L5.354 8.354z"/>'); // eslint-disable-next-line
+
+var BIconArrowsAngleContract = /*#__PURE__*/makeIcon('ArrowsAngleContract', '<path fill-rule="evenodd" d="M9.5 2.036a.5.5 0 0 1 .5.5v3.5h3.5a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M14.354 1.646a.5.5 0 0 1 0 .708l-4.5 4.5a.5.5 0 1 1-.708-.708l4.5-4.5a.5.5 0 0 1 .708 0zm-7.5 7.5a.5.5 0 0 1 0 .708l-4.5 4.5a.5.5 0 0 1-.708-.708l4.5-4.5a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M2.036 9.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V10h-3.5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowsAngleExpand = /*#__PURE__*/makeIcon('ArrowsAngleExpand', '<path fill-rule="evenodd" d="M1.5 10.036a.5.5 0 0 1 .5.5v3.5h3.5a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M6.354 9.646a.5.5 0 0 1 0 .708l-4.5 4.5a.5.5 0 0 1-.708-.708l4.5-4.5a.5.5 0 0 1 .708 0zm8.5-8.5a.5.5 0 0 1 0 .708l-4.5 4.5a.5.5 0 0 1-.708-.708l4.5-4.5a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M10.036 1.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 1 1-1 0V2h-3.5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowsCollapse = /*#__PURE__*/makeIcon('ArrowsCollapse', '<path fill-rule="evenodd" d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8zm6-7a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V1.5A.5.5 0 0 1 8 1z"/><path fill-rule="evenodd" d="M10.354 3.646a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L8 5.293l1.646-1.647a.5.5 0 0 1 .708 0zM8 15a.5.5 0 0 0 .5-.5V10a.5.5 0 0 0-1 0v4.5a.5.5 0 0 0 .5.5z"/><path fill-rule="evenodd" d="M10.354 12.354a.5.5 0 0 0 0-.708l-2-2a.5.5 0 0 0-.708 0l-2 2a.5.5 0 0 0 .708.708L8 10.707l1.646 1.647a.5.5 0 0 0 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconArrowsExpand = /*#__PURE__*/makeIcon('ArrowsExpand', '<path fill-rule="evenodd" d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8zm6-1.5a.5.5 0 0 0 .5-.5V1.5a.5.5 0 0 0-1 0V6a.5.5 0 0 0 .5.5z"/><path fill-rule="evenodd" d="M10.354 3.854a.5.5 0 0 0 0-.708l-2-2a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L8 2.207l1.646 1.647a.5.5 0 0 0 .708 0zM8 9.5a.5.5 0 0 1 .5.5v4.5a.5.5 0 0 1-1 0V10a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M10.354 12.146a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L8 13.793l1.646-1.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconArrowsFullscreen = /*#__PURE__*/makeIcon('ArrowsFullscreen', '<path fill-rule="evenodd" d="M1.464 10.536a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3.5a.5.5 0 0 1-.5-.5v-3.5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M5.964 10a.5.5 0 0 1 0 .707l-4.146 4.147a.5.5 0 0 1-.707-.708L5.257 10a.5.5 0 0 1 .707 0zm8.854-8.854a.5.5 0 0 1 0 .708L10.672 6a.5.5 0 0 1-.708-.707l4.147-4.147a.5.5 0 0 1 .707 0z"/><path fill-rule="evenodd" d="M10.5 1.5A.5.5 0 0 1 11 1h3.5a.5.5 0 0 1 .5.5V5a.5.5 0 0 1-1 0V2h-3a.5.5 0 0 1-.5-.5zm4 9a.5.5 0 0 0-.5.5v3h-3a.5.5 0 0 0 0 1h3.5a.5.5 0 0 0 .5-.5V11a.5.5 0 0 0-.5-.5z"/><path fill-rule="evenodd" d="M10 9.964a.5.5 0 0 0 0 .708l4.146 4.146a.5.5 0 0 0 .708-.707l-4.147-4.147a.5.5 0 0 0-.707 0zM1.182 1.146a.5.5 0 0 0 0 .708L5.328 6a.5.5 0 0 0 .708-.707L1.889 1.146a.5.5 0 0 0-.707 0z"/><path fill-rule="evenodd" d="M5.5 1.5A.5.5 0 0 0 5 1H1.5a.5.5 0 0 0-.5.5V5a.5.5 0 0 0 1 0V2h3a.5.5 0 0 0 .5-.5z"/>'); // eslint-disable-next-line
+
+var BIconArrowsMove = /*#__PURE__*/makeIcon('ArrowsMove', '<path fill-rule="evenodd" d="M6.5 8a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1H6a.5.5 0 0 0 .5-.5z"/><path fill-rule="evenodd" d="M3.854 5.646a.5.5 0 0 0-.708 0l-2 2a.5.5 0 0 0 0 .708l2 2a.5.5 0 0 0 .708-.708L2.207 8l1.647-1.646a.5.5 0 0 0 0-.708zM9.5 8a.5.5 0 0 1 .5-.5h4.5a.5.5 0 0 1 0 1H10a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M12.146 5.646a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L13.793 8l-1.647-1.646a.5.5 0 0 1 0-.708zM8 9.5a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 1 0V10a.5.5 0 0 0-.5-.5z"/><path fill-rule="evenodd" d="M5.646 12.146a.5.5 0 0 0 0 .708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8 13.793l-1.646-1.647a.5.5 0 0 0-.708 0zM8 6.5a.5.5 0 0 1-.5-.5V1.5a.5.5 0 0 1 1 0V6a.5.5 0 0 1-.5.5z"/><path fill-rule="evenodd" d="M5.646 3.854a.5.5 0 0 1 0-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8 2.207 6.354 3.854a.5.5 0 0 1-.708 0z"/>'); // eslint-disable-next-line
+
+var BIconAspectRatio = /*#__PURE__*/makeIcon('AspectRatio', '<path fill-rule="evenodd" d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5v-9zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/><path fill-rule="evenodd" d="M2 4.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H3v2.5a.5.5 0 0 1-1 0v-3zm12 7a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1H13V8.5a.5.5 0 0 1 1 0v3z"/>'); // eslint-disable-next-line
+
+var BIconAspectRatioFill = /*#__PURE__*/makeIcon('AspectRatioFill', '<path fill-rule="evenodd" d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm1 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 1 0V5h2.5a.5.5 0 0 0 0-1h-3zm11 8a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-1 0V11h-2.5a.5.5 0 0 0 0 1h3z"/>'); // eslint-disable-next-line
+
+var BIconAsterisk = /*#__PURE__*/makeIcon('Asterisk', '<path fill-rule="evenodd" d="M8 0a1 1 0 0 1 1 1v5.268l4.562-2.634a1 1 0 1 1 1 1.732L10 8l4.562 2.634a1 1 0 1 1-1 1.732L9 9.732V15a1 1 0 1 1-2 0V9.732l-4.562 2.634a1 1 0 1 1-1-1.732L6 8 1.438 5.366a1 1 0 0 1 1-1.732L7 6.268V1a1 1 0 0 1 1-1z"/>'); // eslint-disable-next-line
+
+var BIconAt = /*#__PURE__*/makeIcon('At', '<path fill-rule="evenodd" d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914z"/>'); // eslint-disable-next-line
+
+var BIconAward = /*#__PURE__*/makeIcon('Award', '<path fill-rule="evenodd" d="M9.669.864L8 0 6.331.864l-1.858.282-.842 1.68-1.337 1.32L2.6 6l-.306 1.854 1.337 1.32.842 1.68 1.858.282L8 12l1.669-.864 1.858-.282.842-1.68 1.337-1.32L13.4 6l.306-1.854-1.337-1.32-.842-1.68L9.669.864zm1.196 1.193l-1.51-.229L8 1.126l-1.355.702-1.51.229-.684 1.365-1.086 1.072L3.614 6l-.25 1.506 1.087 1.072.684 1.365 1.51.229L8 10.874l1.356-.702 1.509-.229.684-1.365 1.086-1.072L12.387 6l.248-1.506-1.086-1.072-.684-1.365z"/><path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>'); // eslint-disable-next-line
 
 var BIconAwardFill = /*#__PURE__*/makeIcon('AwardFill', '<path d="M8 0l1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864 8 0z"/><path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>'); // eslint-disable-next-line
 
-var BIconBackspace = /*#__PURE__*/makeIcon('Backspace', '<path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 011 1v10a1 1 0 01-1 1h-7.08a1 1 0 01-.76-.35L1 8l4.844-5.65A1 1 0 016.603 2zm7.08-1a2 2 0 012 2v10a2 2 0 01-2 2h-7.08a2 2 0 01-1.519-.698L.241 8.65a1 1 0 010-1.302L5.084 1.7A2 2 0 016.603 1h7.08z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 000 .708l5 5a.5.5 0 00.707-.708l-5-5a.5.5 0 00-.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 010 .708l-5 5a.5.5 0 01-.708-.708l5-5a.5.5 0 01.707 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBackspace = /*#__PURE__*/makeIcon('Backspace', '<path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/><path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/><path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>'); // eslint-disable-next-line
 
-var BIconBackspaceFill = /*#__PURE__*/makeIcon('BackspaceFill', '<path fill-rule="evenodd" d="M15.683 3a2 2 0 00-2-2h-7.08a2 2 0 00-1.519.698L.241 7.35a1 1 0 000 1.302l4.843 5.65A2 2 0 006.603 15h7.08a2 2 0 002-2V3zM5.829 5.854a.5.5 0 11.707-.708l2.147 2.147 2.146-2.147a.5.5 0 11.707.708L9.39 8l2.146 2.146a.5.5 0 01-.707.708L8.683 8.707l-2.147 2.147a.5.5 0 01-.707-.708L7.976 8 5.829 5.854z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBackspaceFill = /*#__PURE__*/makeIcon('BackspaceFill', '<path fill-rule="evenodd" d="M15.683 3a2 2 0 0 0-2-2h-7.08a2 2 0 0 0-1.519.698L.241 7.35a1 1 0 0 0 0 1.302l4.843 5.65A2 2 0 0 0 6.603 15h7.08a2 2 0 0 0 2-2V3zM5.829 5.854a.5.5 0 1 1 .707-.708l2.147 2.147 2.146-2.147a.5.5 0 1 1 .707.708L9.39 8l2.146 2.146a.5.5 0 0 1-.707.708L8.683 8.707l-2.147 2.147a.5.5 0 0 1-.707-.708L7.976 8 5.829 5.854z"/>'); // eslint-disable-next-line
 
-var BIconBackspaceReverse = /*#__PURE__*/makeIcon('BackspaceReverse', '<path fill-rule="evenodd" d="M9.08 2H2a1 1 0 00-1 1v10a1 1 0 001 1h7.08a1 1 0 00.76-.35L14.682 8 9.839 2.35A1 1 0 009.08 2zM2 1a2 2 0 00-2 2v10a2 2 0 002 2h7.08a2 2 0 001.519-.698l4.843-5.651a1 1 0 000-1.302L10.6 1.7A2 2 0 009.08 1H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.854 5.146a.5.5 0 010 .708l-5 5a.5.5 0 01-.708-.708l5-5a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.146 5.146a.5.5 0 000 .708l5 5a.5.5 0 00.708-.708l-5-5a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBackspaceReverse = /*#__PURE__*/makeIcon('BackspaceReverse', '<path fill-rule="evenodd" d="M9.08 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7.08a1 1 0 0 0 .76-.35L14.682 8 9.839 2.35A1 1 0 0 0 9.08 2zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7.08a2 2 0 0 0 1.519-.698l4.843-5.651a1 1 0 0 0 0-1.302L10.6 1.7A2 2 0 0 0 9.08 1H2z"/><path fill-rule="evenodd" d="M9.854 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M4.146 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .708-.708l-5-5a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
 
-var BIconBackspaceReverseFill = /*#__PURE__*/makeIcon('BackspaceReverseFill', '<path fill-rule="evenodd" d="M0 3a2 2 0 012-2h7.08a2 2 0 011.519.698l4.843 5.651a1 1 0 010 1.302L10.6 14.3a2 2 0 01-1.52.7H2a2 2 0 01-2-2V3zm9.854 2.854a.5.5 0 00-.708-.708L7 7.293 4.854 5.146a.5.5 0 10-.708.708L6.293 8l-2.147 2.146a.5.5 0 00.708.708L7 8.707l2.146 2.147a.5.5 0 00.708-.708L7.707 8l2.147-2.146z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBackspaceReverseFill = /*#__PURE__*/makeIcon('BackspaceReverseFill', '<path fill-rule="evenodd" d="M0 3a2 2 0 0 1 2-2h7.08a2 2 0 0 1 1.519.698l4.843 5.651a1 1 0 0 1 0 1.302L10.6 14.3a2 2 0 0 1-1.52.7H2a2 2 0 0 1-2-2V3zm9.854 2.854a.5.5 0 0 0-.708-.708L7 7.293 4.854 5.146a.5.5 0 1 0-.708.708L6.293 8l-2.147 2.146a.5.5 0 0 0 .708.708L7 8.707l2.146 2.147a.5.5 0 0 0 .708-.708L7.707 8l2.147-2.146z"/>'); // eslint-disable-next-line
 
-var BIconBag = /*#__PURE__*/makeIcon('Bag', '<path fill-rule="evenodd" d="M14 5H2v9a1 1 0 001 1h10a1 1 0 001-1V5zM1 4v10a2 2 0 002 2h10a2 2 0 002-2V4H1z" clip-rule="evenodd"/><path d="M8 1.5A2.5 2.5 0 005.5 4h-1a3.5 3.5 0 117 0h-1A2.5 2.5 0 008 1.5z"/>'); // eslint-disable-next-line
+var BIconBag = /*#__PURE__*/makeIcon('Bag', '<path fill-rule="evenodd" d="M14 5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5zM1 4v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4H1z"/><path d="M8 1.5A2.5 2.5 0 0 0 5.5 4h-1a3.5 3.5 0 1 1 7 0h-1A2.5 2.5 0 0 0 8 1.5z"/>'); // eslint-disable-next-line
 
-var BIconBagFill = /*#__PURE__*/makeIcon('BagFill', '<path d="M1 4h14v10a2 2 0 01-2 2H3a2 2 0 01-2-2V4zm7-2.5A2.5 2.5 0 005.5 4h-1a3.5 3.5 0 117 0h-1A2.5 2.5 0 008 1.5z"/>'); // eslint-disable-next-line
+var BIconBagCheck = /*#__PURE__*/makeIcon('BagCheck', '<path fill-rule="evenodd" d="M14 5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5zM1 4v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4H1z"/><path d="M8 1.5A2.5 2.5 0 0 0 5.5 4h-1a3.5 3.5 0 1 1 7 0h-1A2.5 2.5 0 0 0 8 1.5z"/><path fill-rule="evenodd" d="M10.854 7.646a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 10.293l2.646-2.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconBarChart = /*#__PURE__*/makeIcon('BarChart', '<path fill-rule="evenodd" d="M4 11H2v3h2v-3zm5-4H7v7h2V7zm5-5h-2v12h2V2zm-2-1a1 1 0 00-1 1v12a1 1 0 001 1h2a1 1 0 001-1V2a1 1 0 00-1-1h-2zM6 7a1 1 0 011-1h2a1 1 0 011 1v7a1 1 0 01-1 1H7a1 1 0 01-1-1V7zm-5 4a1 1 0 011-1h2a1 1 0 011 1v3a1 1 0 01-1 1H2a1 1 0 01-1-1v-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBagDash = /*#__PURE__*/makeIcon('BagDash', '<path fill-rule="evenodd" d="M14 5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5zM1 4v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4H1z"/><path d="M8 1.5A2.5 2.5 0 0 0 5.5 4h-1a3.5 3.5 0 1 1 7 0h-1A2.5 2.5 0 0 0 8 1.5z"/><path fill-rule="evenodd" d="M5.5 10a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconBagFill = /*#__PURE__*/makeIcon('BagFill', '<path d="M1 4h14v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4zm7-2.5A2.5 2.5 0 0 0 5.5 4h-1a3.5 3.5 0 1 1 7 0h-1A2.5 2.5 0 0 0 8 1.5z"/>'); // eslint-disable-next-line
+
+var BIconBagPlus = /*#__PURE__*/makeIcon('BagPlus', '<path fill-rule="evenodd" d="M14 5H2v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5zM1 4v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4H1z"/><path d="M8 1.5A2.5 2.5 0 0 0 5.5 4h-1a3.5 3.5 0 1 1 7 0h-1A2.5 2.5 0 0 0 8 1.5z"/><path fill-rule="evenodd" d="M8 7.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h1.5V8a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M7.5 10a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0v-2z"/>'); // eslint-disable-next-line
+
+var BIconBarChart = /*#__PURE__*/makeIcon('BarChart', '<path fill-rule="evenodd" d="M4 11H2v3h2v-3zm5-4H7v7h2V7zm5-5h-2v12h2V2zm-2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1h-2zM6 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm-5 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3z"/>'); // eslint-disable-next-line
 
 var BIconBarChartFill = /*#__PURE__*/makeIcon('BarChartFill', '<rect width="4" height="5" x="1" y="10" rx="1"/><rect width="4" height="9" x="6" y="6" rx="1"/><rect width="4" height="14" x="11" y="1" rx="1"/>'); // eslint-disable-next-line
 
-var BIconBattery = /*#__PURE__*/makeIcon('Battery', '<path fill-rule="evenodd" d="M12 5H2a1 1 0 00-1 1v4a1 1 0 001 1h10a1 1 0 001-1V6a1 1 0 00-1-1zM2 4a2 2 0 00-2 2v4a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M14.5 9.5a1.5 1.5 0 000-3v3z"/>'); // eslint-disable-next-line
+var BIconBasket = /*#__PURE__*/makeIcon('Basket', '<path fill-rule="evenodd" d="M10.243 1.071a.5.5 0 0 1 .686.172l3 5a.5.5 0 1 1-.858.514l-3-5a.5.5 0 0 1 .172-.686zm-4.486 0a.5.5 0 0 0-.686.172l-3 5a.5.5 0 1 0 .858.514l3-5a.5.5 0 0 0-.172-.686z"/><path fill-rule="evenodd" d="M1 7v1h14V7H1zM.5 6a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5H.5z"/><path fill-rule="evenodd" d="M14 9H2v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9zM2 8a1 1 0 0 0-1 1v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9a1 1 0 0 0-1-1H2z"/><path fill-rule="evenodd" d="M4 10a.5.5 0 0 1 .5.5v3a.5.5 0 1 1-1 0v-3A.5.5 0 0 1 4 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 1 1-1 0v-3A.5.5 0 0 1 6 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 1 1-1 0v-3A.5.5 0 0 1 8 10zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 1 1-1 0v-3a.5.5 0 0 1 .5-.5zm2 0a.5.5 0 0 1 .5.5v3a.5.5 0 1 1-1 0v-3a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconBatteryCharging = /*#__PURE__*/makeIcon('BatteryCharging', '<path d="M14.5 9.5a1.5 1.5 0 000-3v3z"/><path fill-rule="evenodd" d="M9.585 2.568a.5.5 0 01.226.58L8.677 6.832h1.99a.5.5 0 01.364.843l-5.334 5.667a.5.5 0 01-.842-.49L5.99 9.167H4a.5.5 0 01-.364-.843l5.333-5.667a.5.5 0 01.616-.09z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.332 4H2a2 2 0 00-2 2v4a2 2 0 002 2h2.072l.307-1H2a1 1 0 01-1-1V6a1 1 0 011-1h3.391l.941-1zM4.45 6H2v4h1.313a1.5 1.5 0 01-.405-2.361L4.45 6zm.976 5l-.308 1H6.96l.21-.224h.001l.73-.776H6.53l-.085.09.028-.09H5.426zm1.354-1H5.733l.257-.833H4a.5.5 0 01-.364-.843l.793-.843L5.823 6h1.373L5.157 8.167h1.51a.5.5 0 01.478.647L6.78 10zm.69 0h1.374l1.394-1.482.793-.842a.5.5 0 00-.364-.843h-1.99L8.933 6H7.887l-.166.54-.199.646A.5.5 0 008 7.833h1.51L7.47 10zm.725-5H9.24l.308-1H7.706l-.942 1h1.374l.085-.09-.028.09zm2.4-1l-.308 1H12a1 1 0 011 1v4a1 1 0 01-1 1H9.276l-.942 1H12a2 2 0 002-2V6a2 2 0 00-2-2h-1.405zm-.378 6H12V8.02a1.499 1.499 0 01-.241.341L10.217 10zM12 6.646V6h-.646a1.5 1.5 0 01.646.646z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBasket2 = /*#__PURE__*/makeIcon('Basket2', '<path fill-rule="evenodd" d="M1.111 7.186A.5.5 0 0 1 1.5 7h13a.5.5 0 0 1 .489.605l-1.5 7A.5.5 0 0 1 13 15H3a.5.5 0 0 1-.489-.395l-1.5-7a.5.5 0 0 1 .1-.42zM2.118 8l1.286 6h9.192l1.286-6H2.118z"/><path fill-rule="evenodd" d="M11.314 1.036a.5.5 0 0 1 .65.278l2 5a.5.5 0 1 1-.928.372l-2-5a.5.5 0 0 1 .278-.65zm-6.628 0a.5.5 0 0 0-.65.278l-2 5a.5.5 0 1 0 .928.372l2-5a.5.5 0 0 0-.278-.65z"/><path d="M4 10a1 1 0 0 1 2 0v2a1 1 0 1 1-2 0v-2zm3 0a1 1 0 0 1 2 0v2a1 1 0 1 1-2 0v-2zm3 0a1 1 0 0 1 2 0v2a1 1 0 1 1-2 0v-2zM0 6.5A.5.5 0 0 1 .5 6h15a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1-.5-.5v-1z"/>'); // eslint-disable-next-line
 
-var BIconBatteryFull = /*#__PURE__*/makeIcon('BatteryFull', '<path fill-rule="evenodd" d="M12 5H2a1 1 0 00-1 1v4a1 1 0 001 1h10a1 1 0 001-1V6a1 1 0 00-1-1zM2 4a2 2 0 00-2 2v4a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M2 6h10v4H2V6zm12.5 3.5a1.5 1.5 0 000-3v3z"/>'); // eslint-disable-next-line
+var BIconBasket2Fill = /*#__PURE__*/makeIcon('Basket2Fill', '<path fill-rule="evenodd" d="M11.314 1.036a.5.5 0 0 1 .65.278l2 5a.5.5 0 1 1-.928.372l-2-5a.5.5 0 0 1 .278-.65zm-6.628 0a.5.5 0 0 0-.65.278l-2 5a.5.5 0 1 0 .928.372l2-5a.5.5 0 0 0-.278-.65z"/><path fill-rule="evenodd" d="M1.5 7a.5.5 0 0 0-.489.605l1.5 7A.5.5 0 0 0 3 15h10a.5.5 0 0 0 .489-.395l1.5-7A.5.5 0 0 0 14.5 7h-13zM4 10a1 1 0 0 1 2 0v2a1 1 0 1 1-2 0v-2zm3 0a1 1 0 0 1 2 0v2a1 1 0 1 1-2 0v-2zm4-1a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0v-2a1 1 0 0 0-1-1z"/><path d="M0 6.5A.5.5 0 0 1 .5 6h15a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1-.5-.5v-1z"/>'); // eslint-disable-next-line
 
-var BIconBatteryHalf = /*#__PURE__*/makeIcon('BatteryHalf', '<path fill-rule="evenodd" d="M12 5H2a1 1 0 00-1 1v4a1 1 0 001 1h10a1 1 0 001-1V6a1 1 0 00-1-1zM2 4a2 2 0 00-2 2v4a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M2 6h5v4H2V6zm12.5 3.5a1.5 1.5 0 000-3v3z"/>'); // eslint-disable-next-line
+var BIconBasket3 = /*#__PURE__*/makeIcon('Basket3', '<path fill-rule="evenodd" d="M10.243 1.071a.5.5 0 0 1 .686.172l3 5a.5.5 0 1 1-.858.514l-3-5a.5.5 0 0 1 .172-.686zm-4.486 0a.5.5 0 0 0-.686.172l-3 5a.5.5 0 1 0 .858.514l3-5a.5.5 0 0 0-.172-.686z"/><path d="M0 6.5A.5.5 0 0 1 .5 6h15a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1-.5-.5v-1zM.81 9c0 .035.004.07.011.105l1.201 5.604A1 1 0 0 0 3 15.5h10a1 1 0 0 0 .978-.79l1.2-5.605A.495.495 0 0 0 15.19 9h-1.011L13 14.5H3L1.821 9H.81z"/>'); // eslint-disable-next-line
 
-var BIconBell = /*#__PURE__*/makeIcon('Bell', '<path d="M8 16a2 2 0 002-2H6a2 2 0 002 2z"/><path fill-rule="evenodd" d="M8 1.918l-.797.161A4.002 4.002 0 004 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 00-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 111.99 0A5.002 5.002 0 0113 6c0 .88.32 4.2 1.22 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBasket3Fill = /*#__PURE__*/makeIcon('Basket3Fill', '<path fill-rule="evenodd" d="M10.243 1.071a.5.5 0 0 1 .686.172l3 5a.5.5 0 0 1-.858.514l-3-5a.5.5 0 0 1 .172-.686zm-4.486 0a.5.5 0 0 0-.686.172l-3 5a.5.5 0 1 0 .858.514l3-5a.5.5 0 0 0-.172-.686z"/><path d="M13.489 14.605A.5.5 0 0 1 13 15H3a.5.5 0 0 1-.489-.395L1.311 9H14.69l-1.201 5.605z"/><rect width="16" height="2" y="6" rx=".5"/>'); // eslint-disable-next-line
 
-var BIconBellFill = /*#__PURE__*/makeIcon('BellFill', '<path d="M8 16a2 2 0 002-2H6a2 2 0 002 2zm.995-14.901a1 1 0 10-1.99 0A5.002 5.002 0 003 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>'); // eslint-disable-next-line
+var BIconBasketFill = /*#__PURE__*/makeIcon('BasketFill', '<path fill-rule="evenodd" d="M5.071 1.243a.5.5 0 0 1 .858.514L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 6h1.717L5.07 1.243zM3.5 10.5a.5.5 0 0 0-1 0v3a.5.5 0 0 0 1 0v-3zm2.5 0a.5.5 0 0 0-1 0v3a.5.5 0 0 0 1 0v-3zm2.5 0a.5.5 0 0 0-1 0v3a.5.5 0 0 0 1 0v-3zm2.5 0a.5.5 0 0 0-1 0v3a.5.5 0 0 0 1 0v-3zm2.5 0a.5.5 0 0 0-1 0v3a.5.5 0 0 0 1 0v-3z"/>'); // eslint-disable-next-line
 
-var BIconBlockquoteLeft = /*#__PURE__*/makeIcon('BlockquoteLeft', '<path fill-rule="evenodd" d="M2 3.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm5 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm-5 3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M3.734 6.352a6.586 6.586 0 00-.445.275 1.94 1.94 0 00-.346.299 1.38 1.38 0 00-.252.369c-.058.129-.1.295-.123.498h.282c.242 0 .431.06.568.182.14.117.21.29.21.521a.697.697 0 01-.187.463c-.12.14-.289.21-.503.21-.336 0-.577-.108-.721-.327C2.072 8.619 2 8.328 2 7.969c0-.254.055-.485.164-.692.11-.21.242-.398.398-.562.16-.168.33-.31.51-.428.18-.117.33-.213.451-.287l.211.352zm2.168 0a6.588 6.588 0 00-.445.275 1.94 1.94 0 00-.346.299c-.113.12-.199.246-.257.375a1.75 1.75 0 00-.118.492h.282c.242 0 .431.06.568.182.14.117.21.29.21.521a.697.697 0 01-.187.463c-.12.14-.289.21-.504.21-.335 0-.576-.108-.72-.327-.145-.223-.217-.514-.217-.873 0-.254.055-.485.164-.692.11-.21.242-.398.398-.562.16-.168.33-.31.51-.428.18-.117.33-.213.451-.287l.211.352z"/>'); // eslint-disable-next-line
+var BIconBattery = /*#__PURE__*/makeIcon('Battery', '<path fill-rule="evenodd" d="M12 5H2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H2z"/><path d="M14.5 9.5a1.5 1.5 0 0 0 0-3v3z"/>'); // eslint-disable-next-line
 
-var BIconBlockquoteRight = /*#__PURE__*/makeIcon('BlockquoteRight', '<path fill-rule="evenodd" d="M2 3.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M12.168 6.352c.184.105.332.197.445.275.114.074.229.174.346.299.11.117.193.24.252.369s.1.295.123.498h-.281c-.243 0-.432.06-.569.182-.14.117-.21.29-.21.521 0 .164.062.318.187.463.121.14.289.21.504.21.336 0 .576-.108.72-.327.145-.223.217-.514.217-.873 0-.254-.054-.485-.164-.692a2.436 2.436 0 00-.398-.562c-.16-.168-.33-.31-.51-.428-.18-.117-.33-.213-.451-.287l-.211.352zm-2.168 0c.184.105.332.197.445.275.114.074.229.174.346.299.113.12.2.246.258.375.055.125.094.289.117.492h-.281c-.242 0-.432.06-.569.182-.14.117-.21.29-.21.521 0 .164.062.318.187.463.121.14.289.21.504.21.336 0 .576-.108.72-.327.145-.223.217-.514.217-.873 0-.254-.054-.485-.164-.692a2.438 2.438 0 00-.398-.562c-.16-.168-.33-.31-.51-.428-.18-.117-.33-.213-.451-.287L10 6.352z"/>'); // eslint-disable-next-line
+var BIconBatteryCharging = /*#__PURE__*/makeIcon('BatteryCharging', '<path d="M14.5 9.5a1.5 1.5 0 0 0 0-3v3z"/><path fill-rule="evenodd" d="M9.585 2.568a.5.5 0 0 1 .226.58L8.677 6.832h1.99a.5.5 0 0 1 .364.843l-5.334 5.667a.5.5 0 0 1-.842-.49L5.99 9.167H4a.5.5 0 0 1-.364-.843l5.333-5.667a.5.5 0 0 1 .616-.09z"/><path fill-rule="evenodd" d="M6.332 4H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2.072l.307-1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h3.391l.941-1zM4.45 6H2v4h1.313a1.5 1.5 0 0 1-.405-2.361L4.45 6zm.976 5l-.308 1H6.96l.21-.224h.001l.73-.776H6.53l-.085.09.028-.09H5.426zm1.354-1H5.733l.257-.833H4a.5.5 0 0 1-.364-.843l.793-.843L5.823 6h1.373L5.157 8.167h1.51a.5.5 0 0 1 .478.647L6.78 10zm.69 0h1.374l1.394-1.482.793-.842a.5.5 0 0 0-.364-.843h-1.99L8.933 6H7.887l-.166.54-.199.646A.5.5 0 0 0 8 7.833h1.51L7.47 10zm.725-5H9.24l.308-1H7.706l-.942 1h1.374l.085-.09-.028.09zm2.4-1l-.308 1H12a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H9.276l-.942 1H12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.405zm-.378 6H12V8.02a1.499 1.499 0 0 1-.241.341L10.217 10zM12 6.646V6h-.646a1.5 1.5 0 0 1 .646.646z"/>'); // eslint-disable-next-line
 
-var BIconBook = /*#__PURE__*/makeIcon('Book', '<path fill-rule="evenodd" d="M3.214 1.072C4.813.752 6.916.71 8.354 2.146A.5.5 0 018.5 2.5v11a.5.5 0 01-.854.354c-.843-.844-2.115-1.059-3.47-.92-1.344.14-2.66.617-3.452 1.013A.5.5 0 010 13.5v-11a.5.5 0 01.276-.447L.5 2.5l-.224-.447.002-.001.004-.002.013-.006a5.017 5.017 0 01.22-.103 12.958 12.958 0 012.7-.869zM1 2.82v9.908c.846-.343 1.944-.672 3.074-.788 1.143-.118 2.387-.023 3.426.56V2.718c-1.063-.929-2.631-.956-4.09-.664A11.958 11.958 0 001 2.82z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.786 1.072C11.188.752 9.084.71 7.646 2.146A.5.5 0 007.5 2.5v11a.5.5 0 00.854.354c.843-.844 2.115-1.059 3.47-.92 1.344.14 2.66.617 3.452 1.013A.5.5 0 0016 13.5v-11a.5.5 0 00-.276-.447L15.5 2.5l.224-.447-.002-.001-.004-.002-.013-.006-.047-.023a12.582 12.582 0 00-.799-.34 12.96 12.96 0 00-2.073-.609zM15 2.82v9.908c-.846-.343-1.944-.672-3.074-.788-1.143-.118-2.387-.023-3.426.56V2.718c1.063-.929 2.631-.956 4.09-.664A11.956 11.956 0 0115 2.82z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBatteryFull = /*#__PURE__*/makeIcon('BatteryFull', '<path fill-rule="evenodd" d="M12 5H2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H2z"/><path d="M2 6h10v4H2V6zm12.5 3.5a1.5 1.5 0 0 0 0-3v3z"/>'); // eslint-disable-next-line
 
-var BIconBookHalf = /*#__PURE__*/makeIcon('BookHalf', '<path fill-rule="evenodd" d="M3.214 1.072C4.813.752 6.916.71 8.354 2.146A.5.5 0 018.5 2.5v11a.5.5 0 01-.854.354c-.843-.844-2.115-1.059-3.47-.92-1.344.14-2.66.617-3.452 1.013A.5.5 0 010 13.5v-11a.5.5 0 01.276-.447L.5 2.5l-.224-.447.002-.001.004-.002.013-.006a5.017 5.017 0 01.22-.103 12.958 12.958 0 012.7-.869zM1 2.82v9.908c.846-.343 1.944-.672 3.074-.788 1.143-.118 2.387-.023 3.426.56V2.718c-1.063-.929-2.631-.956-4.09-.664A11.958 11.958 0 001 2.82z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.786 1.072C11.188.752 9.084.71 7.646 2.146A.5.5 0 007.5 2.5v11a.5.5 0 00.854.354c.843-.844 2.115-1.059 3.47-.92 1.344.14 2.66.617 3.452 1.013A.5.5 0 0016 13.5v-11a.5.5 0 00-.276-.447L15.5 2.5l.224-.447-.002-.001-.004-.002-.013-.006-.047-.023a12.582 12.582 0 00-.799-.34 12.96 12.96 0 00-2.073-.609z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBatteryHalf = /*#__PURE__*/makeIcon('BatteryHalf', '<path fill-rule="evenodd" d="M12 5H2a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zM2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H2z"/><path d="M2 6h5v4H2V6zm12.5 3.5a1.5 1.5 0 0 0 0-3v3z"/>'); // eslint-disable-next-line
 
-var BIconBookmark = /*#__PURE__*/makeIcon('Bookmark', '<path fill-rule="evenodd" d="M8 12l5 3V3a2 2 0 00-2-2H5a2 2 0 00-2 2v12l5-3zm-4 1.234l4-2.4 4 2.4V3a1 1 0 00-1-1H5a1 1 0 00-1 1v10.234z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBell = /*#__PURE__*/makeIcon('Bell', '<path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z"/><path fill-rule="evenodd" d="M8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>'); // eslint-disable-next-line
 
-var BIconBookmarkCheck = /*#__PURE__*/makeIcon('BookmarkCheck', '<path fill-rule="evenodd" d="M4.5 2a.5.5 0 00-.5.5v11.066l4-2.667 4 2.667V8.5a.5.5 0 011 0v6.934l-5-3.333-5 3.333V2.5A1.5 1.5 0 014.5 1h4a.5.5 0 010 1h-4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15.854 2.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 01.708-.708L12.5 4.793l2.646-2.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBellFill = /*#__PURE__*/makeIcon('BellFill', '<path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>'); // eslint-disable-next-line
 
-var BIconBookmarkDash = /*#__PURE__*/makeIcon('BookmarkDash', '<path fill-rule="evenodd" d="M11 3.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zM4.5 2a.5.5 0 00-.5.5v11.066l4-2.667 4 2.667V8.5a.5.5 0 011 0v6.934l-5-3.333-5 3.333V2.5A1.5 1.5 0 014.5 1h4a.5.5 0 010 1h-4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBlockquoteLeft = /*#__PURE__*/makeIcon('BlockquoteLeft', '<path fill-rule="evenodd" d="M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm5 3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm-5 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/><path d="M3.734 6.352a6.586 6.586 0 0 0-.445.275 1.94 1.94 0 0 0-.346.299 1.38 1.38 0 0 0-.252.369c-.058.129-.1.295-.123.498h.282c.242 0 .431.06.568.182.14.117.21.29.21.521a.697.697 0 0 1-.187.463c-.12.14-.289.21-.503.21-.336 0-.577-.108-.721-.327C2.072 8.619 2 8.328 2 7.969c0-.254.055-.485.164-.692.11-.21.242-.398.398-.562.16-.168.33-.31.51-.428.18-.117.33-.213.451-.287l.211.352zm2.168 0a6.588 6.588 0 0 0-.445.275 1.94 1.94 0 0 0-.346.299c-.113.12-.199.246-.257.375a1.75 1.75 0 0 0-.118.492h.282c.242 0 .431.06.568.182.14.117.21.29.21.521a.697.697 0 0 1-.187.463c-.12.14-.289.21-.504.21-.335 0-.576-.108-.72-.327-.145-.223-.217-.514-.217-.873 0-.254.055-.485.164-.692.11-.21.242-.398.398-.562.16-.168.33-.31.51-.428.18-.117.33-.213.451-.287l.211.352z"/>'); // eslint-disable-next-line
 
-var BIconBookmarkFill = /*#__PURE__*/makeIcon('BookmarkFill', '<path fill-rule="evenodd" d="M3 3a2 2 0 012-2h6a2 2 0 012 2v12l-5-3-5 3V3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBlockquoteRight = /*#__PURE__*/makeIcon('BlockquoteRight', '<path fill-rule="evenodd" d="M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/><path d="M12.168 6.352c.184.105.332.197.445.275.114.074.229.174.346.299.11.117.193.24.252.369s.1.295.123.498h-.281c-.243 0-.432.06-.569.182-.14.117-.21.29-.21.521 0 .164.062.318.187.463.121.14.289.21.504.21.336 0 .576-.108.72-.327.145-.223.217-.514.217-.873 0-.254-.054-.485-.164-.692a2.436 2.436 0 0 0-.398-.562c-.16-.168-.33-.31-.51-.428-.18-.117-.33-.213-.451-.287l-.211.352zm-2.168 0c.184.105.332.197.445.275.114.074.229.174.346.299.113.12.2.246.258.375.055.125.094.289.117.492h-.281c-.242 0-.432.06-.569.182-.14.117-.21.29-.21.521 0 .164.062.318.187.463.121.14.289.21.504.21.336 0 .576-.108.72-.327.145-.223.217-.514.217-.873 0-.254-.054-.485-.164-.692a2.438 2.438 0 0 0-.398-.562c-.16-.168-.33-.31-.51-.428-.18-.117-.33-.213-.451-.287L10 6.352z"/>'); // eslint-disable-next-line
 
-var BIconBookmarkPlus = /*#__PURE__*/makeIcon('BookmarkPlus', '<path fill-rule="evenodd" d="M4.5 2a.5.5 0 00-.5.5v11.066l4-2.667 4 2.667V8.5a.5.5 0 011 0v6.934l-5-3.333-5 3.333V2.5A1.5 1.5 0 014.5 1h4a.5.5 0 010 1h-4zm9-1a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 010-1H13V1.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 3.5a.5.5 0 01.5-.5h2a.5.5 0 010 1H14v1.5a.5.5 0 01-1 0v-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBook = /*#__PURE__*/makeIcon('Book', '<path fill-rule="evenodd" d="M3.214 1.072C4.813.752 6.916.71 8.354 2.146A.5.5 0 0 1 8.5 2.5v11a.5.5 0 0 1-.854.354c-.843-.844-2.115-1.059-3.47-.92-1.344.14-2.66.617-3.452 1.013A.5.5 0 0 1 0 13.5v-11a.5.5 0 0 1 .276-.447L.5 2.5l-.224-.447.002-.001.004-.002.013-.006a5.017 5.017 0 0 1 .22-.103 12.958 12.958 0 0 1 2.7-.869zM1 2.82v9.908c.846-.343 1.944-.672 3.074-.788 1.143-.118 2.387-.023 3.426.56V2.718c-1.063-.929-2.631-.956-4.09-.664A11.958 11.958 0 0 0 1 2.82z"/><path fill-rule="evenodd" d="M12.786 1.072C11.188.752 9.084.71 7.646 2.146A.5.5 0 0 0 7.5 2.5v11a.5.5 0 0 0 .854.354c.843-.844 2.115-1.059 3.47-.92 1.344.14 2.66.617 3.452 1.013A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.276-.447L15.5 2.5l.224-.447-.002-.001-.004-.002-.013-.006-.047-.023a12.582 12.582 0 0 0-.799-.34 12.96 12.96 0 0 0-2.073-.609zM15 2.82v9.908c-.846-.343-1.944-.672-3.074-.788-1.143-.118-2.387-.023-3.426.56V2.718c1.063-.929 2.631-.956 4.09-.664A11.956 11.956 0 0 1 15 2.82z"/>'); // eslint-disable-next-line
 
-var BIconBookmarks = /*#__PURE__*/makeIcon('Bookmarks', '<path fill-rule="evenodd" d="M7 13l5 3V4a2 2 0 00-2-2H4a2 2 0 00-2 2v12l5-3zm-4 1.234l4-2.4 4 2.4V4a1 1 0 00-1-1H4a1 1 0 00-1 1v10.234z" clip-rule="evenodd"/><path d="M14 14l-1-.6V2a1 1 0 00-1-1H4.268A2 2 0 016 0h6a2 2 0 012 2v12z"/>'); // eslint-disable-next-line
+var BIconBookHalf = /*#__PURE__*/makeIcon('BookHalf', '<path fill-rule="evenodd" d="M12.786 1.072C11.188.752 9.084.71 7.646 2.146A.5.5 0 0 0 7.5 2.5v11a.5.5 0 0 0 .854.354c.843-.844 2.115-1.059 3.47-.92 1.344.14 2.66.617 3.452 1.013A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.276-.447L15.5 2.5l.224-.447-.002-.001-.004-.002-.013-.006-.047-.023a12.582 12.582 0 0 0-.799-.34 12.96 12.96 0 0 0-2.073-.609zM15 2.82v9.908c-.846-.343-1.944-.672-3.074-.788-1.143-.118-2.387-.023-3.426.56V2.718c1.063-.929 2.631-.956 4.09-.664A11.956 11.956 0 0 1 15 2.82z"/><path fill-rule="evenodd" d="M3.214 1.072C4.813.752 6.916.71 8.354 2.146A.5.5 0 0 1 8.5 2.5v11a.5.5 0 0 1-.854.354c-.843-.844-2.115-1.059-3.47-.92-1.344.14-2.66.617-3.452 1.013A.5.5 0 0 1 0 13.5v-11a.5.5 0 0 1 .276-.447L.5 2.5l-.224-.447.002-.001.004-.002.013-.006a5.017 5.017 0 0 1 .22-.103 12.958 12.958 0 0 1 2.7-.869z"/>'); // eslint-disable-next-line
 
-var BIconBookmarksFill = /*#__PURE__*/makeIcon('BookmarksFill', '<path fill-rule="evenodd" d="M2 4a2 2 0 012-2h6a2 2 0 012 2v12l-5-3-5 3V4z" clip-rule="evenodd"/><path d="M14 14l-1-.6V2a1 1 0 00-1-1H4.268A2 2 0 016 0h6a2 2 0 012 2v12z"/>'); // eslint-disable-next-line
+var BIconBookmark = /*#__PURE__*/makeIcon('Bookmark', '<path fill-rule="evenodd" d="M8 12l5 3V3a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12l5-3zm-4 1.234l4-2.4 4 2.4V3a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10.234z"/>'); // eslint-disable-next-line
 
-var BIconBootstrap = /*#__PURE__*/makeIcon('Bootstrap', '<path fill-rule="evenodd" d="M12 1H4a3 3 0 00-3 3v8a3 3 0 003 3h8a3 3 0 003-3V4a3 3 0 00-3-3zM4 0a4 4 0 00-4 4v8a4 4 0 004 4h8a4 4 0 004-4V4a4 4 0 00-4-4H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.537 12H5.062V3.545h3.399c1.587 0 2.543.809 2.543 2.11 0 .884-.65 1.675-1.483 1.816v.1c1.143.117 1.904.931 1.904 2.033 0 1.488-1.084 2.396-2.888 2.396zM6.375 4.658v2.467h1.558c1.16 0 1.764-.428 1.764-1.23 0-.78-.569-1.237-1.541-1.237H6.375zm1.898 6.229H6.375V8.162h1.822c1.236 0 1.887.463 1.887 1.348 0 .896-.627 1.377-1.811 1.377z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBookmarkCheck = /*#__PURE__*/makeIcon('BookmarkCheck', '<path fill-rule="evenodd" d="M4.5 2a.5.5 0 0 0-.5.5v11.066l4-2.667 4 2.667V8.5a.5.5 0 0 1 1 0v6.934l-5-3.333-5 3.333V2.5A1.5 1.5 0 0 1 4.5 1h4a.5.5 0 0 1 0 1h-4z"/><path fill-rule="evenodd" d="M15.854 2.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 4.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconBootstrapFill = /*#__PURE__*/makeIcon('BootstrapFill', '<path fill-rule="evenodd" d="M4.002 0a4 4 0 00-4 4v8a4 4 0 004 4h8a4 4 0 004-4V4a4 4 0 00-4-4h-8zm1.06 12h3.475c1.804 0 2.888-.908 2.888-2.396 0-1.102-.761-1.916-1.904-2.034v-.1c.832-.14 1.482-.93 1.482-1.816 0-1.3-.955-2.11-2.542-2.11H5.062V12zm1.313-4.875V4.658h1.78c.973 0 1.542.457 1.542 1.237 0 .802-.604 1.23-1.764 1.23H6.375zm0 3.762h1.898c1.184 0 1.81-.48 1.81-1.377 0-.885-.65-1.348-1.886-1.348H6.375v2.725z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBookmarkDash = /*#__PURE__*/makeIcon('BookmarkDash', '<path fill-rule="evenodd" d="M11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zM4.5 2a.5.5 0 0 0-.5.5v11.066l4-2.667 4 2.667V8.5a.5.5 0 0 1 1 0v6.934l-5-3.333-5 3.333V2.5A1.5 1.5 0 0 1 4.5 1h4a.5.5 0 0 1 0 1h-4z"/>'); // eslint-disable-next-line
 
-var BIconBootstrapReboot = /*#__PURE__*/makeIcon('BootstrapReboot', '<path fill-rule="evenodd" d="M1.161 8a6.84 6.84 0 106.842-6.84.58.58 0 010-1.16 8 8 0 11-6.556 3.412l-.663-.577a.58.58 0 01.227-.997l2.52-.69a.58.58 0 01.728.633l-.332 2.592a.58.58 0 01-.956.364l-.643-.56A6.812 6.812 0 001.16 8zm5.48-.079V5.277h1.57c.881 0 1.416.499 1.416 1.32 0 .84-.504 1.324-1.386 1.324h-1.6zm0 3.75V8.843h1.57l1.498 2.828h1.314L9.377 8.665c.897-.3 1.427-1.106 1.427-2.1 0-1.37-.943-2.246-2.456-2.246H5.5v7.352h1.141z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBookmarkFill = /*#__PURE__*/makeIcon('BookmarkFill', '<path fill-rule="evenodd" d="M3 3a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12l-5-3-5 3V3z"/>'); // eslint-disable-next-line
 
-var BIconBoundingBox = /*#__PURE__*/makeIcon('BoundingBox', '<path fill-rule="evenodd" d="M5 2V0H0v5h2v6H0v5h5v-2h6v2h5v-5h-2V5h2V0h-5v2H5zm6 1H5v2H3v6h2v2h6v-2h2V5h-2V3zm1-2v3h3V1h-3zm3 11h-3v3h3v-3zM4 15v-3H1v3h3zM1 4h3V1H1v3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBookmarkPlus = /*#__PURE__*/makeIcon('BookmarkPlus', '<path fill-rule="evenodd" d="M4.5 2a.5.5 0 0 0-.5.5v11.066l4-2.667 4 2.667V8.5a.5.5 0 0 1 1 0v6.934l-5-3.333-5 3.333V2.5A1.5 1.5 0 0 1 4.5 1h4a.5.5 0 0 1 0 1h-4zm9-1a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1H13V1.5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M13 3.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0v-2z"/>'); // eslint-disable-next-line
 
-var BIconBoundingBoxCircles = /*#__PURE__*/makeIcon('BoundingBoxCircles', '<path fill-rule="evenodd" d="M12.5 2h-9V1h9v1zm-10 1.5v9h-1v-9h1zm11 9v-9h1v9h-1zM3.5 14h9v1h-9v-1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14 3a1 1 0 100-2 1 1 0 000 2zm0 1a2 2 0 100-4 2 2 0 000 4zm0 11a1 1 0 100-2 1 1 0 000 2zm0 1a2 2 0 100-4 2 2 0 000 4zM2 3a1 1 0 100-2 1 1 0 000 2zm0 1a2 2 0 100-4 2 2 0 000 4zm0 11a1 1 0 100-2 1 1 0 000 2zm0 1a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBookmarks = /*#__PURE__*/makeIcon('Bookmarks', '<path fill-rule="evenodd" d="M7 13l5 3V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12l5-3zm-4 1.234l4-2.4 4 2.4V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10.234z"/><path d="M14 14l-1-.6V2a1 1 0 0 0-1-1H4.268A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v12z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowDown = /*#__PURE__*/makeIcon('BoxArrowDown', '<path fill-rule="evenodd" d="M4.646 11.646a.5.5 0 01.708 0L8 14.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.5 2A1.5 1.5 0 014 .5h8A1.5 1.5 0 0113.5 2v7a1.5 1.5 0 01-1.5 1.5h-1.5a.5.5 0 010-1H12a.5.5 0 00.5-.5V2a.5.5 0 00-.5-.5H4a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h1.5a.5.5 0 010 1H4A1.5 1.5 0 012.5 9V2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBookmarksFill = /*#__PURE__*/makeIcon('BookmarksFill', '<path fill-rule="evenodd" d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12l-5-3-5 3V4z"/><path d="M14 14l-1-.6V2a1 1 0 0 0-1-1H4.268A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v12z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowDownLeft = /*#__PURE__*/makeIcon('BoxArrowDownLeft', '<path fill-rule="evenodd" d="M13 1.5A1.5 1.5 0 0114.5 3v8a1.5 1.5 0 01-1.5 1.5H9a.5.5 0 010-1h4a.5.5 0 00.5-.5V3a.5.5 0 00-.5-.5H5a.5.5 0 00-.5.5v4a.5.5 0 01-1 0V3A1.5 1.5 0 015 1.5h8zm-11 7a.5.5 0 00-.5.5v5a.5.5 0 00.5.5h5a.5.5 0 000-1H2.5V9a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.646 14.354a.5.5 0 00.708 0l8-8a.5.5 0 00-.708-.708l-8 8a.5.5 0 000 .708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBootstrap = /*#__PURE__*/makeIcon('Bootstrap', '<path fill-rule="evenodd" d="M12 1H4a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V4a3 3 0 0 0-3-3zM4 0a4 4 0 0 0-4 4v8a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4V4a4 4 0 0 0-4-4H4z"/><path fill-rule="evenodd" d="M8.537 12H5.062V3.545h3.399c1.587 0 2.543.809 2.543 2.11 0 .884-.65 1.675-1.483 1.816v.1c1.143.117 1.904.931 1.904 2.033 0 1.488-1.084 2.396-2.888 2.396zM6.375 4.658v2.467h1.558c1.16 0 1.764-.428 1.764-1.23 0-.78-.569-1.237-1.541-1.237H6.375zm1.898 6.229H6.375V8.162h1.822c1.236 0 1.887.463 1.887 1.348 0 .896-.627 1.377-1.811 1.377z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowDownRight = /*#__PURE__*/makeIcon('BoxArrowDownRight', '<path fill-rule="evenodd" d="M3 1.5A1.5 1.5 0 001.5 3v8A1.5 1.5 0 003 12.5h4a.5.5 0 000-1H3a.5.5 0 01-.5-.5V3a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v4a.5.5 0 001 0V3A1.5 1.5 0 0011 1.5H3zm11 7a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H9a.5.5 0 010-1h4.5V9a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.354 14.354a.5.5 0 01-.708 0l-8-8a.5.5 0 11.708-.708l8 8a.5.5 0 010 .708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBootstrapFill = /*#__PURE__*/makeIcon('BootstrapFill', '<path fill-rule="evenodd" d="M4.002 0a4 4 0 0 0-4 4v8a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4V4a4 4 0 0 0-4-4h-8zm1.06 12h3.475c1.804 0 2.888-.908 2.888-2.396 0-1.102-.761-1.916-1.904-2.034v-.1c.832-.14 1.482-.93 1.482-1.816 0-1.3-.955-2.11-2.542-2.11H5.062V12zm1.313-4.875V4.658h1.78c.973 0 1.542.457 1.542 1.237 0 .802-.604 1.23-1.764 1.23H6.375zm0 3.762h1.898c1.184 0 1.81-.48 1.81-1.377 0-.885-.65-1.348-1.886-1.348H6.375v2.725z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowInDown = /*#__PURE__*/makeIcon('BoxArrowInDown', '<path fill-rule="evenodd" d="M4.646 8.146a.5.5 0 01.708 0L8 10.793l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 1a.5.5 0 01.5.5v9a.5.5 0 01-1 0v-9A.5.5 0 018 1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.5 13.5A1.5 1.5 0 003 15h10a1.5 1.5 0 001.5-1.5v-8A1.5 1.5 0 0013 4h-1.5a.5.5 0 000 1H13a.5.5 0 01.5.5v8a.5.5 0 01-.5.5H3a.5.5 0 01-.5-.5v-8A.5.5 0 013 5h1.5a.5.5 0 000-1H3a1.5 1.5 0 00-1.5 1.5v8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBootstrapReboot = /*#__PURE__*/makeIcon('BootstrapReboot', '<path fill-rule="evenodd" d="M1.161 8a6.84 6.84 0 1 0 6.842-6.84.58.58 0 0 1 0-1.16 8 8 0 1 1-6.556 3.412l-.663-.577a.58.58 0 0 1 .227-.997l2.52-.69a.58.58 0 0 1 .728.633l-.332 2.592a.58.58 0 0 1-.956.364l-.643-.56A6.812 6.812 0 0 0 1.16 8zm5.48-.079V5.277h1.57c.881 0 1.416.499 1.416 1.32 0 .84-.504 1.324-1.386 1.324h-1.6zm0 3.75V8.843h1.57l1.498 2.828h1.314L9.377 8.665c.897-.3 1.427-1.106 1.427-2.1 0-1.37-.943-2.246-2.456-2.246H5.5v7.352h1.141z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowInDownLeft = /*#__PURE__*/makeIcon('BoxArrowInDownLeft', '<path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 003 14.5h10a1.5 1.5 0 001.5-1.5V8a.5.5 0 00-1 0v5a.5.5 0 01-.5.5H3a.5.5 0 01-.5-.5V3a.5.5 0 01.5-.5h4a.5.5 0 000-1H3A1.5 1.5 0 001.5 3v10z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.5 10a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5V5a.5.5 0 011 0v4.5H11a.5.5 0 01.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.646 10.354a.5.5 0 010-.708l8-8a.5.5 0 01.708.708l-8 8a.5.5 0 01-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoundingBox = /*#__PURE__*/makeIcon('BoundingBox', '<path fill-rule="evenodd" d="M5 2V0H0v5h2v6H0v5h5v-2h6v2h5v-5h-2V5h2V0h-5v2H5zm6 1H5v2H3v6h2v2h6v-2h2V5h-2V3zm1-2v3h3V1h-3zm3 11h-3v3h3v-3zM4 15v-3H1v3h3zM1 4h3V1H1v3z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowInDownRight = /*#__PURE__*/makeIcon('BoxArrowInDownRight', '<path fill-rule="evenodd" d="M14.5 13a1.5 1.5 0 01-1.5 1.5H3A1.5 1.5 0 011.5 13V8a.5.5 0 011 0v5a.5.5 0 00.5.5h10a.5.5 0 00.5-.5V3a.5.5 0 00-.5-.5H9a.5.5 0 010-1h4A1.5 1.5 0 0114.5 3v10z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 10a.5.5 0 00.5.5h5a.5.5 0 00.5-.5V5a.5.5 0 00-1 0v4.5H5a.5.5 0 00-.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.354 10.354a.5.5 0 000-.708l-8-8a.5.5 0 10-.708.708l8 8a.5.5 0 00.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoundingBoxCircles = /*#__PURE__*/makeIcon('BoundingBoxCircles', '<path fill-rule="evenodd" d="M12.5 2h-9V1h9v1zm-10 1.5v9h-1v-9h1zm11 9v-9h1v9h-1zM3.5 14h9v1h-9v-1z"/><path fill-rule="evenodd" d="M14 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM2 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowInLeft = /*#__PURE__*/makeIcon('BoxArrowInLeft', '<path fill-rule="evenodd" d="M7.854 11.354a.5.5 0 000-.708L5.207 8l2.647-2.646a.5.5 0 10-.708-.708l-3 3a.5.5 0 000 .708l3 3a.5.5 0 00.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15 8a.5.5 0 00-.5-.5h-9a.5.5 0 000 1h9A.5.5 0 0015 8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.5 14.5A1.5 1.5 0 011 13V3a1.5 1.5 0 011.5-1.5h8A1.5 1.5 0 0112 3v1.5a.5.5 0 01-1 0V3a.5.5 0 00-.5-.5h-8A.5.5 0 002 3v10a.5.5 0 00.5.5h8a.5.5 0 00.5-.5v-1.5a.5.5 0 011 0V13a1.5 1.5 0 01-1.5 1.5h-8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBox = /*#__PURE__*/makeIcon('Box', '<path fill-rule="evenodd" d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowInRight = /*#__PURE__*/makeIcon('BoxArrowInRight', '<path fill-rule="evenodd" d="M8.146 11.354a.5.5 0 010-.708L10.793 8 8.146 5.354a.5.5 0 11.708-.708l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1 8a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9A.5.5 0 011 8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13.5 14.5A1.5 1.5 0 0015 13V3a1.5 1.5 0 00-1.5-1.5h-8A1.5 1.5 0 004 3v1.5a.5.5 0 001 0V3a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v10a.5.5 0 01-.5.5h-8A.5.5 0 015 13v-1.5a.5.5 0 00-1 0V13a1.5 1.5 0 001.5 1.5h8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowDown = /*#__PURE__*/makeIcon('BoxArrowDown', '<path fill-rule="evenodd" d="M4.646 11.646a.5.5 0 0 1 .708 0L8 14.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M2.5 2A1.5 1.5 0 0 1 4 .5h8A1.5 1.5 0 0 1 13.5 2v7a1.5 1.5 0 0 1-1.5 1.5h-1.5a.5.5 0 0 1 0-1H12a.5.5 0 0 0 .5-.5V2a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h1.5a.5.5 0 0 1 0 1H4A1.5 1.5 0 0 1 2.5 9V2z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowInUp = /*#__PURE__*/makeIcon('BoxArrowInUp', '<path fill-rule="evenodd" d="M4.646 7.854a.5.5 0 00.708 0L8 5.207l2.646 2.647a.5.5 0 00.708-.708l-3-3a.5.5 0 00-.708 0l-3 3a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 15a.5.5 0 00.5-.5v-9a.5.5 0 00-1 0v9a.5.5 0 00.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.5 2.5A1.5 1.5 0 013 1h10a1.5 1.5 0 011.5 1.5v8A1.5 1.5 0 0113 12h-1.5a.5.5 0 010-1H13a.5.5 0 00.5-.5v-8A.5.5 0 0013 2H3a.5.5 0 00-.5.5v8a.5.5 0 00.5.5h1.5a.5.5 0 010 1H3a1.5 1.5 0 01-1.5-1.5v-8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowDownLeft = /*#__PURE__*/makeIcon('BoxArrowDownLeft', '<path fill-rule="evenodd" d="M13 1.5A1.5 1.5 0 0 1 14.5 3v8a1.5 1.5 0 0 1-1.5 1.5H9a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5H5a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0V3A1.5 1.5 0 0 1 5 1.5h8zm-11 7a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1H2.5V9a.5.5 0 0 0-.5-.5z"/><path fill-rule="evenodd" d="M1.646 14.354a.5.5 0 0 0 .708 0l8-8a.5.5 0 0 0-.708-.708l-8 8a.5.5 0 0 0 0 .708z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowInUpLeft = /*#__PURE__*/makeIcon('BoxArrowInUpLeft', '<path fill-rule="evenodd" d="M1.5 3A1.5 1.5 0 013 1.5h10A1.5 1.5 0 0114.5 3v5a.5.5 0 01-1 0V3a.5.5 0 00-.5-.5H3a.5.5 0 00-.5.5v10a.5.5 0 00.5.5h4a.5.5 0 010 1H3A1.5 1.5 0 011.5 13V3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.5 6a.5.5 0 00-.5-.5H6a.5.5 0 00-.5.5v5a.5.5 0 001 0V6.5H11a.5.5 0 00.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.646 5.646a.5.5 0 000 .708l8 8a.5.5 0 00.708-.708l-8-8a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowDownRight = /*#__PURE__*/makeIcon('BoxArrowDownRight', '<path fill-rule="evenodd" d="M3 1.5A1.5 1.5 0 0 0 1.5 3v8A1.5 1.5 0 0 0 3 12.5h4a.5.5 0 0 0 0-1H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 1 0V3A1.5 1.5 0 0 0 11 1.5H3zm11 7a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-.5.5H9a.5.5 0 0 1 0-1h4.5V9a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M14.354 14.354a.5.5 0 0 1-.708 0l-8-8a.5.5 0 1 1 .708-.708l8 8a.5.5 0 0 1 0 .708z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowInUpRight = /*#__PURE__*/makeIcon('BoxArrowInUpRight', '<path fill-rule="evenodd" d="M14.5 3A1.5 1.5 0 0013 1.5H3A1.5 1.5 0 001.5 3v5a.5.5 0 001 0V3a.5.5 0 01.5-.5h10a.5.5 0 01.5.5v10a.5.5 0 01-.5.5H9a.5.5 0 000 1h4a1.5 1.5 0 001.5-1.5V3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 6a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V6.5H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.354 5.646a.5.5 0 010 .708l-8 8a.5.5 0 01-.708-.708l8-8a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowInDown = /*#__PURE__*/makeIcon('BoxArrowInDown', '<path fill-rule="evenodd" d="M4.646 8.146a.5.5 0 0 1 .708 0L8 10.793l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-1 0v-9A.5.5 0 0 1 8 1z"/><path fill-rule="evenodd" d="M1.5 13.5A1.5 1.5 0 0 0 3 15h10a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 13 4h-1.5a.5.5 0 0 0 0 1H13a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5v-8A.5.5 0 0 1 3 5h1.5a.5.5 0 0 0 0-1H3a1.5 1.5 0 0 0-1.5 1.5v8z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowLeft = /*#__PURE__*/makeIcon('BoxArrowLeft', '<path fill-rule="evenodd" d="M4.354 11.354a.5.5 0 000-.708L1.707 8l2.647-2.646a.5.5 0 10-.708-.708l-3 3a.5.5 0 000 .708l3 3a.5.5 0 00.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.5 8a.5.5 0 00-.5-.5H2a.5.5 0 000 1h9a.5.5 0 00.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14 13.5a1.5 1.5 0 001.5-1.5V4A1.5 1.5 0 0014 2.5H7A1.5 1.5 0 005.5 4v1.5a.5.5 0 001 0V4a.5.5 0 01.5-.5h7a.5.5 0 01.5.5v8a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5v-1.5a.5.5 0 00-1 0V12A1.5 1.5 0 007 13.5h7z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowInDownLeft = /*#__PURE__*/makeIcon('BoxArrowInDownLeft', '<path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h4a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/><path fill-rule="evenodd" d="M11.5 10a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5V5a.5.5 0 0 1 1 0v4.5H11a.5.5 0 0 1 .5.5z"/><path fill-rule="evenodd" d="M5.646 10.354a.5.5 0 0 1 0-.708l8-8a.5.5 0 0 1 .708.708l-8 8a.5.5 0 0 1-.708 0z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowRight = /*#__PURE__*/makeIcon('BoxArrowRight', '<path fill-rule="evenodd" d="M11.646 11.354a.5.5 0 010-.708L14.293 8l-2.647-2.646a.5.5 0 01.708-.708l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 8a.5.5 0 01.5-.5h9a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2 13.5A1.5 1.5 0 01.5 12V4A1.5 1.5 0 012 2.5h7A1.5 1.5 0 0110.5 4v1.5a.5.5 0 01-1 0V4a.5.5 0 00-.5-.5H2a.5.5 0 00-.5.5v8a.5.5 0 00.5.5h7a.5.5 0 00.5-.5v-1.5a.5.5 0 011 0V12A1.5 1.5 0 019 13.5H2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowInDownRight = /*#__PURE__*/makeIcon('BoxArrowInDownRight', '<path fill-rule="evenodd" d="M14.5 13a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 13V8a.5.5 0 0 1 1 0v5a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5H9a.5.5 0 0 1 0-1h4A1.5 1.5 0 0 1 14.5 3v10z"/><path fill-rule="evenodd" d="M4.5 10a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 .5-.5V5a.5.5 0 0 0-1 0v4.5H5a.5.5 0 0 0-.5.5z"/><path fill-rule="evenodd" d="M10.354 10.354a.5.5 0 0 0 0-.708l-8-8a.5.5 0 1 0-.708.708l8 8a.5.5 0 0 0 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowUp = /*#__PURE__*/makeIcon('BoxArrowUp', '<path fill-rule="evenodd" d="M4.646 4.354a.5.5 0 00.708 0L8 1.707l2.646 2.647a.5.5 0 00.708-.708l-3-3a.5.5 0 00-.708 0l-3 3a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 11.5a.5.5 0 00.5-.5V2a.5.5 0 00-1 0v9a.5.5 0 00.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.5 14A1.5 1.5 0 004 15.5h8a1.5 1.5 0 001.5-1.5V7A1.5 1.5 0 0012 5.5h-1.5a.5.5 0 000 1H12a.5.5 0 01.5.5v7a.5.5 0 01-.5.5H4a.5.5 0 01-.5-.5V7a.5.5 0 01.5-.5h1.5a.5.5 0 000-1H4A1.5 1.5 0 002.5 7v7z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowInLeft = /*#__PURE__*/makeIcon('BoxArrowInLeft', '<path fill-rule="evenodd" d="M7.854 11.354a.5.5 0 0 0 0-.708L5.207 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0 0 1h9A.5.5 0 0 0 15 8z"/><path fill-rule="evenodd" d="M2.5 14.5A1.5 1.5 0 0 1 1 13V3a1.5 1.5 0 0 1 1.5-1.5h8A1.5 1.5 0 0 1 12 3v1.5a.5.5 0 0 1-1 0V3a.5.5 0 0 0-.5-.5h-8A.5.5 0 0 0 2 3v10a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-1.5a.5.5 0 0 1 1 0V13a1.5 1.5 0 0 1-1.5 1.5h-8z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowUpLeft = /*#__PURE__*/makeIcon('BoxArrowUpLeft', '<path fill-rule="evenodd" d="M14.5 13a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 13V9a.5.5 0 011 0v4a.5.5 0 00.5.5h8a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H9a.5.5 0 010-1h4A1.5 1.5 0 0114.5 5v8zm-7-11a.5.5 0 00-.5-.5H2a.5.5 0 00-.5.5v5a.5.5 0 001 0V2.5H7a.5.5 0 00.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.646 1.646a.5.5 0 000 .708l8 8a.5.5 0 00.708-.708l-8-8a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowInRight = /*#__PURE__*/makeIcon('BoxArrowInRight', '<path fill-rule="evenodd" d="M8.146 11.354a.5.5 0 0 1 0-.708L10.793 8 8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 1 8z"/><path fill-rule="evenodd" d="M13.5 14.5A1.5 1.5 0 0 0 15 13V3a1.5 1.5 0 0 0-1.5-1.5h-8A1.5 1.5 0 0 0 4 3v1.5a.5.5 0 0 0 1 0V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5h-8A.5.5 0 0 1 5 13v-1.5a.5.5 0 0 0-1 0V13a1.5 1.5 0 0 0 1.5 1.5h8z"/>'); // eslint-disable-next-line
 
-var BIconBoxArrowUpRight = /*#__PURE__*/makeIcon('BoxArrowUpRight', '<path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 003 14.5h8a1.5 1.5 0 001.5-1.5V9a.5.5 0 00-1 0v4a.5.5 0 01-.5.5H3a.5.5 0 01-.5-.5V5a.5.5 0 01.5-.5h4a.5.5 0 000-1H3A1.5 1.5 0 001.5 5v8zm7-11a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v5a.5.5 0 01-1 0V2.5H9a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.354 1.646a.5.5 0 010 .708l-8 8a.5.5 0 01-.708-.708l8-8a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBoxArrowInUp = /*#__PURE__*/makeIcon('BoxArrowInUp', '<path fill-rule="evenodd" d="M4.646 7.854a.5.5 0 0 0 .708 0L8 5.207l2.646 2.647a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-1 0v9a.5.5 0 0 0 .5.5z"/><path fill-rule="evenodd" d="M1.5 2.5A1.5 1.5 0 0 1 3 1h10a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 13 12h-1.5a.5.5 0 0 1 0-1H13a.5.5 0 0 0 .5-.5v-8A.5.5 0 0 0 13 2H3a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h1.5a.5.5 0 0 1 0 1H3a1.5 1.5 0 0 1-1.5-1.5v-8z"/>'); // eslint-disable-next-line
+
+var BIconBoxArrowInUpLeft = /*#__PURE__*/makeIcon('BoxArrowInUpLeft', '<path fill-rule="evenodd" d="M1.5 3A1.5 1.5 0 0 1 3 1.5h10A1.5 1.5 0 0 1 14.5 3v5a.5.5 0 0 1-1 0V3a.5.5 0 0 0-.5-.5H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1H3A1.5 1.5 0 0 1 1.5 13V3z"/><path fill-rule="evenodd" d="M11.5 6a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 1 0V6.5H11a.5.5 0 0 0 .5-.5z"/><path fill-rule="evenodd" d="M5.646 5.646a.5.5 0 0 0 0 .708l8 8a.5.5 0 0 0 .708-.708l-8-8a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
+
+var BIconBoxArrowInUpRight = /*#__PURE__*/makeIcon('BoxArrowInUpRight', '<path fill-rule="evenodd" d="M14.5 3A1.5 1.5 0 0 0 13 1.5H3A1.5 1.5 0 0 0 1.5 3v5a.5.5 0 0 0 1 0V3a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H9a.5.5 0 0 0 0 1h4a1.5 1.5 0 0 0 1.5-1.5V3z"/><path fill-rule="evenodd" d="M4.5 6a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V6.5H5a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M10.354 5.646a.5.5 0 0 1 0 .708l-8 8a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconBoxArrowLeft = /*#__PURE__*/makeIcon('BoxArrowLeft', '<path fill-rule="evenodd" d="M4.354 11.354a.5.5 0 0 0 0-.708L1.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/><path fill-rule="evenodd" d="M11.5 8a.5.5 0 0 0-.5-.5H2a.5.5 0 0 0 0 1h9a.5.5 0 0 0 .5-.5z"/><path fill-rule="evenodd" d="M14 13.5a1.5 1.5 0 0 0 1.5-1.5V4A1.5 1.5 0 0 0 14 2.5H7A1.5 1.5 0 0 0 5.5 4v1.5a.5.5 0 0 0 1 0V4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5H7a.5.5 0 0 1-.5-.5v-1.5a.5.5 0 0 0-1 0V12A1.5 1.5 0 0 0 7 13.5h7z"/>'); // eslint-disable-next-line
+
+var BIconBoxArrowRight = /*#__PURE__*/makeIcon('BoxArrowRight', '<path fill-rule="evenodd" d="M11.646 11.354a.5.5 0 0 1 0-.708L14.293 8l-2.647-2.646a.5.5 0 0 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/><path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M2 13.5A1.5 1.5 0 0 1 .5 12V4A1.5 1.5 0 0 1 2 2.5h7A1.5 1.5 0 0 1 10.5 4v1.5a.5.5 0 0 1-1 0V4a.5.5 0 0 0-.5-.5H2a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-1.5a.5.5 0 0 1 1 0V12A1.5 1.5 0 0 1 9 13.5H2z"/>'); // eslint-disable-next-line
+
+var BIconBoxArrowUp = /*#__PURE__*/makeIcon('BoxArrowUp', '<path fill-rule="evenodd" d="M4.646 4.354a.5.5 0 0 0 .708 0L8 1.707l2.646 2.647a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M8 11.5a.5.5 0 0 0 .5-.5V2a.5.5 0 0 0-1 0v9a.5.5 0 0 0 .5.5z"/><path fill-rule="evenodd" d="M2.5 14A1.5 1.5 0 0 0 4 15.5h8a1.5 1.5 0 0 0 1.5-1.5V7A1.5 1.5 0 0 0 12 5.5h-1.5a.5.5 0 0 0 0 1H12a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5V7a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 0 0-1H4A1.5 1.5 0 0 0 2.5 7v7z"/>'); // eslint-disable-next-line
+
+var BIconBoxArrowUpLeft = /*#__PURE__*/makeIcon('BoxArrowUpLeft', '<path fill-rule="evenodd" d="M14.5 13a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 13V9a.5.5 0 0 1 1 0v4a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5V5a.5.5 0 0 0-.5-.5H9a.5.5 0 0 1 0-1h4A1.5 1.5 0 0 1 14.5 5v8zm-7-11a.5.5 0 0 0-.5-.5H2a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 1 0V2.5H7a.5.5 0 0 0 .5-.5z"/><path fill-rule="evenodd" d="M1.646 1.646a.5.5 0 0 0 0 .708l8 8a.5.5 0 0 0 .708-.708l-8-8a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
+
+var BIconBoxArrowUpRight = /*#__PURE__*/makeIcon('BoxArrowUpRight', '<path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h8a1.5 1.5 0 0 0 1.5-1.5V9a.5.5 0 0 0-1 0v4a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 5v8zm7-11a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V2.5H9a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M14.354 1.646a.5.5 0 0 1 0 .708l-8 8a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconBoxSeam = /*#__PURE__*/makeIcon('BoxSeam', '<path fill-rule="evenodd" d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>'); // eslint-disable-next-line
 
 var BIconBraces = /*#__PURE__*/makeIcon('Braces', '<path d="M2.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C3.25 2 2.49 2.759 2.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6zM13.886 7.9v.163c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456V7.332c-1.114 0-1.49-.362-1.49-1.456V4.352C13.51 2.759 12.75 2 11.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6z"/>'); // eslint-disable-next-line
 
-var BIconBriefcase = /*#__PURE__*/makeIcon('Briefcase', '<path fill-rule="evenodd" d="M0 12.5A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-6h-1v6a.5.5 0 01-.5.5h-13a.5.5 0 01-.5-.5v-6H0v6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M0 4.5A1.5 1.5 0 011.5 3h13A1.5 1.5 0 0116 4.5v2.384l-7.614 2.03a1.5 1.5 0 01-.772 0L0 6.884V4.5zM1.5 4a.5.5 0 00-.5.5v1.616l6.871 1.832a.5.5 0 00.258 0L15 6.116V4.5a.5.5 0 00-.5-.5h-13zM5 2.5A1.5 1.5 0 016.5 1h3A1.5 1.5 0 0111 2.5V3h-1v-.5a.5.5 0 00-.5-.5h-3a.5.5 0 00-.5.5V3H5v-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBriefcase = /*#__PURE__*/makeIcon('Briefcase', '<path fill-rule="evenodd" d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-6h-1v6a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-6H0v6z"/><path fill-rule="evenodd" d="M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5v2.384l-7.614 2.03a1.5 1.5 0 0 1-.772 0L0 6.884V4.5zM1.5 4a.5.5 0 0 0-.5.5v1.616l6.871 1.832a.5.5 0 0 0 .258 0L15 6.116V4.5a.5.5 0 0 0-.5-.5h-13zM5 2.5A1.5 1.5 0 0 1 6.5 1h3A1.5 1.5 0 0 1 11 2.5V3h-1v-.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5V3H5v-.5z"/>'); // eslint-disable-next-line
 
-var BIconBriefcaseFill = /*#__PURE__*/makeIcon('BriefcaseFill', '<path fill-rule="evenodd" d="M0 12.5A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5V6.85L8.129 8.947a.5.5 0 01-.258 0L0 6.85v5.65z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M0 4.5A1.5 1.5 0 011.5 3h13A1.5 1.5 0 0116 4.5v1.384l-7.614 2.03a1.5 1.5 0 01-.772 0L0 5.884V4.5zm5-2A1.5 1.5 0 016.5 1h3A1.5 1.5 0 0111 2.5V3h-1v-.5a.5.5 0 00-.5-.5h-3a.5.5 0 00-.5.5V3H5v-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBriefcaseFill = /*#__PURE__*/makeIcon('BriefcaseFill', '<path fill-rule="evenodd" d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85v5.65z"/><path fill-rule="evenodd" d="M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5v1.384l-7.614 2.03a1.5 1.5 0 0 1-.772 0L0 5.884V4.5zm5-2A1.5 1.5 0 0 1 6.5 1h3A1.5 1.5 0 0 1 11 2.5V3h-1v-.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5V3H5v-.5z"/>'); // eslint-disable-next-line
 
-var BIconBrightnessAltHigh = /*#__PURE__*/makeIcon('BrightnessAltHigh', '<path fill-rule="evenodd" d="M5.041 10.5h5.918a3 3 0 00-5.918 0zM4 11a4 4 0 118 0 .5.5 0 01-.5.5h-7A.5.5 0 014 11zm4-8a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 3zm8 8a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zM3 11a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zm10.657-5.657a.5.5 0 010 .707l-1.414 1.414a.5.5 0 11-.707-.707l1.414-1.414a.5.5 0 01.707 0zM4.464 7.464a.5.5 0 01-.707 0L2.343 6.05a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .707z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBrightnessAltHigh = /*#__PURE__*/makeIcon('BrightnessAltHigh', '<path fill-rule="evenodd" d="M5.041 10.5h5.918a3 3 0 0 0-5.918 0zM4 11a4 4 0 1 1 8 0 .5.5 0 0 1-.5.5h-7A.5.5 0 0 1 4 11zm4-8a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 3zm8 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 11a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.414a.5.5 0 1 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zM4.464 7.464a.5.5 0 0 1-.707 0L2.343 6.05a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707z"/>'); // eslint-disable-next-line
 
-var BIconBrightnessAltHighFill = /*#__PURE__*/makeIcon('BrightnessAltHighFill', '<path fill-rule="evenodd" d="M4 11a4 4 0 118 0 .5.5 0 01-.5.5h-7A.5.5 0 014 11zm4-8a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 3zm8 8a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zM3 11a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zm10.657-5.657a.5.5 0 010 .707l-1.414 1.414a.5.5 0 11-.707-.707l1.414-1.414a.5.5 0 01.707 0zM4.464 7.464a.5.5 0 01-.707 0L2.343 6.05a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .707z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBrightnessAltHighFill = /*#__PURE__*/makeIcon('BrightnessAltHighFill', '<path fill-rule="evenodd" d="M4 11a4 4 0 1 1 8 0 .5.5 0 0 1-.5.5h-7A.5.5 0 0 1 4 11zm4-8a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 3zm8 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 11a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.414a.5.5 0 1 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zM4.464 7.464a.5.5 0 0 1-.707 0L2.343 6.05a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707z"/>'); // eslint-disable-next-line
 
-var BIconBrightnessAltLow = /*#__PURE__*/makeIcon('BrightnessAltLow', '<path d="M8.5 5.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 6a.5.5 0 110-1 .5.5 0 010 1zm-11 0a.5.5 0 110-1 .5.5 0 010 1zm9.743-4.036a.5.5 0 11-.707-.707.5.5 0 01.707.707zm-8.486 0a.5.5 0 11.707-.707.5.5 0 01-.707.707z"/><path fill-rule="evenodd" d="M5.041 10.5h5.918a3 3 0 00-5.918 0zM4 11a4 4 0 118 0 .5.5 0 01-.5.5h-7A.5.5 0 014 11z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBrightnessAltLow = /*#__PURE__*/makeIcon('BrightnessAltLow', '<path d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm5 6a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm-11 0a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9.743-4.036a.5.5 0 1 1-.707-.707.5.5 0 0 1 .707.707zm-8.486 0a.5.5 0 1 1 .707-.707.5.5 0 0 1-.707.707z"/><path fill-rule="evenodd" d="M5.041 10.5h5.918a3 3 0 0 0-5.918 0zM4 11a4 4 0 1 1 8 0 .5.5 0 0 1-.5.5h-7A.5.5 0 0 1 4 11z"/>'); // eslint-disable-next-line
 
-var BIconBrightnessAltLowFill = /*#__PURE__*/makeIcon('BrightnessAltLowFill', '<path d="M8.5 5.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 6a.5.5 0 110-1 .5.5 0 010 1zm-11 0a.5.5 0 110-1 .5.5 0 010 1zm9.743-4.036a.5.5 0 11-.707-.707.5.5 0 01.707.707zm-8.486 0a.5.5 0 11.707-.707.5.5 0 01-.707.707z"/><path fill-rule="evenodd" d="M4 11a4 4 0 118 0 .5.5 0 01-.5.5h-7A.5.5 0 014 11z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBrightnessAltLowFill = /*#__PURE__*/makeIcon('BrightnessAltLowFill', '<path d="M8.5 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm5 6a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm-11 0a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9.743-4.036a.5.5 0 1 1-.707-.707.5.5 0 0 1 .707.707zm-8.486 0a.5.5 0 1 1 .707-.707.5.5 0 0 1-.707.707z"/><path fill-rule="evenodd" d="M4 11a4 4 0 1 1 8 0 .5.5 0 0 1-.5.5h-7A.5.5 0 0 1 4 11z"/>'); // eslint-disable-next-line
 
-var BIconBrightnessHigh = /*#__PURE__*/makeIcon('BrightnessHigh', '<path fill-rule="evenodd" d="M8 11a3 3 0 100-6 3 3 0 000 6zm0 1a4 4 0 100-8 4 4 0 000 8zM8 0a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 0zm0 13a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 13zm8-5a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zM3 8a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2A.5.5 0 013 8zm10.657-5.657a.5.5 0 010 .707l-1.414 1.415a.5.5 0 11-.707-.708l1.414-1.414a.5.5 0 01.707 0zm-9.193 9.193a.5.5 0 010 .707L3.05 13.657a.5.5 0 01-.707-.707l1.414-1.414a.5.5 0 01.707 0zm9.193 2.121a.5.5 0 01-.707 0l-1.414-1.414a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .707zM4.464 4.465a.5.5 0 01-.707 0L2.343 3.05a.5.5 0 11.707-.707l1.414 1.414a.5.5 0 010 .708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBrightnessHigh = /*#__PURE__*/makeIcon('BrightnessHigh', '<path fill-rule="evenodd" d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>'); // eslint-disable-next-line
 
-var BIconBrightnessHighFill = /*#__PURE__*/makeIcon('BrightnessHighFill', '<circle cx="8" cy="8" r="4"/><path fill-rule="evenodd" d="M8 0a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 0zm0 13a.5.5 0 01.5.5v2a.5.5 0 01-1 0v-2A.5.5 0 018 13zm8-5a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2a.5.5 0 01.5.5zM3 8a.5.5 0 01-.5.5h-2a.5.5 0 010-1h2A.5.5 0 013 8zm10.657-5.657a.5.5 0 010 .707l-1.414 1.415a.5.5 0 11-.707-.708l1.414-1.414a.5.5 0 01.707 0zm-9.193 9.193a.5.5 0 010 .707L3.05 13.657a.5.5 0 01-.707-.707l1.414-1.414a.5.5 0 01.707 0zm9.193 2.121a.5.5 0 01-.707 0l-1.414-1.414a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .707zM4.464 4.465a.5.5 0 01-.707 0L2.343 3.05a.5.5 0 01.707-.707l1.414 1.414a.5.5 0 010 .708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBrightnessHighFill = /*#__PURE__*/makeIcon('BrightnessHighFill', '<circle cx="8" cy="8" r="4"/><path fill-rule="evenodd" d="M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>'); // eslint-disable-next-line
 
-var BIconBrightnessLow = /*#__PURE__*/makeIcon('BrightnessLow', '<path fill-rule="evenodd" d="M8 11a3 3 0 100-6 3 3 0 000 6zm0 1a4 4 0 100-8 4 4 0 000 8z" clip-rule="evenodd"/><circle cx="8" cy="2.5" r=".5"/><circle cx="8" cy="13.5" r=".5"/><circle cx="13.5" cy="8" r=".5" transform="rotate(90 13.5 8)"/><circle cx="2.5" cy="8" r=".5" transform="rotate(90 2.5 8)"/><circle cx="11.889" cy="4.111" r=".5" transform="rotate(45 11.89 4.11)"/><circle cx="4.111" cy="11.889" r=".5" transform="rotate(45 4.11 11.89)"/><circle cx="11.889" cy="11.889" r=".5" transform="rotate(135 11.89 11.889)"/><circle cx="4.111" cy="4.111" r=".5" transform="rotate(135 4.11 4.11)"/>'); // eslint-disable-next-line
+var BIconBrightnessLow = /*#__PURE__*/makeIcon('BrightnessLow', '<path fill-rule="evenodd" d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><circle cx="8" cy="2.5" r=".5"/><circle cx="8" cy="13.5" r=".5"/><circle cx="13.5" cy="8" r=".5" transform="rotate(90 13.5 8)"/><circle cx="2.5" cy="8" r=".5" transform="rotate(90 2.5 8)"/><circle cx="11.889" cy="4.111" r=".5" transform="rotate(45 11.89 4.11)"/><circle cx="4.111" cy="11.889" r=".5" transform="rotate(45 4.11 11.89)"/><circle cx="11.889" cy="11.889" r=".5" transform="rotate(135 11.89 11.889)"/><circle cx="4.111" cy="4.111" r=".5" transform="rotate(135 4.11 4.11)"/>'); // eslint-disable-next-line
 
 var BIconBrightnessLowFill = /*#__PURE__*/makeIcon('BrightnessLowFill', '<circle cx="8" cy="8" r="4"/><circle cx="8" cy="2.5" r=".5"/><circle cx="8" cy="13.5" r=".5"/><circle cx="13.5" cy="8" r=".5" transform="rotate(90 13.5 8)"/><circle cx="2.5" cy="8" r=".5" transform="rotate(90 2.5 8)"/><circle cx="11.889" cy="4.111" r=".5" transform="rotate(45 11.89 4.11)"/><circle cx="4.111" cy="11.889" r=".5" transform="rotate(45 4.11 11.89)"/><circle cx="11.889" cy="11.889" r=".5" transform="rotate(135 11.89 11.889)"/><circle cx="4.111" cy="4.111" r=".5" transform="rotate(135 4.11 4.11)"/>'); // eslint-disable-next-line
 
-var BIconBrush = /*#__PURE__*/makeIcon('Brush', '<path d="M15.213 1.018a.572.572 0 01.756.05.57.57 0 01.057.746C15.085 3.082 12.044 7.107 9.6 9.55c-.71.71-1.42 1.243-1.952 1.596-.508.339-1.167.234-1.599-.197-.416-.416-.53-1.047-.212-1.543.346-.542.887-1.273 1.642-1.977 2.521-2.35 6.476-5.44 7.734-6.411z"/><path d="M7 12a2 2 0 01-2 2c-1 0-2 0-3.5-.5s.5-1 1-1.5 1.395-2 2.5-2a2 2 0 012 2z"/>'); // eslint-disable-next-line
+var BIconBrush = /*#__PURE__*/makeIcon('Brush', '<path d="M15.213 1.018a.572.572 0 0 1 .756.05.57.57 0 0 1 .057.746C15.085 3.082 12.044 7.107 9.6 9.55c-.71.71-1.42 1.243-1.952 1.596-.508.339-1.167.234-1.599-.197-.416-.416-.53-1.047-.212-1.543.346-.542.887-1.273 1.642-1.977 2.521-2.35 6.476-5.44 7.734-6.411z"/><path d="M7 12a2 2 0 0 1-2 2c-1 0-2 0-3.5-.5s.5-1 1-1.5 1.395-2 2.5-2a2 2 0 0 1 2 2z"/>'); // eslint-disable-next-line
 
-var BIconBucket = /*#__PURE__*/makeIcon('Bucket', '<path fill-rule="evenodd" d="M8 1.5A4.5 4.5 0 003.5 6h-1a5.5 5.5 0 1111 0h-1A4.5 4.5 0 008 1.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.61 5.687A.5.5 0 012 5.5h12a.5.5 0 01.488.608l-1.826 8.217a1.5 1.5 0 01-1.464 1.175H4.802a1.5 1.5 0 01-1.464-1.175L1.512 6.108a.5.5 0 01.098-.42zm1.013.813l1.691 7.608a.5.5 0 00.488.392h6.396a.5.5 0 00.488-.392l1.69-7.608H2.624z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBucket = /*#__PURE__*/makeIcon('Bucket', '<path fill-rule="evenodd" d="M8 1.5A4.5 4.5 0 0 0 3.5 6h-1a5.5 5.5 0 1 1 11 0h-1A4.5 4.5 0 0 0 8 1.5z"/><path fill-rule="evenodd" d="M1.61 5.687A.5.5 0 0 1 2 5.5h12a.5.5 0 0 1 .488.608l-1.826 8.217a1.5 1.5 0 0 1-1.464 1.175H4.802a1.5 1.5 0 0 1-1.464-1.175L1.512 6.108a.5.5 0 0 1 .098-.42zm1.013.813l1.691 7.608a.5.5 0 0 0 .488.392h6.396a.5.5 0 0 0 .488-.392l1.69-7.608H2.624z"/>'); // eslint-disable-next-line
 
-var BIconBucketFill = /*#__PURE__*/makeIcon('BucketFill', '<path fill-rule="evenodd" d="M8 1.5A4.5 4.5 0 003.5 6h-1a5.5 5.5 0 1111 0h-1A4.5 4.5 0 008 1.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.61 5.687A.5.5 0 012 5.5h12a.5.5 0 01.488.608l-1.826 8.217a1.5 1.5 0 01-1.464 1.175H4.802a1.5 1.5 0 01-1.464-1.175L1.512 6.108a.5.5 0 01.098-.42z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconBucketFill = /*#__PURE__*/makeIcon('BucketFill', '<path fill-rule="evenodd" d="M8 1.5A4.5 4.5 0 0 0 3.5 6h-1a5.5 5.5 0 1 1 11 0h-1A4.5 4.5 0 0 0 8 1.5z"/><path fill-rule="evenodd" d="M1.61 5.687A.5.5 0 0 1 2 5.5h12a.5.5 0 0 1 .488.608l-1.826 8.217a1.5 1.5 0 0 1-1.464 1.175H4.802a1.5 1.5 0 0 1-1.464-1.175L1.512 6.108a.5.5 0 0 1 .098-.42z"/>'); // eslint-disable-next-line
 
-var BIconBuilding = /*#__PURE__*/makeIcon('Building', '<path fill-rule="evenodd" d="M15.285.089A.5.5 0 0115.5.5v15a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V14h-1v1.5a.5.5 0 01-.5.5H1a.5.5 0 01-.5-.5v-6a.5.5 0 01.418-.493l5.582-.93V3.5a.5.5 0 01.324-.468l8-3a.5.5 0 01.46.057zM7.5 3.846V8.5a.5.5 0 01-.418.493l-5.582.93V15h8v-1.5a.5.5 0 01.5-.5h2a.5.5 0 01.5.5V15h2V1.222l-7 2.624z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 15.5v-7h1v7h-1z" clip-rule="evenodd"/><path d="M2.5 11h1v1h-1v-1zm2 0h1v1h-1v-1zm-2 2h1v1h-1v-1zm2 0h1v1h-1v-1zm6-10h1v1h-1V3zm2 0h1v1h-1V3zm-4 2h1v1h-1V5zm2 0h1v1h-1V5zm2 0h1v1h-1V5zm-2 2h1v1h-1V7zm2 0h1v1h-1V7zm-4 0h1v1h-1V7zm0 2h1v1h-1V9zm2 0h1v1h-1V9zm2 0h1v1h-1V9zm-4 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1z"/>'); // eslint-disable-next-line
+var BIconBuilding = /*#__PURE__*/makeIcon('Building', '<path fill-rule="evenodd" d="M15.285.089A.5.5 0 0 1 15.5.5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5H1a.5.5 0 0 1-.5-.5v-6a.5.5 0 0 1 .418-.493l5.582-.93V3.5a.5.5 0 0 1 .324-.468l8-3a.5.5 0 0 1 .46.057zM7.5 3.846V8.5a.5.5 0 0 1-.418.493l-5.582.93V15h8v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.222l-7 2.624z"/><path fill-rule="evenodd" d="M6.5 15.5v-7h1v7h-1z"/><path d="M2.5 11h1v1h-1v-1zm2 0h1v1h-1v-1zm-2 2h1v1h-1v-1zm2 0h1v1h-1v-1zm6-10h1v1h-1V3zm2 0h1v1h-1V3zm-4 2h1v1h-1V5zm2 0h1v1h-1V5zm2 0h1v1h-1V5zm-2 2h1v1h-1V7zm2 0h1v1h-1V7zm-4 0h1v1h-1V7zm0 2h1v1h-1V9zm2 0h1v1h-1V9zm2 0h1v1h-1V9zm-4 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1z"/>'); // eslint-disable-next-line
 
-var BIconBullseye = /*#__PURE__*/makeIcon('Bullseye', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 13A5 5 0 108 3a5 5 0 000 10zm0 1A6 6 0 108 2a6 6 0 000 12z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 11a3 3 0 100-6 3 3 0 000 6zm0 1a4 4 0 100-8 4 4 0 000 8z" clip-rule="evenodd"/><path d="M9.5 8a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>'); // eslint-disable-next-line
+var BIconBullseye = /*#__PURE__*/makeIcon('Bullseye', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M8 13A5 5 0 1 0 8 3a5 5 0 0 0 0 10zm0 1A6 6 0 1 0 8 2a6 6 0 0 0 0 12z"/><path fill-rule="evenodd" d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M9.5 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>'); // eslint-disable-next-line
 
-var BIconCalendar = /*#__PURE__*/makeIcon('Calendar', '<path fill-rule="evenodd" d="M14 0H2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 7a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm-9 3a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm-9 3a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2zm3 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar = /*#__PURE__*/makeIcon('Calendar', '<path fill-rule="evenodd" d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconCalendarFill = /*#__PURE__*/makeIcon('CalendarFill', '<path d="M0 2a2 2 0 012-2h12a2 2 0 012 2H0z"/><path fill-rule="evenodd" d="M0 3h16v11a2 2 0 01-2 2H2a2 2 0 01-2-2V3zm6.5 4a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm-8 2a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm-8 2a1 1 0 11-2 0 1 1 0 012 0zm2 1a1 1 0 100-2 1 1 0 000 2zm4-1a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2 = /*#__PURE__*/makeIcon('Calendar2', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>'); // eslint-disable-next-line
 
-var BIconCamera = /*#__PURE__*/makeIcon('Camera', '<path d="M9 5C7.343 5 5 6.343 5 8a4 4 0 014-4v1z"/><path fill-rule="evenodd" d="M14.333 3h-2.015A5.97 5.97 0 009 2a5.972 5.972 0 00-3.318 1H1.667C.747 3 0 3.746 0 4.667v6.666C0 12.253.746 13 1.667 13h4.015c.95.632 2.091 1 3.318 1a5.973 5.973 0 003.318-1h2.015c.92 0 1.667-.746 1.667-1.667V4.667C16 3.747 15.254 3 14.333 3zM1.5 5a.5.5 0 100-1 .5.5 0 000 1zM9 13A5 5 0 109 3a5 5 0 000 10z" clip-rule="evenodd"/><path d="M2 3a1 1 0 011-1h1a1 1 0 010 2H3a1 1 0 01-1-1z"/>'); // eslint-disable-next-line
+var BIconCalendar2Check = /*#__PURE__*/makeIcon('Calendar2Check', '<path fill-rule="evenodd" d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>'); // eslint-disable-next-line
 
-var BIconCameraVideo = /*#__PURE__*/makeIcon('CameraVideo', '<path fill-rule="evenodd" d="M2.667 3.5c-.645 0-1.167.522-1.167 1.167v6.666c0 .645.522 1.167 1.167 1.167h6.666c.645 0 1.167-.522 1.167-1.167V4.667c0-.645-.522-1.167-1.167-1.167H2.667zM.5 4.667C.5 3.47 1.47 2.5 2.667 2.5h6.666c1.197 0 2.167.97 2.167 2.167v6.666c0 1.197-.97 2.167-2.167 2.167H2.667A2.167 2.167 0 01.5 11.333V4.667z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.25 5.65l2.768-1.605a.318.318 0 01.482.263v7.384c0 .228-.26.393-.482.264l-2.767-1.605-.502.865 2.767 1.605c.859.498 1.984-.095 1.984-1.129V4.308c0-1.033-1.125-1.626-1.984-1.128L10.75 4.785l.502.865z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2CheckFill = /*#__PURE__*/makeIcon('Calendar2CheckFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zm-2 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1zm8.854 5.354a.5.5 0 0 0-.708-.708L7.5 10.793 6.354 9.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>'); // eslint-disable-next-line
 
-var BIconCameraVideoFill = /*#__PURE__*/makeIcon('CameraVideoFill', '<path d="M2.667 3h6.666C10.253 3 11 3.746 11 4.667v6.666c0 .92-.746 1.667-1.667 1.667H2.667C1.747 13 1 12.254 1 11.333V4.667C1 3.747 1.746 3 2.667 3z"/><path d="M7.404 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.693-1.01-1.233-.696L7.404 7.304a.802.802 0 000 1.393z"/>'); // eslint-disable-next-line
+var BIconCalendar2Date = /*#__PURE__*/makeIcon('Calendar2Date', '<path d="M6.445 12.438V7.104h-.633A12.6 12.6 0 0 0 4.5 7.91v.695c.375-.257.969-.62 1.258-.777h.012v4.61h.675zm1.188-1.305c.047.64.594 1.406 1.703 1.406 1.258 0 2-1.066 2-2.871C11.336 7.734 10.555 7 9.383 7c-.926 0-1.797.672-1.797 1.809 0 1.16.824 1.77 1.676 1.77.746 0 1.23-.376 1.383-.79h.027c-.004 1.316-.461 2.164-1.305 2.164-.664 0-1.008-.45-1.05-.82h-.684zm2.953-2.317c0 .696-.559 1.18-1.184 1.18-.601 0-1.144-.383-1.144-1.2 0-.823.582-1.21 1.168-1.21.633 0 1.16.398 1.16 1.23z"/><path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>'); // eslint-disable-next-line
 
-var BIconCapslock = /*#__PURE__*/makeIcon('Capslock', '<path fill-rule="evenodd" d="M7.27 1.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v1a1 1 0 01-1 1h-5a1 1 0 01-1-1v-1H1.654C.78 9.5.326 8.455.924 7.816L7.27 1.047zM14.346 8.5L8 1.731 1.654 8.5H4.5a1 1 0 011 1v1h5v-1a1 1 0 011-1h2.846zm-9.846 5a1 1 0 011-1h5a1 1 0 011 1v1a1 1 0 01-1 1h-5a1 1 0 01-1-1v-1zm6 0h-5v1h5v-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2DateFill = /*#__PURE__*/makeIcon('Calendar2DateFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zm-2 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1zm7.336 9.04c-1.11 0-1.656-.767-1.703-1.407h.683c.043.37.387.82 1.051.82.844 0 1.301-.848 1.305-2.164h-.027c-.153.414-.637.79-1.383.79-.852 0-1.676-.61-1.676-1.77C7.586 7.672 8.457 7 9.383 7c1.172 0 1.953.734 1.953 2.668 0 1.805-.742 2.871-2 2.871zm.066-2.544c.625 0 1.184-.484 1.184-1.18 0-.832-.527-1.23-1.16-1.23-.586 0-1.168.387-1.168 1.21 0 .817.543 1.2 1.144 1.2zm-2.957-2.89v5.332H5.77v-4.61h-.012c-.29.156-.883.52-1.258.777V7.91a12.6 12.6 0 0 1 1.313-.805h.632z"/>'); // eslint-disable-next-line
 
-var BIconCapslockFill = /*#__PURE__*/makeIcon('CapslockFill', '<path fill-rule="evenodd" d="M7.27 1.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v1a1 1 0 01-1 1h-5a1 1 0 01-1-1v-1H1.654C.78 9.5.326 8.455.924 7.816L7.27 1.047zM4.5 13.5a1 1 0 011-1h5a1 1 0 011 1v1a1 1 0 01-1 1h-5a1 1 0 01-1-1v-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2Day = /*#__PURE__*/makeIcon('Calendar2Day', '<path d="M4.684 12.523v-2.3h2.261v-.61H4.684V7.801h2.464v-.61H4v5.332h.684zm3.296 0h.676V9.98c0-.554.227-1.007.953-1.007.125 0 .258.004.329.015v-.613a1.806 1.806 0 0 0-.254-.02c-.582 0-.891.32-1.012.567h-.02v-.504H7.98v4.105zm2.805-5.093c0 .238.192.425.43.425a.428.428 0 1 0 0-.855.426.426 0 0 0-.43.43zm.094 5.093h.672V8.418h-.672v4.105z"/><path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>'); // eslint-disable-next-line
 
-var BIconCardChecklist = /*#__PURE__*/makeIcon('CardChecklist', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-13-1A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7 5.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm-1.496-.854a.5.5 0 010 .708l-1.5 1.5a.5.5 0 01-.708 0l-.5-.5a.5.5 0 11.708-.708l.146.147 1.146-1.147a.5.5 0 01.708 0zM7 9.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm-1.496-.854a.5.5 0 010 .708l-1.5 1.5a.5.5 0 01-.708 0l-.5-.5a.5.5 0 01.708-.708l.146.147 1.146-1.147a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2DayFill = /*#__PURE__*/makeIcon('Calendar2DayFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zm-2 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1zm9.215 4.355a.425.425 0 0 1-.43-.425c0-.242.192-.43.43-.43a.428.428 0 1 1 0 .855zm.336.563v4.105h-.672V8.418h.672zm-6.867 4.105v-2.3h2.261v-.61H4.684V7.801h2.464v-.61H4v5.332h.684zm3.296 0h.676V9.98c0-.554.227-1.007.953-1.007.125 0 .258.004.329.015v-.613a1.806 1.806 0 0 0-.254-.02c-.582 0-.891.32-1.012.567h-.02v-.504H7.98v4.105z"/>'); // eslint-disable-next-line
 
-var BIconCardHeading = /*#__PURE__*/makeIcon('CardHeading', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-13-1A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3 8.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0 2a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M3 5.5a.5.5 0 01.5-.5h9a.5.5 0 01.5.5v1a.5.5 0 01-.5.5h-9a.5.5 0 01-.5-.5v-1z"/>'); // eslint-disable-next-line
+var BIconCalendar2Fill = /*#__PURE__*/makeIcon('Calendar2Fill', '<path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zm-1 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-11z"/>'); // eslint-disable-next-line
 
-var BIconCardImage = /*#__PURE__*/makeIcon('CardImage', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-13-1A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13z" clip-rule="evenodd"/><path d="M10.648 7.646a.5.5 0 01.577-.093L15.002 9.5V13h-14v-1l2.646-2.354a.5.5 0 01.63-.062l2.66 1.773 3.71-3.71z"/><path fill-rule="evenodd" d="M4.502 7a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2Minus = /*#__PURE__*/makeIcon('Calendar2Minus', '<path fill-rule="evenodd" d="M5.5 10.5A.5.5 0 0 1 6 10h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>'); // eslint-disable-next-line
 
-var BIconCardList = /*#__PURE__*/makeIcon('CardList', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-13-1A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 8a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7A.5.5 0 015 8zm0-2.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0 5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><circle cx="3.5" cy="5.5" r=".5"/><circle cx="3.5" cy="8" r=".5"/><circle cx="3.5" cy="10.5" r=".5"/>'); // eslint-disable-next-line
+var BIconCalendar2MinusFill = /*#__PURE__*/makeIcon('Calendar2MinusFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zm-2 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1zM6 10a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H6z"/>'); // eslint-disable-next-line
 
-var BIconCardText = /*#__PURE__*/makeIcon('CardText', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-13-1A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3 5.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM3 8a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9A.5.5 0 013 8zm0 2.5a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2Month = /*#__PURE__*/makeIcon('Calendar2Month', '<path d="M2.56 12.332l.54-1.602h1.984l.54 1.602h.718L4.444 7h-.696L1.85 12.332h.71zm1.544-4.527L4.9 10.18H3.284l.8-2.375h.02zm5.746.422h-.676v2.543c0 .652-.414 1.023-1.004 1.023-.539 0-.98-.246-.98-1.012V8.227h-.676v2.746c0 .941.606 1.425 1.453 1.425.656 0 1.043-.28 1.188-.605h.027v.539h.668V8.227zm2.258 5.046c-.563 0-.91-.304-.985-.636h-.687c.094.683.625 1.199 1.668 1.199.93 0 1.746-.527 1.746-1.578V8.227h-.649v.578h-.019c-.191-.348-.637-.64-1.195-.64-.965 0-1.64.679-1.64 1.886v.34c0 1.23.683 1.902 1.64 1.902.558 0 1.008-.293 1.172-.648h.02v.605c0 .645-.423 1.023-1.071 1.023zm.008-4.53c.648 0 1.062.527 1.062 1.359v.253c0 .848-.39 1.364-1.062 1.364-.692 0-1.098-.512-1.098-1.364v-.253c0-.868.406-1.36 1.098-1.36z"/><path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>'); // eslint-disable-next-line
 
-var BIconCaretDown = /*#__PURE__*/makeIcon('CaretDown', '<path fill-rule="evenodd" d="M3.204 5L8 10.481 12.796 5H3.204zm-.753.659l4.796 5.48a1 1 0 001.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 00-.753 1.659z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2MonthFill = /*#__PURE__*/makeIcon('Calendar2MonthFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zm-2 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1zm.56 8.832l.54-1.602h1.984l.54 1.602h.718L4.444 7h-.696L1.85 12.332h.71zm1.544-4.527L4.9 10.18H3.284l.8-2.375h.02zm5.746.422h-.676v2.543c0 .652-.414 1.023-1.004 1.023-.539 0-.98-.246-.98-1.012V8.227h-.676v2.746c0 .941.606 1.425 1.453 1.425.656 0 1.043-.28 1.188-.605h.027v.539h.668V8.227zm1.273 4.41c.075.332.422.636.985.636.648 0 1.07-.378 1.07-1.023v-.605h-.02c-.163.355-.613.648-1.171.648-.957 0-1.64-.672-1.64-1.902v-.34c0-1.207.675-1.887 1.64-1.887.558 0 1.004.293 1.195.64h.02v-.577h.648v4.03c0 1.052-.816 1.579-1.746 1.579-1.043 0-1.574-.516-1.668-1.2h.687zm2.055-2.535c0-.832-.414-1.36-1.062-1.36-.692 0-1.098.492-1.098 1.36v.253c0 .852.406 1.364 1.098 1.364.671 0 1.062-.516 1.062-1.364v-.253z"/>'); // eslint-disable-next-line
 
-var BIconCaretDownFill = /*#__PURE__*/makeIcon('CaretDownFill', '<path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 01.753 1.659l-4.796 5.48a1 1 0 01-1.506 0z"/>'); // eslint-disable-next-line
+var BIconCalendar2Plus = /*#__PURE__*/makeIcon('Calendar2Plus', '<path fill-rule="evenodd" d="M8 8a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h1.5V8.5A.5.5 0 0 1 8 8z"/><path fill-rule="evenodd" d="M7.5 10.5A.5.5 0 0 1 8 10h2a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0v-2z"/><path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>'); // eslint-disable-next-line
 
-var BIconCaretLeft = /*#__PURE__*/makeIcon('CaretLeft', '<path fill-rule="evenodd" d="M10 12.796L4.519 8 10 3.204v9.592zm-.659.753l-5.48-4.796a1 1 0 010-1.506l5.48-4.796A1 1 0 0111 3.204v9.592a1 1 0 01-1.659.753z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar2PlusFill = /*#__PURE__*/makeIcon('Calendar2PlusFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zm-2 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1zm6.5 5a.5.5 0 0 0-1 0V10H6a.5.5 0 0 0 0 1h1.5v1.5a.5.5 0 0 0 1 0V11H10a.5.5 0 0 0 0-1H8.5V8.5z"/>'); // eslint-disable-next-line
 
-var BIconCaretLeftFill = /*#__PURE__*/makeIcon('CaretLeftFill', '<path d="M3.86 8.753l5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 00-1.659-.753l-5.48 4.796a1 1 0 000 1.506z"/>'); // eslint-disable-next-line
+var BIconCalendar3 = /*#__PURE__*/makeIcon('Calendar3', '<path fill-rule="evenodd" d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/><path fill-rule="evenodd" d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
 
-var BIconCaretRight = /*#__PURE__*/makeIcon('CaretRight', '<path fill-rule="evenodd" d="M6 12.796L11.481 8 6 3.204v9.592zm.659.753l5.48-4.796a1 1 0 000-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 001.659.753z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendar3Fill = /*#__PURE__*/makeIcon('Calendar3Fill', '<path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2H0z"/><path fill-rule="evenodd" d="M0 3h16v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm6.5 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm2 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-8 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm2 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm2 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-8 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm2 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>'); // eslint-disable-next-line
 
-var BIconCaretRightFill = /*#__PURE__*/makeIcon('CaretRightFill', '<path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 011.659-.753l5.48 4.796a1 1 0 010 1.506z"/>'); // eslint-disable-next-line
+var BIconCalendar4 = /*#__PURE__*/makeIcon('Calendar4', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v2h16V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconCaretUp = /*#__PURE__*/makeIcon('CaretUp', '<path fill-rule="evenodd" d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 011.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 01-.753-1.659z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarCheck = /*#__PURE__*/makeIcon('CalendarCheck', '<path fill-rule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconCaretUpFill = /*#__PURE__*/makeIcon('CaretUpFill', '<path d="M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 00.753-1.659l-4.796-5.48a1 1 0 00-1.506 0z"/>'); // eslint-disable-next-line
+var BIconCalendarCheckFill = /*#__PURE__*/makeIcon('CalendarCheckFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM0 5h16v9a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5zm10.854 3.854a.5.5 0 0 0-.708-.708L7.5 10.793 6.354 9.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>'); // eslint-disable-next-line
 
-var BIconChat = /*#__PURE__*/makeIcon('Chat', '<path fill-rule="evenodd" d="M2.678 11.894a1 1 0 01.287.801 10.97 10.97 0 01-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 01.71-.074A8.06 8.06 0 008 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 01-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 00.244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.52.263-1.639.742-3.468 1.105z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarDate = /*#__PURE__*/makeIcon('CalendarDate', '<path d="M6.445 11.688V6.354h-.633A12.6 12.6 0 0 0 4.5 7.16v.695c.375-.257.969-.62 1.258-.777h.012v4.61h.675zm1.188-1.305c.047.64.594 1.406 1.703 1.406 1.258 0 2-1.066 2-2.871 0-1.934-.781-2.668-1.953-2.668-.926 0-1.797.672-1.797 1.809 0 1.16.824 1.77 1.676 1.77.746 0 1.23-.376 1.383-.79h.027c-.004 1.316-.461 2.164-1.305 2.164-.664 0-1.008-.45-1.05-.82h-.684zm2.953-2.317c0 .696-.559 1.18-1.184 1.18-.601 0-1.144-.383-1.144-1.2 0-.823.582-1.21 1.168-1.21.633 0 1.16.398 1.16 1.23z"/><path fill-rule="evenodd" d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconChatDots = /*#__PURE__*/makeIcon('ChatDots', '<path fill-rule="evenodd" d="M2.678 11.894a1 1 0 01.287.801 10.97 10.97 0 01-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 01.71-.074A8.06 8.06 0 008 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 01-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 00.244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.52.263-1.639.742-3.468 1.105z" clip-rule="evenodd"/><path d="M5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0z"/>'); // eslint-disable-next-line
+var BIconCalendarDateFill = /*#__PURE__*/makeIcon('CalendarDateFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM0 5h16v9a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5zm9.336 7.79c-1.11 0-1.656-.767-1.703-1.407h.683c.043.37.387.82 1.051.82.844 0 1.301-.848 1.305-2.164h-.027c-.153.414-.637.79-1.383.79-.852 0-1.676-.61-1.676-1.77 0-1.137.871-1.809 1.797-1.809 1.172 0 1.953.734 1.953 2.668 0 1.805-.742 2.871-2 2.871zm.066-2.544c.625 0 1.184-.484 1.184-1.18 0-.832-.527-1.23-1.16-1.23-.586 0-1.168.387-1.168 1.21 0 .817.543 1.2 1.144 1.2zm-2.957-2.89v5.332H5.77v-4.61h-.012c-.29.156-.883.52-1.258.777V8.16a12.6 12.6 0 0 1 1.313-.805h.632z"/>'); // eslint-disable-next-line
 
-var BIconChatDotsFill = /*#__PURE__*/makeIcon('ChatDotsFill', '<path fill-rule="evenodd" d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarDay = /*#__PURE__*/makeIcon('CalendarDay', '<path d="M4.684 11.523v-2.3h2.261v-.61H4.684V6.801h2.464v-.61H4v5.332h.684zm3.296 0h.676V8.98c0-.554.227-1.007.953-1.007.125 0 .258.004.329.015v-.613a1.806 1.806 0 0 0-.254-.02c-.582 0-.891.32-1.012.567h-.02v-.504H7.98v4.105zm2.805-5.093c0 .238.192.425.43.425a.428.428 0 1 0 0-.855.426.426 0 0 0-.43.43zm.094 5.093h.672V7.418h-.672v4.105z"/><path fill-rule="evenodd" d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconChatFill = /*#__PURE__*/makeIcon('ChatFill', '<path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 008 15z"/>'); // eslint-disable-next-line
+var BIconCalendarDayFill = /*#__PURE__*/makeIcon('CalendarDayFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM0 5h16v9a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5zm11.215 2.855a.425.425 0 0 1-.43-.425c0-.242.192-.43.43-.43a.428.428 0 1 1 0 .855zm.336.563v4.105h-.672V8.418h.672zm-6.867 4.105v-2.3h2.261v-.61H4.684V7.801h2.464v-.61H4v5.332h.684zm3.296 0h.676V9.98c0-.554.227-1.007.953-1.007.125 0 .258.004.329.015v-.613a1.806 1.806 0 0 0-.254-.02c-.582 0-.891.32-1.012.567h-.02v-.504H7.98v4.105z"/>'); // eslint-disable-next-line
 
-var BIconChatQuote = /*#__PURE__*/makeIcon('ChatQuote', '<path fill-rule="evenodd" d="M2.678 11.894a1 1 0 01.287.801 10.97 10.97 0 01-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 01.71-.074A8.06 8.06 0 008 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 01-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 00.244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.52.263-1.639.742-3.468 1.105z" clip-rule="evenodd"/><path d="M7.468 7.667c0 .92-.776 1.666-1.734 1.666S4 8.587 4 7.667C4 6.747 4.776 6 5.734 6s1.734.746 1.734 1.667z"/><path fill-rule="evenodd" d="M6.157 6.936a.438.438 0 01-.56.293.413.413 0 01-.274-.527c.08-.23.23-.44.477-.546a.891.891 0 01.698.014c.387.16.72.545.923.997.428.948.393 2.377-.942 3.706a.446.446 0 01-.612.01.405.405 0 01-.011-.59c1.093-1.087 1.058-2.158.77-2.794-.152-.336-.354-.514-.47-.563zm-.035-.012h-.001.001z" clip-rule="evenodd"/><path d="M11.803 7.667c0 .92-.776 1.666-1.734 1.666-.957 0-1.734-.746-1.734-1.666 0-.92.777-1.667 1.734-1.667.958 0 1.734.746 1.734 1.667z"/><path fill-rule="evenodd" d="M10.492 6.936a.438.438 0 01-.56.293.413.413 0 01-.274-.527c.08-.23.23-.44.477-.546a.891.891 0 01.698.014c.387.16.72.545.924.997.428.948.392 2.377-.942 3.706a.446.446 0 01-.613.01.405.405 0 01-.011-.59c1.093-1.087 1.058-2.158.77-2.794-.152-.336-.354-.514-.469-.563zm-.034-.012h-.002.002z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarFill = /*#__PURE__*/makeIcon('CalendarFill', '<path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/><path d="M2 1a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2H2zm14 4H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5z"/>'); // eslint-disable-next-line
 
-var BIconChatQuoteFill = /*#__PURE__*/makeIcon('ChatQuoteFill', '<path fill-rule="evenodd" d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM7.194 6.766c.087.124.163.26.227.401.428.948.393 2.377-.942 3.706a.446.446 0 01-.612.01.405.405 0 01-.011-.59c.419-.416.672-.831.809-1.22-.269.165-.588.26-.93.26C4.775 9.333 4 8.587 4 7.667 4 6.747 4.776 6 5.734 6c.271 0 .528.06.756.166l.008.004c.169.07.327.182.469.324.085.083.161.174.227.272zM11 9.073c-.269.165-.588.26-.93.26-.958 0-1.735-.746-1.735-1.666 0-.92.777-1.667 1.734-1.667.271 0 .528.06.756.166l.008.004c.17.07.327.182.469.324.085.083.161.174.227.272.087.124.164.26.228.401.428.948.392 2.377-.942 3.706a.446.446 0 01-.613.01.405.405 0 01-.011-.59c.42-.416.672-.831.81-1.22z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarMinus = /*#__PURE__*/makeIcon('CalendarMinus', '<path fill-rule="evenodd" d="M5.5 9.5A.5.5 0 0 1 6 9h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconChatSquare = /*#__PURE__*/makeIcon('ChatSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v8a1 1 0 001 1h2.5a2 2 0 011.6.8L8 14.333 9.9 11.8a2 2 0 011.6-.8H14a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v8a2 2 0 002 2h2.5a1 1 0 01.8.4l1.9 2.533a1 1 0 001.6 0l1.9-2.533a1 1 0 01.8-.4H14a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarMinusFill = /*#__PURE__*/makeIcon('CalendarMinusFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM0 5h16v9a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5zm6 5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H6z"/>'); // eslint-disable-next-line
 
-var BIconChatSquareDots = /*#__PURE__*/makeIcon('ChatSquareDots', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v8a1 1 0 001 1h2.5a2 2 0 011.6.8L8 14.333 9.9 11.8a2 2 0 011.6-.8H14a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v8a2 2 0 002 2h2.5a1 1 0 01.8.4l1.9 2.533a1 1 0 001.6 0l1.9-2.533a1 1 0 01.8-.4H14a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M5 6a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0z"/>'); // eslint-disable-next-line
+var BIconCalendarMonth = /*#__PURE__*/makeIcon('CalendarMonth', '<path d="M2.56 11.332L3.1 9.73h1.984l.54 1.602h.718L4.444 6h-.696L1.85 11.332h.71zm1.544-4.527L4.9 9.18H3.284l.8-2.375h.02zm5.746.422h-.676V9.77c0 .652-.414 1.023-1.004 1.023-.539 0-.98-.246-.98-1.012V7.227h-.676v2.746c0 .941.606 1.425 1.453 1.425.656 0 1.043-.28 1.188-.605h.027v.539h.668V7.227zm2.258 5.046c-.563 0-.91-.304-.985-.636h-.687c.094.683.625 1.199 1.668 1.199.93 0 1.746-.527 1.746-1.578V7.227h-.649v.578h-.019c-.191-.348-.637-.64-1.195-.64-.965 0-1.64.679-1.64 1.886v.34c0 1.23.683 1.902 1.64 1.902.558 0 1.008-.293 1.172-.648h.02v.605c0 .645-.423 1.023-1.071 1.023zm.008-4.53c.648 0 1.062.527 1.062 1.359v.253c0 .848-.39 1.364-1.062 1.364-.692 0-1.098-.512-1.098-1.364v-.253c0-.868.406-1.36 1.098-1.36z"/><path fill-rule="evenodd" d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconChatSquareDotsFill = /*#__PURE__*/makeIcon('ChatSquareDotsFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-2.5a1 1 0 00-.8.4l-1.9 2.533a1 1 0 01-1.6 0L5.3 12.4a1 1 0 00-.8-.4H2a2 2 0 01-2-2V2zm5 4a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarMonthFill = /*#__PURE__*/makeIcon('CalendarMonthFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM0 5h16v9a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5zm2.56 7.332l.54-1.602h1.984l.54 1.602h.718L4.444 7h-.696L1.85 12.332h.71zm1.544-4.527L4.9 10.18H3.284l.8-2.375h.02zm5.746.422h-.676v2.543c0 .652-.414 1.023-1.004 1.023-.539 0-.98-.246-.98-1.012V8.227h-.676v2.746c0 .941.606 1.425 1.453 1.425.656 0 1.043-.28 1.188-.605h.027v.539h.668V8.227zm1.273 4.41c.075.332.422.636.985.636.648 0 1.07-.378 1.07-1.023v-.605h-.02c-.163.355-.613.648-1.171.648-.957 0-1.64-.672-1.64-1.902v-.34c0-1.207.675-1.887 1.64-1.887.558 0 1.004.293 1.195.64h.02v-.577h.648v4.03c0 1.052-.816 1.579-1.746 1.579-1.043 0-1.574-.516-1.668-1.2h.687zm2.055-2.535c0-.832-.414-1.36-1.062-1.36-.692 0-1.098.492-1.098 1.36v.253c0 .852.406 1.364 1.098 1.364.671 0 1.062-.516 1.062-1.364v-.253z"/>'); // eslint-disable-next-line
 
-var BIconChatSquareFill = /*#__PURE__*/makeIcon('ChatSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 00-2 2v8a2 2 0 002 2h2.5a1 1 0 01.8.4l1.9 2.533a1 1 0 001.6 0l1.9-2.533a1 1 0 01.8-.4H14a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarPlus = /*#__PURE__*/makeIcon('CalendarPlus', '<path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z"/><path fill-rule="evenodd" d="M7.5 9.5A.5.5 0 0 1 8 9h2a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0v-2z"/><path fill-rule="evenodd" d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconChatSquareQuote = /*#__PURE__*/makeIcon('ChatSquareQuote', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v8a1 1 0 001 1h2.5a2 2 0 011.6.8L8 14.333 9.9 11.8a2 2 0 011.6-.8H14a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v8a2 2 0 002 2h2.5a1 1 0 01.8.4l1.9 2.533a1 1 0 001.6 0l1.9-2.533a1 1 0 01.8-.4H14a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M7.468 5.667c0 .92-.776 1.666-1.734 1.666S4 6.587 4 5.667C4 4.747 4.776 4 5.734 4s1.734.746 1.734 1.667z"/><path fill-rule="evenodd" d="M6.157 4.936a.438.438 0 01-.56.293.413.413 0 01-.274-.527c.08-.23.23-.44.477-.546a.891.891 0 01.698.014c.387.16.72.545.923.997.428.948.393 2.377-.942 3.706a.446.446 0 01-.612.01.405.405 0 01-.011-.59c1.093-1.087 1.058-2.158.77-2.794-.152-.336-.354-.514-.47-.563z" clip-rule="evenodd"/><path d="M11.803 5.667c0 .92-.776 1.666-1.734 1.666-.957 0-1.734-.746-1.734-1.666 0-.92.777-1.667 1.734-1.667.958 0 1.734.746 1.734 1.667z"/><path fill-rule="evenodd" d="M10.492 4.936a.438.438 0 01-.56.293.413.413 0 01-.274-.527c.08-.23.23-.44.477-.546a.891.891 0 01.698.014c.387.16.72.545.924.997.428.948.392 2.377-.942 3.706a.446.446 0 01-.613.01.405.405 0 01-.011-.59c1.093-1.087 1.058-2.158.77-2.794-.152-.336-.354-.514-.469-.563z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCalendarPlusFill = /*#__PURE__*/makeIcon('CalendarPlusFill', '<path fill-rule="evenodd" d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM0 5h16v9a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5zm8.5 3.5a.5.5 0 0 0-1 0V10H6a.5.5 0 0 0 0 1h1.5v1.5a.5.5 0 0 0 1 0V11H10a.5.5 0 0 0 0-1H8.5V8.5z"/>'); // eslint-disable-next-line
 
-var BIconChatSquareQuoteFill = /*#__PURE__*/makeIcon('ChatSquareQuoteFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-2.5a1 1 0 00-.8.4l-1.9 2.533a1 1 0 01-1.6 0L5.3 12.4a1 1 0 00-.8-.4H2a2 2 0 01-2-2V2zm7.194 2.766c.087.124.163.26.227.401.428.948.393 2.377-.942 3.706a.446.446 0 01-.612.01.405.405 0 01-.011-.59c.419-.416.672-.831.809-1.22-.269.165-.588.26-.93.26C4.775 7.333 4 6.587 4 5.667 4 4.747 4.776 4 5.734 4c.271 0 .528.06.756.166l.008.004c.169.07.327.182.469.324.085.083.161.174.227.272zM11 7.073c-.269.165-.588.26-.93.26-.958 0-1.735-.746-1.735-1.666 0-.92.777-1.667 1.734-1.667.271 0 .528.06.756.166l.008.004c.17.07.327.182.469.324.085.083.161.174.227.272.087.124.164.26.228.401.428.948.392 2.377-.942 3.706a.446.446 0 01-.613.01.405.405 0 01-.011-.59c.42-.416.672-.831.81-1.22z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCamera = /*#__PURE__*/makeIcon('Camera', '<path d="M9 5C7.343 5 5 6.343 5 8a4 4 0 0 1 4-4v1z"/><path fill-rule="evenodd" d="M14.333 3h-2.015A5.97 5.97 0 0 0 9 2a5.972 5.972 0 0 0-3.318 1H1.667C.747 3 0 3.746 0 4.667v6.666C0 12.253.746 13 1.667 13h4.015c.95.632 2.091 1 3.318 1a5.973 5.973 0 0 0 3.318-1h2.015c.92 0 1.667-.746 1.667-1.667V4.667C16 3.747 15.254 3 14.333 3zM1.5 5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zM9 13A5 5 0 1 0 9 3a5 5 0 0 0 0 10z"/><path d="M2 3a1 1 0 0 1 1-1h1a1 1 0 0 1 0 2H3a1 1 0 0 1-1-1z"/>'); // eslint-disable-next-line
 
-var BIconCheck = /*#__PURE__*/makeIcon('Check', '<path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCameraVideo = /*#__PURE__*/makeIcon('CameraVideo', '<path fill-rule="evenodd" d="M2.667 3.5c-.645 0-1.167.522-1.167 1.167v6.666c0 .645.522 1.167 1.167 1.167h6.666c.645 0 1.167-.522 1.167-1.167V4.667c0-.645-.522-1.167-1.167-1.167H2.667zM.5 4.667C.5 3.47 1.47 2.5 2.667 2.5h6.666c1.197 0 2.167.97 2.167 2.167v6.666c0 1.197-.97 2.167-2.167 2.167H2.667A2.167 2.167 0 0 1 .5 11.333V4.667z"/><path fill-rule="evenodd" d="M11.25 5.65l2.768-1.605a.318.318 0 0 1 .482.263v7.384c0 .228-.26.393-.482.264l-2.767-1.605-.502.865 2.767 1.605c.859.498 1.984-.095 1.984-1.129V4.308c0-1.033-1.125-1.626-1.984-1.128L10.75 4.785l.502.865z"/>'); // eslint-disable-next-line
 
-var BIconCheckAll = /*#__PURE__*/makeIcon('CheckAll', '<path fill-rule="evenodd" d="M12.354 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L5 10.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/><path d="M6.25 8.043l-.896-.897a.5.5 0 10-.708.708l.897.896.707-.707zm1 2.414l.896.897a.5.5 0 00.708 0l7-7a.5.5 0 00-.708-.708L8.5 10.293l-.543-.543-.707.707z"/>'); // eslint-disable-next-line
+var BIconCameraVideoFill = /*#__PURE__*/makeIcon('CameraVideoFill', '<path d="M2.667 3h6.666C10.253 3 11 3.746 11 4.667v6.666c0 .92-.746 1.667-1.667 1.667H2.667C1.747 13 1 12.254 1 11.333V4.667C1 3.747 1.746 3 2.667 3z"/><path d="M7.404 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.693-1.01-1.233-.696L7.404 7.304a.802.802 0 0 0 0 1.393z"/>'); // eslint-disable-next-line
 
-var BIconCheckBox = /*#__PURE__*/makeIcon('CheckBox', '<path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L8 9.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 003 14.5h10a1.5 1.5 0 001.5-1.5V8a.5.5 0 00-1 0v5a.5.5 0 01-.5.5H3a.5.5 0 01-.5-.5V3a.5.5 0 01.5-.5h8a.5.5 0 000-1H3A1.5 1.5 0 001.5 3v10z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCameraVideoOff = /*#__PURE__*/makeIcon('CameraVideoOff', '<path d="M1.075 3.196A2.159 2.159 0 0 0 .5 4.666v6.667c0 1.197.97 2.167 2.167 2.167h6.666c.568 0 1.084-.218 1.47-.575l-.708-.708c-.204.176-.47.283-.762.283H2.667A1.167 1.167 0 0 1 1.5 11.333V4.667c0-.292.107-.558.283-.762l-.708-.709zM10.5 8.379V4.667c0-.645-.522-1.167-1.167-1.167H5.621l-1-1h4.712c1.094 0 1.998.81 2.146 1.862l2.037-1.182c.859-.498 1.984.095 1.984 1.128v7.384c0 .482-.245.869-.594 1.093l-.79-.79a.317.317 0 0 0 .384-.303V4.308a.318.318 0 0 0-.482-.263L11.5 5.505V9.38l-1-1z"/><path fill-rule="evenodd" d="M13.646 14.354l-12-12 .708-.708 12 12-.708.707z"/>'); // eslint-disable-next-line
 
-var BIconCheckCircle = /*#__PURE__*/makeIcon('CheckCircle', '<path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L8 9.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1013.5 8a.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63.5.5 0 11-.5.865A5.472 5.472 0 008 2.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCameraVideoOffFill = /*#__PURE__*/makeIcon('CameraVideoOffFill', '<path d="M1.429 3.55A1.66 1.66 0 0 0 1 4.667v6.666C1 12.253 1.746 13 2.667 13h6.666c.43 0 .821-.162 1.117-.429l-9.02-9.02zm13.111 8.868a.798.798 0 0 0 .46-.726V4.308c0-.63-.693-1.01-1.233-.696L11 5.218v-.551C11 3.747 10.254 3 9.333 3H5.121l9.419 9.418z"/><path fill-rule="evenodd" d="M13.646 14.354l-12-12 .708-.708 12 12-.708.707z"/>'); // eslint-disable-next-line
 
-var BIconChevronBarContract = /*#__PURE__*/makeIcon('ChevronBarContract', '<path fill-rule="evenodd" d="M3.646 14.854a.5.5 0 00.708 0L8 11.207l3.646 3.647a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0l-4 4a.5.5 0 000 .708zm0-13.708a.5.5 0 01.708 0L8 4.793l3.646-3.647a.5.5 0 01.708.708l-4 4a.5.5 0 01-.708 0l-4-4a.5.5 0 010-.708zM1 8a.5.5 0 01.5-.5h13a.5.5 0 010 1h-13A.5.5 0 011 8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCapslock = /*#__PURE__*/makeIcon('Capslock', '<path fill-rule="evenodd" d="M7.27 1.047a1 1 0 0 1 1.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1H1.654C.78 9.5.326 8.455.924 7.816L7.27 1.047zM14.346 8.5L8 1.731 1.654 8.5H4.5a1 1 0 0 1 1 1v1h5v-1a1 1 0 0 1 1-1h2.846zm-9.846 5a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1zm6 0h-5v1h5v-1z"/>'); // eslint-disable-next-line
 
-var BIconChevronBarDown = /*#__PURE__*/makeIcon('ChevronBarDown', '<path fill-rule="evenodd" d="M3.646 4.146a.5.5 0 01.708 0L8 7.793l3.646-3.647a.5.5 0 01.708.708l-4 4a.5.5 0 01-.708 0l-4-4a.5.5 0 010-.708zM1 11.5a.5.5 0 01.5-.5h13a.5.5 0 010 1h-13a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCapslockFill = /*#__PURE__*/makeIcon('CapslockFill', '<path fill-rule="evenodd" d="M7.27 1.047a1 1 0 0 1 1.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1H1.654C.78 9.5.326 8.455.924 7.816L7.27 1.047zM4.5 13.5a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1z"/>'); // eslint-disable-next-line
 
-var BIconChevronBarExpand = /*#__PURE__*/makeIcon('ChevronBarExpand', '<path fill-rule="evenodd" d="M3.646 10.146a.5.5 0 01.708 0L8 13.793l3.646-3.647a.5.5 0 01.708.708l-4 4a.5.5 0 01-.708 0l-4-4a.5.5 0 010-.708zm0-4.292a.5.5 0 00.708 0L8 2.207l3.646 3.647a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0l-4 4a.5.5 0 000 .708zM1 8a.5.5 0 01.5-.5h13a.5.5 0 010 1h-13A.5.5 0 011 8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCardChecklist = /*#__PURE__*/makeIcon('CardChecklist', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/><path fill-rule="evenodd" d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconChevronBarLeft = /*#__PURE__*/makeIcon('ChevronBarLeft', '<path fill-rule="evenodd" d="M11.854 3.646a.5.5 0 010 .708L8.207 8l3.647 3.646a.5.5 0 01-.708.708l-4-4a.5.5 0 010-.708l4-4a.5.5 0 01.708 0zM4.5 1a.5.5 0 00-.5.5v13a.5.5 0 001 0v-13a.5.5 0 00-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCardHeading = /*#__PURE__*/makeIcon('CardHeading', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/><path fill-rule="evenodd" d="M3 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/><path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-1z"/>'); // eslint-disable-next-line
 
-var BIconChevronBarRight = /*#__PURE__*/makeIcon('ChevronBarRight', '<path fill-rule="evenodd" d="M4.146 3.646a.5.5 0 000 .708L7.793 8l-3.647 3.646a.5.5 0 00.708.708l4-4a.5.5 0 000-.708l-4-4a.5.5 0 00-.708 0zM11.5 1a.5.5 0 01.5.5v13a.5.5 0 01-1 0v-13a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCardImage = /*#__PURE__*/makeIcon('CardImage', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/><path d="M10.648 7.646a.5.5 0 0 1 .577-.093L15.002 9.5V13h-14v-1l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71z"/><path fill-rule="evenodd" d="M4.502 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>'); // eslint-disable-next-line
 
-var BIconChevronBarUp = /*#__PURE__*/makeIcon('ChevronBarUp', '<path fill-rule="evenodd" d="M3.646 11.854a.5.5 0 00.708 0L8 8.207l3.646 3.647a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0l-4 4a.5.5 0 000 .708zM2.4 5.2c0 .22.18.4.4.4h10.4a.4.4 0 000-.8H2.8a.4.4 0 00-.4.4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCardList = /*#__PURE__*/makeIcon('CardList', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/><path fill-rule="evenodd" d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/><circle cx="3.5" cy="5.5" r=".5"/><circle cx="3.5" cy="8" r=".5"/><circle cx="3.5" cy="10.5" r=".5"/>'); // eslint-disable-next-line
 
-var BIconChevronCompactDown = /*#__PURE__*/makeIcon('ChevronCompactDown', '<path fill-rule="evenodd" d="M1.553 6.776a.5.5 0 01.67-.223L8 9.44l5.776-2.888a.5.5 0 11.448.894l-6 3a.5.5 0 01-.448 0l-6-3a.5.5 0 01-.223-.67z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCardText = /*#__PURE__*/makeIcon('CardText', '<path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/><path fill-rule="evenodd" d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8zm0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconChevronCompactLeft = /*#__PURE__*/makeIcon('ChevronCompactLeft', '<path fill-rule="evenodd" d="M9.224 1.553a.5.5 0 01.223.67L6.56 8l2.888 5.776a.5.5 0 11-.894.448l-3-6a.5.5 0 010-.448l3-6a.5.5 0 01.67-.223z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretDown = /*#__PURE__*/makeIcon('CaretDown', '<path fill-rule="evenodd" d="M3.204 5L8 10.481 12.796 5H3.204zm-.753.659l4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659z"/>'); // eslint-disable-next-line
 
-var BIconChevronCompactRight = /*#__PURE__*/makeIcon('ChevronCompactRight', '<path fill-rule="evenodd" d="M6.776 1.553a.5.5 0 01.671.223l3 6a.5.5 0 010 .448l-3 6a.5.5 0 11-.894-.448L9.44 8 6.553 2.224a.5.5 0 01.223-.671z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretDownFill = /*#__PURE__*/makeIcon('CaretDownFill', '<path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>'); // eslint-disable-next-line
 
-var BIconChevronCompactUp = /*#__PURE__*/makeIcon('ChevronCompactUp', '<path fill-rule="evenodd" d="M7.776 5.553a.5.5 0 01.448 0l6 3a.5.5 0 11-.448.894L8 6.56 2.224 9.447a.5.5 0 11-.448-.894l6-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretDownSquare = /*#__PURE__*/makeIcon('CaretDownSquare', '<path fill-rule="evenodd" d="M3.544 6.295A.5.5 0 0 1 4 6h8a.5.5 0 0 1 .374.832l-4 4.5a.5.5 0 0 1-.748 0l-4-4.5a.5.5 0 0 1-.082-.537z"/><path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>'); // eslint-disable-next-line
 
-var BIconChevronContract = /*#__PURE__*/makeIcon('ChevronContract', '<path fill-rule="evenodd" d="M3.646 13.854a.5.5 0 00.708 0L8 10.207l3.646 3.647a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0l-4 4a.5.5 0 000 .708zm0-11.708a.5.5 0 01.708 0L8 5.793l3.646-3.647a.5.5 0 01.708.708l-4 4a.5.5 0 01-.708 0l-4-4a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretDownSquareFill = /*#__PURE__*/makeIcon('CaretDownSquareFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4 4a.5.5 0 0 0-.374.832l4 4.5a.5.5 0 0 0 .748 0l4-4.5A.5.5 0 0 0 12 6H4z"/>'); // eslint-disable-next-line
 
-var BIconChevronDoubleDown = /*#__PURE__*/makeIcon('ChevronDoubleDown', '<path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 01.708 0L8 12.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 01.708 0L8 8.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretLeft = /*#__PURE__*/makeIcon('CaretLeft', '<path fill-rule="evenodd" d="M10 12.796L4.519 8 10 3.204v9.592zm-.659.753l-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753z"/>'); // eslint-disable-next-line
 
-var BIconChevronDoubleLeft = /*#__PURE__*/makeIcon('ChevronDoubleLeft', '<path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 010 .708L2.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 010 .708L6.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretLeftFill = /*#__PURE__*/makeIcon('CaretLeftFill', '<path d="M3.86 8.753l5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>'); // eslint-disable-next-line
 
-var BIconChevronDoubleRight = /*#__PURE__*/makeIcon('ChevronDoubleRight', '<path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L9.293 8 3.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L13.293 8 7.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretLeftSquare = /*#__PURE__*/makeIcon('CaretLeftSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M10.205 12.456A.5.5 0 0 0 10.5 12V4a.5.5 0 0 0-.832-.374l-4.5 4a.5.5 0 0 0 0 .748l4.5 4a.5.5 0 0 0 .537.082z"/>'); // eslint-disable-next-line
 
-var BIconChevronDoubleUp = /*#__PURE__*/makeIcon('ChevronDoubleUp', '<path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L8 3.707 2.354 9.354a.5.5 0 11-.708-.708l6-6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L8 7.707l-5.646 5.647a.5.5 0 01-.708-.708l6-6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretLeftSquareFill = /*#__PURE__*/makeIcon('CaretLeftSquareFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm10.5 10a.5.5 0 0 1-.832.374l-4.5-4a.5.5 0 0 1 0-.748l4.5-4A.5.5 0 0 1 10.5 4v8z"/>'); // eslint-disable-next-line
 
-var BIconChevronDown = /*#__PURE__*/makeIcon('ChevronDown', '<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 01.708 0L8 10.293l5.646-5.647a.5.5 0 01.708.708l-6 6a.5.5 0 01-.708 0l-6-6a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretRight = /*#__PURE__*/makeIcon('CaretRight', '<path fill-rule="evenodd" d="M6 12.796L11.481 8 6 3.204v9.592zm.659.753l5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/>'); // eslint-disable-next-line
 
-var BIconChevronExpand = /*#__PURE__*/makeIcon('ChevronExpand', '<path fill-rule="evenodd" d="M3.646 9.146a.5.5 0 01.708 0L8 12.793l3.646-3.647a.5.5 0 01.708.708l-4 4a.5.5 0 01-.708 0l-4-4a.5.5 0 010-.708zm0-2.292a.5.5 0 00.708 0L8 3.207l3.646 3.647a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0l-4 4a.5.5 0 000 .708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretRightFill = /*#__PURE__*/makeIcon('CaretRightFill', '<path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>'); // eslint-disable-next-line
 
-var BIconChevronLeft = /*#__PURE__*/makeIcon('ChevronLeft', '<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 010 .708L5.707 8l5.647 5.646a.5.5 0 01-.708.708l-6-6a.5.5 0 010-.708l6-6a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretRightSquare = /*#__PURE__*/makeIcon('CaretRightSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M5.795 12.456A.5.5 0 0 1 5.5 12V4a.5.5 0 0 1 .832-.374l4.5 4a.5.5 0 0 1 0 .748l-4.5 4a.5.5 0 0 1-.537.082z"/>'); // eslint-disable-next-line
 
-var BIconChevronRight = /*#__PURE__*/makeIcon('ChevronRight', '<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 01.708 0l6 6a.5.5 0 010 .708l-6 6a.5.5 0 01-.708-.708L10.293 8 4.646 2.354a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretRightSquareFill = /*#__PURE__*/makeIcon('CaretRightSquareFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm5.5 10a.5.5 0 0 0 .832.374l4.5-4a.5.5 0 0 0 0-.748l-4.5-4A.5.5 0 0 0 5.5 4v8z"/>'); // eslint-disable-next-line
 
-var BIconChevronUp = /*#__PURE__*/makeIcon('ChevronUp', '<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 01.708 0l6 6a.5.5 0 01-.708.708L8 5.707l-5.646 5.647a.5.5 0 01-.708-.708l6-6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretUp = /*#__PURE__*/makeIcon('CaretUp', '<path fill-rule="evenodd" d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>'); // eslint-disable-next-line
 
-var BIconCircle = /*#__PURE__*/makeIcon('Circle', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCaretUpFill = /*#__PURE__*/makeIcon('CaretUpFill', '<path d="M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>'); // eslint-disable-next-line
+
+var BIconCaretUpSquare = /*#__PURE__*/makeIcon('CaretUpSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.544 10.705A.5.5 0 0 0 4 11h8a.5.5 0 0 0 .374-.832l-4-4.5a.5.5 0 0 0-.748 0l-4 4.5a.5.5 0 0 0-.082.537z"/>'); // eslint-disable-next-line
+
+var BIconCaretUpSquareFill = /*#__PURE__*/makeIcon('CaretUpSquareFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4 9a.5.5 0 0 1-.374-.832l4-4.5a.5.5 0 0 1 .748 0l4 4.5A.5.5 0 0 1 12 11H4z"/>'); // eslint-disable-next-line
+
+var BIconCart = /*#__PURE__*/makeIcon('Cart', '<path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
+
+var BIconCart2 = /*#__PURE__*/makeIcon('Cart2', '<path fill-rule="evenodd" d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>'); // eslint-disable-next-line
+
+var BIconCart3 = /*#__PURE__*/makeIcon('Cart3', '<path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
+
+var BIconCart4 = /*#__PURE__*/makeIcon('Cart4', '<path fill-rule="evenodd" d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l.5 2H5V5H3.14zM6 5v2h2V5H6zm3 0v2h2V5H9zm3 0v2h1.36l.5-2H12zm1.11 3H12v2h.61l.5-2zM11 8H9v2h2V8zM8 8H6v2h2V8zM5 8H3.89l.5 2H5V8zm0 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>'); // eslint-disable-next-line
+
+var BIconCartCheck = /*#__PURE__*/makeIcon('CartCheck', '<path fill-rule="evenodd" d="M11.354 5.646a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L8 8.293l2.646-2.647a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
+
+var BIconCartDash = /*#__PURE__*/makeIcon('CartDash', '<path fill-rule="evenodd" d="M6 7.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
+
+var BIconCartFill = /*#__PURE__*/makeIcon('CartFill', '<path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
+
+var BIconCartPlus = /*#__PURE__*/makeIcon('CartPlus', '<path fill-rule="evenodd" d="M8.5 5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1H8V5.5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M8 7.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H9v1.5a.5.5 0 0 1-1 0v-2z"/><path fill-rule="evenodd" d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
+
+var BIconChat = /*#__PURE__*/makeIcon('Chat', '<path fill-rule="evenodd" d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>'); // eslint-disable-next-line
+
+var BIconChatDots = /*#__PURE__*/makeIcon('ChatDots', '<path fill-rule="evenodd" d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/><path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>'); // eslint-disable-next-line
+
+var BIconChatDotsFill = /*#__PURE__*/makeIcon('ChatDotsFill', '<path fill-rule="evenodd" d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
+
+var BIconChatFill = /*#__PURE__*/makeIcon('ChatFill', '<path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 0 0 8 15z"/>'); // eslint-disable-next-line
+
+var BIconChatQuote = /*#__PURE__*/makeIcon('ChatQuote', '<path fill-rule="evenodd" d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/><path d="M7.468 7.667c0 .92-.776 1.666-1.734 1.666S4 8.587 4 7.667C4 6.747 4.776 6 5.734 6s1.734.746 1.734 1.667z"/><path fill-rule="evenodd" d="M6.157 6.936a.438.438 0 0 1-.56.293.413.413 0 0 1-.274-.527c.08-.23.23-.44.477-.546a.891.891 0 0 1 .698.014c.387.16.72.545.923.997.428.948.393 2.377-.942 3.706a.446.446 0 0 1-.612.01.405.405 0 0 1-.011-.59c1.093-1.087 1.058-2.158.77-2.794-.152-.336-.354-.514-.47-.563zm-.035-.012h-.001.001z"/><path d="M11.803 7.667c0 .92-.776 1.666-1.734 1.666-.957 0-1.734-.746-1.734-1.666 0-.92.777-1.667 1.734-1.667.958 0 1.734.746 1.734 1.667z"/><path fill-rule="evenodd" d="M10.492 6.936a.438.438 0 0 1-.56.293.413.413 0 0 1-.274-.527c.08-.23.23-.44.477-.546a.891.891 0 0 1 .698.014c.387.16.72.545.924.997.428.948.392 2.377-.942 3.706a.446.446 0 0 1-.613.01.405.405 0 0 1-.011-.59c1.093-1.087 1.058-2.158.77-2.794-.152-.336-.354-.514-.469-.563zm-.034-.012h-.002.002z"/>'); // eslint-disable-next-line
+
+var BIconChatQuoteFill = /*#__PURE__*/makeIcon('ChatQuoteFill', '<path fill-rule="evenodd" d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM7.194 6.766c.087.124.163.26.227.401.428.948.393 2.377-.942 3.706a.446.446 0 0 1-.612.01.405.405 0 0 1-.011-.59c.419-.416.672-.831.809-1.22-.269.165-.588.26-.93.26C4.775 9.333 4 8.587 4 7.667 4 6.747 4.776 6 5.734 6c.271 0 .528.06.756.166l.008.004c.169.07.327.182.469.324.085.083.161.174.227.272zM11 9.073c-.269.165-.588.26-.93.26-.958 0-1.735-.746-1.735-1.666 0-.92.777-1.667 1.734-1.667.271 0 .528.06.756.166l.008.004c.17.07.327.182.469.324.085.083.161.174.227.272.087.124.164.26.228.401.428.948.392 2.377-.942 3.706a.446.446 0 0 1-.613.01.405.405 0 0 1-.011-.59c.42-.416.672-.831.81-1.22z"/>'); // eslint-disable-next-line
+
+var BIconChatSquare = /*#__PURE__*/makeIcon('ChatSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2.5a2 2 0 0 1 1.6.8L8 14.333 9.9 11.8a2 2 0 0 1 1.6-.8H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>'); // eslint-disable-next-line
+
+var BIconChatSquareDots = /*#__PURE__*/makeIcon('ChatSquareDots', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2.5a2 2 0 0 1 1.6.8L8 14.333 9.9 11.8a2 2 0 0 1 1.6-.8H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>'); // eslint-disable-next-line
+
+var BIconChatSquareDotsFill = /*#__PURE__*/makeIcon('ChatSquareDotsFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.5a1 1 0 0 0-.8.4l-1.9 2.533a1 1 0 0 1-1.6 0L5.3 12.4a1 1 0 0 0-.8-.4H2a2 2 0 0 1-2-2V2zm5 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
+
+var BIconChatSquareFill = /*#__PURE__*/makeIcon('ChatSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>'); // eslint-disable-next-line
+
+var BIconChatSquareQuote = /*#__PURE__*/makeIcon('ChatSquareQuote', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2.5a2 2 0 0 1 1.6.8L8 14.333 9.9 11.8a2 2 0 0 1 1.6-.8H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M7.468 5.667c0 .92-.776 1.666-1.734 1.666S4 6.587 4 5.667C4 4.747 4.776 4 5.734 4s1.734.746 1.734 1.667z"/><path fill-rule="evenodd" d="M6.157 4.936a.438.438 0 0 1-.56.293.413.413 0 0 1-.274-.527c.08-.23.23-.44.477-.546a.891.891 0 0 1 .698.014c.387.16.72.545.923.997.428.948.393 2.377-.942 3.706a.446.446 0 0 1-.612.01.405.405 0 0 1-.011-.59c1.093-1.087 1.058-2.158.77-2.794-.152-.336-.354-.514-.47-.563z"/><path d="M11.803 5.667c0 .92-.776 1.666-1.734 1.666-.957 0-1.734-.746-1.734-1.666 0-.92.777-1.667 1.734-1.667.958 0 1.734.746 1.734 1.667z"/><path fill-rule="evenodd" d="M10.492 4.936a.438.438 0 0 1-.56.293.413.413 0 0 1-.274-.527c.08-.23.23-.44.477-.546a.891.891 0 0 1 .698.014c.387.16.72.545.924.997.428.948.392 2.377-.942 3.706a.446.446 0 0 1-.613.01.405.405 0 0 1-.011-.59c1.093-1.087 1.058-2.158.77-2.794-.152-.336-.354-.514-.469-.563z"/>'); // eslint-disable-next-line
+
+var BIconChatSquareQuoteFill = /*#__PURE__*/makeIcon('ChatSquareQuoteFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.5a1 1 0 0 0-.8.4l-1.9 2.533a1 1 0 0 1-1.6 0L5.3 12.4a1 1 0 0 0-.8-.4H2a2 2 0 0 1-2-2V2zm7.194 2.766c.087.124.163.26.227.401.428.948.393 2.377-.942 3.706a.446.446 0 0 1-.612.01.405.405 0 0 1-.011-.59c.419-.416.672-.831.809-1.22-.269.165-.588.26-.93.26C4.775 7.333 4 6.587 4 5.667 4 4.747 4.776 4 5.734 4c.271 0 .528.06.756.166l.008.004c.169.07.327.182.469.324.085.083.161.174.227.272zM11 7.073c-.269.165-.588.26-.93.26-.958 0-1.735-.746-1.735-1.666 0-.92.777-1.667 1.734-1.667.271 0 .528.06.756.166l.008.004c.17.07.327.182.469.324.085.083.161.174.227.272.087.124.164.26.228.401.428.948.392 2.377-.942 3.706a.446.446 0 0 1-.613.01.405.405 0 0 1-.011-.59c.42-.416.672-.831.81-1.22z"/>'); // eslint-disable-next-line
+
+var BIconCheck = /*#__PURE__*/makeIcon('Check', '<path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/>'); // eslint-disable-next-line
+
+var BIconCheck2 = /*#__PURE__*/makeIcon('Check2', '<path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconCheck2All = /*#__PURE__*/makeIcon('Check2All', '<path fill-rule="evenodd" d="M12.354 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/><path d="M6.25 8.043l-.896-.897a.5.5 0 1 0-.708.708l.897.896.707-.707zm1 2.414l.896.897a.5.5 0 0 0 .708 0l7-7a.5.5 0 0 0-.708-.708L8.5 10.293l-.543-.543-.707.707z"/>'); // eslint-disable-next-line
+
+var BIconCheck2Circle = /*#__PURE__*/makeIcon('Check2Circle', '<path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1 0 13.5 8a.5.5 0 0 1 1 0 6.5 6.5 0 1 1-3.25-5.63.5.5 0 1 1-.5.865A5.472 5.472 0 0 0 8 2.5z"/>'); // eslint-disable-next-line
+
+var BIconCheck2Square = /*#__PURE__*/makeIcon('Check2Square', '<path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>'); // eslint-disable-next-line
+
+var BIconCheckAll = /*#__PURE__*/makeIcon('CheckAll', '<path fill-rule="evenodd" d="M8.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L2.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093L8.95 4.992a.252.252 0 0 1 .02-.022zm-.92 5.14l.92.92a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 1 0-1.091-1.028L9.477 9.417l-.485-.486-.943 1.179z"/>'); // eslint-disable-next-line
+
+var BIconCheckCircle = /*#__PURE__*/makeIcon('CheckCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/>'); // eslint-disable-next-line
+
+var BIconCheckCircleFill = /*#__PURE__*/makeIcon('CheckCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>'); // eslint-disable-next-line
+
+var BIconCheckSquare = /*#__PURE__*/makeIcon('CheckSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/>'); // eslint-disable-next-line
+
+var BIconCheckSquareFill = /*#__PURE__*/makeIcon('CheckSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>'); // eslint-disable-next-line
+
+var BIconChevronBarContract = /*#__PURE__*/makeIcon('ChevronBarContract', '<path fill-rule="evenodd" d="M3.646 14.854a.5.5 0 0 0 .708 0L8 11.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zm0-13.708a.5.5 0 0 1 .708 0L8 4.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zM1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z"/>'); // eslint-disable-next-line
+
+var BIconChevronBarDown = /*#__PURE__*/makeIcon('ChevronBarDown', '<path fill-rule="evenodd" d="M3.646 4.146a.5.5 0 0 1 .708 0L8 7.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zM1 11.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconChevronBarExpand = /*#__PURE__*/makeIcon('ChevronBarExpand', '<path fill-rule="evenodd" d="M3.646 10.146a.5.5 0 0 1 .708 0L8 13.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-4.292a.5.5 0 0 0 .708 0L8 2.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z"/>'); // eslint-disable-next-line
+
+var BIconChevronBarLeft = /*#__PURE__*/makeIcon('ChevronBarLeft', '<path fill-rule="evenodd" d="M11.854 3.646a.5.5 0 0 1 0 .708L8.207 8l3.647 3.646a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708 0zM4.5 1a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 1 0v-13a.5.5 0 0 0-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconChevronBarRight = /*#__PURE__*/makeIcon('ChevronBarRight', '<path fill-rule="evenodd" d="M4.146 3.646a.5.5 0 0 0 0 .708L7.793 8l-3.647 3.646a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708 0zM11.5 1a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-1 0v-13a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
+
+var BIconChevronBarUp = /*#__PURE__*/makeIcon('ChevronBarUp', '<path fill-rule="evenodd" d="M3.646 11.854a.5.5 0 0 0 .708 0L8 8.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM2.4 5.2c0 .22.18.4.4.4h10.4a.4.4 0 0 0 0-.8H2.8a.4.4 0 0 0-.4.4z"/>'); // eslint-disable-next-line
+
+var BIconChevronCompactDown = /*#__PURE__*/makeIcon('ChevronCompactDown', '<path fill-rule="evenodd" d="M1.553 6.776a.5.5 0 0 1 .67-.223L8 9.44l5.776-2.888a.5.5 0 1 1 .448.894l-6 3a.5.5 0 0 1-.448 0l-6-3a.5.5 0 0 1-.223-.67z"/>'); // eslint-disable-next-line
+
+var BIconChevronCompactLeft = /*#__PURE__*/makeIcon('ChevronCompactLeft', '<path fill-rule="evenodd" d="M9.224 1.553a.5.5 0 0 1 .223.67L6.56 8l2.888 5.776a.5.5 0 1 1-.894.448l-3-6a.5.5 0 0 1 0-.448l3-6a.5.5 0 0 1 .67-.223z"/>'); // eslint-disable-next-line
+
+var BIconChevronCompactRight = /*#__PURE__*/makeIcon('ChevronCompactRight', '<path fill-rule="evenodd" d="M6.776 1.553a.5.5 0 0 1 .671.223l3 6a.5.5 0 0 1 0 .448l-3 6a.5.5 0 1 1-.894-.448L9.44 8 6.553 2.224a.5.5 0 0 1 .223-.671z"/>'); // eslint-disable-next-line
+
+var BIconChevronCompactUp = /*#__PURE__*/makeIcon('ChevronCompactUp', '<path fill-rule="evenodd" d="M7.776 5.553a.5.5 0 0 1 .448 0l6 3a.5.5 0 1 1-.448.894L8 6.56 2.224 9.447a.5.5 0 1 1-.448-.894l6-3z"/>'); // eslint-disable-next-line
+
+var BIconChevronContract = /*#__PURE__*/makeIcon('ChevronContract', '<path fill-rule="evenodd" d="M3.646 13.854a.5.5 0 0 0 .708 0L8 10.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zm0-11.708a.5.5 0 0 1 .708 0L8 5.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
+
+var BIconChevronDoubleDown = /*#__PURE__*/makeIcon('ChevronDoubleDown', '<path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M1.646 2.646a.5.5 0 0 1 .708 0L8 8.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
+
+var BIconChevronDoubleLeft = /*#__PURE__*/makeIcon('ChevronDoubleLeft', '<path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconChevronDoubleRight = /*#__PURE__*/makeIcon('ChevronDoubleRight', '<path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
+
+var BIconChevronDoubleUp = /*#__PURE__*/makeIcon('ChevronDoubleUp', '<path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708l6-6z"/><path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>'); // eslint-disable-next-line
+
+var BIconChevronDown = /*#__PURE__*/makeIcon('ChevronDown', '<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
+
+var BIconChevronExpand = /*#__PURE__*/makeIcon('ChevronExpand', '<path fill-rule="evenodd" d="M3.646 9.146a.5.5 0 0 1 .708 0L8 12.793l3.646-3.647a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 0-.708zm0-2.292a.5.5 0 0 0 .708 0L8 3.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708z"/>'); // eslint-disable-next-line
+
+var BIconChevronLeft = /*#__PURE__*/makeIcon('ChevronLeft', '<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconChevronRight = /*#__PURE__*/makeIcon('ChevronRight', '<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
+
+var BIconChevronUp = /*#__PURE__*/makeIcon('ChevronUp', '<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>'); // eslint-disable-next-line
+
+var BIconCircle = /*#__PURE__*/makeIcon('Circle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>'); // eslint-disable-next-line
 
 var BIconCircleFill = /*#__PURE__*/makeIcon('CircleFill', '<circle cx="8" cy="8" r="8"/>'); // eslint-disable-next-line
 
-var BIconCircleHalf = /*#__PURE__*/makeIcon('CircleHalf', '<path fill-rule="evenodd" d="M8 15V1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCircleHalf = /*#__PURE__*/makeIcon('CircleHalf', '<path fill-rule="evenodd" d="M8 15V1a7 7 0 1 1 0 14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>'); // eslint-disable-next-line
 
-var BIconCircleSquare = /*#__PURE__*/makeIcon('CircleSquare', '<path d="M0 6a6 6 0 1112 0A6 6 0 010 6z"/><path d="M12.93 5h1.57a.5.5 0 01.5.5v9a.5.5 0 01-.5.5h-9a.5.5 0 01-.5-.5v-1.57a6.953 6.953 0 01-1-.22v1.79A1.5 1.5 0 005.5 16h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 4h-1.79c.097.324.17.658.22 1z"/>'); // eslint-disable-next-line
+var BIconCircleSquare = /*#__PURE__*/makeIcon('CircleSquare', '<path d="M0 6a6 6 0 1 1 12 0A6 6 0 0 1 0 6z"/><path d="M12.93 5h1.57a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-1.57a6.953 6.953 0 0 1-1-.22v1.79A1.5 1.5 0 0 0 5.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 4h-1.79c.097.324.17.658.22 1z"/>'); // eslint-disable-next-line
 
-var BIconClipboard = /*#__PURE__*/makeIcon('Clipboard', '<path fill-rule="evenodd" d="M4 1.5H3a2 2 0 00-2 2V14a2 2 0 002 2h10a2 2 0 002-2V3.5a2 2 0 00-2-2h-1v1h1a1 1 0 011 1V14a1 1 0 01-1 1H3a1 1 0 01-1-1V3.5a1 1 0 011-1h1v-1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.5 1h-3a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5zm-3-1A1.5 1.5 0 005 1.5v1A1.5 1.5 0 006.5 4h3A1.5 1.5 0 0011 2.5v-1A1.5 1.5 0 009.5 0h-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconClipboard = /*#__PURE__*/makeIcon('Clipboard', '<path fill-rule="evenodd" d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path fill-rule="evenodd" d="M9.5 1h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>'); // eslint-disable-next-line
 
-var BIconClipboardData = /*#__PURE__*/makeIcon('ClipboardData', '<path fill-rule="evenodd" d="M4 1.5H3a2 2 0 00-2 2V14a2 2 0 002 2h10a2 2 0 002-2V3.5a2 2 0 00-2-2h-1v1h1a1 1 0 011 1V14a1 1 0 01-1 1H3a1 1 0 01-1-1V3.5a1 1 0 011-1h1v-1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.5 1h-3a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5zm-3-1A1.5 1.5 0 005 1.5v1A1.5 1.5 0 006.5 4h3A1.5 1.5 0 0011 2.5v-1A1.5 1.5 0 009.5 0h-3z" clip-rule="evenodd"/><path d="M4 11a1 1 0 112 0v1a1 1 0 11-2 0v-1zm6-4a1 1 0 112 0v5a1 1 0 11-2 0V7zM7 9a1 1 0 012 0v3a1 1 0 11-2 0V9z"/>'); // eslint-disable-next-line
+var BIconClipboardData = /*#__PURE__*/makeIcon('ClipboardData', '<path fill-rule="evenodd" d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path fill-rule="evenodd" d="M9.5 1h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/><path d="M4 11a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0v-1zm6-4a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0V7zM7 9a1 1 0 0 1 2 0v3a1 1 0 1 1-2 0V9z"/>'); // eslint-disable-next-line
 
-var BIconClock = /*#__PURE__*/makeIcon('Clock', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm8-7A8 8 0 110 8a8 8 0 0116 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 3a.5.5 0 01.5.5v5.21l3.248 1.856a.5.5 0 01-.496.868l-3.5-2A.5.5 0 017 9V3.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconClock = /*#__PURE__*/makeIcon('Clock', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm8-7A8 8 0 1 1 0 8a8 8 0 0 1 16 0z"/><path fill-rule="evenodd" d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconClockFill = /*#__PURE__*/makeIcon('ClockFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zM8 3.5a.5.5 0 00-1 0V9a.5.5 0 00.252.434l3.5 2a.5.5 0 00.496-.868L8 8.71V3.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconClockFill = /*#__PURE__*/makeIcon('ClockFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>'); // eslint-disable-next-line
 
-var BIconClockHistory = /*#__PURE__*/makeIcon('ClockHistory', '<path fill-rule="evenodd" d="M8.515 1.019A7 7 0 008 1V0a8 8 0 01.589.022l-.074.997zm2.004.45a7.003 7.003 0 00-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 00-.439-.27l.493-.87a8.025 8.025 0 01.979.654l-.615.789a6.996 6.996 0 00-.418-.302zm1.834 1.79a6.99 6.99 0 00-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 00-.214-.468l.893-.45a7.976 7.976 0 01.45 1.088l-.95.313a7.023 7.023 0 00-.179-.483zm.53 2.507a6.991 6.991 0 00-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 01-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 01-.401.432l-.707-.707z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 1a7 7 0 104.95 11.95l.707.707A8.001 8.001 0 118 0v1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 3a.5.5 0 01.5.5v5.21l3.248 1.856a.5.5 0 01-.496.868l-3.5-2A.5.5 0 017 9V3.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconClockHistory = /*#__PURE__*/makeIcon('ClockHistory', '<path fill-rule="evenodd" d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/><path fill-rule="evenodd" d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/><path fill-rule="evenodd" d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconCloud = /*#__PURE__*/makeIcon('Cloud', '<path fill-rule="evenodd" d="M4.887 7.2l-.964-.165A2.5 2.5 0 103.5 12h10a1.5 1.5 0 00.237-2.981L12.7 8.854l.216-1.028a4 4 0 10-7.843-1.587l-.185.96zm9.084.341a5 5 0 00-9.88-1.492A3.5 3.5 0 103.5 13h9.999a2.5 2.5 0 00.394-4.968c.033-.16.06-.324.077-.49z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCloud = /*#__PURE__*/makeIcon('Cloud', '<path fill-rule="evenodd" d="M4.887 7.2l-.964-.165A2.5 2.5 0 1 0 3.5 12h10a1.5 1.5 0 0 0 .237-2.981L12.7 8.854l.216-1.028a4 4 0 1 0-7.843-1.587l-.185.96zm9.084.341a5 5 0 0 0-9.88-1.492A3.5 3.5 0 1 0 3.5 13h9.999a2.5 2.5 0 0 0 .394-4.968c.033-.16.06-.324.077-.49z"/>'); // eslint-disable-next-line
 
-var BIconCloudDownload = /*#__PURE__*/makeIcon('CloudDownload', '<path d="M4.887 5.2l-.964-.165A2.5 2.5 0 103.5 10H6v1H3.5a3.5 3.5 0 11.59-6.95 5.002 5.002 0 119.804 1.98A2.501 2.501 0 0113.5 11H10v-1h3.5a1.5 1.5 0 00.237-2.981L12.7 6.854l.216-1.028a4 4 0 10-7.843-1.587l-.185.96z"/><path fill-rule="evenodd" d="M5 12.5a.5.5 0 01.707 0L8 14.793l2.293-2.293a.5.5 0 11.707.707l-2.646 2.646a.5.5 0 01-.708 0L5 13.207a.5.5 0 010-.707z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8A.5.5 0 018 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCloudDownload = /*#__PURE__*/makeIcon('CloudDownload', '<path d="M4.887 5.2l-.964-.165A2.5 2.5 0 1 0 3.5 10H6v1H3.5a3.5 3.5 0 1 1 .59-6.95 5.002 5.002 0 1 1 9.804 1.98A2.501 2.501 0 0 1 13.5 11H10v-1h3.5a1.5 1.5 0 0 0 .237-2.981L12.7 6.854l.216-1.028a4 4 0 1 0-7.843-1.587l-.185.96z"/><path fill-rule="evenodd" d="M5 12.5a.5.5 0 0 1 .707 0L8 14.793l2.293-2.293a.5.5 0 1 1 .707.707l-2.646 2.646a.5.5 0 0 1-.708 0L5 13.207a.5.5 0 0 1 0-.707z"/><path fill-rule="evenodd" d="M8 6a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8A.5.5 0 0 1 8 6z"/>'); // eslint-disable-next-line
 
-var BIconCloudFill = /*#__PURE__*/makeIcon('CloudFill', '<path fill-rule="evenodd" d="M3.5 13a3.5 3.5 0 11.59-6.95 5.002 5.002 0 119.804 1.98A2.5 2.5 0 0113.5 13h-10z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCloudFill = /*#__PURE__*/makeIcon('CloudFill', '<path fill-rule="evenodd" d="M3.5 13a3.5 3.5 0 1 1 .59-6.95 5.002 5.002 0 1 1 9.804 1.98A2.5 2.5 0 0 1 13.5 13h-10z"/>'); // eslint-disable-next-line
 
-var BIconCloudUpload = /*#__PURE__*/makeIcon('CloudUpload', '<path d="M4.887 6.2l-.964-.165A2.5 2.5 0 103.5 11H6v1H3.5a3.5 3.5 0 11.59-6.95 5.002 5.002 0 119.804 1.98A2.501 2.501 0 0113.5 12H10v-1h3.5a1.5 1.5 0 00.237-2.981L12.7 7.854l.216-1.028a4 4 0 10-7.843-1.587l-.185.96z"/><path fill-rule="evenodd" d="M5 8.854a.5.5 0 00.707 0L8 6.56l2.293 2.293A.5.5 0 1011 8.146L8.354 5.5a.5.5 0 00-.708 0L5 8.146a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 6a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8A.5.5 0 018 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCloudSlash = /*#__PURE__*/makeIcon('CloudSlash', '<path d="M3.901 6.023A3.5 3.5 0 1 0 3.5 13h7.379l-1-1H3.5a2.5 2.5 0 1 1 .423-4.965l.964.164.031-.16-1.017-1.016zm10.125 5.882a1.5 1.5 0 0 0-.289-2.886L12.7 8.854l.216-1.028a4 4 0 0 0-6.682-3.714l-.707-.708a5 5 0 0 1 8.368 4.626 2.501 2.501 0 0 1 .88 4.621l-.748-.746z"/><path fill-rule="evenodd" d="M13.646 14.354l-12-12 .708-.708 12 12-.707.707z"/>'); // eslint-disable-next-line
 
-var BIconCode = /*#__PURE__*/makeIcon('Code', '<path fill-rule="evenodd" d="M5.854 4.146a.5.5 0 010 .708L2.707 8l3.147 3.146a.5.5 0 01-.708.708l-3.5-3.5a.5.5 0 010-.708l3.5-3.5a.5.5 0 01.708 0zm4.292 0a.5.5 0 000 .708L13.293 8l-3.147 3.146a.5.5 0 00.708.708l3.5-3.5a.5.5 0 000-.708l-3.5-3.5a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCloudSlashFill = /*#__PURE__*/makeIcon('CloudSlashFill', '<path d="M3.901 6.023A3.5 3.5 0 1 0 3.5 13h7.379L3.9 6.023zm10.872 6.629a2.5 2.5 0 0 0-.88-4.621 5 5 0 0 0-8.368-4.626l9.248 9.247z"/><path fill-rule="evenodd" d="M13.646 14.354l-12-12 .708-.708 12 12-.707.707z"/>'); // eslint-disable-next-line
 
-var BIconCodeSlash = /*#__PURE__*/makeIcon('CodeSlash', '<path fill-rule="evenodd" d="M4.854 4.146a.5.5 0 010 .708L1.707 8l3.147 3.146a.5.5 0 01-.708.708l-3.5-3.5a.5.5 0 010-.708l3.5-3.5a.5.5 0 01.708 0zm6.292 0a.5.5 0 000 .708L14.293 8l-3.147 3.146a.5.5 0 00.708.708l3.5-3.5a.5.5 0 000-.708l-3.5-3.5a.5.5 0 00-.708 0zm-.999-3.124a.5.5 0 01.33.625l-4 13a.5.5 0 01-.955-.294l4-13a.5.5 0 01.625-.33z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCloudUpload = /*#__PURE__*/makeIcon('CloudUpload', '<path d="M4.887 6.2l-.964-.165A2.5 2.5 0 1 0 3.5 11H6v1H3.5a3.5 3.5 0 1 1 .59-6.95 5.002 5.002 0 1 1 9.804 1.98A2.501 2.501 0 0 1 13.5 12H10v-1h3.5a1.5 1.5 0 0 0 .237-2.981L12.7 7.854l.216-1.028a4 4 0 1 0-7.843-1.587l-.185.96z"/><path fill-rule="evenodd" d="M5 8.854a.5.5 0 0 0 .707 0L8 6.56l2.293 2.293A.5.5 0 1 0 11 8.146L8.354 5.5a.5.5 0 0 0-.708 0L5 8.146a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M8 6a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8A.5.5 0 0 1 8 6z"/>'); // eslint-disable-next-line
 
-var BIconCollection = /*#__PURE__*/makeIcon('Collection', '<path fill-rule="evenodd" d="M14.5 13.5h-13A.5.5 0 011 13V6a.5.5 0 01.5-.5h13a.5.5 0 01.5.5v7a.5.5 0 01-.5.5zm-13 1A1.5 1.5 0 010 13V6a1.5 1.5 0 011.5-1.5h13A1.5 1.5 0 0116 6v7a1.5 1.5 0 01-1.5 1.5h-13zM2 3a.5.5 0 00.5.5h11a.5.5 0 000-1h-11A.5.5 0 002 3zm2-2a.5.5 0 00.5.5h7a.5.5 0 000-1h-7A.5.5 0 004 1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCode = /*#__PURE__*/makeIcon('Code', '<path fill-rule="evenodd" d="M5.854 4.146a.5.5 0 0 1 0 .708L2.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm4.292 0a.5.5 0 0 0 0 .708L13.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
 
-var BIconCollectionFill = /*#__PURE__*/makeIcon('CollectionFill', '<rect width="16" height="10" rx="1.5" transform="matrix(1 0 0 -1 0 14.5)"/><path fill-rule="evenodd" d="M2 3a.5.5 0 00.5.5h11a.5.5 0 000-1h-11A.5.5 0 002 3zm2-2a.5.5 0 00.5.5h7a.5.5 0 000-1h-7A.5.5 0 004 1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCodeSlash = /*#__PURE__*/makeIcon('CodeSlash', '<path fill-rule="evenodd" d="M4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0zm-.999-3.124a.5.5 0 0 1 .33.625l-4 13a.5.5 0 0 1-.955-.294l4-13a.5.5 0 0 1 .625-.33z"/>'); // eslint-disable-next-line
 
-var BIconCollectionPlay = /*#__PURE__*/makeIcon('CollectionPlay', '<path fill-rule="evenodd" d="M14.5 13.5h-13A.5.5 0 011 13V6a.5.5 0 01.5-.5h13a.5.5 0 01.5.5v7a.5.5 0 01-.5.5zm-13 1A1.5 1.5 0 010 13V6a1.5 1.5 0 011.5-1.5h13A1.5 1.5 0 0116 6v7a1.5 1.5 0 01-1.5 1.5h-13zM2 3a.5.5 0 00.5.5h11a.5.5 0 000-1h-11A.5.5 0 002 3zm2-2a.5.5 0 00.5.5h7a.5.5 0 000-1h-7A.5.5 0 004 1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.258 6.563a.5.5 0 01.507.013l4 2.5a.5.5 0 010 .848l-4 2.5A.5.5 0 016 12V7a.5.5 0 01.258-.437z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCollection = /*#__PURE__*/makeIcon('Collection', '<path fill-rule="evenodd" d="M14.5 13.5h-13A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5zm-13 1A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5h-13zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3zm2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1z"/>'); // eslint-disable-next-line
 
-var BIconCollectionPlayFill = /*#__PURE__*/makeIcon('CollectionPlayFill', '<path fill-rule="evenodd" d="M1.5 14.5A1.5 1.5 0 010 13V6a1.5 1.5 0 011.5-1.5h13A1.5 1.5 0 0116 6v7a1.5 1.5 0 01-1.5 1.5h-13zm5.265-7.924A.5.5 0 006 7v5a.5.5 0 00.765.424l4-2.5a.5.5 0 000-.848l-4-2.5zM2 3a.5.5 0 00.5.5h11a.5.5 0 000-1h-11A.5.5 0 002 3zm2-2a.5.5 0 00.5.5h7a.5.5 0 000-1h-7A.5.5 0 004 1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCollectionFill = /*#__PURE__*/makeIcon('CollectionFill', '<rect width="16" height="10" rx="1.5" transform="matrix(1 0 0 -1 0 14.5)"/><path fill-rule="evenodd" d="M2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3zm2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1z"/>'); // eslint-disable-next-line
 
-var BIconColumns = /*#__PURE__*/makeIcon('Columns', '<path fill-rule="evenodd" d="M15 2H1v12h14V2zM1 1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V2a1 1 0 00-1-1H1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 14V2h1v12h-1zm0-8H1V5h6.5v1zm7.5 5H8.5v-1H15v1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCollectionPlay = /*#__PURE__*/makeIcon('CollectionPlay', '<path fill-rule="evenodd" d="M14.5 13.5h-13A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5zm-13 1A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5h-13zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3zm2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1z"/><path fill-rule="evenodd" d="M6.258 6.563a.5.5 0 0 1 .507.013l4 2.5a.5.5 0 0 1 0 .848l-4 2.5A.5.5 0 0 1 6 12V7a.5.5 0 0 1 .258-.437z"/>'); // eslint-disable-next-line
 
-var BIconColumnsGap = /*#__PURE__*/makeIcon('ColumnsGap', '<path fill-rule="evenodd" d="M6 1H1v3h5V1zM1 0a1 1 0 00-1 1v3a1 1 0 001 1h5a1 1 0 001-1V1a1 1 0 00-1-1H1zm14 12h-5v3h5v-3zm-5-1a1 1 0 00-1 1v3a1 1 0 001 1h5a1 1 0 001-1v-3a1 1 0 00-1-1h-5zM6 8H1v7h5V8zM1 7a1 1 0 00-1 1v7a1 1 0 001 1h5a1 1 0 001-1V8a1 1 0 00-1-1H1zm14-6h-5v7h5V1zm-5-1a1 1 0 00-1 1v7a1 1 0 001 1h5a1 1 0 001-1V1a1 1 0 00-1-1h-5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCollectionPlayFill = /*#__PURE__*/makeIcon('CollectionPlayFill', '<path fill-rule="evenodd" d="M1.5 14.5A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5h-13zm5.265-7.924A.5.5 0 0 0 6 7v5a.5.5 0 0 0 .765.424l4-2.5a.5.5 0 0 0 0-.848l-4-2.5zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3zm2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1z"/>'); // eslint-disable-next-line
 
-var BIconCommand = /*#__PURE__*/makeIcon('Command', '<path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 003.5 5H5V3.5a1.5 1.5 0 10-3 0zM6 6V3.5A2.5 2.5 0 103.5 6H6zm8-2.5A1.5 1.5 0 0112.5 5H11V3.5a1.5 1.5 0 013 0zM10 6V3.5A2.5 2.5 0 1112.5 6H10zm-8 6.5A1.5 1.5 0 013.5 11H5v1.5a1.5 1.5 0 01-3 0zM6 10v2.5A2.5 2.5 0 113.5 10H6zm8 2.5a1.5 1.5 0 00-1.5-1.5H11v1.5a1.5 1.5 0 003 0zM10 10v2.5a2.5 2.5 0 102.5-2.5H10z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 6H6v4h4V6zM5 5v6h6V5H5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconColumns = /*#__PURE__*/makeIcon('Columns', '<path fill-rule="evenodd" d="M15 2H1v12h14V2zM1 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H1z"/><path fill-rule="evenodd" d="M7.5 14V2h1v12h-1zm0-8H1V5h6.5v1zm7.5 5H8.5v-1H15v1z"/>'); // eslint-disable-next-line
 
-var BIconCompass = /*#__PURE__*/makeIcon('Compass', '<path fill-rule="evenodd" d="M8 15.016a6.5 6.5 0 100-13 6.5 6.5 0 000 13zm0 1a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" clip-rule="evenodd"/><path d="M6 1a1 1 0 011-1h2a1 1 0 010 2H7a1 1 0 01-1-1zm.94 6.44l4.95-2.83-2.83 4.95-4.95 2.83 2.83-4.95z"/>'); // eslint-disable-next-line
+var BIconColumnsGap = /*#__PURE__*/makeIcon('ColumnsGap', '<path fill-rule="evenodd" d="M6 1H1v3h5V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H1zm14 12h-5v3h5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5zM6 8H1v7h5V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H1zm14-6h-5v7h5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1h-5z"/>'); // eslint-disable-next-line
 
-var BIconCone = /*#__PURE__*/makeIcon('Cone', '<path d="M7.03 1.88c.252-1.01 1.688-1.01 1.94 0L12 14H4L7.03 1.88z"/><path fill-rule="evenodd" d="M1.5 14a.5.5 0 01.5-.5h12a.5.5 0 010 1H2a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCommand = /*#__PURE__*/makeIcon('Command', '<path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 0 0 3.5 5H5V3.5a1.5 1.5 0 1 0-3 0zM6 6V3.5A2.5 2.5 0 1 0 3.5 6H6zm8-2.5A1.5 1.5 0 0 1 12.5 5H11V3.5a1.5 1.5 0 0 1 3 0zM10 6V3.5A2.5 2.5 0 1 1 12.5 6H10zm-8 6.5A1.5 1.5 0 0 1 3.5 11H5v1.5a1.5 1.5 0 0 1-3 0zM6 10v2.5A2.5 2.5 0 1 1 3.5 10H6zm8 2.5a1.5 1.5 0 0 0-1.5-1.5H11v1.5a1.5 1.5 0 0 0 3 0zM10 10v2.5a2.5 2.5 0 1 0 2.5-2.5H10z"/><path fill-rule="evenodd" d="M10 6H6v4h4V6zM5 5v6h6V5H5z"/>'); // eslint-disable-next-line
 
-var BIconConeStriped = /*#__PURE__*/makeIcon('ConeStriped', '<path fill-rule="evenodd" d="M7.879 11.015a.5.5 0 01.242 0l6 1.5a.5.5 0 01.037.96l-6 2a.499.499 0 01-.316 0l-6-2a.5.5 0 01.037-.96l6-1.5z" clip-rule="evenodd"/><path d="M11.885 12.538l-.72-2.877C10.303 9.873 9.201 10 8 10s-2.303-.127-3.165-.339l-.72 2.877c-.073.292-.002.6.256.756C4.86 13.589 5.916 14 8 14s3.14-.411 3.63-.706c.257-.155.328-.464.255-.756zM9.97 4.88l.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.159-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12zm-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098z"/>'); // eslint-disable-next-line
+var BIconCompass = /*#__PURE__*/makeIcon('Compass', '<path fill-rule="evenodd" d="M8 15.016a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zm0 1a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15z"/><path d="M6 1a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H7a1 1 0 0 1-1-1zm.94 6.44l4.95-2.83-2.83 4.95-4.95 2.83 2.83-4.95z"/>'); // eslint-disable-next-line
 
-var BIconController = /*#__PURE__*/makeIcon('Controller', '<path fill-rule="evenodd" d="M11.119 2.693c.904.19 1.75.495 2.235.98.407.408.779 1.05 1.094 1.772.32.733.599 1.591.805 2.466.206.875.34 1.78.364 2.606.024.815-.059 1.602-.328 2.21a1.42 1.42 0 01-1.445.83c-.636-.067-1.115-.394-1.513-.773a11.307 11.307 0 01-.739-.809c-.126-.147-.25-.291-.368-.422-.728-.804-1.597-1.527-3.224-1.527-1.627 0-2.496.723-3.224 1.527-.119.131-.242.275-.368.422-.243.283-.494.576-.739.81-.398.378-.877.705-1.513.772a1.42 1.42 0 01-1.445-.83c-.27-.608-.352-1.395-.329-2.21.024-.826.16-1.73.365-2.606.206-.875.486-1.733.805-2.466.315-.722.687-1.364 1.094-1.772.486-.485 1.331-.79 2.235-.98.932-.196 2.03-.292 3.119-.292 1.089 0 2.187.096 3.119.292zm-6.032.979c-.877.185-1.469.443-1.733.708-.276.276-.587.783-.885 1.465a13.748 13.748 0 00-.748 2.295 12.351 12.351 0 00-.339 2.406c-.022.755.062 1.368.243 1.776a.42.42 0 00.426.24c.327-.034.61-.199.929-.502.212-.202.4-.423.615-.674.133-.156.276-.323.44-.505C4.861 9.97 5.978 9.026 8 9.026s3.139.943 3.965 1.855c.164.182.307.35.44.505.214.25.403.472.615.674.318.303.601.468.929.503a.42.42 0 00.426-.241c.18-.408.265-1.02.243-1.776a12.354 12.354 0 00-.339-2.406 13.753 13.753 0 00-.748-2.295c-.298-.682-.61-1.19-.885-1.465-.264-.265-.856-.523-1.733-.708-.85-.179-1.877-.27-2.913-.27-1.036 0-2.063.091-2.913.27z" clip-rule="evenodd"/><path d="M11.5 6.026a.5.5 0 11-1 0 .5.5 0 011 0zm-1 1a.5.5 0 11-1 0 .5.5 0 011 0zm2 0a.5.5 0 11-1 0 .5.5 0 011 0zm-1 1a.5.5 0 11-1 0 .5.5 0 011 0zm-7-2.5h1v3h-1v-3z"/><path d="M3.5 6.526h3v1h-3v-1zM3.051 3.26a.5.5 0 01.354-.613l1.932-.518a.5.5 0 01.258.966l-1.932.518a.5.5 0 01-.612-.354zm9.976 0a.5.5 0 00-.353-.613l-1.932-.518a.5.5 0 10-.259.966l1.932.518a.5.5 0 00.612-.354z"/>'); // eslint-disable-next-line
+var BIconCone = /*#__PURE__*/makeIcon('Cone', '<path d="M7.03 1.88c.252-1.01 1.688-1.01 1.94 0L12 14H4L7.03 1.88z"/><path fill-rule="evenodd" d="M1.5 14a.5.5 0 0 1 .5-.5h12a.5.5 0 0 1 0 1H2a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconCreditCard = /*#__PURE__*/makeIcon('CreditCard', '<path fill-rule="evenodd" d="M14 3H2a1 1 0 00-1 1v8a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM2 2a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H2z" clip-rule="evenodd"/><rect width="3" height="3" x="2" y="9" rx="1"/><path d="M1 5h14v2H1z"/>'); // eslint-disable-next-line
+var BIconConeStriped = /*#__PURE__*/makeIcon('ConeStriped', '<path fill-rule="evenodd" d="M7.879 11.015a.5.5 0 0 1 .242 0l6 1.5a.5.5 0 0 1 .037.96l-6 2a.499.499 0 0 1-.316 0l-6-2a.5.5 0 0 1 .037-.96l6-1.5z"/><path d="M11.885 12.538l-.72-2.877C10.303 9.873 9.201 10 8 10s-2.303-.127-3.165-.339l-.72 2.877c-.073.292-.002.6.256.756C4.86 13.589 5.916 14 8 14s3.14-.411 3.63-.706c.257-.155.328-.464.255-.756zM9.97 4.88l.953 3.811C10.159 8.878 9.14 9 8 9c-1.14 0-2.159-.122-2.923-.309L6.03 4.88C6.635 4.957 7.3 5 8 5s1.365-.043 1.97-.12zm-.245-.978L8.97.88C8.718-.13 7.282-.13 7.03.88L6.275 3.9C6.8 3.965 7.382 4 8 4c.618 0 1.2-.036 1.725-.098z"/>'); // eslint-disable-next-line
 
-var BIconCrop = /*#__PURE__*/makeIcon('Crop', '<path fill-rule="evenodd" d="M3.5.5A.5.5 0 014 1v13h13a.5.5 0 010 1H3.5a.5.5 0 01-.5-.5V1a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M.5 3.5A.5.5 0 011 3h2.5a.5.5 0 010 1H1a.5.5 0 01-.5-.5zm5.5 0a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v8a.5.5 0 01-1 0V4H6.5a.5.5 0 01-.5-.5zM14.5 14a.5.5 0 01.5.5V17a.5.5 0 01-1 0v-2.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconController = /*#__PURE__*/makeIcon('Controller', '<path fill-rule="evenodd" d="M11.119 2.693c.904.19 1.75.495 2.235.98.407.408.779 1.05 1.094 1.772.32.733.599 1.591.805 2.466.206.875.34 1.78.364 2.606.024.815-.059 1.602-.328 2.21a1.42 1.42 0 0 1-1.445.83c-.636-.067-1.115-.394-1.513-.773a11.307 11.307 0 0 1-.739-.809c-.126-.147-.25-.291-.368-.422-.728-.804-1.597-1.527-3.224-1.527-1.627 0-2.496.723-3.224 1.527-.119.131-.242.275-.368.422-.243.283-.494.576-.739.81-.398.378-.877.705-1.513.772a1.42 1.42 0 0 1-1.445-.83c-.27-.608-.352-1.395-.329-2.21.024-.826.16-1.73.365-2.606.206-.875.486-1.733.805-2.466.315-.722.687-1.364 1.094-1.772.486-.485 1.331-.79 2.235-.98.932-.196 2.03-.292 3.119-.292 1.089 0 2.187.096 3.119.292zm-6.032.979c-.877.185-1.469.443-1.733.708-.276.276-.587.783-.885 1.465a13.748 13.748 0 0 0-.748 2.295 12.351 12.351 0 0 0-.339 2.406c-.022.755.062 1.368.243 1.776a.42.42 0 0 0 .426.24c.327-.034.61-.199.929-.502.212-.202.4-.423.615-.674.133-.156.276-.323.44-.505C4.861 9.97 5.978 9.026 8 9.026s3.139.943 3.965 1.855c.164.182.307.35.44.505.214.25.403.472.615.674.318.303.601.468.929.503a.42.42 0 0 0 .426-.241c.18-.408.265-1.02.243-1.776a12.354 12.354 0 0 0-.339-2.406 13.753 13.753 0 0 0-.748-2.295c-.298-.682-.61-1.19-.885-1.465-.264-.265-.856-.523-1.733-.708-.85-.179-1.877-.27-2.913-.27-1.036 0-2.063.091-2.913.27z"/><path d="M11.5 6.026a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1 1a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm2 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1 1a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-7-2.5h1v3h-1v-3z"/><path d="M3.5 6.526h3v1h-3v-1zM3.051 3.26a.5.5 0 0 1 .354-.613l1.932-.518a.5.5 0 0 1 .258.966l-1.932.518a.5.5 0 0 1-.612-.354zm9.976 0a.5.5 0 0 0-.353-.613l-1.932-.518a.5.5 0 1 0-.259.966l1.932.518a.5.5 0 0 0 .612-.354z"/>'); // eslint-disable-next-line
 
-var BIconCursor = /*#__PURE__*/makeIcon('Cursor', '<path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 01.103.557L8.528 15.467a.5.5 0 01-.917-.007L5.57 10.694.803 8.652a.5.5 0 01-.006-.916l12.728-5.657a.5.5 0 01.556.103zM2.25 8.184l3.897 1.67a.5.5 0 01.262.263l1.67 3.897L12.743 3.52 2.25 8.184z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCreditCard = /*#__PURE__*/makeIcon('CreditCard', '<path fill-rule="evenodd" d="M14 3H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2z"/><rect width="3" height="3" x="2" y="9" rx="1"/><path d="M1 5h14v2H1z"/>'); // eslint-disable-next-line
 
-var BIconCursorFill = /*#__PURE__*/makeIcon('CursorFill', '<path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 01.103.557L8.528 15.467a.5.5 0 01-.917-.007L5.57 10.694.803 8.652a.5.5 0 01-.006-.916l12.728-5.657a.5.5 0 01.556.103z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCrop = /*#__PURE__*/makeIcon('Crop', '<path fill-rule="evenodd" d="M3.5.5A.5.5 0 0 1 4 1v13h13a.5.5 0 0 1 0 1H3.5a.5.5 0 0 1-.5-.5V1a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M.5 3.5A.5.5 0 0 1 1 3h2.5a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.5-.5zm5.5 0a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4H6.5a.5.5 0 0 1-.5-.5zM14.5 14a.5.5 0 0 1 .5.5V17a.5.5 0 0 1-1 0v-2.5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconCursorText = /*#__PURE__*/makeIcon('CursorText', '<path fill-rule="evenodd" d="M5 2a.5.5 0 01.5-.5c.862 0 1.573.287 2.06.566.174.099.321.198.44.286.119-.088.266-.187.44-.286A4.165 4.165 0 0110.5 1.5a.5.5 0 010 1c-.638 0-1.177.213-1.564.434a3.49 3.49 0 00-.436.294V7.5H9a.5.5 0 010 1h-.5v4.272c.1.08.248.187.436.294.387.221.926.434 1.564.434a.5.5 0 010 1 4.165 4.165 0 01-2.06-.566A4.561 4.561 0 018 13.65a4.561 4.561 0 01-.44.285 4.165 4.165 0 01-2.06.566.5.5 0 010-1c.638 0 1.177-.213 1.564-.434.188-.107.335-.214.436-.294V8.5H7a.5.5 0 010-1h.5V3.228a3.49 3.49 0 00-.436-.294A3.166 3.166 0 005.5 2.5.5.5 0 015 2zm3.352 1.355zm-.704 9.29z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCup = /*#__PURE__*/makeIcon('Cup', '<path fill-rule="evenodd" d="M12 4H4v8a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4zM3 3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V3H3z"/><path fill-rule="evenodd" d="M14.5 5.5h-2v-1h2A1.5 1.5 0 0 1 16 6v4a1.5 1.5 0 0 1-1.5 1.5h-2v-1h2a.5.5 0 0 0 .5-.5V6a.5.5 0 0 0-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconDash = /*#__PURE__*/makeIcon('Dash', '<path fill-rule="evenodd" d="M3.5 8a.5.5 0 01.5-.5h8a.5.5 0 010 1H4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCursor = /*#__PURE__*/makeIcon('Cursor', '<path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52 2.25 8.184z"/>'); // eslint-disable-next-line
 
-var BIconDashCircle = /*#__PURE__*/makeIcon('DashCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.5 8a.5.5 0 01.5-.5h8a.5.5 0 010 1H4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCursorFill = /*#__PURE__*/makeIcon('CursorFill', '<path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>'); // eslint-disable-next-line
 
-var BIconDashCircleFill = /*#__PURE__*/makeIcon('DashCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zM4 7.5a.5.5 0 000 1h8a.5.5 0 000-1H4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconCursorText = /*#__PURE__*/makeIcon('CursorText', '<path fill-rule="evenodd" d="M5 2a.5.5 0 0 1 .5-.5c.862 0 1.573.287 2.06.566.174.099.321.198.44.286.119-.088.266-.187.44-.286A4.165 4.165 0 0 1 10.5 1.5a.5.5 0 0 1 0 1c-.638 0-1.177.213-1.564.434a3.49 3.49 0 0 0-.436.294V7.5H9a.5.5 0 0 1 0 1h-.5v4.272c.1.08.248.187.436.294.387.221.926.434 1.564.434a.5.5 0 0 1 0 1 4.165 4.165 0 0 1-2.06-.566A4.561 4.561 0 0 1 8 13.65a4.561 4.561 0 0 1-.44.285 4.165 4.165 0 0 1-2.06.566.5.5 0 0 1 0-1c.638 0 1.177-.213 1.564-.434.188-.107.335-.214.436-.294V8.5H7a.5.5 0 0 1 0-1h.5V3.228a3.49 3.49 0 0 0-.436-.294A3.166 3.166 0 0 0 5.5 2.5.5.5 0 0 1 5 2zm3.352 1.355zm-.704 9.29z"/>'); // eslint-disable-next-line
 
-var BIconDashSquare = /*#__PURE__*/makeIcon('DashSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.5 8a.5.5 0 01.5-.5h8a.5.5 0 010 1H4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDash = /*#__PURE__*/makeIcon('Dash', '<path fill-rule="evenodd" d="M3.5 8a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconDashSquareFill = /*#__PURE__*/makeIcon('DashSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2zm2 7.5a.5.5 0 000 1h8a.5.5 0 000-1H4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDashCircle = /*#__PURE__*/makeIcon('DashCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M3.5 8a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconDiamond = /*#__PURE__*/makeIcon('Diamond', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 010-2.098L6.95.435zm1.4.7a.495.495 0 00-.7 0L1.134 7.65a.495.495 0 000 .7l6.516 6.516a.495.495 0 00.7 0l6.516-6.516a.495.495 0 000-.7L8.35 1.134z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDashCircleFill = /*#__PURE__*/makeIcon('DashCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4 7.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1H4z"/>'); // eslint-disable-next-line
 
-var BIconDiamondFill = /*#__PURE__*/makeIcon('DiamondFill', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 010-2.098L6.95.435z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDashSquare = /*#__PURE__*/makeIcon('DashSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M3.5 8a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconDiamondHalf = /*#__PURE__*/makeIcon('DiamondHalf', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 010-2.098L6.95.435zM8 .989a.493.493 0 00-.35.145L1.134 7.65a.495.495 0 000 .7l6.516 6.516a.493.493 0 00.35.145V.989z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDashSquareFill = /*#__PURE__*/makeIcon('DashSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm2 7.5a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1H4z"/>'); // eslint-disable-next-line
 
-var BIconDisplay = /*#__PURE__*/makeIcon('Display', '<path d="M5.75 13.5c.167-.333.25-.833.25-1.5h4c0 .667.083 1.167.25 1.5H11a.5.5 0 010 1H5a.5.5 0 010-1h.75z"/><path fill-rule="evenodd" d="M13.991 3H2c-.325 0-.502.078-.602.145a.758.758 0 00-.254.302A1.46 1.46 0 001 4.01V10c0 .325.078.502.145.602.07.105.17.188.302.254a1.464 1.464 0 00.538.143L2.01 11H14c.325 0 .502-.078.602-.145a.758.758 0 00.254-.302 1.464 1.464 0 00.143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.757.757 0 00-.302-.254A1.46 1.46 0 0013.99 3zM14 2H2C0 2 0 4 0 4v6c0 2 2 2 2 2h12c2 0 2-2 2-2V4c0-2-2-2-2-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDiamond = /*#__PURE__*/makeIcon('Diamond', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 0 1 0-2.098L6.95.435zm1.4.7a.495.495 0 0 0-.7 0L1.134 7.65a.495.495 0 0 0 0 .7l6.516 6.516a.495.495 0 0 0 .7 0l6.516-6.516a.495.495 0 0 0 0-.7L8.35 1.134z"/>'); // eslint-disable-next-line
 
-var BIconDisplayFill = /*#__PURE__*/makeIcon('DisplayFill', '<path d="M5.75 13.5c.167-.333.25-.833.25-1.5h4c0 .667.083 1.167.25 1.5H11a.5.5 0 010 1H5a.5.5 0 010-1h.75z"/><path fill-rule="evenodd" d="M13.991 3H2c-.325 0-.502.078-.602.145a.758.758 0 00-.254.302A1.46 1.46 0 001 4.01V10c0 .325.078.502.145.602.07.105.17.188.302.254a1.464 1.464 0 00.538.143L2.01 11H14c.325 0 .502-.078.602-.145a.758.758 0 00.254-.302 1.464 1.464 0 00.143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.757.757 0 00-.302-.254A1.46 1.46 0 0013.99 3zM14 2H2C0 2 0 4 0 4v6c0 2 2 2 2 2h12c2 0 2-2 2-2V4c0-2-2-2-2-2z" clip-rule="evenodd"/><path d="M2 4h12v6H2z"/>'); // eslint-disable-next-line
+var BIconDiamondFill = /*#__PURE__*/makeIcon('DiamondFill', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 0 1 0-2.098L6.95.435z"/>'); // eslint-disable-next-line
 
-var BIconDot = /*#__PURE__*/makeIcon('Dot', '<path fill-rule="evenodd" d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDiamondHalf = /*#__PURE__*/makeIcon('DiamondHalf', '<path fill-rule="evenodd" d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM8 .989c.127 0 .253.049.35.145l6.516 6.516a.495.495 0 0 1 0 .7L8.35 14.866a.493.493 0 0 1-.35.145V.989z"/>'); // eslint-disable-next-line
 
-var BIconDownload = /*#__PURE__*/makeIcon('Download', '<path fill-rule="evenodd" d="M.5 8a.5.5 0 01.5.5V12a1 1 0 001 1h12a1 1 0 001-1V8.5a.5.5 0 011 0V12a2 2 0 01-2 2H2a2 2 0 01-2-2V8.5A.5.5 0 01.5 8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 7.5a.5.5 0 01.707 0L8 9.793 10.293 7.5a.5.5 0 11.707.707l-2.646 2.647a.5.5 0 01-.708 0L5 8.207A.5.5 0 015 7.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 1a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8A.5.5 0 018 1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDisplay = /*#__PURE__*/makeIcon('Display', '<path d="M5.75 13.5c.167-.333.25-.833.25-1.5h4c0 .667.083 1.167.25 1.5H11a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1h.75z"/><path fill-rule="evenodd" d="M13.991 3H2c-.325 0-.502.078-.602.145a.758.758 0 0 0-.254.302A1.46 1.46 0 0 0 1 4.01V10c0 .325.078.502.145.602.07.105.17.188.302.254a1.464 1.464 0 0 0 .538.143L2.01 11H14c.325 0 .502-.078.602-.145a.758.758 0 0 0 .254-.302 1.464 1.464 0 0 0 .143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.757.757 0 0 0-.302-.254A1.46 1.46 0 0 0 13.99 3zM14 2H2C0 2 0 4 0 4v6c0 2 2 2 2 2h12c2 0 2-2 2-2V4c0-2-2-2-2-2z"/>'); // eslint-disable-next-line
 
-var BIconDroplet = /*#__PURE__*/makeIcon('Droplet', '<path fill-rule="evenodd" d="M7.21.8C7.69.295 8 0 8 0c.109.363.234.708.371 1.038.812 1.946 2.073 3.35 3.197 4.6C12.878 7.096 14 8.345 14 10a6 6 0 01-12 0C2 6.668 5.58 2.517 7.21.8zm.413 1.021A31.25 31.25 0 005.794 3.99c-.726.95-1.436 2.008-1.96 3.07C3.304 8.133 3 9.138 3 10a5 5 0 0010 0c0-1.201-.796-2.157-2.181-3.7l-.03-.032C9.75 5.11 8.5 3.72 7.623 1.82z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.553 7.776c.82-1.641 1.717-2.753 2.093-3.13l.708.708c-.29.29-1.128 1.311-1.907 2.87l-.894-.448z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDisplayFill = /*#__PURE__*/makeIcon('DisplayFill', '<path d="M5.75 13.5c.167-.333.25-.833.25-1.5h4c0 .667.083 1.167.25 1.5H11a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1h.75z"/><path fill-rule="evenodd" d="M13.991 3H2c-.325 0-.502.078-.602.145a.758.758 0 0 0-.254.302A1.46 1.46 0 0 0 1 4.01V10c0 .325.078.502.145.602.07.105.17.188.302.254a1.464 1.464 0 0 0 .538.143L2.01 11H14c.325 0 .502-.078.602-.145a.758.758 0 0 0 .254-.302 1.464 1.464 0 0 0 .143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.757.757 0 0 0-.302-.254A1.46 1.46 0 0 0 13.99 3zM14 2H2C0 2 0 4 0 4v6c0 2 2 2 2 2h12c2 0 2-2 2-2V4c0-2-2-2-2-2z"/><path d="M2 4h12v6H2z"/>'); // eslint-disable-next-line
 
-var BIconDropletFill = /*#__PURE__*/makeIcon('DropletFill', '<path fill-rule="evenodd" d="M8 16a6 6 0 006-6c0-1.655-1.122-2.904-2.432-4.362C10.254 4.176 8.75 2.503 8 0c0 0-6 5.686-6 10a6 6 0 006 6zM6.646 4.646c-.376.377-1.272 1.489-2.093 3.13l.894.448c.78-1.559 1.616-2.58 1.907-2.87l-.708-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDoorClosed = /*#__PURE__*/makeIcon('DoorClosed', '<path fill-rule="evenodd" d="M3 2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2zm1 0v13h8V2H4z"/><path d="M7 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/><path fill-rule="evenodd" d="M1 15.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconDropletHalf = /*#__PURE__*/makeIcon('DropletHalf', '<path fill-rule="evenodd" d="M7.21.8C7.69.295 8 0 8 0c.109.363.234.708.371 1.038.812 1.946 2.073 3.35 3.197 4.6C12.878 7.096 14 8.345 14 10a6 6 0 01-12 0C2 6.668 5.58 2.517 7.21.8zm.413 1.021A31.25 31.25 0 005.794 3.99c-.726.95-1.436 2.008-1.96 3.07C3.304 8.133 3 9.138 3 10a5 5 0 0010 0c0-1.201-.796-2.157-2.181-3.7l-.03-.032C9.75 5.11 8.5 3.72 7.623 1.82z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.553 7.776c.82-1.641 1.717-2.753 2.093-3.13l.708.708c-.29.29-1.128 1.311-1.907 2.87l-.894-.448z" clip-rule="evenodd"/><path d="M14 10a6 6 0 01-12 0s2.5 2.5 6.5.5S14 10 14 10z"/>'); // eslint-disable-next-line
+var BIconDoorClosedFill = /*#__PURE__*/makeIcon('DoorClosedFill', '<path fill-rule="evenodd" d="M4 1a1 1 0 0 0-1 1v13H1.5a.5.5 0 0 0 0 1h13a.5.5 0 0 0 0-1H13V2a1 1 0 0 0-1-1H4zm2 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
 
-var BIconEgg = /*#__PURE__*/makeIcon('Egg', '<path fill-rule="evenodd" d="M8 15a5 5 0 005-5c0-1.956-.69-4.286-1.742-6.12-.524-.913-1.112-1.658-1.704-2.164C8.956 1.206 8.428 1 8 1c-.428 0-.956.206-1.554.716-.592.506-1.18 1.251-1.704 2.164C3.69 5.714 3 8.044 3 10a5 5 0 005 5zm0 1a6 6 0 006-6c0-4.314-3-10-6-10S2 5.686 2 10a6 6 0 006 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDot = /*#__PURE__*/makeIcon('Dot', '<path fill-rule="evenodd" d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>'); // eslint-disable-next-line
 
-var BIconEggFill = /*#__PURE__*/makeIcon('EggFill', '<path d="M14 10a6 6 0 01-12 0C2 5.686 5 0 8 0s6 5.686 6 10z"/>'); // eslint-disable-next-line
+var BIconDownload = /*#__PURE__*/makeIcon('Download', '<path fill-rule="evenodd" d="M.5 8a.5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8.5a.5.5 0 0 1 1 0V12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V8.5A.5.5 0 0 1 .5 8z"/><path fill-rule="evenodd" d="M5 7.5a.5.5 0 0 1 .707 0L8 9.793 10.293 7.5a.5.5 0 1 1 .707.707l-2.646 2.647a.5.5 0 0 1-.708 0L5 8.207A.5.5 0 0 1 5 7.5z"/><path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8A.5.5 0 0 1 8 1z"/>'); // eslint-disable-next-line
 
-var BIconEggFried = /*#__PURE__*/makeIcon('EggFried', '<path fill-rule="evenodd" d="M13.665 6.113a1 1 0 01-.667-.977L13 5a4 4 0 00-6.483-3.136 1 1 0 01-.8.2 4 4 0 00-3.693 6.61 1 1 0 01.2 1 4 4 0 006.67 4.087 1 1 0 011.262-.152 2.5 2.5 0 003.715-2.905 1 1 0 01.341-1.113 2.001 2.001 0 00-.547-3.478zM14 5c0 .057 0 .113-.003.17a3.001 3.001 0 01.822 5.216 3.5 3.5 0 01-5.201 4.065 5 5 0 01-8.336-5.109A5 5 0 015.896 1.08 5 5 0 0114 5z" clip-rule="evenodd"/><circle cx="8" cy="8" r="3"/>'); // eslint-disable-next-line
+var BIconDroplet = /*#__PURE__*/makeIcon('Droplet', '<path fill-rule="evenodd" d="M7.21.8C7.69.295 8 0 8 0c.109.363.234.708.371 1.038.812 1.946 2.073 3.35 3.197 4.6C12.878 7.096 14 8.345 14 10a6 6 0 0 1-12 0C2 6.668 5.58 2.517 7.21.8zm.413 1.021A31.25 31.25 0 0 0 5.794 3.99c-.726.95-1.436 2.008-1.96 3.07C3.304 8.133 3 9.138 3 10a5 5 0 0 0 10 0c0-1.201-.796-2.157-2.181-3.7l-.03-.032C9.75 5.11 8.5 3.72 7.623 1.82z"/><path fill-rule="evenodd" d="M4.553 7.776c.82-1.641 1.717-2.753 2.093-3.13l.708.708c-.29.29-1.128 1.311-1.907 2.87l-.894-.448z"/>'); // eslint-disable-next-line
 
-var BIconEject = /*#__PURE__*/makeIcon('Eject', '<path fill-rule="evenodd" d="M7.27 1.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H1.656C.78 9.5.326 8.455.926 7.816L7.27 1.047zM14.346 8.5L8 1.731 1.654 8.5h12.692zM.5 11.5a1 1 0 011-1h13a1 1 0 011 1v1a1 1 0 01-1 1h-13a1 1 0 01-1-1v-1zm14 0h-13v1h13v-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDropletFill = /*#__PURE__*/makeIcon('DropletFill', '<path fill-rule="evenodd" d="M8 16a6 6 0 0 0 6-6c0-1.655-1.122-2.904-2.432-4.362C10.254 4.176 8.75 2.503 8 0c0 0-6 5.686-6 10a6 6 0 0 0 6 6zM6.646 4.646c-.376.377-1.272 1.489-2.093 3.13l.894.448c.78-1.559 1.616-2.58 1.907-2.87l-.708-.708z"/>'); // eslint-disable-next-line
 
-var BIconEjectFill = /*#__PURE__*/makeIcon('EjectFill', '<path fill-rule="evenodd" d="M7.27 1.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H1.656C.78 9.5.326 8.455.926 7.816L7.27 1.047zM.5 11.5a1 1 0 011-1h13a1 1 0 011 1v1a1 1 0 01-1 1h-13a1 1 0 01-1-1v-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconDropletHalf = /*#__PURE__*/makeIcon('DropletHalf', '<path fill-rule="evenodd" d="M7.21.8C7.69.295 8 0 8 0c.109.363.234.708.371 1.038.812 1.946 2.073 3.35 3.197 4.6C12.878 7.096 14 8.345 14 10a6 6 0 0 1-12 0C2 6.668 5.58 2.517 7.21.8zm.413 1.021A31.25 31.25 0 0 0 5.794 3.99c-.726.95-1.436 2.008-1.96 3.07C3.304 8.133 3 9.138 3 10a5 5 0 0 0 10 0c0-1.201-.796-2.157-2.181-3.7l-.03-.032C9.75 5.11 8.5 3.72 7.623 1.82z"/><path fill-rule="evenodd" d="M4.553 7.776c.82-1.641 1.717-2.753 2.093-3.13l.708.708c-.29.29-1.128 1.311-1.907 2.87l-.894-.448z"/><path d="M14 10a6 6 0 0 1-12 0s2.5 2.5 6.5.5S14 10 14 10z"/>'); // eslint-disable-next-line
 
-var BIconEnvelope = /*#__PURE__*/makeIcon('Envelope', '<path fill-rule="evenodd" d="M14 3H2a1 1 0 00-1 1v8a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM2 2a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M.071 4.243a.5.5 0 01.686-.172L8 8.417l7.243-4.346a.5.5 0 01.514.858L8 9.583.243 4.93a.5.5 0 01-.172-.686z" clip-rule="evenodd"/><path d="M6.752 8.932l.432-.252-.504-.864-.432.252.504.864zm-6 3.5l6-3.5-.504-.864-6 3.5.504.864zm8.496-3.5l-.432-.252.504-.864.432.252-.504.864zm6 3.5l-6-3.5.504-.864 6 3.5-.504.864z"/>'); // eslint-disable-next-line
+var BIconEgg = /*#__PURE__*/makeIcon('Egg', '<path fill-rule="evenodd" d="M8 15a5 5 0 0 0 5-5c0-1.956-.69-4.286-1.742-6.12-.524-.913-1.112-1.658-1.704-2.164C8.956 1.206 8.428 1 8 1c-.428 0-.956.206-1.554.716-.592.506-1.18 1.251-1.704 2.164C3.69 5.714 3 8.044 3 10a5 5 0 0 0 5 5zm0 1a6 6 0 0 0 6-6c0-4.314-3-10-6-10S2 5.686 2 10a6 6 0 0 0 6 6z"/>'); // eslint-disable-next-line
 
-var BIconEnvelopeFill = /*#__PURE__*/makeIcon('EnvelopeFill', '<path d="M.05 3.555L8 8.414l7.95-4.859A2 2 0 0014 2H2A2 2 0 00.05 3.555zM16 4.697l-5.875 3.59L16 11.743V4.697zm-.168 8.108L9.157 8.879 8 9.586l-1.157-.707-6.675 3.926A2 2 0 002 14h12a2 2 0 001.832-1.195zM0 11.743l5.875-3.456L0 4.697v7.046z"/>'); // eslint-disable-next-line
+var BIconEggFill = /*#__PURE__*/makeIcon('EggFill', '<path d="M14 10a6 6 0 0 1-12 0C2 5.686 5 0 8 0s6 5.686 6 10z"/>'); // eslint-disable-next-line
 
-var BIconEnvelopeOpen = /*#__PURE__*/makeIcon('EnvelopeOpen', '<path fill-rule="evenodd" d="M.243 6.929l.514-.858L8 10.417l7.243-4.346.514.858L8 11.583.243 6.93z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.184 10.68L.752 14.432l-.504-.864L6.68 9.816l.504.864zm1.632 0l6.432 3.752.504-.864L9.32 9.816l-.504.864z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.47 1.318a1 1 0 00-.94 0l-6 3.2A1 1 0 001 5.4V14a1 1 0 001 1h12a1 1 0 001-1V5.4a1 1 0 00-.53-.882l-6-3.2zM7.06.435a2 2 0 011.882 0l6 3.2A2 2 0 0116 5.4V14a2 2 0 01-2 2H2a2 2 0 01-2-2V5.4a2 2 0 011.059-1.765l6-3.2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEggFried = /*#__PURE__*/makeIcon('EggFried', '<path fill-rule="evenodd" d="M13.665 6.113a1 1 0 0 1-.667-.977L13 5a4 4 0 0 0-6.483-3.136 1 1 0 0 1-.8.2 4 4 0 0 0-3.693 6.61 1 1 0 0 1 .2 1 4 4 0 0 0 6.67 4.087 1 1 0 0 1 1.262-.152 2.5 2.5 0 0 0 3.715-2.905 1 1 0 0 1 .341-1.113 2.001 2.001 0 0 0-.547-3.478zM14 5c0 .057 0 .113-.003.17a3.001 3.001 0 0 1 .822 5.216 3.5 3.5 0 0 1-5.201 4.065 5 5 0 0 1-8.336-5.109A5 5 0 0 1 5.896 1.08 5 5 0 0 1 14 5z"/><circle cx="8" cy="8" r="3"/>'); // eslint-disable-next-line
 
-var BIconEnvelopeOpenFill = /*#__PURE__*/makeIcon('EnvelopeOpenFill', '<path fill-rule="evenodd" d="M8.941.435a2 2 0 00-1.882 0l-6 3.2A2 2 0 000 5.4v.125l8 4.889 8-4.889V5.4a2 2 0 00-1.059-1.765l-6-3.2zM16 6.697l-5.875 3.59L16 13.743V6.697zm-.168 8.108L9.246 10.93l-.089-.052-.896.548-.261.159-.26-.16-.897-.547-.09.052-6.585 3.874A2 2 0 002 16h12a2 2 0 001.832-1.195zM0 13.743l5.875-3.456L0 6.697v7.046z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEject = /*#__PURE__*/makeIcon('Eject', '<path fill-rule="evenodd" d="M7.27 1.047a1 1 0 0 1 1.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H1.656C.78 9.5.326 8.455.926 7.816L7.27 1.047zM14.346 8.5L8 1.731 1.654 8.5h12.692zM.5 11.5a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-1zm14 0h-13v1h13v-1z"/>'); // eslint-disable-next-line
 
-var BIconExclamation = /*#__PURE__*/makeIcon('Exclamation', '<path d="M7.002 11a1 1 0 112 0 1 1 0 01-2 0zM7.1 4.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
+var BIconEjectFill = /*#__PURE__*/makeIcon('EjectFill', '<path fill-rule="evenodd" d="M7.27 1.047a1 1 0 0 1 1.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H1.656C.78 9.5.326 8.455.926 7.816L7.27 1.047zM.5 11.5a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-1z"/>'); // eslint-disable-next-line
 
-var BIconExclamationCircle = /*#__PURE__*/makeIcon('ExclamationCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path d="M7.002 11a1 1 0 112 0 1 1 0 01-2 0zM7.1 4.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
+var BIconEmojiAngry = /*#__PURE__*/makeIcon('EmojiAngry', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.498 3.498 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.498 4.498 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683z"/><path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/><path fill-rule="evenodd" d="M4.053 4.276a.5.5 0 0 1 .67-.223l2 1a.5.5 0 1 1-.447.894l-2-1a.5.5 0 0 1-.223-.67zm7.894 0a.5.5 0 0 0-.67-.223l-2 1a.5.5 0 1 0 .447.894l2-1a.5.5 0 0 0 .223-.67z"/>'); // eslint-disable-next-line
 
-var BIconExclamationCircleFill = /*#__PURE__*/makeIcon('ExclamationCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zM8 4a.905.905 0 00-.9.995l.35 3.507a.552.552 0 001.1 0l.35-3.507A.905.905 0 008 4zm.002 6a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEmojiDizzy = /*#__PURE__*/makeIcon('EmojiDizzy', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M9.146 5.146a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708.708l-.647.646.647.646a.5.5 0 0 1-.708.708l-.646-.647-.646.647a.5.5 0 1 1-.708-.708l.647-.646-.647-.646a.5.5 0 0 1 0-.708zm-5 0a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 1 1 .708.708l-.647.646.647.646a.5.5 0 1 1-.708.708L5.5 7.207l-.646.647a.5.5 0 1 1-.708-.708l.647-.646-.647-.646a.5.5 0 0 1 0-.708z"/><path d="M10 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>'); // eslint-disable-next-line
 
-var BIconExclamationDiamond = /*#__PURE__*/makeIcon('ExclamationDiamond', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 010-2.098L6.95.435zm1.4.7a.495.495 0 00-.7 0L1.134 7.65a.495.495 0 000 .7l6.516 6.516a.495.495 0 00.7 0l6.516-6.516a.495.495 0 000-.7L8.35 1.134z" clip-rule="evenodd"/><path d="M7.002 11a1 1 0 112 0 1 1 0 01-2 0zM7.1 4.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
+var BIconEmojiFrown = /*#__PURE__*/makeIcon('EmojiFrown', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.498 3.498 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.498 4.498 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683z"/><path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>'); // eslint-disable-next-line
 
-var BIconExclamationDiamondFill = /*#__PURE__*/makeIcon('ExclamationDiamondFill', '<path fill-rule="evenodd" d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM8 4a.905.905 0 00-.9.995l.35 3.507a.552.552 0 001.1 0l.35-3.507A.905.905 0 008 4zm.002 6a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEmojiLaughing = /*#__PURE__*/makeIcon('EmojiLaughing', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M12.331 9.5a1 1 0 0 1 0 1A4.998 4.998 0 0 1 8 13a4.998 4.998 0 0 1-4.33-2.5A1 1 0 0 1 4.535 9h6.93a1 1 0 0 1 .866.5z"/><path d="M7 6.5c0 .828-.448 0-1 0s-1 .828-1 0S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 0-1 0s-1 .828-1 0S9.448 5 10 5s1 .672 1 1.5z"/>'); // eslint-disable-next-line
 
-var BIconExclamationOctagon = /*#__PURE__*/makeIcon('ExclamationOctagon', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 014.893 0h6.214a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H4.893a.5.5 0 01-.353-.146L.146 11.46A.5.5 0 010 11.107V4.893a.5.5 0 01.146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z" clip-rule="evenodd"/><path d="M7.002 11a1 1 0 112 0 1 1 0 01-2 0zM7.1 4.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
+var BIconEmojiNeutral = /*#__PURE__*/makeIcon('EmojiNeutral', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/><path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>'); // eslint-disable-next-line
 
-var BIconExclamationOctagonFill = /*#__PURE__*/makeIcon('ExclamationOctagonFill', '<path fill-rule="evenodd" d="M11.46.146A.5.5 0 0011.107 0H4.893a.5.5 0 00-.353.146L.146 4.54A.5.5 0 000 4.893v6.214a.5.5 0 00.146.353l4.394 4.394a.5.5 0 00.353.146h6.214a.5.5 0 00.353-.146l4.394-4.394a.5.5 0 00.146-.353V4.893a.5.5 0 00-.146-.353L11.46.146zM8 4a.905.905 0 00-.9.995l.35 3.507a.552.552 0 001.1 0l.35-3.507A.905.905 0 008 4zm.002 6a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEmojiSmile = /*#__PURE__*/makeIcon('EmojiSmile', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683z"/><path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>'); // eslint-disable-next-line
 
-var BIconExclamationSquare = /*#__PURE__*/makeIcon('ExclamationSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M7.002 11a1 1 0 112 0 1 1 0 01-2 0zM7.1 4.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
+var BIconEmojiSmileUpsideDown = /*#__PURE__*/makeIcon('EmojiSmileUpsideDown', '<path fill-rule="evenodd" d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0-1a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"/><path fill-rule="evenodd" d="M4.285 6.433a.5.5 0 0 0 .683-.183A3.498 3.498 0 0 1 8 4.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.498 4.498 0 0 0 8 3.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683z"/><path d="M7 9.5C7 8.672 6.552 8 6 8s-1 .672-1 1.5.448 1.5 1 1.5 1-.672 1-1.5zm4 0c0-.828-.448-1.5-1-1.5s-1 .672-1 1.5.448 1.5 1 1.5 1-.672 1-1.5z"/>'); // eslint-disable-next-line
 
-var BIconExclamationSquareFill = /*#__PURE__*/makeIcon('ExclamationSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2zm6 4a.905.905 0 00-.9.995l.35 3.507a.552.552 0 001.1 0l.35-3.507A.905.905 0 008 4zm.002 6a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEmojiSunglasses = /*#__PURE__*/makeIcon('EmojiSunglasses', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM6.5 6.497V6.5h-1c0-.568.447-.947.862-1.154C6.807 5.123 7.387 5 8 5s1.193.123 1.638.346c.415.207.862.586.862 1.154h-1v-.003l-.003-.01a.213.213 0 0 0-.036-.053.86.86 0 0 0-.27-.194C8.91 6.1 8.49 6 8 6c-.491 0-.912.1-1.19.24a.86.86 0 0 0-.271.194.213.213 0 0 0-.036.054l-.003.01z"/><path d="M2.31 5.243A1 1 0 0 1 3.28 4H6a1 1 0 0 1 1 1v1a2 2 0 0 1-2 2h-.438a2 2 0 0 1-1.94-1.515L2.31 5.243zM9 5a1 1 0 0 1 1-1h2.72a1 1 0 0 1 .97 1.243l-.311 1.242A2 2 0 0 1 11.439 8H11a2 2 0 0 1-2-2V5z"/>'); // eslint-disable-next-line
 
-var BIconExclamationTriangle = /*#__PURE__*/makeIcon('ExclamationTriangle', '<path fill-rule="evenodd" d="M7.938 2.016a.146.146 0 00-.054.057L1.027 13.74a.176.176 0 00-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 00.066-.017.163.163 0 00.055-.06.176.176 0 00-.003-.183L8.12 2.073a.146.146 0 00-.054-.057A.13.13 0 008.002 2a.13.13 0 00-.064.016zm1.044-.45a1.13 1.13 0 00-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" clip-rule="evenodd"/><path d="M7.002 12a1 1 0 112 0 1 1 0 01-2 0zM7.1 5.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 5.995z"/>'); // eslint-disable-next-line
+var BIconEnvelope = /*#__PURE__*/makeIcon('Envelope', '<path fill-rule="evenodd" d="M14 3H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2z"/><path d="M.05 3.555C.017 3.698 0 3.847 0 4v.697l5.803 3.546L0 11.801V12c0 .306.069.596.192.856l6.57-4.027L8 9.586l1.239-.757 6.57 4.027c.122-.26.191-.55.191-.856v-.2l-5.803-3.557L16 4.697V4c0-.153-.017-.302-.05-.445L8 8.414.05 3.555z"/>'); // eslint-disable-next-line
 
-var BIconExclamationTriangleFill = /*#__PURE__*/makeIcon('ExclamationTriangleFill', '<path fill-rule="evenodd" d="M8.982 1.566a1.13 1.13 0 00-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5a.905.905 0 00-.9.995l.35 3.507a.552.552 0 001.1 0l.35-3.507A.905.905 0 008 5zm.002 6a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEnvelopeFill = /*#__PURE__*/makeIcon('EnvelopeFill', '<path fill-rule="evenodd" d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555zM0 4.697v7.104l5.803-3.558L0 4.697zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757zm3.436-.586L16 11.801V4.697l-5.803 3.546z"/>'); // eslint-disable-next-line
 
-var BIconExclude = /*#__PURE__*/makeIcon('Exclude', '<path fill-rule="evenodd" d="M1.5 0A1.5 1.5 0 000 1.5v9A1.5 1.5 0 001.5 12H4v2.5A1.5 1.5 0 005.5 16h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 4H12V1.5A1.5 1.5 0 0010.5 0h-9zM12 4H5.5A1.5 1.5 0 004 5.5V12h6.5a1.5 1.5 0 001.5-1.5V4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEnvelopeOpen = /*#__PURE__*/makeIcon('EnvelopeOpen', '<path fill-rule="evenodd" d="M8 8.917l7.757 4.654-.514.858L8 10.083.757 14.43l-.514-.858L8 8.917z"/><path fill-rule="evenodd" d="M6.447 10.651L.243 6.93l.514-.858 6.204 3.723-.514.857zm9.31-3.722L9.553 10.65l-.514-.857 6.204-3.723.514.858z"/><path fill-rule="evenodd" d="M15 14V5.236a1 1 0 0 0-.553-.894l-6-3a1 1 0 0 0-.894 0l-6 3A1 1 0 0 0 1 5.236V14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM1.106 3.447A2 2 0 0 0 0 5.237V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5.236a2 2 0 0 0-1.106-1.789l-6-3a2 2 0 0 0-1.788 0l-6 3z"/>'); // eslint-disable-next-line
 
-var BIconEye = /*#__PURE__*/makeIcon('Eye', '<path fill-rule="evenodd" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 001.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0014.828 8a13.133 13.133 0 00-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 001.172 8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4.5 8a3.5 3.5 0 117 0 3.5 3.5 0 01-7 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEnvelopeOpenFill = /*#__PURE__*/makeIcon('EnvelopeOpenFill', '<path d="M8.941.435a2 2 0 0 0-1.882 0l-6 3.2A2 2 0 0 0 0 5.4v.313l6.709 3.933L8 8.928l1.291.717L16 5.715V5.4a2 2 0 0 0-1.059-1.765l-6-3.2zM16 6.873l-5.693 3.337L16 13.372v-6.5zm-.059 7.611L8 10.072.059 14.484A2 2 0 0 0 2 16h12a2 2 0 0 0 1.941-1.516zM0 13.373l5.693-3.163L0 6.873v6.5z"/>'); // eslint-disable-next-line
 
-var BIconEyeFill = /*#__PURE__*/makeIcon('EyeFill', '<path d="M10.5 8a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/><path fill-rule="evenodd" d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamation = /*#__PURE__*/makeIcon('Exclamation', '<path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
 
-var BIconEyeSlash = /*#__PURE__*/makeIcon('EyeSlash', '<path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 00-2.79.588l.77.771A5.944 5.944 0 018 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0114.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 00-4.474-4.474l.823.823a2.5 2.5 0 012.829 2.829l.822.822zm-2.943 1.299l.822.822a3.5 3.5 0 01-4.474-4.474l.823.823a2.5 2.5 0 002.829 2.829z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 001.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 018 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709z"/><path fill-rule="evenodd" d="M13.646 14.354l-12-12 .708-.708 12 12-.708.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamationCircle = /*#__PURE__*/makeIcon('ExclamationCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
 
-var BIconEyeSlashFill = /*#__PURE__*/makeIcon('EyeSlashFill', '<path d="M10.79 12.912l-1.614-1.615a3.5 3.5 0 01-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7.029 7.029 0 002.79-.588zM5.21 3.088A7.028 7.028 0 018 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 00-4.474-4.474L5.21 3.089z"/><path d="M5.525 7.646a2.5 2.5 0 002.829 2.829l-2.83-2.829zm4.95.708l-2.829-2.83a2.5 2.5 0 012.829 2.829z"/><path fill-rule="evenodd" d="M13.646 14.354l-12-12 .708-.708 12 12-.708.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamationCircleFill = /*#__PURE__*/makeIcon('ExclamationCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
 
-var BIconFile = /*#__PURE__*/makeIcon('File', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamationDiamond = /*#__PURE__*/makeIcon('ExclamationDiamond', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 0 1 0-2.098L6.95.435zm1.4.7a.495.495 0 0 0-.7 0L1.134 7.65a.495.495 0 0 0 0 .7l6.516 6.516a.495.495 0 0 0 .7 0l6.516-6.516a.495.495 0 0 0 0-.7L8.35 1.134z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
 
-var BIconFileArrowDown = /*#__PURE__*/makeIcon('FileArrowDown', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.646 8.146a.5.5 0 01.708 0L8 10.793l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 4a.5.5 0 01.5.5v6a.5.5 0 01-1 0v-6A.5.5 0 018 4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamationDiamondFill = /*#__PURE__*/makeIcon('ExclamationDiamondFill', '<path fill-rule="evenodd" d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
 
-var BIconFileArrowUp = /*#__PURE__*/makeIcon('FileArrowUp', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.646 7.854a.5.5 0 00.708 0L8 5.207l2.646 2.647a.5.5 0 00.708-.708l-3-3a.5.5 0 00-.708 0l-3 3a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 12a.5.5 0 00.5-.5v-6a.5.5 0 00-1 0v6a.5.5 0 00.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamationOctagon = /*#__PURE__*/makeIcon('ExclamationOctagon', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
 
-var BIconFileBreak = /*#__PURE__*/makeIcon('FileBreak', '<path fill-rule="evenodd" d="M0 10.5a.5.5 0 01.5-.5h15a.5.5 0 010 1H.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M12 1H4a2 2 0 00-2 2v6h1V3a1 1 0 011-1h8a1 1 0 011 1v6h1V3a2 2 0 00-2-2zm2 11h-1v1a1 1 0 01-1 1H4a1 1 0 01-1-1v-1H2v1a2 2 0 002 2h8a2 2 0 002-2v-1z"/>'); // eslint-disable-next-line
+var BIconExclamationOctagonFill = /*#__PURE__*/makeIcon('ExclamationOctagonFill', '<path fill-rule="evenodd" d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353L11.46.146zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
 
-var BIconFileCheck = /*#__PURE__*/makeIcon('FileCheck', '<path d="M9 1H4a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V8h-1v5a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1h5V1z"/><path fill-rule="evenodd" d="M15.854 2.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 01.708-.708L12.5 4.793l2.646-2.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamationSquare = /*#__PURE__*/makeIcon('ExclamationSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>'); // eslint-disable-next-line
 
-var BIconFileCode = /*#__PURE__*/makeIcon('FileCode', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.646 5.646a.5.5 0 01.708 0l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708L10.293 8 8.646 6.354a.5.5 0 010-.708zm-1.292 0a.5.5 0 00-.708 0l-2 2a.5.5 0 000 .708l2 2a.5.5 0 00.708-.708L5.707 8l1.647-1.646a.5.5 0 000-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamationSquareFill = /*#__PURE__*/makeIcon('ExclamationSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
 
-var BIconFileDiff = /*#__PURE__*/makeIcon('FileDiff', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.5 10.5A.5.5 0 016 10h4a.5.5 0 010 1H6a.5.5 0 01-.5-.5zM8 4a.5.5 0 01.5.5v4a.5.5 0 01-1 0v-4A.5.5 0 018 4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.5 6.5A.5.5 0 016 6h4a.5.5 0 010 1H6a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclamationTriangle = /*#__PURE__*/makeIcon('ExclamationTriangle', '<path fill-rule="evenodd" d="M7.938 2.016a.146.146 0 0 0-.054.057L1.027 13.74a.176.176 0 0 0-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 0 0 .066-.017.163.163 0 0 0 .055-.06.176.176 0 0 0-.003-.183L8.12 2.073a.146.146 0 0 0-.054-.057A.13.13 0 0 0 8.002 2a.13.13 0 0 0-.064.016zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/><path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmark = /*#__PURE__*/makeIcon('FileEarmark', '<path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/>'); // eslint-disable-next-line
+var BIconExclamationTriangleFill = /*#__PURE__*/makeIcon('ExclamationTriangleFill', '<path fill-rule="evenodd" d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 5zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkArrowDown = /*#__PURE__*/makeIcon('FileEarmarkArrowDown', '<path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/><path fill-rule="evenodd" d="M5.646 9.146a.5.5 0 01.708 0L8 10.793l1.646-1.647a.5.5 0 01.708.708l-2 2a.5.5 0 01-.708 0l-2-2a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 6a.5.5 0 01.5.5v4a.5.5 0 01-1 0v-4A.5.5 0 018 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconExclude = /*#__PURE__*/makeIcon('Exclude', '<path fill-rule="evenodd" d="M1.5 0A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12H4v2.5A1.5 1.5 0 0 0 5.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 4H12V1.5A1.5 1.5 0 0 0 10.5 0h-9zM12 4H5.5A1.5 1.5 0 0 0 4 5.5V12h6.5a1.5 1.5 0 0 0 1.5-1.5V4z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkArrowUp = /*#__PURE__*/makeIcon('FileEarmarkArrowUp', '<path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/><path fill-rule="evenodd" d="M5.646 8.854a.5.5 0 00.708 0L8 7.207l1.646 1.647a.5.5 0 00.708-.708l-2-2a.5.5 0 00-.708 0l-2 2a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 12a.5.5 0 00.5-.5v-4a.5.5 0 00-1 0v4a.5.5 0 00.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEye = /*#__PURE__*/makeIcon('Eye', '<path fill-rule="evenodd" d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.134 13.134 0 0 0 1.66 2.043C4.12 11.332 5.88 12.5 8 12.5c2.12 0 3.879-1.168 5.168-2.457A13.134 13.134 0 0 0 14.828 8a13.133 13.133 0 0 0-1.66-2.043C11.879 4.668 10.119 3.5 8 3.5c-2.12 0-3.879 1.168-5.168 2.457A13.133 13.133 0 0 0 1.172 8z"/><path fill-rule="evenodd" d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkBreak = /*#__PURE__*/makeIcon('FileEarmarkBreak', '<path fill-rule="evenodd" d="M9 1H4a2 2 0 00-2 2v6h1V3a1 1 0 011-1h5v2.5A1.5 1.5 0 0010.5 6H13v3h1V6L9 1zm5 11h-1v1a1 1 0 01-1 1H4a1 1 0 01-1-1v-1H2v1a2 2 0 002 2h8a2 2 0 002-2v-1zM0 10.5a.5.5 0 01.5-.5h15a.5.5 0 010 1H.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEyeFill = /*#__PURE__*/makeIcon('EyeFill', '<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path fill-rule="evenodd" d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkCheck = /*#__PURE__*/makeIcon('FileEarmarkCheck', '<path d="M9 1H4a2 2 0 00-2 2v10a2 2 0 002 2h5v-1H4a1 1 0 01-1-1V3a1 1 0 011-1h5v2.5A1.5 1.5 0 0010.5 6H13v2h1V6L9 1z"/><path fill-rule="evenodd" d="M15.854 10.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 01.708-.708l1.146 1.147 2.646-2.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEyeSlash = /*#__PURE__*/makeIcon('EyeSlash', '<path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299l.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709z"/><path fill-rule="evenodd" d="M13.646 14.354l-12-12 .708-.708 12 12-.708.708z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkCode = /*#__PURE__*/makeIcon('FileEarmarkCode', '<path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/><path fill-rule="evenodd" d="M8.646 6.646a.5.5 0 01.708 0l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708L10.293 9 8.646 7.354a.5.5 0 010-.708zm-1.292 0a.5.5 0 00-.708 0l-2 2a.5.5 0 000 .708l2 2a.5.5 0 00.708-.708L5.707 9l1.647-1.646a.5.5 0 000-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconEyeSlashFill = /*#__PURE__*/makeIcon('EyeSlashFill', '<path d="M10.79 12.912l-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7.029 7.029 0 0 0 2.79-.588zM5.21 3.088A7.028 7.028 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474L5.21 3.089z"/><path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829l-2.83-2.829zm4.95.708l-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829z"/><path fill-rule="evenodd" d="M13.646 14.354l-12-12 .708-.708 12 12-.708.708z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkDiff = /*#__PURE__*/makeIcon('FileEarmarkDiff', '<path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/><path fill-rule="evenodd" d="M5.5 11.5A.5.5 0 016 11h4a.5.5 0 010 1H6a.5.5 0 01-.5-.5zM8 5a.5.5 0 01.5.5v4a.5.5 0 01-1 0v-4A.5.5 0 018 5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.5 7.5A.5.5 0 016 7h4a.5.5 0 010 1H6a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFile = /*#__PURE__*/makeIcon('File', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkMinus = /*#__PURE__*/makeIcon('FileEarmarkMinus', '<path d="M9 1H4a2 2 0 00-2 2v10a2 2 0 002 2h5v-1H4a1 1 0 01-1-1V3a1 1 0 011-1h5v2.5A1.5 1.5 0 0010.5 6H13v2h1V6L9 1z"/><path fill-rule="evenodd" d="M11 11.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileArrowDown = /*#__PURE__*/makeIcon('FileArrowDown', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M4.646 8.146a.5.5 0 0 1 .708 0L8 10.793l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0v-6A.5.5 0 0 1 8 4z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkPlus = /*#__PURE__*/makeIcon('FileEarmarkPlus', '<path d="M9 1H4a2 2 0 00-2 2v10a2 2 0 002 2h5v-1H4a1 1 0 01-1-1V3a1 1 0 011-1h5v2.5A1.5 1.5 0 0010.5 6H13v2h1V6L9 1z"/><path fill-rule="evenodd" d="M13.5 10a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 010-1H13v-1.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 12.5a.5.5 0 01.5-.5h2a.5.5 0 010 1H14v1.5a.5.5 0 01-1 0v-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileArrowUp = /*#__PURE__*/makeIcon('FileArrowUp', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M4.646 7.854a.5.5 0 0 0 .708 0L8 5.207l2.646 2.647a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 0 .5.5z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkRuled = /*#__PURE__*/makeIcon('FileEarmarkRuled', '<path fill-rule="evenodd" d="M13 9H3V8h10v1zm0 3H3v-1h10v1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 14V9h1v5H5z" clip-rule="evenodd"/><path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/>'); // eslint-disable-next-line
+var BIconFileBreak = /*#__PURE__*/makeIcon('FileBreak', '<path fill-rule="evenodd" d="M0 10.5a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/><path d="M12 1H4a2 2 0 0 0-2 2v6h1V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v6h1V3a2 2 0 0 0-2-2zm2 11h-1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1H2v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkSpreadsheet = /*#__PURE__*/makeIcon('FileEarmarkSpreadsheet', '<path fill-rule="evenodd" d="M13 9H3V8h10v1zm0 3H3v-1h10v1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 14V9h1v5H5zm4 0V9h1v5H9z" clip-rule="evenodd"/><path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/>'); // eslint-disable-next-line
+var BIconFileCheck = /*#__PURE__*/makeIcon('FileCheck', '<path d="M9 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8h-1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5V1z"/><path fill-rule="evenodd" d="M15.854 2.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 4.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkText = /*#__PURE__*/makeIcon('FileEarmarkText', '<path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/><path fill-rule="evenodd" d="M5 11.5a.5.5 0 01.5-.5h2a.5.5 0 010 1h-2a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileCode = /*#__PURE__*/makeIcon('FileCode', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M8.646 5.646a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L10.293 8 8.646 6.354a.5.5 0 0 1 0-.708zm-1.292 0a.5.5 0 0 0-.708 0l-2 2a.5.5 0 0 0 0 .708l2 2a.5.5 0 0 0 .708-.708L5.707 8l1.647-1.646a.5.5 0 0 0 0-.708z"/>'); // eslint-disable-next-line
 
-var BIconFileEarmarkZip = /*#__PURE__*/makeIcon('FileEarmarkZip', '<path d="M4 1h5v1H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6h1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 019 4.5z"/><path fill-rule="evenodd" d="M5 8.5a1 1 0 011-1h1a1 1 0 011 1v.938l.4 1.599a1 1 0 01-.416 1.074l-.93.62a1 1 0 01-1.11 0l-.929-.62a1 1 0 01-.415-1.074L5 9.438V8.5zm2 0H6v.938a1 1 0 01-.03.243l-.4 1.598.93.62.929-.62-.4-1.598A1 1 0 017 9.438V8.5z" clip-rule="evenodd"/><path d="M6 2h1.5v1H6zM5 3h1.5v1H5zm1 1h1.5v1H6zM5 5h1.5v1H5zm1 1h1.5v1H6V6z"/>'); // eslint-disable-next-line
+var BIconFileDiff = /*#__PURE__*/makeIcon('FileDiff', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M5.5 10.5A.5.5 0 0 1 6 10h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5zM8 4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 8 4z"/><path fill-rule="evenodd" d="M5.5 6.5A.5.5 0 0 1 6 6h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFileMinus = /*#__PURE__*/makeIcon('FileMinus', '<path d="M9 1H4a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V8h-1v5a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1h5V1z"/><path fill-rule="evenodd" d="M11 3.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmark = /*#__PURE__*/makeIcon('FileEarmark', '<path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/>'); // eslint-disable-next-line
 
-var BIconFilePlus = /*#__PURE__*/makeIcon('FilePlus', '<path d="M9 1H4a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V8h-1v5a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1h5V1z"/><path fill-rule="evenodd" d="M13.5 1a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 010-1H13V1.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 3.5a.5.5 0 01.5-.5h2a.5.5 0 010 1H14v1.5a.5.5 0 01-1 0v-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmarkArrowDown = /*#__PURE__*/makeIcon('FileEarmarkArrowDown', '<path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/><path fill-rule="evenodd" d="M5.646 9.146a.5.5 0 0 1 .708 0L8 10.793l1.646-1.647a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M8 6a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 8 6z"/>'); // eslint-disable-next-line
 
-var BIconFilePost = /*#__PURE__*/makeIcon('FilePost', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path d="M4 5.5a.5.5 0 01.5-.5h7a.5.5 0 01.5.5v7a.5.5 0 01-.5.5h-7a.5.5 0 01-.5-.5v-7z"/><path fill-rule="evenodd" d="M4 3.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmarkArrowUp = /*#__PURE__*/makeIcon('FileEarmarkArrowUp', '<path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/><path fill-rule="evenodd" d="M5.646 8.854a.5.5 0 0 0 .708 0L8 7.207l1.646 1.647a.5.5 0 0 0 .708-.708l-2-2a.5.5 0 0 0-.708 0l-2 2a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-1 0v4a.5.5 0 0 0 .5.5z"/>'); // eslint-disable-next-line
 
-var BIconFileRichtext = /*#__PURE__*/makeIcon('FileRichtext', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 11.5A.5.5 0 015 11h3a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-2A.5.5 0 015 9h6a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm1.639-3.708l1.33.886 1.854-1.855a.25.25 0 01.289-.047l1.888.974V7.5a.5.5 0 01-.5.5H5a.5.5 0 01-.5-.5V7s1.54-1.274 1.639-1.208zM6.25 5a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmarkBreak = /*#__PURE__*/makeIcon('FileEarmarkBreak', '<path fill-rule="evenodd" d="M9 1H4a2 2 0 0 0-2 2v6h1V3a1 1 0 0 1 1-1h5v2.5A1.5 1.5 0 0 0 10.5 6H13v3h1V6L9 1zm5 11h-1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1H2v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1zM0 10.5a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFileRuled = /*#__PURE__*/makeIcon('FileRuled', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path stroke="currentColor" d="M3 5.5h10m-10 3h10m-10 3h10M5.5 6v8"/>'); // eslint-disable-next-line
+var BIconFileEarmarkCheck = /*#__PURE__*/makeIcon('FileEarmarkCheck', '<path d="M9 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5v-1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5v2.5A1.5 1.5 0 0 0 10.5 6H13v2h1V6L9 1z"/><path fill-rule="evenodd" d="M15.854 10.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708l1.146 1.147 2.646-2.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconFileSpreadsheet = /*#__PURE__*/makeIcon('FileSpreadsheet', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 6H3V5h10v1zm0 3H3V8h10v1zm0 3H3v-1h10v1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 14V6h1v8H5zm4 0V6h1v8H9z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmarkCode = /*#__PURE__*/makeIcon('FileEarmarkCode', '<path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/><path fill-rule="evenodd" d="M8.646 6.646a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L10.293 9 8.646 7.354a.5.5 0 0 1 0-.708zm-1.292 0a.5.5 0 0 0-.708 0l-2 2a.5.5 0 0 0 0 .708l2 2a.5.5 0 0 0 .708-.708L5.707 9l1.647-1.646a.5.5 0 0 0 0-.708z"/>'); // eslint-disable-next-line
 
-var BIconFileText = /*#__PURE__*/makeIcon('FileText', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.5 10.5A.5.5 0 015 10h3a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-2A.5.5 0 015 8h6a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-2A.5.5 0 015 6h6a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm0-2A.5.5 0 015 4h6a.5.5 0 010 1H5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmarkDiff = /*#__PURE__*/makeIcon('FileEarmarkDiff', '<path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/><path fill-rule="evenodd" d="M5.5 11.5A.5.5 0 0 1 6 11h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5zM8 5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 8 5z"/><path fill-rule="evenodd" d="M5.5 7.5A.5.5 0 0 1 6 7h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFileZip = /*#__PURE__*/makeIcon('FileZip', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 8.5a1 1 0 011-1h1a1 1 0 011 1v.938l.4 1.599a1 1 0 01-.416 1.074l-.93.62a1 1 0 01-1.109 0l-.93-.62a1 1 0 01-.415-1.074l.4-1.599V8.5zm2 0h-1v.938a1 1 0 01-.03.243l-.4 1.598.93.62.93-.62-.4-1.598a1 1 0 01-.03-.243V8.5z" clip-rule="evenodd"/><path d="M7.5 2H9v1H7.5zm-1 1H8v1H6.5zm1 1H9v1H7.5zm-1 1H8v1H6.5zm1 1H9v1H7.5V6z"/>'); // eslint-disable-next-line
+var BIconFileEarmarkMinus = /*#__PURE__*/makeIcon('FileEarmarkMinus', '<path d="M9 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5v-1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5v2.5A1.5 1.5 0 0 0 10.5 6H13v2h1V6L9 1z"/><path fill-rule="evenodd" d="M11 11.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFiles = /*#__PURE__*/makeIcon('Files', '<path fill-rule="evenodd" d="M3 2h8a2 2 0 012 2v10a2 2 0 01-2 2H3a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H3z" clip-rule="evenodd"/><path d="M5 0h8a2 2 0 012 2v10a2 2 0 01-2 2v-1a1 1 0 001-1V2a1 1 0 00-1-1H5a1 1 0 00-1 1H3a2 2 0 012-2z"/>'); // eslint-disable-next-line
+var BIconFileEarmarkPlus = /*#__PURE__*/makeIcon('FileEarmarkPlus', '<path d="M9 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5v-1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5v2.5A1.5 1.5 0 0 0 10.5 6H13v2h1V6L9 1z"/><path fill-rule="evenodd" d="M13.5 10a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1H13v-1.5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M13 12.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0v-2z"/>'); // eslint-disable-next-line
 
-var BIconFilesAlt = /*#__PURE__*/makeIcon('FilesAlt', '<path fill-rule="evenodd" d="M3 1h8a2 2 0 012 2v10a2 2 0 01-2 2H3a2 2 0 01-2-2V3a2 2 0 012-2zm0 1a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1H3z" clip-rule="evenodd"/><path d="M13 4V3a2 2 0 012 2v6a2 2 0 01-2 2v-1a1 1 0 001-1V5a1 1 0 00-1-1z"/>'); // eslint-disable-next-line
+var BIconFileEarmarkRuled = /*#__PURE__*/makeIcon('FileEarmarkRuled', '<path fill-rule="evenodd" d="M13 9H3V8h10v1zm0 3H3v-1h10v1z"/><path fill-rule="evenodd" d="M5 14V9h1v5H5z"/><path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/>'); // eslint-disable-next-line
 
-var BIconFilm = /*#__PURE__*/makeIcon('Film', '<path fill-rule="evenodd" d="M0 1a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H1a1 1 0 01-1-1V1zm4 0h8v6H4V1zm8 8H4v6h8V9zM1 1h2v2H1V1zm2 3H1v2h2V4zM1 7h2v2H1V7zm2 3H1v2h2v-2zm-2 3h2v2H1v-2zM15 1h-2v2h2V1zm-2 3h2v2h-2V4zm2 3h-2v2h2V7zm-2 3h2v2h-2v-2zm2 3h-2v2h2v-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmarkSpreadsheet = /*#__PURE__*/makeIcon('FileEarmarkSpreadsheet', '<path fill-rule="evenodd" d="M13 9H3V8h10v1zm0 3H3v-1h10v1z"/><path fill-rule="evenodd" d="M5 14V9h1v5H5zm4 0V9h1v5H9z"/><path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/>'); // eslint-disable-next-line
 
-var BIconFilter = /*#__PURE__*/makeIcon('Filter', '<path fill-rule="evenodd" d="M6 10.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmarkText = /*#__PURE__*/makeIcon('FileEarmarkText', '<path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/><path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFilterLeft = /*#__PURE__*/makeIcon('FilterLeft', '<path fill-rule="evenodd" d="M2 10.5a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileEarmarkZip = /*#__PURE__*/makeIcon('FileEarmarkZip', '<path d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/><path fill-rule="evenodd" d="M5 8.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v.938l.4 1.599a1 1 0 0 1-.416 1.074l-.93.62a1 1 0 0 1-1.11 0l-.929-.62a1 1 0 0 1-.415-1.074L5 9.438V8.5zm2 0H6v.938a1 1 0 0 1-.03.243l-.4 1.598.93.62.929-.62-.4-1.598A1 1 0 0 1 7 9.438V8.5z"/><path d="M6 2h1.5v1H6zM5 3h1.5v1H5zm1 1h1.5v1H6zM5 5h1.5v1H5zm1 1h1.5v1H6V6z"/>'); // eslint-disable-next-line
 
-var BIconFilterRight = /*#__PURE__*/makeIcon('FilterRight', '<path fill-rule="evenodd" d="M14 10.5a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zm0-3a.5.5 0 00-.5-.5h-7a.5.5 0 000 1h7a.5.5 0 00.5-.5zm0-3a.5.5 0 00-.5-.5h-11a.5.5 0 000 1h11a.5.5 0 00.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileMinus = /*#__PURE__*/makeIcon('FileMinus', '<path d="M9 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8h-1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5V1z"/><path fill-rule="evenodd" d="M11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFlag = /*#__PURE__*/makeIcon('Flag', '<path fill-rule="evenodd" d="M3.5 1a.5.5 0 01.5.5v13a.5.5 0 01-1 0v-13a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.762 2.558C4.735 1.909 5.348 1.5 6.5 1.5c.653 0 1.139.325 1.495.562l.032.022c.391.26.646.416.973.416.168 0 .356-.042.587-.126a8.89 8.89 0 00.593-.25c.058-.027.117-.053.18-.08.57-.255 1.278-.544 2.14-.544a.5.5 0 01.5.5v6a.5.5 0 01-.5.5c-.638 0-1.18.21-1.734.457l-.159.07c-.22.1-.453.205-.678.287A2.719 2.719 0 019 9.5c-.653 0-1.139-.325-1.495-.562l-.032-.022c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916a.5.5 0 11-.515-.858C4.735 7.909 5.348 7.5 6.5 7.5c.653 0 1.139.325 1.495.562l.032.022c.391.26.646.416.973.416.168 0 .356-.042.587-.126.187-.068.376-.153.593-.25.058-.027.117-.053.18-.08.456-.204 1-.43 1.64-.512V2.543c-.433.074-.83.234-1.234.414l-.159.07c-.22.1-.453.205-.678.287A2.719 2.719 0 019 3.5c-.653 0-1.139-.325-1.495-.562l-.032-.022c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916a.5.5 0 01-.554-.832l.04-.026z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFilePlus = /*#__PURE__*/makeIcon('FilePlus', '<path d="M9 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8h-1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5V1z"/><path fill-rule="evenodd" d="M13.5 1a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1H13V1.5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M13 3.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0v-2z"/>'); // eslint-disable-next-line
 
-var BIconFlagFill = /*#__PURE__*/makeIcon('FlagFill', '<path fill-rule="evenodd" d="M3.5 1a.5.5 0 01.5.5v13a.5.5 0 01-1 0v-13a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3.762 2.558C4.735 1.909 5.348 1.5 6.5 1.5c.653 0 1.139.325 1.495.562l.032.022c.391.26.646.416.973.416.168 0 .356-.042.587-.126a8.89 8.89 0 00.593-.25c.058-.027.117-.053.18-.08.57-.255 1.278-.544 2.14-.544a.5.5 0 01.5.5v6a.5.5 0 01-.5.5c-.638 0-1.18.21-1.734.457l-.159.07c-.22.1-.453.205-.678.287A2.719 2.719 0 019 9.5c-.653 0-1.139-.325-1.495-.562l-.032-.022c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916A.5.5 0 013.5 9V3a.5.5 0 01.223-.416l.04-.026z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFilePost = /*#__PURE__*/makeIcon('FilePost', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-7z"/><path fill-rule="evenodd" d="M4 3.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFolder = /*#__PURE__*/makeIcon('Folder', '<path d="M9.828 4a3 3 0 01-2.12-.879l-.83-.828A1 1 0 006.173 2H2.5a1 1 0 00-1 .981L1.546 4h-1L.5 3a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 009.828 3v1z"/><path fill-rule="evenodd" d="M13.81 4H2.19a1 1 0 00-.996 1.09l.637 7a1 1 0 00.995.91h10.348a1 1 0 00.995-.91l.637-7A1 1 0 0013.81 4zM2.19 3A2 2 0 00.198 5.181l.637 7A2 2 0 002.826 14h10.348a2 2 0 001.991-1.819l.637-7A2 2 0 0013.81 3H2.19z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileRichtext = /*#__PURE__*/makeIcon('FileRichtext', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M4.5 11.5A.5.5 0 0 1 5 11h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm0-2A.5.5 0 0 1 5 9h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm1.639-3.708l1.33.886 1.854-1.855a.25.25 0 0 1 .289-.047l1.888.974V7.5a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V7s1.54-1.274 1.639-1.208zM6.25 5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z"/>'); // eslint-disable-next-line
 
-var BIconFolderCheck = /*#__PURE__*/makeIcon('FolderCheck', '<path fill-rule="evenodd" d="M9.828 4H2.19a1 1 0 00-.996 1.09l.637 7a1 1 0 00.995.91H9v1H2.826a2 2 0 01-1.991-1.819l-.637-7a1.99 1.99 0 01.342-1.31L.5 3a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 009.828 3h3.982a2 2 0 011.992 2.181L15.546 8H14.54l.265-2.91A1 1 0 0013.81 4H9.828zm-2.95-1.707L7.587 3H2.19c-.24 0-.47.042-.684.12L1.5 2.98a1 1 0 011-.98h3.672a1 1 0 01.707.293z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15.854 10.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 01.708-.708l1.146 1.147 2.646-2.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileRuled = /*#__PURE__*/makeIcon('FileRuled', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M13 6H3V5h10v1zm0 3H3V8h10v1zm0 3H3v-1h10v1z"/><path fill-rule="evenodd" d="M5 14V6h1v8H5z"/>'); // eslint-disable-next-line
 
-var BIconFolderFill = /*#__PURE__*/makeIcon('FolderFill', '<path fill-rule="evenodd" d="M9.828 3h3.982a2 2 0 011.992 2.181l-.637 7A2 2 0 0113.174 14H2.826a2 2 0 01-1.991-1.819l-.637-7a1.99 1.99 0 01.342-1.31L.5 3a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 009.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 006.172 2H2.5a1 1 0 00-1 .981l.006.139z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileSpreadsheet = /*#__PURE__*/makeIcon('FileSpreadsheet', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M13 6H3V5h10v1zm0 3H3V8h10v1zm0 3H3v-1h10v1z"/><path fill-rule="evenodd" d="M5 14V6h1v8H5zm4 0V6h1v8H9z"/>'); // eslint-disable-next-line
 
-var BIconFolderMinus = /*#__PURE__*/makeIcon('FolderMinus', '<path fill-rule="evenodd" d="M9.828 4H2.19a1 1 0 00-.996 1.09l.637 7a1 1 0 00.995.91H9v1H2.826a2 2 0 01-1.991-1.819l-.637-7a1.99 1.99 0 01.342-1.31L.5 3a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 009.828 3h3.982a2 2 0 011.992 2.181L15.546 8H14.54l.265-2.91A1 1 0 0013.81 4H9.828zm-2.95-1.707L7.587 3H2.19c-.24 0-.47.042-.684.12L1.5 2.98a1 1 0 011-.98h3.672a1 1 0 01.707.293z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11 11.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileText = /*#__PURE__*/makeIcon('FileText', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M4.5 10.5A.5.5 0 0 1 5 10h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm0-2A.5.5 0 0 1 5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm0-2A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm0-2A.5.5 0 0 1 5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFolderPlus = /*#__PURE__*/makeIcon('FolderPlus', '<path fill-rule="evenodd" d="M9.828 4H2.19a1 1 0 00-.996 1.09l.637 7a1 1 0 00.995.91H9v1H2.826a2 2 0 01-1.991-1.819l-.637-7a1.99 1.99 0 01.342-1.31L.5 3a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 009.828 3h3.982a2 2 0 011.992 2.181L15.546 8H14.54l.265-2.91A1 1 0 0013.81 4H9.828zm-2.95-1.707L7.587 3H2.19c-.24 0-.47.042-.684.12L1.5 2.98a1 1 0 011-.98h3.672a1 1 0 01.707.293z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13.5 10a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 010-1H13v-1.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 12.5a.5.5 0 01.5-.5h2a.5.5 0 010 1H14v1.5a.5.5 0 01-1 0v-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFileZip = /*#__PURE__*/makeIcon('FileZip', '<path fill-rule="evenodd" d="M4 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H4z"/><path fill-rule="evenodd" d="M6.5 8.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v.938l.4 1.599a1 1 0 0 1-.416 1.074l-.93.62a1 1 0 0 1-1.109 0l-.93-.62a1 1 0 0 1-.415-1.074l.4-1.599V8.5zm2 0h-1v.938a1 1 0 0 1-.03.243l-.4 1.598.93.62.93-.62-.4-1.598a1 1 0 0 1-.03-.243V8.5z"/><path d="M7.5 2H9v1H7.5zm-1 1H8v1H6.5zm1 1H9v1H7.5zm-1 1H8v1H6.5zm1 1H9v1H7.5V6z"/>'); // eslint-disable-next-line
 
-var BIconFolderSymlink = /*#__PURE__*/makeIcon('FolderSymlink', '<path d="M9.828 4a3 3 0 01-2.12-.879l-.83-.828A1 1 0 006.173 2H2.5a1 1 0 00-1 .981L1.546 4h-1L.5 3a2 2 0 012-2h3.672a2 2 0 011.414.586l.828.828A2 2 0 009.828 3v1z"/><path fill-rule="evenodd" d="M13.81 4H2.19a1 1 0 00-.996 1.09l.637 7a1 1 0 00.995.91h10.348a1 1 0 00.995-.91l.637-7A1 1 0 0013.81 4zM2.19 3A2 2 0 00.198 5.181l.637 7A2 2 0 002.826 14h10.348a2 2 0 001.991-1.819l.637-7A2 2 0 0013.81 3H2.19z" clip-rule="evenodd"/><path d="M8.616 10.24l3.182-1.969a.443.443 0 000-.742l-3.182-1.97c-.27-.166-.616.036-.616.372V6.7c-.857 0-3.429 0-4 4.8 1.429-2.7 4-2.4 4-2.4v.769c0 .336.346.538.616.371z"/>'); // eslint-disable-next-line
+var BIconFiles = /*#__PURE__*/makeIcon('Files', '<path fill-rule="evenodd" d="M3 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H3z"/><path d="M5 0h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1H3a2 2 0 0 1 2-2z"/>'); // eslint-disable-next-line
 
-var BIconFolderSymlinkFill = /*#__PURE__*/makeIcon('FolderSymlinkFill', '<path fill-rule="evenodd" d="M13.81 3H9.828a2 2 0 01-1.414-.586l-.828-.828A2 2 0 006.172 1H2.5a2 2 0 00-2 2l.04.87a1.99 1.99 0 00-.342 1.311l.637 7A2 2 0 002.826 14h10.348a2 2 0 001.991-1.819l.637-7A2 2 0 0013.81 3zM2.19 3c-.24 0-.47.042-.684.12L1.5 2.98a1 1 0 011-.98h3.672a1 1 0 01.707.293L7.586 3H2.19zm9.608 5.271l-3.182 1.97c-.27.166-.616-.036-.616-.372V9.1s-2.571-.3-4 2.4c.571-4.8 3.143-4.8 4-4.8v-.769c0-.336.346-.538.616-.371l3.182 1.969c.27.166.27.576 0 .742z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFilesAlt = /*#__PURE__*/makeIcon('FilesAlt', '<path fill-rule="evenodd" d="M3 1h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H3z"/><path d="M13 4V3a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2v-1a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/>'); // eslint-disable-next-line
+
+var BIconFilm = /*#__PURE__*/makeIcon('Film', '<path fill-rule="evenodd" d="M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm4 0h8v6H4V1zm8 8H4v6h8V9zM1 1h2v2H1V1zm2 3H1v2h2V4zM1 7h2v2H1V7zm2 3H1v2h2v-2zm-2 3h2v2H1v-2zM15 1h-2v2h2V1zm-2 3h2v2h-2V4zm2 3h-2v2h2V7zm-2 3h2v2h-2v-2zm2 3h-2v2h2v-2z"/>'); // eslint-disable-next-line
+
+var BIconFilter = /*#__PURE__*/makeIcon('Filter', '<path fill-rule="evenodd" d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconFilterLeft = /*#__PURE__*/makeIcon('FilterLeft', '<path fill-rule="evenodd" d="M2 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconFilterRight = /*#__PURE__*/makeIcon('FilterRight', '<path fill-rule="evenodd" d="M14 10.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0 0 1h7a.5.5 0 0 0 .5-.5zm0-3a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0 0 1h11a.5.5 0 0 0 .5-.5z"/>'); // eslint-disable-next-line
+
+var BIconFlag = /*#__PURE__*/makeIcon('Flag', '<path fill-rule="evenodd" d="M3.5 1a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-1 0v-13a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M3.762 2.558C4.735 1.909 5.348 1.5 6.5 1.5c.653 0 1.139.325 1.495.562l.032.022c.391.26.646.416.973.416.168 0 .356-.042.587-.126a8.89 8.89 0 0 0 .593-.25c.058-.027.117-.053.18-.08.57-.255 1.278-.544 2.14-.544a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-.5.5c-.638 0-1.18.21-1.734.457l-.159.07c-.22.1-.453.205-.678.287A2.719 2.719 0 0 1 9 9.5c-.653 0-1.139-.325-1.495-.562l-.032-.022c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916a.5.5 0 1 1-.515-.858C4.735 7.909 5.348 7.5 6.5 7.5c.653 0 1.139.325 1.495.562l.032.022c.391.26.646.416.973.416.168 0 .356-.042.587-.126.187-.068.376-.153.593-.25.058-.027.117-.053.18-.08.456-.204 1-.43 1.64-.512V2.543c-.433.074-.83.234-1.234.414l-.159.07c-.22.1-.453.205-.678.287A2.719 2.719 0 0 1 9 3.5c-.653 0-1.139-.325-1.495-.562l-.032-.022c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916a.5.5 0 0 1-.554-.832l.04-.026z"/>'); // eslint-disable-next-line
+
+var BIconFlagFill = /*#__PURE__*/makeIcon('FlagFill', '<path fill-rule="evenodd" d="M3.5 1a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-1 0v-13a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M3.762 2.558C4.735 1.909 5.348 1.5 6.5 1.5c.653 0 1.139.325 1.495.562l.032.022c.391.26.646.416.973.416.168 0 .356-.042.587-.126a8.89 8.89 0 0 0 .593-.25c.058-.027.117-.053.18-.08.57-.255 1.278-.544 2.14-.544a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-.5.5c-.638 0-1.18.21-1.734.457l-.159.07c-.22.1-.453.205-.678.287A2.719 2.719 0 0 1 9 9.5c-.653 0-1.139-.325-1.495-.562l-.032-.022c-.391-.26-.646-.416-.973-.416-.833 0-1.218.246-2.223.916A.5.5 0 0 1 3.5 9V3a.5.5 0 0 1 .223-.416l.04-.026z"/>'); // eslint-disable-next-line
+
+var BIconFolder = /*#__PURE__*/makeIcon('Folder', '<path d="M9.828 4a3 3 0 0 1-2.12-.879l-.83-.828A1 1 0 0 0 6.173 2H2.5a1 1 0 0 0-1 .981L1.546 4h-1L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3v1z"/><path fill-rule="evenodd" d="M13.81 4H2.19a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4zM2.19 3A2 2 0 0 0 .198 5.181l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H2.19z"/>'); // eslint-disable-next-line
+
+var BIconFolderCheck = /*#__PURE__*/makeIcon('FolderCheck', '<path fill-rule="evenodd" d="M9.828 4H2.19a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91H9v1H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181L15.546 8H14.54l.265-2.91A1 1 0 0 0 13.81 4H9.828zm-2.95-1.707L7.587 3H2.19c-.24 0-.47.042-.684.12L1.5 2.98a1 1 0 0 1 1-.98h3.672a1 1 0 0 1 .707.293z"/><path fill-rule="evenodd" d="M15.854 10.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708l1.146 1.147 2.646-2.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconFolderFill = /*#__PURE__*/makeIcon('FolderFill', '<path fill-rule="evenodd" d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"/>'); // eslint-disable-next-line
+
+var BIconFolderMinus = /*#__PURE__*/makeIcon('FolderMinus', '<path fill-rule="evenodd" d="M9.828 4H2.19a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91H9v1H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181L15.546 8H14.54l.265-2.91A1 1 0 0 0 13.81 4H9.828zm-2.95-1.707L7.587 3H2.19c-.24 0-.47.042-.684.12L1.5 2.98a1 1 0 0 1 1-.98h3.672a1 1 0 0 1 .707.293z"/><path fill-rule="evenodd" d="M11 11.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
+
+var BIconFolderPlus = /*#__PURE__*/makeIcon('FolderPlus', '<path fill-rule="evenodd" d="M9.828 4H2.19a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91H9v1H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181L15.546 8H14.54l.265-2.91A1 1 0 0 0 13.81 4H9.828zm-2.95-1.707L7.587 3H2.19c-.24 0-.47.042-.684.12L1.5 2.98a1 1 0 0 1 1-.98h3.672a1 1 0 0 1 .707.293z"/><path fill-rule="evenodd" d="M13.5 10a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1H13v-1.5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M13 12.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0v-2z"/>'); // eslint-disable-next-line
+
+var BIconFolderSymlink = /*#__PURE__*/makeIcon('FolderSymlink', '<path d="M9.828 4a3 3 0 0 1-2.12-.879l-.83-.828A1 1 0 0 0 6.173 2H2.5a1 1 0 0 0-1 .981L1.546 4h-1L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3v1z"/><path fill-rule="evenodd" d="M13.81 4H2.19a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4zM2.19 3A2 2 0 0 0 .198 5.181l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H2.19z"/><path d="M8.616 10.24l3.182-1.969a.443.443 0 0 0 0-.742l-3.182-1.97c-.27-.166-.616.036-.616.372V6.7c-.857 0-3.429 0-4 4.8 1.429-2.7 4-2.4 4-2.4v.769c0 .336.346.538.616.371z"/>'); // eslint-disable-next-line
+
+var BIconFolderSymlinkFill = /*#__PURE__*/makeIcon('FolderSymlinkFill', '<path fill-rule="evenodd" d="M13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2l.04.87a1.99 1.99 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3zM2.19 3c-.24 0-.47.042-.684.12L1.5 2.98a1 1 0 0 1 1-.98h3.672a1 1 0 0 1 .707.293L7.586 3H2.19zm9.608 5.271l-3.182 1.97c-.27.166-.616-.036-.616-.372V9.1s-2.571-.3-4 2.4c.571-4.8 3.143-4.8 4-4.8v-.769c0-.336.346-.538.616-.371l3.182 1.969c.27.166.27.576 0 .742z"/>'); // eslint-disable-next-line
 
 var BIconFonts = /*#__PURE__*/makeIcon('Fonts', '<path d="M12.258 3H3.747l-.082 2.46h.479c.26-1.544.758-1.783 2.693-1.845l.424-.013v7.827c0 .663-.144.82-1.3.923v.52h4.082v-.52c-1.162-.103-1.306-.26-1.306-.923V3.602l.43.013c1.935.062 2.434.301 2.694 1.846h.479L12.258 3z"/>'); // eslint-disable-next-line
 
-var BIconForward = /*#__PURE__*/makeIcon('Forward', '<path fill-rule="evenodd" d="M9.502 5.513a.144.144 0 00-.202.134V6.65a.5.5 0 01-.5.5H2.5v2.9h6.3a.5.5 0 01.5.5v1.003c0 .108.11.176.202.134l3.984-2.933a.51.51 0 01.042-.028.147.147 0 000-.252.51.51 0 01-.042-.028L9.502 5.513zM8.3 5.647a1.144 1.144 0 011.767-.96l3.994 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a1.144 1.144 0 01-1.767-.96v-.503H2a.5.5 0 01-.5-.5v-3.9a.5.5 0 01.5-.5h6.3v-.503z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconForward = /*#__PURE__*/makeIcon('Forward', '<path fill-rule="evenodd" d="M9.502 5.513a.144.144 0 0 0-.202.134V6.65a.5.5 0 0 1-.5.5H2.5v2.9h6.3a.5.5 0 0 1 .5.5v1.003c0 .108.11.176.202.134l3.984-2.933a.51.51 0 0 1 .042-.028.147.147 0 0 0 0-.252.51.51 0 0 1-.042-.028L9.502 5.513zM8.3 5.647a1.144 1.144 0 0 1 1.767-.96l3.994 2.94a1.147 1.147 0 0 1 0 1.946l-3.994 2.94a1.144 1.144 0 0 1-1.767-.96v-.503H2a.5.5 0 0 1-.5-.5v-3.9a.5.5 0 0 1 .5-.5h6.3v-.503z"/>'); // eslint-disable-next-line
 
-var BIconForwardFill = /*#__PURE__*/makeIcon('ForwardFill', '<path d="M9.77 12.11l4.012-2.953a.647.647 0 000-1.114L9.771 5.09a.644.644 0 00-.971.557V6.65H2v3.9h6.8v1.003c0 .505.545.808.97.557z"/>'); // eslint-disable-next-line
+var BIconForwardFill = /*#__PURE__*/makeIcon('ForwardFill', '<path d="M9.77 12.11l4.012-2.953a.647.647 0 0 0 0-1.114L9.771 5.09a.644.644 0 0 0-.971.557V6.65H2v3.9h6.8v1.003c0 .505.545.808.97.557z"/>'); // eslint-disable-next-line
 
-var BIconFullscreen = /*#__PURE__*/makeIcon('Fullscreen', '<path fill-rule="evenodd" d="M1.5 1a.5.5 0 00-.5.5v4a.5.5 0 01-1 0v-4A1.5 1.5 0 011.5 0h4a.5.5 0 010 1h-4zM10 .5a.5.5 0 01.5-.5h4A1.5 1.5 0 0116 1.5v4a.5.5 0 01-1 0v-4a.5.5 0 00-.5-.5h-4a.5.5 0 01-.5-.5zM.5 10a.5.5 0 01.5.5v4a.5.5 0 00.5.5h4a.5.5 0 010 1h-4A1.5 1.5 0 010 14.5v-4a.5.5 0 01.5-.5zm15 0a.5.5 0 01.5.5v4a1.5 1.5 0 01-1.5 1.5h-4a.5.5 0 010-1h4a.5.5 0 00.5-.5v-4a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFullscreen = /*#__PURE__*/makeIcon('Fullscreen', '<path fill-rule="evenodd" d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconFullscreenExit = /*#__PURE__*/makeIcon('FullscreenExit', '<path fill-rule="evenodd" d="M5.5 0a.5.5 0 01.5.5v4A1.5 1.5 0 014.5 6h-4a.5.5 0 010-1h4a.5.5 0 00.5-.5v-4a.5.5 0 01.5-.5zm5 0a.5.5 0 01.5.5v4a.5.5 0 00.5.5h4a.5.5 0 010 1h-4A1.5 1.5 0 0110 4.5v-4a.5.5 0 01.5-.5zM0 10.5a.5.5 0 01.5-.5h4A1.5 1.5 0 016 11.5v4a.5.5 0 01-1 0v-4a.5.5 0 00-.5-.5h-4a.5.5 0 01-.5-.5zm10 1a1.5 1.5 0 011.5-1.5h4a.5.5 0 010 1h-4a.5.5 0 00-.5.5v4a.5.5 0 01-1 0v-4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFullscreenExit = /*#__PURE__*/makeIcon('FullscreenExit', '<path fill-rule="evenodd" d="M5.5 0a.5.5 0 0 1 .5.5v4A1.5 1.5 0 0 1 4.5 6h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5zm5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 10 4.5v-4a.5.5 0 0 1 .5-.5zM0 10.5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 6 11.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zm10 1a1.5 1.5 0 0 1 1.5-1.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4z"/>'); // eslint-disable-next-line
 
-var BIconFunnel = /*#__PURE__*/makeIcon('Funnel', '<path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 012 1h12a.5.5 0 01.5.5v2a.5.5 0 01-.128.334L10 8.692V13.5a.5.5 0 01-.342.474l-3 1A.5.5 0 016 14.5V8.692L1.628 3.834A.5.5 0 011.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 017 8.5v5.306l2-.666V8.5a.5.5 0 01.128-.334L13.5 3.308V2h-11z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFunnel = /*#__PURE__*/makeIcon('Funnel', '<path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>'); // eslint-disable-next-line
 
-var BIconFunnelFill = /*#__PURE__*/makeIcon('FunnelFill', '<path d="M2 3.5v-2h12v2l-4.5 5v5l-3 1v-6L2 3.5z"/><path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 012 1h12a.5.5 0 01.5.5v2a.5.5 0 01-.128.334L10 8.692V13.5a.5.5 0 01-.342.474l-3 1A.5.5 0 016 14.5V8.692L1.628 3.834A.5.5 0 011.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 017 8.5v5.306l2-.666V8.5a.5.5 0 01.128-.334L13.5 3.308V2h-11z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconFunnelFill = /*#__PURE__*/makeIcon('FunnelFill', '<path d="M2 3.5v-2h12v2l-4.5 5v5l-3 1v-6L2 3.5z"/><path fill-rule="evenodd" d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>'); // eslint-disable-next-line
 
-var BIconGear = /*#__PURE__*/makeIcon('Gear', '<path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 014.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 01-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 011.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 012.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 012.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 011.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 01-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 018.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 001.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 00.52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 00-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 00-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 00-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 00-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 00.52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 001.255-.52l.094-.319z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 100 4.492 2.246 2.246 0 000-4.492zM4.754 8a3.246 3.246 0 116.492 0 3.246 3.246 0 01-6.492 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGear = /*#__PURE__*/makeIcon('Gear', '<path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"/><path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"/>'); // eslint-disable-next-line
 
-var BIconGearFill = /*#__PURE__*/makeIcon('GearFill', '<path fill-rule="evenodd" d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 01-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 01.872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 012.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 012.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 01.872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 01-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 01-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 100-5.86 2.929 2.929 0 000 5.858z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGearFill = /*#__PURE__*/makeIcon('GearFill', '<path fill-rule="evenodd" d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 0 0-5.86 2.929 2.929 0 0 0 0 5.858z"/>'); // eslint-disable-next-line
 
-var BIconGearWide = /*#__PURE__*/makeIcon('GearWide', '<path fill-rule="evenodd" d="M9.928 1.723c-.243-.97-1.62-.97-1.863 0l-.072.286a.96.96 0 01-1.622.435l-.204-.212c-.695-.718-1.889-.03-1.614.932l.08.283a.96.96 0 01-1.186 1.187l-.283-.081c-.961-.275-1.65.919-.932 1.614l.212.204a.96.96 0 01-.435 1.622l-.286.072c-.97.242-.97 1.62 0 1.863l.286.071a.96.96 0 01.435 1.622l-.212.205c-.718.695-.03 1.888.932 1.613l.283-.08a.96.96 0 011.187 1.187l-.081.283c-.275.96.919 1.65 1.614.931l.204-.211a.96.96 0 011.622.434l.072.286c.242.97 1.62.97 1.863 0l.071-.286a.96.96 0 011.622-.434l.205.212c.695.718 1.888.029 1.613-.932l-.08-.283a.96.96 0 011.187-1.188l.283.081c.96.275 1.65-.918.931-1.613l-.211-.205A.96.96 0 0115.983 10l.286-.071c.97-.243.97-1.62 0-1.863l-.286-.072a.96.96 0 01-.434-1.622l.212-.204c.718-.695.029-1.889-.932-1.614l-.283.08a.96.96 0 01-1.188-1.186l.081-.283c.275-.961-.918-1.65-1.613-.932l-.205.212A.96.96 0 0110 2.009l-.071-.286zm-.932 12.27a4.998 4.998 0 100-9.994 4.998 4.998 0 000 9.995z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGearWide = /*#__PURE__*/makeIcon('GearWide', '<path fill-rule="evenodd" d="M8.932.727c-.243-.97-1.62-.97-1.864 0l-.071.286a.96.96 0 0 1-1.622.434l-.205-.211c-.695-.719-1.888-.03-1.613.931l.08.284a.96.96 0 0 1-1.186 1.187l-.284-.081c-.96-.275-1.65.918-.931 1.613l.211.205a.96.96 0 0 1-.434 1.622l-.286.071c-.97.243-.97 1.62 0 1.864l.286.071a.96.96 0 0 1 .434 1.622l-.211.205c-.719.695-.03 1.888.931 1.613l.284-.08a.96.96 0 0 1 1.187 1.187l-.081.283c-.275.96.918 1.65 1.613.931l.205-.211a.96.96 0 0 1 1.622.434l.071.286c.243.97 1.62.97 1.864 0l.071-.286a.96.96 0 0 1 1.622-.434l.205.211c.695.719 1.888.03 1.613-.931l-.08-.284a.96.96 0 0 1 1.187-1.187l.283.081c.96.275 1.65-.918.931-1.613l-.211-.205a.96.96 0 0 1 .434-1.622l.286-.071c.97-.243.97-1.62 0-1.864l-.286-.071a.96.96 0 0 1-.434-1.622l.211-.205c.719-.695.03-1.888-.931-1.613l-.284.08a.96.96 0 0 1-1.187-1.186l.081-.284c.275-.96-.918-1.65-1.613-.931l-.205.211a.96.96 0 0 1-1.622-.434L8.932.727zM8 12.997a4.998 4.998 0 1 0 0-9.995 4.998 4.998 0 0 0 0 9.996z"/>'); // eslint-disable-next-line
 
-var BIconGearWideConnected = /*#__PURE__*/makeIcon('GearWideConnected', '<path fill-rule="evenodd" d="M9.928 1.723c-.243-.97-1.62-.97-1.863 0l-.072.286a.96.96 0 01-1.622.435l-.204-.212c-.695-.718-1.889-.03-1.614.932l.08.283a.96.96 0 01-1.186 1.187l-.283-.081c-.961-.275-1.65.919-.932 1.614l.212.204a.96.96 0 01-.435 1.622l-.286.072c-.97.242-.97 1.62 0 1.863l.286.071a.96.96 0 01.435 1.622l-.212.205c-.718.695-.03 1.888.932 1.613l.283-.08a.96.96 0 011.187 1.187l-.081.283c-.275.96.919 1.65 1.614.931l.204-.211a.96.96 0 011.622.434l.072.286c.242.97 1.62.97 1.863 0l.071-.286a.96.96 0 011.622-.434l.205.212c.695.718 1.888.029 1.613-.932l-.08-.283a.96.96 0 011.187-1.188l.283.081c.96.275 1.65-.918.931-1.613l-.211-.205A.96.96 0 0115.983 10l.286-.071c.97-.243.97-1.62 0-1.863l-.286-.072a.96.96 0 01-.434-1.622l.212-.204c.718-.695.029-1.889-.932-1.614l-.283.08a.96.96 0 01-1.188-1.186l.081-.283c.275-.961-.918-1.65-1.613-.932l-.205.212A.96.96 0 0110 2.009l-.071-.286zm-.932 12.27a4.998 4.998 0 100-9.994 4.998 4.998 0 000 9.995z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8.372 8.996L5.598 5.298l.8-.6 2.848 3.798h4.748v1H9.246l-2.849 3.798-.8-.6 2.775-3.698z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGearWideConnected = /*#__PURE__*/makeIcon('GearWideConnected', '<path fill-rule="evenodd" d="M8.932.727c-.243-.97-1.62-.97-1.864 0l-.071.286a.96.96 0 0 1-1.622.434l-.205-.211c-.695-.719-1.888-.03-1.613.931l.08.284a.96.96 0 0 1-1.186 1.187l-.284-.081c-.96-.275-1.65.918-.931 1.613l.211.205a.96.96 0 0 1-.434 1.622l-.286.071c-.97.243-.97 1.62 0 1.864l.286.071a.96.96 0 0 1 .434 1.622l-.211.205c-.719.695-.03 1.888.931 1.613l.284-.08a.96.96 0 0 1 1.187 1.187l-.081.283c-.275.96.918 1.65 1.613.931l.205-.211a.96.96 0 0 1 1.622.434l.071.286c.243.97 1.62.97 1.864 0l.071-.286a.96.96 0 0 1 1.622-.434l.205.211c.695.719 1.888.03 1.613-.931l-.08-.284a.96.96 0 0 1 1.187-1.187l.283.081c.96.275 1.65-.918.931-1.613l-.211-.205a.96.96 0 0 1 .434-1.622l.286-.071c.97-.243.97-1.62 0-1.864l-.286-.071a.96.96 0 0 1-.434-1.622l.211-.205c.719-.695.03-1.888-.931-1.613l-.284.08a.96.96 0 0 1-1.187-1.186l.081-.284c.275-.96-.918-1.65-1.613-.931l-.205.211a.96.96 0 0 1-1.622-.434L8.932.727zM8 12.997a4.998 4.998 0 1 0 0-9.995 4.998 4.998 0 0 0 0 9.996z"/><path fill-rule="evenodd" d="M7.375 8L4.602 4.302l.8-.6L8.25 7.5h4.748v1H8.25L5.4 12.298l-.8-.6L7.376 8z"/>'); // eslint-disable-next-line
 
-var BIconGem = /*#__PURE__*/makeIcon('Gem', '<path fill-rule="evenodd" d="M3.1.7a.5.5 0 01.4-.2h9a.5.5 0 01.4.2l2.976 3.974c.149.185.156.45.01.644L8.4 15.3a.5.5 0 01-.8 0L.1 5.3a.5.5 0 010-.6l3-4zm11.386 3.785l-1.806-2.41-.776 2.413 2.582-.003zm-3.633.004l.961-2.989H4.186l.963 2.995 5.704-.006zM5.47 5.495l5.062-.005L8 13.366 5.47 5.495zm-1.371-.999l-.78-2.422-1.818 2.425 2.598-.003zM1.499 5.5l2.92-.003 2.193 6.82L1.5 5.5zm7.889 6.817l2.194-6.828 2.929-.003-5.123 6.831z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGem = /*#__PURE__*/makeIcon('Gem', '<path fill-rule="evenodd" d="M3.1.7a.5.5 0 0 1 .4-.2h9a.5.5 0 0 1 .4.2l2.976 3.974c.149.185.156.45.01.644L8.4 15.3a.5.5 0 0 1-.8 0L.1 5.3a.5.5 0 0 1 0-.6l3-4zm11.386 3.785l-1.806-2.41-.776 2.413 2.582-.003zm-3.633.004l.961-2.989H4.186l.963 2.995 5.704-.006zM5.47 5.495l5.062-.005L8 13.366 5.47 5.495zm-1.371-.999l-.78-2.422-1.818 2.425 2.598-.003zM1.499 5.5l2.92-.003 2.193 6.82L1.5 5.5zm7.889 6.817l2.194-6.828 2.929-.003-5.123 6.831z"/>'); // eslint-disable-next-line
 
-var BIconGeo = /*#__PURE__*/makeIcon('Geo', '<path d="M11 4a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M7.5 4h1v9a.5.5 0 01-1 0V4z"/><path fill-rule="evenodd" d="M6.489 12.095a.5.5 0 01-.383.594c-.565.123-1.003.292-1.286.472-.302.192-.32.321-.32.339 0 .013.005.085.146.21.14.124.372.26.701.382.655.246 1.593.408 2.653.408s1.998-.162 2.653-.408c.329-.123.56-.258.701-.382.14-.125.146-.197.146-.21 0-.018-.018-.147-.32-.339-.283-.18-.721-.35-1.286-.472a.5.5 0 11.212-.977c.63.137 1.193.34 1.61.606.4.253.784.645.784 1.182 0 .402-.219.724-.483.958-.264.235-.618.423-1.013.57-.793.298-1.855.472-3.004.472s-2.21-.174-3.004-.471c-.395-.148-.749-.336-1.013-.571-.264-.234-.483-.556-.483-.958 0-.537.384-.929.783-1.182.418-.266.98-.47 1.611-.606a.5.5 0 01.595.383z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGeo = /*#__PURE__*/makeIcon('Geo', '<path d="M11 4a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path d="M7.5 4h1v9a.5.5 0 0 1-1 0V4z"/><path fill-rule="evenodd" d="M6.489 12.095a.5.5 0 0 1-.383.594c-.565.123-1.003.292-1.286.472-.302.192-.32.321-.32.339 0 .013.005.085.146.21.14.124.372.26.701.382.655.246 1.593.408 2.653.408s1.998-.162 2.653-.408c.329-.123.56-.258.701-.382.14-.125.146-.197.146-.21 0-.018-.018-.147-.32-.339-.283-.18-.721-.35-1.286-.472a.5.5 0 1 1 .212-.977c.63.137 1.193.34 1.61.606.4.253.784.645.784 1.182 0 .402-.219.724-.483.958-.264.235-.618.423-1.013.57-.793.298-1.855.472-3.004.472s-2.21-.174-3.004-.471c-.395-.148-.749-.336-1.013-.571-.264-.234-.483-.556-.483-.958 0-.537.384-.929.783-1.182.418-.266.98-.47 1.611-.606a.5.5 0 0 1 .595.383z"/>'); // eslint-disable-next-line
 
-var BIconGeoAlt = /*#__PURE__*/makeIcon('GeoAlt', '<path fill-rule="evenodd" d="M8 16s6-5.686 6-10A6 6 0 002 6c0 4.314 6 10 6 10zm0-7a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGeoAlt = /*#__PURE__*/makeIcon('GeoAlt', '<path fill-rule="evenodd" d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>'); // eslint-disable-next-line
 
-var BIconGift = /*#__PURE__*/makeIcon('Gift', '<path fill-rule="evenodd" d="M2 6v8.5a.5.5 0 00.5.5h11a.5.5 0 00.5-.5V6h1v8.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 14.5V6h1zm8-5a1.5 1.5 0 00-1.5 1.5c0 .098.033.16.12.227.103.081.272.15.49.2A3.44 3.44 0 009.96 3h.015L10 2.999l.025.002h.014A2.569 2.569 0 0010.293 3c.17-.006.387-.026.598-.073.217-.048.386-.118.49-.199.086-.066.119-.13.119-.227A1.5 1.5 0 0010 1zm0 3h-.006a3.535 3.535 0 01-.326 0 4.435 4.435 0 01-.777-.097c-.283-.063-.614-.175-.885-.385A1.255 1.255 0 017.5 2.5a2.5 2.5 0 015 0c0 .454-.217.793-.506 1.017-.27.21-.602.322-.885.385a4.434 4.434 0 01-1.104.099H10z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 1a1.5 1.5 0 00-1.5 1.5c0 .098.033.16.12.227.103.081.272.15.49.2A3.44 3.44 0 005.96 3h.015L6 2.999l.025.002h.014l.053.001a3.869 3.869 0 00.799-.076c.217-.048.386-.118.49-.199.086-.066.119-.13.119-.227A1.5 1.5 0 006 1zm0 3h-.006a3.535 3.535 0 01-.326 0 4.435 4.435 0 01-.777-.097c-.283-.063-.614-.175-.885-.385A1.255 1.255 0 013.5 2.5a2.5 2.5 0 015 0c0 .454-.217.793-.506 1.017-.27.21-.602.322-.885.385a4.435 4.435 0 01-1.103.099H6zm1.5 12V6h1v10h-1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15 4H1v1h14V4zM1 3a1 1 0 00-1 1v1a1 1 0 001 1h14a1 1 0 001-1V4a1 1 0 00-1-1H1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGift = /*#__PURE__*/makeIcon('Gift', '<path fill-rule="evenodd" d="M2 6v8.5a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5V6h1v8.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 14.5V6h1zm8-5a1.5 1.5 0 0 0-1.5 1.5c0 .098.033.16.12.227.103.081.272.15.49.2A3.44 3.44 0 0 0 9.96 3h.015L10 2.999l.025.002h.014A2.569 2.569 0 0 0 10.293 3c.17-.006.387-.026.598-.073.217-.048.386-.118.49-.199.086-.066.119-.13.119-.227A1.5 1.5 0 0 0 10 1zm0 3h-.006a3.535 3.535 0 0 1-.326 0 4.435 4.435 0 0 1-.777-.097c-.283-.063-.614-.175-.885-.385A1.255 1.255 0 0 1 7.5 2.5a2.5 2.5 0 0 1 5 0c0 .454-.217.793-.506 1.017-.27.21-.602.322-.885.385a4.434 4.434 0 0 1-1.104.099H10z"/><path fill-rule="evenodd" d="M6 1a1.5 1.5 0 0 0-1.5 1.5c0 .098.033.16.12.227.103.081.272.15.49.2A3.44 3.44 0 0 0 5.96 3h.015L6 2.999l.025.002h.014l.053.001a3.869 3.869 0 0 0 .799-.076c.217-.048.386-.118.49-.199.086-.066.119-.13.119-.227A1.5 1.5 0 0 0 6 1zm0 3h-.006a3.535 3.535 0 0 1-.326 0 4.435 4.435 0 0 1-.777-.097c-.283-.063-.614-.175-.885-.385A1.255 1.255 0 0 1 3.5 2.5a2.5 2.5 0 0 1 5 0c0 .454-.217.793-.506 1.017-.27.21-.602.322-.885.385a4.435 4.435 0 0 1-1.103.099H6zm1.5 12V6h1v10h-1z"/><path fill-rule="evenodd" d="M15 4H1v1h14V4zM1 3a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H1z"/>'); // eslint-disable-next-line
 
-var BIconGiftFill = /*#__PURE__*/makeIcon('GiftFill', '<path fill-rule="evenodd" d="M10 1a1.5 1.5 0 00-1.5 1.5c0 .098.033.16.12.227.103.081.272.15.49.2A3.44 3.44 0 009.96 3h.015L10 2.999l.025.002h.014A2.569 2.569 0 0010.293 3c.17-.006.387-.026.598-.073.217-.048.386-.118.49-.199.086-.066.119-.13.119-.227A1.5 1.5 0 0010 1zm0 3h-.006a3.535 3.535 0 01-.326 0 4.435 4.435 0 01-.777-.097c-.283-.063-.614-.175-.885-.385A1.255 1.255 0 017.5 2.5a2.5 2.5 0 015 0c0 .454-.217.793-.506 1.017-.27.21-.602.322-.885.385a4.434 4.434 0 01-1.104.099H10z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 1a1.5 1.5 0 00-1.5 1.5c0 .098.033.16.12.227.103.081.272.15.49.2A3.44 3.44 0 005.96 3h.015L6 2.999l.025.002h.014l.053.001a3.869 3.869 0 00.799-.076c.217-.048.386-.118.49-.199.086-.066.119-.13.119-.227A1.5 1.5 0 006 1zm0 3h-.006a3.535 3.535 0 01-.326 0 4.435 4.435 0 01-.777-.097c-.283-.063-.614-.175-.885-.385A1.255 1.255 0 013.5 2.5a2.5 2.5 0 015 0c0 .454-.217.793-.506 1.017-.27.21-.602.322-.885.385a4.435 4.435 0 01-1.103.099H6zm9 10.5V7H8.5v9h5a1.5 1.5 0 001.5-1.5zM7.5 16h-5A1.5 1.5 0 011 14.5V7h6.5v9z" clip-rule="evenodd"/><path d="M0 4a1 1 0 011-1h14a1 1 0 011 1v1a1 1 0 01-1 1H1a1 1 0 01-1-1V4z"/>'); // eslint-disable-next-line
+var BIconGiftFill = /*#__PURE__*/makeIcon('GiftFill', '<path fill-rule="evenodd" d="M10 1a1.5 1.5 0 0 0-1.5 1.5c0 .098.033.16.12.227.103.081.272.15.49.2A3.44 3.44 0 0 0 9.96 3h.015L10 2.999l.025.002h.014A2.569 2.569 0 0 0 10.293 3c.17-.006.387-.026.598-.073.217-.048.386-.118.49-.199.086-.066.119-.13.119-.227A1.5 1.5 0 0 0 10 1zm0 3h-.006a3.535 3.535 0 0 1-.326 0 4.435 4.435 0 0 1-.777-.097c-.283-.063-.614-.175-.885-.385A1.255 1.255 0 0 1 7.5 2.5a2.5 2.5 0 0 1 5 0c0 .454-.217.793-.506 1.017-.27.21-.602.322-.885.385a4.434 4.434 0 0 1-1.104.099H10z"/><path fill-rule="evenodd" d="M6 1a1.5 1.5 0 0 0-1.5 1.5c0 .098.033.16.12.227.103.081.272.15.49.2A3.44 3.44 0 0 0 5.96 3h.015L6 2.999l.025.002h.014l.053.001a3.869 3.869 0 0 0 .799-.076c.217-.048.386-.118.49-.199.086-.066.119-.13.119-.227A1.5 1.5 0 0 0 6 1zm0 3h-.006a3.535 3.535 0 0 1-.326 0 4.435 4.435 0 0 1-.777-.097c-.283-.063-.614-.175-.885-.385A1.255 1.255 0 0 1 3.5 2.5a2.5 2.5 0 0 1 5 0c0 .454-.217.793-.506 1.017-.27.21-.602.322-.885.385a4.435 4.435 0 0 1-1.103.099H6zm9 10.5V7H8.5v9h5a1.5 1.5 0 0 0 1.5-1.5zM7.5 16h-5A1.5 1.5 0 0 1 1 14.5V7h6.5v9z"/><path d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V4z"/>'); // eslint-disable-next-line
 
-var BIconGraphDown = /*#__PURE__*/makeIcon('GraphDown', '<path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"/><path fill-rule="evenodd" d="M14.39 9.041l-4.349-5.436L7 6.646 3.354 3l-.708.707L7 8.061l2.959-2.959 3.65 4.564.781-.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 9.854a.5.5 0 00.5.5h4a.5.5 0 00.5-.5v-4a.5.5 0 00-1 0v3.5h-3.5a.5.5 0 00-.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGraphDown = /*#__PURE__*/makeIcon('GraphDown', '<path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"/><path fill-rule="evenodd" d="M14.39 9.041l-4.349-5.436L7 6.646 3.354 3l-.708.707L7 8.061l2.959-2.959 3.65 4.564.781-.625z"/><path fill-rule="evenodd" d="M10 9.854a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-1 0v3.5h-3.5a.5.5 0 0 0-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconGraphUp = /*#__PURE__*/makeIcon('GraphUp', '<path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"/><path fill-rule="evenodd" d="M14.39 4.312L10.041 9.75 7 6.707l-3.646 3.647-.708-.708L7 5.293 9.959 8.25l3.65-4.563.781.624z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 3.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4h-3.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGraphUp = /*#__PURE__*/makeIcon('GraphUp', '<path d="M0 0h1v16H0V0zm1 15h15v1H1v-1z"/><path fill-rule="evenodd" d="M14.39 4.312L10.041 9.75 7 6.707l-3.646 3.647-.708-.708L7 5.293 9.959 8.25l3.65-4.563.781.624z"/><path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4h-3.5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconGrid = /*#__PURE__*/makeIcon('Grid', '<path fill-rule="evenodd" d="M1 2.5A1.5 1.5 0 012.5 1h3A1.5 1.5 0 017 2.5v3A1.5 1.5 0 015.5 7h-3A1.5 1.5 0 011 5.5v-3zM2.5 2a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5h-3zm6.5.5A1.5 1.5 0 0110.5 1h3A1.5 1.5 0 0115 2.5v3A1.5 1.5 0 0113.5 7h-3A1.5 1.5 0 019 5.5v-3zm1.5-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5h-3zM1 10.5A1.5 1.5 0 012.5 9h3A1.5 1.5 0 017 10.5v3A1.5 1.5 0 015.5 15h-3A1.5 1.5 0 011 13.5v-3zm1.5-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5h-3zm6.5.5A1.5 1.5 0 0110.5 9h3a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-1.5 1.5h-3A1.5 1.5 0 019 13.5v-3zm1.5-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5h-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGrid = /*#__PURE__*/makeIcon('Grid', '<path fill-rule="evenodd" d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>'); // eslint-disable-next-line
 
-var BIconGrid1x2 = /*#__PURE__*/makeIcon('Grid1x2', '<path fill-rule="evenodd" d="M6 1H1v14h5V1zm9 0h-5v5h5V1zm0 9h-5v5h5v-5zM0 1a1 1 0 011-1h5a1 1 0 011 1v14a1 1 0 01-1 1H1a1 1 0 01-1-1V1zm9 0a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1h-5a1 1 0 01-1-1V1zm1 8a1 1 0 00-1 1v5a1 1 0 001 1h5a1 1 0 001-1v-5a1 1 0 00-1-1h-5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGrid1x2 = /*#__PURE__*/makeIcon('Grid1x2', '<path fill-rule="evenodd" d="M6 1H1v14h5V1zm9 0h-5v5h5V1zm0 9h-5v5h5v-5zM0 1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm9 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V1zm1 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1h-5z"/>'); // eslint-disable-next-line
 
-var BIconGrid1x2Fill = /*#__PURE__*/makeIcon('Grid1x2Fill', '<path d="M0 1a1 1 0 011-1h5a1 1 0 011 1v14a1 1 0 01-1 1H1a1 1 0 01-1-1V1zm9 0a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1h-5a1 1 0 01-1-1V1zm0 9a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 01-1 1h-5a1 1 0 01-1-1v-5z"/>'); // eslint-disable-next-line
+var BIconGrid1x2Fill = /*#__PURE__*/makeIcon('Grid1x2Fill', '<path d="M0 1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm9 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V1zm0 9a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5z"/>'); // eslint-disable-next-line
 
-var BIconGrid3x2 = /*#__PURE__*/makeIcon('Grid3x2', '<path fill-rule="evenodd" d="M0 3.5A1.5 1.5 0 011.5 2h13A1.5 1.5 0 0116 3.5v8a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 010 11.5v-8zM1.5 3a.5.5 0 00-.5.5V7h4V3H1.5zM5 8H1v3.5a.5.5 0 00.5.5H5V8zm1 0h4v4H6V8zm4-1H6V3h4v4zm1 1v4h3.5a.5.5 0 00.5-.5V8h-4zm0-1V3h3.5a.5.5 0 01.5.5V7h-4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGrid3x2 = /*#__PURE__*/makeIcon('Grid3x2', '<path fill-rule="evenodd" d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 11.5v-8zM1.5 3a.5.5 0 0 0-.5.5V7h4V3H1.5zM5 8H1v3.5a.5.5 0 0 0 .5.5H5V8zm1 0h4v4H6V8zm4-1H6V3h4v4zm1 1v4h3.5a.5.5 0 0 0 .5-.5V8h-4zm0-1V3h3.5a.5.5 0 0 1 .5.5V7h-4z"/>'); // eslint-disable-next-line
 
-var BIconGrid3x2Gap = /*#__PURE__*/makeIcon('Grid3x2Gap', '<path stroke="currentColor" d="M1.5 4a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H2a.5.5 0 01-.5-.5V4zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5V4zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 01-.5-.5V4zm-10 5a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H2a.5.5 0 01-.5-.5V9zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5V9zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 01-.5-.5V9z"/>'); // eslint-disable-next-line
+var BIconGrid3x2Gap = /*#__PURE__*/makeIcon('Grid3x2Gap', '<path fill-rule="evenodd" d="M4 4H2v2h2V4zm1 7V9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zm0-5V4a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zm5 5V9a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zm0-5V4a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zM9 4H7v2h2V4zm5 0h-2v2h2V4zM4 9H2v2h2V9zm5 0H7v2h2V9zm5 0h-2v2h2V9zm-3-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V4zm1 4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-2z"/>'); // eslint-disable-next-line
 
-var BIconGrid3x2GapFill = /*#__PURE__*/makeIcon('Grid3x2GapFill', '<path d="M1 4a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1V4zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1V4zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V4zM1 9a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1V9zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1V9zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V9z"/>'); // eslint-disable-next-line
+var BIconGrid3x2GapFill = /*#__PURE__*/makeIcon('Grid3x2GapFill', '<path d="M1 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V4zM1 9a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V9zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V9z"/>'); // eslint-disable-next-line
 
-var BIconGrid3x3 = /*#__PURE__*/makeIcon('Grid3x3', '<path fill-rule="evenodd" d="M0 1.5A1.5 1.5 0 011.5 0h13A1.5 1.5 0 0116 1.5v13a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 010 14.5v-13zM1.5 1a.5.5 0 00-.5.5V5h4V1H1.5zM5 6H1v4h4V6zm1 4V6h4v4H6zm-1 1H1v3.5a.5.5 0 00.5.5H5v-4zm1 0h4v4H6v-4zm5 0v4h3.5a.5.5 0 00.5-.5V11h-4zm0-1h4V6h-4v4zm0-5h4V1.5a.5.5 0 00-.5-.5H11v4zm-1 0H6V1h4v4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGrid3x3 = /*#__PURE__*/makeIcon('Grid3x3', '<path fill-rule="evenodd" d="M0 1.5A1.5 1.5 0 0 1 1.5 0h13A1.5 1.5 0 0 1 16 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13zM1.5 1a.5.5 0 0 0-.5.5V5h4V1H1.5zM5 6H1v4h4V6zm1 4V6h4v4H6zm-1 1H1v3.5a.5.5 0 0 0 .5.5H5v-4zm1 0h4v4H6v-4zm5 0v4h3.5a.5.5 0 0 0 .5-.5V11h-4zm0-1h4V6h-4v4zm0-5h4V1.5a.5.5 0 0 0-.5-.5H11v4zm-1 0H6V1h4v4z"/>'); // eslint-disable-next-line
 
-var BIconGrid3x3Gap = /*#__PURE__*/makeIcon('Grid3x3Gap', '<path stroke="currentColor" d="M1.5 2a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H2a.5.5 0 01-.5-.5V2zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5V2zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 01-.5-.5V2zm-10 5a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H2a.5.5 0 01-.5-.5V7zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5V7zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 01-.5-.5V7zm-10 5a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H2a.5.5 0 01-.5-.5v-2zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5v-2zm5 0a.5.5 0 01.5-.5h2a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 01-.5-.5v-2z"/>'); // eslint-disable-next-line
+var BIconGrid3x3Gap = /*#__PURE__*/makeIcon('Grid3x3Gap', '<path fill-rule="evenodd" d="M4 2H2v2h2V2zm1 12v-2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zm0-5V7a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zm0-5V2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zm5 10v-2a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zm0-5V7a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zm0-5V2a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1zM9 2H7v2h2V2zm5 0h-2v2h2V2zM4 7H2v2h2V7zm5 0H7v2h2V7zm5 0h-2v2h2V7zM4 12H2v2h2v-2zm5 0H7v2h2v-2zm5 0h-2v2h2v-2zM12 1a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1h-2zm-1 6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V7zm1 4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2z"/>'); // eslint-disable-next-line
 
-var BIconGrid3x3GapFill = /*#__PURE__*/makeIcon('Grid3x3GapFill', '<path d="M1 2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1V2zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1V2zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V2zM1 7a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1V7zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1V7zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1V7zM1 12a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1v-2zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1v-2zm5 0a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1h-2a1 1 0 01-1-1v-2z"/>'); // eslint-disable-next-line
+var BIconGrid3x3GapFill = /*#__PURE__*/makeIcon('Grid3x3GapFill', '<path d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V2zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V7zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-2zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-2z"/>'); // eslint-disable-next-line
 
-var BIconGridFill = /*#__PURE__*/makeIcon('GridFill', '<path fill-rule="evenodd" d="M1 2.5A1.5 1.5 0 012.5 1h3A1.5 1.5 0 017 2.5v3A1.5 1.5 0 015.5 7h-3A1.5 1.5 0 011 5.5v-3zm8 0A1.5 1.5 0 0110.5 1h3A1.5 1.5 0 0115 2.5v3A1.5 1.5 0 0113.5 7h-3A1.5 1.5 0 019 5.5v-3zm-8 8A1.5 1.5 0 012.5 9h3A1.5 1.5 0 017 10.5v3A1.5 1.5 0 015.5 15h-3A1.5 1.5 0 011 13.5v-3zm8 0A1.5 1.5 0 0110.5 9h3a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-1.5 1.5h-3A1.5 1.5 0 019 13.5v-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGridFill = /*#__PURE__*/makeIcon('GridFill', '<path fill-rule="evenodd" d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>'); // eslint-disable-next-line
 
-var BIconHammer = /*#__PURE__*/makeIcon('Hammer', '<path d="M9.812 1.952a.5.5 0 01-.312.89c-1.671 0-2.852.596-3.616 1.185L4.857 5.073V6.21a.5.5 0 01-.146.354L3.425 7.853a.5.5 0 01-.708 0L.146 5.274a.5.5 0 010-.706l1.286-1.29a.5.5 0 01.354-.146H2.84C4.505 1.228 6.216.862 7.557 1.04a5.009 5.009 0 012.077.782l.178.129z"/><path fill-rule="evenodd" d="M6.012 3.5a.5.5 0 01.359.165l9.146 8.646A.5.5 0 0115.5 13L14 14.5a.5.5 0 01-.756-.056L4.598 5.297a.5.5 0 01.048-.65l1-1a.5.5 0 01.366-.147z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconGripHorizontal = /*#__PURE__*/makeIcon('GripHorizontal', '<path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>'); // eslint-disable-next-line
 
-var BIconHash = /*#__PURE__*/makeIcon('Hash', '<path d="M8.39 12.648a1.32 1.32 0 00-.015.18c0 .305.21.508.5.508.266 0 .492-.172.555-.477l.554-2.703h1.204c.421 0 .617-.234.617-.547 0-.312-.188-.53-.617-.53h-.985l.516-2.524h1.265c.43 0 .618-.227.618-.547 0-.313-.188-.524-.618-.524h-1.046l.476-2.304a1.06 1.06 0 00.016-.164.51.51 0 00-.516-.516.54.54 0 00-.539.43l-.523 2.554H7.617l.477-2.304c.008-.04.015-.118.015-.164a.512.512 0 00-.523-.516.539.539 0 00-.531.43L6.53 5.484H5.414c-.43 0-.617.22-.617.532 0 .312.187.539.617.539h.906l-.515 2.523H4.609c-.421 0-.609.219-.609.531 0 .313.188.547.61.547h.976l-.516 2.492c-.008.04-.015.125-.015.18 0 .305.21.508.5.508.265 0 .492-.172.554-.477l.555-2.703h2.242l-.515 2.492zm-1-6.109h2.266l-.515 2.563H6.859l.532-2.563z"/>'); // eslint-disable-next-line
+var BIconGripVertical = /*#__PURE__*/makeIcon('GripVertical', '<path d="M2 8a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm0-3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm3 3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm0-3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm3 3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm0-3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm3 3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm0-3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm3 3a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm0-3a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>'); // eslint-disable-next-line
 
-var BIconHeart = /*#__PURE__*/makeIcon('Heart', '<path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 01.176-.17C12.72-3.042 23.333 4.867 8 15z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHammer = /*#__PURE__*/makeIcon('Hammer', '<path d="M9.812 1.952a.5.5 0 0 1-.312.89c-1.671 0-2.852.596-3.616 1.185L4.857 5.073V6.21a.5.5 0 0 1-.146.354L3.425 7.853a.5.5 0 0 1-.708 0L.146 5.274a.5.5 0 0 1 0-.706l1.286-1.29a.5.5 0 0 1 .354-.146H2.84C4.505 1.228 6.216.862 7.557 1.04a5.009 5.009 0 0 1 2.077.782l.178.129z"/><path fill-rule="evenodd" d="M6.012 3.5a.5.5 0 0 1 .359.165l9.146 8.646A.5.5 0 0 1 15.5 13L14 14.5a.5.5 0 0 1-.756-.056L4.598 5.297a.5.5 0 0 1 .048-.65l1-1a.5.5 0 0 1 .366-.147z"/>'); // eslint-disable-next-line
 
-var BIconHeartFill = /*#__PURE__*/makeIcon('HeartFill', '<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHandIndex = /*#__PURE__*/makeIcon('HandIndex', '<path fill-rule="evenodd" d="M6.75 1a.75.75 0 0 0-.75.75V9a.5.5 0 0 1-1 0v-.89l-1.003.2a.5.5 0 0 0-.399.546l.345 3.105a1.5 1.5 0 0 0 .243.666l1.433 2.15a.5.5 0 0 0 .416.223h6.385a.5.5 0 0 0 .434-.252l1.395-2.442a2.5 2.5 0 0 0 .317-.991l.272-2.715a1 1 0 0 0-.995-1.1H13.5v1a.5.5 0 0 1-1 0V7.154a4.208 4.208 0 0 0-.2-.26c-.187-.222-.368-.383-.486-.43-.124-.05-.392-.063-.708-.039a4.844 4.844 0 0 0-.106.01V8a.5.5 0 0 1-1 0V5.986c0-.167-.073-.272-.15-.314a1.657 1.657 0 0 0-.448-.182c-.179-.035-.5-.04-.816-.027l-.086.004V8a.5.5 0 0 1-1 0V1.75A.75.75 0 0 0 6.75 1zM8.5 4.466V1.75a1.75 1.75 0 0 0-3.5 0v5.34l-1.199.24a1.5 1.5 0 0 0-1.197 1.636l.345 3.106a2.5 2.5 0 0 0 .405 1.11l1.433 2.15A1.5 1.5 0 0 0 6.035 16h6.385a1.5 1.5 0 0 0 1.302-.756l1.395-2.441a3.5 3.5 0 0 0 .444-1.389l.272-2.715a2 2 0 0 0-1.99-2.199h-.582a5.184 5.184 0 0 0-.195-.248c-.191-.229-.51-.568-.88-.716-.364-.146-.846-.132-1.158-.108l-.132.012a1.26 1.26 0 0 0-.56-.642 2.634 2.634 0 0 0-.738-.288c-.31-.062-.739-.058-1.05-.046l-.048.002zm2.094 2.025z"/>'); // eslint-disable-next-line
 
-var BIconHeartHalf = /*#__PURE__*/makeIcon('HeartHalf', '<path fill-rule="evenodd" d="M8 1.314C3.562-3.248-7.534 4.735 8 15V1.314z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 01.176-.17C12.72-3.042 23.333 4.867 8 15z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHandIndexThumb = /*#__PURE__*/makeIcon('HandIndexThumb', '<path fill-rule="evenodd" d="M6.75 1a.75.75 0 0 0-.75.75V9.5a.5.5 0 0 1-.854.354l-2.41-2.411a.517.517 0 0 0-.809.631l2.512 4.185 1.232 2.465a.5.5 0 0 0 .447.276h6.302a.5.5 0 0 0 .434-.252l1.395-2.442a2.5 2.5 0 0 0 .317-.991l.272-2.715a1 1 0 0 0-.995-1.1H13.5v1a.5.5 0 1 1-1 0V7.154a4.208 4.208 0 0 0-.2-.26c-.187-.222-.368-.383-.486-.43-.124-.05-.392-.063-.708-.039a4.844 4.844 0 0 0-.106.01V8a.5.5 0 1 1-1 0V5.986c0-.167-.073-.272-.15-.314a1.657 1.657 0 0 0-.448-.182c-.179-.035-.5-.04-.816-.027l-.086.004V8a.5.5 0 1 1-1 0V1.75A.75.75 0 0 0 6.75 1zM8.5 4.466V1.75a1.75 1.75 0 1 0-3.5 0v6.543L3.443 6.736A1.517 1.517 0 0 0 1.07 8.588l2.491 4.153 1.215 2.43A1.5 1.5 0 0 0 6.118 16h6.302a1.5 1.5 0 0 0 1.302-.756l1.395-2.441a3.5 3.5 0 0 0 .444-1.389l.272-2.715a2 2 0 0 0-1.99-2.199h-.582a5.114 5.114 0 0 0-.195-.248c-.191-.229-.51-.568-.88-.716-.364-.146-.846-.132-1.158-.108l-.132.012a1.26 1.26 0 0 0-.56-.642 2.634 2.634 0 0 0-.738-.288c-.31-.062-.739-.058-1.05-.046l-.048.002zm2.094 2.025z"/>'); // eslint-disable-next-line
 
-var BIconHouse = /*#__PURE__*/makeIcon('House', '<path fill-rule="evenodd" d="M2 13.5V7h1v6.5a.5.5 0 00.5.5h9a.5.5 0 00.5-.5V7h1v6.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 012 13.5zm11-11V6l-2-2V2.5a.5.5 0 01.5-.5h1a.5.5 0 01.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.293 1.5a1 1 0 011.414 0l6.647 6.646a.5.5 0 01-.708.708L8 2.207 1.354 8.854a.5.5 0 11-.708-.708L7.293 1.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHandThumbsDown = /*#__PURE__*/makeIcon('HandThumbsDown', '<path fill-rule="evenodd" d="M6.956 14.534c.065.936.952 1.659 1.908 1.42l.261-.065a1.378 1.378 0 0 0 1.012-.965c.22-.816.533-2.512.062-4.51.136.02.285.037.443.051.713.065 1.669.071 2.516-.211.518-.173.994-.68 1.2-1.272a1.896 1.896 0 0 0-.234-1.734c.058-.118.103-.242.138-.362.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.094 2.094 0 0 0-.16-.403c.169-.387.107-.82-.003-1.149a3.162 3.162 0 0 0-.488-.9c.054-.153.076-.313.076-.465a1.86 1.86 0 0 0-.253-.912C13.1.757 12.437.28 11.5.28v1c.563 0 .901.272 1.066.56.086.15.121.3.121.416 0 .12-.035.165-.04.17l-.354.353.353.354c.202.202.407.512.505.805.104.312.043.44-.005.488l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.415-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.353.352.373.714.267 1.021-.122.35-.396.593-.571.651-.653.218-1.447.224-2.11.164a8.907 8.907 0 0 1-1.094-.17l-.014-.004H9.62a.5.5 0 0 0-.595.643 8.34 8.34 0 0 1 .145 4.725c-.03.112-.128.215-.288.255l-.262.066c-.306.076-.642-.156-.667-.519-.075-1.081-.239-2.15-.482-2.85-.174-.502-.603-1.267-1.238-1.977C5.597 8.926 4.715 8.23 3.62 7.93 3.226 7.823 3 7.534 3 7.28V3.279c0-.26.22-.515.553-.55 1.293-.138 1.936-.53 2.491-.869l.04-.024c.27-.165.495-.296.776-.393.277-.096.63-.163 1.14-.163h3.5v-1H8c-.605 0-1.07.08-1.466.217a4.823 4.823 0 0 0-.97.485l-.048.029c-.504.308-.999.61-2.068.723C2.682 1.815 2 2.434 2 3.279v4c0 .851.685 1.433 1.357 1.616.849.232 1.574.787 2.132 1.41.56.626.914 1.28 1.039 1.638.199.575.356 1.54.428 2.591z"/>'); // eslint-disable-next-line
 
-var BIconHouseDoor = /*#__PURE__*/makeIcon('HouseDoor', '<path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 01.708 0l6 6a.5.5 0 01.146.354v7a.5.5 0 01-.5.5H9.5a.5.5 0 01-.5-.5v-4H7v4a.5.5 0 01-.5.5H2a.5.5 0 01-.5-.5v-7a.5.5 0 01.146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v4h3.5V7.707L8 2.207l-5.5 5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 01.5-.5h1a.5.5 0 01.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHandThumbsUp = /*#__PURE__*/makeIcon('HandThumbsUp', '<path fill-rule="evenodd" d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16v-1c.563 0 .901-.272 1.066-.56a.865.865 0 0 0 .121-.416c0-.12-.035-.165-.04-.17l-.354-.354.353-.354c.202-.201.407-.511.505-.804.104-.312.043-.441-.005-.488l-.353-.354.353-.354c.043-.042.105-.14.154-.315.048-.167.075-.37.075-.581 0-.211-.027-.414-.075-.581-.05-.174-.111-.273-.154-.315L12.793 9l.353-.354c.353-.352.373-.713.267-1.02-.122-.35-.396-.593-.571-.652-.653-.217-1.447-.224-2.11-.164a8.907 8.907 0 0 0-1.094.171l-.014.003-.003.001a.5.5 0 0 1-.595-.643 8.34 8.34 0 0 0 .145-4.726c-.03-.111-.128-.215-.288-.255l-.262-.065c-.306-.077-.642.156-.667.518-.075 1.082-.239 2.15-.482 2.85-.174.502-.603 1.268-1.238 1.977-.637.712-1.519 1.41-2.614 1.708-.394.108-.62.396-.62.65v4.002c0 .26.22.515.553.55 1.293.137 1.936.53 2.491.868l.04.025c.27.164.495.296.776.393.277.095.63.163 1.14.163h3.5v1H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z"/>'); // eslint-disable-next-line
 
-var BIconHouseDoorFill = /*#__PURE__*/makeIcon('HouseDoorFill', '<path d="M6.5 10.995V14.5a.5.5 0 01-.5.5H2a.5.5 0 01-.5-.5v-7a.5.5 0 01.146-.354l6-6a.5.5 0 01.708 0l6 6a.5.5 0 01.146.354v7a.5.5 0 01-.5.5h-4a.5.5 0 01-.5-.5V11c0-.25-.25-.5-.5-.5H7c-.25 0-.5.25-.5.495z"/><path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 01.5-.5h1a.5.5 0 01.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHandbag = /*#__PURE__*/makeIcon('Handbag', '<path fill-rule="evenodd" d="M8 1a2 2 0 0 0-2 2v4.5a.5.5 0 0 1-1 0V3a3 3 0 0 1 6 0v4.5a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z"/><path fill-rule="evenodd" d="M3.405 6a.5.5 0 0 0-.498.45l-.912 6.9A1.5 1.5 0 0 0 3.488 15h9.024a1.5 1.5 0 0 0 1.493-1.65l-.913-6.9a.5.5 0 0 0-.497-.45h-9.19zm-1.493.35A1.5 1.5 0 0 1 3.405 5h9.19a1.5 1.5 0 0 1 1.493 1.35L15 13.252A2.5 2.5 0 0 1 12.512 16H3.488A2.5 2.5 0 0 1 1 13.251l.912-6.9z"/>'); // eslint-disable-next-line
 
-var BIconHouseFill = /*#__PURE__*/makeIcon('HouseFill', '<path fill-rule="evenodd" d="M8 3.293l6 6V13.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 012 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 01.5-.5h1a.5.5 0 01.5.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.293 1.5a1 1 0 011.414 0l6.647 6.646a.5.5 0 01-.708.708L8 2.207 1.354 8.854a.5.5 0 11-.708-.708L7.293 1.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHandbagFill = /*#__PURE__*/makeIcon('HandbagFill', '<path d="M8 1a2 2 0 0 0-2 2v2H5V3a3 3 0 1 1 6 0v2h-1V3a2 2 0 0 0-2-2z"/><path d="M3.405 5a1.5 1.5 0 0 0-1.493 1.35L1 13.252A2.5 2.5 0 0 0 3.488 16h9.024A2.5 2.5 0 0 0 15 13.251l-.912-6.9A1.5 1.5 0 0 0 12.595 5H11v2.5a.5.5 0 1 1-1 0V5H6v2.5a.5.5 0 0 1-1 0V5H3.405z"/>'); // eslint-disable-next-line
 
-var BIconHr = /*#__PURE__*/makeIcon('Hr', '<path fill-rule="evenodd" d="M0 8a.5.5 0 01.5-.5h15a.5.5 0 010 1H.5A.5.5 0 010 8z" clip-rule="evenodd"/><path d="M4 3h8a1 1 0 011 1v2.5h1V4a2 2 0 00-2-2H4a2 2 0 00-2 2v2.5h1V4a1 1 0 011-1zM3 9.5H2V12a2 2 0 002 2h8a2 2 0 002-2V9.5h-1V12a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>'); // eslint-disable-next-line
+var BIconHash = /*#__PURE__*/makeIcon('Hash', '<path d="M8.39 12.648a1.32 1.32 0 0 0-.015.18c0 .305.21.508.5.508.266 0 .492-.172.555-.477l.554-2.703h1.204c.421 0 .617-.234.617-.547 0-.312-.188-.53-.617-.53h-.985l.516-2.524h1.265c.43 0 .618-.227.618-.547 0-.313-.188-.524-.618-.524h-1.046l.476-2.304a1.06 1.06 0 0 0 .016-.164.51.51 0 0 0-.516-.516.54.54 0 0 0-.539.43l-.523 2.554H7.617l.477-2.304c.008-.04.015-.118.015-.164a.512.512 0 0 0-.523-.516.539.539 0 0 0-.531.43L6.53 5.484H5.414c-.43 0-.617.22-.617.532 0 .312.187.539.617.539h.906l-.515 2.523H4.609c-.421 0-.609.219-.609.531 0 .313.188.547.61.547h.976l-.516 2.492c-.008.04-.015.125-.015.18 0 .305.21.508.5.508.265 0 .492-.172.554-.477l.555-2.703h2.242l-.515 2.492zm-1-6.109h2.266l-.515 2.563H6.859l.532-2.563z"/>'); // eslint-disable-next-line
 
-var BIconImage = /*#__PURE__*/makeIcon('Image', '<path fill-rule="evenodd" d="M14.002 2h-12a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zm-12-1a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V3a2 2 0 00-2-2h-12z" clip-rule="evenodd"/><path d="M10.648 7.646a.5.5 0 01.577-.093L15.002 9.5V14h-14v-2l2.646-2.354a.5.5 0 01.63-.062l2.66 1.773 3.71-3.71z"/><path fill-rule="evenodd" d="M4.502 7a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHeadphones = /*#__PURE__*/makeIcon('Headphones', '<path fill-rule="evenodd" d="M8 3a5 5 0 0 0-5 5v4.5H2V8a6 6 0 1 1 12 0v4.5h-1V8a5 5 0 0 0-5-5z"/><path d="M11 10a1 1 0 0 1 1-1h2v4a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-3zm-6 0a1 1 0 0 0-1-1H2v4a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-3z"/>'); // eslint-disable-next-line
 
-var BIconImageAlt = /*#__PURE__*/makeIcon('ImageAlt', '<path d="M10.648 6.646a.5.5 0 01.577-.093l4.777 3.947V15a1 1 0 01-1 1h-14a1 1 0 01-1-1v-2l3.646-4.354a.5.5 0 01.63-.062l2.66 2.773 3.71-4.71z"/><path fill-rule="evenodd" d="M4.5 5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHeart = /*#__PURE__*/makeIcon('Heart', '<path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>'); // eslint-disable-next-line
 
-var BIconImageFill = /*#__PURE__*/makeIcon('ImageFill', '<path fill-rule="evenodd" d="M.002 3a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2h-12a2 2 0 01-2-2V3zm1 9l2.646-2.354a.5.5 0 01.63-.062l2.66 1.773 3.71-3.71a.5.5 0 01.577-.094L15.002 9.5V13a1 1 0 01-1 1h-12a1 1 0 01-1-1v-1zm5-6.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHeartFill = /*#__PURE__*/makeIcon('HeartFill', '<path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>'); // eslint-disable-next-line
 
-var BIconImages = /*#__PURE__*/makeIcon('Images', '<path fill-rule="evenodd" d="M12.002 4h-10a1 1 0 00-1 1v8a1 1 0 001 1h10a1 1 0 001-1V5a1 1 0 00-1-1zm-10-1a2 2 0 00-2 2v8a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2h-10z" clip-rule="evenodd"/><path d="M10.648 8.646a.5.5 0 01.577-.093l1.777 1.947V14h-12v-1l2.646-2.354a.5.5 0 01.63-.062l2.66 1.773 3.71-3.71z"/><path fill-rule="evenodd" d="M4.502 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM4 2h10a1 1 0 011 1v8a1 1 0 01-1 1v1a2 2 0 002-2V3a2 2 0 00-2-2H4a2 2 0 00-2 2h1a1 1 0 011-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHeartHalf = /*#__PURE__*/makeIcon('HeartHalf', '<path fill-rule="evenodd" d="M8 1.314C3.562-3.248-7.534 4.735 8 15V1.314z"/><path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>'); // eslint-disable-next-line
 
-var BIconInbox = /*#__PURE__*/makeIcon('Inbox', '<path fill-rule="evenodd" d="M3.81 4.063A1.5 1.5 0 014.98 3.5h6.04a1.5 1.5 0 011.17.563l3.7 4.625a.5.5 0 01-.78.624l-3.7-4.624a.5.5 0 00-.39-.188H4.98a.5.5 0 00-.39.188L.89 9.312a.5.5 0 11-.78-.624l3.7-4.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M.125 8.67A.5.5 0 01.5 8.5H6a.5.5 0 01.5.5 1.5 1.5 0 003 0 .5.5 0 01.5-.5h5.5a.5.5 0 01.496.562l-.39 3.124a1.5 1.5 0 01-1.489 1.314H1.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393zm.941.83l.32 2.562a.5.5 0 00.497.438h12.234a.5.5 0 00.496-.438l.32-2.562H10.45a2.5 2.5 0 01-4.9 0H1.066z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHexagon = /*#__PURE__*/makeIcon('Hexagon', '<path fill-rule="evenodd" d="M14 4.577L8 1 2 4.577v6.846L8 15l6-3.577V4.577zM8.5.134a1 1 0 0 0-1 0l-6 3.577a1 1 0 0 0-.5.866v6.846a1 1 0 0 0 .5.866l6 3.577a1 1 0 0 0 1 0l6-3.577a1 1 0 0 0 .5-.866V4.577a1 1 0 0 0-.5-.866L8.5.134z"/>'); // eslint-disable-next-line
 
-var BIconInboxFill = /*#__PURE__*/makeIcon('InboxFill', '<path fill-rule="evenodd" d="M3.81 4.063A1.5 1.5 0 014.98 3.5h6.04a1.5 1.5 0 011.17.563l3.7 4.625a.5.5 0 01-.78.624l-3.7-4.624a.5.5 0 00-.39-.188H4.98a.5.5 0 00-.39.188L.89 9.312a.5.5 0 11-.78-.624l3.7-4.625z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M.125 8.67A.5.5 0 01.5 8.5h5A.5.5 0 016 9c0 .828.625 2 2 2s2-1.172 2-2a.5.5 0 01.5-.5h5a.5.5 0 01.496.562l-.39 3.124a1.5 1.5 0 01-1.489 1.314H1.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHexagonFill = /*#__PURE__*/makeIcon('HexagonFill', '<path fill-rule="evenodd" d="M8.5.134a1 1 0 0 0-1 0l-6 3.577a1 1 0 0 0-.5.866v6.846a1 1 0 0 0 .5.866l6 3.577a1 1 0 0 0 1 0l6-3.577a1 1 0 0 0 .5-.866V4.577a1 1 0 0 0-.5-.866L8.5.134z"/>'); // eslint-disable-next-line
 
-var BIconInboxes = /*#__PURE__*/makeIcon('Inboxes', '<path fill-rule="evenodd" d="M.125 11.17A.5.5 0 01.5 11H6a.5.5 0 01.5.5 1.5 1.5 0 003 0 .5.5 0 01.5-.5h5.5a.5.5 0 01.496.562l-.39 3.124A1.5 1.5 0 0114.117 16H1.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393zm.941.83l.32 2.562a.5.5 0 00.497.438h12.234a.5.5 0 00.496-.438l.32-2.562H10.45a2.5 2.5 0 01-4.9 0H1.066zM3.81.563A1.5 1.5 0 014.98 0h6.04a1.5 1.5 0 011.17.563l3.7 4.625a.5.5 0 01-.78.624l-3.7-4.624A.5.5 0 0011.02 1H4.98a.5.5 0 00-.39.188L.89 5.812a.5.5 0 11-.78-.624L3.81.563z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M.125 5.17A.5.5 0 01.5 5H6a.5.5 0 01.5.5 1.5 1.5 0 003 0A.5.5 0 0110 5h5.5a.5.5 0 01.496.562l-.39 3.124A1.5 1.5 0 0114.117 10H1.883A1.5 1.5 0 01.394 8.686l-.39-3.124a.5.5 0 01.121-.393zm.941.83l.32 2.562A.5.5 0 001.884 9h12.234a.5.5 0 00.496-.438L14.933 6H10.45a2.5 2.5 0 01-4.9 0H1.066z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHexagonHalf = /*#__PURE__*/makeIcon('HexagonHalf', '<path fill-rule="evenodd" d="M14 4.577L8 1v14l6-3.577V4.577zM8.5.134a1 1 0 0 0-1 0l-6 3.577a1 1 0 0 0-.5.866v6.846a1 1 0 0 0 .5.866l6 3.577a1 1 0 0 0 1 0l6-3.577a1 1 0 0 0 .5-.866V4.577a1 1 0 0 0-.5-.866L8.5.134z"/>'); // eslint-disable-next-line
 
-var BIconInboxesFill = /*#__PURE__*/makeIcon('InboxesFill', '<path fill-rule="evenodd" d="M.125 11.17A.5.5 0 01.5 11H6a.5.5 0 01.5.5 1.5 1.5 0 003 0 .5.5 0 01.5-.5h5.5a.5.5 0 01.496.562l-.39 3.124A1.5 1.5 0 0114.117 16H1.883a1.5 1.5 0 01-1.489-1.314l-.39-3.124a.5.5 0 01.121-.393zM3.81.563A1.5 1.5 0 014.98 0h6.04a1.5 1.5 0 011.17.563l3.7 4.625a.5.5 0 01-.78.624l-3.7-4.624A.5.5 0 0011.02 1H4.98a.5.5 0 00-.39.188L.89 5.812a.5.5 0 11-.78-.624L3.81.563z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M.125 5.17A.5.5 0 01.5 5H6a.5.5 0 01.5.5 1.5 1.5 0 003 0A.5.5 0 0110 5h5.5a.5.5 0 01.496.562l-.39 3.124A1.5 1.5 0 0114.117 10H1.883A1.5 1.5 0 01.394 8.686l-.39-3.124a.5.5 0 01.121-.393z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconHouse = /*#__PURE__*/makeIcon('House', '<path fill-rule="evenodd" d="M2 13.5V7h1v6.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h1v6.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5zm11-11V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/><path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>'); // eslint-disable-next-line
+
+var BIconHouseDoor = /*#__PURE__*/makeIcon('HouseDoor', '<path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z"/><path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>'); // eslint-disable-next-line
+
+var BIconHouseDoorFill = /*#__PURE__*/makeIcon('HouseDoorFill', '<path d="M6.5 10.995V14.5a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5V11c0-.25-.25-.5-.5-.5H7c-.25 0-.5.25-.5.495z"/><path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>'); // eslint-disable-next-line
+
+var BIconHouseFill = /*#__PURE__*/makeIcon('HouseFill', '<path fill-rule="evenodd" d="M8 3.293l6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/><path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>'); // eslint-disable-next-line
+
+var BIconHr = /*#__PURE__*/makeIcon('Hr', '<path fill-rule="evenodd" d="M0 8a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H.5A.5.5 0 0 1 0 8z"/><path d="M4 3h8a1 1 0 0 1 1 1v2.5h1V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2.5h1V4a1 1 0 0 1 1-1zM3 9.5H2V12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9.5h-1V12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>'); // eslint-disable-next-line
+
+var BIconImage = /*#__PURE__*/makeIcon('Image', '<path fill-rule="evenodd" d="M14.002 2h-12a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm-12-1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12z"/><path d="M10.648 7.646a.5.5 0 0 1 .577-.093L15.002 9.5V14h-14v-2l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71z"/><path fill-rule="evenodd" d="M4.502 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>'); // eslint-disable-next-line
+
+var BIconImageAlt = /*#__PURE__*/makeIcon('ImageAlt', '<path d="M10.648 6.646a.5.5 0 0 1 .577-.093l4.777 3.947V15a1 1 0 0 1-1 1h-14a1 1 0 0 1-1-1v-2l3.646-4.354a.5.5 0 0 1 .63-.062l2.66 2.773 3.71-4.71z"/><path fill-rule="evenodd" d="M4.5 5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>'); // eslint-disable-next-line
+
+var BIconImageFill = /*#__PURE__*/makeIcon('ImageFill', '<path fill-rule="evenodd" d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094L15.002 9.5V13a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1v-1zm5-6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>'); // eslint-disable-next-line
+
+var BIconImages = /*#__PURE__*/makeIcon('Images', '<path fill-rule="evenodd" d="M12.002 4h-10a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1zm-10-1a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-10z"/><path d="M10.648 8.646a.5.5 0 0 1 .577-.093l1.777 1.947V14h-12v-1l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71z"/><path fill-rule="evenodd" d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM4 2h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1v1a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2h1a1 1 0 0 1 1-1z"/>'); // eslint-disable-next-line
+
+var BIconInbox = /*#__PURE__*/makeIcon('Inbox', '<path fill-rule="evenodd" d="M3.81 4.063A1.5 1.5 0 0 1 4.98 3.5h6.04a1.5 1.5 0 0 1 1.17.563l3.7 4.625a.5.5 0 0 1-.78.624l-3.7-4.624a.5.5 0 0 0-.39-.188H4.98a.5.5 0 0 0-.39.188L.89 9.312a.5.5 0 1 1-.78-.624l3.7-4.625z"/><path fill-rule="evenodd" d="M.125 8.67A.5.5 0 0 1 .5 8.5H6a.5.5 0 0 1 .5.5 1.5 1.5 0 0 0 3 0 .5.5 0 0 1 .5-.5h5.5a.5.5 0 0 1 .496.562l-.39 3.124a1.5 1.5 0 0 1-1.489 1.314H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .121-.393zm.941.83l.32 2.562a.5.5 0 0 0 .497.438h12.234a.5.5 0 0 0 .496-.438l.32-2.562H10.45a2.5 2.5 0 0 1-4.9 0H1.066z"/>'); // eslint-disable-next-line
+
+var BIconInboxFill = /*#__PURE__*/makeIcon('InboxFill', '<path fill-rule="evenodd" d="M3.81 4.063A1.5 1.5 0 0 1 4.98 3.5h6.04a1.5 1.5 0 0 1 1.17.563l3.7 4.625a.5.5 0 0 1-.78.624l-3.7-4.624a.5.5 0 0 0-.39-.188H4.98a.5.5 0 0 0-.39.188L.89 9.312a.5.5 0 1 1-.78-.624l3.7-4.625z"/><path fill-rule="evenodd" d="M.125 8.67A.5.5 0 0 1 .5 8.5h5A.5.5 0 0 1 6 9c0 .828.625 2 2 2s2-1.172 2-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .496.562l-.39 3.124a1.5 1.5 0 0 1-1.489 1.314H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .121-.393z"/>'); // eslint-disable-next-line
+
+var BIconInboxes = /*#__PURE__*/makeIcon('Inboxes', '<path fill-rule="evenodd" d="M.125 11.17A.5.5 0 0 1 .5 11H6a.5.5 0 0 1 .5.5 1.5 1.5 0 0 0 3 0 .5.5 0 0 1 .5-.5h5.5a.5.5 0 0 1 .496.562l-.39 3.124A1.5 1.5 0 0 1 14.117 16H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .121-.393zm.941.83l.32 2.562a.5.5 0 0 0 .497.438h12.234a.5.5 0 0 0 .496-.438l.32-2.562H10.45a2.5 2.5 0 0 1-4.9 0H1.066zM3.81.563A1.5 1.5 0 0 1 4.98 0h6.04a1.5 1.5 0 0 1 1.17.563l3.7 4.625a.5.5 0 0 1-.78.624l-3.7-4.624A.5.5 0 0 0 11.02 1H4.98a.5.5 0 0 0-.39.188L.89 5.812a.5.5 0 1 1-.78-.624L3.81.563z"/><path fill-rule="evenodd" d="M.125 5.17A.5.5 0 0 1 .5 5H6a.5.5 0 0 1 .5.5 1.5 1.5 0 0 0 3 0A.5.5 0 0 1 10 5h5.5a.5.5 0 0 1 .496.562l-.39 3.124A1.5 1.5 0 0 1 14.117 10H1.883A1.5 1.5 0 0 1 .394 8.686l-.39-3.124a.5.5 0 0 1 .121-.393zm.941.83l.32 2.562A.5.5 0 0 0 1.884 9h12.234a.5.5 0 0 0 .496-.438L14.933 6H10.45a2.5 2.5 0 0 1-4.9 0H1.066z"/>'); // eslint-disable-next-line
+
+var BIconInboxesFill = /*#__PURE__*/makeIcon('InboxesFill', '<path fill-rule="evenodd" d="M.125 11.17A.5.5 0 0 1 .5 11H6a.5.5 0 0 1 .5.5 1.5 1.5 0 0 0 3 0 .5.5 0 0 1 .5-.5h5.5a.5.5 0 0 1 .496.562l-.39 3.124A1.5 1.5 0 0 1 14.117 16H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .121-.393zM3.81.563A1.5 1.5 0 0 1 4.98 0h6.04a1.5 1.5 0 0 1 1.17.563l3.7 4.625a.5.5 0 0 1-.78.624l-3.7-4.624A.5.5 0 0 0 11.02 1H4.98a.5.5 0 0 0-.39.188L.89 5.812a.5.5 0 1 1-.78-.624L3.81.563z"/><path fill-rule="evenodd" d="M.125 5.17A.5.5 0 0 1 .5 5H6a.5.5 0 0 1 .5.5 1.5 1.5 0 0 0 3 0A.5.5 0 0 1 10 5h5.5a.5.5 0 0 1 .496.562l-.39 3.124A1.5 1.5 0 0 1 14.117 10H1.883A1.5 1.5 0 0 1 .394 8.686l-.39-3.124a.5.5 0 0 1 .121-.393z"/>'); // eslint-disable-next-line
 
 var BIconInfo = /*#__PURE__*/makeIcon('Info', '<path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/><circle cx="8" cy="4.5" r="1"/>'); // eslint-disable-next-line
 
-var BIconInfoCircle = /*#__PURE__*/makeIcon('InfoCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/><circle cx="8" cy="4.5" r="1"/>'); // eslint-disable-next-line
+var BIconInfoCircle = /*#__PURE__*/makeIcon('InfoCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/><circle cx="8" cy="4.5" r="1"/>'); // eslint-disable-next-line
 
-var BIconInfoCircleFill = /*#__PURE__*/makeIcon('InfoCircleFill', '<path fill-rule="evenodd" d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconInfoCircleFill = /*#__PURE__*/makeIcon('InfoCircleFill', '<path fill-rule="evenodd" d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
 
-var BIconInfoSquare = /*#__PURE__*/makeIcon('InfoSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/><circle cx="8" cy="4.5" r="1"/>'); // eslint-disable-next-line
+var BIconInfoSquare = /*#__PURE__*/makeIcon('InfoSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/><circle cx="8" cy="4.5" r="1"/>'); // eslint-disable-next-line
 
-var BIconInfoSquareFill = /*#__PURE__*/makeIcon('InfoSquareFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H2a2 2 0 01-2-2V2zm8.93 4.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconInfoSquareFill = /*#__PURE__*/makeIcon('InfoSquareFill', '<path fill-rule="evenodd" d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8.93 4.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
 
-var BIconIntersect = /*#__PURE__*/makeIcon('Intersect', '<path fill-rule="evenodd" d="M12 4v6.5a1.5 1.5 0 01-1.5 1.5H4V5.5A1.5 1.5 0 015.5 4H12z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14.5 5h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h9a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-9-1A1.5 1.5 0 004 5.5v9A1.5 1.5 0 005.5 16h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 4h-9z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.5 1h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h9a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-9-1A1.5 1.5 0 000 1.5v9A1.5 1.5 0 001.5 12h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0010.5 0h-9z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconIntersect = /*#__PURE__*/makeIcon('Intersect', '<path fill-rule="evenodd" d="M12 4v6.5a1.5 1.5 0 0 1-1.5 1.5H4V5.5A1.5 1.5 0 0 1 5.5 4H12z"/><path fill-rule="evenodd" d="M14.5 5h-9a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-9-1A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 4h-9z"/><path fill-rule="evenodd" d="M10.5 1h-9a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-9-1A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 10.5 0h-9z"/>'); // eslint-disable-next-line
 
-var BIconJustify = /*#__PURE__*/makeIcon('Justify', '<path fill-rule="evenodd" d="M2 12.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconJustify = /*#__PURE__*/makeIcon('Justify', '<path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconJustifyLeft = /*#__PURE__*/makeIcon('JustifyLeft', '<path fill-rule="evenodd" d="M2 12.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconJustifyLeft = /*#__PURE__*/makeIcon('JustifyLeft', '<path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconJustifyRight = /*#__PURE__*/makeIcon('JustifyRight', '<path fill-rule="evenodd" d="M6 12.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-4-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconJustifyRight = /*#__PURE__*/makeIcon('JustifyRight', '<path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconKanban = /*#__PURE__*/makeIcon('Kanban', '<path fill-rule="evenodd" d="M13.5 1h-11a1 1 0 00-1 1v12a1 1 0 001 1h11a1 1 0 001-1V2a1 1 0 00-1-1zm-11-1a2 2 0 00-2 2v12a2 2 0 002 2h11a2 2 0 002-2V2a2 2 0 00-2-2h-11z" clip-rule="evenodd"/><rect width="3" height="5" x="6.5" y="2" rx="1"/><rect width="3" height="9" x="2.5" y="2" rx="1"/><rect width="3" height="12" x="10.5" y="2" rx="1"/>'); // eslint-disable-next-line
+var BIconKanban = /*#__PURE__*/makeIcon('Kanban', '<path fill-rule="evenodd" d="M13.5 1h-11a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zm-11-1a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2h-11z"/><rect width="3" height="5" x="6.5" y="2" rx="1"/><rect width="3" height="9" x="2.5" y="2" rx="1"/><rect width="3" height="12" x="10.5" y="2" rx="1"/>'); // eslint-disable-next-line
 
-var BIconKanbanFill = /*#__PURE__*/makeIcon('KanbanFill', '<path fill-rule="evenodd" d="M2.5 0a2 2 0 00-2 2v12a2 2 0 002 2h11a2 2 0 002-2V2a2 2 0 00-2-2h-11zm5 2a1 1 0 00-1 1v3a1 1 0 001 1h1a1 1 0 001-1V3a1 1 0 00-1-1h-1zm-5 1a1 1 0 011-1h1a1 1 0 011 1v7a1 1 0 01-1 1h-1a1 1 0 01-1-1V3zm9-1a1 1 0 00-1 1v10a1 1 0 001 1h1a1 1 0 001-1V3a1 1 0 00-1-1h-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconKanbanFill = /*#__PURE__*/makeIcon('KanbanFill', '<path fill-rule="evenodd" d="M2.5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2h-11zm5 2a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-1zm-5 1a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V3zm9-1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1h-1z"/>'); // eslint-disable-next-line
 
-var BIconLaptop = /*#__PURE__*/makeIcon('Laptop', '<path fill-rule="evenodd" d="M13.5 3h-11a.5.5 0 00-.5.5V11h12V3.5a.5.5 0 00-.5-.5zm-11-1A1.5 1.5 0 001 3.5V12h14V3.5A1.5 1.5 0 0013.5 2h-11z" clip-rule="evenodd"/><path d="M0 12h16v.5a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 010 12.5V12z"/>'); // eslint-disable-next-line
+var BIconLaptop = /*#__PURE__*/makeIcon('Laptop', '<path fill-rule="evenodd" d="M13.5 3h-11a.5.5 0 0 0-.5.5V11h12V3.5a.5.5 0 0 0-.5-.5zm-11-1A1.5 1.5 0 0 0 1 3.5V12h14V3.5A1.5 1.5 0 0 0 13.5 2h-11z"/><path d="M0 12h16v.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5V12z"/>'); // eslint-disable-next-line
 
-var BIconLayers = /*#__PURE__*/makeIcon('Layers', '<path fill-rule="evenodd" d="M3.188 8L.264 9.559a.5.5 0 000 .882l7.5 4a.5.5 0 00.47 0l7.5-4a.5.5 0 000-.882L12.813 8l-1.063.567L14.438 10 8 13.433 1.562 10 4.25 8.567 3.187 8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 01.47 0l7.5 4a.5.5 0 010 .882l-7.5 4a.5.5 0 01-.47 0l-7.5-4a.5.5 0 010-.882l7.5-4zM1.563 6L8 9.433 14.438 6 8 2.567 1.562 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayers = /*#__PURE__*/makeIcon('Layers', '<path fill-rule="evenodd" d="M3.188 8L.264 9.559a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882L12.813 8l-1.063.567L14.438 10 8 13.433 1.562 10 4.25 8.567 3.187 8z"/><path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4zM1.563 6L8 9.433 14.438 6 8 2.567 1.562 6z"/>'); // eslint-disable-next-line
 
-var BIconLayersFill = /*#__PURE__*/makeIcon('LayersFill', '<path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 01.47 0l7.5 4a.5.5 0 010 .882l-7.5 4a.5.5 0 01-.47 0l-7.5-4a.5.5 0 010-.882l7.5-4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.125 8.567l-1.86.992a.5.5 0 000 .882l7.5 4a.5.5 0 00.47 0l7.5-4a.5.5 0 000-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 01-1.41 0l.418-.785-.419.785-5.169-2.756z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayersFill = /*#__PURE__*/makeIcon('LayersFill', '<path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/><path fill-rule="evenodd" d="M2.125 8.567l-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l.418-.785-.419.785-5.169-2.756z"/>'); // eslint-disable-next-line
 
-var BIconLayersHalf = /*#__PURE__*/makeIcon('LayersHalf', '<path fill-rule="evenodd" d="M3.188 8L.264 9.559a.5.5 0 000 .882l7.5 4a.5.5 0 00.47 0l7.5-4a.5.5 0 000-.882L12.813 8l-4.578 2.441a.5.5 0 01-.47 0L3.188 8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 01.47 0l7.5 4a.5.5 0 010 .882l-7.5 4a.5.5 0 01-.47 0l-7.5-4a.5.5 0 010-.882l7.5-4zM1.563 6L8 9.433 14.438 6 8 2.567 1.562 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayersHalf = /*#__PURE__*/makeIcon('LayersHalf', '<path fill-rule="evenodd" d="M3.188 8L.264 9.559a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882L12.813 8l-4.578 2.441a.5.5 0 0 1-.47 0L3.188 8z"/><path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4zM1.563 6L8 9.433 14.438 6 8 2.567 1.562 6z"/>'); // eslint-disable-next-line
 
-var BIconLayoutSidebar = /*#__PURE__*/makeIcon('LayoutSidebar', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM2 1a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V3a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4 14V2h1v12H4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutSidebar = /*#__PURE__*/makeIcon('LayoutSidebar', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M4 14V2h1v12H4z"/>'); // eslint-disable-next-line
 
-var BIconLayoutSidebarInset = /*#__PURE__*/makeIcon('LayoutSidebarInset', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM2 1a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V3a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M3 4a1 1 0 011-1h2a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"/>'); // eslint-disable-next-line
+var BIconLayoutSidebarInset = /*#__PURE__*/makeIcon('LayoutSidebarInset', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path d="M3 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"/>'); // eslint-disable-next-line
 
-var BIconLayoutSidebarInsetReverse = /*#__PURE__*/makeIcon('LayoutSidebarInsetReverse', '<path fill-rule="evenodd" d="M2 2h12a1 1 0 011 1v10a1 1 0 01-1 1H2a1 1 0 01-1-1V3a1 1 0 011-1zm12-1a2 2 0 012 2v10a2 2 0 01-2 2H2a2 2 0 01-2-2V3a2 2 0 012-2h12z" clip-rule="evenodd"/><path d="M13 4a1 1 0 00-1-1h-2a1 1 0 00-1 1v8a1 1 0 001 1h2a1 1 0 001-1V4z"/>'); // eslint-disable-next-line
+var BIconLayoutSidebarInsetReverse = /*#__PURE__*/makeIcon('LayoutSidebarInsetReverse', '<path fill-rule="evenodd" d="M2 2h12a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm12-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h12z"/><path d="M13 4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V4z"/>'); // eslint-disable-next-line
 
-var BIconLayoutSidebarReverse = /*#__PURE__*/makeIcon('LayoutSidebarReverse', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM2 1a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V3a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11 14V2h1v12h-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutSidebarReverse = /*#__PURE__*/makeIcon('LayoutSidebarReverse', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M11 14V2h1v12h-1z"/>'); // eslint-disable-next-line
 
-var BIconLayoutSplit = /*#__PURE__*/makeIcon('LayoutSplit', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM2 1a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V3a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 14V2h1v12h-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutSplit = /*#__PURE__*/makeIcon('LayoutSplit', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M7.5 14V2h1v12h-1z"/>'); // eslint-disable-next-line
 
-var BIconLayoutTextSidebar = /*#__PURE__*/makeIcon('LayoutTextSidebar', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11 15V1h1v14h-1zM3 3.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutTextSidebar = /*#__PURE__*/makeIcon('LayoutTextSidebar', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M11 15V1h1v14h-1zM3 3.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconLayoutTextSidebarReverse = /*#__PURE__*/makeIcon('LayoutTextSidebarReverse', '<path fill-rule="evenodd" d="M2 1h12a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1zm12-1a2 2 0 012 2v12a2 2 0 01-2 2H2a2 2 0 01-2-2V2a2 2 0 012-2h12z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 15V1H4v14h1zm8-11.5a.5.5 0 00-.5-.5h-5a.5.5 0 000 1h5a.5.5 0 00.5-.5zm0 3a.5.5 0 00-.5-.5h-5a.5.5 0 000 1h5a.5.5 0 00.5-.5zm0 3a.5.5 0 00-.5-.5h-5a.5.5 0 000 1h5a.5.5 0 00.5-.5zm0 3a.5.5 0 00-.5-.5h-5a.5.5 0 000 1h5a.5.5 0 00.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutTextSidebarReverse = /*#__PURE__*/makeIcon('LayoutTextSidebarReverse', '<path fill-rule="evenodd" d="M2 1h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm12-1a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12z"/><path fill-rule="evenodd" d="M5 15V1H4v14h1zm8-11.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5zm0 3a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5zm0 3a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5zm0 3a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconLayoutTextWindow = /*#__PURE__*/makeIcon('LayoutTextWindow', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11 15V4h1v11h-1zm4.5-11H.5V3h15v1zM3 6.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutTextWindow = /*#__PURE__*/makeIcon('LayoutTextWindow', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M11 15V4h1v11h-1zm4.5-11H.5V3h15v1zM3 6.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconLayoutTextWindowReverse = /*#__PURE__*/makeIcon('LayoutTextWindowReverse', '<path fill-rule="evenodd" d="M2 1h12a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1zm12-1a2 2 0 012 2v12a2 2 0 01-2 2H2a2 2 0 01-2-2V2a2 2 0 012-2h12z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 15V4H4v11h1zM.5 4h15V3H.5v1zM13 6.5a.5.5 0 00-.5-.5h-5a.5.5 0 000 1h5a.5.5 0 00.5-.5zm0 3a.5.5 0 00-.5-.5h-5a.5.5 0 000 1h5a.5.5 0 00.5-.5zm0 3a.5.5 0 00-.5-.5h-5a.5.5 0 000 1h5a.5.5 0 00.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutTextWindowReverse = /*#__PURE__*/makeIcon('LayoutTextWindowReverse', '<path fill-rule="evenodd" d="M2 1h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm12-1a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12z"/><path fill-rule="evenodd" d="M5 15V4H4v11h1zM.5 4h15V3H.5v1zM13 6.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5zm0 3a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5zm0 3a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconLayoutThreeColumns = /*#__PURE__*/makeIcon('LayoutThreeColumns', '<path fill-rule="evenodd" d="M0 2.5A1.5 1.5 0 011.5 1h13A1.5 1.5 0 0116 2.5v11a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 010 13.5v-11zM1.5 2a.5.5 0 00-.5.5v11a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-11a.5.5 0 00-.5-.5h-13z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 15V1h1v14H5zm5 0V1h1v14h-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutThreeColumns = /*#__PURE__*/makeIcon('LayoutThreeColumns', '<path fill-rule="evenodd" d="M0 2.5A1.5 1.5 0 0 1 1.5 1h13A1.5 1.5 0 0 1 16 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-11zM1.5 2a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5h-13z"/><path fill-rule="evenodd" d="M5 15V1h1v14H5zm5 0V1h1v14h-1z"/>'); // eslint-disable-next-line
 
-var BIconLayoutWtf = /*#__PURE__*/makeIcon('LayoutWtf', '<path fill-rule="evenodd" d="M5 1H1v8h4V1zM1 0a1 1 0 00-1 1v8a1 1 0 001 1h4a1 1 0 001-1V1a1 1 0 00-1-1H1zm13 2H9v5h5V2zM9 1a1 1 0 00-1 1v5a1 1 0 001 1h5a1 1 0 001-1V2a1 1 0 00-1-1H9zM5 13H3v2h2v-2zm-2-1a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 00-1-1H3zm12-1H9v2h6v-2zm-6-1a1 1 0 00-1 1v2a1 1 0 001 1h6a1 1 0 001-1v-2a1 1 0 00-1-1H9z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLayoutWtf = /*#__PURE__*/makeIcon('LayoutWtf', '<path fill-rule="evenodd" d="M5 1H1v8h4V1zM1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H1zm13 2H9v5h5V2zM9 1a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9zM5 13H3v2h2v-2zm-2-1a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3zm12-1H9v2h6v-2zm-6-1a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H9z"/>'); // eslint-disable-next-line
 
-var BIconLifePreserver = /*#__PURE__*/makeIcon('LifePreserver', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 11a3 3 0 100-6 3 3 0 000 6zm0 1a4 4 0 100-8 4 4 0 000 8z" clip-rule="evenodd"/><path d="M11.642 6.343L15 5v6l-3.358-1.343A3.99 3.99 0 0012 8a3.99 3.99 0 00-.358-1.657zM9.657 4.358L11 1H5l1.343 3.358A3.985 3.985 0 018 4c.59 0 1.152.128 1.657.358zM4.358 6.343L1 5v6l3.358-1.343A3.985 3.985 0 014 8c0-.59.128-1.152.358-1.657zm1.985 5.299L5 15h6l-1.343-3.358A3.984 3.984 0 018 12a3.99 3.99 0 01-1.657-.358z"/>'); // eslint-disable-next-line
+var BIconLifePreserver = /*#__PURE__*/makeIcon('LifePreserver', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M11.642 6.343L15 5v6l-3.358-1.343A3.99 3.99 0 0 0 12 8a3.99 3.99 0 0 0-.358-1.657zM9.657 4.358L11 1H5l1.343 3.358A3.985 3.985 0 0 1 8 4c.59 0 1.152.128 1.657.358zM4.358 6.343L1 5v6l3.358-1.343A3.985 3.985 0 0 1 4 8c0-.59.128-1.152.358-1.657zm1.985 5.299L5 15h6l-1.343-3.358A3.984 3.984 0 0 1 8 12a3.99 3.99 0 0 1-1.657-.358z"/>'); // eslint-disable-next-line
 
-var BIconLightning = /*#__PURE__*/makeIcon('Lightning', '<path fill-rule="evenodd" d="M11.251.068a.5.5 0 01.227.58L9.677 6.5H13a.5.5 0 01.364.843l-8 8.5a.5.5 0 01-.842-.49L6.323 9.5H3a.5.5 0 01-.364-.843l8-8.5a.5.5 0 01.615-.09zM4.157 8.5H7a.5.5 0 01.478.647L6.11 13.59l5.732-6.09H9a.5.5 0 01-.478-.647L9.89 2.41 4.157 8.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLightning = /*#__PURE__*/makeIcon('Lightning', '<path fill-rule="evenodd" d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z"/>'); // eslint-disable-next-line
 
-var BIconLightningFill = /*#__PURE__*/makeIcon('LightningFill', '<path fill-rule="evenodd" d="M11.251.068a.5.5 0 01.227.58L9.677 6.5H13a.5.5 0 01.364.843l-8 8.5a.5.5 0 01-.842-.49L6.323 9.5H3a.5.5 0 01-.364-.843l8-8.5a.5.5 0 01.615-.09z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLightningFill = /*#__PURE__*/makeIcon('LightningFill', '<path fill-rule="evenodd" d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>'); // eslint-disable-next-line
 
-var BIconLink = /*#__PURE__*/makeIcon('Link', '<path d="M6.354 5.5H4a3 3 0 000 6h3a3 3 0 002.83-4H9c-.086 0-.17.01-.25.031A2 2 0 017 10.5H4a2 2 0 110-4h1.535c.218-.376.495-.714.82-1z"/><path d="M6.764 6.5H7c.364 0 .706.097 1 .268A1.99 1.99 0 019 6.5h.236A3.004 3.004 0 008 5.67a3 3 0 00-1.236.83z"/><path d="M9 5.5a3 3 0 00-2.83 4h1.098A2 2 0 019 6.5h3a2 2 0 110 4h-1.535a4.02 4.02 0 01-.82 1H12a3 3 0 100-6H9z"/><path d="M8 11.33a3.01 3.01 0 001.236-.83H9a1.99 1.99 0 01-1-.268 1.99 1.99 0 01-1 .268h-.236c.332.371.756.66 1.236.83z"/>'); // eslint-disable-next-line
+var BIconLink = /*#__PURE__*/makeIcon('Link', '<path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/><path d="M6.764 6.5H7c.364 0 .706.097 1 .268A1.99 1.99 0 0 1 9 6.5h.236A3.004 3.004 0 0 0 8 5.67a3 3 0 0 0-1.236.83z"/><path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/><path d="M8 11.33a3.01 3.01 0 0 0 1.236-.83H9a1.99 1.99 0 0 1-1-.268 1.99 1.99 0 0 1-1 .268h-.236c.332.371.756.66 1.236.83z"/>'); // eslint-disable-next-line
 
-var BIconLink45deg = /*#__PURE__*/makeIcon('Link45deg', '<path d="M4.715 6.542L3.343 7.914a3 3 0 104.243 4.243l1.828-1.829A3 3 0 008.586 5.5L8 6.086a1.001 1.001 0 00-.154.199 2 2 0 01.861 3.337L6.88 11.45a2 2 0 11-2.83-2.83l.793-.792a4.018 4.018 0 01-.128-1.287z"/><path d="M5.712 6.96l.167-.167a1.99 1.99 0 01.896-.518 1.99 1.99 0 01.518-.896l.167-.167A3.004 3.004 0 006 5.499c-.22.46-.316.963-.288 1.46z"/><path d="M6.586 4.672A3 3 0 007.414 9.5l.775-.776a2 2 0 01-.896-3.346L9.12 3.55a2 2 0 012.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 00-4.243-4.243L6.586 4.672z"/><path d="M10 9.5a2.99 2.99 0 00.288-1.46l-.167.167a1.99 1.99 0 01-.896.518 1.99 1.99 0 01-.518.896l-.167.167A3.004 3.004 0 0010 9.501z"/>'); // eslint-disable-next-line
+var BIconLink45deg = /*#__PURE__*/makeIcon('Link45deg', '<path d="M4.715 6.542L3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.001 1.001 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/><path d="M5.712 6.96l.167-.167a1.99 1.99 0 0 1 .896-.518 1.99 1.99 0 0 1 .518-.896l.167-.167A3.004 3.004 0 0 0 6 5.499c-.22.46-.316.963-.288 1.46z"/><path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 0 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 0 0-4.243-4.243L6.586 4.672z"/><path d="M10 9.5a2.99 2.99 0 0 0 .288-1.46l-.167.167a1.99 1.99 0 0 1-.896.518 1.99 1.99 0 0 1-.518.896l-.167.167A3.004 3.004 0 0 0 10 9.501z"/>'); // eslint-disable-next-line
 
-var BIconList = /*#__PURE__*/makeIcon('List', '<path fill-rule="evenodd" d="M2.5 11.5A.5.5 0 013 11h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconList = /*#__PURE__*/makeIcon('List', '<path fill-rule="evenodd" d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconListCheck = /*#__PURE__*/makeIcon('ListCheck', '<path fill-rule="evenodd" d="M5 11.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM3.854 2.146a.5.5 0 010 .708l-1.5 1.5a.5.5 0 01-.708 0l-.5-.5a.5.5 0 11.708-.708L2 3.293l1.146-1.147a.5.5 0 01.708 0zm0 4a.5.5 0 010 .708l-1.5 1.5a.5.5 0 01-.708 0l-.5-.5a.5.5 0 11.708-.708L2 7.293l1.146-1.147a.5.5 0 01.708 0zm0 4a.5.5 0 010 .708l-1.5 1.5a.5.5 0 01-.708 0l-.5-.5a.5.5 0 01.708-.708l.146.147 1.146-1.147a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconListCheck = /*#__PURE__*/makeIcon('ListCheck', '<path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconListNested = /*#__PURE__*/makeIcon('ListNested', '<path fill-rule="evenodd" d="M4.5 11.5A.5.5 0 015 11h10a.5.5 0 010 1H5a.5.5 0 01-.5-.5zm-2-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm-2-4A.5.5 0 011 3h10a.5.5 0 010 1H1a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconListNested = /*#__PURE__*/makeIcon('ListNested', '<path fill-rule="evenodd" d="M4.5 11.5A.5.5 0 0 1 5 11h10a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm-2-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm-2-4A.5.5 0 0 1 1 3h10a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconListOl = /*#__PURE__*/makeIcon('ListOl', '<path fill-rule="evenodd" d="M5 11.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M1.713 11.865v-.474H2c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 01-.492.594v.033a.615.615 0 01.569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V9H1.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 00-.342.338v.041zM2.564 5h-.635V2.924h-.031l-.598.42v-.567l.629-.443h.635V5z"/>'); // eslint-disable-next-line
+var BIconListOl = /*#__PURE__*/makeIcon('ListOl', '<path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5z"/><path d="M1.713 11.865v-.474H2c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 0 1-.492.594v.033a.615.615 0 0 1 .569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V9H1.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 0 0-.342.338v.041zM2.564 5h-.635V2.924h-.031l-.598.42v-.567l.629-.443h.635V5z"/>'); // eslint-disable-next-line
 
-var BIconListTask = /*#__PURE__*/makeIcon('ListTask', '<path fill-rule="evenodd" d="M2 2.5a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h1a.5.5 0 00.5-.5V3a.5.5 0 00-.5-.5H2zM3 3H2v1h1V3z" clip-rule="evenodd"/><path d="M5 3.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM5.5 7a.5.5 0 000 1h9a.5.5 0 000-1h-9zm0 4a.5.5 0 000 1h9a.5.5 0 000-1h-9z"/><path fill-rule="evenodd" d="M1.5 7a.5.5 0 01.5-.5h1a.5.5 0 01.5.5v1a.5.5 0 01-.5.5H2a.5.5 0 01-.5-.5V7zM2 7h1v1H2V7zm0 3.5a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h1a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5H2zm1 .5H2v1h1v-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconListTask = /*#__PURE__*/makeIcon('ListTask', '<path fill-rule="evenodd" d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5H2zM3 3H2v1h1V3z"/><path d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9z"/><path fill-rule="evenodd" d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V7zM2 7h1v1H2V7zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H2zm1 .5H2v1h1v-1z"/>'); // eslint-disable-next-line
 
-var BIconListUl = /*#__PURE__*/makeIcon('ListUl', '<path fill-rule="evenodd" d="M5 11.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zm-3 1a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2zm0 4a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconListUl = /*#__PURE__*/makeIcon('ListUl', '<path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
 
-var BIconLock = /*#__PURE__*/makeIcon('Lock', '<path fill-rule="evenodd" d="M11.5 8h-7a1 1 0 00-1 1v5a1 1 0 001 1h7a1 1 0 001-1V9a1 1 0 00-1-1zm-7-1a2 2 0 00-2 2v5a2 2 0 002 2h7a2 2 0 002-2V9a2 2 0 00-2-2h-7zm0-3a3.5 3.5 0 117 0v3h-1V4a2.5 2.5 0 00-5 0v3h-1V4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLock = /*#__PURE__*/makeIcon('Lock', '<path fill-rule="evenodd" d="M11.5 8h-7a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1zm-7-1a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7zm0-3a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z"/>'); // eslint-disable-next-line
 
-var BIconLockFill = /*#__PURE__*/makeIcon('LockFill', '<rect width="11" height="9" x="2.5" y="7" rx="2"/><path fill-rule="evenodd" d="M4.5 4a3.5 3.5 0 117 0v3h-1V4a2.5 2.5 0 00-5 0v3h-1V4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconLockFill = /*#__PURE__*/makeIcon('LockFill', '<rect width="11" height="9" x="2.5" y="7" rx="2"/><path fill-rule="evenodd" d="M4.5 4a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z"/>'); // eslint-disable-next-line
 
-var BIconMap = /*#__PURE__*/makeIcon('Map', '<path fill-rule="evenodd" d="M15.817.613A.5.5 0 0116 1v13a.5.5 0 01-.402.49l-5 1a.502.502 0 01-.196 0L5.5 14.51l-4.902.98A.5.5 0 010 15V2a.5.5 0 01.402-.49l5-1a.5.5 0 01.196 0l4.902.98 4.902-.98a.5.5 0 01.415.103zM10 2.41l-4-.8v11.98l4 .8V2.41zm1 11.98l4-.8V1.61l-4 .8v11.98zm-6-.8V1.61l-4 .8v11.98l4-.8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconMap = /*#__PURE__*/makeIcon('Map', '<path fill-rule="evenodd" d="M15.817.613A.5.5 0 0 1 16 1v13a.5.5 0 0 1-.402.49l-5 1a.502.502 0 0 1-.196 0L5.5 14.51l-4.902.98A.5.5 0 0 1 0 15V2a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0l4.902.98 4.902-.98a.5.5 0 0 1 .415.103zM10 2.41l-4-.8v11.98l4 .8V2.41zm1 11.98l4-.8V1.61l-4 .8v11.98zm-6-.8V1.61l-4 .8v11.98l4-.8z"/>'); // eslint-disable-next-line
 
-var BIconMic = /*#__PURE__*/makeIcon('Mic', '<path fill-rule="evenodd" d="M3.5 6.5A.5.5 0 014 7v1a4 4 0 008 0V7a.5.5 0 011 0v1a5 5 0 01-4.5 4.975V15h3a.5.5 0 010 1h-7a.5.5 0 010-1h3v-2.025A5 5 0 013 8V7a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10 8V3a2 2 0 10-4 0v5a2 2 0 104 0zM8 0a3 3 0 00-3 3v5a3 3 0 006 0V3a3 3 0 00-3-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconMic = /*#__PURE__*/makeIcon('Mic', '<path fill-rule="evenodd" d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M10 8V3a2 2 0 1 0-4 0v5a2 2 0 1 0 4 0zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>'); // eslint-disable-next-line
 
-var BIconMicFill = /*#__PURE__*/makeIcon('MicFill', '<path d="M5 3a3 3 0 016 0v5a3 3 0 01-6 0V3z"/><path fill-rule="evenodd" d="M3.5 6.5A.5.5 0 014 7v1a4 4 0 008 0V7a.5.5 0 011 0v1a5 5 0 01-4.5 4.975V15h3a.5.5 0 010 1h-7a.5.5 0 010-1h3v-2.025A5 5 0 013 8V7a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconMicFill = /*#__PURE__*/makeIcon('MicFill', '<path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"/><path fill-rule="evenodd" d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconMicMute = /*#__PURE__*/makeIcon('MicMute', '<path fill-rule="evenodd" d="M12.734 9.613A4.995 4.995 0 0013 8V7a.5.5 0 00-1 0v1c0 .274-.027.54-.08.799l.814.814zm-2.522 1.72A4 4 0 014 8V7a.5.5 0 00-1 0v1a5 5 0 004.5 4.975V15h-3a.5.5 0 000 1h7a.5.5 0 000-1h-3v-2.025a4.973 4.973 0 002.43-.923l-.718-.719zM11 7.88V3a3 3 0 00-5.842-.963l.845.845A2 2 0 0110 3v3.879l1 1zM8.738 9.86l.748.748A3 3 0 015 8V6.121l1 1V8a2 2 0 002.738 1.86z" clip-rule="evenodd"/><path stroke="currentColor" d="M2 1l12 12"/>'); // eslint-disable-next-line
+var BIconMicMute = /*#__PURE__*/makeIcon('MicMute', '<path fill-rule="evenodd" d="M12.734 9.613A4.995 4.995 0 0 0 13 8V7a.5.5 0 0 0-1 0v1c0 .274-.027.54-.08.799l.814.814zm-2.522 1.72A4 4 0 0 1 4 8V7a.5.5 0 0 0-1 0v1a5 5 0 0 0 4.5 4.975V15h-3a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-3v-2.025a4.973 4.973 0 0 0 2.43-.923l-.718-.719zM11 7.88V3a3 3 0 0 0-5.842-.963l.845.845A2 2 0 0 1 10 3v3.879l1 1zM8.738 9.86l.748.748A3 3 0 0 1 5 8V6.121l1 1V8a2 2 0 0 0 2.738 1.86zm4.908 3.494l-12-12 .708-.708 12 12-.708.707z"/>'); // eslint-disable-next-line
 
-var BIconMicMuteFill = /*#__PURE__*/makeIcon('MicMuteFill', '<path fill-rule="evenodd" d="M12.734 9.613A4.995 4.995 0 0013 8V7a.5.5 0 00-1 0v1c0 .274-.027.54-.08.799l.814.814zm-2.522 1.72A4 4 0 014 8V7a.5.5 0 00-1 0v1a5 5 0 004.5 4.975V15h-3a.5.5 0 000 1h7a.5.5 0 000-1h-3v-2.025a4.973 4.973 0 002.43-.923l-.718-.719zM11 7.88V3a3 3 0 00-5.842-.963L11 7.879zM5 6.12l4.486 4.486A3 3 0 015 8V6.121z" clip-rule="evenodd"/><path stroke="currentColor" d="M2 1l12 12"/>'); // eslint-disable-next-line
+var BIconMicMuteFill = /*#__PURE__*/makeIcon('MicMuteFill', '<path fill-rule="evenodd" d="M12.734 9.613A4.995 4.995 0 0 0 13 8V7a.5.5 0 0 0-1 0v1c0 .274-.027.54-.08.799l.814.814zm-2.522 1.72A4 4 0 0 1 4 8V7a.5.5 0 0 0-1 0v1a5 5 0 0 0 4.5 4.975V15h-3a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1h-3v-2.025a4.973 4.973 0 0 0 2.43-.923l-.718-.719zM11 7.88V3a3 3 0 0 0-5.842-.963L11 7.879zM5 6.12l4.486 4.486A3 3 0 0 1 5 8V6.121zm8.646 7.234l-12-12 .708-.708 12 12-.708.707z"/>'); // eslint-disable-next-line
 
-var BIconMoon = /*#__PURE__*/makeIcon('Moon', '<path fill-rule="evenodd" d="M14.53 10.53a7 7 0 01-9.058-9.058A7.003 7.003 0 008 15a7.002 7.002 0 006.53-4.47z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconMinecart = /*#__PURE__*/makeIcon('Minecart', '<path fill-rule="evenodd" d="M4 15a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm8-1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM.115 3.18A.5.5 0 0 1 .5 3h15a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 14 12H2a.5.5 0 0 1-.491-.408l-1.5-8a.5.5 0 0 1 .106-.411zm.987.82l1.313 7h11.17l1.313-7H1.102z"/>'); // eslint-disable-next-line
 
-var BIconMusicNote = /*#__PURE__*/makeIcon('MusicNote', '<path d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z"/><path fill-rule="evenodd" d="M9 3v10H8V3h1z" clip-rule="evenodd"/><path d="M8 2.82a1 1 0 01.804-.98l3-.6A1 1 0 0113 2.22V4L8 5V2.82z"/>'); // eslint-disable-next-line
+var BIconMinecartLoaded = /*#__PURE__*/makeIcon('MinecartLoaded', '<path fill-rule="evenodd" d="M4 15a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm8-1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM.115 3.18A.5.5 0 0 1 .5 3h15a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 14 12H2a.5.5 0 0 1-.491-.408l-1.5-8a.5.5 0 0 1 .106-.411zm.987.82l1.313 7h11.17l1.313-7H1.102z"/><path fill-rule="evenodd" d="M6 1.5a2.498 2.498 0 0 1 4 0c.818 0 1.545.394 2 1 .67 0 1.28.265 1.729.694l-.692.722A1.493 1.493 0 0 0 12 3.5c-.314 0-.611-.15-.8-.4-.274-.365-.71-.6-1.2-.6-.314 0-.611-.15-.8-.4a1.497 1.497 0 0 0-2.4 0c-.189.25-.486.4-.8.4-.507 0-.955.251-1.228.638a2.65 2.65 0 0 1-.634.634 1.511 1.511 0 0 0-.263.236l-.75-.662a2.5 2.5 0 0 1 .437-.391 1.63 1.63 0 0 0 .393-.393A2.498 2.498 0 0 1 6 1.5z"/>'); // eslint-disable-next-line
 
-var BIconMusicNoteBeamed = /*#__PURE__*/makeIcon('MusicNoteBeamed', '<path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z"/><path fill-rule="evenodd" d="M14 11V2h1v9h-1zM6 3v10H5V3h1z" clip-rule="evenodd"/><path d="M5 2.905a1 1 0 01.9-.995l8-.8a1 1 0 011.1.995V3L5 4V2.905z"/>'); // eslint-disable-next-line
+var BIconMoon = /*#__PURE__*/makeIcon('Moon', '<path fill-rule="evenodd" d="M14.53 10.53a7 7 0 0 1-9.058-9.058A7.003 7.003 0 0 0 8 15a7.002 7.002 0 0 0 6.53-4.47z"/>'); // eslint-disable-next-line
 
-var BIconMusicNoteList = /*#__PURE__*/makeIcon('MusicNoteList', '<path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z"/><path fill-rule="evenodd" d="M12 3v10h-1V3h1z" clip-rule="evenodd"/><path d="M11 2.82a1 1 0 01.804-.98l3-.6A1 1 0 0116 2.22V4l-5 1V2.82z"/><path fill-rule="evenodd" d="M0 11.5a.5.5 0 01.5-.5H4a.5.5 0 010 1H.5a.5.5 0 01-.5-.5zm0-4A.5.5 0 01.5 7H8a.5.5 0 010 1H.5a.5.5 0 01-.5-.5zm0-4A.5.5 0 01.5 3H8a.5.5 0 010 1H.5a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconMusicNote = /*#__PURE__*/makeIcon('MusicNote', '<path d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z"/><path fill-rule="evenodd" d="M9 3v10H8V3h1z"/><path d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z"/>'); // eslint-disable-next-line
 
-var BIconMusicPlayer = /*#__PURE__*/makeIcon('MusicPlayer', '<path fill-rule="evenodd" d="M12 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V2a1 1 0 00-1-1zM4 0a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V2a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11 3H5v3h6V3zM5 2a1 1 0 00-1 1v3a1 1 0 001 1h6a1 1 0 001-1V3a1 1 0 00-1-1H5zm3 11a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/><circle cx="8" cy="11" r="1"/>'); // eslint-disable-next-line
+var BIconMusicNoteBeamed = /*#__PURE__*/makeIcon('MusicNoteBeamed', '<path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z"/><path fill-rule="evenodd" d="M14 11V2h1v9h-1zM6 3v10H5V3h1z"/><path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4V2.905z"/>'); // eslint-disable-next-line
 
-var BIconMusicPlayerFill = /*#__PURE__*/makeIcon('MusicPlayerFill', '<path fill-rule="evenodd" d="M2 2a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V2zm2 1a1 1 0 011-1h6a1 1 0 011 1v2.5a1 1 0 01-1 1H5a1 1 0 01-1-1V3zm7 8a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/><circle cx="8" cy="11" r="1"/>'); // eslint-disable-next-line
+var BIconMusicNoteList = /*#__PURE__*/makeIcon('MusicNoteList', '<path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z"/><path fill-rule="evenodd" d="M12 3v10h-1V3h1z"/><path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z"/><path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconNewspaper = /*#__PURE__*/makeIcon('Newspaper', '<path fill-rule="evenodd" d="M0 2A1.5 1.5 0 011.5.5h11A1.5 1.5 0 0114 2v12a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 010 14V2zm1.5-.5A.5.5 0 001 2v12a.5.5 0 00.5.5h11a.5.5 0 00.5-.5V2a.5.5 0 00-.5-.5h-11z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15.5 3a.5.5 0 01.5.5V14a1.5 1.5 0 01-1.5 1.5h-3v-1h3a.5.5 0 00.5-.5V3.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path d="M2 3h10v2H2V3zm0 3h4v3H2V6zm0 4h4v1H2v-1zm0 2h4v1H2v-1zm5-6h2v1H7V6zm3 0h2v1h-2V6zM7 8h2v1H7V8zm3 0h2v1h-2V8zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1z"/>'); // eslint-disable-next-line
+var BIconMusicPlayer = /*#__PURE__*/makeIcon('MusicPlayer', '<path fill-rule="evenodd" d="M12 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4z"/><path fill-rule="evenodd" d="M11 3H5v3h6V3zM5 2a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H5zm3 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><circle cx="8" cy="11" r="1"/>'); // eslint-disable-next-line
 
-var BIconOctagon = /*#__PURE__*/makeIcon('Octagon', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 014.893 0h6.214a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H4.893a.5.5 0 01-.353-.146L.146 11.46A.5.5 0 010 11.107V4.893a.5.5 0 01.146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconMusicPlayerFill = /*#__PURE__*/makeIcon('MusicPlayerFill', '<path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2 1a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V3zm7 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><circle cx="8" cy="11" r="1"/>'); // eslint-disable-next-line
 
-var BIconOctagonFill = /*#__PURE__*/makeIcon('OctagonFill', '<path d="M11.107 0a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H4.893a.5.5 0 01-.353-.146L.146 11.46A.5.5 0 010 11.107V4.893a.5.5 0 01.146-.353L4.54.146A.5.5 0 014.893 0h6.214z"/>'); // eslint-disable-next-line
+var BIconNewspaper = /*#__PURE__*/makeIcon('Newspaper', '<path fill-rule="evenodd" d="M0 2A1.5 1.5 0 0 1 1.5.5h11A1.5 1.5 0 0 1 14 2v12a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 0 14V2zm1.5-.5A.5.5 0 0 0 1 2v12a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5V2a.5.5 0 0 0-.5-.5h-11z"/><path fill-rule="evenodd" d="M15.5 3a.5.5 0 0 1 .5.5V14a1.5 1.5 0 0 1-1.5 1.5h-3v-1h3a.5.5 0 0 0 .5-.5V3.5a.5.5 0 0 1 .5-.5z"/><path d="M2 3h10v2H2V3zm0 3h4v3H2V6zm0 4h4v1H2v-1zm0 2h4v1H2v-1zm5-6h2v1H7V6zm3 0h2v1h-2V6zM7 8h2v1H7V8zm3 0h2v1h-2V8zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1z"/>'); // eslint-disable-next-line
 
-var BIconOctagonHalf = /*#__PURE__*/makeIcon('OctagonHalf', '<path d="M4.893 16h3.214V0H4.893a.5.5 0 00-.353.146L.146 4.54A.5.5 0 000 4.893v6.214a.5.5 0 00.146.353l4.394 4.394a.5.5 0 00.353.146z"/><path fill-rule="evenodd" d="M4.54.146A.5.5 0 014.893 0h6.214a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H4.893a.5.5 0 01-.353-.146L.146 11.46A.5.5 0 010 11.107V4.893a.5.5 0 01.146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconOctagon = /*#__PURE__*/makeIcon('Octagon', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/>'); // eslint-disable-next-line
 
-var BIconOption = /*#__PURE__*/makeIcon('Option', '<path fill-rule="evenodd" d="M1 2.5a.5.5 0 01.5-.5h3.797a.5.5 0 01.439.26L11 13h3.5a.5.5 0 010 1h-3.797a.5.5 0 01-.439-.26L5 3H1.5a.5.5 0 01-.5-.5zm10 0a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconOctagonFill = /*#__PURE__*/makeIcon('OctagonFill', '<path d="M11.107 0a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146A.5.5 0 0 1 4.893 0h6.214z"/>'); // eslint-disable-next-line
 
-var BIconOutlet = /*#__PURE__*/makeIcon('Outlet', '<path fill-rule="evenodd" d="M3.34 2.994c.275-.338.68-.494 1.074-.494h7.172c.393 0 .798.156 1.074.494.578.708 1.84 2.534 1.84 5.006 0 2.472-1.262 4.297-1.84 5.006-.276.338-.68.494-1.074.494H4.414c-.394 0-.799-.156-1.074-.494C2.762 12.297 1.5 10.472 1.5 8c0-2.472 1.262-4.297 1.84-5.006zm1.074.506a.376.376 0 00-.299.126C3.599 4.259 2.5 5.863 2.5 8c0 2.137 1.099 3.74 1.615 4.374.06.073.163.126.3.126h7.17c.137 0 .24-.053.3-.126.516-.633 1.615-2.237 1.615-4.374 0-2.137-1.099-3.74-1.615-4.374a.376.376 0 00-.3-.126h-7.17z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 5.5a.5.5 0 01.5.5v1.5a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v1.5a.5.5 0 01-1 0V6a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path d="M7 10v1h2v-1a1 1 0 00-2 0z"/>'); // eslint-disable-next-line
+var BIconOctagonHalf = /*#__PURE__*/makeIcon('OctagonHalf', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM8 15h2.9l4.1-4.1V5.1L10.9 1H8v14z"/>'); // eslint-disable-next-line
 
-var BIconPaperclip = /*#__PURE__*/makeIcon('Paperclip', '<path fill-rule="evenodd" d="M4.5 3a2.5 2.5 0 015 0v9a1.5 1.5 0 01-3 0V5a.5.5 0 011 0v7a.5.5 0 001 0V3a1.5 1.5 0 10-3 0v9a2.5 2.5 0 005 0V5a.5.5 0 011 0v7a3.5 3.5 0 11-7 0V3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconOption = /*#__PURE__*/makeIcon('Option', '<path fill-rule="evenodd" d="M1 2.5a.5.5 0 0 1 .5-.5h3.797a.5.5 0 0 1 .439.26L11 13h3.5a.5.5 0 0 1 0 1h-3.797a.5.5 0 0 1-.439-.26L5 3H1.5a.5.5 0 0 1-.5-.5zm10 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconPause = /*#__PURE__*/makeIcon('Pause', '<path fill-rule="evenodd" d="M6 3.5a.5.5 0 01.5.5v8a.5.5 0 01-1 0V4a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v8a.5.5 0 01-1 0V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconOutlet = /*#__PURE__*/makeIcon('Outlet', '<path fill-rule="evenodd" d="M3.34 2.994c.275-.338.68-.494 1.074-.494h7.172c.393 0 .798.156 1.074.494.578.708 1.84 2.534 1.84 5.006 0 2.472-1.262 4.297-1.84 5.006-.276.338-.68.494-1.074.494H4.414c-.394 0-.799-.156-1.074-.494C2.762 12.297 1.5 10.472 1.5 8c0-2.472 1.262-4.297 1.84-5.006zm1.074.506a.376.376 0 0 0-.299.126C3.599 4.259 2.5 5.863 2.5 8c0 2.137 1.099 3.74 1.615 4.374.06.073.163.126.3.126h7.17c.137 0 .24-.053.3-.126.516-.633 1.615-2.237 1.615-4.374 0-2.137-1.099-3.74-1.615-4.374a.376.376 0 0 0-.3-.126h-7.17z"/><path fill-rule="evenodd" d="M6 5.5a.5.5 0 0 1 .5.5v1.5a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v1.5a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5z"/><path d="M7 10v1h2v-1a1 1 0 0 0-2 0z"/>'); // eslint-disable-next-line
 
-var BIconPauseFill = /*#__PURE__*/makeIcon('PauseFill', '<path d="M5.5 3.5A1.5 1.5 0 017 5v6a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5zm5 0A1.5 1.5 0 0112 5v6a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5z"/>'); // eslint-disable-next-line
+var BIconPaperclip = /*#__PURE__*/makeIcon('Paperclip', '<path fill-rule="evenodd" d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>'); // eslint-disable-next-line
 
-var BIconPen = /*#__PURE__*/makeIcon('Pen', '<path fill-rule="evenodd" d="M5.707 13.707a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391L10.086 2.5a2 2 0 012.828 0l.586.586a2 2 0 010 2.828l-7.793 7.793zM3 11l7.793-7.793a1 1 0 011.414 0l.586.586a1 1 0 010 1.414L5 13l-3 1 1-3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.854 2.56a.5.5 0 00-.708 0L5.854 5.855a.5.5 0 01-.708-.708L8.44 1.854a1.5 1.5 0 012.122 0l.293.292a.5.5 0 01-.707.708l-.293-.293z" clip-rule="evenodd"/><path d="M13.293 1.207a1 1 0 011.414 0l.03.03a1 1 0 01.03 1.383L13.5 4 12 2.5l1.293-1.293z"/>'); // eslint-disable-next-line
+var BIconPause = /*#__PURE__*/makeIcon('Pause', '<path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconPencil = /*#__PURE__*/makeIcon('Pencil', '<path fill-rule="evenodd" d="M11.293 1.293a1 1 0 011.414 0l2 2a1 1 0 010 1.414l-9 9a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 00.5.5H4v.5a.5.5 0 00.5.5H5v.5a.5.5 0 00.5.5H6v-1.5a.5.5 0 00-.5-.5H5v-.5a.5.5 0 00-.5-.5H3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPauseFill = /*#__PURE__*/makeIcon('PauseFill', '<path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/>'); // eslint-disable-next-line
 
-var BIconPencilSquare = /*#__PURE__*/makeIcon('PencilSquare', '<path d="M15.502 1.94a.5.5 0 010 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 01.707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 00-.121.196l-.805 2.414a.25.25 0 00.316.316l2.414-.805a.5.5 0 00.196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 002.5 15h11a1.5 1.5 0 001.5-1.5v-6a.5.5 0 00-1 0v6a.5.5 0 01-.5.5h-11a.5.5 0 01-.5-.5v-11a.5.5 0 01.5-.5H9a.5.5 0 000-1H2.5A1.5 1.5 0 001 2.5v11z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPen = /*#__PURE__*/makeIcon('Pen', '<path fill-rule="evenodd" d="M5.707 13.707a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391L10.086 2.5a2 2 0 0 1 2.828 0l.586.586a2 2 0 0 1 0 2.828l-7.793 7.793zM3 11l7.793-7.793a1 1 0 0 1 1.414 0l.586.586a1 1 0 0 1 0 1.414L5 13l-3 1 1-3z"/><path fill-rule="evenodd" d="M9.854 2.56a.5.5 0 0 0-.708 0L5.854 5.855a.5.5 0 0 1-.708-.708L8.44 1.854a1.5 1.5 0 0 1 2.122 0l.293.292a.5.5 0 0 1-.707.708l-.293-.293z"/><path d="M13.293 1.207a1 1 0 0 1 1.414 0l.03.03a1 1 0 0 1 .03 1.383L13.5 4 12 2.5l1.293-1.293z"/>'); // eslint-disable-next-line
 
-var BIconPentagon = /*#__PURE__*/makeIcon('Pentagon', '<path fill-rule="evenodd" d="M8 1.288l-6.842 5.56L3.733 15h8.534l2.575-8.153L8 1.288zM16 6.5L8 0 0 6.5 3 16h10l3-9.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPencil = /*#__PURE__*/makeIcon('Pencil', '<path fill-rule="evenodd" d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"/><path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>'); // eslint-disable-next-line
+
+var BIconPencilSquare = /*#__PURE__*/makeIcon('PencilSquare', '<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/><path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>'); // eslint-disable-next-line
+
+var BIconPentagon = /*#__PURE__*/makeIcon('Pentagon', '<path fill-rule="evenodd" d="M8 1.288l-6.842 5.56L3.733 15h8.534l2.575-8.153L8 1.288zM16 6.5L8 0 0 6.5 3 16h10l3-9.5z"/>'); // eslint-disable-next-line
 
 var BIconPentagonFill = /*#__PURE__*/makeIcon('PentagonFill', '<path d="M8 0l8 6.5-3 9.5H3L0 6.5 8 0z"/>'); // eslint-disable-next-line
 
-var BIconPentagonHalf = /*#__PURE__*/makeIcon('PentagonHalf', '<path fill-rule="evenodd" d="M8 1.288V15h4.267l2.575-8.153L8 1.288zM16 6.5L8 0 0 6.5 3 16h10l3-9.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPentagonHalf = /*#__PURE__*/makeIcon('PentagonHalf', '<path fill-rule="evenodd" d="M8 1.288V15h4.267l2.575-8.153L8 1.288zM16 6.5L8 0 0 6.5 3 16h10l3-9.5z"/>'); // eslint-disable-next-line
 
-var BIconPeople = /*#__PURE__*/makeIcon('People', '<path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.995-.944v-.002.002zM7.022 13h7.956a.274.274 0 00.014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 00.022.004zm7.973.056v-.002.002zM11 7a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0zM6.936 9.28a5.88 5.88 0 00-1.23-.247A7.35 7.35 0 005 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 015 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 116 0 3 3 0 01-6 0zm3-2a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPeople = /*#__PURE__*/makeIcon('People', '<path fill-rule="evenodd" d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.995-.944v-.002.002zM7.022 13h7.956a.274.274 0 0 0 .014-.002l.008-.002c-.002-.264-.167-1.03-.76-1.72C13.688 10.629 12.718 10 11 10c-1.717 0-2.687.63-3.24 1.276-.593.69-.759 1.457-.76 1.72a1.05 1.05 0 0 0 .022.004zm7.973.056v-.002.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10c-1.668.02-2.615.64-3.16 1.276C1.163 11.97 1 12.739 1 13h3c0-1.045.323-2.086.92-3zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>'); // eslint-disable-next-line
 
-var BIconPeopleCircle = /*#__PURE__*/makeIcon('PeopleCircle', '<path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 008 15a6.987 6.987 0 005.468-2.63z"/><path fill-rule="evenodd" d="M8 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPeopleFill = /*#__PURE__*/makeIcon('PeopleFill', '<path fill-rule="evenodd" d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>'); // eslint-disable-next-line
 
-var BIconPeopleFill = /*#__PURE__*/makeIcon('PeopleFill', '<path fill-rule="evenodd" d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 100-6 3 3 0 000 6zm-5.784 6A2.238 2.238 0 015 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 005 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPerson = /*#__PURE__*/makeIcon('Person', '<path fill-rule="evenodd" d="M13 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM3.022 13h9.956a.274.274 0 0 0 .014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 0 0 .022.004zm9.974.056v-.002.002zM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>'); // eslint-disable-next-line
 
-var BIconPerson = /*#__PURE__*/makeIcon('Person', '<path fill-rule="evenodd" d="M13 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM3.022 13h9.956a.274.274 0 00.014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 00.022.004zm9.974.056v-.002.002zM8 7a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonBoundingBox = /*#__PURE__*/makeIcon('PersonBoundingBox', '<path fill-rule="evenodd" d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>'); // eslint-disable-next-line
 
-var BIconPersonBoundingBox = /*#__PURE__*/makeIcon('PersonBoundingBox', '<path fill-rule="evenodd" d="M1.5 1a.5.5 0 00-.5.5v3a.5.5 0 01-1 0v-3A1.5 1.5 0 011.5 0h3a.5.5 0 010 1h-3zM11 .5a.5.5 0 01.5-.5h3A1.5 1.5 0 0116 1.5v3a.5.5 0 01-1 0v-3a.5.5 0 00-.5-.5h-3a.5.5 0 01-.5-.5zM.5 11a.5.5 0 01.5.5v3a.5.5 0 00.5.5h3a.5.5 0 010 1h-3A1.5 1.5 0 010 14.5v-3a.5.5 0 01.5-.5zm15 0a.5.5 0 01.5.5v3a1.5 1.5 0 01-1.5 1.5h-3a.5.5 0 010-1h3a.5.5 0 00.5-.5v-3a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonCheck = /*#__PURE__*/makeIcon('PersonCheck', '<path fill-rule="evenodd" d="M11 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM1.022 13h9.956a.274.274 0 0 0 .014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 0 0 .022.004zm9.974.056v-.002.002zM6 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm6.854.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconPersonCheck = /*#__PURE__*/makeIcon('PersonCheck', '<path fill-rule="evenodd" d="M11 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM1.022 13h9.956a.274.274 0 00.014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 00.022.004zm9.974.056v-.002.002zM6 7a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0zm6.854.146a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 01.708-.708L12.5 7.793l2.646-2.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonCheckFill = /*#__PURE__*/makeIcon('PersonCheckFill', '<path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm9.854-2.854a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconPersonCheckFill = /*#__PURE__*/makeIcon('PersonCheckFill', '<path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 100-6 3 3 0 000 6zm9.854-2.854a.5.5 0 010 .708l-3 3a.5.5 0 01-.708 0l-1.5-1.5a.5.5 0 01.708-.708L12.5 7.793l2.646-2.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonCircle = /*#__PURE__*/makeIcon('PersonCircle', '<path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 0 0 8 15a6.987 6.987 0 0 0 5.468-2.63z"/><path fill-rule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>'); // eslint-disable-next-line
 
-var BIconPersonDash = /*#__PURE__*/makeIcon('PersonDash', '<path fill-rule="evenodd" d="M11 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM1.022 13h9.956a.274.274 0 00.014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 00.022.004zm9.974.056v-.002.002zM6 7a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0zm2 2.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonDash = /*#__PURE__*/makeIcon('PersonDash', '<path fill-rule="evenodd" d="M11 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM1.022 13h9.956a.274.274 0 0 0 .014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 0 0 .022.004zm9.974.056v-.002.002zM6 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconPersonDashFill = /*#__PURE__*/makeIcon('PersonDashFill', '<path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 100-6 3 3 0 000 6zm5-.5a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonDashFill = /*#__PURE__*/makeIcon('PersonDashFill', '<path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm5-.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconPersonFill = /*#__PURE__*/makeIcon('PersonFill', '<path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonFill = /*#__PURE__*/makeIcon('PersonFill', '<path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>'); // eslint-disable-next-line
 
-var BIconPersonLinesFill = /*#__PURE__*/makeIcon('PersonLinesFill', '<path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 100-6 3 3 0 000 6zm7 1.5a.5.5 0 01.5-.5h2a.5.5 0 010 1h-2a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h4a.5.5 0 010 1h-4a.5.5 0 01-.5-.5zm2 9a.5.5 0 01.5-.5h2a.5.5 0 010 1h-2a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonLinesFill = /*#__PURE__*/makeIcon('PersonLinesFill', '<path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7 1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5zm2 9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconPersonPlus = /*#__PURE__*/makeIcon('PersonPlus', '<path fill-rule="evenodd" d="M11 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM1.022 13h9.956a.274.274 0 00.014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 00.022.004zm9.974.056v-.002.002zM6 7a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0zm4.5 0a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 010-1H13V5.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 7.5a.5.5 0 01.5-.5h2a.5.5 0 010 1H14v1.5a.5.5 0 01-1 0v-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonPlus = /*#__PURE__*/makeIcon('PersonPlus', '<path fill-rule="evenodd" d="M11 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM1.022 13h9.956a.274.274 0 0 0 .014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 0 0 .022.004zm9.974.056v-.002.002zM6 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm4.5 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M13 7.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0v-2z"/>'); // eslint-disable-next-line
 
-var BIconPersonPlusFill = /*#__PURE__*/makeIcon('PersonPlusFill', '<path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 100-6 3 3 0 000 6zm7.5-3a.5.5 0 01.5.5v2a.5.5 0 01-.5.5h-2a.5.5 0 010-1H13V5.5a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M13 7.5a.5.5 0 01.5-.5h2a.5.5 0 010 1H14v1.5a.5.5 0 01-1 0v-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonPlusFill = /*#__PURE__*/makeIcon('PersonPlusFill', '<path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7.5-3a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M13 7.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0v-2z"/>'); // eslint-disable-next-line
 
-var BIconPersonSquare = /*#__PURE__*/makeIcon('PersonSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPersonSquare = /*#__PURE__*/makeIcon('PersonSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>'); // eslint-disable-next-line
 
-var BIconPhone = /*#__PURE__*/makeIcon('Phone', '<path fill-rule="evenodd" d="M11 1H5a1 1 0 00-1 1v12a1 1 0 001 1h6a1 1 0 001-1V2a1 1 0 00-1-1zM5 0a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V2a2 2 0 00-2-2H5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 14a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPhone = /*#__PURE__*/makeIcon('Phone', '<path fill-rule="evenodd" d="M11 1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H5z"/><path fill-rule="evenodd" d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
 
-var BIconPhoneLandscape = /*#__PURE__*/makeIcon('PhoneLandscape', '<path fill-rule="evenodd" d="M1 4.5v6a1 1 0 001 1h12a1 1 0 001-1v-6a1 1 0 00-1-1H2a1 1 0 00-1 1zm-1 6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2H2a2 2 0 00-2 2v6z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14 7.5a1 1 0 10-2 0 1 1 0 002 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPhoneLandscape = /*#__PURE__*/makeIcon('PhoneLandscape', '<path fill-rule="evenodd" d="M1 4.5v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1zm-1 6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v6z"/><path fill-rule="evenodd" d="M14 7.5a1 1 0 1 0-2 0 1 1 0 0 0 2 0z"/>'); // eslint-disable-next-line
 
-var BIconPieChart = /*#__PURE__*/makeIcon('PieChart', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 7.793V1h1v6.5H15v1H8.207l-4.853 4.854-.708-.708L7.5 7.793z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPieChart = /*#__PURE__*/makeIcon('PieChart', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M7.5 7.793V1h1v6.5H15v1H8.207l-4.853 4.854-.708-.708L7.5 7.793z"/>'); // eslint-disable-next-line
 
-var BIconPieChartFill = /*#__PURE__*/makeIcon('PieChartFill', '<path d="M15.985 8.5H8.207l-5.5 5.5a8 8 0 0013.277-5.5zM2 13.292A8 8 0 017.5.015v7.778l-5.5 5.5zM8.5.015V7.5h7.485A8.001 8.001 0 008.5.015z"/>'); // eslint-disable-next-line
+var BIconPieChartFill = /*#__PURE__*/makeIcon('PieChartFill', '<path d="M15.985 8.5H8.207l-5.5 5.5a8 8 0 0 0 13.277-5.5zM2 13.292A8 8 0 0 1 7.5.015v7.778l-5.5 5.5zM8.5.015V7.5h7.485A8.001 8.001 0 0 0 8.5.015z"/>'); // eslint-disable-next-line
 
-var BIconPip = /*#__PURE__*/makeIcon('Pip', '<path fill-rule="evenodd" d="M0 3.5A1.5 1.5 0 011.5 2h13A1.5 1.5 0 0116 3.5v9a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 010 12.5v-9zM1.5 3a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5h-13z" clip-rule="evenodd"/><path d="M8 8.5a.5.5 0 01.5-.5h5a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-5a.5.5 0 01-.5-.5v-3z"/>'); // eslint-disable-next-line
+var BIconPip = /*#__PURE__*/makeIcon('Pip', '<path fill-rule="evenodd" d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5v-9zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/><path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3z"/>'); // eslint-disable-next-line
 
-var BIconPipFill = /*#__PURE__*/makeIcon('PipFill', '<path fill-rule="evenodd" d="M1.5 2A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13zm7 6a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h5a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5h-5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPipFill = /*#__PURE__*/makeIcon('PipFill', '<path fill-rule="evenodd" d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm7 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-5z"/>'); // eslint-disable-next-line
 
-var BIconPlay = /*#__PURE__*/makeIcon('Play', '<path fill-rule="evenodd" d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 010 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPlay = /*#__PURE__*/makeIcon('Play', '<path fill-rule="evenodd" d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>'); // eslint-disable-next-line
 
-var BIconPlayFill = /*#__PURE__*/makeIcon('PlayFill', '<path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"/>'); // eslint-disable-next-line
+var BIconPlayFill = /*#__PURE__*/makeIcon('PlayFill', '<path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>'); // eslint-disable-next-line
 
-var BIconPlug = /*#__PURE__*/makeIcon('Plug', '<path d="M4 5h8v3a4 4 0 01-8 0V5z"/><path fill-rule="evenodd" d="M6 1.5a.5.5 0 01.5.5v3a.5.5 0 01-1 0V2a.5.5 0 01.5-.5zm4 0a.5.5 0 01.5.5v3a.5.5 0 01-1 0V2a.5.5 0 01.5-.5zM7.115 13.651c.256-.511.385-1.408.385-2.651h1c0 1.257-.121 2.36-.49 3.099-.191.381-.47.707-.87.877-.401.17-.845.15-1.298-.002-.961-.32-1.534-.175-1.851.046-.33.23-.491.615-.491.98h-1c0-.635.278-1.353.918-1.8.653-.456 1.58-.561 2.74-.174.297.099.478.078.592.03.115-.05.244-.161.365-.405z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPlug = /*#__PURE__*/makeIcon('Plug', '<path d="M4 5h8v3a4 4 0 0 1-8 0V5z"/><path fill-rule="evenodd" d="M6 1.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V2a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V2a.5.5 0 0 1 .5-.5zM7.115 13.651c.256-.511.385-1.408.385-2.651h1c0 1.257-.121 2.36-.49 3.099-.191.381-.47.707-.87.877-.401.17-.845.15-1.298-.002-.961-.32-1.534-.175-1.851.046-.33.23-.491.615-.491.98h-1c0-.635.278-1.353.918-1.8.653-.456 1.58-.561 2.74-.174.297.099.478.078.592.03.115-.05.244-.161.365-.405z"/>'); // eslint-disable-next-line
 
-var BIconPlus = /*#__PURE__*/makeIcon('Plus', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H4a.5.5 0 010-1h3.5V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 8a.5.5 0 01.5-.5h4a.5.5 0 010 1H8.5V12a.5.5 0 01-1 0V8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPlus = /*#__PURE__*/makeIcon('Plus', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/>'); // eslint-disable-next-line
 
-var BIconPlusCircle = /*#__PURE__*/makeIcon('PlusCircle', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H4a.5.5 0 010-1h3.5V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 8a.5.5 0 01.5-.5h4a.5.5 0 010 1H8.5V12a.5.5 0 01-1 0V8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPlusCircle = /*#__PURE__*/makeIcon('PlusCircle', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/><path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>'); // eslint-disable-next-line
 
-var BIconPlusCircleFill = /*#__PURE__*/makeIcon('PlusCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zM8.5 4a.5.5 0 00-1 0v3.5H4a.5.5 0 000 1h3.5V12a.5.5 0 001 0V8.5H12a.5.5 0 000-1H8.5V4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPlusCircleFill = /*#__PURE__*/makeIcon('PlusCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4a.5.5 0 0 0-1 0v3.5H4a.5.5 0 0 0 0 1h3.5V12a.5.5 0 0 0 1 0V8.5H12a.5.5 0 0 0 0-1H8.5V4z"/>'); // eslint-disable-next-line
 
-var BIconPlusSquare = /*#__PURE__*/makeIcon('PlusSquare', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H4a.5.5 0 010-1h3.5V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 8a.5.5 0 01.5-.5h4a.5.5 0 010 1H8.5V12a.5.5 0 01-1 0V8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPlusSquare = /*#__PURE__*/makeIcon('PlusSquare', '<path fill-rule="evenodd" d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/><path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>'); // eslint-disable-next-line
 
-var BIconPlusSquareFill = /*#__PURE__*/makeIcon('PlusSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2zm6.5 4a.5.5 0 00-1 0v3.5H4a.5.5 0 000 1h3.5V12a.5.5 0 001 0V8.5H12a.5.5 0 000-1H8.5V4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPlusSquareFill = /*#__PURE__*/makeIcon('PlusSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4a.5.5 0 0 0-1 0v3.5H4a.5.5 0 0 0 0 1h3.5V12a.5.5 0 0 0 1 0V8.5H12a.5.5 0 0 0 0-1H8.5V4z"/>'); // eslint-disable-next-line
 
-var BIconPower = /*#__PURE__*/makeIcon('Power', '<path fill-rule="evenodd" d="M5.578 4.437a5 5 0 104.922.044l.5-.866a6 6 0 11-5.908-.053l.486.875z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.5 8V1h1v7h-1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPower = /*#__PURE__*/makeIcon('Power', '<path fill-rule="evenodd" d="M5.578 4.437a5 5 0 1 0 4.922.044l.5-.866a6 6 0 1 1-5.908-.053l.486.875z"/><path fill-rule="evenodd" d="M7.5 8V1h1v7h-1z"/>'); // eslint-disable-next-line
 
-var BIconPuzzle = /*#__PURE__*/makeIcon('Puzzle', '<path d="M4.605 2.5V2v.5zM3.61 3.6l.498-.043V3.55l-.498.05zM7 2.5h.5A.5.5 0 007 2v.5zm-.676 1.454l.304.397-.304-.397zm3.352 0l-.304.397.304-.397zM9 2.5V2a.5.5 0 00-.5.5H9zm3.39 1.1l-.498-.05v.007l.498.043zM12.1 7l-.498-.043a.5.5 0 00.498.543V7zm1.854-.676l.397.304-.397-.304zm0 3.352l.397-.304-.397.304zM12.1 9v-.5a.5.5 0 00-.498.542L12.1 9zm.29 3.4l-.498.043v.007l.498-.05zM9 13.5h-.5a.5.5 0 00.5.5v-.5zm.676-1.454l-.304-.397.304.397zm-3.352 0l.304-.397-.304.397zM7 13.5v.5a.5.5 0 00.5-.5H7zm-2.395 0V13v.5zm-.995-1.1l.498.05v-.007L3.61 12.4zM3.9 9l.498.042A.5.5 0 003.9 8.5V9zm-1.854.676l-.397-.304.397.304zm0-3.352l-.397.304.397-.304zM3.9 7v.5a.5.5 0 00.498-.543L3.9 7zm.705-5a1.5 1.5 0 00-1.493 1.65l.995-.1A.5.5 0 014.605 3V2zM7 2H4.605v1H7V2zm.5.882V2.5h-1v.382h1zm-.872 1.469c.375-.287.872-.773.872-1.469h-1c0 .195-.147.42-.48.675l.608.794zM6.5 4.5l.001-.006a.113.113 0 01.012-.025.459.459 0 01.115-.118l-.608-.794c-.274.21-.52.528-.52.943h1zM8 5c-.491 0-.912-.1-1.19-.24a.86.86 0 01-.271-.194.213.213 0 01-.039-.063V4.5h-1c0 .568.447.947.862 1.154C6.807 5.877 7.387 6 8 6V5zm1.5-.5v.003a.213.213 0 01-.039.064.86.86 0 01-.27.193C8.91 4.9 8.49 5 8 5v1c.613 0 1.193-.123 1.638-.346.415-.207.862-.586.862-1.154h-1zm-.128-.15c.065.05.099.092.115.119.008.013.01.021.012.025L9.5 4.5h1c0-.415-.246-.733-.52-.943l-.608.794zM8.5 2.883c0 .696.497 1.182.872 1.469l.608-.794c-.333-.255-.48-.48-.48-.675h-1zm0-.382v.382h1V2.5h-1zm2.895-.5H9v1h2.395V2zm1.493 1.65A1.5 1.5 0 0011.395 2v1a.5.5 0 01.498.55l.995.1zm-.29 3.392l.29-3.4-.996-.085-.29 3.4.996.085zm.284-.542H12.1v1h.782v-1zm.675-.48c-.255.333-.48.48-.675.48v1c.696 0 1.182-.497 1.469-.872l-.794-.608zm.943-.52c-.415 0-.733.246-.943.52l.794.608a.459.459 0 01.118-.115.113.113 0 01.025-.012L14.5 6.5v-1zM16 8c0-.613-.123-1.193-.346-1.638-.207-.415-.586-.862-1.154-.862v1h.003l.01.003a.237.237 0 01.053.036.86.86 0 01.194.27c.14.28.24.7.24 1.191h1zm-1.5 2.5c.568 0 .947-.447 1.154-.862C15.877 9.193 16 8.613 16 8h-1c0 .491-.1.912-.24 1.19a.86.86 0 01-.194.271.214.214 0 01-.063.039H14.5v1zm-.943-.52c.21.274.528.52.943.52v-1l-.006-.001a.113.113 0 01-.025-.012.458.458 0 01-.118-.115l-.794.608zm-.675-.48c.195 0 .42.147.675.48l.794-.608c-.287-.375-.773-.872-1.469-.872v1zm-.782 0h.782v-1H12.1v1zm.788 2.858l-.29-3.4-.996.084.29 3.401.996-.085zM11.395 14a1.5 1.5 0 001.493-1.65l-.995.1a.5.5 0 01-.498.55v1zM9 14h2.395v-1H9v1zm.5-.5v-.382h-1v.382h1zm0-.382c0-.195.147-.42.48-.675l-.608-.794c-.375.287-.872.773-.872 1.469h1zm.48-.675c.274-.21.52-.528.52-.943h-1l-.001.006a.113.113 0 01-.012.025.459.459 0 01-.115.118l.608.794zm.52-.943c0-.568-.447-.947-.862-1.154C9.193 10.123 8.613 10 8 10v1c.492 0 .912.1 1.19.24.14.07.226.14.271.194a.214.214 0 01.039.063v.003h1zM8 10c-.613 0-1.193.123-1.638.346-.415.207-.862.586-.862 1.154h1v-.003l.003-.01a.214.214 0 01.036-.053.859.859 0 01.27-.194C7.09 11.1 7.51 11 8 11v-1zm-2.5 1.5c0 .415.246.733.52.943l.608-.794a.459.459 0 01-.115-.118.113.113 0 01-.012-.025L6.5 11.5h-1zm.52.943c.333.255.48.48.48.675h1c0-.696-.497-1.182-.872-1.469l-.608.794zm.48.675v.382h1v-.382h-1zM4.605 14H7v-1H4.605v1zm-1.493-1.65A1.5 1.5 0 004.605 14v-1a.5.5 0 01-.498-.55l-.995-.1zm.29-3.393l-.29 3.401.996.085.29-3.4-.996-.086zm-.284.543H3.9v-1h-.782v1zm-.675.48c.255-.333.48-.48.675-.48v-1c-.696 0-1.182.497-1.469.872l.794.608zm-.943.52c.415 0 .733-.246.943-.52l-.794-.608a.459.459 0 01-.118.115.112.112 0 01-.025.012L1.5 9.5v1zM0 8c0 .613.123 1.193.346 1.638.207.415.586.862 1.154.862v-1h-.003a.213.213 0 01-.064-.039.86.86 0 01-.193-.27C1.1 8.91 1 8.49 1 8H0zm1.5-2.5c-.568 0-.947.447-1.154.862C.123 6.807 0 7.387 0 8h1c0-.492.1-.912.24-1.19a.86.86 0 01.194-.271.213.213 0 01.063-.039H1.5v-1zm.943.52c-.21-.274-.528-.52-.943-.52v1l.006.001a.112.112 0 01.025.012c.027.016.068.05.118.115l.794-.608zm.675.48c-.195 0-.42-.147-.675-.48l-.794.608c.287.375.773.872 1.469.872v-1zm.782 0h-.782v1H3.9v-1zm-.788-2.858l.29 3.4.996-.085-.29-3.4-.996.085z"/>'); // eslint-disable-next-line
+var BIconPuzzle = /*#__PURE__*/makeIcon('Puzzle', '<path d="M4.605 2.5V2v.5zM3.61 3.6l.498-.043V3.55l-.498.05zM7 2.5h.5A.5.5 0 0 0 7 2v.5zm-.676 1.454l.304.397-.304-.397zm3.352 0l-.304.397.304-.397zM9 2.5V2a.5.5 0 0 0-.5.5H9zm3.39 1.1l-.498-.05v.007l.498.043zM12.1 7l-.498-.043a.5.5 0 0 0 .498.543V7zm1.854-.676l.397.304-.397-.304zm0 3.352l.397-.304-.397.304zM12.1 9v-.5a.5.5 0 0 0-.498.542L12.1 9zm.29 3.4l-.498.043v.007l.498-.05zM9 13.5h-.5a.5.5 0 0 0 .5.5v-.5zm.676-1.454l-.304-.397.304.397zm-3.352 0l.304-.397-.304.397zM7 13.5v.5a.5.5 0 0 0 .5-.5H7zm-2.395 0V13v.5zm-.995-1.1l.498.05v-.007L3.61 12.4zM3.9 9l.498.042A.5.5 0 0 0 3.9 8.5V9zm-1.854.676l-.397-.304.397.304zm0-3.352l-.397.304.397-.304zM3.9 7v.5a.5.5 0 0 0 .498-.543L3.9 7zm.705-5a1.5 1.5 0 0 0-1.493 1.65l.995-.1A.5.5 0 0 1 4.605 3V2zM7 2H4.605v1H7V2zm.5.882V2.5h-1v.382h1zm-.872 1.469c.375-.287.872-.773.872-1.469h-1c0 .195-.147.42-.48.675l.608.794zM6.5 4.5l.001-.006a.113.113 0 0 1 .012-.025.459.459 0 0 1 .115-.118l-.608-.794c-.274.21-.52.528-.52.943h1zM8 5c-.491 0-.912-.1-1.19-.24a.86.86 0 0 1-.271-.194.213.213 0 0 1-.039-.063V4.5h-1c0 .568.447.947.862 1.154C6.807 5.877 7.387 6 8 6V5zm1.5-.5v.003a.213.213 0 0 1-.039.064.86.86 0 0 1-.27.193C8.91 4.9 8.49 5 8 5v1c.613 0 1.193-.123 1.638-.346.415-.207.862-.586.862-1.154h-1zm-.128-.15c.065.05.099.092.115.119.008.013.01.021.012.025L9.5 4.5h1c0-.415-.246-.733-.52-.943l-.608.794zM8.5 2.883c0 .696.497 1.182.872 1.469l.608-.794c-.333-.255-.48-.48-.48-.675h-1zm0-.382v.382h1V2.5h-1zm2.895-.5H9v1h2.395V2zm1.493 1.65A1.5 1.5 0 0 0 11.395 2v1a.5.5 0 0 1 .498.55l.995.1zm-.29 3.392l.29-3.4-.996-.085-.29 3.4.996.085zm.284-.542H12.1v1h.782v-1zm.675-.48c-.255.333-.48.48-.675.48v1c.696 0 1.182-.497 1.469-.872l-.794-.608zm.943-.52c-.415 0-.733.246-.943.52l.794.608a.459.459 0 0 1 .118-.115.113.113 0 0 1 .025-.012L14.5 6.5v-1zM16 8c0-.613-.123-1.193-.346-1.638-.207-.415-.586-.862-1.154-.862v1h.003l.01.003a.237.237 0 0 1 .053.036.86.86 0 0 1 .194.27c.14.28.24.7.24 1.191h1zm-1.5 2.5c.568 0 .947-.447 1.154-.862C15.877 9.193 16 8.613 16 8h-1c0 .491-.1.912-.24 1.19a.86.86 0 0 1-.194.271.214.214 0 0 1-.063.039H14.5v1zm-.943-.52c.21.274.528.52.943.52v-1l-.006-.001a.113.113 0 0 1-.025-.012.458.458 0 0 1-.118-.115l-.794.608zm-.675-.48c.195 0 .42.147.675.48l.794-.608c-.287-.375-.773-.872-1.469-.872v1zm-.782 0h.782v-1H12.1v1zm.788 2.858l-.29-3.4-.996.084.29 3.401.996-.085zM11.395 14a1.5 1.5 0 0 0 1.493-1.65l-.995.1a.5.5 0 0 1-.498.55v1zM9 14h2.395v-1H9v1zm.5-.5v-.382h-1v.382h1zm0-.382c0-.195.147-.42.48-.675l-.608-.794c-.375.287-.872.773-.872 1.469h1zm.48-.675c.274-.21.52-.528.52-.943h-1l-.001.006a.113.113 0 0 1-.012.025.459.459 0 0 1-.115.118l.608.794zm.52-.943c0-.568-.447-.947-.862-1.154C9.193 10.123 8.613 10 8 10v1c.492 0 .912.1 1.19.24.14.07.226.14.271.194a.214.214 0 0 1 .039.063v.003h1zM8 10c-.613 0-1.193.123-1.638.346-.415.207-.862.586-.862 1.154h1v-.003l.003-.01a.214.214 0 0 1 .036-.053.859.859 0 0 1 .27-.194C7.09 11.1 7.51 11 8 11v-1zm-2.5 1.5c0 .415.246.733.52.943l.608-.794a.459.459 0 0 1-.115-.118.113.113 0 0 1-.012-.025L6.5 11.5h-1zm.52.943c.333.255.48.48.48.675h1c0-.696-.497-1.182-.872-1.469l-.608.794zm.48.675v.382h1v-.382h-1zM4.605 14H7v-1H4.605v1zm-1.493-1.65A1.5 1.5 0 0 0 4.605 14v-1a.5.5 0 0 1-.498-.55l-.995-.1zm.29-3.393l-.29 3.401.996.085.29-3.4-.996-.086zm-.284.543H3.9v-1h-.782v1zm-.675.48c.255-.333.48-.48.675-.48v-1c-.696 0-1.182.497-1.469.872l.794.608zm-.943.52c.415 0 .733-.246.943-.52l-.794-.608a.459.459 0 0 1-.118.115.112.112 0 0 1-.025.012L1.5 9.5v1zM0 8c0 .613.123 1.193.346 1.638.207.415.586.862 1.154.862v-1h-.003a.213.213 0 0 1-.064-.039.86.86 0 0 1-.193-.27C1.1 8.91 1 8.49 1 8H0zm1.5-2.5c-.568 0-.947.447-1.154.862C.123 6.807 0 7.387 0 8h1c0-.492.1-.912.24-1.19a.86.86 0 0 1 .194-.271.213.213 0 0 1 .063-.039H1.5v-1zm.943.52c-.21-.274-.528-.52-.943-.52v1l.006.001a.112.112 0 0 1 .025.012c.027.016.068.05.118.115l.794-.608zm.675.48c-.195 0-.42-.147-.675-.48l-.794.608c.287.375.773.872 1.469.872v-1zm.782 0h-.782v1H3.9v-1zm-.788-2.858l.29 3.4.996-.085-.29-3.4-.996.085z"/>'); // eslint-disable-next-line
 
-var BIconPuzzleFill = /*#__PURE__*/makeIcon('PuzzleFill', '<path fill-rule="evenodd" d="M3.112 3.645A1.5 1.5 0 014.605 2H7a.5.5 0 01.5.5v.382c0 .696-.497 1.182-.872 1.469a.459.459 0 00-.115.118.113.113 0 00-.012.025L6.5 4.5v.003l.003.01c.004.01.014.028.036.053a.86.86 0 00.27.194C7.09 4.9 7.51 5 8 5c.492 0 .912-.1 1.19-.24a.86.86 0 00.271-.194.213.213 0 00.036-.054l.003-.01v-.008a.112.112 0 00-.012-.025.459.459 0 00-.115-.118c-.375-.287-.872-.773-.872-1.469V2.5A.5.5 0 019 2h2.395a1.5 1.5 0 011.493 1.645L12.645 6.5h.237c.195 0 .42-.147.675-.48.21-.274.528-.52.943-.52.568 0 .947.447 1.154.862C15.877 6.807 16 7.387 16 8s-.123 1.193-.346 1.638c-.207.415-.586.862-1.154.862-.415 0-.733-.246-.943-.52-.255-.333-.48-.48-.675-.48h-.237l.243 2.855A1.5 1.5 0 0111.395 14H9a.5.5 0 01-.5-.5v-.382c0-.696.497-1.182.872-1.469a.459.459 0 00.115-.118.113.113 0 00.012-.025L9.5 11.5v-.003l-.003-.01a.214.214 0 00-.036-.053.859.859 0 00-.27-.194C8.91 11.1 8.49 11 8 11c-.491 0-.912.1-1.19.24a.859.859 0 00-.271.194.214.214 0 00-.036.054l-.003.01v.002l.001.006a.113.113 0 00.012.025c.016.027.05.068.115.118.375.287.872.773.872 1.469v.382a.5.5 0 01-.5.5H4.605a1.5 1.5 0 01-1.493-1.645L3.356 9.5h-.238c-.195 0-.42.147-.675.48-.21.274-.528.52-.943.52-.568 0-.947-.447-1.154-.862C.123 9.193 0 8.613 0 8s.123-1.193.346-1.638C.553 5.947.932 5.5 1.5 5.5c.415 0 .733.246.943.52.255.333.48.48.675.48h.238l-.244-2.855z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconPuzzleFill = /*#__PURE__*/makeIcon('PuzzleFill', '<path fill-rule="evenodd" d="M3.112 3.645A1.5 1.5 0 0 1 4.605 2H7a.5.5 0 0 1 .5.5v.382c0 .696-.497 1.182-.872 1.469a.459.459 0 0 0-.115.118.113.113 0 0 0-.012.025L6.5 4.5v.003l.003.01c.004.01.014.028.036.053a.86.86 0 0 0 .27.194C7.09 4.9 7.51 5 8 5c.492 0 .912-.1 1.19-.24a.86.86 0 0 0 .271-.194.213.213 0 0 0 .036-.054l.003-.01v-.008a.112.112 0 0 0-.012-.025.459.459 0 0 0-.115-.118c-.375-.287-.872-.773-.872-1.469V2.5A.5.5 0 0 1 9 2h2.395a1.5 1.5 0 0 1 1.493 1.645L12.645 6.5h.237c.195 0 .42-.147.675-.48.21-.274.528-.52.943-.52.568 0 .947.447 1.154.862C15.877 6.807 16 7.387 16 8s-.123 1.193-.346 1.638c-.207.415-.586.862-1.154.862-.415 0-.733-.246-.943-.52-.255-.333-.48-.48-.675-.48h-.237l.243 2.855A1.5 1.5 0 0 1 11.395 14H9a.5.5 0 0 1-.5-.5v-.382c0-.696.497-1.182.872-1.469a.459.459 0 0 0 .115-.118.113.113 0 0 0 .012-.025L9.5 11.5v-.003l-.003-.01a.214.214 0 0 0-.036-.053.859.859 0 0 0-.27-.194C8.91 11.1 8.49 11 8 11c-.491 0-.912.1-1.19.24a.859.859 0 0 0-.271.194.214.214 0 0 0-.036.054l-.003.01v.002l.001.006a.113.113 0 0 0 .012.025c.016.027.05.068.115.118.375.287.872.773.872 1.469v.382a.5.5 0 0 1-.5.5H4.605a1.5 1.5 0 0 1-1.493-1.645L3.356 9.5h-.238c-.195 0-.42.147-.675.48-.21.274-.528.52-.943.52-.568 0-.947-.447-1.154-.862C.123 9.193 0 8.613 0 8s.123-1.193.346-1.638C.553 5.947.932 5.5 1.5 5.5c.415 0 .733.246.943.52.255.333.48.48.675.48h.238l-.244-2.855z"/>'); // eslint-disable-next-line
 
 var BIconQuestion = /*#__PURE__*/makeIcon('Question', '<path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
 
-var BIconQuestionCircle = /*#__PURE__*/makeIcon('QuestionCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
+var BIconQuestionCircle = /*#__PURE__*/makeIcon('QuestionCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
 
-var BIconQuestionCircleFill = /*#__PURE__*/makeIcon('QuestionCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zM6.57 6.033H5.25C5.22 4.147 6.68 3.5 8.006 3.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H7.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconQuestionCircleFill = /*#__PURE__*/makeIcon('QuestionCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.57 6.033H5.25C5.22 4.147 6.68 3.5 8.006 3.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H7.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z"/>'); // eslint-disable-next-line
 
-var BIconQuestionDiamond = /*#__PURE__*/makeIcon('QuestionDiamond', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 010-2.098L6.95.435zm1.4.7a.495.495 0 00-.7 0L1.134 7.65a.495.495 0 000 .7l6.516 6.516a.495.495 0 00.7 0l6.516-6.516a.495.495 0 000-.7L8.35 1.134z" clip-rule="evenodd"/><path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
+var BIconQuestionDiamond = /*#__PURE__*/makeIcon('QuestionDiamond', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 0 1 0-2.098L6.95.435zm1.4.7a.495.495 0 0 0-.7 0L1.134 7.65a.495.495 0 0 0 0 .7l6.516 6.516a.495.495 0 0 0 .7 0l6.516-6.516a.495.495 0 0 0 0-.7L8.35 1.134z"/><path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
 
-var BIconQuestionDiamondFill = /*#__PURE__*/makeIcon('QuestionDiamondFill', '<path fill-rule="evenodd" d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM6.57 6.033H5.25C5.22 4.147 6.68 3.5 8.006 3.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H7.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconQuestionDiamondFill = /*#__PURE__*/makeIcon('QuestionDiamondFill', '<path fill-rule="evenodd" d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM6.57 6.033H5.25C5.22 4.147 6.68 3.5 8.006 3.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H7.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z"/>'); // eslint-disable-next-line
 
-var BIconQuestionOctagon = /*#__PURE__*/makeIcon('QuestionOctagon', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 014.893 0h6.214a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H4.893a.5.5 0 01-.353-.146L.146 11.46A.5.5 0 010 11.107V4.893a.5.5 0 01.146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z" clip-rule="evenodd"/><path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
+var BIconQuestionOctagon = /*#__PURE__*/makeIcon('QuestionOctagon', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/><path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
 
-var BIconQuestionOctagonFill = /*#__PURE__*/makeIcon('QuestionOctagonFill', '<path fill-rule="evenodd" d="M11.46.146A.5.5 0 0011.107 0H4.893a.5.5 0 00-.353.146L.146 4.54A.5.5 0 000 4.893v6.214a.5.5 0 00.146.353l4.394 4.394a.5.5 0 00.353.146h6.214a.5.5 0 00.353-.146l4.394-4.394a.5.5 0 00.146-.353V4.893a.5.5 0 00-.146-.353L11.46.146zM6.57 6.033H5.25C5.22 4.147 6.68 3.5 8.006 3.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H7.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconQuestionOctagonFill = /*#__PURE__*/makeIcon('QuestionOctagonFill', '<path fill-rule="evenodd" d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353L11.46.146zM6.57 6.033H5.25C5.22 4.147 6.68 3.5 8.006 3.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H7.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z"/>'); // eslint-disable-next-line
 
-var BIconQuestionSquare = /*#__PURE__*/makeIcon('QuestionSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
+var BIconQuestionSquare = /*#__PURE__*/makeIcon('QuestionSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M5.25 6.033h1.32c0-.781.458-1.384 1.36-1.384.685 0 1.313.343 1.313 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.007.463h1.307v-.355c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.326 0-2.786.647-2.754 2.533zm1.562 5.516c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>'); // eslint-disable-next-line
 
-var BIconQuestionSquareFill = /*#__PURE__*/makeIcon('QuestionSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2zm4.57 6.033H5.25C5.22 4.147 6.68 3.5 8.006 3.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H7.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconQuestionSquareFill = /*#__PURE__*/makeIcon('QuestionSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm4.57 6.033H5.25C5.22 4.147 6.68 3.5 8.006 3.5c1.397 0 2.673.73 2.673 2.24 0 1.08-.635 1.594-1.244 2.057-.737.559-1.01.768-1.01 1.486v.355H7.117l-.007-.463c-.038-.927.495-1.498 1.168-1.987.59-.444.965-.736.965-1.371 0-.825-.628-1.168-1.314-1.168-.901 0-1.358.603-1.358 1.384zm1.251 6.443c-.584 0-1.009-.394-1.009-.927 0-.552.425-.94 1.01-.94.609 0 1.028.388 1.028.94 0 .533-.42.927-1.029.927z"/>'); // eslint-disable-next-line
 
-var BIconReply = /*#__PURE__*/makeIcon('Reply', '<path fill-rule="evenodd" d="M9.502 5.013a.144.144 0 00-.202.134V6.3a.5.5 0 01-.5.5c-.667 0-2.013.005-3.3.822-.984.624-1.99 1.76-2.595 3.876C3.925 10.515 5.09 9.982 6.11 9.7a8.741 8.741 0 011.921-.306 7.403 7.403 0 01.798.008h.013l.005.001h.001L8.8 9.9l.05-.498a.5.5 0 01.45.498v1.153c0 .108.11.176.202.134l3.984-2.933a.494.494 0 01.042-.028.147.147 0 000-.252.494.494 0 01-.042-.028L9.502 5.013zM8.3 10.386a7.745 7.745 0 00-1.923.277c-1.326.368-2.896 1.201-3.94 3.08a.5.5 0 01-.933-.305c.464-3.71 1.886-5.662 3.46-6.66 1.245-.79 2.527-.942 3.336-.971v-.66a1.144 1.144 0 011.767-.96l3.994 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a1.144 1.144 0 01-1.767-.96v-.667z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconReceipt = /*#__PURE__*/makeIcon('Receipt', '<path fill-rule="evenodd" d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zm.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.51z"/><path fill-rule="evenodd" d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconReplyAll = /*#__PURE__*/makeIcon('ReplyAll', '<path fill-rule="evenodd" d="M8.002 5.013a.144.144 0 00-.202.134V6.3a.5.5 0 01-.5.5c-.667 0-2.013.005-3.3.822-.984.624-1.99 1.76-2.595 3.876C2.425 10.515 3.59 9.982 4.61 9.7a8.741 8.741 0 011.921-.306 7.403 7.403 0 01.798.008h.013l.005.001h.001L7.3 9.9l.05-.498a.5.5 0 01.45.498v1.153c0 .108.11.176.202.134l3.984-2.933a.494.494 0 01.042-.028.147.147 0 000-.252.494.494 0 01-.042-.028L8.002 5.013zM6.8 10.386a7.745 7.745 0 00-1.923.277c-1.326.368-2.896 1.201-3.94 3.08a.5.5 0 01-.933-.305c.464-3.71 1.886-5.662 3.46-6.66 1.245-.79 2.527-.942 3.336-.971v-.66a1.144 1.144 0 011.767-.96l3.994 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a1.144 1.144 0 01-1.767-.96v-.667z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.868 4.293a.5.5 0 01.7-.106l3.993 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a.5.5 0 01-.593-.805l4.012-2.954a.493.493 0 01.042-.028.147.147 0 000-.252.496.496 0 01-.042-.028l-4.012-2.954a.5.5 0 01-.106-.699z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconReceiptCutoff = /*#__PURE__*/makeIcon('ReceiptCutoff', '<path fill-rule="evenodd" d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v13h-1V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.51L2 2.118V15H1V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zM0 15.5a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm8-8a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconReplyAllFill = /*#__PURE__*/makeIcon('ReplyAllFill', '<path d="M8.079 11.9l4.568-3.281a.719.719 0 000-1.238L8.079 4.1A.716.716 0 007 4.719V6c-1.5 0-6 0-7 8 2.5-4.5 7-4 7-4v1.281c0 .56.606.898 1.079.62z"/><path fill-rule="evenodd" d="M10.868 4.293a.5.5 0 01.7-.106l3.993 2.94a1.147 1.147 0 010 1.946l-3.994 2.94a.5.5 0 01-.593-.805l4.012-2.954a.493.493 0 01.042-.028.147.147 0 000-.252.496.496 0 01-.042-.028l-4.012-2.954a.5.5 0 01-.106-.699z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconReply = /*#__PURE__*/makeIcon('Reply', '<path fill-rule="evenodd" d="M9.502 5.013a.144.144 0 0 0-.202.134V6.3a.5.5 0 0 1-.5.5c-.667 0-2.013.005-3.3.822-.984.624-1.99 1.76-2.595 3.876C3.925 10.515 5.09 9.982 6.11 9.7a8.741 8.741 0 0 1 1.921-.306 7.403 7.403 0 0 1 .798.008h.013l.005.001h.001L8.8 9.9l.05-.498a.5.5 0 0 1 .45.498v1.153c0 .108.11.176.202.134l3.984-2.933a.494.494 0 0 1 .042-.028.147.147 0 0 0 0-.252.494.494 0 0 1-.042-.028L9.502 5.013zM8.3 10.386a7.745 7.745 0 0 0-1.923.277c-1.326.368-2.896 1.201-3.94 3.08a.5.5 0 0 1-.933-.305c.464-3.71 1.886-5.662 3.46-6.66 1.245-.79 2.527-.942 3.336-.971v-.66a1.144 1.144 0 0 1 1.767-.96l3.994 2.94a1.147 1.147 0 0 1 0 1.946l-3.994 2.94a1.144 1.144 0 0 1-1.767-.96v-.667z"/>'); // eslint-disable-next-line
 
-var BIconReplyFill = /*#__PURE__*/makeIcon('ReplyFill', '<path d="M9.079 11.9l4.568-3.281a.719.719 0 000-1.238L9.079 4.1A.716.716 0 008 4.719V6c-1.5 0-6 0-7 8 2.5-4.5 7-4 7-4v1.281c0 .56.606.898 1.079.62z"/>'); // eslint-disable-next-line
+var BIconReplyAll = /*#__PURE__*/makeIcon('ReplyAll', '<path fill-rule="evenodd" d="M8.002 5.013a.144.144 0 0 0-.202.134V6.3a.5.5 0 0 1-.5.5c-.667 0-2.013.005-3.3.822-.984.624-1.99 1.76-2.595 3.876C2.425 10.515 3.59 9.982 4.61 9.7a8.741 8.741 0 0 1 1.921-.306 7.403 7.403 0 0 1 .798.008h.013l.005.001h.001L7.3 9.9l.05-.498a.5.5 0 0 1 .45.498v1.153c0 .108.11.176.202.134l3.984-2.933a.494.494 0 0 1 .042-.028.147.147 0 0 0 0-.252.494.494 0 0 1-.042-.028L8.002 5.013zM6.8 10.386a7.745 7.745 0 0 0-1.923.277c-1.326.368-2.896 1.201-3.94 3.08a.5.5 0 0 1-.933-.305c.464-3.71 1.886-5.662 3.46-6.66 1.245-.79 2.527-.942 3.336-.971v-.66a1.144 1.144 0 0 1 1.767-.96l3.994 2.94a1.147 1.147 0 0 1 0 1.946l-3.994 2.94a1.144 1.144 0 0 1-1.767-.96v-.667z"/><path fill-rule="evenodd" d="M10.868 4.293a.5.5 0 0 1 .7-.106l3.993 2.94a1.147 1.147 0 0 1 0 1.946l-3.994 2.94a.5.5 0 0 1-.593-.805l4.012-2.954a.493.493 0 0 1 .042-.028.147.147 0 0 0 0-.252.496.496 0 0 1-.042-.028l-4.012-2.954a.5.5 0 0 1-.106-.699z"/>'); // eslint-disable-next-line
 
-var BIconScrewdriver = /*#__PURE__*/makeIcon('Screwdriver', '<path fill-rule="evenodd" d="M0 1l1-1 3.081 2.2a1 1 0 01.419.815v.07a1 1 0 00.293.708L10.5 9.5l.914-.305a1 1 0 011.023.242l3.356 3.356a1 1 0 010 1.414l-1.586 1.586a1 1 0 01-1.414 0l-3.356-3.356a1 1 0 01-.242-1.023L9.5 10.5 3.793 4.793a1 1 0 00-.707-.293h-.071a1 1 0 01-.814-.419L0 1zm11.354 9.646a.5.5 0 00-.708.708l3 3a.5.5 0 00.708-.708l-3-3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconReplyAllFill = /*#__PURE__*/makeIcon('ReplyAllFill', '<path d="M8.079 11.9l4.568-3.281a.719.719 0 0 0 0-1.238L8.079 4.1A.716.716 0 0 0 7 4.719V6c-1.5 0-6 0-7 8 2.5-4.5 7-4 7-4v1.281c0 .56.606.898 1.079.62z"/><path fill-rule="evenodd" d="M10.868 4.293a.5.5 0 0 1 .7-.106l3.993 2.94a1.147 1.147 0 0 1 0 1.946l-3.994 2.94a.5.5 0 0 1-.593-.805l4.012-2.954a.493.493 0 0 1 .042-.028.147.147 0 0 0 0-.252.496.496 0 0 1-.042-.028l-4.012-2.954a.5.5 0 0 1-.106-.699z"/>'); // eslint-disable-next-line
 
-var BIconSearch = /*#__PURE__*/makeIcon('Search', '<path fill-rule="evenodd" d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconReplyFill = /*#__PURE__*/makeIcon('ReplyFill', '<path d="M9.079 11.9l4.568-3.281a.719.719 0 0 0 0-1.238L9.079 4.1A.716.716 0 0 0 8 4.719V6c-1.5 0-6 0-7 8 2.5-4.5 7-4 7-4v1.281c0 .56.606.898 1.079.62z"/>'); // eslint-disable-next-line
 
-var BIconServer = /*#__PURE__*/makeIcon('Server', '<path d="M13 2c0-1.105-2.239-2-5-2S3 .895 3 2s2.239 2 5 2 5-.895 5-2z"/><path d="M13 3.75c-.322.24-.698.435-1.093.593C10.857 4.763 9.475 5 8 5s-2.857-.237-3.907-.657A4.881 4.881 0 013 3.75V6c0 1.105 2.239 2 5 2s5-.895 5-2V3.75z"/><path d="M13 7.75c-.322.24-.698.435-1.093.593C10.857 8.763 9.475 9 8 9s-2.857-.237-3.907-.657A4.881 4.881 0 013 7.75V10c0 1.105 2.239 2 5 2s5-.895 5-2V7.75z"/><path d="M13 11.75c-.322.24-.698.435-1.093.593-1.05.42-2.432.657-3.907.657s-2.857-.237-3.907-.657A4.883 4.883 0 013 11.75V14c0 1.105 2.239 2 5 2s5-.895 5-2v-2.25z"/>'); // eslint-disable-next-line
+var BIconScrewdriver = /*#__PURE__*/makeIcon('Screwdriver', '<path fill-rule="evenodd" d="M0 1l1-1 3.081 2.2a1 1 0 0 1 .419.815v.07a1 1 0 0 0 .293.708L10.5 9.5l.914-.305a1 1 0 0 1 1.023.242l3.356 3.356a1 1 0 0 1 0 1.414l-1.586 1.586a1 1 0 0 1-1.414 0l-3.356-3.356a1 1 0 0 1-.242-1.023L9.5 10.5 3.793 4.793a1 1 0 0 0-.707-.293h-.071a1 1 0 0 1-.814-.419L0 1zm11.354 9.646a.5.5 0 0 0-.708.708l3 3a.5.5 0 0 0 .708-.708l-3-3z"/>'); // eslint-disable-next-line
 
-var BIconShield = /*#__PURE__*/makeIcon('Shield', '<path fill-rule="evenodd" d="M5.443 1.991a60.17 60.17 0 00-2.725.802.454.454 0 00-.315.366C1.87 7.056 3.1 9.9 4.567 11.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 008 14.5c.007-.001.038-.005.097-.023.072-.022.166-.058.282-.111.23-.106.525-.272.857-.5a10.197 10.197 0 002.197-2.093C12.9 9.9 14.13 7.056 13.597 3.159a.454.454 0 00-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491zm-.256-.966C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 012.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 012.415 1.84a61.11 61.11 0 012.772-.815z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSearch = /*#__PURE__*/makeIcon('Search', '<path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/><path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>'); // eslint-disable-next-line
 
-var BIconShieldFill = /*#__PURE__*/makeIcon('ShieldFill', '<path fill-rule="evenodd" d="M5.187 1.025C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 012.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 012.415 1.84a61.11 61.11 0 012.772-.815z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconServer = /*#__PURE__*/makeIcon('Server', '<path d="M13 2c0-1.105-2.239-2-5-2S3 .895 3 2s2.239 2 5 2 5-.895 5-2z"/><path d="M13 3.75c-.322.24-.698.435-1.093.593C10.857 4.763 9.475 5 8 5s-2.857-.237-3.907-.657A4.881 4.881 0 0 1 3 3.75V6c0 1.105 2.239 2 5 2s5-.895 5-2V3.75z"/><path d="M13 7.75c-.322.24-.698.435-1.093.593C10.857 8.763 9.475 9 8 9s-2.857-.237-3.907-.657A4.881 4.881 0 0 1 3 7.75V10c0 1.105 2.239 2 5 2s5-.895 5-2V7.75z"/><path d="M13 11.75c-.322.24-.698.435-1.093.593-1.05.42-2.432.657-3.907.657s-2.857-.237-3.907-.657A4.883 4.883 0 0 1 3 11.75V14c0 1.105 2.239 2 5 2s5-.895 5-2v-2.25z"/>'); // eslint-disable-next-line
 
-var BIconShieldLock = /*#__PURE__*/makeIcon('ShieldLock', '<path fill-rule="evenodd" d="M5.443 1.991a60.17 60.17 0 00-2.725.802.454.454 0 00-.315.366C1.87 7.056 3.1 9.9 4.567 11.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 008 14.5c.007-.001.038-.005.097-.023.072-.022.166-.058.282-.111.23-.106.525-.272.857-.5a10.197 10.197 0 002.197-2.093C12.9 9.9 14.13 7.056 13.597 3.159a.454.454 0 00-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491zm-.256-.966C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 012.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 012.415 1.84a61.11 61.11 0 012.772-.815z" clip-rule="evenodd"/><path d="M9.5 6.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M7.411 8.034a.5.5 0 01.493-.417h.156a.5.5 0 01.492.414l.347 2a.5.5 0 01-.493.585h-.835a.5.5 0 01-.493-.582l.333-2z"/>'); // eslint-disable-next-line
+var BIconShield = /*#__PURE__*/makeIcon('Shield', '<path fill-rule="evenodd" d="M5.443 1.991a60.17 60.17 0 0 0-2.725.802.454.454 0 0 0-.315.366C1.87 7.056 3.1 9.9 4.567 11.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 0 0 8 14.5c.007-.001.038-.005.097-.023.072-.022.166-.058.282-.111.23-.106.525-.272.857-.5a10.197 10.197 0 0 0 2.197-2.093C12.9 9.9 14.13 7.056 13.597 3.159a.454.454 0 0 0-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491zm-.256-.966C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 0 1-2.418 2.3 6.942 6.942 0 0 1-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 0 1-1.007-.586 11.192 11.192 0 0 1-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 0 1 2.415 1.84a61.11 61.11 0 0 1 2.772-.815z"/>'); // eslint-disable-next-line
 
-var BIconShieldLockFill = /*#__PURE__*/makeIcon('ShieldLockFill', '<path fill-rule="evenodd" d="M5.187 1.025C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 012.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 012.415 1.84a61.11 61.11 0 012.772-.815zm3.328 6.884a1.5 1.5 0 10-1.06-.011.5.5 0 00-.044.136l-.333 2a.5.5 0 00.493.582h.835a.5.5 0 00.493-.585l-.347-2a.5.5 0 00-.037-.122z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconShieldFill = /*#__PURE__*/makeIcon('ShieldFill', '<path fill-rule="evenodd" d="M5.187 1.025C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 0 1-2.418 2.3 6.942 6.942 0 0 1-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 0 1-1.007-.586 11.192 11.192 0 0 1-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 0 1 2.415 1.84a61.11 61.11 0 0 1 2.772-.815z"/>'); // eslint-disable-next-line
 
-var BIconShieldShaded = /*#__PURE__*/makeIcon('ShieldShaded', '<path fill-rule="evenodd" d="M5.443 1.991a60.17 60.17 0 00-2.725.802.454.454 0 00-.315.366C1.87 7.056 3.1 9.9 4.567 11.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 008 14.5c.007-.001.038-.005.097-.023.072-.022.166-.058.282-.111.23-.106.525-.272.857-.5a10.197 10.197 0 002.197-2.093C12.9 9.9 14.13 7.056 13.597 3.159a.454.454 0 00-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491zm-.256-.966C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 012.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 01-2.418 2.3 6.942 6.942 0 01-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 01-1.007-.586 11.192 11.192 0 01-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 012.415 1.84a61.11 61.11 0 012.772-.815z" clip-rule="evenodd"/><path d="M8 2.25c.909 0 3.188.685 4.254 1.022a.94.94 0 01.656.773c.814 6.424-4.13 9.452-4.91 9.452V2.25z"/>'); // eslint-disable-next-line
+var BIconShieldLock = /*#__PURE__*/makeIcon('ShieldLock', '<path fill-rule="evenodd" d="M5.443 1.991a60.17 60.17 0 0 0-2.725.802.454.454 0 0 0-.315.366C1.87 7.056 3.1 9.9 4.567 11.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 0 0 8 14.5c.007-.001.038-.005.097-.023.072-.022.166-.058.282-.111.23-.106.525-.272.857-.5a10.197 10.197 0 0 0 2.197-2.093C12.9 9.9 14.13 7.056 13.597 3.159a.454.454 0 0 0-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491zm-.256-.966C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 0 1-2.418 2.3 6.942 6.942 0 0 1-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 0 1-1.007-.586 11.192 11.192 0 0 1-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 0 1 2.415 1.84a61.11 61.11 0 0 1 2.772-.815z"/><path d="M9.5 6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/><path d="M7.411 8.034a.5.5 0 0 1 .493-.417h.156a.5.5 0 0 1 .492.414l.347 2a.5.5 0 0 1-.493.585h-.835a.5.5 0 0 1-.493-.582l.333-2z"/>'); // eslint-disable-next-line
 
-var BIconShift = /*#__PURE__*/makeIcon('Shift', '<path fill-rule="evenodd" d="M7.27 2.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v3a1 1 0 01-1 1h-5a1 1 0 01-1-1v-3H1.654C.78 10.5.326 9.455.924 8.816L7.27 2.047zM14.346 9.5L8 2.731 1.654 9.5H4.5a1 1 0 011 1v3h5v-3a1 1 0 011-1h2.846z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconShieldLockFill = /*#__PURE__*/makeIcon('ShieldLockFill', '<path fill-rule="evenodd" d="M5.187 1.025C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 0 1-2.418 2.3 6.942 6.942 0 0 1-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 0 1-1.007-.586 11.192 11.192 0 0 1-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 0 1 2.415 1.84a61.11 61.11 0 0 1 2.772-.815zm3.328 6.884a1.5 1.5 0 1 0-1.06-.011.5.5 0 0 0-.044.136l-.333 2a.5.5 0 0 0 .493.582h.835a.5.5 0 0 0 .493-.585l-.347-2a.5.5 0 0 0-.037-.122z"/>'); // eslint-disable-next-line
 
-var BIconShiftFill = /*#__PURE__*/makeIcon('ShiftFill', '<path fill-rule="evenodd" d="M7.27 2.047a1 1 0 011.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v3a1 1 0 01-1 1h-5a1 1 0 01-1-1v-3H1.654C.78 10.5.326 9.455.924 8.816L7.27 2.047z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconShieldShaded = /*#__PURE__*/makeIcon('ShieldShaded', '<path fill-rule="evenodd" d="M5.443 1.991a60.17 60.17 0 0 0-2.725.802.454.454 0 0 0-.315.366C1.87 7.056 3.1 9.9 4.567 11.773c.736.94 1.533 1.636 2.197 2.093.333.228.626.394.857.5.116.053.21.089.282.11A.73.73 0 0 0 8 14.5c.007-.001.038-.005.097-.023.072-.022.166-.058.282-.111.23-.106.525-.272.857-.5a10.197 10.197 0 0 0 2.197-2.093C12.9 9.9 14.13 7.056 13.597 3.159a.454.454 0 0 0-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491zm-.256-.966C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.573 4.197-.756 7.307-2.367 9.365a11.191 11.191 0 0 1-2.418 2.3 6.942 6.942 0 0 1-1.007.586c-.27.124-.558.225-.796.225s-.526-.101-.796-.225a6.908 6.908 0 0 1-1.007-.586 11.192 11.192 0 0 1-2.417-2.3C2.167 10.331.839 7.221 1.412 3.024A1.454 1.454 0 0 1 2.415 1.84a61.11 61.11 0 0 1 2.772-.815z"/><path d="M8 2.25c.909 0 3.188.685 4.254 1.022a.94.94 0 0 1 .656.773c.814 6.424-4.13 9.452-4.91 9.452V2.25z"/>'); // eslint-disable-next-line
 
-var BIconShuffle = /*#__PURE__*/makeIcon('Shuffle', '<path fill-rule="evenodd" d="M12.646 1.146a.5.5 0 01.708 0l2.5 2.5a.5.5 0 010 .708l-2.5 2.5a.5.5 0 01-.708-.708L14.793 4l-2.147-2.146a.5.5 0 010-.708zm0 8a.5.5 0 01.708 0l2.5 2.5a.5.5 0 010 .708l-2.5 2.5a.5.5 0 01-.708-.708L14.793 12l-2.147-2.146a.5.5 0 010-.708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M0 4a.5.5 0 01.5-.5h2c3.053 0 4.564 2.258 5.856 4.226l.08.123c.636.97 1.224 1.865 1.932 2.539.718.682 1.538 1.112 2.632 1.112h2a.5.5 0 010 1h-2c-1.406 0-2.461-.57-3.321-1.388-.795-.755-1.441-1.742-2.055-2.679l-.105-.159C6.186 6.242 4.947 4.5 2.5 4.5h-2A.5.5 0 010 4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M0 12a.5.5 0 00.5.5h2c3.053 0 4.564-2.258 5.856-4.226l.08-.123c.636-.97 1.224-1.865 1.932-2.539C11.086 4.93 11.906 4.5 13 4.5h2a.5.5 0 000-1h-2c-1.406 0-2.461.57-3.321 1.388-.795.755-1.441 1.742-2.055 2.679l-.105.159C6.186 9.758 4.947 11.5 2.5 11.5h-2a.5.5 0 00-.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconShieldSlash = /*#__PURE__*/makeIcon('ShieldSlash', '<path d="M1.357 3.478c-.42 3.969.87 6.928 2.423 8.911a11.192 11.192 0 0 0 2.417 2.3c.371.256.715.451 1.007.586.27.124.558.225.796.225s.527-.101.796-.225c.292-.135.636-.33 1.007-.586.466-.32.983-.74 1.502-1.263l-.707-.707a9.692 9.692 0 0 1-1.362 1.147 5.934 5.934 0 0 1-.857.5c-.116.053-.21.089-.282.11A.73.73 0 0 1 8 14.5c-.007-.001-.038-.005-.097-.023a2.273 2.273 0 0 1-.282-.111 5.934 5.934 0 0 1-.857-.5 10.197 10.197 0 0 1-2.197-2.093C3.262 10.107 2.145 7.672 2.289 4.41l-.932-.932zm11.053 6.81c.971-1.785 1.594-4.15 1.187-7.129a.454.454 0 0 0-.315-.366c-.626-.2-1.682-.526-2.725-.802C9.491 1.71 8.51 1.5 8 1.5c-.51 0-1.49.21-2.557.491a45.4 45.4 0 0 0-1.041.29l-.806-.806a52.727 52.727 0 0 1 1.591-.45C6.23.749 7.337.5 8 .5c.662 0 1.77.249 2.813.525a61.09 61.09 0 0 1 2.772.815c.528.168.926.623 1.003 1.184.458 3.355-.299 6.015-1.444 7.999l-.735-.735z"/><path fill-rule="evenodd" d="M14.646 15.354l-14-14 .708-.708 14 14-.707.707z"/>'); // eslint-disable-next-line
 
-var BIconSkipBackward = /*#__PURE__*/makeIcon('SkipBackward', '<path fill-rule="evenodd" d="M.5 3.5A.5.5 0 011 4v3.248l6.267-3.636c.52-.302 1.233.043 1.233.696v2.94l6.267-3.636c.52-.302 1.233.043 1.233.696v7.384c0 .653-.713.998-1.233.696L8.5 8.752v2.94c0 .653-.713.998-1.233.696L1 8.752V12a.5.5 0 01-1 0V4a.5.5 0 01.5-.5zm7 1.133L1.696 8 7.5 11.367V4.633zm7.5 0L9.196 8 15 11.367V4.633z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconShieldSlashFill = /*#__PURE__*/makeIcon('ShieldSlashFill', '<path d="M1.357 3.478c-.42 3.969.87 6.928 2.423 8.911a11.192 11.192 0 0 0 2.417 2.3c.371.256.715.451 1.007.586.27.124.558.225.796.225s.527-.101.796-.225c.292-.135.636-.33 1.007-.586.466-.32.983-.74 1.502-1.263L1.357 3.478zm11.787 7.545c1.145-1.984 1.902-4.644 1.444-8a1.454 1.454 0 0 0-1.003-1.183 61.09 61.09 0 0 0-2.772-.815C9.77.749 8.663.5 8 .5c-.662 0-1.77.249-2.813.525-.548.145-1.1.303-1.59.45l9.547 9.548z"/><path fill-rule="evenodd" d="M14.646 15.354l-14-14 .708-.708 14 14-.707.707z"/>'); // eslint-disable-next-line
 
-var BIconSkipBackwardFill = /*#__PURE__*/makeIcon('SkipBackwardFill', '<path fill-rule="evenodd" d="M.5 3.5A.5.5 0 000 4v8a.5.5 0 001 0V4a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path d="M.904 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.692-1.01-1.233-.696L.904 7.304a.802.802 0 000 1.393z"/><path d="M8.404 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.693-1.01-1.233-.696L8.404 7.304a.802.802 0 000 1.393z"/>'); // eslint-disable-next-line
+var BIconShift = /*#__PURE__*/makeIcon('Shift', '<path fill-rule="evenodd" d="M7.27 2.047a1 1 0 0 1 1.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v3a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-3H1.654C.78 10.5.326 9.455.924 8.816L7.27 2.047zM14.346 9.5L8 2.731 1.654 9.5H4.5a1 1 0 0 1 1 1v3h5v-3a1 1 0 0 1 1-1h2.846z"/>'); // eslint-disable-next-line
 
-var BIconSkipEnd = /*#__PURE__*/makeIcon('SkipEnd', '<path fill-rule="evenodd" d="M12 3.5a.5.5 0 01.5.5v8a.5.5 0 01-1 0V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 010 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconShiftFill = /*#__PURE__*/makeIcon('ShiftFill', '<path fill-rule="evenodd" d="M7.27 2.047a1 1 0 0 1 1.46 0l6.345 6.77c.6.638.146 1.683-.73 1.683H11.5v3a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-3H1.654C.78 10.5.326 9.455.924 8.816L7.27 2.047z"/>'); // eslint-disable-next-line
 
-var BIconSkipEndFill = /*#__PURE__*/makeIcon('SkipEndFill', '<path fill-rule="evenodd" d="M12 3.5a.5.5 0 01.5.5v8a.5.5 0 01-1 0V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"/>'); // eslint-disable-next-line
+var BIconShop = /*#__PURE__*/makeIcon('Shop', '<path fill-rule="evenodd" d="M0 15.5a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zM3.12 1.175A.5.5 0 0 1 3.5 1h9a.5.5 0 0 1 .38.175l2.759 3.219A1.5 1.5 0 0 1 16 5.37v.13h-1v-.13a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.13H0v-.13a1.5 1.5 0 0 1 .361-.976l2.76-3.22z"/><path d="M2.375 6.875c.76 0 1.375-.616 1.375-1.375h1a1.375 1.375 0 0 0 2.75 0h1a1.375 1.375 0 0 0 2.75 0h1a1.375 1.375 0 1 0 2.75 0h1a2.375 2.375 0 0 1-4.25 1.458 2.371 2.371 0 0 1-1.875.917A2.37 2.37 0 0 1 8 6.958a2.37 2.37 0 0 1-1.875.917 2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.5h1c0 .76.616 1.375 1.375 1.375z"/><path d="M4.75 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm3.75 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm3.75 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/><path fill-rule="evenodd" d="M2 7.846V7H1v.437c.291.207.632.35 1 .409zm-1 .737c.311.14.647.232 1 .271V15H1V8.583zm13 .271a3.354 3.354 0 0 0 1-.27V15h-1V8.854zm1-1.417c-.291.207-.632.35-1 .409V7h1v.437zM3 9.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5V15H7v-5H4v5H3V9.5zm6 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4zm1 .5v3h2v-3h-2z"/>'); // eslint-disable-next-line
 
-var BIconSkipForward = /*#__PURE__*/makeIcon('SkipForward', '<path fill-rule="evenodd" d="M15.5 3.5a.5.5 0 01.5.5v8a.5.5 0 01-1 0V8.752l-6.267 3.636c-.52.302-1.233-.043-1.233-.696v-2.94l-6.267 3.636C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696L7.5 7.248v-2.94c0-.653.713-.998 1.233-.696L15 7.248V4a.5.5 0 01.5-.5zM1 4.633v6.734L6.804 8 1 4.633zm7.5 0v6.734L14.304 8 8.5 4.633z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconShopWindow = /*#__PURE__*/makeIcon('ShopWindow', '<path fill-rule="evenodd" d="M3.12 1.175A.5.5 0 0 1 3.5 1h9a.5.5 0 0 1 .38.175l2.759 3.219A1.5 1.5 0 0 1 16 5.37v.13h-1v-.13a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.13H0v-.13a1.5 1.5 0 0 1 .361-.976l2.76-3.22z"/><path d="M2.375 6.875c.76 0 1.375-.616 1.375-1.375h1a1.375 1.375 0 0 0 2.75 0h1a1.375 1.375 0 0 0 2.75 0h1a1.375 1.375 0 1 0 2.75 0h1a2.375 2.375 0 0 1-4.25 1.458 2.371 2.371 0 0 1-1.875.917A2.37 2.37 0 0 1 8 6.958a2.37 2.37 0 0 1-1.875.917 2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.5h1c0 .76.616 1.375 1.375 1.375z"/><path d="M4.75 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm3.75 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm3.75 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zM2 8.854V15h12V8.854a3.354 3.354 0 0 0 1-.27V15h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V8.583c.311.14.647.232 1 .271zm0-1.008V7H1v.437c.291.207.632.35 1 .409zm13-.409c-.291.207-.632.35-1 .409V7h1v.437z"/><path d="M4 13V9H3v4a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9h-1v4H4z"/>'); // eslint-disable-next-line
 
-var BIconSkipForwardFill = /*#__PURE__*/makeIcon('SkipForwardFill', '<path fill-rule="evenodd" d="M15.5 3.5a.5.5 0 01.5.5v8a.5.5 0 01-1 0V4a.5.5 0 01.5-.5z" clip-rule="evenodd"/><path d="M7.596 8.697l-6.363 3.692C.693 12.702 0 12.322 0 11.692V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"/><path d="M15.096 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"/>'); // eslint-disable-next-line
+var BIconShuffle = /*#__PURE__*/makeIcon('Shuffle', '<path fill-rule="evenodd" d="M12.646 1.146a.5.5 0 0 1 .708 0l2.5 2.5a.5.5 0 0 1 0 .708l-2.5 2.5a.5.5 0 0 1-.708-.708L14.793 4l-2.147-2.146a.5.5 0 0 1 0-.708zm0 8a.5.5 0 0 1 .708 0l2.5 2.5a.5.5 0 0 1 0 .708l-2.5 2.5a.5.5 0 0 1-.708-.708L14.793 12l-2.147-2.146a.5.5 0 0 1 0-.708z"/><path fill-rule="evenodd" d="M0 4a.5.5 0 0 1 .5-.5h2c3.053 0 4.564 2.258 5.856 4.226l.08.123c.636.97 1.224 1.865 1.932 2.539.718.682 1.538 1.112 2.632 1.112h2a.5.5 0 0 1 0 1h-2c-1.406 0-2.461-.57-3.321-1.388-.795-.755-1.441-1.742-2.055-2.679l-.105-.159C6.186 6.242 4.947 4.5 2.5 4.5h-2A.5.5 0 0 1 0 4z"/><path fill-rule="evenodd" d="M0 12a.5.5 0 0 0 .5.5h2c3.053 0 4.564-2.258 5.856-4.226l.08-.123c.636-.97 1.224-1.865 1.932-2.539C11.086 4.93 11.906 4.5 13 4.5h2a.5.5 0 0 0 0-1h-2c-1.406 0-2.461.57-3.321 1.388-.795.755-1.441 1.742-2.055 2.679l-.105.159C6.186 9.758 4.947 11.5 2.5 11.5h-2a.5.5 0 0 0-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconSkipStart = /*#__PURE__*/makeIcon('SkipStart', '<path fill-rule="evenodd" d="M4.5 3.5A.5.5 0 004 4v8a.5.5 0 001 0V4a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5.696 8L11.5 4.633v6.734L5.696 8zm-.792-.696a.802.802 0 000 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696L4.904 7.304z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSkipBackward = /*#__PURE__*/makeIcon('SkipBackward', '<path fill-rule="evenodd" d="M.5 3.5A.5.5 0 0 1 1 4v3.248l6.267-3.636c.52-.302 1.233.043 1.233.696v2.94l6.267-3.636c.52-.302 1.233.043 1.233.696v7.384c0 .653-.713.998-1.233.696L8.5 8.752v2.94c0 .653-.713.998-1.233.696L1 8.752V12a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5zm7 1.133L1.696 8 7.5 11.367V4.633zm7.5 0L9.196 8 15 11.367V4.633z"/>'); // eslint-disable-next-line
 
-var BIconSkipStartFill = /*#__PURE__*/makeIcon('SkipStartFill', '<path fill-rule="evenodd" d="M4.5 3.5A.5.5 0 004 4v8a.5.5 0 001 0V4a.5.5 0 00-.5-.5z" clip-rule="evenodd"/><path d="M4.903 8.697l6.364 3.692c.54.313 1.232-.066 1.232-.697V4.308c0-.63-.692-1.01-1.232-.696L4.903 7.304a.802.802 0 000 1.393z"/>'); // eslint-disable-next-line
+var BIconSkipBackwardFill = /*#__PURE__*/makeIcon('SkipBackwardFill', '<path fill-rule="evenodd" d="M.5 3.5A.5.5 0 0 0 0 4v8a.5.5 0 0 0 1 0V4a.5.5 0 0 0-.5-.5z"/><path d="M.904 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.692-1.01-1.233-.696L.904 7.304a.802.802 0 0 0 0 1.393z"/><path d="M8.404 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.693-1.01-1.233-.696L8.404 7.304a.802.802 0 0 0 0 1.393z"/>'); // eslint-disable-next-line
 
-var BIconSlash = /*#__PURE__*/makeIcon('Slash', '<path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSkipEnd = /*#__PURE__*/makeIcon('SkipEnd', '<path fill-rule="evenodd" d="M12 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/><path fill-rule="evenodd" d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>'); // eslint-disable-next-line
 
-var BIconSlashCircle = /*#__PURE__*/makeIcon('SlashCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSkipEndFill = /*#__PURE__*/makeIcon('SkipEndFill', '<path fill-rule="evenodd" d="M12 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>'); // eslint-disable-next-line
 
-var BIconSlashCircleFill = /*#__PURE__*/makeIcon('SlashCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zm-4.146-3.146a.5.5 0 00-.708-.708l-7 7a.5.5 0 00.708.708l7-7z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSkipForward = /*#__PURE__*/makeIcon('SkipForward', '<path fill-rule="evenodd" d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V8.752l-6.267 3.636c-.52.302-1.233-.043-1.233-.696v-2.94l-6.267 3.636C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696L7.5 7.248v-2.94c0-.653.713-.998 1.233-.696L15 7.248V4a.5.5 0 0 1 .5-.5zM1 4.633v6.734L6.804 8 1 4.633zm7.5 0v6.734L14.304 8 8.5 4.633z"/>'); // eslint-disable-next-line
 
-var BIconSlashSquare = /*#__PURE__*/makeIcon('SlashSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSkipForwardFill = /*#__PURE__*/makeIcon('SkipForwardFill', '<path fill-rule="evenodd" d="M15.5 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/><path d="M7.596 8.697l-6.363 3.692C.693 12.702 0 12.322 0 11.692V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/><path d="M15.096 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.693-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>'); // eslint-disable-next-line
 
-var BIconSlashSquareFill = /*#__PURE__*/makeIcon('SlashSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2zm9.854 4.854a.5.5 0 00-.708-.708l-7 7a.5.5 0 00.708.708l7-7z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSkipStart = /*#__PURE__*/makeIcon('SkipStart', '<path fill-rule="evenodd" d="M4.5 3.5A.5.5 0 0 0 4 4v8a.5.5 0 0 0 1 0V4a.5.5 0 0 0-.5-.5z"/><path fill-rule="evenodd" d="M5.696 8L11.5 4.633v6.734L5.696 8zm-.792-.696a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696L4.904 7.304z"/>'); // eslint-disable-next-line
 
-var BIconSliders = /*#__PURE__*/makeIcon('Sliders', '<path d="M0 0h16v16H0z"/><path fill-rule="evenodd" d="M14 3.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM11.5 5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM7 8.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM4.5 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm9.5 3.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM11.5 15a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.5 4H0V3h9.5v1zM16 4h-2.5V3H16v1zM9.5 14H0v-1h9.5v1zm6.5 0h-2.5v-1H16v1zM6.5 9H16V8H6.5v1zM0 9h2.5V8H0v1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSkipStartFill = /*#__PURE__*/makeIcon('SkipStartFill', '<path fill-rule="evenodd" d="M4.5 3.5A.5.5 0 0 0 4 4v8a.5.5 0 0 0 1 0V4a.5.5 0 0 0-.5-.5z"/><path d="M4.903 8.697l6.364 3.692c.54.313 1.232-.066 1.232-.697V4.308c0-.63-.692-1.01-1.232-.696L4.903 7.304a.802.802 0 0 0 0 1.393z"/>'); // eslint-disable-next-line
 
-var BIconSoundwave = /*#__PURE__*/makeIcon('Soundwave', '<path stroke="currentColor" stroke-linecap="round" d="M2.5 7v2m12-2v2m-2-3v4m-8-4v4m4-7.5v11m-2-9v7m4-7v7"/>'); // eslint-disable-next-line
+var BIconSlash = /*#__PURE__*/makeIcon('Slash', '<path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconSpeaker = /*#__PURE__*/makeIcon('Speaker', '<path d="M9 4a1 1 0 11-2 0 1 1 0 012 0zm-2.5 6.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"/><path fill-rule="evenodd" d="M4 0a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V2a2 2 0 00-2-2H4zm6 4a2 2 0 11-4 0 2 2 0 014 0zM8 7a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSlashCircle = /*#__PURE__*/makeIcon('SlashCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
 
-var BIconSquare = /*#__PURE__*/makeIcon('Square', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSlashCircleFill = /*#__PURE__*/makeIcon('SlashCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.146-3.146a.5.5 0 0 0-.708-.708l-7 7a.5.5 0 0 0 .708.708l7-7z"/>'); // eslint-disable-next-line
+
+var BIconSlashSquare = /*#__PURE__*/makeIcon('SlashSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>'); // eslint-disable-next-line
+
+var BIconSlashSquareFill = /*#__PURE__*/makeIcon('SlashSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm9.854 4.854a.5.5 0 0 0-.708-.708l-7 7a.5.5 0 0 0 .708.708l7-7z"/>'); // eslint-disable-next-line
+
+var BIconSliders = /*#__PURE__*/makeIcon('Sliders', '<path d="M0 0h16v16H0z"/><path fill-rule="evenodd" d="M14 3.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM11.5 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM7 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM4.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm9.5 3.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM11.5 15a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path fill-rule="evenodd" d="M9.5 4H0V3h9.5v1zM16 4h-2.5V3H16v1zM9.5 14H0v-1h9.5v1zm6.5 0h-2.5v-1H16v1zM6.5 9H16V8H6.5v1zM0 9h2.5V8H0v1z"/>'); // eslint-disable-next-line
+
+var BIconSoundwave = /*#__PURE__*/makeIcon('Soundwave', '<path fill-rule="evenodd" d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5zm-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zm-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5zm12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
+
+var BIconSpeaker = /*#__PURE__*/makeIcon('Speaker', '<path d="M9 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-2.5 6.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z"/><path fill-rule="evenodd" d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4zm6 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM8 7a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/>'); // eslint-disable-next-line
+
+var BIconSquare = /*#__PURE__*/makeIcon('Square', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>'); // eslint-disable-next-line
 
 var BIconSquareFill = /*#__PURE__*/makeIcon('SquareFill', '<rect width="16" height="16" rx="2"/>'); // eslint-disable-next-line
 
-var BIconSquareHalf = /*#__PURE__*/makeIcon('SquareHalf', '<path fill-rule="evenodd" d="M8 1H2a1 1 0 00-1 1v12a1 1 0 001 1h6V1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSquareHalf = /*#__PURE__*/makeIcon('SquareHalf', '<path fill-rule="evenodd" d="M8 1h6a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8V1zm6-1a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12z"/>'); // eslint-disable-next-line
 
-var BIconStar = /*#__PURE__*/makeIcon('Star', '<path fill-rule="evenodd" d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 00-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 00-.163-.505L1.71 6.745l4.052-.576a.525.525 0 00.393-.288l1.847-3.658 1.846 3.658a.525.525 0 00.393.288l4.052.575-2.906 2.77a.564.564 0 00-.163.506l.694 3.957-3.686-1.894a.503.503 0 00-.461 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconStar = /*#__PURE__*/makeIcon('Star', '<path fill-rule="evenodd" d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>'); // eslint-disable-next-line
 
 var BIconStarFill = /*#__PURE__*/makeIcon('StarFill', '<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>'); // eslint-disable-next-line
 
-var BIconStarHalf = /*#__PURE__*/makeIcon('StarHalf', '<path fill-rule="evenodd" d="M5.354 5.119L7.538.792A.516.516 0 018 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0116 6.32a.55.55 0 01-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.519.519 0 01-.146.05c-.341.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 01-.171-.403.59.59 0 01.084-.302.513.513 0 01.37-.245l4.898-.696zM8 12.027c.08 0 .16.018.232.056l3.686 1.894-.694-3.957a.564.564 0 01.163-.505l2.906-2.77-4.052-.576a.525.525 0 01-.393-.288L8.002 2.223 8 2.226v9.8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconStarHalf = /*#__PURE__*/makeIcon('StarHalf', '<path fill-rule="evenodd" d="M5.354 5.119L7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.55.55 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.519.519 0 0 1-.146.05c-.341.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.171-.403.59.59 0 0 1 .084-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027c.08 0 .16.018.232.056l3.686 1.894-.694-3.957a.564.564 0 0 1 .163-.505l2.906-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.002 2.223 8 2.226v9.8z"/>'); // eslint-disable-next-line
 
-var BIconStop = /*#__PURE__*/makeIcon('Stop', '<path fill-rule="evenodd" d="M3.5 5A1.5 1.5 0 015 3.5h6A1.5 1.5 0 0112.5 5v6a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 11V5zM5 4.5a.5.5 0 00-.5.5v6a.5.5 0 00.5.5h6a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconStop = /*#__PURE__*/makeIcon('Stop', '<path fill-rule="evenodd" d="M3.5 5A1.5 1.5 0 0 1 5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5zM5 4.5a.5.5 0 0 0-.5.5v6a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 .5-.5V5a.5.5 0 0 0-.5-.5H5z"/>'); // eslint-disable-next-line
 
-var BIconStopFill = /*#__PURE__*/makeIcon('StopFill', '<path d="M5 3.5h6A1.5 1.5 0 0112.5 5v6a1.5 1.5 0 01-1.5 1.5H5A1.5 1.5 0 013.5 11V5A1.5 1.5 0 015 3.5z"/>'); // eslint-disable-next-line
+var BIconStopFill = /*#__PURE__*/makeIcon('StopFill', '<path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/>'); // eslint-disable-next-line
 
-var BIconStopwatch = /*#__PURE__*/makeIcon('Stopwatch', '<path fill-rule="evenodd" d="M8 15A6 6 0 108 3a6 6 0 000 12zm0 1A7 7 0 108 2a7 7 0 000 14z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 01.5.5v4a.5.5 0 01-.5.5H4.5a.5.5 0 010-1h3V5a.5.5 0 01.5-.5zM5.5.5A.5.5 0 016 0h4a.5.5 0 010 1H6a.5.5 0 01-.5-.5z" clip-rule="evenodd"/><path d="M7 1h2v2H7V1z"/>'); // eslint-disable-next-line
+var BIconStopwatch = /*#__PURE__*/makeIcon('Stopwatch', '<path fill-rule="evenodd" d="M8 15A6 6 0 1 0 8 3a6 6 0 0 0 0 12zm0 1A7 7 0 1 0 8 2a7 7 0 0 0 0 14z"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1 0-1h3V5a.5.5 0 0 1 .5-.5zM5.5.5A.5.5 0 0 1 6 0h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/><path d="M7 1h2v2H7V1z"/>'); // eslint-disable-next-line
 
-var BIconStopwatchFill = /*#__PURE__*/makeIcon('StopwatchFill', '<path fill-rule="evenodd" d="M5.5.5A.5.5 0 016 0h4a.5.5 0 010 1H9v1.07A7.002 7.002 0 018 16 7 7 0 017 2.07V1H6a.5.5 0 01-.5-.5zm3 4.5a.5.5 0 00-1 0v3.5h-3a.5.5 0 000 1H8a.5.5 0 00.5-.5V5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconStopwatchFill = /*#__PURE__*/makeIcon('StopwatchFill', '<path fill-rule="evenodd" d="M5.5.5A.5.5 0 0 1 6 0h4a.5.5 0 0 1 0 1H9v1.07A7.002 7.002 0 0 1 8 16 7 7 0 0 1 7 2.07V1H6a.5.5 0 0 1-.5-.5zm3 4.5a.5.5 0 0 0-1 0v3.5h-3a.5.5 0 0 0 0 1H8a.5.5 0 0 0 .5-.5V5z"/>'); // eslint-disable-next-line
 
-var BIconSubtract = /*#__PURE__*/makeIcon('Subtract', '<path d="M4 12v2.5A1.5 1.5 0 005.5 16h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 4H12v6.5a1.5 1.5 0 01-1.5 1.5H4z"/><path fill-rule="evenodd" d="M10.5 1h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h9a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-9-1A1.5 1.5 0 000 1.5v9A1.5 1.5 0 001.5 12h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0010.5 0h-9z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSubtract = /*#__PURE__*/makeIcon('Subtract', '<path d="M4 12v2.5A1.5 1.5 0 0 0 5.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 4H12v6.5a1.5 1.5 0 0 1-1.5 1.5H4z"/><path fill-rule="evenodd" d="M10.5 1h-9a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5zm-9-1A1.5 1.5 0 0 0 0 1.5v9A1.5 1.5 0 0 0 1.5 12h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 10.5 0h-9z"/>'); // eslint-disable-next-line
 
-var BIconSun = /*#__PURE__*/makeIcon('Sun', '<path d="M3.5 8a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0z"/><path fill-rule="evenodd" d="M8.202.28a.25.25 0 00-.404 0l-.91 1.255a.25.25 0 01-.334.067L5.232.79a.25.25 0 00-.374.155l-.36 1.508a.25.25 0 01-.282.19l-1.532-.245a.25.25 0 00-.286.286l.244 1.532a.25.25 0 01-.189.282l-1.509.36a.25.25 0 00-.154.374l.812 1.322a.25.25 0 01-.067.333l-1.256.91a.25.25 0 000 .405l1.256.91a.25.25 0 01.067.334L.79 10.768a.25.25 0 00.154.374l1.51.36a.25.25 0 01.188.282l-.244 1.532a.25.25 0 00.286.286l1.532-.244a.25.25 0 01.282.189l.36 1.508a.25.25 0 00.374.155l1.322-.812a.25.25 0 01.333.067l.91 1.256a.25.25 0 00.405 0l.91-1.256a.25.25 0 01.334-.067l1.322.812a.25.25 0 00.374-.155l.36-1.508a.25.25 0 01.282-.19l1.532.245a.25.25 0 00.286-.286l-.244-1.532a.25.25 0 01.189-.282l1.508-.36a.25.25 0 00.155-.374l-.812-1.322a.25.25 0 01.067-.333l1.256-.91a.25.25 0 000-.405l-1.256-.91a.25.25 0 01-.067-.334l.812-1.322a.25.25 0 00-.155-.374l-1.508-.36a.25.25 0 01-.19-.282l.245-1.532a.25.25 0 00-.286-.286l-1.532.244a.25.25 0 01-.282-.189l-.36-1.508a.25.25 0 00-.374-.155l-1.322.812a.25.25 0 01-.333-.067L8.203.28zM8 2.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconSun = /*#__PURE__*/makeIcon('Sun', '<path d="M3.5 8a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0z"/><path fill-rule="evenodd" d="M8.202.28a.25.25 0 0 0-.404 0l-.91 1.255a.25.25 0 0 1-.334.067L5.232.79a.25.25 0 0 0-.374.155l-.36 1.508a.25.25 0 0 1-.282.19l-1.532-.245a.25.25 0 0 0-.286.286l.244 1.532a.25.25 0 0 1-.189.282l-1.509.36a.25.25 0 0 0-.154.374l.812 1.322a.25.25 0 0 1-.067.333l-1.256.91a.25.25 0 0 0 0 .405l1.256.91a.25.25 0 0 1 .067.334L.79 10.768a.25.25 0 0 0 .154.374l1.51.36a.25.25 0 0 1 .188.282l-.244 1.532a.25.25 0 0 0 .286.286l1.532-.244a.25.25 0 0 1 .282.189l.36 1.508a.25.25 0 0 0 .374.155l1.322-.812a.25.25 0 0 1 .333.067l.91 1.256a.25.25 0 0 0 .405 0l.91-1.256a.25.25 0 0 1 .334-.067l1.322.812a.25.25 0 0 0 .374-.155l.36-1.508a.25.25 0 0 1 .282-.19l1.532.245a.25.25 0 0 0 .286-.286l-.244-1.532a.25.25 0 0 1 .189-.282l1.508-.36a.25.25 0 0 0 .155-.374l-.812-1.322a.25.25 0 0 1 .067-.333l1.256-.91a.25.25 0 0 0 0-.405l-1.256-.91a.25.25 0 0 1-.067-.334l.812-1.322a.25.25 0 0 0-.155-.374l-1.508-.36a.25.25 0 0 1-.19-.282l.245-1.532a.25.25 0 0 0-.286-.286l-1.532.244a.25.25 0 0 1-.282-.189l-.36-1.508a.25.25 0 0 0-.374-.155l-1.322.812a.25.25 0 0 1-.333-.067L8.203.28zM8 2.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/>'); // eslint-disable-next-line
 
-var BIconTable = /*#__PURE__*/makeIcon('Table', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15 4H1V3h14v1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M5 15.5v-14h1v14H5zm5 0v-14h1v14h-1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15 8H1V7h14v1zm0 4H1v-1h14v1z" clip-rule="evenodd"/><path d="M0 2a2 2 0 012-2h12a2 2 0 012 2v2H0V2z"/>'); // eslint-disable-next-line
+var BIconTable = /*#__PURE__*/makeIcon('Table', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M15 4H1V3h14v1z"/><path fill-rule="evenodd" d="M5 15.5v-14h1v14H5zm5 0v-14h1v14h-1z"/><path fill-rule="evenodd" d="M15 8H1V7h14v1zm0 4H1v-1h14v1z"/><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2H0V2z"/>'); // eslint-disable-next-line
 
-var BIconTablet = /*#__PURE__*/makeIcon('Tablet', '<path fill-rule="evenodd" d="M12 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V2a1 1 0 00-1-1zM4 0a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V2a2 2 0 00-2-2H4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 14a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTablet = /*#__PURE__*/makeIcon('Tablet', '<path fill-rule="evenodd" d="M12 1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4z"/><path fill-rule="evenodd" d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>'); // eslint-disable-next-line
 
-var BIconTabletLandscape = /*#__PURE__*/makeIcon('TabletLandscape', '<path fill-rule="evenodd" d="M1 4v8a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H2a1 1 0 00-1 1zm-1 8a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H2a2 2 0 00-2 2v8z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M14 8a1 1 0 10-2 0 1 1 0 002 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTabletLandscape = /*#__PURE__*/makeIcon('TabletLandscape', '<path fill-rule="evenodd" d="M1 4v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1zm-1 8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v8z"/><path fill-rule="evenodd" d="M14 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0z"/>'); // eslint-disable-next-line
 
-var BIconTag = /*#__PURE__*/makeIcon('Tag', '<path fill-rule="evenodd" d="M.5 2A1.5 1.5 0 012 .5h4.586a1.5 1.5 0 011.06.44l7 7a1.5 1.5 0 010 2.12l-4.585 4.586a1.5 1.5 0 01-2.122 0l-7-7A1.5 1.5 0 01.5 6.586V2zM2 1.5a.5.5 0 00-.5.5v4.586a.5.5 0 00.146.353l7 7a.5.5 0 00.708 0l4.585-4.585a.5.5 0 000-.708l-7-7a.5.5 0 00-.353-.146H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2.5 4.5a2 2 0 114 0 2 2 0 01-4 0zm2-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTag = /*#__PURE__*/makeIcon('Tag', '<path fill-rule="evenodd" d="M.5 2A1.5 1.5 0 0 1 2 .5h4.586a1.5 1.5 0 0 1 1.06.44l7 7a1.5 1.5 0 0 1 0 2.12l-4.585 4.586a1.5 1.5 0 0 1-2.122 0l-7-7A1.5 1.5 0 0 1 .5 6.586V2zM2 1.5a.5.5 0 0 0-.5.5v4.586a.5.5 0 0 0 .146.353l7 7a.5.5 0 0 0 .708 0l4.585-4.585a.5.5 0 0 0 0-.708l-7-7a.5.5 0 0 0-.353-.146H2z"/><path fill-rule="evenodd" d="M2.5 4.5a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm2-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>'); // eslint-disable-next-line
 
-var BIconTagFill = /*#__PURE__*/makeIcon('TagFill', '<path fill-rule="evenodd" d="M2 1a1 1 0 00-1 1v4.586a1 1 0 00.293.707l7 7a1 1 0 001.414 0l4.586-4.586a1 1 0 000-1.414l-7-7A1 1 0 006.586 1H2zm4 3.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTagFill = /*#__PURE__*/makeIcon('TagFill', '<path fill-rule="evenodd" d="M2 1a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l4.586-4.586a1 1 0 0 0 0-1.414l-7-7A1 1 0 0 0 6.586 1H2zm4 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>'); // eslint-disable-next-line
 
-var BIconTerminal = /*#__PURE__*/makeIcon('Terminal', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM2 1a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V3a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M6 9a.5.5 0 01.5-.5h3a.5.5 0 010 1h-3A.5.5 0 016 9zM3.146 4.146a.5.5 0 01.708 0l2 2a.5.5 0 010 .708l-2 2a.5.5 0 11-.708-.708L4.793 6.5 3.146 4.854a.5.5 0 010-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTerminal = /*#__PURE__*/makeIcon('Terminal', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M6 9a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3A.5.5 0 0 1 6 9zM3.146 4.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 1 1-.708-.708L4.793 6.5 3.146 4.854a.5.5 0 0 1 0-.708z"/>'); // eslint-disable-next-line
 
-var BIconTerminalFill = /*#__PURE__*/makeIcon('TerminalFill', '<path fill-rule="evenodd" d="M0 3a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H2a2 2 0 01-2-2V3zm9.5 5.5h-3a.5.5 0 000 1h3a.5.5 0 000-1zm-6.354-.354L4.793 6.5 3.146 4.854a.5.5 0 11.708-.708l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTerminalFill = /*#__PURE__*/makeIcon('TerminalFill', '<path fill-rule="evenodd" d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm9.5 5.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm-6.354-.354L4.793 6.5 3.146 4.854a.5.5 0 1 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708z"/>'); // eslint-disable-next-line
 
-var BIconTextCenter = /*#__PURE__*/makeIcon('TextCenter', '<path fill-rule="evenodd" d="M4 12.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm2-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-2-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTextCenter = /*#__PURE__*/makeIcon('TextCenter', '<path fill-rule="evenodd" d="M4 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconTextIndentLeft = /*#__PURE__*/makeIcon('TextIndentLeft', '<path fill-rule="evenodd" d="M2 3.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm.646 2.146a.5.5 0 01.708 0l2 2a.5.5 0 010 .708l-2 2a.5.5 0 01-.708-.708L4.293 8 2.646 6.354a.5.5 0 010-.708zM7 6.5a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm-5 3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTextIndentLeft = /*#__PURE__*/makeIcon('TextIndentLeft', '<path fill-rule="evenodd" d="M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm.646 2.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L4.293 8 2.646 6.354a.5.5 0 0 1 0-.708zM7 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm-5 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconTextIndentRight = /*#__PURE__*/makeIcon('TextIndentRight', '<path fill-rule="evenodd" d="M2 3.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm10.646 2.146a.5.5 0 01.708.708L11.707 8l1.647 1.646a.5.5 0 01-.708.708l-2-2a.5.5 0 010-.708l2-2zM2 6.5a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5zm0 3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTextIndentRight = /*#__PURE__*/makeIcon('TextIndentRight', '<path fill-rule="evenodd" d="M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm10.646 2.146a.5.5 0 0 1 .708.708L11.707 8l1.647 1.646a.5.5 0 0 1-.708.708l-2-2a.5.5 0 0 1 0-.708l2-2zM2 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconTextLeft = /*#__PURE__*/makeIcon('TextLeft', '<path fill-rule="evenodd" d="M2 12.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTextLeft = /*#__PURE__*/makeIcon('TextLeft', '<path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconTextRight = /*#__PURE__*/makeIcon('TextRight', '<path fill-rule="evenodd" d="M6 12.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-4-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5zm4-3a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm-4-3a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTextRight = /*#__PURE__*/makeIcon('TextRight', '<path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm4-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>'); // eslint-disable-next-line
 
-var BIconTextarea = /*#__PURE__*/makeIcon('Textarea', '<path fill-rule="evenodd" d="M14 9a1 1 0 100-2 1 1 0 000 2zm0 1a2 2 0 100-4 2 2 0 000 4zM2 9a1 1 0 100-2 1 1 0 000 2zm0 1a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.5 2.5A1.5 1.5 0 013 1h10a1.5 1.5 0 011.5 1.5v4h-1v-4A.5.5 0 0013 2H3a.5.5 0 00-.5.5v4h-1v-4zm1 7v4a.5.5 0 00.5.5h10a.5.5 0 00.5-.5v-4h1v4A1.5 1.5 0 0113 15H3a1.5 1.5 0 01-1.5-1.5v-4h1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTextarea = /*#__PURE__*/makeIcon('Textarea', '<path fill-rule="evenodd" d="M14 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM2 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path fill-rule="evenodd" d="M1.5 2.5A1.5 1.5 0 0 1 3 1h10a1.5 1.5 0 0 1 1.5 1.5v4h-1v-4A.5.5 0 0 0 13 2H3a.5.5 0 0 0-.5.5v4h-1v-4zm1 7v4a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-4h1v4A1.5 1.5 0 0 1 13 15H3a1.5 1.5 0 0 1-1.5-1.5v-4h1z"/>'); // eslint-disable-next-line
 
-var BIconTextareaT = /*#__PURE__*/makeIcon('TextareaT', '<path fill-rule="evenodd" d="M14 9a1 1 0 100-2 1 1 0 000 2zm0 1a2 2 0 100-4 2 2 0 000 4zM2 9a1 1 0 100-2 1 1 0 000 2zm0 1a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M1.5 2.5A1.5 1.5 0 013 1h10a1.5 1.5 0 011.5 1.5v4h-1v-4A.5.5 0 0013 2H3a.5.5 0 00-.5.5v4h-1v-4zm1 7v4a.5.5 0 00.5.5h10a.5.5 0 00.5-.5v-4h1v4A1.5 1.5 0 0113 15H3a1.5 1.5 0 01-1.5-1.5v-4h1z" clip-rule="evenodd"/><path d="M11.434 4H4.566L4.5 5.994h.386c.21-1.252.612-1.446 2.173-1.495l.343-.011v6.343c0 .537-.116.665-1.049.748V12h3.294v-.421c-.938-.083-1.054-.21-1.054-.748V4.488l.348.01c1.56.05 1.963.244 2.173 1.496h.386L11.434 4z"/>'); // eslint-disable-next-line
+var BIconTextareaT = /*#__PURE__*/makeIcon('TextareaT', '<path fill-rule="evenodd" d="M14 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM2 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path fill-rule="evenodd" d="M1.5 2.5A1.5 1.5 0 0 1 3 1h10a1.5 1.5 0 0 1 1.5 1.5v4h-1v-4A.5.5 0 0 0 13 2H3a.5.5 0 0 0-.5.5v4h-1v-4zm1 7v4a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-4h1v4A1.5 1.5 0 0 1 13 15H3a1.5 1.5 0 0 1-1.5-1.5v-4h1z"/><path d="M11.434 4H4.566L4.5 5.994h.386c.21-1.252.612-1.446 2.173-1.495l.343-.011v6.343c0 .537-.116.665-1.049.748V12h3.294v-.421c-.938-.083-1.054-.21-1.054-.748V4.488l.348.01c1.56.05 1.963.244 2.173 1.496h.386L11.434 4z"/>'); // eslint-disable-next-line
 
-var BIconThreeDots = /*#__PURE__*/makeIcon('ThreeDots', '<path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconThreeDots = /*#__PURE__*/makeIcon('ThreeDots', '<path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>'); // eslint-disable-next-line
 
-var BIconThreeDotsVertical = /*#__PURE__*/makeIcon('ThreeDotsVertical', '<path fill-rule="evenodd" d="M9.5 13a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm0-5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm0-5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconThreeDotsVertical = /*#__PURE__*/makeIcon('ThreeDotsVertical', '<path fill-rule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>'); // eslint-disable-next-line
 
-var BIconToggleOff = /*#__PURE__*/makeIcon('ToggleOff', '<path fill-rule="evenodd" d="M11 4a4 4 0 010 8H8a4.992 4.992 0 002-4 4.992 4.992 0 00-2-4h3zm-6 8a4 4 0 110-8 4 4 0 010 8zM0 8a5 5 0 005 5h6a5 5 0 000-10H5a5 5 0 00-5 5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconToggleOff = /*#__PURE__*/makeIcon('ToggleOff', '<path fill-rule="evenodd" d="M11 4a4 4 0 0 1 0 8H8a4.992 4.992 0 0 0 2-4 4.992 4.992 0 0 0-2-4h3zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8zM0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5z"/>'); // eslint-disable-next-line
 
-var BIconToggleOn = /*#__PURE__*/makeIcon('ToggleOn', '<path fill-rule="evenodd" d="M5 3a5 5 0 000 10h6a5 5 0 000-10H5zm6 9a4 4 0 100-8 4 4 0 000 8z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconToggleOn = /*#__PURE__*/makeIcon('ToggleOn', '<path fill-rule="evenodd" d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10H5zm6 9a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>'); // eslint-disable-next-line
 
-var BIconToggles = /*#__PURE__*/makeIcon('Toggles', '<path fill-rule="evenodd" d="M11.5 1h-7a2.5 2.5 0 000 5h7a2.5 2.5 0 000-5zm-7-1a3.5 3.5 0 100 7h7a3.5 3.5 0 100-7h-7zm0 9a3.5 3.5 0 100 7h7a3.5 3.5 0 100-7h-7zm7 6a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 3.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM4.5 6a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconToggles = /*#__PURE__*/makeIcon('Toggles', '<path fill-rule="evenodd" d="M11.5 1h-7a2.5 2.5 0 0 0 0 5h7a2.5 2.5 0 0 0 0-5zm-7-1a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7h-7zm0 9a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7h-7zm7 6a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/><path fill-rule="evenodd" d="M8 3.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0zM4.5 6a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>'); // eslint-disable-next-line
 
-var BIconTools = /*#__PURE__*/makeIcon('Tools', '<path fill-rule="evenodd" d="M0 1l1-1 3.081 2.2a1 1 0 01.419.815v.07a1 1 0 00.293.708L10.5 9.5l.914-.305a1 1 0 011.023.242l3.356 3.356a1 1 0 010 1.414l-1.586 1.586a1 1 0 01-1.414 0l-3.356-3.356a1 1 0 01-.242-1.023L9.5 10.5 3.793 4.793a1 1 0 00-.707-.293h-.071a1 1 0 01-.814-.419L0 1zm11.354 9.646a.5.5 0 00-.708.708l3 3a.5.5 0 00.708-.708l-3-3z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15.898 2.223a3.003 3.003 0 01-3.679 3.674L5.878 12.15a3 3 0 11-2.027-2.027l6.252-6.341A3 3 0 0113.778.1l-2.142 2.142L12 4l1.757.364 2.141-2.141zm-13.37 9.019L3.001 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTools = /*#__PURE__*/makeIcon('Tools', '<path fill-rule="evenodd" d="M0 1l1-1 3.081 2.2a1 1 0 0 1 .419.815v.07a1 1 0 0 0 .293.708L10.5 9.5l.914-.305a1 1 0 0 1 1.023.242l3.356 3.356a1 1 0 0 1 0 1.414l-1.586 1.586a1 1 0 0 1-1.414 0l-3.356-3.356a1 1 0 0 1-.242-1.023L9.5 10.5 3.793 4.793a1 1 0 0 0-.707-.293h-.071a1 1 0 0 1-.814-.419L0 1zm11.354 9.646a.5.5 0 0 0-.708.708l3 3a.5.5 0 0 0 .708-.708l-3-3z"/><path fill-rule="evenodd" d="M15.898 2.223a3.003 3.003 0 0 1-3.679 3.674L5.878 12.15a3 3 0 1 1-2.027-2.027l6.252-6.341A3 3 0 0 1 13.778.1l-2.142 2.142L12 4l1.757.364 2.141-2.141zm-13.37 9.019L3.001 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z"/>'); // eslint-disable-next-line
 
-var BIconTrash = /*#__PURE__*/makeIcon('Trash', '<path d="M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTrash = /*#__PURE__*/makeIcon('Trash', '<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>'); // eslint-disable-next-line
 
-var BIconTrash2 = /*#__PURE__*/makeIcon('Trash2', '<path fill-rule="evenodd" d="M3.18 4l1.528 9.164a1 1 0 00.986.836h4.612a1 1 0 00.986-.836L12.82 4H3.18zm.541 9.329A2 2 0 005.694 15h4.612a2 2 0 001.973-1.671L14 3H2l1.721 10.329z" clip-rule="evenodd"/><path d="M14 3c0 1.105-2.686 2-6 2s-6-.895-6-2 2.686-2 6-2 6 .895 6 2z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTrash2 = /*#__PURE__*/makeIcon('Trash2', '<path fill-rule="evenodd" d="M3.18 4l1.528 9.164a1 1 0 0 0 .986.836h4.612a1 1 0 0 0 .986-.836L12.82 4H3.18zm.541 9.329A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671L14 3H2l1.721 10.329z"/><path d="M14 3c0 1.105-2.686 2-6 2s-6-.895-6-2 2.686-2 6-2 6 .895 6 2z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/>'); // eslint-disable-next-line
 
-var BIconTrash2Fill = /*#__PURE__*/makeIcon('Trash2Fill', '<path d="M2.037 3.225l1.684 10.104A2 2 0 005.694 15h4.612a2 2 0 001.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTrash2Fill = /*#__PURE__*/makeIcon('Trash2Fill', '<path d="M2.037 3.225l1.684 10.104A2 2 0 0 0 5.694 15h4.612a2 2 0 0 0 1.973-1.671l1.684-10.104C13.627 4.224 11.085 5 8 5c-3.086 0-5.627-.776-5.963-1.775z"/><path fill-rule="evenodd" d="M12.9 3c-.18-.14-.497-.307-.974-.466C10.967 2.214 9.58 2 8 2s-2.968.215-3.926.534c-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466zM8 5c3.314 0 6-.895 6-2s-2.686-2-6-2-6 .895-6 2 2.686 2 6 2z"/>'); // eslint-disable-next-line
 
-var BIconTrashFill = /*#__PURE__*/makeIcon('TrashFill', '<path fill-rule="evenodd" d="M2.5 1a1 1 0 00-1 1v1a1 1 0 001 1H3v9a2 2 0 002 2h6a2 2 0 002-2V4h.5a1 1 0 001-1V2a1 1 0 00-1-1H10a1 1 0 00-1-1H7a1 1 0 00-1 1H2.5zm3 4a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7a.5.5 0 01.5-.5zM8 5a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7A.5.5 0 018 5zm3 .5a.5.5 0 00-1 0v7a.5.5 0 001 0v-7z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTrashFill = /*#__PURE__*/makeIcon('TrashFill', '<path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>'); // eslint-disable-next-line
 
-var BIconTriangle = /*#__PURE__*/makeIcon('Triangle', '<path fill-rule="evenodd" d="M7.938 2.016a.146.146 0 00-.054.057L1.027 13.74a.176.176 0 00-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 00.066-.017.163.163 0 00.055-.06.176.176 0 00-.003-.183L8.12 2.073a.146.146 0 00-.054-.057A.13.13 0 008.002 2a.13.13 0 00-.064.016zm1.044-.45a1.13 1.13 0 00-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTriangle = /*#__PURE__*/makeIcon('Triangle', '<path fill-rule="evenodd" d="M7.938 2.016a.146.146 0 0 0-.054.057L1.027 13.74a.176.176 0 0 0-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 0 0 .066-.017.163.163 0 0 0 .055-.06.176.176 0 0 0-.003-.183L8.12 2.073a.146.146 0 0 0-.054-.057A.13.13 0 0 0 8.002 2a.13.13 0 0 0-.064.016zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>'); // eslint-disable-next-line
 
-var BIconTriangleFill = /*#__PURE__*/makeIcon('TriangleFill', '<path fill-rule="evenodd" d="M7.022 1.566a1.13 1.13 0 011.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H1.144c-.889 0-1.437-.99-.98-1.767L7.022 1.566z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTriangleFill = /*#__PURE__*/makeIcon('TriangleFill', '<path fill-rule="evenodd" d="M7.022 1.566a1.13 1.13 0 0 1 1.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H1.144c-.889 0-1.437-.99-.98-1.767L7.022 1.566z"/>'); // eslint-disable-next-line
 
-var BIconTriangleHalf = /*#__PURE__*/makeIcon('TriangleHalf', '<path fill-rule="evenodd" d="M7.938 2.016a.146.146 0 00-.054.057L1.027 13.74a.176.176 0 00-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017l6.857-.017V2a.13.13 0 00-.064.016zm1.044-.45a1.13 1.13 0 00-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTriangleHalf = /*#__PURE__*/makeIcon('TriangleHalf', '<path fill-rule="evenodd" d="M8.065 2.016a.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.162.162 0 0 1-.054.06.115.115 0 0 1-.066.017l-6.856-.017V2a.13.13 0 0 1 .063.016zm-1.043-.45a1.13 1.13 0 0 1 1.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H1.144c-.889 0-1.437-.99-.98-1.767L7.022 1.566z"/>'); // eslint-disable-next-line
 
-var BIconTrophy = /*#__PURE__*/makeIcon('Trophy', '<path d="M3 1h10c-.495 3.467-.5 10-5 10S3.495 4.467 3 1zm0 15a1 1 0 011-1h8a1 1 0 011 1H3zm2-1a1 1 0 011-1h4a1 1 0 011 1H5z"/><path fill-rule="evenodd" d="M12.5 3a2 2 0 100 4 2 2 0 000-4zm-3 2a3 3 0 116 0 3 3 0 01-6 0zm-6-2a2 2 0 100 4 2 2 0 000-4zm-3 2a3 3 0 116 0 3 3 0 01-6 0z" clip-rule="evenodd"/><path d="M7 10h2v4H7v-4z"/><path d="M10 11c0 .552-.895 1-2 1s-2-.448-2-1 .895-1 2-1 2 .448 2 1z"/>'); // eslint-disable-next-line
+var BIconTrophy = /*#__PURE__*/makeIcon('Trophy', '<path d="M3 1h10c-.495 3.467-.5 10-5 10S3.495 4.467 3 1zm0 15a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1H3zm2-1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1H5z"/><path fill-rule="evenodd" d="M12.5 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-3 2a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm-6-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-3 2a3 3 0 1 1 6 0 3 3 0 0 1-6 0z"/><path d="M7 10h2v4H7v-4z"/><path d="M10 11c0 .552-.895 1-2 1s-2-.448-2-1 .895-1 2-1 2 .448 2 1z"/>'); // eslint-disable-next-line
 
-var BIconTv = /*#__PURE__*/makeIcon('Tv', '<path fill-rule="evenodd" d="M2.5 13.5A.5.5 0 013 13h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zM13.991 3H2c-.325 0-.502.078-.602.145a.758.758 0 00-.254.302A1.46 1.46 0 001 4.01V10c0 .325.078.502.145.602.07.105.17.188.302.254a1.464 1.464 0 00.538.143L2.01 11H14c.325 0 .502-.078.602-.145a.758.758 0 00.254-.302 1.464 1.464 0 00.143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.757.757 0 00-.302-.254A1.46 1.46 0 0013.99 3zM14 2H2C0 2 0 4 0 4v6c0 2 2 2 2 2h12c2 0 2-2 2-2V4c0-2-2-2-2-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTruck = /*#__PURE__*/makeIcon('Truck', '<path fill-rule="evenodd" d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5v7h-1v-7a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5v1A1.5 1.5 0 0 1 0 10.5v-7zM4.5 11h6v1h-6v-1z"/><path fill-rule="evenodd" d="M11 5h2.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5h-1v-1h1a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4.5h-1V5zm-8 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path fill-rule="evenodd" d="M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>'); // eslint-disable-next-line
 
-var BIconTvFill = /*#__PURE__*/makeIcon('TvFill', '<path fill-rule="evenodd" d="M2.5 13.5A.5.5 0 013 13h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zM2 2h12s2 0 2 2v6s0 2-2 2H2s-2 0-2-2V4s0-2 2-2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTruckFlatbed = /*#__PURE__*/makeIcon('TruckFlatbed', '<path fill-rule="evenodd" d="M11 5h2.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5h-1v-1h1a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4.5h-1V5zm-8 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path fill-rule="evenodd" d="M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 1a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M0 10h11v2H4.5v-1h-3v1H1a1 1 0 0 1-1-1v-1zm11-6a1 1 0 0 1 1 1v6h-1V4z"/>'); // eslint-disable-next-line
+
+var BIconTv = /*#__PURE__*/makeIcon('Tv', '<path fill-rule="evenodd" d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zM13.991 3H2c-.325 0-.502.078-.602.145a.758.758 0 0 0-.254.302A1.46 1.46 0 0 0 1 4.01V10c0 .325.078.502.145.602.07.105.17.188.302.254a1.464 1.464 0 0 0 .538.143L2.01 11H14c.325 0 .502-.078.602-.145a.758.758 0 0 0 .254-.302 1.464 1.464 0 0 0 .143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.757.757 0 0 0-.302-.254A1.46 1.46 0 0 0 13.99 3zM14 2H2C0 2 0 4 0 4v6c0 2 2 2 2 2h12c2 0 2-2 2-2V4c0-2-2-2-2-2z"/>'); // eslint-disable-next-line
+
+var BIconTvFill = /*#__PURE__*/makeIcon('TvFill', '<path fill-rule="evenodd" d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zM2 2h12s2 0 2 2v6s0 2-2 2H2s-2 0-2-2V4s0-2 2-2z"/>'); // eslint-disable-next-line
 
 var BIconType = /*#__PURE__*/makeIcon('Type', '<path d="M2.244 13.081l.943-2.803H6.66l.944 2.803H8.86L5.54 3.75H4.322L1 13.081h1.244zm2.7-7.923L6.34 9.314H3.51l1.4-4.156h.034zm9.146 7.027h.035v.896h1.128V8.125c0-1.51-1.114-2.345-2.646-2.345-1.736 0-2.59.916-2.666 2.174h1.108c.068-.718.595-1.19 1.517-1.19.971 0 1.518.52 1.518 1.464v.731H12.19c-1.647.007-2.522.8-2.522 2.058 0 1.319.957 2.18 2.345 2.18 1.06 0 1.716-.43 2.078-1.011zm-1.763.035c-.752 0-1.456-.397-1.456-1.244 0-.65.424-1.115 1.408-1.115h1.805v.834c0 .896-.752 1.525-1.757 1.525z"/>'); // eslint-disable-next-line
 
-var BIconTypeBold = /*#__PURE__*/makeIcon('TypeBold', '<path d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 001.852-2.14c0-1.51-1.162-2.46-3.014-2.46H3.843V13H8.21zM5.908 4.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908V4.673zm0 6.788V8.598h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907z"/>'); // eslint-disable-next-line
+var BIconTypeBold = /*#__PURE__*/makeIcon('TypeBold', '<path d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 0 0 1.852-2.14c0-1.51-1.162-2.46-3.014-2.46H3.843V13H8.21zM5.908 4.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908V4.673zm0 6.788V8.598h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907z"/>'); // eslint-disable-next-line
 
 var BIconTypeH1 = /*#__PURE__*/makeIcon('TypeH1', '<path d="M8.637 13V3.669H7.379V7.62H2.758V3.67H1.5V13h1.258V8.728h4.62V13h1.259zm5.329 0V3.669h-1.244L10.5 5.316v1.265l2.16-1.565h.062V13h1.244z"/>'); // eslint-disable-next-line
 
@@ -3999,63 +4400,73 @@ var BIconTypeH3 = /*#__PURE__*/makeIcon('TypeH3', '<path d="M7.637 13V3.669H6.37
 
 var BIconTypeItalic = /*#__PURE__*/makeIcon('TypeItalic', '<path d="M7.991 11.674L9.53 4.455c.123-.595.246-.71 1.347-.807l.11-.52H7.211l-.11.52c1.06.096 1.128.212 1.005.807L6.57 11.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z"/>'); // eslint-disable-next-line
 
-var BIconTypeStrikethrough = /*#__PURE__*/makeIcon('TypeStrikethrough', '<path d="M8.527 13.164c-2.153 0-3.589-1.107-3.705-2.81h1.23c.144 1.06 1.129 1.703 2.544 1.703 1.34 0 2.31-.705 2.31-1.675 0-.827-.547-1.374-1.914-1.675L8.046 8.5h3.45c.468.437.675.994.675 1.697 0 1.826-1.436 2.967-3.644 2.967zM6.602 6.5H5.167a2.776 2.776 0 01-.099-.76c0-1.627 1.436-2.768 3.48-2.768 1.969 0 3.39 1.175 3.445 2.85h-1.23c-.11-1.08-.964-1.743-2.25-1.743-1.23 0-2.18.602-2.18 1.607 0 .31.083.581.27.814z"/><path fill-rule="evenodd" d="M15 8.5H1v-1h14v1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTypeStrikethrough = /*#__PURE__*/makeIcon('TypeStrikethrough', '<path d="M8.527 13.164c-2.153 0-3.589-1.107-3.705-2.81h1.23c.144 1.06 1.129 1.703 2.544 1.703 1.34 0 2.31-.705 2.31-1.675 0-.827-.547-1.374-1.914-1.675L8.046 8.5h3.45c.468.437.675.994.675 1.697 0 1.826-1.436 2.967-3.644 2.967zM6.602 6.5H5.167a2.776 2.776 0 0 1-.099-.76c0-1.627 1.436-2.768 3.48-2.768 1.969 0 3.39 1.175 3.445 2.85h-1.23c-.11-1.08-.964-1.743-2.25-1.743-1.23 0-2.18.602-2.18 1.607 0 .31.083.581.27.814z"/><path fill-rule="evenodd" d="M15 8.5H1v-1h14v1z"/>'); // eslint-disable-next-line
 
-var BIconTypeUnderline = /*#__PURE__*/makeIcon('TypeUnderline', '<path d="M5.313 3.136h-1.23V9.54c0 2.105 1.47 3.623 3.917 3.623s3.917-1.518 3.917-3.623V3.136h-1.23v6.323c0 1.49-.978 2.57-2.687 2.57-1.709 0-2.687-1.08-2.687-2.57V3.136z"/><path fill-rule="evenodd" d="M12.5 15h-9v-1h9v1z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconTypeUnderline = /*#__PURE__*/makeIcon('TypeUnderline', '<path d="M5.313 3.136h-1.23V9.54c0 2.105 1.47 3.623 3.917 3.623s3.917-1.518 3.917-3.623V3.136h-1.23v6.323c0 1.49-.978 2.57-2.687 2.57-1.709 0-2.687-1.08-2.687-2.57V3.136z"/><path fill-rule="evenodd" d="M12.5 15h-9v-1h9v1z"/>'); // eslint-disable-next-line
 
-var BIconUnion = /*#__PURE__*/makeIcon('Union', '<path d="M4 5.5A1.5 1.5 0 015.5 4h9A1.5 1.5 0 0116 5.5v9a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 014 14.5v-9z"/><path d="M0 1.5A1.5 1.5 0 011.5 0h9A1.5 1.5 0 0112 1.5v9a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 010 10.5v-9z"/>'); // eslint-disable-next-line
+var BIconUnion = /*#__PURE__*/makeIcon('Union', '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h9A1.5 1.5 0 0 1 16 5.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 4 14.5v-9z"/><path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h9A1.5 1.5 0 0 1 12 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 0 10.5v-9z"/>'); // eslint-disable-next-line
 
-var BIconUnlock = /*#__PURE__*/makeIcon('Unlock', '<path fill-rule="evenodd" d="M9.655 8H2.333c-.264 0-.398.068-.471.121a.73.73 0 00-.224.296 1.626 1.626 0 00-.138.59V14c0 .342.076.531.14.635.064.106.151.18.256.237a1.122 1.122 0 00.436.127l.013.001h7.322c.264 0 .398-.068.471-.121a.73.73 0 00.224-.296 1.627 1.627 0 00.138-.59V9c0-.342-.076-.531-.14-.635a.658.658 0 00-.255-.237A1.122 1.122 0 009.655 8zm.012-1H2.333C.5 7 .5 9 .5 9v5c0 2 1.833 2 1.833 2h7.334c1.833 0 1.833-2 1.833-2V9c0-2-1.833-2-1.833-2zM8.5 4a3.5 3.5 0 117 0v3h-1V4a2.5 2.5 0 00-5 0v3h-1V4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconUnlock = /*#__PURE__*/makeIcon('Unlock', '<path fill-rule="evenodd" d="M9.655 8H2.333c-.264 0-.398.068-.471.121a.73.73 0 0 0-.224.296 1.626 1.626 0 0 0-.138.59V14c0 .342.076.531.14.635.064.106.151.18.256.237a1.122 1.122 0 0 0 .436.127l.013.001h7.322c.264 0 .398-.068.471-.121a.73.73 0 0 0 .224-.296 1.627 1.627 0 0 0 .138-.59V9c0-.342-.076-.531-.14-.635a.658.658 0 0 0-.255-.237A1.122 1.122 0 0 0 9.655 8zm.012-1H2.333C.5 7 .5 9 .5 9v5c0 2 1.833 2 1.833 2h7.334c1.833 0 1.833-2 1.833-2V9c0-2-1.833-2-1.833-2zM8.5 4a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z"/>'); // eslint-disable-next-line
 
-var BIconUnlockFill = /*#__PURE__*/makeIcon('UnlockFill', '<path d="M.5 9a2 2 0 012-2h7a2 2 0 012 2v5a2 2 0 01-2 2h-7a2 2 0 01-2-2V9z"/><path fill-rule="evenodd" d="M8.5 4a3.5 3.5 0 117 0v3h-1V4a2.5 2.5 0 00-5 0v3h-1V4z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconUnlockFill = /*#__PURE__*/makeIcon('UnlockFill', '<path d="M.5 9a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2V9z"/><path fill-rule="evenodd" d="M8.5 4a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z"/>'); // eslint-disable-next-line
 
-var BIconUpload = /*#__PURE__*/makeIcon('Upload', '<path fill-rule="evenodd" d="M.5 8a.5.5 0 01.5.5V12a1 1 0 001 1h12a1 1 0 001-1V8.5a.5.5 0 011 0V12a2 2 0 01-2 2H2a2 2 0 01-2-2V8.5A.5.5 0 01.5 8zM5 4.854a.5.5 0 00.707 0L8 2.56l2.293 2.293A.5.5 0 1011 4.146L8.354 1.5a.5.5 0 00-.708 0L5 4.146a.5.5 0 000 .708z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 2a.5.5 0 01.5.5v8a.5.5 0 01-1 0v-8A.5.5 0 018 2z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconUpc = /*#__PURE__*/makeIcon('Upc', '<path d="M3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>'); // eslint-disable-next-line
 
-var BIconViewList = /*#__PURE__*/makeIcon('ViewList', '<path fill-rule="evenodd" d="M3 4.5h10a2 2 0 012 2v3a2 2 0 01-2 2H3a2 2 0 01-2-2v-3a2 2 0 012-2zm0 1a1 1 0 00-1 1v3a1 1 0 001 1h10a1 1 0 001-1v-3a1 1 0 00-1-1H3zM1 2a.5.5 0 01.5-.5h13a.5.5 0 010 1h-13A.5.5 0 011 2zm0 12a.5.5 0 01.5-.5h13a.5.5 0 010 1h-13A.5.5 0 011 14z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconUpcScan = /*#__PURE__*/makeIcon('UpcScan', '<path fill-rule="evenodd" d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/><path d="M3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7zm2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-7zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0v-7z"/>'); // eslint-disable-next-line
 
-var BIconViewStacked = /*#__PURE__*/makeIcon('ViewStacked', '<path fill-rule="evenodd" d="M3 0h10a2 2 0 012 2v3a2 2 0 01-2 2H3a2 2 0 01-2-2V2a2 2 0 012-2zm0 1a1 1 0 00-1 1v3a1 1 0 001 1h10a1 1 0 001-1V2a1 1 0 00-1-1H3zm0 8h10a2 2 0 012 2v3a2 2 0 01-2 2H3a2 2 0 01-2-2v-3a2 2 0 012-2zm0 1a1 1 0 00-1 1v3a1 1 0 001 1h10a1 1 0 001-1v-3a1 1 0 00-1-1H3z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconUpload = /*#__PURE__*/makeIcon('Upload', '<path fill-rule="evenodd" d="M.5 8a.5.5 0 0 1 .5.5V12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8.5a.5.5 0 0 1 1 0V12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V8.5A.5.5 0 0 1 .5 8zM5 4.854a.5.5 0 0 0 .707 0L8 2.56l2.293 2.293A.5.5 0 1 0 11 4.146L8.354 1.5a.5.5 0 0 0-.708 0L5 4.146a.5.5 0 0 0 0 .708z"/><path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8A.5.5 0 0 1 8 2z"/>'); // eslint-disable-next-line
 
-var BIconVolumeDown = /*#__PURE__*/makeIcon('VolumeDown', '<path fill-rule="evenodd" d="M8.717 3.55A.5.5 0 019 4v8a.5.5 0 01-.812.39L5.825 10.5H3.5A.5.5 0 013 10V6a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06zM8 5.04L6.312 6.39A.5.5 0 016 6.5H4v3h2a.5.5 0 01.312.11L8 10.96V5.04z" clip-rule="evenodd"/><path d="M10.707 11.182A4.486 4.486 0 0012.025 8a4.486 4.486 0 00-1.318-3.182L10 5.525A3.489 3.489 0 0111.025 8c0 .966-.392 1.841-1.025 2.475l.707.707z"/>'); // eslint-disable-next-line
+var BIconViewList = /*#__PURE__*/makeIcon('ViewList', '<path fill-rule="evenodd" d="M3 4.5h10a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1H3zM1 2a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 2zm0 12a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 14z"/>'); // eslint-disable-next-line
 
-var BIconVolumeDownFill = /*#__PURE__*/makeIcon('VolumeDownFill', '<path fill-rule="evenodd" d="M8.717 3.55A.5.5 0 019 4v8a.5.5 0 01-.812.39L5.825 10.5H3.5A.5.5 0 013 10V6a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06z" clip-rule="evenodd"/><path d="M10.707 11.182A4.486 4.486 0 0012.025 8a4.486 4.486 0 00-1.318-3.182L10 5.525A3.489 3.489 0 0111.025 8c0 .966-.392 1.841-1.025 2.475l.707.707z"/>'); // eslint-disable-next-line
+var BIconViewStacked = /*#__PURE__*/makeIcon('ViewStacked', '<path fill-rule="evenodd" d="M3 0h10a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3zm0 8h10a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1H3z"/>'); // eslint-disable-next-line
 
-var BIconVolumeMute = /*#__PURE__*/makeIcon('VolumeMute', '<path fill-rule="evenodd" d="M6.717 3.55A.5.5 0 017 4v8a.5.5 0 01-.812.39L3.825 10.5H1.5A.5.5 0 011 10V6a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06zM6 5.04L4.312 6.39A.5.5 0 014 6.5H2v3h2a.5.5 0 01.312.11L6 10.96V5.04zm7.854.606a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708l4-4a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.146 5.646a.5.5 0 000 .708l4 4a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconVolumeDown = /*#__PURE__*/makeIcon('VolumeDown', '<path fill-rule="evenodd" d="M8.717 3.55A.5.5 0 0 1 9 4v8a.5.5 0 0 1-.812.39L5.825 10.5H3.5A.5.5 0 0 1 3 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zM8 5.04L6.312 6.39A.5.5 0 0 1 6 6.5H4v3h2a.5.5 0 0 1 .312.11L8 10.96V5.04z"/><path d="M10.707 11.182A4.486 4.486 0 0 0 12.025 8a4.486 4.486 0 0 0-1.318-3.182L10 5.525A3.489 3.489 0 0 1 11.025 8c0 .966-.392 1.841-1.025 2.475l.707.707z"/>'); // eslint-disable-next-line
 
-var BIconVolumeMuteFill = /*#__PURE__*/makeIcon('VolumeMuteFill', '<path fill-rule="evenodd" d="M6.717 3.55A.5.5 0 017 4v8a.5.5 0 01-.812.39L3.825 10.5H1.5A.5.5 0 011 10V6a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06zm7.137 1.596a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708l4-4a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M9.146 5.146a.5.5 0 000 .708l4 4a.5.5 0 00.708-.708l-4-4a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconVolumeDownFill = /*#__PURE__*/makeIcon('VolumeDownFill', '<path fill-rule="evenodd" d="M8.717 3.55A.5.5 0 0 1 9 4v8a.5.5 0 0 1-.812.39L5.825 10.5H3.5A.5.5 0 0 1 3 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/><path d="M10.707 11.182A4.486 4.486 0 0 0 12.025 8a4.486 4.486 0 0 0-1.318-3.182L10 5.525A3.489 3.489 0 0 1 11.025 8c0 .966-.392 1.841-1.025 2.475l.707.707z"/>'); // eslint-disable-next-line
 
-var BIconVolumeUp = /*#__PURE__*/makeIcon('VolumeUp', '<path fill-rule="evenodd" d="M6.717 3.55A.5.5 0 017 4v8a.5.5 0 01-.812.39L3.825 10.5H1.5A.5.5 0 011 10V6a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06zM6 5.04L4.312 6.39A.5.5 0 014 6.5H2v3h2a.5.5 0 01.312.11L6 10.96V5.04z" clip-rule="evenodd"/><path d="M11.536 14.01A8.473 8.473 0 0014.026 8a8.473 8.473 0 00-2.49-6.01l-.708.707A7.476 7.476 0 0113.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0012.025 8a6.48 6.48 0 00-1.904-4.596l-.707.707A5.483 5.483 0 0111.025 8a5.483 5.483 0 01-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0010.025 8a4.486 4.486 0 00-1.318-3.182L8 5.525A3.489 3.489 0 019.025 8 3.49 3.49 0 018 10.475l.707.707z"/>'); // eslint-disable-next-line
+var BIconVolumeMute = /*#__PURE__*/makeIcon('VolumeMute', '<path fill-rule="evenodd" d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zM6 5.04L4.312 6.39A.5.5 0 0 1 4 6.5H2v3h2a.5.5 0 0 1 .312.11L6 10.96V5.04zm7.854.606a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l4-4a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M9.146 5.646a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
 
-var BIconVolumeUpFill = /*#__PURE__*/makeIcon('VolumeUpFill', '<path d="M11.536 14.01A8.473 8.473 0 0014.026 8a8.473 8.473 0 00-2.49-6.01l-.708.707A7.476 7.476 0 0113.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0012.025 8a6.48 6.48 0 00-1.904-4.596l-.707.707A5.483 5.483 0 0111.025 8a5.483 5.483 0 01-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0010.025 8a4.486 4.486 0 00-1.318-3.182L8 5.525A3.489 3.489 0 019.025 8 3.49 3.49 0 018 10.475l.707.707z"/><path fill-rule="evenodd" d="M6.717 3.55A.5.5 0 017 4v8a.5.5 0 01-.812.39L3.825 10.5H1.5A.5.5 0 011 10V6a.5.5 0 01.5-.5h2.325l2.363-1.89a.5.5 0 01.529-.06z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconVolumeMuteFill = /*#__PURE__*/makeIcon('VolumeMuteFill', '<path fill-rule="evenodd" d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zm7.137 1.596a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l4-4a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M9.146 5.146a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
 
-var BIconVr = /*#__PURE__*/makeIcon('Vr', '<path d="M3 12V4a1 1 0 011-1h2.5V2H4a2 2 0 00-2 2v8a2 2 0 002 2h2.5v-1H4a1 1 0 01-1-1zm6.5 1v1H12a2 2 0 002-2V4a2 2 0 00-2-2H9.5v1H12a1 1 0 011 1v8a1 1 0 01-1 1H9.5z"/><path fill-rule="evenodd" d="M8 16a.5.5 0 01-.5-.5V.5a.5.5 0 011 0v15a.5.5 0 01-.5.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconVolumeOff = /*#__PURE__*/makeIcon('VolumeOff', '<path fill-rule="evenodd" d="M10.717 3.55A.5.5 0 0 1 11 4v8a.5.5 0 0 1-.812.39L7.825 10.5H5.5A.5.5 0 0 1 5 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zM10 5.04L8.312 6.39A.5.5 0 0 1 8 6.5H6v3h2a.5.5 0 0 1 .312.11L10 10.96V5.04z"/>'); // eslint-disable-next-line
 
-var BIconWallet = /*#__PURE__*/makeIcon('Wallet', '<path fill-rule="evenodd" d="M1.5 3a.5.5 0 00-.5.5v2h5a.5.5 0 01.5.5c0 .253.08.644.306.958.207.288.557.542 1.194.542.637 0 .987-.254 1.194-.542.226-.314.306-.705.306-.958a.5.5 0 01.5-.5h5v-2a.5.5 0 00-.5-.5h-13zM15 6.5h-4.551a2.678 2.678 0 01-.443 1.042C9.613 8.088 8.963 8.5 8 8.5c-.963 0-1.613-.412-2.006-.958A2.679 2.679 0 015.551 6.5H1v6a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-6zm-15-3A1.5 1.5 0 011.5 2h13A1.5 1.5 0 0116 3.5v9a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 010 12.5v-9z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconVolumeOffFill = /*#__PURE__*/makeIcon('VolumeOffFill', '<path fill-rule="evenodd" d="M10.717 3.55A.5.5 0 0 1 11 4v8a.5.5 0 0 1-.812.39L7.825 10.5H5.5A.5.5 0 0 1 5 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>'); // eslint-disable-next-line
 
-var BIconWatch = /*#__PURE__*/makeIcon('Watch', '<path fill-rule="evenodd" d="M4 14.333v-1.86A5.985 5.985 0 012 8c0-1.777.772-3.374 2-4.472V1.667C4 .747 4.746 0 5.667 0h4.666C11.253 0 12 .746 12 1.667v1.86A5.985 5.985 0 0114 8a5.985 5.985 0 01-2 4.472v1.861c0 .92-.746 1.667-1.667 1.667H5.667C4.747 16 4 15.254 4 14.333zM13 8A5 5 0 103 8a5 5 0 0010 0z" clip-rule="evenodd"/><rect width="1" height="2" x="13.5" y="7" rx=".5"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 010-1h1.5V5a.5.5 0 01.5-.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconVolumeUp = /*#__PURE__*/makeIcon('VolumeUp', '<path fill-rule="evenodd" d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zM6 5.04L4.312 6.39A.5.5 0 0 1 4 6.5H2v3h2a.5.5 0 0 1 .312.11L6 10.96V5.04z"/><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707z"/>'); // eslint-disable-next-line
 
-var BIconWifi = /*#__PURE__*/makeIcon('Wifi', '<path fill-rule="evenodd" d="M6.858 11.858A1.991 1.991 0 018 11.5c.425 0 .818.132 1.142.358L8 13l-1.142-1.142z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M7.731 12.024l.269.269.269-.269a1.507 1.507 0 00-.538 0zm-1.159-.576A2.49 2.49 0 018 11c.53 0 1.023.165 1.428.448a.5.5 0 01.068.763l-1.142 1.143a.5.5 0 01-.708 0L6.504 12.21a.5.5 0 01.354-.853v.5l-.286-.41zM8 9.5a4.478 4.478 0 00-2.7.9.5.5 0 01-.6-.8c.919-.69 2.062-1.1 3.3-1.1s2.381.41 3.3 1.1a.5.5 0 01-.6.8A4.478 4.478 0 008 9.5zm0-3c-1.833 0-3.51.657-4.814 1.748a.5.5 0 01-.642-.766A8.468 8.468 0 018 5.5c2.076 0 3.98.745 5.456 1.982a.5.5 0 11-.642.766A7.468 7.468 0 008 6.5z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M8 3.5c-2.657 0-5.082.986-6.932 2.613a.5.5 0 11-.66-.75A11.458 11.458 0 018 2.5c2.91 0 5.567 1.081 7.592 2.862a.5.5 0 11-.66.751A10.458 10.458 0 008 3.5z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconVolumeUpFill = /*#__PURE__*/makeIcon('VolumeUpFill', '<path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707z"/><path fill-rule="evenodd" d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>'); // eslint-disable-next-line
 
-var BIconWindow = /*#__PURE__*/makeIcon('Window', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM2 1a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V3a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M15 6H1V5h14v1z" clip-rule="evenodd"/><path d="M3 3.5a.5.5 0 11-1 0 .5.5 0 011 0zm1.5 0a.5.5 0 11-1 0 .5.5 0 011 0zm1.5 0a.5.5 0 11-1 0 .5.5 0 011 0z"/>'); // eslint-disable-next-line
+var BIconVr = /*#__PURE__*/makeIcon('Vr', '<path d="M3 12V4a1 1 0 0 1 1-1h2.5V2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5v-1H4a1 1 0 0 1-1-1zm6.5 1v1H12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H9.5v1H12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H9.5z"/><path fill-rule="evenodd" d="M8 16a.5.5 0 0 1-.5-.5V.5a.5.5 0 0 1 1 0v15a.5.5 0 0 1-.5.5z"/>'); // eslint-disable-next-line
 
-var BIconWrench = /*#__PURE__*/makeIcon('Wrench', '<path fill-rule="evenodd" d="M.102 2.223A3.004 3.004 0 003.78 5.897l6.341 6.252A3.003 3.003 0 0013 16a3 3 0 10-.851-5.878L5.897 3.781A3.004 3.004 0 002.223.1l2.141 2.142L4 4l-1.757.364L.102 2.223zm13.37 9.019L13 11l-.471.242-.529.026-.287.445-.445.287-.026.529L11 13l.242.471.026.529.445.287.287.445.529.026L13 15l.471-.242.529-.026.287-.445.445-.287.026-.529L15 13l-.242-.471-.026-.529-.445-.287-.287-.445-.529-.026z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconWallet = /*#__PURE__*/makeIcon('Wallet', '<path fill-rule="evenodd" d="M2 4v8.5A1.5 1.5 0 0 0 3.5 14h10a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 1 1 0v8a1.5 1.5 0 0 1-1.5 1.5h-10A2.5 2.5 0 0 1 1 12.5V4h1z"/><path fill-rule="evenodd" d="M1 4a2 2 0 0 1 2-2h11.5a.5.5 0 0 1 0 1H3a1 1 0 0 0 0 2h11.5v1H3a2 2 0 0 1-2-2z"/><path fill-rule="evenodd" d="M13 5V3h1v2h-1z"/>'); // eslint-disable-next-line
 
-var BIconX = /*#__PURE__*/makeIcon('X', '<path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 000 .708l7 7a.5.5 0 00.708-.708l-7-7a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconWallet2 = /*#__PURE__*/makeIcon('Wallet2', '<path d="M2.5 4l10-3A1.5 1.5 0 0 1 14 2.5v2h-1v-2a.5.5 0 0 0-.5-.5L5.833 4H2.5z"/><path fill-rule="evenodd" d="M1 5.5A1.5 1.5 0 0 1 2.5 4h11A1.5 1.5 0 0 1 15 5.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-8zM2.5 5a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-11z"/>'); // eslint-disable-next-line
 
-var BIconXCircle = /*#__PURE__*/makeIcon('XCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 000 .708l7 7a.5.5 0 00.708-.708l-7-7a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconWatch = /*#__PURE__*/makeIcon('Watch', '<path fill-rule="evenodd" d="M4 14.333v-1.86A5.985 5.985 0 0 1 2 8c0-1.777.772-3.374 2-4.472V1.667C4 .747 4.746 0 5.667 0h4.666C11.253 0 12 .746 12 1.667v1.86A5.985 5.985 0 0 1 14 8a5.985 5.985 0 0 1-2 4.472v1.861c0 .92-.746 1.667-1.667 1.667H5.667C4.747 16 4 15.254 4 14.333zM13 8A5 5 0 1 0 3 8a5 5 0 0 0 10 0z"/><rect width="1" height="2" x="13.5" y="7" rx=".5"/><path fill-rule="evenodd" d="M8 4.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5H6a.5.5 0 0 1 0-1h1.5V5a.5.5 0 0 1 .5-.5z"/>'); // eslint-disable-next-line
 
-var BIconXCircleFill = /*#__PURE__*/makeIcon('XCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zm-4.146-3.146a.5.5 0 00-.708-.708L8 7.293 4.854 4.146a.5.5 0 10-.708.708L7.293 8l-3.147 3.146a.5.5 0 00.708.708L8 8.707l3.146 3.147a.5.5 0 00.708-.708L8.707 8l3.147-3.146z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconWifi = /*#__PURE__*/makeIcon('Wifi', '<path fill-rule="evenodd" d="M6.858 11.858A1.991 1.991 0 0 1 8 11.5c.425 0 .818.132 1.142.358L8 13l-1.142-1.142z"/><path fill-rule="evenodd" d="M7.731 12.024l.269.269.269-.269a1.507 1.507 0 0 0-.538 0zm-1.159-.576A2.49 2.49 0 0 1 8 11c.53 0 1.023.165 1.428.448a.5.5 0 0 1 .068.763l-1.142 1.143a.5.5 0 0 1-.708 0L6.504 12.21a.5.5 0 0 1 .354-.853v.5l-.286-.41zM8 9.5a4.478 4.478 0 0 0-2.7.9.5.5 0 0 1-.6-.8c.919-.69 2.062-1.1 3.3-1.1s2.381.41 3.3 1.1a.5.5 0 0 1-.6.8A4.478 4.478 0 0 0 8 9.5zm0-3c-1.833 0-3.51.657-4.814 1.748a.5.5 0 0 1-.642-.766A8.468 8.468 0 0 1 8 5.5c2.076 0 3.98.745 5.456 1.982a.5.5 0 1 1-.642.766A7.468 7.468 0 0 0 8 6.5z"/><path fill-rule="evenodd" d="M8 3.5c-2.657 0-5.082.986-6.932 2.613a.5.5 0 1 1-.66-.75A11.458 11.458 0 0 1 8 2.5c2.91 0 5.567 1.081 7.592 2.862a.5.5 0 1 1-.66.751A10.458 10.458 0 0 0 8 3.5z"/>'); // eslint-disable-next-line
 
-var BIconXDiamond = /*#__PURE__*/makeIcon('XDiamond', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 010-2.098L6.95.435zm1.4.7a.495.495 0 00-.7 0L1.134 7.65a.495.495 0 000 .7l6.516 6.516a.495.495 0 00.7 0l6.516-6.516a.495.495 0 000-.7L8.35 1.134z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 000 .708l7 7a.5.5 0 00.708-.708l-7-7a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconWindow = /*#__PURE__*/makeIcon('Window', '<path fill-rule="evenodd" d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M15 6H1V5h14v1z"/><path d="M3 3.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1.5 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1.5 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>'); // eslint-disable-next-line
 
-var BIconXDiamondFill = /*#__PURE__*/makeIcon('XDiamondFill', '<path fill-rule="evenodd" d="M9.05.435c-.58-.58-1.52-.58-2.1 0L4.047 3.339 8 7.293l3.954-3.954L9.049.435zm3.61 3.611L8.708 8l3.954 3.954 2.904-2.905c.58-.58.58-1.519 0-2.098l-2.904-2.905zm-.706 8.615L8 8.707l-3.954 3.954 2.905 2.904c.58.58 1.519.58 2.098 0l2.905-2.904zm-8.615-.707L7.293 8 3.339 4.046.435 6.951c-.58.58-.58 1.519 0 2.098l2.904 2.905z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconWrench = /*#__PURE__*/makeIcon('Wrench', '<path fill-rule="evenodd" d="M.102 2.223A3.004 3.004 0 0 0 3.78 5.897l6.341 6.252A3.003 3.003 0 0 0 13 16a3 3 0 1 0-.851-5.878L5.897 3.781A3.004 3.004 0 0 0 2.223.1l2.141 2.142L4 4l-1.757.364L.102 2.223zm13.37 9.019L13 11l-.471.242-.529.026-.287.445-.445.287-.026.529L11 13l.242.471.026.529.445.287.287.445.529.026L13 15l.471-.242.529-.026.287-.445.445-.287.026-.529L15 13l-.242-.471-.026-.529-.445-.287-.287-.445-.529-.026z"/>'); // eslint-disable-next-line
 
-var BIconXOctagon = /*#__PURE__*/makeIcon('XOctagon', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 014.893 0h6.214a.5.5 0 01.353.146l4.394 4.394a.5.5 0 01.146.353v6.214a.5.5 0 01-.146.353l-4.394 4.394a.5.5 0 01-.353.146H4.893a.5.5 0 01-.353-.146L.146 11.46A.5.5 0 010 11.107V4.893a.5.5 0 01.146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 000 .708l7 7a.5.5 0 00.708-.708l-7-7a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconX = /*#__PURE__*/makeIcon('X', '<path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
 
-var BIconXOctagonFill = /*#__PURE__*/makeIcon('XOctagonFill', '<path fill-rule="evenodd" d="M11.46.146A.5.5 0 0011.107 0H4.893a.5.5 0 00-.353.146L.146 4.54A.5.5 0 000 4.893v6.214a.5.5 0 00.146.353l4.394 4.394a.5.5 0 00.353.146h6.214a.5.5 0 00.353-.146l4.394-4.394a.5.5 0 00.146-.353V4.893a.5.5 0 00-.146-.353L11.46.146zm.394 4.708a.5.5 0 00-.708-.708L8 7.293 4.854 4.146a.5.5 0 10-.708.708L7.293 8l-3.147 3.146a.5.5 0 00.708.708L8 8.707l3.146 3.147a.5.5 0 00.708-.708L8.707 8l3.147-3.146z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconXCircle = /*#__PURE__*/makeIcon('XCircle', '<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
 
-var BIconXSquare = /*#__PURE__*/makeIcon('XSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 010 .708l-7 7a.5.5 0 01-.708-.708l7-7a.5.5 0 01.708 0z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 000 .708l7 7a.5.5 0 00.708-.708l-7-7a.5.5 0 00-.708 0z" clip-rule="evenodd"/>'); // eslint-disable-next-line
+var BIconXCircleFill = /*#__PURE__*/makeIcon('XCircleFill', '<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.146-3.146a.5.5 0 0 0-.708-.708L8 7.293 4.854 4.146a.5.5 0 1 0-.708.708L7.293 8l-3.147 3.146a.5.5 0 0 0 .708.708L8 8.707l3.146 3.147a.5.5 0 0 0 .708-.708L8.707 8l3.147-3.146z"/>'); // eslint-disable-next-line
 
-var BIconXSquareFill = /*#__PURE__*/makeIcon('XSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2zm9.854 4.854a.5.5 0 00-.708-.708L8 7.293 4.854 4.146a.5.5 0 10-.708.708L7.293 8l-3.147 3.146a.5.5 0 00.708.708L8 8.707l3.146 3.147a.5.5 0 00.708-.708L8.707 8l3.147-3.146z" clip-rule="evenodd"/>'); // --- END AUTO-GENERATED FILE ---
+var BIconXDiamond = /*#__PURE__*/makeIcon('XDiamond', '<path fill-rule="evenodd" d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.482 1.482 0 0 1 0-2.098L6.95.435zm1.4.7a.495.495 0 0 0-.7 0L1.134 7.65a.495.495 0 0 0 0 .7l6.516 6.516a.495.495 0 0 0 .7 0l6.516-6.516a.495.495 0 0 0 0-.7L8.35 1.134z"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
+
+var BIconXDiamondFill = /*#__PURE__*/makeIcon('XDiamondFill', '<path fill-rule="evenodd" d="M9.05.435c-.58-.58-1.52-.58-2.1 0L4.047 3.339 8 7.293l3.954-3.954L9.049.435zm3.61 3.611L8.708 8l3.954 3.954 2.904-2.905c.58-.58.58-1.519 0-2.098l-2.904-2.905zm-.706 8.615L8 8.707l-3.954 3.954 2.905 2.904c.58.58 1.519.58 2.098 0l2.905-2.904zm-8.615-.707L7.293 8 3.339 4.046.435 6.951c-.58.58-.58 1.519 0 2.098l2.904 2.905z"/>'); // eslint-disable-next-line
+
+var BIconXOctagon = /*#__PURE__*/makeIcon('XOctagon', '<path fill-rule="evenodd" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
+
+var BIconXOctagonFill = /*#__PURE__*/makeIcon('XOctagonFill', '<path fill-rule="evenodd" d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353L11.46.146zm.394 4.708a.5.5 0 0 0-.708-.708L8 7.293 4.854 4.146a.5.5 0 1 0-.708.708L7.293 8l-3.147 3.146a.5.5 0 0 0 .708.708L8 8.707l3.146 3.147a.5.5 0 0 0 .708-.708L8.707 8l3.147-3.146z"/>'); // eslint-disable-next-line
+
+var BIconXSquare = /*#__PURE__*/makeIcon('XSquare', '<path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>'); // eslint-disable-next-line
+
+var BIconXSquareFill = /*#__PURE__*/makeIcon('XSquareFill', '<path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm9.854 4.854a.5.5 0 0 0-.708-.708L8 7.293 4.854 4.146a.5.5 0 1 0-.708.708L7.293 8l-3.147 3.146a.5.5 0 0 0 .708.708L8 8.707l3.146 3.147a.5.5 0 0 0 .708-.708L8.707 8l3.147-3.146z"/>'); // --- END AUTO-GENERATED FILE ---
 
 var RX_ICON_PREFIX = /^BIcon/; // Helper BIcon component
 // Requires the requested icon component to be installed
@@ -4063,12 +4474,12 @@ var RX_ICON_PREFIX = /^BIcon/; // Helper BIcon component
 var BIcon = /*#__PURE__*/Vue.extend({
   name: 'BIcon',
   functional: true,
-  props: _objectSpread2({
+  props: _objectSpread2(_objectSpread2({
     icon: {
       type: String,
       default: null
     }
-  }, commonIconProps, {
+  }, commonIconProps), {}, {
     stacked: {
       type: Boolean,
       default: false
@@ -4086,14 +4497,14 @@ var BIcon = /*#__PURE__*/Vue.extend({
     var components = ((parent || {}).$options || {}).components;
     var componentRefOrName = icon && components ? components[iconName] || BIconBlank : icon ? iconName : BIconBlank;
     return h(componentRefOrName, vueFunctionalDataMerge.mergeData(data, {
-      props: _objectSpread2({}, props, {
+      props: _objectSpread2(_objectSpread2({}, props), {}, {
         icon: null
       })
     }));
   }
 });
 
-var NAME$5 = 'BAvatar';
+var NAME$6 = 'BAvatar';
 var CLASS_NAME$1 = 'b-avatar';
 var RX_NUMBER = /^[0-9]*\.?[0-9]+$/;
 var FONT_SIZE_SCALE = 0.4;
@@ -4104,54 +4515,9 @@ var DEFAULT_SIZES = {
   lg: '3.5em'
 }; // --- Props ---
 
-var linkProps$1 = {
-  href: {
-    type: String // default: null
+var linkProps$1 = omit(props$1, ['active', 'event', 'routerTag']);
 
-  },
-  to: {
-    type: [String, Object] // default: null
-
-  },
-  append: {
-    type: Boolean,
-    default: false
-  },
-  replace: {
-    type: Boolean,
-    default: false
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  rel: {
-    type: String // default: null
-
-  },
-  target: {
-    type: String // default: null
-
-  },
-  activeClass: {
-    type: String // default: null
-
-  },
-  exact: {
-    type: Boolean,
-    default: false
-  },
-  exactActiveClass: {
-    type: String // default: null
-
-  },
-  noPrefetch: {
-    type: Boolean,
-    default: false
-  }
-};
-
-var props$2 = _objectSpread2({
+var props$3 = _objectSpread2(_objectSpread2({
   src: {
     type: String // default: null
 
@@ -4171,7 +4537,7 @@ var props$2 = _objectSpread2({
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$5, 'variant');
+      return getComponentConfig(NAME$6, 'variant');
     }
   },
   size: {
@@ -4201,7 +4567,7 @@ var props$2 = _objectSpread2({
   badgeVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$5, 'badgeVariant');
+      return getComponentConfig(NAME$6, 'badgeVariant');
     }
   },
   badgeTop: {
@@ -4216,7 +4582,7 @@ var props$2 = _objectSpread2({
     type: String,
     default: '0px'
   }
-}, linkProps$1, {
+}, linkProps$1), {}, {
   ariaLabel: {
     type: String // default: null
 
@@ -4227,7 +4593,7 @@ var props$2 = _objectSpread2({
 var computeSize = function computeSize(value) {
   // Default to `md` size when `null`, or parse to
   // number when value is a float-like string
-  value = value === null ? 'md' : isString(value) && RX_NUMBER.test(value) ? toFloat(value, 0) : value; // Convert all numbers to pixel values
+  value = isUndefinedOrNull(value) || value === '' ? 'md' : isString(value) && RX_NUMBER.test(value) ? toFloat(value, 0) : value; // Convert all numbers to pixel values
   // Handle default sizes when `sm`, `md` or `lg`
   // Or use value as is
 
@@ -4235,11 +4601,15 @@ var computeSize = function computeSize(value) {
 }; // --- Main component ---
 // @vue/component
 
-
 var BAvatar = /*#__PURE__*/Vue.extend({
-  name: NAME$5,
+  name: NAME$6,
   mixins: [normalizeSlotMixin],
-  props: props$2,
+  inject: {
+    bvAvatarGroup: {
+      default: null
+    }
+  },
+  props: props$3,
   data: function data() {
     return {
       localSrc: this.src || null
@@ -4247,11 +4617,36 @@ var BAvatar = /*#__PURE__*/Vue.extend({
   },
   computed: {
     computedSize: function computedSize() {
-      return computeSize(this.size);
+      // Always use the avatar group size
+      return computeSize(this.bvAvatarGroup ? this.bvAvatarGroup.size : this.size);
     },
-    fontSize: function fontSize() {
+    computedVariant: function computedVariant() {
+      // Prefer avatar-group variant if provided
+      var avatarGroup = this.bvAvatarGroup;
+      return avatarGroup && avatarGroup.variant ? avatarGroup.variant : this.variant;
+    },
+    computedRounded: function computedRounded() {
+      var avatarGroup = this.bvAvatarGroup;
+      var square = avatarGroup && avatarGroup.square ? true : this.square;
+      var rounded = avatarGroup && avatarGroup.rounded ? avatarGroup.rounded : this.rounded;
+      return square ? '0' : rounded === '' ? true : rounded || 'circle';
+    },
+    fontStyle: function fontStyle() {
+      var fontSize = this.computedSize;
+      fontSize = fontSize ? "calc(".concat(fontSize, " * ").concat(FONT_SIZE_SCALE, ")") : null;
+      return fontSize ? {
+        fontSize: fontSize
+      } : {};
+    },
+    marginStyle: function marginStyle() {
+      var avatarGroup = this.bvAvatarGroup;
+      var overlapScale = avatarGroup ? avatarGroup.overlapScale : 0;
       var size = this.computedSize;
-      return size ? "calc(".concat(size, " * ").concat(FONT_SIZE_SCALE, ")") : null;
+      var value = size && overlapScale ? "calc(".concat(size, " * -").concat(overlapScale, ")") : null;
+      return value ? {
+        marginLeft: value,
+        marginRight: value
+      } : {};
     },
     badgeStyle: function badgeStyle() {
       var size = this.computedSize,
@@ -4287,22 +4682,22 @@ var BAvatar = /*#__PURE__*/Vue.extend({
   render: function render(h) {
     var _class2;
 
-    var variant = this.variant,
+    var variant = this.computedVariant,
         disabled = this.disabled,
-        square = this.square,
+        rounded = this.computedRounded,
         icon = this.icon,
         src = this.localSrc,
         text = this.text,
-        fontSize = this.fontSize,
+        fontStyle = this.fontStyle,
+        marginStyle = this.marginStyle,
         size = this.computedSize,
-        isButton = this.button,
+        button = this.button,
         type = this.buttonType,
         badge = this.badge,
         badgeVariant = this.badgeVariant,
         badgeStyle = this.badgeStyle;
-    var isBLink = !isButton && (this.href || this.to);
-    var tag = isButton ? BButton : isBLink ? BLink : 'span';
-    var rounded = square ? false : this.rounded === '' ? true : this.rounded || 'circle';
+    var link = !button && isLink(this);
+    var tag = button ? BButton : link ? BLink : 'span';
     var alt = this.alt || null;
     var ariaLabel = this.ariaLabel || null;
     var $content = null;
@@ -4326,6 +4721,9 @@ var BAvatar = /*#__PURE__*/Vue.extend({
           error: this.onImgError
         }
       });
+      $content = h('span', {
+        staticClass: 'b-avatar-img'
+      }, [$content]);
     } else if (icon) {
       $content = h(BIcon, {
         props: {
@@ -4339,9 +4737,7 @@ var BAvatar = /*#__PURE__*/Vue.extend({
     } else if (text) {
       $content = h('span', {
         staticClass: 'b-avatar-text',
-        style: {
-          fontSize: fontSize
-        }
+        style: fontStyle
       }, [h('span', text)]);
     } else {
       // Fallback default avatar content
@@ -4367,20 +4763,20 @@ var BAvatar = /*#__PURE__*/Vue.extend({
 
     var componentData = {
       staticClass: CLASS_NAME$1,
-      class: (_class2 = {}, _defineProperty(_class2, "badge-".concat(variant), !isButton && variant), _defineProperty(_class2, "rounded", rounded === true), _defineProperty(_class2, 'rounded-0', square), _defineProperty(_class2, "rounded-".concat(rounded), rounded && rounded !== true), _defineProperty(_class2, "disabled", disabled), _class2),
-      style: {
+      class: (_class2 = {}, _defineProperty(_class2, "badge-".concat(variant), !button && variant), _defineProperty(_class2, "rounded", rounded === true), _defineProperty(_class2, "rounded-".concat(rounded), rounded && rounded !== true), _defineProperty(_class2, "disabled", disabled), _class2),
+      style: _objectSpread2({
         width: size,
         height: size
-      },
+      }, marginStyle),
       attrs: {
         'aria-label': ariaLabel || null
       },
-      props: isButton ? {
+      props: button ? {
         variant: variant,
         disabled: disabled,
         type: type
-      } : isBLink ? pluckProps(linkProps$1, this) : {},
-      on: isBLink || isButton ? {
+      } : link ? pluckProps(linkProps$1, this) : {},
+      on: button || link ? {
         click: this.onClick
       } : {}
     };
@@ -4388,17 +4784,90 @@ var BAvatar = /*#__PURE__*/Vue.extend({
   }
 });
 
-var AvatarPlugin = /*#__PURE__*/pluginFactory({
-  components: {
-    BAvatar: BAvatar
+var NAME$7 = 'BAvatarGroup'; // --- Main component ---
+// @vue/component
+
+var BAvatarGroup = /*#__PURE__*/Vue.extend({
+  name: NAME$7,
+  mixins: [normalizeSlotMixin],
+  provide: function provide() {
+    return {
+      bvAvatarGroup: this
+    };
+  },
+  props: {
+    variant: {
+      // Child avatars will prefer this variant over their own
+      type: String,
+      default: null
+    },
+    size: {
+      // Child avatars will always use this over their own size
+      type: String,
+      default: null
+    },
+    overlap: {
+      type: [Number, String],
+      default: 0.3
+    },
+    square: {
+      // Child avatars will prefer this prop (if set) over their own
+      type: Boolean,
+      default: false
+    },
+    rounded: {
+      // Child avatars will prefer this prop (if set) over their own
+      type: [Boolean, String],
+      default: false
+    },
+    tag: {
+      type: String,
+      default: 'div'
+    }
+  },
+  computed: {
+    computedSize: function computedSize() {
+      return computeSize(this.size);
+    },
+    overlapScale: function overlapScale() {
+      return mathMin(mathMax(toFloat(this.overlap, 0), 0), 1) / 2;
+    },
+    paddingStyle: function paddingStyle() {
+      var value = this.computedSize;
+      value = value ? "calc(".concat(value, " * ").concat(this.overlapScale, ")") : null;
+      return value ? {
+        paddingLeft: value,
+        paddingRight: value
+      } : {};
+    }
+  },
+  render: function render(h) {
+    var $inner = h('div', {
+      staticClass: 'b-avatar-group-inner',
+      style: this.paddingStyle
+    }, [this.normalizeSlot('default')]);
+    return h(this.tag, {
+      staticClass: 'b-avatar-group',
+      attrs: {
+        role: 'group'
+      }
+    }, [$inner]);
   }
 });
 
-var NAME$6 = 'BBadge';
-var linkProps$2 = propsFactory();
+var AvatarPlugin = /*#__PURE__*/pluginFactory({
+  components: {
+    BAvatar: BAvatar,
+    BAvatarGroup: BAvatarGroup
+  }
+});
+
+var NAME$8 = 'BBadge'; // --- Props ---
+
+var linkProps$2 = omit(props$1, ['event', 'routerTag']);
 delete linkProps$2.href.default;
 delete linkProps$2.to.default;
-var props$3 = _objectSpread2({}, linkProps$2, {
+var props$4 = _objectSpread2({
   tag: {
     type: String,
     default: 'span'
@@ -4406,25 +4875,26 @@ var props$3 = _objectSpread2({}, linkProps$2, {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$6, 'variant');
+      return getComponentConfig(NAME$8, 'variant');
     }
   },
   pill: {
     type: Boolean,
     default: false
   }
-}); // @vue/component
+}, linkProps$2); // --- Main component ---
+// @vue/component
 
 var BBadge = /*#__PURE__*/Vue.extend({
-  name: NAME$6,
+  name: NAME$8,
   functional: true,
-  props: props$3,
+  props: props$4,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    var isBLink = props.href || props.to;
-    var tag = isBLink ? BLink : props.tag;
+    var link = isLink(props);
+    var tag = link ? BLink : props.tag;
     var componentData = {
       staticClass: 'badge',
       class: [props.variant ? "badge-".concat(props.variant) : 'badge-secondary', {
@@ -4432,7 +4902,7 @@ var BBadge = /*#__PURE__*/Vue.extend({
         active: props.active,
         disabled: props.disabled
       }],
-      props: isBLink ? pluckProps(linkProps$2, props) : {}
+      props: link ? pluckProps(linkProps$2, props) : {}
     };
     return h(tag, vueFunctionalDataMerge.mergeData(data, componentData), children);
   }
@@ -4444,12 +4914,12 @@ var BadgePlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var stripTagsRegex = /(<([^>]+)>)/gi; // Removes any thing that looks like an HTML tag from the supplied string
+var RX_HTML_TAGS = /(<([^>]+)>)/gi; // Removes anything that looks like an HTML tag from the supplied string
 
 var stripTags = function stripTags() {
   var text = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return String(text).replace(stripTagsRegex, '');
-}; // Generate a domProps object for either innerHTML, textContent or nothing
+  return String(text).replace(RX_HTML_TAGS, '');
+}; // Generate a `domProps` object for either `innerHTML`, `textContent` or an empty object
 
 var htmlOrText = function htmlOrText(innerHTML, textContent) {
   return innerHTML ? {
@@ -4459,7 +4929,7 @@ var htmlOrText = function htmlOrText(innerHTML, textContent) {
   } : {};
 };
 
-var props$4 = _objectSpread2({}, propsFactory(), {
+var props$5 = _objectSpread2({
   text: {
     type: String,
     default: null
@@ -4472,26 +4942,25 @@ var props$4 = _objectSpread2({}, propsFactory(), {
     type: String,
     default: 'location'
   }
-}); // @vue/component
+}, omit(props$1, ['event', 'routerTag'])); // --- Main component ---
+// @vue/component
 
 var BBreadcrumbLink = /*#__PURE__*/Vue.extend({
   name: 'BBreadcrumbLink',
   functional: true,
-  props: props$4,
+  props: props$5,
   render: function render(h, _ref) {
     var suppliedProps = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    var tag = suppliedProps.active ? 'span' : BLink;
+    var active = suppliedProps.active;
+    var tag = active ? 'span' : BLink;
     var componentData = {
-      props: pluckProps(props$4, suppliedProps)
+      attrs: {
+        'aria-current': active ? suppliedProps.ariaCurrent : null
+      },
+      props: pluckProps(props$5, suppliedProps)
     };
-
-    if (suppliedProps.active) {
-      componentData.attrs = {
-        'aria-current': suppliedProps.ariaCurrent
-      };
-    }
 
     if (!children) {
       componentData.domProps = htmlOrText(suppliedProps.html, suppliedProps.text);
@@ -4504,7 +4973,7 @@ var BBreadcrumbLink = /*#__PURE__*/Vue.extend({
 var BBreadcrumbItem = /*#__PURE__*/Vue.extend({
   name: 'BBreadcrumbItem',
   functional: true,
-  props: props$4,
+  props: props$5,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -4520,7 +4989,7 @@ var BBreadcrumbItem = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$5 = {
+var props$6 = {
   items: {
     type: Array,
     default: null
@@ -4530,7 +4999,7 @@ var props$5 = {
 var BBreadcrumb = /*#__PURE__*/Vue.extend({
   name: 'BBreadcrumb',
   functional: true,
-  props: props$5,
+  props: props$6,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -4559,7 +5028,7 @@ var BBreadcrumb = /*#__PURE__*/Vue.extend({
         }
 
         return h(BBreadcrumbItem, {
-          props: _objectSpread2({}, item, {
+          props: _objectSpread2(_objectSpread2({}, item), {}, {
             active: active
           })
         });
@@ -4589,8 +5058,8 @@ var ButtonPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$7 = 'BButtonGroup';
-var props$6 = {
+var NAME$9 = 'BButtonGroup';
+var props$7 = {
   vertical: {
     type: Boolean,
     default: false
@@ -4612,9 +5081,9 @@ var props$6 = {
 }; // @vue/component
 
 var BButtonGroup = /*#__PURE__*/Vue.extend({
-  name: NAME$7,
+  name: NAME$9,
   functional: true,
-  props: props$6,
+  props: props$7,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -4688,12 +5157,9 @@ var BButtonToolbar = /*#__PURE__*/Vue.extend({
         shift ? this.focusLast(evt) : this.focusNext(evt);
       }
     },
-    setItemFocus: function setItemFocus(item) {
-      item && item.focus && item.focus();
-    },
     focusFirst: function focusFirst() {
       var items = this.getItems();
-      this.setItemFocus(items[0]);
+      attemptFocus(items[0]);
     },
     focusPrev: function focusPrev(evt) {
       var items = this.getItems();
@@ -4701,7 +5167,7 @@ var BButtonToolbar = /*#__PURE__*/Vue.extend({
 
       if (index > -1) {
         items = items.slice(0, index).reverse();
-        this.setItemFocus(items[0]);
+        attemptFocus(items[0]);
       }
     },
     focusNext: function focusNext(evt) {
@@ -4710,12 +5176,12 @@ var BButtonToolbar = /*#__PURE__*/Vue.extend({
 
       if (index > -1) {
         items = items.slice(index + 1);
-        this.setItemFocus(items[0]);
+        attemptFocus(items[0]);
       }
     },
     focusLast: function focusLast() {
       var items = this.getItems().reverse();
-      this.setItemFocus(items[0]);
+      attemptFocus(items[0]);
     },
     getItems: function getItems() {
       var items = selectAll(ITEM_SELECTOR, this.$el);
@@ -4825,7 +5291,12 @@ var looseEqual = function looseEqual(a, b) {
   return String(a) === String(b);
 };
 
-var RX_DATE = /^\d+-\d+-\d+$/; // --- Date utility methods ---
+// Loose YYYY-MM-DD matching, ignores any appended time inforation
+// Matches '1999-12-20', '1999-1-1', '1999-01-20T22:51:49.118Z', '1999-01-02 13:00:00'
+
+var RX_DATE = /^\d+-\d\d?-\d\d?(?:\s|T|$)/; // Used to split off the date parts of the YYYY-MM-DD string
+
+var RX_DATE_SPLIT = /-|\s|T/; // --- Date utility methods ---
 // Create or clone a date (`new Date(...)` shortcut)
 
 var createDate = function createDate() {
@@ -4838,7 +5309,9 @@ var createDate = function createDate() {
 
 var parseYMD = function parseYMD(date) {
   if (isString(date) && RX_DATE.test(date.trim())) {
-    var _date$split$map = date.split('-').map(toInteger),
+    var _date$split$map = date.split(RX_DATE_SPLIT).map(function (v) {
+      return toInteger(v, 1);
+    }),
         _date$split$map2 = _slicedToArray(_date$split$map, 3),
         year = _date$split$map2[0],
         month = _date$split$map2[1],
@@ -4974,11 +5447,9 @@ var isLocaleRTL = function isLocaleRTL(locale) {
   return arrayIncludes(RTL_LANGS, locale1) || arrayIncludes(RTL_LANGS, locale2);
 };
 
-/*
- * SSR Safe Client Side ID attribute generation
- * id's can only be generated client side, after mount.
- * this._uid is not synched between server and client.
- */
+// SSR safe client-side ID attribute generation
+// ID's can only be generated client-side, after mount
+// `this._uid` is not synched between server and client
 // @vue/component
 var idMixin = {
   props: {
@@ -4994,11 +5465,11 @@ var idMixin = {
   },
   computed: {
     safeId: function safeId() {
-      // Computed property that returns a dynamic function for creating the ID.
-      // Reacts to changes in both .id and .localId_ And regens a new function
+      // Computed property that returns a dynamic function for creating the ID
+      // Reacts to changes in both `.id` and `.localId_` and regenerates a new function
       var id = this.id || this.localId_; // We return a function that accepts an optional suffix string
-      // So this computed prop looks and works like a method!!!
-      // But benefits from Vue's Computed prop caching
+      // So this computed prop looks and works like a method
+      // but benefits from Vue's computed prop caching
 
       var fn = function fn(suffix) {
         if (!id) {
@@ -5015,16 +5486,16 @@ var idMixin = {
   mounted: function mounted() {
     var _this = this;
 
-    // mounted only occurs client side
+    // `mounted()` only occurs client-side
     this.$nextTick(function () {
-      // Update dom with auto ID after dom loaded to prevent
-      // SSR hydration errors.
+      // Update DOM with auto-generated ID after mount
+      // to prevent SSR hydration errors
       _this.localId_ = "__BVID__".concat(_this._uid);
     });
   }
 };
 
-var NAME$8 = 'BCalendar'; // Key Codes
+var NAME$a = 'BCalendar'; // Key Codes
 
 var UP = KEY_CODES.UP,
     DOWN = KEY_CODES.DOWN,
@@ -5046,8 +5517,9 @@ var STR_NARROW = 'narrow'; // --- BCalendar component ---
 // @vue/component
 
 var BCalendar = Vue.extend({
-  name: NAME$8,
-  mixins: [idMixin, normalizeSlotMixin],
+  name: NAME$a,
+  // Mixin order is important!
+  mixins: [attrsMixin, idMixin, normalizeSlotMixin],
   model: {
     // Even though this is the default that Vue assumes, we need
     // to add it for the docs to reflect that this is the model
@@ -5173,79 +5645,79 @@ var BCalendar = Vue.extend({
     labelPrevDecade: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelPrevDecade');
+        return getComponentConfig(NAME$a, 'labelPrevDecade');
       }
     },
     labelPrevYear: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelPrevYear');
+        return getComponentConfig(NAME$a, 'labelPrevYear');
       }
     },
     labelPrevMonth: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelPrevMonth');
+        return getComponentConfig(NAME$a, 'labelPrevMonth');
       }
     },
     labelCurrentMonth: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelCurrentMonth');
+        return getComponentConfig(NAME$a, 'labelCurrentMonth');
       }
     },
     labelNextMonth: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelNextMonth');
+        return getComponentConfig(NAME$a, 'labelNextMonth');
       }
     },
     labelNextYear: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelNextYear');
+        return getComponentConfig(NAME$a, 'labelNextYear');
       }
     },
     labelNextDecade: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelNextDecade');
+        return getComponentConfig(NAME$a, 'labelNextDecade');
       }
     },
     labelToday: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelToday');
+        return getComponentConfig(NAME$a, 'labelToday');
       }
     },
     labelSelected: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelSelected');
+        return getComponentConfig(NAME$a, 'labelSelected');
       }
     },
     labelNoDateSelected: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelNoDateSelected');
+        return getComponentConfig(NAME$a, 'labelNoDateSelected');
       }
     },
     labelCalendar: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelCalendar');
+        return getComponentConfig(NAME$a, 'labelCalendar');
       }
     },
     labelNav: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelNav');
+        return getComponentConfig(NAME$a, 'labelNav');
       }
     },
     labelHelp: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$8, 'labelHelp');
+        return getComponentConfig(NAME$a, 'labelHelp');
       }
     },
     dateFormatOptions: {
@@ -5290,6 +5762,27 @@ var BCalendar = Vue.extend({
     };
   },
   computed: {
+    valueId: function valueId() {
+      return this.safeId();
+    },
+    widgetId: function widgetId() {
+      return this.safeId('_calendar-wrapper_');
+    },
+    navId: function navId() {
+      return this.safeId('_calendar-nav_');
+    },
+    gridId: function gridId() {
+      return this.safeId('_calendar-grid_');
+    },
+    gridCaptionId: function gridCaptionId() {
+      return this.safeId('_calendar-grid-caption_');
+    },
+    gridHelpId: function gridHelpId() {
+      return this.safeId('_calendar-grid-help_');
+    },
+    activeId: function activeId() {
+      return this.activeYMD ? this.safeId("_cell-".concat(this.activeYMD, "_")) : null;
+    },
     // TODO: Use computed props to convert `YYYY-MM-DD` to `Date` object
     selectedDate: function selectedDate() {
       // Selected as a `Date` object
@@ -5307,7 +5800,7 @@ var BCalendar = Vue.extend({
     },
     computedWeekStarts: function computedWeekStarts() {
       // `startWeekday` is a prop (constrained to `0` through `6`)
-      return Math.max(toInteger(this.startWeekday, 0), 0) % 7;
+      return mathMax(toInteger(this.startWeekday, 0), 0) % 7;
     },
     computedLocale: function computedLocale() {
       // Returns the resolved locale used by the calendar
@@ -5393,7 +5886,7 @@ var BCalendar = Vue.extend({
     },
     // Computed props that return a function reference
     dateOutOfRange: function dateOutOfRange() {
-      // Check wether a date is within the min/max range
+      // Check whether a date is within the min/max range
       // returns a new function ref if the pops change
       // We do this as we need to trigger the calendar computed prop
       // to update when these props update
@@ -5426,14 +5919,14 @@ var BCalendar = Vue.extend({
     // Computed props that return date formatter functions
     formatDateString: function formatDateString() {
       // Returns a date formatter function
-      return createDateFormatter(this.calendarLocale, _objectSpread2({
+      return createDateFormatter(this.calendarLocale, _objectSpread2(_objectSpread2({
         // Ensure we have year, month, day shown for screen readers/ARIA
         // If users really want to leave one of these out, they can
         // pass `undefined` for the property value
         year: STR_NUMERIC,
         month: STR_2_DIGIT,
         day: STR_2_DIGIT
-      }, this.dateFormatOptions, {
+      }, this.dateFormatOptions), {}, {
         // Ensure hours/minutes/seconds are not shown
         // As we do not support the time portion (yet)
         hour: undefined,
@@ -5640,15 +6133,13 @@ var BCalendar = Vue.extend({
     // Public method(s)
     focus: function focus() {
       if (!this.disabled) {
-        try {
-          this.$refs.grid.focus();
-        } catch (_unused) {}
+        attemptFocus(this.$refs.grid);
       }
     },
     blur: function blur() {
-      try {
-        this.$refs.grid.blur();
-      } catch (_unused2) {}
+      if (!this.disabled) {
+        attemptBlur(this.$refs.grid);
+      }
     },
     // Private methods
     setLive: function setLive(on) {
@@ -5828,28 +6319,26 @@ var BCalendar = Vue.extend({
   render: function render(h) {
     var _this5 = this;
 
-    // If hidden prop is set, render just a placeholder node
+    // If `hidden` prop is set, render just a placeholder node
     if (this.hidden) {
       return h();
     }
 
-    var isLive = this.isLive,
+    var valueId = this.valueId,
+        widgetId = this.widgetId,
+        navId = this.navId,
+        gridId = this.gridId,
+        gridCaptionId = this.gridCaptionId,
+        gridHelpId = this.gridHelpId,
+        activeId = this.activeId,
+        isLive = this.isLive,
         isRTL = this.isRTL,
         activeYMD = this.activeYMD,
         selectedYMD = this.selectedYMD,
         safeId = this.safeId;
     var hideDecadeNav = !this.showDecadeNav;
     var todayYMD = formatYMD(this.getToday());
-    var highlightToday = !this.noHighlightToday; // Pre-compute some IDs
-    // This should be computed props
-
-    var idValue = safeId();
-    var idWidget = safeId('_calendar-wrapper_');
-    var idNav = safeId('_calendar-nav_');
-    var idGrid = safeId('_calendar-grid_');
-    var idGridCaption = safeId('_calendar-grid-caption_');
-    var idGridHelp = safeId('_calendar-grid-help_');
-    var idActive = activeYMD ? safeId("_cell-".concat(activeYMD, "_")) : null; // Header showing current selected date
+    var highlightToday = !this.noHighlightToday; // Header showing current selected date
 
     var $header = h('output', {
       staticClass: 'form-control form-control-sm text-center',
@@ -5858,8 +6347,8 @@ var BCalendar = Vue.extend({
         readonly: this.readonly || this.disabled
       },
       attrs: {
-        id: idValue,
-        for: idGrid,
+        id: valueId,
+        for: gridId,
         role: 'status',
         tabindex: this.disabled ? null : '-1',
         // Mainly for testing purposes, as we do not know
@@ -5899,11 +6388,11 @@ var BCalendar = Vue.extend({
       shiftV: 0.5
     };
 
-    var navPrevProps = _objectSpread2({}, navProps, {
+    var navPrevProps = _objectSpread2(_objectSpread2({}, navProps), {}, {
       flipH: isRTL
     });
 
-    var navNextProps = _objectSpread2({}, navProps, {
+    var navNextProps = _objectSpread2(_objectSpread2({}, navProps), {}, {
       flipH: !isRTL
     });
 
@@ -5956,11 +6445,11 @@ var BCalendar = Vue.extend({
     var $nav = h('div', {
       staticClass: 'b-calendar-nav d-flex',
       attrs: {
-        id: idNav,
+        id: navId,
         role: 'group',
         'aria-hidden': this.disabled ? 'true' : null,
         'aria-label': this.labelNav || null,
-        'aria-controls': idGrid
+        'aria-controls': gridId
       }
     }, [hideDecadeNav ? h() : makeNavBtn($prevDecadeIcon, this.labelPrevDecade, this.gotoPrevDecade, this.prevDecadeDisabled, 'Ctrl+Alt+PageDown'), makeNavBtn($prevYearIcon, this.labelPrevYear, this.gotoPrevYear, this.prevYearDisabled, 'Alt+PageDown'), makeNavBtn($prevMonthIcon, this.labelPrevMonth, this.gotoPrevMonth, this.prevMonthDisabled, 'PageDown'), makeNavBtn($thisMonthIcon, this.labelCurrentMonth, this.gotoCurrentMonth, this.thisMonthDisabled, 'Home'), makeNavBtn($nextMonthIcon, this.labelNextMonth, this.gotoNextMonth, this.nextMonthDisabled, 'PageUp'), makeNavBtn($nextYearIcon, this.labelNextYear, this.gotoNextYear, this.nextYearDisabled, 'Alt+PageUp'), hideDecadeNav ? h() : makeNavBtn($nextDecadeIcon, this.labelNextDecade, this.gotoNextDecade, this.nextDecadeDisabled, 'Ctrl+Alt+PageUp')]); // Caption for calendar grid
 
@@ -5971,7 +6460,7 @@ var BCalendar = Vue.extend({
         'text-muted': this.disabled
       },
       attrs: {
-        id: idGridCaption,
+        id: gridCaptionId,
         'aria-live': isLive ? 'polite' : null,
         'aria-atomic': isLive ? 'true' : null
       }
@@ -6062,7 +6551,7 @@ var BCalendar = Vue.extend({
     var $gridHelp = h('footer', {
       staticClass: 'b-calendar-grid-help border-top small text-muted text-center bg-light',
       attrs: {
-        id: idGridHelp
+        id: gridHelpId
       }
     }, [h('div', {
       staticClass: 'small'
@@ -6071,19 +6560,19 @@ var BCalendar = Vue.extend({
       ref: 'grid',
       staticClass: 'b-calendar-grid form-control h-auto text-center',
       attrs: {
-        id: idGrid,
+        id: gridId,
         role: 'application',
         tabindex: this.disabled ? null : '0',
         'data-month': activeYMD.slice(0, -3),
         // `YYYY-MM`, mainly for testing
         'aria-roledescription': this.labelCalendar || null,
-        'aria-labelledby': idGridCaption,
-        'aria-describedby': idGridHelp,
+        'aria-labelledby': gridCaptionId,
+        'aria-describedby': gridHelpId,
         // `aria-readonly` is not considered valid on `role="application"`
         // https://www.w3.org/TR/wai-aria-1.1/#aria-readonly
         // 'aria-readonly': this.readonly && !this.disabled ? 'true' : null,
         'aria-disabled': this.disabled ? 'true' : null,
-        'aria-activedescendant': idActive
+        'aria-activedescendant': activeId
       },
       on: {
         keydown: this.onKeydownGrid,
@@ -6102,7 +6591,7 @@ var BCalendar = Vue.extend({
         width: this.width
       },
       attrs: {
-        id: idWidget,
+        id: widgetId,
         dir: isRTL ? 'rtl' : 'ltr',
         lang: this.computedLocale || null,
         role: 'group',
@@ -6113,7 +6602,7 @@ var BCalendar = Vue.extend({
         'aria-roledescription': this.roleDescription || null,
         'aria-describedby': [// Should the attr (if present) go last?
         // Or should this attr be a prop?
-        this.$attrs['aria-describedby'], idValue, idGridHelp].filter(identity).join(' ')
+        this.bvAttrs['aria-describedby'], valueId, gridHelpId].filter(identity).join(' ')
       },
       on: {
         keydown: this.onKeydownWrapper
@@ -6134,56 +6623,6 @@ var CalendarPlugin = /*#__PURE__*/pluginFactory({
     BCalendar: BCalendar
   }
 });
-
-/**
- * @param {string} prefix
- * @param {string} value
- */
-
-var prefixPropName = function prefixPropName(prefix, value) {
-  return prefix + upperFirst(value);
-};
-
-/**
- * @param {string} prefix
- * @param {string} value
- */
-
-var unprefixPropName = function unprefixPropName(prefix, value) {
-  return lowerFirst(value.replace(prefix, ''));
-};
-
-/**
- * Copies props from one array/object to a new array/object. Prop values
- * are also cloned as new references to prevent possible mutation of original
- * prop object values. Optionally accepts a function to transform the prop name.
- *
- * @param {[]|{}} props
- * @param {Function} transformFn
- */
-
-var copyProps = function copyProps(props) {
-  var transformFn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : identity;
-
-  if (isArray(props)) {
-    return props.map(transformFn);
-  } // Props as an object.
-
-
-  var copied = {};
-
-  for (var prop in props) {
-    /* istanbul ignore else */
-    // eslint-disable-next-line no-prototype-builtins
-    if (props.hasOwnProperty(prop)) {
-      // If the prop value is an object, do a shallow clone to prevent
-      // potential mutations to the original object.
-      copied[transformFn(prop)] = isObject(props[prop]) ? clone(props[prop]) : props[prop];
-    }
-  }
-
-  return copied;
-};
 
 // @vue/component
 var cardMixin = {
@@ -6207,7 +6646,7 @@ var cardMixin = {
   }
 };
 
-var props$7 = {
+var props$8 = {
   title: {
     type: String // default: null
 
@@ -6221,7 +6660,7 @@ var props$7 = {
 var BCardTitle = /*#__PURE__*/Vue.extend({
   name: 'BCardTitle',
   functional: true,
-  props: props$7,
+  props: props$8,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -6232,8 +6671,8 @@ var BCardTitle = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$9 = 'BCardSubTitle';
-var props$8 = {
+var NAME$b = 'BCardSubTitle';
+var props$9 = {
   subTitle: {
     type: String // default: null
 
@@ -6245,15 +6684,15 @@ var props$8 = {
   subTitleTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$9, 'subTitleTextVariant');
+      return getComponentConfig(NAME$b, 'subTitleTextVariant');
     }
   }
 }; // @vue/component
 
 var BCardSubTitle = /*#__PURE__*/Vue.extend({
-  name: NAME$9,
+  name: NAME$b,
   functional: true,
-  props: props$8,
+  props: props$9,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -6265,12 +6704,12 @@ var BCardSubTitle = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$9 = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'body')), {
+var props$a = _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'body'))), {}, {
   bodyClass: {
     type: [String, Object, Array] // default: null
 
   }
-}, props$7, {}, props$8, {
+}, props$8), props$9), {}, {
   overlay: {
     type: Boolean,
     default: false
@@ -6280,7 +6719,7 @@ var props$9 = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(
 var BCardBody = /*#__PURE__*/Vue.extend({
   name: 'BCardBody',
   functional: true,
-  props: props$9,
+  props: props$a,
   render: function render(h, _ref) {
     var _ref2;
 
@@ -6293,13 +6732,13 @@ var BCardBody = /*#__PURE__*/Vue.extend({
 
     if (props.title) {
       cardTitle = h(BCardTitle, {
-        props: pluckProps(props$7, props)
+        props: pluckProps(props$8, props)
       });
     }
 
     if (props.subTitle) {
       cardSubTitle = h(BCardSubTitle, {
-        props: pluckProps(props$8, props),
+        props: pluckProps(props$9, props),
         class: ['mb-2']
       });
     }
@@ -6313,7 +6752,7 @@ var BCardBody = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$a = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'header')), {
+var props$b = _objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'header'))), {}, {
   header: {
     type: String // default: null
 
@@ -6326,28 +6765,31 @@ var props$a = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(
     type: [String, Object, Array] // default: null
 
   }
-}); // @vue/component
+}); // --- Main component ---
+// @vue/component
 
 var BCardHeader = /*#__PURE__*/Vue.extend({
   name: 'BCardHeader',
   functional: true,
-  props: props$a,
+  props: props$b,
   render: function render(h, _ref) {
     var _ref2;
 
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
+    var headerBgVariant = props.headerBgVariant,
+        headerBorderVariant = props.headerBorderVariant,
+        headerTextVariant = props.headerTextVariant;
     return h(props.headerTag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card-header',
-      class: [props.headerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.headerBgVariant), props.headerBgVariant), _defineProperty(_ref2, "border-".concat(props.headerBorderVariant), props.headerBorderVariant), _defineProperty(_ref2, "text-".concat(props.headerTextVariant), props.headerTextVariant), _ref2)]
-    }), children || [h('div', {
-      domProps: htmlOrText(props.headerHtml, props.header)
-    })]);
+      class: [props.headerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(headerBgVariant), headerBgVariant), _defineProperty(_ref2, "border-".concat(headerBorderVariant), headerBorderVariant), _defineProperty(_ref2, "text-".concat(headerTextVariant), headerTextVariant), _ref2)],
+      domProps: children ? {} : htmlOrText(props.headerHtml, props.header)
+    }), children);
   }
 });
 
-var props$b = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'footer')), {
+var props$c = _objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'footer'))), {}, {
   footer: {
     type: String // default: null
 
@@ -6360,28 +6802,31 @@ var props$b = _objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(
     type: [String, Object, Array] // default: null
 
   }
-}); // @vue/component
+}); // --- Main component ---
+// @vue/component
 
 var BCardFooter = /*#__PURE__*/Vue.extend({
   name: 'BCardFooter',
   functional: true,
-  props: props$b,
+  props: props$c,
   render: function render(h, _ref) {
     var _ref2;
 
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
+    var footerBgVariant = props.footerBgVariant,
+        footerBorderVariant = props.footerBorderVariant,
+        footerTextVariant = props.footerTextVariant;
     return h(props.footerTag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card-footer',
-      class: [props.footerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(props.footerBgVariant), props.footerBgVariant), _defineProperty(_ref2, "border-".concat(props.footerBorderVariant), props.footerBorderVariant), _defineProperty(_ref2, "text-".concat(props.footerTextVariant), props.footerTextVariant), _ref2)]
-    }), children || [h('div', {
-      domProps: htmlOrText(props.footerHtml, props.footer)
-    })]);
+      class: [props.footerClass, (_ref2 = {}, _defineProperty(_ref2, "bg-".concat(footerBgVariant), footerBgVariant), _defineProperty(_ref2, "border-".concat(footerBorderVariant), footerBorderVariant), _defineProperty(_ref2, "text-".concat(footerTextVariant), footerTextVariant), _ref2)],
+      domProps: children ? {} : htmlOrText(props.footerHtml, props.footer)
+    }), children);
   }
 });
 
-var props$c = {
+var props$d = {
   src: {
     type: String,
     required: true
@@ -6429,7 +6874,7 @@ var props$c = {
 var BCardImg = /*#__PURE__*/Vue.extend({
   name: 'BCardImg',
   functional: true,
-  props: props$c,
+  props: props$d,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data;
@@ -6457,9 +6902,9 @@ var BCardImg = /*#__PURE__*/Vue.extend({
   }
 });
 
-var cardImgProps = copyProps(props$c, prefixPropName.bind(null, 'img'));
+var cardImgProps = copyProps(props$d, prefixPropName.bind(null, 'img'));
 cardImgProps.imgSrc.required = false;
-var props$d = _objectSpread2({}, props$9, {}, props$a, {}, props$b, {}, cardImgProps, {}, copyProps(cardMixin.props), {
+var props$e = _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$a), props$b), props$c), cardImgProps), copyProps(cardMixin.props)), {}, {
   align: {
     type: String // default: null
 
@@ -6473,7 +6918,7 @@ var props$d = _objectSpread2({}, props$9, {}, props$a, {}, props$b, {}, cardImgP
 var BCard = /*#__PURE__*/Vue.extend({
   name: 'BCard',
   functional: true,
-  props: props$d,
+  props: props$e,
   render: function render(h, _ref) {
     var _class;
 
@@ -6481,61 +6926,76 @@ var BCard = /*#__PURE__*/Vue.extend({
         data = _ref.data,
         slots = _ref.slots,
         scopedSlots = _ref.scopedSlots;
-    var $slots = slots(); // Vue < 2.6.x may return undefined for scopedSlots
-
-    var $scopedSlots = scopedSlots || {}; // Create placeholder elements for each section
-
-    var imgFirst = h();
-    var header = h();
-    var content = h();
-    var footer = h();
-    var imgLast = h();
+    var imgLeft = props.imgLeft,
+        imgRight = props.imgRight,
+        imgStart = props.imgStart,
+        imgEnd = props.imgEnd,
+        header = props.header,
+        headerHtml = props.headerHtml,
+        footer = props.footer,
+        footerHtml = props.footerHtml,
+        align = props.align,
+        textVariant = props.textVariant,
+        bgVariant = props.bgVariant,
+        borderVariant = props.borderVariant;
+    var $scopedSlots = scopedSlots || {};
+    var $slots = slots();
+    var slotScope = {};
+    var $imgFirst = h();
+    var $imgLast = h();
 
     if (props.imgSrc) {
-      var img = h(BCardImg, {
+      var $img = h(BCardImg, {
         props: pluckProps(cardImgProps, props, unprefixPropName.bind(null, 'img'))
       });
 
       if (props.imgBottom) {
-        imgLast = img;
+        $imgLast = $img;
       } else {
-        imgFirst = img;
+        $imgFirst = $img;
       }
     }
 
-    if (props.header || props.headerHtml || hasNormalizedSlot('header', $scopedSlots, $slots)) {
-      header = h(BCardHeader, {
-        props: pluckProps(props$a, props)
-      }, normalizeSlot('header', {}, $scopedSlots, $slots));
+    var $header = h();
+    var hasHeaderSlot = hasNormalizedSlot('header', $scopedSlots, $slots);
+
+    if (hasHeaderSlot || header || headerHtml) {
+      $header = h(BCardHeader, {
+        props: pluckProps(props$b, props),
+        domProps: hasHeaderSlot ? {} : htmlOrText(headerHtml, header)
+      }, normalizeSlot('header', slotScope, $scopedSlots, $slots));
     }
 
-    content = normalizeSlot('default', {}, $scopedSlots, $slots) || [];
+    var $content = normalizeSlot('default', slotScope, $scopedSlots, $slots); // Wrap content in <card-body> when `noBody` prop set
 
     if (!props.noBody) {
-      // Wrap content in card-body
-      content = [h(BCardBody, {
-        props: pluckProps(props$9, props)
-      }, _toConsumableArray(content))];
+      $content = h(BCardBody, {
+        props: pluckProps(props$a, props)
+      }, $content);
     }
 
-    if (props.footer || props.footerHtml || hasNormalizedSlot('footer', $scopedSlots, $slots)) {
-      footer = h(BCardFooter, {
-        props: pluckProps(props$b, props)
-      }, normalizeSlot('footer', {}, $scopedSlots, $slots));
+    var $footer = h();
+    var hasFooterSlot = hasNormalizedSlot('footer', $scopedSlots, $slots);
+
+    if (hasFooterSlot || footer || footerHtml) {
+      $footer = h(BCardFooter, {
+        props: pluckProps(props$c, props),
+        domProps: hasHeaderSlot ? {} : htmlOrText(footerHtml, footer)
+      }, normalizeSlot('footer', slotScope, $scopedSlots, $slots));
     }
 
     return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'card',
       class: (_class = {
-        'flex-row': props.imgLeft || props.imgStart,
-        'flex-row-reverse': (props.imgRight || props.imgEnd) && !(props.imgLeft || props.imgStart)
-      }, _defineProperty(_class, "text-".concat(props.align), props.align), _defineProperty(_class, "bg-".concat(props.bgVariant), props.bgVariant), _defineProperty(_class, "border-".concat(props.borderVariant), props.borderVariant), _defineProperty(_class, "text-".concat(props.textVariant), props.textVariant), _class)
-    }), [imgFirst, header].concat(_toConsumableArray(content), [footer, imgLast]));
+        'flex-row': imgLeft || imgStart,
+        'flex-row-reverse': (imgRight || imgEnd) && !(imgLeft || imgStart)
+      }, _defineProperty(_class, "text-".concat(align), align), _defineProperty(_class, "bg-".concat(bgVariant), bgVariant), _defineProperty(_class, "border-".concat(borderVariant), borderVariant), _defineProperty(_class, "text-".concat(textVariant), textVariant), _class)
+    }), [$imgFirst, $header, $content, $footer, $imgLast]);
   }
 });
 
 var OBSERVER_PROP_NAME = '__bv__visibility_observer';
-var onlyDgitsRE = /^\d+$/;
+var RX_ONLY_DIGITS = /^\d+$/;
 
 var VisibilityObserver = /*#__PURE__*/function () {
   function VisibilityObserver(el, options, vnode) {
@@ -6625,13 +7085,8 @@ var VisibilityObserver = /*#__PURE__*/function () {
   }, {
     key: "stop",
     value: function stop() {
-      var observer = this.observer;
       /* istanbul ignore next */
-
-      if (observer && observer.disconnect) {
-        observer.disconnect();
-      }
-
+      this.observer && this.observer.disconnect();
       this.observer = null;
     }
   }]);
@@ -6661,7 +7116,7 @@ var bind = function bind(el, _ref, vnode) {
 
   keys(modifiers).forEach(function (mod) {
     /* istanbul ignore else: Until <b-img-lazy> is switched to use this directive */
-    if (onlyDgitsRE.test(mod)) {
+    if (RX_ONLY_DIGITS.test(mod)) {
       options.margin = "".concat(mod, "px");
     } else if (mod.toLowerCase() === 'once') {
       options.once = true;
@@ -6709,10 +7164,10 @@ var VBVisible = {
   unbind: unbind
 };
 
-var NAME$a = 'BImg'; // Blank image with fill template
+var NAME$c = 'BImg'; // Blank image with fill template
 
 var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>';
-var props$e = {
+var props$f = {
   src: {
     type: String // default: null
 
@@ -6786,7 +7241,7 @@ var props$e = {
   blankColor: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$a, 'blankColor');
+      return getComponentConfig(NAME$c, 'blankColor');
     }
   }
 }; // --- Helper methods ---
@@ -6798,9 +7253,9 @@ var makeBlankImgSrc = function makeBlankImgSrc(width, height, color) {
 
 
 var BImg = /*#__PURE__*/Vue.extend({
-  name: NAME$a,
+  name: NAME$c,
   functional: true,
-  props: props$e,
+  props: props$f,
   render: function render(h, _ref) {
     var _class;
 
@@ -6861,8 +7316,8 @@ var BImg = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$b = 'BImgLazy';
-var props$f = {
+var NAME$d = 'BImgLazy';
+var props$g = {
   src: {
     type: String,
     required: true
@@ -6895,7 +7350,7 @@ var props$f = {
   blankColor: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$b, 'blankColor');
+      return getComponentConfig(NAME$d, 'blankColor');
     }
   },
   blankWidth: {
@@ -6951,11 +7406,11 @@ var props$f = {
 }; // @vue/component
 
 var BImgLazy = /*#__PURE__*/Vue.extend({
-  name: NAME$b,
+  name: NAME$d,
   directives: {
     bVisible: VBVisible
   },
-  props: props$f,
+  props: props$g,
   data: function data() {
     return {
       isShown: this.show
@@ -7064,8 +7519,8 @@ var BImgLazy = /*#__PURE__*/Vue.extend({
 
 // The `omit()` util creates a new object, so we can just pass the original props
 
-var lazyProps = omit(props$f, ['left', 'right', 'center', 'block', 'rounded', 'thumbnail', 'fluid', 'fluidGrow']);
-var props$g = _objectSpread2({}, lazyProps, {
+var lazyProps = omit(props$g, ['left', 'right', 'center', 'block', 'rounded', 'thumbnail', 'fluid', 'fluidGrow']);
+var props$h = _objectSpread2(_objectSpread2({}, lazyProps), {}, {
   top: {
     type: Boolean,
     default: false
@@ -7097,7 +7552,7 @@ var props$g = _objectSpread2({}, lazyProps, {
 var BCardImgLazy = /*#__PURE__*/Vue.extend({
   name: 'BCardImgLazy',
   functional: true,
-  props: props$g,
+  props: props$h,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data;
@@ -7114,7 +7569,7 @@ var BCardImgLazy = /*#__PURE__*/Vue.extend({
     } // False out the left/center/right props before passing to b-img-lazy
 
 
-    var lazyProps = _objectSpread2({}, props, {
+    var lazyProps = _objectSpread2(_objectSpread2({}, props), {}, {
       left: false,
       right: false,
       center: false
@@ -7127,7 +7582,7 @@ var BCardImgLazy = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$h = {
+var props$i = {
   textTag: {
     type: String,
     default: 'p'
@@ -7137,7 +7592,7 @@ var props$h = {
 var BCardText = /*#__PURE__*/Vue.extend({
   name: 'BCardText',
   functional: true,
-  props: props$h,
+  props: props$i,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -7148,7 +7603,7 @@ var BCardText = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$i = {
+var props$j = {
   tag: {
     type: String,
     default: 'div'
@@ -7166,7 +7621,7 @@ var props$i = {
 var BCardGroup = /*#__PURE__*/Vue.extend({
   name: 'BCardGroup',
   functional: true,
-  props: props$i,
+  props: props$j,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -7246,7 +7701,7 @@ var observeDom = function observeDom(el, callback, options)
         changed = true;
       }
     } // We only call the callback if a change that could affect
-    // layout/size truely happened
+    // layout/size truly happened
 
 
     if (changed) {
@@ -7309,7 +7764,7 @@ var eventOnOff = function eventOnOff(on) {
   method.apply(void 0, args);
 };
 
-var NAME$c = 'BCarousel'; // Slide directional classes
+var NAME$e = 'BCarousel'; // Slide directional classes
 
 var DIRECTION = {
   next: {
@@ -7355,7 +7810,7 @@ var getTransitionEndEvent = function getTransitionEndEvent(el) {
 
 
 var BCarousel = /*#__PURE__*/Vue.extend({
-  name: NAME$c,
+  name: NAME$e,
   mixins: [idMixin, normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -7370,25 +7825,25 @@ var BCarousel = /*#__PURE__*/Vue.extend({
     labelPrev: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'labelPrev');
+        return getComponentConfig(NAME$e, 'labelPrev');
       }
     },
     labelNext: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'labelNext');
+        return getComponentConfig(NAME$e, 'labelNext');
       }
     },
     labelGotoSlide: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'labelGotoSlide');
+        return getComponentConfig(NAME$e, 'labelGotoSlide');
       }
     },
     labelIndicators: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$c, 'labelIndicators');
+        return getComponentConfig(NAME$e, 'labelIndicators');
       }
     },
     interval: {
@@ -7502,9 +7957,10 @@ var BCarousel = /*#__PURE__*/Vue.extend({
   },
   created: function created() {
     // Create private non-reactive props
-    this._intervalId = null;
-    this._animationTimeout = null;
-    this._touchTimeout = null; // Set initial paused state
+    this.$_interval = null;
+    this.$_animationTimeout = null;
+    this.$_touchTimeout = null;
+    this.$_observer = null; // Set initial paused state
 
     this.isPaused = !(toInteger(this.interval, 0) > 0);
   },
@@ -7514,22 +7970,51 @@ var BCarousel = /*#__PURE__*/Vue.extend({
 
     this.updateSlides(); // Observe child changes so we can update slide list
 
-    observeDom(this.$refs.inner, this.updateSlides.bind(this), {
-      subtree: false,
-      childList: true,
-      attributes: true,
-      attributeFilter: ['id']
-    });
+    this.setObserver(true);
   },
   beforeDestroy: function beforeDestroy() {
-    clearTimeout(this._animationTimeout);
-    clearTimeout(this._touchTimeout);
-    clearInterval(this._intervalId);
-    this._intervalId = null;
-    this._animationTimeout = null;
-    this._touchTimeout = null;
+    this.clearInterval();
+    this.clearAnimationTimeout();
+    this.clearTouchTimeout();
+    this.setObserver(false);
   },
   methods: {
+    clearInterval: function (_clearInterval) {
+      function clearInterval() {
+        return _clearInterval.apply(this, arguments);
+      }
+
+      clearInterval.toString = function () {
+        return _clearInterval.toString();
+      };
+
+      return clearInterval;
+    }(function () {
+      clearInterval(this.$_interval);
+      this.$_interval = null;
+    }),
+    clearAnimationTimeout: function clearAnimationTimeout() {
+      clearTimeout(this.$_animationTimeout);
+      this.$_animationTimeout = null;
+    },
+    clearTouchTimeout: function clearTouchTimeout() {
+      clearTimeout(this.$_touchTimeout);
+      this.$_touchTimeout = null;
+    },
+    setObserver: function setObserver() {
+      var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      this.$_observer && this.$_observer.disconnect();
+      this.$_observer = null;
+
+      if (on) {
+        this.$_observer = observeDom(this.$refs.inner, this.updateSlides.bind(this), {
+          subtree: false,
+          childList: true,
+          attributes: true,
+          attributeFilter: ['id']
+        });
+      }
+    },
     // Set slide
     setSlide: function setSlide(slide) {
       var _this = this;
@@ -7546,7 +8031,7 @@ var BCarousel = /*#__PURE__*/Vue.extend({
       var noWrap = this.noWrap;
       var numSlides = this.numSlides; // Make sure we have an integer (you never know!)
 
-      slide = Math.floor(slide); // Don't do anything if nothing to slide to
+      slide = mathFloor(slide); // Don't do anything if nothing to slide to
 
       if (numSlides === 0) {
         return;
@@ -7585,10 +8070,7 @@ var BCarousel = /*#__PURE__*/Vue.extend({
         this.isPaused = true;
       }
 
-      if (this._intervalId) {
-        clearInterval(this._intervalId);
-        this._intervalId = null;
-      }
+      this.clearInterval();
     },
     // Start auto rotate slides
     start: function start(evt) {
@@ -7598,14 +8080,10 @@ var BCarousel = /*#__PURE__*/Vue.extend({
       /* istanbul ignore next: most likely will never happen, but just in case */
 
 
-      if (this._intervalId) {
-        clearInterval(this._intervalId);
-        this._intervalId = null;
-      } // Don't start if no interval, or less than 2 slides
-
+      this.clearInterval(); // Don't start if no interval, or less than 2 slides
 
       if (this.interval && this.numSlides > 1) {
-        this._intervalId = setInterval(this.next, Math.max(1000, this.interval));
+        this.$_interval = setInterval(this.next, mathMax(1000, this.interval));
       }
     },
     // Restart auto rotate slides when focus/hover leaves the carousel
@@ -7614,7 +8092,7 @@ var BCarousel = /*#__PURE__*/Vue.extend({
     restart: function restart()
     /* istanbul ignore next: difficult to test */
     {
-      if (!this.$el.contains(document.activeElement)) {
+      if (!this.$el.contains(getActiveElement())) {
         this.start();
       }
     },
@@ -7680,7 +8158,8 @@ var BCarousel = /*#__PURE__*/Vue.extend({
             });
           }
 
-          _this2._animationTimeout = null;
+          _this2.clearAnimationTimeout();
+
           removeClass(nextSlide, dirClass);
           removeClass(nextSlide, overlayClass);
           addClass(nextSlide, 'active');
@@ -7710,7 +8189,7 @@ var BCarousel = /*#__PURE__*/Vue.extend({
         } // Fallback to setTimeout()
 
 
-        this._animationTimeout = setTimeout(onceTransEnd, TRANS_DURATION);
+        this.$_animationTimeout = setTimeout(onceTransEnd, TRANS_DURATION);
       }
 
       if (isCycling) {
@@ -7724,7 +8203,7 @@ var BCarousel = /*#__PURE__*/Vue.extend({
       this.slides = selectAll('.carousel-item', this.$refs.inner);
       var numSlides = this.slides.length; // Keep slide number in range
 
-      var index = Math.max(0, Math.min(Math.floor(this.index), numSlides - 1));
+      var index = mathMax(0, mathMin(mathFloor(this.index), numSlides - 1));
       this.slides.forEach(function (slide, idx) {
         var n = idx + 1;
 
@@ -7768,7 +8247,7 @@ var BCarousel = /*#__PURE__*/Vue.extend({
     handleSwipe: function handleSwipe()
     /* istanbul ignore next: JSDOM doesn't support touch events */
     {
-      var absDeltaX = Math.abs(this.touchDeltaX);
+      var absDeltaX = mathAbs(this.touchDeltaX);
 
       if (absDeltaX <= SWIPE_THRESHOLD) {
         return;
@@ -7828,12 +8307,8 @@ var BCarousel = /*#__PURE__*/Vue.extend({
       // events to fire) we explicitly restart cycling
 
       this.pause(false);
-
-      if (this._touchTimeout) {
-        clearTimeout(this._touchTimeout);
-      }
-
-      this._touchTimeout = setTimeout(this.start, TOUCH_EVENT_COMPAT_WAIT + Math.max(1000, this.interval));
+      this.clearTouchTimeout();
+      this.$_touchTimeout = setTimeout(this.start, TOUCH_EVENT_COMPAT_WAIT + mathMax(1000, this.interval));
     }
   },
   render: function render(h) {
@@ -8012,7 +8487,7 @@ var BCarousel = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$j = {
+var imgProps = {
   imgSrc: {
     type: String // default: undefined
 
@@ -8036,7 +8511,9 @@ var props$j = {
   imgBlankColor: {
     type: String,
     default: 'transparent'
-  },
+  }
+};
+var props$k = _objectSpread2(_objectSpread2({}, imgProps), {}, {
   contentVisibleUp: {
     type: String
   },
@@ -8067,7 +8544,8 @@ var props$j = {
   background: {
     type: String
   }
-}; // @vue/component
+}); // --- Main component ---
+// @vue/component
 
 var BCarouselSlide = /*#__PURE__*/Vue.extend({
   name: 'BCarouselSlide',
@@ -8082,7 +8560,7 @@ var BCarouselSlide = /*#__PURE__*/Vue.extend({
       }
     }
   },
-  props: props$j,
+  props: props$k,
   computed: {
     contentClasses: function contentClasses() {
       return [this.contentVisibleUp ? 'd-none' : '', this.contentVisibleUp ? "d-".concat(this.contentVisibleUp, "-block") : ''];
@@ -8097,52 +8575,46 @@ var BCarouselSlide = /*#__PURE__*/Vue.extend({
     }
   },
   render: function render(h) {
-    var noDrag = !this.bvCarousel.noTouch && hasTouchSupport;
-    var img = this.normalizeSlot('img');
+    var $img = this.normalizeSlot('img');
 
-    if (!img && (this.imgSrc || this.imgBlank)) {
-      img = h(BImg, {
-        props: {
-          fluidGrow: true,
-          block: true,
-          src: this.imgSrc,
-          blank: this.imgBlank,
-          blankColor: this.imgBlankColor,
+    if (!$img && (this.imgSrc || this.imgBlank)) {
+      var on = {}; // Touch support event handler
+
+      /* istanbul ignore if: difficult to test in JSDOM */
+
+      if (!this.bvCarousel.noTouch && hasTouchSupport) {
+        on.dragstart = function (evt) {
+          evt.preventDefault();
+        };
+      }
+
+      $img = h(BImg, {
+        props: _objectSpread2(_objectSpread2({}, pluckProps(imgProps, this.$props, unprefixPropName.bind(null, 'img'))), {}, {
           width: this.computedWidth,
           height: this.computedHeight,
-          alt: this.imgAlt
-        },
-        // Touch support event handler
-        on: noDrag ?
-        /* istanbul ignore next */
-        {
-          dragstart
-          /* istanbul ignore next */
-          : function dragstart(e) {
-            /* istanbul ignore next: difficult to test in JSDOM */
-            e.preventDefault();
-          }
-        } : {}
+          fluidGrow: true,
+          block: true
+        }),
+        on: on
       });
     }
 
-    if (!img) {
-      img = h();
-    }
-
-    var content = h();
-    var contentChildren = [this.caption || this.captionHtml ? h(this.captionTag, {
+    var $contentChildren = [// Caption
+    this.caption || this.captionHtml ? h(this.captionTag, {
       domProps: htmlOrText(this.captionHtml, this.caption)
-    }) : false, this.text || this.textHtml ? h(this.textTag, {
+    }) : false, // Text
+    this.text || this.textHtml ? h(this.textTag, {
       domProps: htmlOrText(this.textHtml, this.text)
-    }) : false, this.normalizeSlot('default') || false];
+    }) : false, // Children
+    this.normalizeSlot('default') || false];
+    var $content = h();
 
-    if (contentChildren.some(Boolean)) {
-      content = h(this.contentTag, {
+    if ($contentChildren.some(Boolean)) {
+      $content = h(this.contentTag, {
         staticClass: 'carousel-caption',
         class: this.contentClasses
-      }, contentChildren.map(function (i) {
-        return i || h();
+      }, $contentChildren.map(function ($child) {
+        return $child || h();
       }));
     }
 
@@ -8155,7 +8627,7 @@ var BCarouselSlide = /*#__PURE__*/Vue.extend({
         id: this.safeId(),
         role: 'listitem'
       }
-    }, [img, content]);
+    }, [$img, $content]);
   }
 });
 
@@ -8171,7 +8643,7 @@ pluginFactory({
 // Generic collapse transion helper component
 
 var onEnter = function onEnter(el) {
-  el.style.height = 0; // Animaton frame delay neeeded for `appear` to work
+  el.style.height = 0; // Animaton frame delay needed for `appear` to work
 
   requestAF(function () {
     reflow(el);
@@ -8235,7 +8707,7 @@ var BVCollapse = /*#__PURE__*/Vue.extend({
       on: TRANSITION_HANDLERS
     }, {
       props: props
-    }), // Note: `<tranition>` supports a single root element only
+    }), // Note: `<transition>` supports a single root element only
     children);
   }
 });
@@ -8307,71 +8779,29 @@ var listenOnRootMixin = {
   }
 };
 
-var allListenTypes = {
-  hover: true,
-  click: true,
-  focus: true
-};
-var BVBoundListeners = '__BV_boundEventListeners__';
+var ENTER$1 = KEY_CODES.ENTER,
+    SPACE$1 = KEY_CODES.SPACE; // Classes to apply to trigger element
 
-var getTargets = function getTargets(binding) {
-  var targets = keys(binding.modifiers || {}).filter(function (t) {
-    return !allListenTypes[t];
-  });
+var CLASS_BV_TOGGLE_COLLAPSED = 'collapsed';
+var CLASS_BV_TOGGLE_NOT_COLLAPSED = 'not-collapsed'; // Property key for handler storage
 
-  if (binding.value) {
-    targets.push(binding.value);
-  }
+var BV_BASE = '__BV_toggle'; // Root event listener property (Function)
 
-  return targets;
-};
+var BV_TOGGLE_ROOT_HANDLER = "".concat(BV_BASE, "_HANDLER__"); // Trigger element click handler property (Function)
 
-var bindTargets = function bindTargets(vnode, binding, listenTypes, fn) {
-  var targets = getTargets(binding);
+var BV_TOGGLE_CLICK_HANDLER = "".concat(BV_BASE, "_CLICK__"); // Target visibility state property (Boolean)
 
-  var listener = function listener() {
-    fn({
-      targets: targets,
-      vnode: vnode
-    });
-  };
+var BV_TOGGLE_STATE = "".concat(BV_BASE, "_STATE__"); // Target ID list property (Array)
 
-  keys(allListenTypes).forEach(function (type) {
-    if (listenTypes[type] || binding.modifiers[type]) {
-      eventOn(vnode.elm, type, listener);
-      var boundListeners = vnode.elm[BVBoundListeners] || {};
-      boundListeners[type] = boundListeners[type] || [];
-      boundListeners[type].push(listener);
-      vnode.elm[BVBoundListeners] = boundListeners;
-    }
-  }); // Return the list of targets
+var BV_TOGGLE_TARGETS = "".concat(BV_BASE, "_TARGETS__"); // Commonly used strings
 
-  return targets;
-};
+var STRING_FALSE = 'false';
+var STRING_TRUE = 'true'; // Commonly used attribute names
 
-var unbindTargets = function unbindTargets(vnode, binding, listenTypes) {
-  keys(allListenTypes).forEach(function (type) {
-    if (listenTypes[type] || binding.modifiers[type]) {
-      var boundListeners = vnode.elm[BVBoundListeners] && vnode.elm[BVBoundListeners][type];
-
-      if (boundListeners) {
-        boundListeners.forEach(function (listener) {
-          return eventOff(vnode.elm, type, listener);
-        });
-        delete vnode.elm[BVBoundListeners][type];
-      }
-    }
-  });
-};
-
-var listenTypes = {
-  click: true
-}; // Property key for handler storage
-
-var BV_TOGGLE = '__BV_toggle__';
-var BV_TOGGLE_STATE = '__BV_toggle_STATE__';
-var BV_TOGGLE_CONTROLS = '__BV_toggle_CONTROLS__';
-var BV_TOGGLE_TARGETS = '__BV_toggle_TARGETS__'; // Emitted control event for collapse (emitted to collapse)
+var ATTR_ARIA_CONTROLS = 'aria-controls';
+var ATTR_ARIA_EXPANDED = 'aria-expanded';
+var ATTR_ROLE = 'role';
+var ATTR_TABINDEX = 'tabindex'; // Emitted control event for collapse (emitted to collapse)
 
 var EVENT_TOGGLE = 'bv::toggle::collapse'; // Listen to event for toggle state update (emitted by collapse)
 
@@ -8381,59 +8811,173 @@ var EVENT_STATE = 'bv::collapse::state'; // Private event emitted on `$root` to 
 
 var EVENT_STATE_SYNC = 'bv::collapse::sync::state'; // Private event we send to collapse to request state update sync event
 
-var EVENT_STATE_REQUEST = 'bv::request::collapse::state'; // Reset and remove a property from the provided element
+var EVENT_STATE_REQUEST = 'bv::request::collapse::state';
+var KEYDOWN_KEY_CODES = [ENTER$1, SPACE$1];
+var RX_HASH = /^#/;
+var RX_HASH_ID = /^#[A-Za-z]+[\w\-:.]*$/;
+var RX_SPLIT_SEPARATOR = /\s+/; // --- Helper methods ---
+
+var isNonStandardTag$1 = function isNonStandardTag(el) {
+  return !arrayIncludes(['button', 'a'], el.tagName.toLowerCase());
+};
+
+var getTargets = function getTargets(_ref, el) {
+  var modifiers = _ref.modifiers,
+      arg = _ref.arg,
+      value = _ref.value;
+  // Any modifiers are considered target IDs
+  var targets = keys(modifiers || {}); // If value is a string, split out individual targets (if space delimited)
+
+  value = isString(value) ? value.split(RX_SPLIT_SEPARATOR) : value; // Support target ID as link href (`href="#id"`)
+
+  if (isTag(el.tagName, 'a')) {
+    var href = getAttr(el, 'href') || '';
+
+    if (RX_HASH_ID.test(href)) {
+      targets.push(href.replace(RX_HASH, ''));
+    }
+  } // Add ID from `arg` (if provided), and support value
+  // as a single string ID or an array of string IDs
+  // If `value` is not an array or string, then it gets filtered out
+
+
+  concat(arg, value).forEach(function (t) {
+    return isString(t) && targets.push(t);
+  }); // Return only unique and truthy target IDs
+
+  return targets.filter(function (t, index, arr) {
+    return t && arr.indexOf(t) === index;
+  });
+};
+
+var removeClickListener = function removeClickListener(el) {
+  var handler = el[BV_TOGGLE_CLICK_HANDLER];
+
+  if (handler) {
+    eventOff(el, 'click', handler);
+    eventOff(el, 'keydown', handler);
+  }
+
+  el[BV_TOGGLE_CLICK_HANDLER] = null;
+};
+
+var addClickListener = function addClickListener(el, vnode) {
+  removeClickListener(el);
+
+  if (vnode.context) {
+    var handler = function handler(evt) {
+      if (!(evt.type === 'keydown' && !arrayIncludes(KEYDOWN_KEY_CODES, evt.keyCode)) && !isDisabled(el)) {
+        var targets = el[BV_TOGGLE_TARGETS] || [];
+        targets.forEach(function (target) {
+          vnode.context.$root.$emit(EVENT_TOGGLE, target);
+        });
+      }
+    };
+
+    el[BV_TOGGLE_CLICK_HANDLER] = handler;
+    eventOn(el, 'click', handler);
+
+    if (isNonStandardTag$1(el)) {
+      eventOn(el, 'keydown', handler);
+    }
+  }
+};
+
+var removeRootListeners = function removeRootListeners(el, vnode) {
+  if (el[BV_TOGGLE_ROOT_HANDLER] && vnode.context) {
+    vnode.context.$root.$off([EVENT_STATE, EVENT_STATE_SYNC], el[BV_TOGGLE_ROOT_HANDLER]);
+  }
+
+  el[BV_TOGGLE_ROOT_HANDLER] = null;
+};
+
+var addRootListeners = function addRootListeners(el, vnode) {
+  removeRootListeners(el, vnode);
+
+  if (vnode.context) {
+    var handler = function handler(id, state) {
+      // `state` will be `true` if target is expanded
+      if (arrayIncludes(el[BV_TOGGLE_TARGETS] || [], id)) {
+        // Set/Clear 'collapsed' visibility class state
+        el[BV_TOGGLE_STATE] = state; // Set `aria-expanded` and class state on trigger element
+
+        setToggleState(el, state);
+      }
+    };
+
+    el[BV_TOGGLE_ROOT_HANDLER] = handler; // Listen for toggle state changes (public) and sync (private)
+
+    vnode.context.$root.$on([EVENT_STATE, EVENT_STATE_SYNC], handler);
+  }
+};
+
+var setToggleState = function setToggleState(el, state) {
+  // State refers to the visibility of the collapse/sidebar
+  if (state) {
+    removeClass(el, CLASS_BV_TOGGLE_COLLAPSED);
+    addClass(el, CLASS_BV_TOGGLE_NOT_COLLAPSED);
+    setAttr(el, ATTR_ARIA_EXPANDED, STRING_TRUE);
+  } else {
+    removeClass(el, CLASS_BV_TOGGLE_NOT_COLLAPSED);
+    addClass(el, CLASS_BV_TOGGLE_COLLAPSED);
+    setAttr(el, ATTR_ARIA_EXPANDED, STRING_FALSE);
+  }
+}; // Reset and remove a property from the provided element
+
 
 var resetProp = function resetProp(el, prop) {
   el[prop] = null;
   delete el[prop];
-}; // Handle targets update
-
-
-var handleTargets = function handleTargets(_ref) {
-  var targets = _ref.targets,
-      vnode = _ref.vnode;
-  targets.forEach(function (target) {
-    vnode.context.$root.$emit(EVENT_TOGGLE, target);
-  });
 }; // Handle directive updates
-
-/* istanbul ignore next: not easy to test */
 
 
 var handleUpdate = function handleUpdate(el, binding, vnode) {
-  if (!isBrowser) {
+  /* istanbul ignore next: should never happen */
+  if (!isBrowser || !vnode.context) {
     return;
-  }
+  } // If element is not a button or link, we add `role="button"`
+  // and `tabindex="0"` for accessibility reasons
 
-  if (!looseEqual(getTargets(binding), el[BV_TOGGLE_TARGETS])) {
-    // Targets have changed, so update accordingly
-    unbindTargets(vnode, binding, listenTypes);
-    var targets = bindTargets(vnode, binding, listenTypes, handleTargets); // Update targets array to element
 
-    el[BV_TOGGLE_TARGETS] = targets; // Add aria attributes to element
+  if (isNonStandardTag$1(el)) {
+    if (!hasAttr(el, ATTR_ROLE)) {
+      setAttr(el, ATTR_ROLE, 'button');
+    }
 
-    el[BV_TOGGLE_CONTROLS] = targets.join(' '); // ensure aria-controls is up to date
+    if (!hasAttr(el, ATTR_TABINDEX)) {
+      setAttr(el, ATTR_TABINDEX, '0');
+    }
+  } // Ensure the collapse class and `aria-*` attributes persist
+  // after element is updated (either by parent re-rendering
+  // or changes to this element or its contents)
 
-    setAttr(el, 'aria-controls', el[BV_TOGGLE_CONTROLS]); // Request a state update from targets so that we can ensure
-    // expanded state is correct
+
+  setToggleState(el, el[BV_TOGGLE_STATE]); // Parse list of target IDs
+
+  var targets = getTargets(binding, el);
+  /* istanbul ignore else */
+  // Ensure the `aria-controls` hasn't been overwritten
+  // or removed when vnode updates
+
+  if (targets.length) {
+    setAttr(el, ATTR_ARIA_CONTROLS, targets.join(' '));
+  } else {
+    removeAttr(el, ATTR_ARIA_CONTROLS);
+  } // Add/Update our click listener(s)
+
+
+  addClickListener(el, vnode); // If targets array has changed, update
+
+  if (!looseEqual(targets, el[BV_TOGGLE_TARGETS])) {
+    // Update targets array to element storage
+    el[BV_TOGGLE_TARGETS] = targets; // Ensure `aria-controls` is up to date
+    // Request a state update from targets so that we can
+    // ensure expanded state is correct (in most cases)
 
     targets.forEach(function (target) {
       vnode.context.$root.$emit(EVENT_STATE_REQUEST, target);
     });
-  } // Ensure the collapse class and aria-* attributes persist
-  // after element is updated (either by parent re-rendering
-  // or changes to this element or its contents
-
-
-  if (el[BV_TOGGLE_STATE] === true) {
-    addClass(el, 'collapsed');
-    setAttr(el, 'aria-expanded', 'true');
-  } else if (el[BV_TOGGLE_STATE] === false) {
-    removeClass(el, 'collapsed');
-    setAttr(el, 'aria-expanded', 'false');
   }
-
-  setAttr(el, 'aria-controls', el[BV_TOGGLE_CONTROLS]);
 };
 /*
  * Export our directive
@@ -8442,70 +8986,32 @@ var handleUpdate = function handleUpdate(el, binding, vnode) {
 
 var VBToggle = {
   bind: function bind(el, binding, vnode) {
-    var targets = bindTargets(vnode, binding, listenTypes, handleTargets);
+    // State is initially collapsed until we receive a state event
+    el[BV_TOGGLE_STATE] = false; // Assume no targets initially
 
-    if (isBrowser && vnode.context && targets.length > 0) {
-      // Add targets array to element
-      el[BV_TOGGLE_TARGETS] = targets; // Add aria attributes to element
+    el[BV_TOGGLE_TARGETS] = []; // Add our root listeners
 
-      el[BV_TOGGLE_CONTROLS] = targets.join(' '); // State is initially collapsed until we receive a state event
+    addRootListeners(el, vnode); // Initial update of trigger
 
-      el[BV_TOGGLE_STATE] = false;
-      setAttr(el, 'aria-controls', el[BV_TOGGLE_CONTROLS]);
-      setAttr(el, 'aria-expanded', 'false'); // If element is not a button, we add `role="button"` for accessibility
-
-      if (el.tagName !== 'BUTTON' && !hasAttr(el, 'role')) {
-        setAttr(el, 'role', 'button');
-      } // Toggle state handler
-
-
-      var toggleDirectiveHandler = function toggleDirectiveHandler(id, state) {
-        var targets = el[BV_TOGGLE_TARGETS] || [];
-
-        if (targets.indexOf(id) !== -1) {
-          // Set aria-expanded state
-          setAttr(el, 'aria-expanded', state ? 'true' : 'false'); // Set/Clear 'collapsed' class state
-
-          el[BV_TOGGLE_STATE] = state;
-
-          if (state) {
-            removeClass(el, 'collapsed');
-          } else {
-            addClass(el, 'collapsed');
-          }
-        }
-      }; // Store the toggle handler on the element
-
-
-      el[BV_TOGGLE] = toggleDirectiveHandler; // Listen for toggle state changes (public)
-
-      vnode.context.$root.$on(EVENT_STATE, el[BV_TOGGLE]); // Listen for toggle state sync (private)
-
-      vnode.context.$root.$on(EVENT_STATE_SYNC, el[BV_TOGGLE]);
-    }
+    handleUpdate(el, binding, vnode);
   },
   componentUpdated: handleUpdate,
   updated: handleUpdate,
-  unbind: function unbind(el, binding, vnode)
-  /* istanbul ignore next */
-  {
-    unbindTargets(vnode, binding, listenTypes); // Remove our $root listener
+  unbind: function unbind(el, binding, vnode) {
+    removeClickListener(el); // Remove our $root listener
 
-    if (el[BV_TOGGLE]) {
-      vnode.context.$root.$off(EVENT_STATE, el[BV_TOGGLE]);
-      vnode.context.$root.$off(EVENT_STATE_SYNC, el[BV_TOGGLE]);
-    } // Reset custom  props
+    removeRootListeners(el, vnode); // Reset custom props
 
-
-    resetProp(el, BV_TOGGLE);
+    resetProp(el, BV_TOGGLE_ROOT_HANDLER);
+    resetProp(el, BV_TOGGLE_CLICK_HANDLER);
     resetProp(el, BV_TOGGLE_STATE);
-    resetProp(el, BV_TOGGLE_CONTROLS);
     resetProp(el, BV_TOGGLE_TARGETS); // Reset classes/attrs
 
-    removeClass(el, 'collapsed');
-    removeAttr(el, 'aria-expanded');
-    removeAttr(el, 'aria-controls');
-    removeAttr(el, 'role');
+    removeClass(el, CLASS_BV_TOGGLE_COLLAPSED);
+    removeClass(el, CLASS_BV_TOGGLE_NOT_COLLAPSED);
+    removeAttr(el, ATTR_ARIA_EXPANDED);
+    removeAttr(el, ATTR_ARIA_CONTROLS);
+    removeAttr(el, ATTR_ROLE);
   }
 };
 
@@ -8770,12 +9276,18 @@ var BCollapse = /*#__PURE__*/Vue.extend({
   }
 });
 
+var VBTogglePlugin = /*#__PURE__*/pluginFactory({
+  directives: {
+    VBToggle: VBToggle
+  }
+});
+
 var CollapsePlugin = /*#__PURE__*/pluginFactory({
   components: {
     BCollapse: BCollapse
   },
-  directives: {
-    VBToggle: VBToggle
+  plugins: {
+    VBTogglePlugin: VBTogglePlugin
   }
 });
 
@@ -9102,7 +9614,7 @@ var dropdownMixin = {
     }
   },
   created: function created() {
-    // Create non-reactive property
+    // Create private non-reactive props
     this.$_popper = null;
   },
 
@@ -9173,19 +9685,16 @@ var dropdownMixin = {
       this.destroyPopper();
       this.$_popper = new Popper(element, this.$refs.menu, this.getPopperConfig());
     },
+    // Ensure popper event listeners are removed cleanly
     destroyPopper: function destroyPopper() {
-      // Ensure popper event listeners are removed cleanly
-      if (this.$_popper) {
-        this.$_popper.destroy();
-      }
-
+      this.$_popper && this.$_popper.destroy();
       this.$_popper = null;
     },
+    // Instructs popper to re-computes the dropdown position
+    // useful if the content changes size
     updatePopper: function updatePopper()
     /* istanbul ignore next: not easy to test */
     {
-      // Instructs popper to re-computes the dropdown position
-      // usefull if the content changes size
       try {
         this.$_popper.scheduleUpdate();
       } catch (_unused) {}
@@ -9221,7 +9730,7 @@ var dropdownMixin = {
         };
       }
 
-      return _objectSpread2({}, popperConfig, {}, this.popperOpts || {});
+      return _objectSpread2(_objectSpread2({}, popperConfig), this.popperOpts || {});
     },
     // Turn listeners on/off while open
     whileOpenListen: function whileOpenListen(isOpen) {
@@ -9403,40 +9912,32 @@ var dropdownMixin = {
         _this3.focusItem(index, items);
       });
     },
-    focusItem: function focusItem(idx, items) {
+    focusItem: function focusItem(index, items) {
       var el = items.find(function (el, i) {
-        return i === idx;
+        return i === index;
       });
-
-      if (el && el.focus) {
-        el.focus();
-      }
+      attemptFocus(el);
     },
     getItems: function getItems() {
       // Get all items
       return filterVisibles(selectAll(Selector.ITEM_SELECTOR, this.$refs.menu));
     },
     focusMenu: function focusMenu() {
-      try {
-        this.$refs.menu.focus();
-      } catch (_unused2) {}
+      attemptFocus(this.$refs.menu);
     },
     focusToggler: function focusToggler() {
       var _this4 = this;
 
       this.$nextTick(function () {
-        var toggler = _this4.toggler;
-
-        if (toggler && toggler.focus) {
-          toggler.focus();
-        }
+        attemptFocus(_this4.toggler);
       });
     }
   }
 };
 
-var NAME$d = 'BDropdown';
-var props$k = {
+var NAME$f = 'BDropdown'; // --- Props ---
+
+var props$l = {
   text: {
     // Button label
     type: String,
@@ -9447,16 +9948,16 @@ var props$k = {
     type: String // default: undefined
 
   },
-  size: {
-    type: String,
-    default: function _default() {
-      return getComponentConfig(NAME$d, 'size');
-    }
-  },
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$d, 'variant');
+      return getComponentConfig(NAME$f, 'variant');
+    }
+  },
+  size: {
+    type: String,
+    default: function _default() {
+      return getComponentConfig(NAME$f, 'size');
     }
   },
   block: {
@@ -9475,7 +9976,7 @@ var props$k = {
     // This really should be toggleLabel
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$d, 'toggleText');
+      return getComponentConfig(NAME$f, 'toggleText');
     }
   },
   toggleClass: {
@@ -9501,7 +10002,7 @@ var props$k = {
   splitVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$d, 'splitVariant');
+      return getComponentConfig(NAME$f, 'splitVariant');
     }
   },
   splitClass: {
@@ -9524,27 +10025,31 @@ var props$k = {
     type: String,
     default: 'menu'
   }
-}; // @vue/component
+}; // --- Main component ---
+// @vue/component
 
 var BDropdown = /*#__PURE__*/Vue.extend({
-  name: NAME$d,
+  name: NAME$f,
   mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
-  props: props$k,
+  props: props$l,
   computed: {
     dropdownClasses: function dropdownClasses() {
+      var block = this.block,
+          split = this.split,
+          boundary = this.boundary;
       return [this.directionClass, {
         show: this.visible,
         // The 'btn-group' class is required in `split` mode for button alignment
         // It needs also to be applied when `block` is disabled to allow multiple
         // dropdowns to be aligned one line
-        'btn-group': this.split || !this.block,
+        'btn-group': split || !block,
         // When `block` is enabled and we are in `split` mode the 'd-flex' class
         // needs to be applied to allow the buttons to stretch to full width
-        'd-flex': this.block && this.split,
+        'd-flex': block && split,
         // Position `static` is needed to allow menu to "breakout" of the `scrollParent`
         // boundaries when boundary is anything other than `scrollParent`
         // See: https://github.com/twbs/bootstrap/issues/24251#issuecomment-341413786
-        'position-static': this.boundary !== 'scrollParent' || !this.boundary
+        'position-static': boundary !== 'scrollParent' || !boundary
       }];
     },
     menuClasses: function menuClasses() {
@@ -9554,83 +10059,99 @@ var BDropdown = /*#__PURE__*/Vue.extend({
       }];
     },
     toggleClasses: function toggleClasses() {
+      var split = this.split;
       return [this.toggleClass, {
-        'dropdown-toggle-split': this.split,
-        'dropdown-toggle-no-caret': this.noCaret && !this.split
+        'dropdown-toggle-split': split,
+        'dropdown-toggle-no-caret': this.noCaret && !split
       }];
     }
   },
   render: function render(h) {
-    var split = h();
-    var buttonContent = this.normalizeSlot('button-content') || this.html || stripTags(this.text);
+    var variant = this.variant,
+        size = this.size,
+        block = this.block,
+        disabled = this.disabled,
+        split = this.split,
+        role = this.role;
+    var commonProps = {
+      variant: variant,
+      size: size,
+      block: block,
+      disabled: disabled
+    };
+    var $buttonContent = this.normalizeSlot('button-content');
+    var buttonContentProps = this.hasNormalizedSlot('button-content') ? {} : htmlOrText(this.html, this.text);
+    var $split = h();
 
-    if (this.split) {
-      var btnProps = {
-        variant: this.splitVariant || this.variant,
-        size: this.size,
-        block: this.block,
-        disabled: this.disabled
-      }; // We add these as needed due to router-link issues with defined property with undefined/null values
+    if (split) {
+      var splitTo = this.splitTo,
+          splitHref = this.splitHref,
+          splitButtonType = this.splitButtonType;
 
-      if (this.splitTo) {
-        btnProps.to = this.splitTo;
-      } else if (this.splitHref) {
-        btnProps.href = this.splitHref;
-      } else if (this.splitButtonType) {
-        btnProps.type = this.splitButtonType;
+      var btnProps = _objectSpread2(_objectSpread2({}, commonProps), {}, {
+        variant: this.splitVariant || this.variant
+      }); // We add these as needed due to <router-link> issues with
+      // defined property with `undefined`/`null` values
+
+
+      if (splitTo) {
+        btnProps.to = splitTo;
+      } else if (splitHref) {
+        btnProps.href = splitHref;
+      } else if (splitButtonType) {
+        btnProps.type = splitButtonType;
       }
 
-      split = h(BButton, {
-        ref: 'button',
-        props: btnProps,
+      $split = h(BButton, {
         class: this.splitClass,
         attrs: {
           id: this.safeId('_BV_button_')
         },
+        props: btnProps,
+        domProps: buttonContentProps,
         on: {
           click: this.onSplitClick
-        }
-      }, [buttonContent]);
+        },
+        ref: 'button'
+      }, [$buttonContent]);
     }
 
-    var toggle = h(BButton, {
-      ref: 'toggle',
+    var $toggle = h(BButton, {
       staticClass: 'dropdown-toggle',
       class: this.toggleClasses,
-      props: {
-        tag: this.toggleTag,
-        variant: this.variant,
-        size: this.size,
-        block: this.block && !this.split,
-        disabled: this.disabled
-      },
       attrs: {
         id: this.safeId('_BV_toggle_'),
         'aria-haspopup': 'true',
         'aria-expanded': this.visible ? 'true' : 'false'
       },
+      props: _objectSpread2(_objectSpread2({}, commonProps), {}, {
+        tag: this.toggleTag,
+        block: block && !split
+      }),
+      domProps: split ? {} : buttonContentProps,
       on: {
         mousedown: this.onMousedown,
         click: this.toggle,
         keydown: this.toggle // Handle ENTER, SPACE and DOWN
 
-      }
-    }, [this.split ? h('span', {
+      },
+      ref: 'toggle'
+    }, [split ? h('span', {
       class: ['sr-only']
-    }, [this.toggleText]) : buttonContent]);
-    var menu = h('ul', {
-      ref: 'menu',
+    }, [this.toggleText]) : $buttonContent]);
+    var $menu = h('ul', {
       staticClass: 'dropdown-menu',
       class: this.menuClasses,
       attrs: {
-        role: this.role,
+        role: role,
         tabindex: '-1',
-        'aria-labelledby': this.safeId(this.split ? '_BV_button_' : '_BV_toggle_')
+        'aria-labelledby': this.safeId(split ? '_BV_button_' : '_BV_toggle_')
       },
       on: {
         keydown: this.onKeydown // Handle UP, DOWN and ESC
 
-      }
+      },
+      ref: 'menu'
     }, !this.lazy || this.visible ? this.normalizeSlot('default', {
       hide: this.hide
     }) : [h()]);
@@ -9640,22 +10161,22 @@ var BDropdown = /*#__PURE__*/Vue.extend({
       attrs: {
         id: this.safeId()
       }
-    }, [split, toggle, menu]);
+    }, [$split, $toggle, $menu]);
   }
 });
 
-var props$l = propsFactory(); // @vue/component
+var props$m = omit(props$1, ['event', 'routerTag']); // @vue/component
 
 var BDropdownItem = /*#__PURE__*/Vue.extend({
   name: 'BDropdownItem',
-  mixins: [normalizeSlotMixin],
+  mixins: [attrsMixin, normalizeSlotMixin],
   inheritAttrs: false,
   inject: {
     bvDropdown: {
       default: null
     }
   },
-  props: _objectSpread2({}, props$l, {
+  props: _objectSpread2(_objectSpread2({}, props$m), {}, {
     linkClass: {
       type: [String, Array, Object],
       default: null
@@ -9665,6 +10186,13 @@ var BDropdownItem = /*#__PURE__*/Vue.extend({
       default: null
     }
   }),
+  computed: {
+    computedAttrs: function computedAttrs() {
+      return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        role: 'menuitem'
+      });
+    }
+  },
   methods: {
     closeDropdown: function closeDropdown() {
       var _this = this;
@@ -9690,9 +10218,7 @@ var BDropdownItem = /*#__PURE__*/Vue.extend({
       props: this.$props,
       staticClass: 'dropdown-item',
       class: [this.linkClass, _defineProperty({}, "text-".concat(this.variant), this.variant && !(this.active || this.disabled))],
-      attrs: _objectSpread2({}, this.$attrs, {
-        role: 'menuitem'
-      }),
+      attrs: this.computedAttrs,
       on: {
         click: this.onClick
       },
@@ -9701,7 +10227,7 @@ var BDropdownItem = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$m = {
+var props$n = {
   active: {
     type: Boolean,
     default: false
@@ -9726,14 +10252,23 @@ var props$m = {
 
 var BDropdownItemButton = /*#__PURE__*/Vue.extend({
   name: 'BDropdownItemButton',
-  mixins: [normalizeSlotMixin],
+  mixins: [attrsMixin, normalizeSlotMixin],
   inheritAttrs: false,
   inject: {
     bvDropdown: {
       default: null
     }
   },
-  props: props$m,
+  props: props$n,
+  computed: {
+    computedAttrs: function computedAttrs() {
+      return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        role: 'menuitem',
+        type: 'button',
+        disabled: this.disabled
+      });
+    }
+  },
   methods: {
     closeDropdown: function closeDropdown() {
       if (this.bvDropdown) {
@@ -9755,11 +10290,7 @@ var BDropdownItemButton = /*#__PURE__*/Vue.extend({
     }, [h('button', {
       staticClass: 'dropdown-item',
       class: [this.buttonClass, (_ref = {}, _defineProperty(_ref, this.activeClass, this.active), _defineProperty(_ref, "text-".concat(this.variant), this.variant && !(this.active || this.disabled)), _ref)],
-      attrs: _objectSpread2({}, this.$attrs, {
-        role: 'menuitem',
-        type: 'button',
-        disabled: this.disabled
-      }),
+      attrs: this.computedAttrs,
       on: {
         click: this.onClick
       },
@@ -9768,7 +10299,7 @@ var BDropdownItemButton = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$n = {
+var props$o = {
   id: {
     type: String // default: null
 
@@ -9786,7 +10317,7 @@ var props$n = {
 var BDropdownHeader = /*#__PURE__*/Vue.extend({
   name: 'BDropdownHeader',
   functional: true,
-  props: props$n,
+  props: props$o,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -9800,7 +10331,7 @@ var BDropdownHeader = /*#__PURE__*/Vue.extend({
     }), [h(props.tag, {
       staticClass: 'dropdown-header',
       class: _defineProperty({}, "text-".concat(props.variant), props.variant),
-      attrs: _objectSpread2({}, $attrs, {
+      attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
         id: props.id || null,
         role: 'heading'
       }),
@@ -9809,7 +10340,7 @@ var BDropdownHeader = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$o = {
+var props$p = {
   tag: {
     type: String,
     default: 'hr'
@@ -9819,7 +10350,7 @@ var props$o = {
 var BDropdownDivider = /*#__PURE__*/Vue.extend({
   name: 'BDropdownDivider',
   functional: true,
-  props: props$o,
+  props: props$p,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data;
@@ -9831,7 +10362,7 @@ var BDropdownDivider = /*#__PURE__*/Vue.extend({
       }
     }), [h(props.tag, {
       staticClass: 'dropdown-divider',
-      attrs: _objectSpread2({}, $attrs, {
+      attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
         role: 'separator',
         'aria-orientation': 'horizontal'
       }),
@@ -9840,7 +10371,7 @@ var BDropdownDivider = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$p = {
+var props$q = {
   id: {
     type: String // default: null
 
@@ -9862,7 +10393,7 @@ var props$p = {
 var BForm = /*#__PURE__*/Vue.extend({
   name: 'BForm',
   functional: true,
-  props: props$p,
+  props: props$q,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -9883,7 +10414,7 @@ var BForm = /*#__PURE__*/Vue.extend({
 var BDropdownForm = /*#__PURE__*/Vue.extend({
   name: 'BDropdownForm',
   functional: true,
-  props: _objectSpread2({}, props$p, {
+  props: _objectSpread2(_objectSpread2({}, props$q), {}, {
     disabled: {
       type: Boolean,
       default: false
@@ -9912,7 +10443,7 @@ var BDropdownForm = /*#__PURE__*/Vue.extend({
         disabled: props.disabled
       }],
       props: props,
-      attrs: _objectSpread2({}, $attrs, {
+      attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
         disabled: props.disabled,
         // Tab index of -1 for keyboard navigation
         tabindex: props.disabled ? null : '-1'
@@ -9955,7 +10486,7 @@ var BDropdownText = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$q = {
+var props$r = {
   id: {
     type: String // default: null
 
@@ -9985,7 +10516,7 @@ var props$q = {
 var BDropdownGroup = /*#__PURE__*/Vue.extend({
   name: 'BDropdownGroup',
   functional: true,
-  props: props$q,
+  props: props$r,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -10017,7 +10548,7 @@ var BDropdownGroup = /*#__PURE__*/Vue.extend({
       }
     }), [header || h(), h('ul', {
       staticClass: 'list-unstyled',
-      attrs: _objectSpread2({}, $attrs, {
+      attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
         id: props.id || null,
         role: 'group',
         'aria-describedby': adb || null
@@ -10049,7 +10580,7 @@ var DropdownPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var props$r = {
+var props$s = {
   type: {
     type: String,
     default: 'iframe',
@@ -10070,7 +10601,7 @@ var props$r = {
 var BEmbed = /*#__PURE__*/Vue.extend({
   name: 'BEmbed',
   functional: true,
-  props: props$r,
+  props: props$s,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -10121,27 +10652,7 @@ var formOptionsMixin = {
   },
   computed: {
     formOptions: function formOptions() {
-      var _this = this;
-
-      var options = this.options; // Normalize the given options array
-
-      if (isArray(options)) {
-        return options.map(function (option) {
-          return _this.normalizeOption(option);
-        });
-      } else if (isPlainObject(options)) {
-        // Deprecate the object options format
-        warn(OPTIONS_OBJECT_DEPRECATED_MSG, this.$options.name); // Normalize a `options` object to an array of options
-
-        return keys(options).map(function (key) {
-          return _this.normalizeOption(options[key] || {}, key);
-        });
-      } // If not an array or object, return an empty array
-
-      /* istanbul ignore next */
-
-
-      return [];
+      return this.normalizeOptions(this.options);
     }
   },
   methods: {
@@ -10166,6 +10677,28 @@ var formOptionsMixin = {
         text: stripTags(String(option)),
         disabled: false
       };
+    },
+    normalizeOptions: function normalizeOptions(options) {
+      var _this = this;
+
+      // Normalize the given options array
+      if (isArray(options)) {
+        return options.map(function (option) {
+          return _this.normalizeOption(option);
+        });
+      } else if (isPlainObject(options)) {
+        // Deprecate the object options format
+        warn(OPTIONS_OBJECT_DEPRECATED_MSG, this.$options.name); // Normalize a `options` object to an array of options
+
+        return keys(options).map(function (key) {
+          return _this.normalizeOption(options[key] || {}, key);
+        });
+      } // If not an array or object, return an empty array
+
+      /* istanbul ignore next */
+
+
+      return [];
     }
   }
 };
@@ -10180,27 +10713,30 @@ var BFormDatalist = /*#__PURE__*/Vue.extend({
     }
   },
   render: function render(h) {
-    var options = this.formOptions.map(function (option, index) {
+    var $options = this.formOptions.map(function (option, index) {
+      var value = option.value,
+          text = option.text,
+          html = option.html,
+          disabled = option.disabled;
       return h('option', {
-        key: "option_".concat(index, "_opt"),
         attrs: {
-          disabled: option.disabled
+          value: value,
+          disabled: disabled
         },
-        domProps: _objectSpread2({}, htmlOrText(option.html, option.text), {
-          value: option.value
-        })
+        domProps: htmlOrText(html, text),
+        key: "option_".concat(index)
       });
     });
     return h('datalist', {
       attrs: {
         id: this.id
       }
-    }, [options, this.normalizeSlot('default')]);
+    }, [$options, this.normalizeSlot('default')]);
   }
 });
 
-var NAME$e = 'BFormText';
-var props$s = {
+var NAME$g = 'BFormText';
+var props$t = {
   id: {
     type: String // default: null
 
@@ -10212,7 +10748,7 @@ var props$s = {
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$e, 'textVariant');
+      return getComponentConfig(NAME$g, 'textVariant');
     }
   },
   inline: {
@@ -10222,9 +10758,9 @@ var props$s = {
 }; // @vue/component
 
 var BFormText = /*#__PURE__*/Vue.extend({
-  name: NAME$e,
+  name: NAME$g,
   functional: true,
-  props: props$s,
+  props: props$t,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -10240,7 +10776,7 @@ var BFormText = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$t = {
+var props$u = {
   id: {
     type: String // default: null
 
@@ -10275,7 +10811,7 @@ var props$t = {
 var BFormInvalidFeedback = /*#__PURE__*/Vue.extend({
   name: 'BFormInvalidFeedback',
   functional: true,
-  props: props$t,
+  props: props$u,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -10297,7 +10833,7 @@ var BFormInvalidFeedback = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$u = {
+var props$v = {
   id: {
     type: String // default: null
 
@@ -10332,7 +10868,7 @@ var props$u = {
 var BFormValidFeedback = /*#__PURE__*/Vue.extend({
   name: 'BFormValidFeedback',
   functional: true,
-  props: props$u,
+  props: props$v,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -10354,7 +10890,7 @@ var BFormValidFeedback = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$v = {
+var props$w = {
   tag: {
     type: String,
     default: 'div'
@@ -10364,7 +10900,7 @@ var props$v = {
 var BFormRow = /*#__PURE__*/Vue.extend({
   name: 'BFormRow',
   functional: true,
-  props: props$v,
+  props: props$w,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -10449,7 +10985,7 @@ var formMixin = {
               el = select(SELECTOR, el);
             }
 
-            el && el.focus && el.focus();
+            attemptFocus(el);
           }
         });
       });
@@ -10458,7 +10994,7 @@ var formMixin = {
 };
 
 var formRadioCheckMixin = {
-  mixins: [normalizeSlotMixin],
+  mixins: [attrsMixin, normalizeSlotMixin],
   inheritAttrs: false,
   model: {
     prop: 'checked',
@@ -10581,6 +11117,20 @@ var formRadioCheckMixin = {
 
       // Same for radio & check
       return ['btn', "btn-".concat(this.getButtonVariant), (_ref = {}, _defineProperty(_ref, "btn-".concat(this.getSize), this.getSize), _defineProperty(_ref, "disabled", this.isDisabled), _defineProperty(_ref, "active", this.isChecked), _defineProperty(_ref, "focus", this.hasFocus), _ref)];
+    },
+    computedAttrs: function computedAttrs() {
+      return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        id: this.safeId(),
+        type: this.isRadio ? 'radio' : 'checkbox',
+        name: this.getName,
+        form: this.getForm,
+        disabled: this.isDisabled,
+        required: this.isRequired,
+        autocomplete: 'off',
+        'aria-required': this.isRequired || null,
+        'aria-label': this.ariaLabel || null,
+        'aria-labelledby': this.ariaLabelledby || null
+      });
     }
   },
   watch: {
@@ -10602,13 +11152,13 @@ var formRadioCheckMixin = {
     },
     // Convenience methods for focusing the input
     focus: function focus() {
-      if (!this.isDisabled && this.$refs.input && this.$refs.input.focus) {
-        this.$refs.input.focus();
+      if (!this.isDisabled) {
+        attemptFocus(this.$refs.input);
       }
     },
     blur: function blur() {
-      if (!this.isDisabled && this.$refs.input && this.$refs.input.blur) {
-        this.$refs.input.blur();
+      if (!this.isDisabled) {
+        attemptBlur(this.$refs.input);
       }
     }
   },
@@ -10642,18 +11192,7 @@ var formRadioCheckMixin = {
         value: this.computedLocalChecked,
         expression: 'computedLocalChecked'
       }],
-      attrs: _objectSpread2({}, this.$attrs, {
-        id: this.safeId(),
-        type: this.isRadio ? 'radio' : 'checkbox',
-        name: this.getName,
-        form: this.getForm,
-        disabled: this.isDisabled,
-        required: this.isRequired,
-        autocomplete: 'off',
-        'aria-required': this.isRequired || null,
-        'aria-label': this.ariaLabel || null,
-        'aria-labelledby': this.ariaLabelledby || null
-      }),
+      attrs: this.computedAttrs,
       domProps: {
         value: this.value,
         checked: this.isChecked
@@ -10999,12 +11538,11 @@ var formRadioCheckGroupMixin = {
   render: function render(h) {
     var _this = this;
 
-    var inputs = this.formOptions.map(function (option, idx) {
-      var uid = "_BV_option_".concat(idx, "_");
+    var $inputs = this.formOptions.map(function (option, index) {
+      var key = "BV_option_".concat(index);
       return h(_this.isRadioGroup ? BFormRadio : BFormCheckbox, {
-        key: uid,
         props: {
-          id: _this.safeId(uid),
+          id: _this.safeId(key),
           value: option.value,
           // Individual radios or checks can be disabled in a group
           disabled: option.disabled || false // We don't need to include these, since the input's will know they are inside here
@@ -11012,7 +11550,8 @@ var formRadioCheckGroupMixin = {
           // form: this.form || null,
           // required: Boolean(this.name && this.required)
 
-        }
+        },
+        key: key
       }, [h('span', {
         domProps: htmlOrText(option.html, option.text)
       })]);
@@ -11022,17 +11561,16 @@ var formRadioCheckGroupMixin = {
       attrs: {
         id: this.safeId(),
         role: this.isRadioGroup ? 'radiogroup' : 'group',
-        // Tabindex to allow group to be focused
-        // if needed by screen readers
+        // Add `tabindex="-1"` to allow group to be focused if needed by screen readers
         tabindex: '-1',
         'aria-required': this.required ? 'true' : null,
         'aria-invalid': this.computedAriaInvalid
       }
-    }, [this.normalizeSlot('first'), inputs, this.normalizeSlot('default')]);
+    }, [this.normalizeSlot('first'), $inputs, this.normalizeSlot('default')]);
   }
 };
 
-var props$w = {
+var props$x = {
   switches: {
     // Custom switch styling
     type: Boolean,
@@ -11053,7 +11591,7 @@ var BFormCheckboxGroup = /*#__PURE__*/Vue.extend({
       bvCheckGroup: this
     };
   },
-  props: props$w,
+  props: props$x,
   data: function data() {
     return {
       localChecked: this.checked || []
@@ -11244,16 +11782,12 @@ var BVFormBtnLabelControl = /*#__PURE__*/Vue.extend({
   methods: {
     focus: function focus() {
       if (!this.disabled) {
-        try {
-          this.$refs.toggle.focus();
-        } catch (_unused) {}
+        attemptFocus(this.$refs.toggle);
       }
     },
     blur: function blur() {
       if (!this.disabled) {
-        try {
-          this.$refs.toggle.blur();
-        } catch (_unused2) {}
+        attemptBlur(this.$refs.toggle);
       }
     },
     setFocus: function setFocus(evt) {
@@ -11393,10 +11927,9 @@ var BVFormBtnLabelControl = /*#__PURE__*/Vue.extend({
     }, labelSelected) : '']); // Return the custom form control wrapper
 
     return h('div', {
-      staticClass: 'dropdown',
+      staticClass: 'b-form-btn-label-control dropdown',
       class: [this.directionClass, (_ref = {
         'btn-group': buttonOnly,
-        'b-form-btn-label-control': !buttonOnly,
         'form-control': !buttonOnly
       }, _defineProperty(_ref, "form-control-".concat(size), !!size && !buttonOnly), _defineProperty(_ref, 'd-flex', !buttonOnly), _defineProperty(_ref, 'h-auto', !buttonOnly), _defineProperty(_ref, 'align-items-stretch', !buttonOnly), _defineProperty(_ref, "focus", hasFocus && !buttonOnly), _defineProperty(_ref, "show", visible), _defineProperty(_ref, 'is-valid', state === true), _defineProperty(_ref, 'is-invalid', state === false), _ref)],
       attrs: {
@@ -11414,10 +11947,10 @@ var BVFormBtnLabelControl = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$f = 'BFormDatepicker'; // Fallback to BCalendar prop if no value found
+var NAME$h = 'BFormDatepicker'; // Fallback to BCalendar prop if no value found
 
 var getConfigFallback = function getConfigFallback(prop) {
-  return getComponentConfig(NAME$f, prop) || getComponentConfig('BCalendar', prop);
+  return getComponentConfig(NAME$h, prop) || getComponentConfig('BCalendar', prop);
 }; // We create our props as a mixin so that we can control
 // where they appear in the props listing reference section
 
@@ -11554,7 +12087,7 @@ var propsMixin = {
     labelTodayButton: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'labelTodayButton');
+        return getComponentConfig(NAME$h, 'labelTodayButton');
       }
     },
     todayButtonVariant: {
@@ -11568,7 +12101,7 @@ var propsMixin = {
     labelResetButton: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'labelResetButton');
+        return getComponentConfig(NAME$h, 'labelResetButton');
       }
     },
     resetButtonVariant: {
@@ -11582,7 +12115,7 @@ var propsMixin = {
     labelCloseButton: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$f, 'labelCloseButton');
+        return getComponentConfig(NAME$h, 'labelCloseButton');
       }
     },
     closeButtonVariant: {
@@ -11715,7 +12248,7 @@ var propsMixin = {
 // @vue/component
 
 var BFormDatepicker = /*#__PURE__*/Vue.extend({
-  name: NAME$f,
+  name: NAME$h,
   // The mixins order determines the order of appearance in the props reference section
   mixins: [idMixin, propsMixin],
   model: {
@@ -11815,16 +12348,12 @@ var BFormDatepicker = /*#__PURE__*/Vue.extend({
     // Public methods
     focus: function focus() {
       if (!this.disabled) {
-        try {
-          this.$refs.control.focus();
-        } catch (_unused2) {}
+        attemptFocus(this.$refs.control);
       }
     },
     blur: function blur() {
       if (!this.disabled) {
-        try {
-          this.$refs.control.blur();
-        } catch (_unused3) {}
+        attemptBlur(this.$refs.control);
       }
     },
     // Private methods
@@ -11883,9 +12412,7 @@ var BFormDatepicker = /*#__PURE__*/Vue.extend({
       var _this3 = this;
 
       this.$nextTick(function () {
-        try {
-          _this3.$refs.calendar.focus();
-        } catch (_unused4) {}
+        attemptFocus(_this3.$refs.calendar);
 
         _this3.$emit('shown');
       });
@@ -11978,7 +12505,7 @@ var BFormDatepicker = /*#__PURE__*/Vue.extend({
     var $calendar = h(BCalendar, {
       key: 'calendar',
       ref: 'calendar',
-      staticClass: 'b-form-date-calendar',
+      staticClass: 'b-form-date-calendar w-100',
       props: this.calendarProps,
       on: {
         selected: this.onSelected,
@@ -11990,7 +12517,7 @@ var BFormDatepicker = /*#__PURE__*/Vue.extend({
     return h(BVFormBtnLabelControl, {
       ref: 'control',
       staticClass: 'b-form-datepicker',
-      props: _objectSpread2({}, this.$props, {
+      props: _objectSpread2(_objectSpread2({}, this.$props), {}, {
         // Overridden / computed props
         id: this.safeId(),
         rtl: this.isRTL,
@@ -12037,7 +12564,7 @@ var formCustomMixin = {
   }
 };
 
-var NAME$g = 'BFormFile';
+var NAME$i = 'BFormFile';
 var VALUE_EMPTY_DEPRECATED_MSG = 'Setting "value"/"v-model" to an empty string for reset is deprecated. Set to "null" instead.'; // --- Helper methods ---
 
 var isValidValue = function isValidValue(value) {
@@ -12048,8 +12575,8 @@ var isValidValue = function isValidValue(value) {
 
 
 var BFormFile = /*#__PURE__*/Vue.extend({
-  name: NAME$g,
-  mixins: [idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
+  name: NAME$i,
+  mixins: [attrsMixin, idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
   inheritAttrs: false,
   model: {
     prop: 'value',
@@ -12068,7 +12595,7 @@ var BFormFile = /*#__PURE__*/Vue.extend({
       validator: function validator(value) {
         /* istanbul ignore next */
         if (value === '') {
-          warn(VALUE_EMPTY_DEPRECATED_MSG, NAME$g);
+          warn(VALUE_EMPTY_DEPRECATED_MSG, NAME$i);
           return true;
         }
 
@@ -12087,19 +12614,19 @@ var BFormFile = /*#__PURE__*/Vue.extend({
     placeholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$g, 'placeholder');
+        return getComponentConfig(NAME$i, 'placeholder');
       }
     },
     browseText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$g, 'browseText');
+        return getComponentConfig(NAME$i, 'browseText');
       }
     },
     dropPlaceholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$g, 'dropPlaceholder');
+        return getComponentConfig(NAME$i, 'dropPlaceholder');
       }
     },
     multiple: {
@@ -12159,6 +12686,21 @@ var BFormFile = /*#__PURE__*/Vue.extend({
           return file.name;
         }).join(', ');
       }
+    },
+    computedAttrs: function computedAttrs() {
+      return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        type: 'file',
+        id: this.safeId(),
+        name: this.name,
+        disabled: this.disabled,
+        required: this.required,
+        form: this.form || null,
+        capture: this.capture || null,
+        accept: this.accept || null,
+        multiple: this.multiple,
+        webkitdirectory: this.directory,
+        'aria-required': this.required ? 'true' : null
+      });
     }
   },
   watch: {
@@ -12343,19 +12885,7 @@ var BFormFile = /*#__PURE__*/Vue.extend({
         'custom-file-input': this.custom,
         focus: this.custom && this.hasFocus
       }, this.stateClass],
-      attrs: _objectSpread2({}, this.$attrs, {
-        type: 'file',
-        id: this.safeId(),
-        name: this.name,
-        disabled: this.disabled,
-        required: this.required,
-        form: this.form || null,
-        capture: this.capture || null,
-        accept: this.accept || null,
-        multiple: this.multiple,
-        webkitdirectory: this.directory,
-        'aria-required': this.required ? 'true' : null
-      }),
+      attrs: this.computedAttrs,
       on: {
         change: this.onFileChange,
         focusin: this.focusHandler,
@@ -12399,18 +12929,6 @@ var FormFilePlugin = /*#__PURE__*/pluginFactory({
     BFile: BFormFile
   }
 });
-
-/**
- * Suffix can be a falsey value so nothing is appended to string.
- * (helps when looping over props & some shouldn't change)
- * Use data last parameters to allow for currying.
- * @param {string} suffix
- * @param {string} str
- */
-
-var suffixPropName = function suffixPropName(suffix, str) {
-  return str + (suffix ? upperFirst(suffix) : '');
-};
 
 var RX_COL_CLASS = /^col-/; // Generates a prop object with a type of `[Boolean, String, Number]`
 
@@ -12490,7 +13008,7 @@ var generateProps = function generateProps() {
     order: keys(breakpointOrder)
   }); // Return the generated props
 
-  return _objectSpread2({
+  return _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({
     // Generic flexbox .col (xs)
     col: {
       type: Boolean,
@@ -12498,11 +13016,11 @@ var generateProps = function generateProps() {
     },
     // .col-[1-12]|auto  (xs)
     cols: strNum()
-  }, breakpointCol, {
+  }, breakpointCol), {}, {
     offset: strNum()
-  }, breakpointOffset, {
+  }, breakpointOffset), {}, {
     order: strNum()
-  }, breakpointOrder, {
+  }, breakpointOrder), {}, {
     // Flex alignment
     alignSelf: {
       type: String,
@@ -12571,7 +13089,7 @@ var BCol = {
 
 // Component name
 
-var NAME$h = 'BFormGroup'; // Selector for finding first input in the form-group
+var NAME$j = 'BFormGroup'; // Selector for finding first input in the form-group
 
 var SELECTOR$1 = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])'; // --- Render methods ---
 
@@ -12722,7 +13240,7 @@ var generateProps$1 = function generateProps() {
     };
     return props;
   }, create(null));
-  return _objectSpread2({
+  return _objectSpread2(_objectSpread2(_objectSpread2({
     label: {
       type: String // default: null
 
@@ -12739,7 +13257,7 @@ var generateProps$1 = function generateProps() {
       type: Boolean,
       default: false
     }
-  }, bpLabelColProps, {}, bpLabelAlignProps, {
+  }, bpLabelColProps), bpLabelAlignProps), {}, {
     labelClass: {
       type: [String, Array, Object] // default: null
 
@@ -12780,7 +13298,7 @@ var generateProps$1 = function generateProps() {
 
 
 var BFormGroup = {
-  name: NAME$h,
+  name: NAME$j,
   mixins: [idMixin, formStateMixin, normalizeSlotMixin],
 
   get props() {
@@ -12905,13 +13423,10 @@ var BFormGroup = {
         return;
       }
 
-      var inputs = selectAll(SELECTOR$1, this.$refs.content).filter(isVisible);
+      var inputs = selectAll(SELECTOR$1, this.$refs.content).filter(isVisible); // If only a single input, focus it, emulating label behaviour
 
-      if (inputs && inputs.length === 1 && inputs[0].focus) {
-        // if only a single input, focus it, emulating label behaviour
-        try {
-          inputs[0].focus();
-        } catch (_unused) {}
+      if (inputs && inputs.length === 1) {
+        attemptFocus(inputs[0]);
       }
     },
     setInputDescribedBy: function setInputDescribedBy(add, remove) {
@@ -12932,7 +13447,7 @@ var BFormGroup = {
             return !arrayIncludes(remove, id);
           }).concat(add).filter(Boolean);
           ids = keys(ids.reduce(function (memo, id) {
-            return _objectSpread2({}, memo, _defineProperty({}, id, true));
+            return _objectSpread2(_objectSpread2({}, memo), {}, _defineProperty({}, id, true));
           }, {})).join(' ').trim();
 
           if (ids) {
@@ -12992,6 +13507,79 @@ var FormGroupPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
+// @vue/component
+var formSelectionMixin = {
+  computed: {
+    selectionStart: {
+      // Expose selectionStart for formatters, etc
+      cache: false,
+
+      /* istanbul ignore next */
+      get: function get() {
+        return this.$refs.input.selectionStart;
+      },
+
+      /* istanbul ignore next */
+      set: function set(val) {
+        this.$refs.input.selectionStart = val;
+      }
+    },
+    selectionEnd: {
+      // Expose selectionEnd for formatters, etc
+      cache: false,
+
+      /* istanbul ignore next */
+      get: function get() {
+        return this.$refs.input.selectionEnd;
+      },
+
+      /* istanbul ignore next */
+      set: function set(val) {
+        this.$refs.input.selectionEnd = val;
+      }
+    },
+    selectionDirection: {
+      // Expose selectionDirection for formatters, etc
+      cache: false,
+
+      /* istanbul ignore next */
+      get: function get() {
+        return this.$refs.input.selectionDirection;
+      },
+
+      /* istanbul ignore next */
+      set: function set(val) {
+        this.$refs.input.selectionDirection = val;
+      }
+    }
+  },
+  methods: {
+    /* istanbul ignore next */
+    select: function select() {
+      var _this$$refs$input;
+
+      // For external handler that may want a select() method
+      (_this$$refs$input = this.$refs.input).select.apply(_this$$refs$input, arguments);
+    },
+
+    /* istanbul ignore next */
+    setSelectionRange: function setSelectionRange() {
+      var _this$$refs$input2;
+
+      // For external handler that may want a setSelectionRange(a,b,c) method
+      (_this$$refs$input2 = this.$refs.input).setSelectionRange.apply(_this$$refs$input2, arguments);
+    },
+
+    /* istanbul ignore next */
+    setRangeText: function setRangeText() {
+      var _this$$refs$input3;
+
+      // For external handler that may want a setRangeText(a,b,c) method
+      (_this$$refs$input3 = this.$refs.input).setRangeText.apply(_this$$refs$input3, arguments);
+    }
+  }
+};
+
 var formTextMixin = {
   model: {
     prop: 'value',
@@ -13044,7 +13632,7 @@ var formTextMixin = {
       default: false
     },
     debounce: {
-      // Debounce timout (in ms). Not applicable with `lazy` prop
+      // Debounce timeout (in ms). Not applicable with `lazy` prop
       type: [Number, String],
       default: 0
     }
@@ -13083,7 +13671,7 @@ var formTextMixin = {
     },
     computedDebounce: function computedDebounce() {
       // Ensure we have a positive number equal to or greater than 0
-      return Math.max(toInteger(this.debounce, 0), 0);
+      return mathMax(toInteger(this.debounce, 0), 0);
     },
     hasFormatter: function hasFormatter() {
       return isFunction(this.formatter);
@@ -13102,9 +13690,12 @@ var formTextMixin = {
       }
     }
   },
-  mounted: function mounted() {
-    // Create non-reactive property and set up destroy handler
+  created: function created() {
+    // Create private non-reactive props
     this.$_inputDebounceTimer = null;
+  },
+  mounted: function mounted() {
+    // Set up destroy handler
     this.$on('hook:beforeDestroy', this.clearDebounce); // Preset the internal state
 
     var value = this.value;
@@ -13253,87 +13844,14 @@ var formTextMixin = {
     focus: function focus() {
       // For external handler that may want a focus method
       if (!this.disabled) {
-        this.$el.focus();
+        attemptFocus(this.$el);
       }
     },
     blur: function blur() {
       // For external handler that may want a blur method
       if (!this.disabled) {
-        this.$el.blur();
+        attemptBlur(this.$el);
       }
-    }
-  }
-};
-
-// @vue/component
-var formSelectionMixin = {
-  computed: {
-    selectionStart: {
-      // Expose selectionStart for formatters, etc
-      cache: false,
-
-      /* istanbul ignore next */
-      get: function get() {
-        return this.$refs.input.selectionStart;
-      },
-
-      /* istanbul ignore next */
-      set: function set(val) {
-        this.$refs.input.selectionStart = val;
-      }
-    },
-    selectionEnd: {
-      // Expose selectionEnd for formatters, etc
-      cache: false,
-
-      /* istanbul ignore next */
-      get: function get() {
-        return this.$refs.input.selectionEnd;
-      },
-
-      /* istanbul ignore next */
-      set: function set(val) {
-        this.$refs.input.selectionEnd = val;
-      }
-    },
-    selectionDirection: {
-      // Expose selectionDirection for formatters, etc
-      cache: false,
-
-      /* istanbul ignore next */
-      get: function get() {
-        return this.$refs.input.selectionDirection;
-      },
-
-      /* istanbul ignore next */
-      set: function set(val) {
-        this.$refs.input.selectionDirection = val;
-      }
-    }
-  },
-  methods: {
-    /* istanbul ignore next */
-    select: function select() {
-      var _this$$refs$input;
-
-      // For external handler that may want a select() method
-      (_this$$refs$input = this.$refs.input).select.apply(_this$$refs$input, arguments);
-    },
-
-    /* istanbul ignore next */
-    setSelectionRange: function setSelectionRange() {
-      var _this$$refs$input2;
-
-      // For external handler that may want a setSelectionRange(a,b,c) method
-      (_this$$refs$input2 = this.$refs.input).setSelectionRange.apply(_this$$refs$input2, arguments);
-    },
-
-    /* istanbul ignore next */
-    setRangeText: function setRangeText() {
-      var _this$$refs$input3;
-
-      // For external handler that may want a setRangeText(a,b,c) method
-      (_this$$refs$input3 = this.$refs.input).setRangeText.apply(_this$$refs$input3, arguments);
     }
   }
 };
@@ -13400,10 +13918,10 @@ var TYPES = ['text', 'password', 'email', 'number', 'url', 'tel', 'search', 'ran
 
 var BFormInput = /*#__PURE__*/Vue.extend({
   name: 'BFormInput',
-  mixins: [idMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
+  // Mixin order is important!
+  mixins: [listenersMixin, idMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
   props: {
-    // value prop defined in form-text mixin
-    // value: { },
+    // `value` prop is defined in form-text mixin
     type: {
       type: String,
       default: 'text',
@@ -13412,7 +13930,8 @@ var BFormInput = /*#__PURE__*/Vue.extend({
       }
     },
     noWheel: {
-      // Disable mousewheel to prevent wheel from changing values (i.e. number/date).
+      // Disable mousewheel to prevent wheel from
+      // changing values (i.e. number/date)
       type: Boolean,
       default: false
     },
@@ -13437,6 +13956,39 @@ var BFormInput = /*#__PURE__*/Vue.extend({
     localType: function localType() {
       // We only allow certain types
       return arrayIncludes(TYPES, this.type) ? this.type : 'text';
+    },
+    computedAttrs: function computedAttrs() {
+      var type = this.localType,
+          disabled = this.disabled,
+          placeholder = this.placeholder,
+          required = this.required,
+          min = this.min,
+          max = this.max,
+          step = this.step;
+      return {
+        id: this.safeId(),
+        name: this.name || null,
+        form: this.form || null,
+        type: type,
+        disabled: disabled,
+        placeholder: placeholder,
+        required: required,
+        autocomplete: this.autocomplete || null,
+        readonly: this.readonly || this.plaintext,
+        min: min,
+        max: max,
+        step: step,
+        list: type !== 'password' ? this.list : null,
+        'aria-required': required ? 'true' : null,
+        'aria-invalid': this.computedAriaInvalid
+      };
+    },
+    computedListeners: function computedListeners() {
+      return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+        input: this.onInput,
+        change: this.onChange,
+        blur: this.onBlur
+      });
     }
   },
   watch: {
@@ -13486,45 +14038,18 @@ var BFormInput = /*#__PURE__*/Vue.extend({
     },
     stopWheel: function stopWheel(evt) {
       evt.preventDefault();
-      this.$el.blur();
+      attemptBlur(this.$el);
     }
   },
   render: function render(h) {
-    var self = this;
     return h('input', {
       ref: 'input',
-      class: self.computedClass,
-      directives: [{
-        name: 'model',
-        rawName: 'v-model',
-        value: self.localValue,
-        expression: 'localValue'
-      }],
-      attrs: {
-        id: self.safeId(),
-        name: self.name,
-        form: self.form || null,
-        type: self.localType,
-        disabled: self.disabled,
-        placeholder: self.placeholder,
-        required: self.required,
-        autocomplete: self.autocomplete || null,
-        readonly: self.readonly || self.plaintext,
-        min: self.min,
-        max: self.max,
-        step: self.step,
-        list: self.localType !== 'password' ? self.list : null,
-        'aria-required': self.required ? 'true' : null,
-        'aria-invalid': self.computedAriaInvalid
-      },
+      class: this.computedClass,
+      attrs: this.computedAttrs,
       domProps: {
-        value: self.localValue
+        value: this.localValue
       },
-      on: _objectSpread2({}, self.$listeners, {
-        input: self.onInput,
-        change: self.onChange,
-        blur: self.onBlur
-      })
+      on: this.computedListeners
     });
   }
 });
@@ -13536,7 +14061,7 @@ var FormInputPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var props$x = {
+var props$y = {
   checked: {
     // type: [String, Number, Boolean, Object],
     default: null
@@ -13552,7 +14077,7 @@ var BFormRadioGroup = /*#__PURE__*/Vue.extend({
       bvRadioGroup: this
     };
   },
-  props: props$x,
+  props: props$y,
   data: function data() {
     return {
       localChecked: this.checked
@@ -13574,7 +14099,7 @@ var FormRadioPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$i = 'BFormRating';
+var NAME$k = 'BFormRating';
 var MIN_STARS = 3;
 var DEFAULT_STARS = 5;
 var LEFT$1 = KEY_CODES.LEFT,
@@ -13663,17 +14188,17 @@ var BVFormRatingStar = Vue.extend({
 }); // --- Utility methods ---
 
 var computeStars = function computeStars(stars) {
-  return Math.max(MIN_STARS, toInteger(stars, DEFAULT_STARS));
+  return mathMax(MIN_STARS, toInteger(stars, DEFAULT_STARS));
 };
 
 var clampValue = function clampValue(value, min, max) {
-  return Math.max(Math.min(value, max), min);
+  return mathMax(mathMin(value, max), min);
 }; // --- BFormRating ---
 // @vue/component
 
 
 var BFormRating = /*#__PURE__*/Vue.extend({
-  name: NAME$i,
+  name: NAME$k,
   components: {
     BIconStar: BIconStar,
     BIconStarHalf: BIconStarHalf,
@@ -13700,17 +14225,21 @@ var BFormRating = /*#__PURE__*/Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$i, 'variant');
+        return getComponentConfig(NAME$k, 'variant');
       }
     },
     color: {
       // CSS color string (overrides variant)
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$i, 'color');
+        return getComponentConfig(NAME$k, 'color');
       }
     },
     showValue: {
+      type: Boolean,
+      default: false
+    },
+    showValueMax: {
       type: Boolean,
       default: false
     },
@@ -13803,13 +14332,18 @@ var BFormRating = /*#__PURE__*/Vue.extend({
       return isLocaleRTL(this.computedLocale);
     },
     formattedRating: function formattedRating() {
-      var value = this.localValue;
       var precision = toInteger(this.precision);
-      return isNull(value) ? '' : value.toLocaleString(this.computedLocale, {
+      var showValueMax = this.showValueMax;
+      var locale = this.computedLocale;
+      var formatOptions = {
         notation: 'standard',
         minimumFractionDigits: isNaN(precision) ? 0 : precision,
         maximumFractionDigits: isNaN(precision) ? 3 : precision
-      });
+      };
+      var stars = this.computedStars.toLocaleString(locale);
+      var value = this.localValue;
+      value = isNull(value) ? showValueMax ? '-' : '' : value.toLocaleString(locale, formatOptions);
+      return showValueMax ? "".concat(value, "/").concat(stars) : value;
     }
   },
   watch: {
@@ -13835,16 +14369,12 @@ var BFormRating = /*#__PURE__*/Vue.extend({
     // --- Public methods ---
     focus: function focus() {
       if (!this.disabled) {
-        try {
-          this.$el.focus();
-        } catch (_unused) {}
+        attemptFocus(this.$el);
       }
     },
     blur: function blur() {
       if (!this.disabled) {
-        try {
-          this.$el.blur();
-        } catch (_unused2) {}
+        attemptBlur(this.$el);
       }
     },
     // --- Private methods ---
@@ -14050,12 +14580,12 @@ var optionsMixin = {
       if (isPlainObject(option)) {
         var value = get(option, this.valueField);
         var text = get(option, this.textField);
-        var options = get(option, this.optionsField); // When it has options, create an `<optgroup>` object
+        var options = get(option, this.optionsField, null); // When it has options, create an `<optgroup>` object
 
-        if (isArray(options)) {
+        if (!isNull(options)) {
           return {
             label: String(get(option, this.labelField) || text),
-            options: options
+            options: this.normalizeOptions(options)
           };
         } // Otherwise create an `<option>` object
 
@@ -14078,8 +14608,8 @@ var optionsMixin = {
   }
 };
 
-var NAME$j = 'BFormSelectOption';
-var props$y = {
+var NAME$l = 'BFormSelectOption';
+var props$z = {
   value: {
     // type: [String, Number, Boolean, Object],
     required: true
@@ -14091,9 +14621,9 @@ var props$y = {
 }; // @vue/component
 
 var BFormSelectOption = /*#__PURE__*/Vue.extend({
-  name: NAME$j,
+  name: NAME$l,
   functional: true,
-  props: props$y,
+  props: props$z,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -14121,20 +14651,25 @@ var BFormSelectOptionGroup = /*#__PURE__*/Vue.extend({
     }
   },
   render: function render(h) {
+    var $options = this.formOptions.map(function (option, index) {
+      var value = option.value,
+          text = option.text,
+          html = option.html,
+          disabled = option.disabled;
+      return h(BFormSelectOption, {
+        attrs: {
+          value: value,
+          disabled: disabled
+        },
+        domProps: htmlOrText(html, text),
+        key: "option_".concat(index)
+      });
+    });
     return h('optgroup', {
       attrs: {
         label: this.label
       }
-    }, [this.normalizeSlot('first'), this.formOptions.map(function (option, index) {
-      return h(BFormSelectOption, {
-        props: {
-          value: option.value,
-          disabled: option.disabled
-        },
-        domProps: htmlOrText(option.html, option.text),
-        key: "option_".concat(index, "_opt")
-      });
-    }), this.normalizeSlot('default')]);
+    }, [this.normalizeSlot('first'), $options, this.normalizeSlot('default')]);
   }
 });
 
@@ -14196,68 +14731,75 @@ var BFormSelect = /*#__PURE__*/Vue.extend({
   },
   methods: {
     focus: function focus() {
-      this.$refs.input.focus();
+      attemptFocus(this.$refs.input);
     },
     blur: function blur() {
-      this.$refs.input.blur();
+      attemptBlur(this.$refs.input);
+    },
+    onChange: function onChange(evt) {
+      var _this = this;
+
+      var target = evt.target;
+      var selectedVal = from(target.options).filter(function (o) {
+        return o.selected;
+      }).map(function (o) {
+        return '_value' in o ? o._value : o.value;
+      });
+      this.localValue = target.multiple ? selectedVal : selectedVal[0];
+      this.$nextTick(function () {
+        _this.$emit('change', _this.localValue);
+      });
     }
   },
   render: function render(h) {
-    var _this = this;
-
-    return h('select', {
-      ref: 'input',
-      class: this.inputClass,
-      directives: [{
-        name: 'model',
-        rawName: 'v-model',
-        value: this.localValue,
-        expression: 'localValue'
-      }],
-      attrs: {
-        id: this.safeId(),
-        name: this.name,
-        form: this.form || null,
-        multiple: this.multiple || null,
-        size: this.computedSelectSize,
-        disabled: this.disabled,
-        required: this.required,
-        'aria-required': this.required ? 'true' : null,
-        'aria-invalid': this.computedAriaInvalid
-      },
-      on: {
-        change: function change(evt) {
-          var target = evt.target;
-          var selectedVal = from(target.options).filter(function (o) {
-            return o.selected;
-          }).map(function (o) {
-            return '_value' in o ? o._value : o.value;
-          });
-          _this.localValue = target.multiple ? selectedVal : selectedVal[0];
-
-          _this.$nextTick(function () {
-            _this.$emit('change', _this.localValue);
-          });
-        }
-      }
-    }, [this.normalizeSlot('first'), this.formOptions.map(function (option, index) {
-      var key = "option_".concat(index, "_opt");
-      var options = option.options;
+    var name = this.name,
+        disabled = this.disabled,
+        required = this.required,
+        size = this.computedSelectSize,
+        value = this.localValue;
+    var $options = this.formOptions.map(function (option, index) {
+      var value = option.value,
+          label = option.label,
+          options = option.options,
+          disabled = option.disabled;
+      var key = "option_".concat(index);
       return isArray(options) ? h(BFormSelectOptionGroup, {
         props: {
-          label: option.label,
+          label: label,
           options: options
         },
         key: key
       }) : h(BFormSelectOption, {
         props: {
-          value: option.value,
-          disabled: option.disabled
+          value: value,
+          disabled: disabled
         },
         domProps: htmlOrText(option.html, option.text),
         key: key
       });
-    }), this.normalizeSlot('default')]);
+    });
+    return h('select', {
+      class: this.inputClass,
+      attrs: {
+        id: this.safeId(),
+        name: name,
+        form: this.form || null,
+        multiple: this.multiple || null,
+        size: size,
+        disabled: disabled,
+        required: required,
+        'aria-required': required ? 'true' : null,
+        'aria-invalid': this.computedAriaInvalid
+      },
+      on: {
+        change: this.onChange
+      },
+      directives: [{
+        name: 'model',
+        value: value
+      }],
+      ref: 'input'
+    }, [this.normalizeSlot('first'), $options, this.normalizeSlot('default')]);
   }
 });
 
@@ -14272,7 +14814,7 @@ var FormSelectPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$k = 'BFormSpinbutton';
+var NAME$m = 'BFormSpinbutton';
 var UP$2 = KEY_CODES.UP,
     DOWN$2 = KEY_CODES.DOWN,
     HOME$1 = KEY_CODES.HOME,
@@ -14294,8 +14836,9 @@ var DEFAULT_REPEAT_MULTIPLIER = 4; // --- BFormSpinbutton ---
 // @vue/component
 
 var BFormSpinbutton = /*#__PURE__*/Vue.extend({
-  name: NAME$k,
-  mixins: [idMixin, normalizeSlotMixin],
+  name: NAME$m,
+  // Mixin order is important!
+  mixins: [attrsMixin, idMixin, normalizeSlotMixin],
   inheritAttrs: false,
   props: {
     value: {
@@ -14376,13 +14919,13 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
     labelDecrement: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$k, 'labelDecrement');
+        return getComponentConfig(NAME$m, 'labelDecrement');
       }
     },
     labelIncrement: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$k, 'labelIncrement');
+        return getComponentConfig(NAME$m, 'labelIncrement');
       }
     },
     locale: {
@@ -14413,6 +14956,18 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
     };
   },
   computed: {
+    spinId: function spinId() {
+      return this.safeId();
+    },
+    computedInline: function computedInline() {
+      return this.inline && !this.vertical;
+    },
+    computedReadonly: function computedReadonly() {
+      return this.readonly && !this.disabled;
+    },
+    computedRequired: function computedRequired() {
+      return this.required && !this.computedReadonly && !this.disabled;
+    },
     computedStep: function computedStep() {
       return toFloat(this.step, DEFAULT_STEP);
     },
@@ -14424,7 +14979,7 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
       var max = toFloat(this.max, DEFAULT_MAX);
       var step = this.computedStep;
       var min = this.computedMin;
-      return Math.floor((max - min) / step) * step + min;
+      return mathFloor((max - min) / step) * step + min;
     },
     computedDelay: function computedDelay() {
       var delay = toInteger(this.repeatDelay, 0);
@@ -14435,18 +14990,18 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
       return interval > 0 ? interval : DEFAULT_REPEAT_INTERVAL;
     },
     computedThreshold: function computedThreshold() {
-      return Math.max(toInteger(this.repeatThreshold, DEFAULT_REPEAT_THRESHOLD), 1);
+      return mathMax(toInteger(this.repeatThreshold, DEFAULT_REPEAT_THRESHOLD), 1);
     },
     computedStepMultiplier: function computedStepMultiplier() {
-      return Math.max(toInteger(this.repeatStepMultiplier, DEFAULT_REPEAT_MULTIPLIER), 1);
+      return mathMax(toInteger(this.repeatStepMultiplier, DEFAULT_REPEAT_MULTIPLIER), 1);
     },
     computedPrecision: function computedPrecision() {
       // Quick and dirty way to get the number of decimals
       var step = this.computedStep;
-      return Math.floor(step) === step ? 0 : (step.toString().split('.')[1] || '').length;
+      return mathFloor(step) === step ? 0 : (step.toString().split('.')[1] || '').length;
     },
     computedMultiplier: function computedMultiplier() {
-      return Math.pow(10, this.computedPrecision || 0);
+      return mathPow(10, this.computedPrecision || 0);
     },
     valueAsFixed: function valueAsFixed() {
       var value = this.localValue;
@@ -14473,6 +15028,46 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
       }); // Return the format method reference
 
       return nf.format;
+    },
+    computedFormatter: function computedFormatter() {
+      return isFunction(this.formatterFn) ? this.formatterFn : this.defaultFormatter;
+    },
+    computedAttrs: function computedAttrs() {
+      return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        role: 'group',
+        lang: this.computedLocale,
+        tabindex: this.disabled ? null : '-1',
+        title: this.ariaLabel
+      });
+    },
+    computedSpinAttrs: function computedSpinAttrs() {
+      var spinId = this.spinId,
+          value = this.localValue,
+          required = this.computedRequired,
+          disabled = this.disabled,
+          state = this.state,
+          computedFormatter = this.computedFormatter;
+      var hasValue = !isNull(value);
+      return _objectSpread2(_objectSpread2({
+        dir: this.computedRTL ? 'rtl' : 'ltr'
+      }, this.bvAttrs), {}, {
+        id: spinId,
+        role: 'spinbutton',
+        tabindex: disabled ? null : '0',
+        'aria-live': 'off',
+        'aria-label': this.ariaLabel || null,
+        'aria-controls': this.ariaControls || null,
+        // TODO: May want to check if the value is in range
+        'aria-invalid': state === false || !hasValue && required ? 'true' : null,
+        'aria-required': required ? 'true' : null,
+        // These attrs are required for role spinbutton
+        'aria-valuemin': toString$1(this.computedMin),
+        'aria-valuemax': toString$1(this.computedMax),
+        // These should be `null` if the value is out of range
+        // They must also be non-existent attrs if the value is out of range or `null`
+        'aria-valuenow': hasValue ? value : null,
+        'aria-valuetext': hasValue ? computedFormatter(value) : null
+      });
     }
   },
   watch: {
@@ -14513,16 +15108,12 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
     // --- Public methods ---
     focus: function focus() {
       if (!this.disabled) {
-        try {
-          this.$refs.spinner.focus();
-        } catch (_unused) {}
+        attemptFocus(this.$refs.spinner);
       }
     },
     blur: function blur() {
       if (!this.disabled) {
-        try {
-          this.$refs.spinner.blur();
-        } catch (_unused2) {}
+        attemptBlur(this.$refs.spinner);
       }
     },
     // --- Private methods ---
@@ -14541,9 +15132,9 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
         var multiplier = this.computedMultiplier;
         var wrap = this.wrap; // We ensure that the value steps like a native input
 
-        value = Math.round((value - min) / step) * step + min + step; // We ensure that precision is maintained (decimals)
+        value = mathRound((value - min) / step) * step + min + step; // We ensure that precision is maintained (decimals)
 
-        value = Math.round(value * multiplier) / multiplier; // Handle if wrapping is enabled
+        value = mathRound(value * multiplier) / multiplier; // Handle if wrapping is enabled
 
         this.localValue = value > max ? wrap ? min : max : value < min ? wrap ? max : min : value;
       }
@@ -14700,11 +15291,13 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
       try {
         eventOnOff(on, document.body, 'mouseup', this.onMouseup, false);
         eventOnOff(on, document.body, 'touchend', this.onMouseup, false);
-      } catch (_unused3) {}
+      } catch (_unused) {}
     },
     resetTimers: function resetTimers() {
       clearTimeout(this.$_autoDelayTimer);
       clearInterval(this.$_autoRepeatTimer);
+      this.$_autoDelayTimer = null;
+      this.$_autoRepeatTimer = null;
     },
     clearRepeat: function clearRepeat() {
       this.resetTimers();
@@ -14716,17 +15309,16 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
     var _this2 = this,
         _class;
 
-    var spinId = this.safeId();
-    var value = this.localValue;
-    var isVertical = this.vertical;
-    var isInline = this.inline && !isVertical;
-    var isDisabled = this.disabled;
-    var isReadonly = this.readonly && !isDisabled;
-    var isRequired = this.required && !isReadonly && !isDisabled;
-    var state = this.state;
-    var size = this.size;
+    var spinId = this.spinId,
+        value = this.localValue,
+        inline = this.computedInline,
+        readonly = this.computedReadonly,
+        vertical = this.vertical,
+        disabled = this.disabled,
+        state = this.state,
+        size = this.size,
+        computedFormatter = this.computedFormatter;
     var hasValue = !isNull(value);
-    var formatter = isFunction(this.formatterFn) ? this.formatterFn : this.defaultFormatter;
 
     var makeButton = function makeButton(stepper, label, IconCmp, keyRef, shortcut, btnDisabled, slotName) {
       var $icon = h(IconCmp, {
@@ -14742,15 +15334,13 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
       };
 
       var handler = function handler(evt) {
-        if (!isDisabled && !isReadonly) {
+        if (!disabled && !readonly) {
           evt.preventDefault();
 
-          _this2.setMouseup(true);
+          _this2.setMouseup(true); // Since we `preventDefault()`, we must manually focus the button
 
-          try {
-            // Since we `preventDefault()`, we must manually focus the button
-            evt.currentTarget.focus();
-          } catch (_unused4) {}
+
+          attemptFocus(evt.currentTarget);
 
           _this2.handleStepRepeat(evt, stepper);
         }
@@ -14761,13 +15351,13 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
         ref: keyRef,
         staticClass: 'btn btn-sm border-0 rounded-0',
         class: {
-          'py-0': !isVertical
+          'py-0': !vertical
         },
         attrs: {
           tabindex: '-1',
           type: 'button',
-          disabled: isDisabled || isReadonly || btnDisabled,
-          'aria-disabled': isDisabled || isReadonly || btnDisabled ? 'true' : null,
+          disabled: disabled || readonly || btnDisabled,
+          'aria-disabled': disabled || readonly || btnDisabled ? 'true' : null,
           'aria-controls': spinId,
           'aria-label': label || null,
           'aria-keyshortcuts': shortcut || null
@@ -14784,7 +15374,7 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
     var $decrement = makeButton(this.stepDown, this.labelDecrement, BIconDash, 'dec', 'ArrowDown', false, 'decrement');
     var $hidden = h();
 
-    if (this.name && !isDisabled) {
+    if (this.name && !disabled) {
       $hidden = h('input', {
         key: 'hidden',
         attrs: {
@@ -14803,48 +15393,24 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
       key: 'output',
       staticClass: 'flex-grow-1',
       class: {
-        'd-flex': isVertical,
-        'align-self-center': !isVertical,
-        'align-items-center': isVertical,
-        'border-top': isVertical,
-        'border-bottom': isVertical,
-        'border-left': !isVertical,
-        'border-right': !isVertical
+        'd-flex': vertical,
+        'align-self-center': !vertical,
+        'align-items-center': vertical,
+        'border-top': vertical,
+        'border-bottom': vertical,
+        'border-left': !vertical,
+        'border-right': !vertical
       },
-      attrs: _objectSpread2({
-        dir: this.computedRTL ? 'rtl' : 'ltr'
-      }, this.$attrs, {
-        id: spinId,
-        role: 'spinbutton',
-        tabindex: isDisabled ? null : '0',
-        'aria-live': 'off',
-        'aria-label': this.ariaLabel || null,
-        'aria-controls': this.ariaControls || null,
-        // TODO: May want to check if the value is in range
-        'aria-invalid': state === false || !hasValue && isRequired ? 'true' : null,
-        'aria-required': isRequired ? 'true' : null,
-        // These attrs are required for role spinbutton
-        'aria-valuemin': toString$1(this.computedMin),
-        'aria-valuemax': toString$1(this.computedMax),
-        // These should be `null` if the value is out of range
-        // They must also be non-existent attrs if the value is out of range or `null`
-        'aria-valuenow': hasValue ? value : null,
-        'aria-valuetext': hasValue ? formatter(value) : null
-      })
-    }, [h('bdi', hasValue ? formatter(value) : this.placeholder || '')]);
+      attrs: this.computedSpinAttrs
+    }, [h('bdi', hasValue ? computedFormatter(value) : this.placeholder || '')]);
     return h('div', {
       staticClass: 'b-form-spinbutton form-control',
       class: (_class = {
-        disabled: isDisabled,
-        readonly: isReadonly,
+        disabled: disabled,
+        readonly: readonly,
         focus: this.hasFocus
-      }, _defineProperty(_class, "form-control-".concat(size), !!size), _defineProperty(_class, 'd-inline-flex', isInline || isVertical), _defineProperty(_class, 'd-flex', !isInline && !isVertical), _defineProperty(_class, 'align-items-stretch', !isVertical), _defineProperty(_class, 'flex-column', isVertical), _defineProperty(_class, 'is-valid', state === true), _defineProperty(_class, 'is-invalid', state === false), _class),
-      attrs: {
-        role: 'group',
-        lang: this.computedLocale,
-        tabindex: isDisabled ? null : '-1',
-        title: this.ariaLabel
-      },
+      }, _defineProperty(_class, "form-control-".concat(size), !!size), _defineProperty(_class, 'd-inline-flex', inline || vertical), _defineProperty(_class, 'd-flex', !inline && !vertical), _defineProperty(_class, 'align-items-stretch', !vertical), _defineProperty(_class, 'flex-column', vertical), _defineProperty(_class, 'is-valid', state === true), _defineProperty(_class, 'is-invalid', state === false), _class),
+      attrs: this.computedAttrs,
       on: {
         keydown: this.onKeydown,
         keyup: this.onKeyup,
@@ -14852,7 +15418,7 @@ var BFormSpinbutton = /*#__PURE__*/Vue.extend({
         '!focus': this.onFocusBlur,
         '!blur': this.onFocusBlur
       }
-    }, isVertical ? [$increment, $hidden, $spin, $decrement] : [$decrement, $hidden, $spin, $increment]);
+    }, vertical ? [$increment, $hidden, $spin, $decrement] : [$decrement, $hidden, $spin, $increment]);
   }
 });
 
@@ -14863,15 +15429,15 @@ var FormSpinbuttonPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$l = 'BFormTag';
+var NAME$n = 'BFormTag';
 var BFormTag = /*#__PURE__*/Vue.extend({
-  name: NAME$l,
+  name: NAME$n,
   mixins: [idMixin, normalizeSlotMixin],
   props: {
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$l, 'variant');
+        return getComponentConfig(NAME$n, 'variant');
       }
     },
     disabled: {
@@ -14889,7 +15455,7 @@ var BFormTag = /*#__PURE__*/Vue.extend({
     removeLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$l, 'removeLabel');
+        return getComponentConfig(NAME$n, 'removeLabel');
       }
     },
     tag: {
@@ -14955,13 +15521,13 @@ var BFormTag = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$m = 'BFormTags'; // Supported input types (for built in input)
+var NAME$o = 'BFormTags'; // Supported input types (for built in input)
 
 var TYPES$1 = ['text', 'email', 'tel', 'url', 'number']; // Pre-compiled regular expressions for performance reasons
 
 var RX_SPACES = /[\s\uFEFF\xA0]+/g; // KeyCode constants
 
-var ENTER$1 = KEY_CODES.ENTER,
+var ENTER$2 = KEY_CODES.ENTER,
     BACKSPACE = KEY_CODES.BACKSPACE,
     DELETE = KEY_CODES.DELETE; // --- Utility methods ---
 // Escape special chars in string and replace
@@ -14997,7 +15563,7 @@ var cleanTagsState = function cleanTagsState() {
 
 
 var BFormTags = /*#__PURE__*/Vue.extend({
-  name: NAME$m,
+  name: NAME$o,
   mixins: [idMixin, normalizeSlotMixin],
   model: {
     // Even though this is the default that Vue assumes, we need
@@ -15013,7 +15579,7 @@ var BFormTags = /*#__PURE__*/Vue.extend({
     placeholder: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'placeholder');
+        return getComponentConfig(NAME$o, 'placeholder');
       }
     },
     disabled: {
@@ -15062,19 +15628,19 @@ var BFormTags = /*#__PURE__*/Vue.extend({
     addButtonText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'addButtonText');
+        return getComponentConfig(NAME$o, 'addButtonText');
       }
     },
     addButtonVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'addButtonVariant');
+        return getComponentConfig(NAME$o, 'addButtonVariant');
       }
     },
     tagVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'tagVariant');
+        return getComponentConfig(NAME$o, 'tagVariant');
       }
     },
     tagClass: {
@@ -15088,13 +15654,13 @@ var BFormTags = /*#__PURE__*/Vue.extend({
     tagRemoveLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'tagRemoveLabel');
+        return getComponentConfig(NAME$o, 'tagRemoveLabel');
       }
     },
     tagRemovedLabel: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'tagRemovedLabel');
+        return getComponentConfig(NAME$o, 'tagRemovedLabel');
       }
     },
     tagValidator: {
@@ -15104,13 +15670,13 @@ var BFormTags = /*#__PURE__*/Vue.extend({
     duplicateTagText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'duplicateTagText');
+        return getComponentConfig(NAME$o, 'duplicateTagText');
       }
     },
     invalidTagText: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$m, 'invalidTagText');
+        return getComponentConfig(NAME$o, 'invalidTagText');
       }
     },
     separator: {
@@ -15168,7 +15734,7 @@ var BFormTags = /*#__PURE__*/Vue.extend({
       return arrayIncludes(TYPES$1, this.inputType) ? this.inputType : 'text';
     },
     computedInputAttrs: function computedInputAttrs() {
-      return _objectSpread2({}, this.inputAttrs, {
+      return _objectSpread2(_objectSpread2({}, this.inputAttrs), {}, {
         // Must have attributes
         id: this.computedInputId,
         value: this.newTag,
@@ -15384,7 +15950,7 @@ var BFormTags = /*#__PURE__*/Vue.extend({
       var value = evt.target.value || '';
       /* istanbul ignore else: testing to be added later */
 
-      if (!this.noAddOnEnter && keyCode === ENTER$1) {
+      if (!this.noAddOnEnter && keyCode === ENTER$2) {
         // Attempt to add the tag when user presses enter
         evt.preventDefault();
         this.addTag();
@@ -15424,15 +15990,13 @@ var BFormTags = /*#__PURE__*/Vue.extend({
     // --- Public methods ---
     focus: function focus() {
       if (!this.disabled) {
-        try {
-          this.getInput().focus();
-        } catch (_unused) {}
+        attemptFocus(this.getInput());
       }
     },
     blur: function blur() {
-      try {
-        this.getInput().blur();
-      } catch (_unused2) {}
+      if (!this.disabled) {
+        attemptBlur(this.getInput());
+      }
     },
     // --- Private methods ---
     splitTags: function splitTags(newTag) {
@@ -15552,7 +16116,7 @@ var BFormTags = /*#__PURE__*/Vue.extend({
           outline: 0,
           minWidth: '5rem'
         },
-        attrs: _objectSpread2({}, inputAttrs, {
+        attrs: _objectSpread2(_objectSpread2({}, inputAttrs), {}, {
           'aria-describedby': ariaDescribedby || null,
           type: inputType,
           placeholder: placeholder || null
@@ -15782,7 +16346,8 @@ var BFormTextarea = /*#__PURE__*/Vue.extend({
   directives: {
     'b-visible': VBVisible
   },
-  mixins: [idMixin, listenOnRootMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
+  // Mixin order is important!
+  mixins: [listenersMixin, idMixin, listenOnRootMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
   props: {
     rows: {
       type: [Number, String],
@@ -15836,15 +16401,40 @@ var BFormTextarea = /*#__PURE__*/Vue.extend({
       // Ensure rows is at least 2 and positive (2 is the native textarea value)
       // A value of 1 can cause issues in some browsers, and most browsers
       // only support 2 as the smallest value
-      return Math.max(toInteger(this.rows, 2), 2);
+      return mathMax(toInteger(this.rows, 2), 2);
     },
     computedMaxRows: function computedMaxRows() {
-      return Math.max(this.computedMinRows, toInteger(this.maxRows, 0));
+      return mathMax(this.computedMinRows, toInteger(this.maxRows, 0));
     },
     computedRows: function computedRows() {
       // This is used to set the attribute 'rows' on the textarea
       // If auto-height is enabled, then we return `null` as we use CSS to control height
       return this.computedMinRows === this.computedMaxRows ? this.computedMinRows : null;
+    },
+    computedAttrs: function computedAttrs() {
+      var disabled = this.disabled,
+          required = this.required;
+      return {
+        id: this.safeId(),
+        name: this.name || null,
+        form: this.form || null,
+        disabled: disabled,
+        placeholder: this.placeholder || null,
+        required: required,
+        autocomplete: this.autocomplete || null,
+        readonly: this.readonly || this.plaintext,
+        rows: this.computedRows,
+        wrap: this.wrap || null,
+        'aria-required': this.required ? 'true' : null,
+        'aria-invalid': this.computedAriaInvalid
+      };
+    },
+    computedListeners: function computedListeners() {
+      return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+        input: this.onInput,
+        change: this.onChange,
+        blur: this.onBlur
+      });
     }
   },
   watch: {
@@ -15909,11 +16499,11 @@ var BFormTextarea = /*#__PURE__*/Vue.extend({
 
       el.style.height = oldHeight; // Calculate content height in 'rows' (scrollHeight includes padding but not border)
 
-      var contentRows = Math.max((scrollHeight - padding) / lineHeight, 2); // Calculate number of rows to display (limited within min/max rows)
+      var contentRows = mathMax((scrollHeight - padding) / lineHeight, 2); // Calculate number of rows to display (limited within min/max rows)
 
-      var rows = Math.min(Math.max(contentRows, this.computedMinRows), this.computedMaxRows); // Calculate the required height of the textarea including border and padding (in pixels)
+      var rows = mathMin(mathMax(contentRows, this.computedMinRows), this.computedMaxRows); // Calculate the required height of the textarea including border and padding (in pixels)
 
-      var height = Math.max(Math.ceil(rows * lineHeight + offset), minHeight); // Computed height remains the larger of `oldHeight` and new `height`,
+      var height = mathMax(mathCeil(rows * lineHeight + offset), minHeight); // Computed height remains the larger of `oldHeight` and new `height`,
       // when height is in `sticky` mode (prop `no-auto-shrink` is true)
 
       if (this.noAutoShrink && toFloat(oldHeight, 0) > height) {
@@ -15925,16 +16515,11 @@ var BFormTextarea = /*#__PURE__*/Vue.extend({
     }
   },
   render: function render(h) {
-    // Using self instead of this helps reduce code size during minification
-    var self = this;
     return h('textarea', {
       ref: 'input',
-      class: self.computedClass,
-      style: self.computedStyle,
+      class: this.computedClass,
+      style: this.computedStyle,
       directives: [{
-        name: 'model',
-        value: self.localValue
-      }, {
         name: 'b-visible',
         value: this.visibleCallback,
         // If textarea is within 640px of viewport, consider it visible
@@ -15942,28 +16527,11 @@ var BFormTextarea = /*#__PURE__*/Vue.extend({
           '640': true
         }
       }],
-      attrs: {
-        id: self.safeId(),
-        name: self.name || null,
-        form: self.form || null,
-        disabled: self.disabled,
-        placeholder: self.placeholder || null,
-        required: self.required,
-        autocomplete: self.autocomplete || null,
-        readonly: self.readonly || self.plaintext,
-        rows: self.computedRows,
-        wrap: self.wrap || null,
-        'aria-required': self.required ? 'true' : null,
-        'aria-invalid': self.computedAriaInvalid
-      },
+      attrs: this.computedAttrs,
       domProps: {
-        value: self.localValue
+        value: this.localValue
       },
-      on: _objectSpread2({}, self.$listeners, {
-        input: self.onInput,
-        change: self.onChange,
-        blur: self.onBlur
-      })
+      on: this.computedListeners
     });
   }
 });
@@ -15975,7 +16543,7 @@ var FormTextareaPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$n = 'BTime';
+var NAME$p = 'BTime';
 var NUMERIC = 'numeric';
 var LEFT$2 = KEY_CODES.LEFT,
     RIGHT$2 = KEY_CODES.RIGHT; // Time string RegExpr (optional seconds)
@@ -15984,7 +16552,7 @@ var RE_TIME = /^([0-1]?[0-9]|2[0-3]):[0-5]?[0-9](:[0-5]?[0-9])?$/; // --- Helper
 // Fallback to BFormSpinbutton prop if no value found
 
 var getConfigFallback$1 = function getConfigFallback(prop) {
-  return getComponentConfig(NAME$n, prop) || getComponentConfig('BFormSpinbutton', prop);
+  return getComponentConfig(NAME$p, prop) || getComponentConfig('BFormSpinbutton', prop);
 };
 
 var padLeftZeros = function padLeftZeros(num) {
@@ -16034,7 +16602,7 @@ var formatHMS = function formatHMS(_ref) {
 
 
 var BTime = /*#__PURE__*/Vue.extend({
-  name: NAME$n,
+  name: NAME$p,
   mixins: [idMixin, normalizeSlotMixin],
   model: {
     prop: 'value',
@@ -16089,49 +16657,49 @@ var BTime = /*#__PURE__*/Vue.extend({
     labelNoTimeSelected: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'labelNoTimeSelected');
+        return getComponentConfig(NAME$p, 'labelNoTimeSelected');
       }
     },
     labelSelected: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'labelSelected');
+        return getComponentConfig(NAME$p, 'labelSelected');
       }
     },
     labelHours: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'labelHours');
+        return getComponentConfig(NAME$p, 'labelHours');
       }
     },
     labelMinutes: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'labelMinutes');
+        return getComponentConfig(NAME$p, 'labelMinutes');
       }
     },
     labelSeconds: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'labelSeconds');
+        return getComponentConfig(NAME$p, 'labelSeconds');
       }
     },
     labelAmpm: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'labelAmpm');
+        return getComponentConfig(NAME$p, 'labelAmpm');
       }
     },
     labelAm: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'labelAm');
+        return getComponentConfig(NAME$p, 'labelAm');
       }
     },
     labelPm: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$n, 'labelPm');
+        return getComponentConfig(NAME$p, 'labelPm');
       }
     },
     // Passed to the spin buttons
@@ -16392,19 +16960,17 @@ var BTime = /*#__PURE__*/Vue.extend({
     // Public methods
     focus: function focus() {
       if (!this.disabled) {
-        try {
-          // We focus the first spin button
-          this.$refs.spinners[0].focus();
-        } catch (_unused) {}
+        // We focus the first spin button
+        attemptFocus(this.$refs.spinners[0]);
       }
     },
     blur: function blur() {
       if (!this.disabled) {
-        try {
-          if (contains(this.$el, document.activeElement)) {
-            document.activeElement.blur();
-          }
-        } catch (_unused2) {}
+        var activeElement = getActiveElement();
+
+        if (contains(this.$el, activeElement)) {
+          attemptBlur(activeElement);
+        }
       }
     },
     // Formatters for the spin buttons
@@ -16458,10 +17024,7 @@ var BTime = /*#__PURE__*/Vue.extend({
         }).indexOf(true);
         index = index + (keyCode === LEFT$2 ? -1 : 1);
         index = index >= spinners.length ? 0 : index < 0 ? spinners.length - 1 : index;
-
-        try {
-          spinners[index].focus();
-        } catch (_unused3) {}
+        attemptFocus(spinners[index]);
       }
     },
     setLive: function setLive(on) {
@@ -16664,10 +17227,10 @@ var BTime = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$o = 'BFormTimepicker'; // Fallback to BTime/BFormSpinbutton prop if no value found
+var NAME$q = 'BFormTimepicker'; // Fallback to BTime/BFormSpinbutton prop if no value found
 
 var getConfigFallback$2 = function getConfigFallback(prop) {
-  return getComponentConfig(NAME$o, prop) || getComponentConfig('BTime', prop) || getComponentConfig('BFormSpinbutton', prop);
+  return getComponentConfig(NAME$q, prop) || getComponentConfig('BTime', prop) || getComponentConfig('BFormSpinbutton', prop);
 }; // We create our props as a mixin so that we can control
 // where they appear in the props listing reference section
 
@@ -16758,7 +17321,7 @@ var propsMixin$1 = {
     labelNowButton: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$o, 'labelNowButton');
+        return getComponentConfig(NAME$q, 'labelNowButton');
       }
     },
     nowButtonVariant: {
@@ -16772,7 +17335,7 @@ var propsMixin$1 = {
     labelResetButton: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$o, 'labelResetButton');
+        return getComponentConfig(NAME$q, 'labelResetButton');
       }
     },
     resetButtonVariant: {
@@ -16786,7 +17349,7 @@ var propsMixin$1 = {
     labelCloseButton: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$o, 'labelCloseButton');
+        return getComponentConfig(NAME$q, 'labelCloseButton');
       }
     },
     closeButtonVariant: {
@@ -16866,7 +17429,7 @@ var propsMixin$1 = {
 // @vue/component
 
 var BFormTimepicker = /*#__PURE__*/Vue.extend({
-  name: NAME$o,
+  name: NAME$q,
   // The mixins order determines the order of appearance in the props reference section
   mixins: [idMixin, propsMixin$1],
   model: {
@@ -16936,16 +17499,12 @@ var BFormTimepicker = /*#__PURE__*/Vue.extend({
     // Public methods
     focus: function focus() {
       if (!this.disabled) {
-        try {
-          this.$refs.control.focus();
-        } catch (_unused) {}
+        attemptFocus(this.$refs.control);
       }
     },
     blur: function blur() {
       if (!this.disabled) {
-        try {
-          this.$refs.control.blur();
-        } catch (_unused2) {}
+        attemptBlur(this.$refs.control);
       }
     },
     // Private methods
@@ -16997,9 +17556,7 @@ var BFormTimepicker = /*#__PURE__*/Vue.extend({
       var _this2 = this;
 
       this.$nextTick(function () {
-        try {
-          _this2.$refs.time.focus();
-        } catch (_unused3) {}
+        attemptFocus(_this2.$refs.time);
 
         _this2.$emit('shown');
       });
@@ -17047,7 +17604,7 @@ var BFormTimepicker = /*#__PURE__*/Vue.extend({
 
     if (this.resetButton) {
       if ($footer.length > 0) {
-        // Add a "spacer" betwen buttons ('&nbsp;')
+        // Add a "spacer" between buttons ('&nbsp;')
         $footer.push(h('span', "\xA0"));
       }
 
@@ -17070,7 +17627,7 @@ var BFormTimepicker = /*#__PURE__*/Vue.extend({
 
     if (!this.noCloseButton) {
       if ($footer.length > 0) {
-        // Add a "spacer" betwen buttons ('&nbsp;')
+        // Add a "spacer" between buttons ('&nbsp;')
         $footer.push(h('span', "\xA0"));
       }
 
@@ -17113,7 +17670,7 @@ var BFormTimepicker = /*#__PURE__*/Vue.extend({
     return h(BVFormBtnLabelControl, {
       ref: 'control',
       staticClass: 'b-form-timepicker',
-      props: _objectSpread2({}, this.$props, {
+      props: _objectSpread2(_objectSpread2({}, this.$props), {}, {
         // Overridden / computed props
         id: this.safeId(),
         rtl: this.isRTL,
@@ -17148,7 +17705,7 @@ var ImagePlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var props$z = {
+var props$A = {
   tag: {
     type: String,
     default: 'div'
@@ -17158,7 +17715,7 @@ var props$z = {
 var BInputGroupText = /*#__PURE__*/Vue.extend({
   name: 'BInputGroupText',
   functional: true,
-  props: props$z,
+  props: props$A,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -17187,7 +17744,7 @@ var commonProps$1 = {
 var BInputGroupAddon = /*#__PURE__*/Vue.extend({
   name: 'BInputGroupAddon',
   functional: true,
-  props: _objectSpread2({}, commonProps$1, {
+  props: _objectSpread2(_objectSpread2({}, commonProps$1), {}, {
     append: {
       type: Boolean,
       default: false
@@ -17209,6 +17766,23 @@ var BInputGroupAddon = /*#__PURE__*/Vue.extend({
   }
 });
 
+var BInputGroupAppend = /*#__PURE__*/Vue.extend({
+  name: 'BInputGroupAppend',
+  functional: true,
+  props: commonProps$1,
+  render: function render(h, _ref) {
+    var props = _ref.props,
+        data = _ref.data,
+        children = _ref.children;
+    // Pass all our data down to child, and set `append` to `true`
+    return h(BInputGroupAddon, vueFunctionalDataMerge.mergeData(data, {
+      props: _objectSpread2(_objectSpread2({}, props), {}, {
+        append: true
+      })
+    }), children);
+  }
+});
+
 var BInputGroupPrepend = /*#__PURE__*/Vue.extend({
   name: 'BInputGroupPrepend',
   functional: true,
@@ -17219,39 +17793,23 @@ var BInputGroupPrepend = /*#__PURE__*/Vue.extend({
         children = _ref.children;
     // pass all our props/attrs down to child, and set`append` to false
     return h(BInputGroupAddon, vueFunctionalDataMerge.mergeData(data, {
-      props: _objectSpread2({}, props, {
+      props: _objectSpread2(_objectSpread2({}, props), {}, {
         append: false
       })
     }), children);
   }
 });
 
-var BInputGroupAppend = /*#__PURE__*/Vue.extend({
-  name: 'BInputGroupAppend',
-  functional: true,
-  props: commonProps$1,
-  render: function render(h, _ref) {
-    var props = _ref.props,
-        data = _ref.data,
-        children = _ref.children;
-    // pass all our props/attrs down to child, and set`append` to true
-    return h(BInputGroupAddon, vueFunctionalDataMerge.mergeData(data, {
-      props: _objectSpread2({}, props, {
-        append: true
-      })
-    }), children);
-  }
-});
+var NAME$r = 'BInputGroup'; // --- Props ---
 
-var NAME$p = 'BInputGroup';
-var props$A = {
+var props$B = {
   id: {
     type: String
   },
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$p, 'size');
+      return getComponentConfig(NAME$r, 'size');
     }
   },
   prepend: {
@@ -17270,57 +17828,52 @@ var props$A = {
     type: String,
     default: 'div'
   }
-}; // @vue/component
+}; // --- Main component ---
+// @vue/component
 
 var BInputGroup = /*#__PURE__*/Vue.extend({
-  name: NAME$p,
+  name: NAME$r,
   functional: true,
-  props: props$A,
+  props: props$B,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
         slots = _ref.slots,
         scopedSlots = _ref.scopedSlots;
-    var $slots = slots();
+    var prepend = props.prepend,
+        prependHtml = props.prependHtml,
+        append = props.append,
+        appendHtml = props.appendHtml,
+        size = props.size;
     var $scopedSlots = scopedSlots || {};
-    var childNodes = []; // Prepend prop/slot
+    var $slots = slots();
+    var slotScope = {};
+    var $prepend = h();
+    var hasPrependSlot = hasNormalizedSlot('prepend', $scopedSlots, $slots);
 
-    if (props.prepend || props.prependHtml || hasNormalizedSlot('prepend', $scopedSlots, $slots)) {
-      childNodes.push(h(BInputGroupPrepend, [// Prop
-      props.prepend || props.prependHtml ? h(BInputGroupText, {
-        domProps: htmlOrText(props.prependHtml, props.prepend)
-      }) : h(), // Slot
-      normalizeSlot('prepend', {}, $scopedSlots, $slots) || h()]));
-    } else {
-      childNodes.push(h());
-    } // Default slot
+    if (hasPrependSlot || prepend || prependHtml) {
+      $prepend = h(BInputGroupPrepend, [hasPrependSlot ? normalizeSlot('prepend', slotScope, $scopedSlots, $slots) : h(BInputGroupText, {
+        domProps: htmlOrText(prependHtml, prepend)
+      })]);
+    }
 
+    var $append = h();
+    var hasAppendSlot = hasNormalizedSlot('append', $scopedSlots, $slots);
 
-    if (hasNormalizedSlot('default', $scopedSlots, $slots)) {
-      childNodes.push.apply(childNodes, _toConsumableArray(normalizeSlot('default', {}, $scopedSlots, $slots)));
-    } else {
-      childNodes.push(h());
-    } // Append prop
-
-
-    if (props.append || props.appendHtml || hasNormalizedSlot('append', $scopedSlots, $slots)) {
-      childNodes.push(h(BInputGroupAppend, [// prop
-      props.append || props.appendHtml ? h(BInputGroupText, {
-        domProps: htmlOrText(props.appendHtml, props.append)
-      }) : h(), // Slot
-      normalizeSlot('append', {}, $scopedSlots, $slots) || h()]));
-    } else {
-      childNodes.push(h());
+    if (hasAppendSlot || append || appendHtml) {
+      $append = h(BInputGroupAppend, [hasAppendSlot ? normalizeSlot('append', slotScope, $scopedSlots, $slots) : h(BInputGroupText, {
+        domProps: htmlOrText(appendHtml, append)
+      })]);
     }
 
     return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'input-group',
-      class: _defineProperty({}, "input-group-".concat(props.size), props.size),
+      class: _defineProperty({}, "input-group-".concat(size), size),
       attrs: {
         id: props.id || null,
         role: 'group'
       }
-    }), childNodes);
+    }), [$prepend, normalizeSlot('default', slotScope, $scopedSlots, $slots), $append]);
   }
 });
 
@@ -17334,7 +17887,7 @@ var InputGroupPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var props$B = {
+var props$C = {
   tag: {
     type: String,
     default: 'div'
@@ -17349,7 +17902,7 @@ var props$B = {
 var BContainer = /*#__PURE__*/Vue.extend({
   name: 'BContainer',
   functional: true,
-  props: props$B,
+  props: props$C,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -17363,8 +17916,9 @@ var BContainer = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$q = 'BJumbotron';
-var props$C = {
+var NAME$s = 'BJumbotron'; // --- Props ---
+
+var props$D = {
   fluid: {
     type: Boolean,
     default: false
@@ -17408,27 +17962,28 @@ var props$C = {
   bgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$q, 'bgVariant');
+      return getComponentConfig(NAME$s, 'bgVariant');
     }
   },
   borderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$q, 'borderVariant');
+      return getComponentConfig(NAME$s, 'borderVariant');
     }
   },
   textVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$q, 'textVariant');
+      return getComponentConfig(NAME$s, 'textVariant');
     }
   }
-}; // @vue/component
+}; // --- Main component ---
+// @vue/component
 
 var BJumbotron = /*#__PURE__*/Vue.extend({
-  name: NAME$q,
+  name: NAME$s,
   functional: true,
-  props: props$C,
+  props: props$D,
   render: function render(h, _ref) {
     var _class2;
 
@@ -17436,47 +17991,53 @@ var BJumbotron = /*#__PURE__*/Vue.extend({
         data = _ref.data,
         slots = _ref.slots,
         scopedSlots = _ref.scopedSlots;
-    // The order of the conditionals matter.
-    // We are building the component markup in order.
-    var childNodes = [];
+    var header = props.header,
+        headerHtml = props.headerHtml,
+        lead = props.lead,
+        leadHtml = props.leadHtml,
+        textVariant = props.textVariant,
+        bgVariant = props.bgVariant,
+        borderVariant = props.borderVariant;
+    var $scopedSlots = scopedSlots || {};
     var $slots = slots();
-    var $scopedSlots = scopedSlots || {}; // Header
+    var slotScope = {};
+    var $header = h();
+    var hasHeaderSlot = hasNormalizedSlot('header', $scopedSlots, $slots);
 
-    if (props.header || hasNormalizedSlot('header', $scopedSlots, $slots) || props.headerHtml) {
-      childNodes.push(h(props.headerTag, {
-        class: _defineProperty({}, "display-".concat(props.headerLevel), props.headerLevel)
-      }, normalizeSlot('header', {}, $scopedSlots, $slots) || props.headerHtml || stripTags(props.header)));
-    } // Lead
+    if (hasHeaderSlot || header || headerHtml) {
+      var headerLevel = props.headerLevel;
+      $header = h(props.headerTag, {
+        class: _defineProperty({}, "display-".concat(headerLevel), headerLevel),
+        domProps: hasHeaderSlot ? {} : htmlOrText(headerHtml, header)
+      }, normalizeSlot('header', slotScope, $scopedSlots, $slots));
+    }
 
+    var $lead = h();
+    var hasLeadSlot = hasNormalizedSlot('lead', $scopedSlots, $slots);
 
-    if (props.lead || hasNormalizedSlot('lead', $scopedSlots, $slots) || props.leadHtml) {
-      childNodes.push(h(props.leadTag, {
-        staticClass: 'lead'
-      }, normalizeSlot('lead', {}, $scopedSlots, $slots) || props.leadHtml || stripTags(props.lead)));
-    } // Default slot
+    if (hasLeadSlot || lead || leadHtml) {
+      $lead = h(props.leadTag, {
+        staticClass: 'lead',
+        domProps: hasLeadSlot ? {} : htmlOrText(leadHtml, lead)
+      }, normalizeSlot('lead', slotScope, $scopedSlots, $slots));
+    }
 
-
-    if (hasNormalizedSlot('default', $scopedSlots, $slots)) {
-      childNodes.push(normalizeSlot('default', {}, $scopedSlots, $slots));
-    } // If fluid, wrap content in a container/container-fluid
-
+    var $children = [$header, $lead, normalizeSlot('default', slotScope, $scopedSlots, $slots)]; // If fluid, wrap content in a container
 
     if (props.fluid) {
-      // Children become a child of a container
-      childNodes = [h(BContainer, {
+      $children = [h(BContainer, {
         props: {
           fluid: props.containerFluid
         }
-      }, childNodes)];
-    } // Return the jumbotron
-
+      }, $children)];
+    }
 
     return h(props.tag, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'jumbotron',
       class: (_class2 = {
         'jumbotron-fluid': props.fluid
-      }, _defineProperty(_class2, "text-".concat(props.textVariant), props.textVariant), _defineProperty(_class2, "bg-".concat(props.bgVariant), props.bgVariant), _defineProperty(_class2, "border-".concat(props.borderVariant), props.borderVariant), _defineProperty(_class2, "border", props.borderVariant), _class2)
-    }), childNodes);
+      }, _defineProperty(_class2, "text-".concat(textVariant), textVariant), _defineProperty(_class2, "bg-".concat(bgVariant), bgVariant), _defineProperty(_class2, "border-".concat(borderVariant), borderVariant), _defineProperty(_class2, "border", borderVariant), _class2)
+    }), $children);
   }
 });
 
@@ -17535,21 +18096,21 @@ var generateProps$2 = function generateProps() {
       type: String,
       default: null,
       validator: function validator(str) {
-        return arrayIncludes(COMMON_ALIGNMENT.concat(['baseline', 'stretch']), str);
+        return arrayIncludes(concat(COMMON_ALIGNMENT, 'baseline', 'stretch'), str);
       }
     },
     alignH: {
       type: String,
       default: null,
       validator: function validator(str) {
-        return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around']), str);
+        return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around'), str);
       }
     },
     alignContent: {
       type: String,
       default: null,
       validator: function validator(str) {
-        return arrayIncludes(COMMON_ALIGNMENT.concat(['between', 'around', 'stretch']), str);
+        return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around', 'stretch'), str);
       }
     }
   }, rowColsProps);
@@ -17611,7 +18172,7 @@ var LinkPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var props$D = {
+var props$E = {
   tag: {
     type: String,
     default: 'div'
@@ -17629,7 +18190,7 @@ var props$D = {
 var BListGroup = /*#__PURE__*/Vue.extend({
   name: 'BListGroup',
   functional: true,
-  props: props$D,
+  props: props$E,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -17647,12 +18208,13 @@ var BListGroup = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$r = 'BListGroupItem';
-var actionTags = ['a', 'router-link', 'button', 'b-link'];
-var linkProps$3 = propsFactory();
+var NAME$t = 'BListGroupItem';
+var actionTags = ['a', 'router-link', 'button', 'b-link']; // --- Props ---
+
+var linkProps$3 = omit(props$1, ['event', 'routerTag']);
 delete linkProps$3.href.default;
 delete linkProps$3.to.default;
-var props$E = _objectSpread2({
+var props$F = _objectSpread2({
   tag: {
     type: String,
     default: 'div'
@@ -17668,27 +18230,33 @@ var props$E = _objectSpread2({
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$r, 'variant');
+      return getComponentConfig(NAME$t, 'variant');
     }
   }
-}, linkProps$3); // @vue/component
+}, linkProps$3); // --- Main component ---
+// @vue/component
 
 var BListGroupItem = /*#__PURE__*/Vue.extend({
-  name: NAME$r,
+  name: NAME$t,
   functional: true,
-  props: props$E,
+  props: props$F,
   render: function render(h, _ref) {
     var _class;
 
     var props = _ref.props,
         data = _ref.data,
         children = _ref.children;
-    var tag = props.button ? 'button' : !props.href && !props.to ? props.tag : BLink;
-    var isAction = Boolean(props.href || props.to || props.action || props.button || arrayIncludes(actionTags, props.tag));
+    var button = props.button,
+        variant = props.variant,
+        active = props.active,
+        disabled = props.disabled;
+    var link = isLink(props);
+    var tag = button ? 'button' : !link ? props.tag : BLink;
+    var action = !!(props.action || link || button || arrayIncludes(actionTags, props.tag));
     var attrs = {};
     var itemProps = {};
 
-    if (tag === 'button') {
+    if (isTag(tag, 'button')) {
       if (!data.attrs || !data.attrs.type) {
         // Add a type for button is one not provided in passed attributes
         attrs.type = 'button';
@@ -17702,13 +18270,12 @@ var BListGroupItem = /*#__PURE__*/Vue.extend({
       itemProps = pluckProps(linkProps$3, props);
     }
 
-    var componentData = {
+    return h(tag, vueFunctionalDataMerge.mergeData(data, {
       attrs: attrs,
       props: itemProps,
       staticClass: 'list-group-item',
-      class: (_class = {}, _defineProperty(_class, "list-group-item-".concat(props.variant), props.variant), _defineProperty(_class, 'list-group-item-action', isAction), _defineProperty(_class, "active", props.active), _defineProperty(_class, "disabled", props.disabled), _class)
-    };
-    return h(tag, vueFunctionalDataMerge.mergeData(data, componentData), children);
+      class: (_class = {}, _defineProperty(_class, "list-group-item-".concat(variant), variant), _defineProperty(_class, 'list-group-item-action', action), _defineProperty(_class, "active", active), _defineProperty(_class, "disabled", disabled), _class)
+    }), children);
   }
 });
 
@@ -17719,7 +18286,7 @@ var ListGroupPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var props$F = {
+var props$G = {
   tag: {
     type: String,
     default: 'div'
@@ -17729,7 +18296,7 @@ var props$F = {
 var BMediaBody = /*#__PURE__*/Vue.extend({
   name: 'BMediaBody',
   functional: true,
-  props: props$F,
+  props: props$G,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -17740,7 +18307,7 @@ var BMediaBody = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$G = {
+var props$H = {
   tag: {
     type: String,
     default: 'div'
@@ -17754,7 +18321,7 @@ var props$G = {
 var BMediaAside = /*#__PURE__*/Vue.extend({
   name: 'BMediaAside',
   functional: true,
-  props: props$G,
+  props: props$H,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -17769,7 +18336,7 @@ var BMediaAside = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$H = {
+var props$I = {
   tag: {
     type: String,
     default: 'div'
@@ -17791,7 +18358,7 @@ var props$H = {
 var BMedia = /*#__PURE__*/Vue.extend({
   name: 'BMedia',
   functional: true,
-  props: props$H,
+  props: props$I,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -17921,8 +18488,9 @@ var BTransporterSingle = /*#__PURE__*/Vue.extend({
     }
   },
   created: function created() {
-    this._bv_defaultFn = null;
-    this._bv_target = null;
+    // Create private non-reactive props
+    this.$_defaultFn = null;
+    this.$_target = null;
   },
   beforeMount: function beforeMount() {
     this.mountTarget();
@@ -17938,7 +18506,7 @@ var BTransporterSingle = /*#__PURE__*/Vue.extend({
   },
   beforeDestroy: function beforeDestroy() {
     this.unmountTarget();
-    this._bv_defaultFn = null;
+    this.$_defaultFn = null;
   },
   methods: {
     // Get the element which the target should be appended to
@@ -17953,13 +18521,13 @@ var BTransporterSingle = /*#__PURE__*/Vue.extend({
     },
     // Mount the target
     mountTarget: function mountTarget() {
-      if (!this._bv_target) {
+      if (!this.$_target) {
         var container = this.getContainer();
 
         if (container) {
           var el = document.createElement('div');
           container.appendChild(el);
-          this._bv_target = new BTransporterTargetSingle({
+          this.$_target = new BTransporterTargetSingle({
             el: el,
             parent: this,
             propsData: {
@@ -17972,33 +18540,30 @@ var BTransporterSingle = /*#__PURE__*/Vue.extend({
     },
     // Update the content of the target
     updateTarget: function updateTarget() {
-      if (isBrowser && this._bv_target) {
+      if (isBrowser && this.$_target) {
         var defaultFn = this.$scopedSlots.default;
 
         if (!this.disabled) {
           /* istanbul ignore else: only applicable in Vue 2.5.x */
-          if (defaultFn && this._bv_defaultFn !== defaultFn) {
+          if (defaultFn && this.$_defaultFn !== defaultFn) {
             // We only update the target component if the scoped slot
             // function is a fresh one. The new slot syntax (since Vue 2.6)
             // can cache unchanged slot functions and we want to respect that here
-            this._bv_target.updatedNodes = defaultFn;
+            this.$_target.updatedNodes = defaultFn;
           } else if (!defaultFn) {
             // We also need to be back compatible with non-scoped default slot (i.e. 2.5.x)
-            this._bv_target.updatedNodes = this.$slots.default;
+            this.$_target.updatedNodes = this.$slots.default;
           }
         } // Update the scoped slot function cache
 
 
-        this._bv_defaultFn = defaultFn;
+        this.$_defaultFn = defaultFn;
       }
     },
     // Unmount the target
     unmountTarget: function unmountTarget() {
-      if (this._bv_target) {
-        this._bv_target.$destroy();
-
-        this._bv_target = null;
-      }
+      this.$_target && this.$_target.$destroy();
+      this.$_target = null;
     }
   },
   render: function render(h) {
@@ -18388,7 +18953,7 @@ var BvModalEvent = /*#__PURE__*/function (_BvEvent) {
   _createClass(BvModalEvent, null, [{
     key: "Defaults",
     get: function get() {
-      return _objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this), {
+      return _objectSpread2(_objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this)), {}, {
         trigger: null
       });
     }
@@ -18397,7 +18962,7 @@ var BvModalEvent = /*#__PURE__*/function (_BvEvent) {
   return BvModalEvent;
 }(BvEvent); // Named exports
 
-var NAME$s = 'BModal'; // ObserveDom config to detect changes in modal content
+var NAME$u = 'BModal'; // ObserveDom config to detect changes in modal content
 // so that we can adjust the modal padding if needed
 
 var OBSERVER_CONFIG = {
@@ -18406,26 +18971,13 @@ var OBSERVER_CONFIG = {
   characterData: true,
   attributes: true,
   attributeFilter: ['style', 'class']
-}; // --- Utility methods ---
-// Attempt to focus an element, and return true if successful
-
-var attemptFocus = function attemptFocus(el) {
-  if (el && isVisible(el) && el.focus) {
-    try {
-      el.focus();
-    } catch (_unused) {}
-  } // If the element has focus, then return true
-
-
-  return document.activeElement === el;
 }; // --- Props ---
 
-
-var props$I = {
+var props$J = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'size');
+      return getComponentConfig(NAME$u, 'size');
     }
   },
   centered: {
@@ -18474,7 +19026,7 @@ var props$I = {
   titleTag: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'titleTag');
+      return getComponentConfig(NAME$u, 'titleTag');
     }
   },
   titleClass: {
@@ -18492,25 +19044,25 @@ var props$I = {
   headerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'headerBgVariant');
+      return getComponentConfig(NAME$u, 'headerBgVariant');
     }
   },
   headerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'headerBorderVariant');
+      return getComponentConfig(NAME$u, 'headerBorderVariant');
     }
   },
   headerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'headerTextVariant');
+      return getComponentConfig(NAME$u, 'headerTextVariant');
     }
   },
   headerCloseVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'headerCloseVariant');
+      return getComponentConfig(NAME$u, 'headerCloseVariant');
     }
   },
   headerClass: {
@@ -18520,13 +19072,13 @@ var props$I = {
   bodyBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'bodyBgVariant');
+      return getComponentConfig(NAME$u, 'bodyBgVariant');
     }
   },
   bodyTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'bodyTextVariant');
+      return getComponentConfig(NAME$u, 'bodyTextVariant');
     }
   },
   modalClass: {
@@ -18548,19 +19100,19 @@ var props$I = {
   footerBgVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'footerBgVariant');
+      return getComponentConfig(NAME$u, 'footerBgVariant');
     }
   },
   footerBorderVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'footerBorderVariant');
+      return getComponentConfig(NAME$u, 'footerBorderVariant');
     }
   },
   footerTextVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'footerTextVariant');
+      return getComponentConfig(NAME$u, 'footerTextVariant');
     }
   },
   footerClass: {
@@ -18611,19 +19163,19 @@ var props$I = {
   headerCloseContent: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'headerCloseContent');
+      return getComponentConfig(NAME$u, 'headerCloseContent');
     }
   },
   headerCloseLabel: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'headerCloseLabel');
+      return getComponentConfig(NAME$u, 'headerCloseLabel');
     }
   },
   cancelTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'cancelTitle');
+      return getComponentConfig(NAME$u, 'cancelTitle');
     }
   },
   cancelTitleHtml: {
@@ -18632,7 +19184,7 @@ var props$I = {
   okTitle: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'okTitle');
+      return getComponentConfig(NAME$u, 'okTitle');
     }
   },
   okTitleHtml: {
@@ -18641,13 +19193,13 @@ var props$I = {
   cancelVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'cancelVariant');
+      return getComponentConfig(NAME$u, 'cancelVariant');
     }
   },
   okVariant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$s, 'okVariant');
+      return getComponentConfig(NAME$u, 'okVariant');
     }
   },
   lazy: {
@@ -18675,14 +19227,14 @@ var props$I = {
 }; // @vue/component
 
 var BModal = /*#__PURE__*/Vue.extend({
-  name: NAME$s,
-  mixins: [idMixin, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
+  name: NAME$u,
+  mixins: [attrsMixin, idMixin, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
   inheritAttrs: false,
   model: {
     prop: 'visible',
     event: 'change'
   },
-  props: props$I,
+  props: props$J,
   data: function data() {
     return {
       isHidden: true,
@@ -18711,6 +19263,30 @@ var BModal = /*#__PURE__*/Vue.extend({
     };
   },
   computed: {
+    modalId: function modalId() {
+      return this.safeId();
+    },
+    modalOuterId: function modalOuterId() {
+      return this.safeId('__BV_modal_outer_');
+    },
+    modalHeaderId: function modalHeaderId() {
+      return this.safeId('__BV_modal_header_');
+    },
+    modalBodyId: function modalBodyId() {
+      return this.safeId('__BV_modal_body_');
+    },
+    modalTitleId: function modalTitleId() {
+      return this.safeId('__BV_modal_title_');
+    },
+    modalContentId: function modalContentId() {
+      return this.safeId('__BV_modal_content_');
+    },
+    modalFooterId: function modalFooterId() {
+      return this.safeId('__BV_modal_footer_');
+    },
+    modalBackdropId: function modalBackdropId() {
+      return this.safeId('__BV_modal_backdrop_');
+    },
     modalClasses: function modalClasses() {
       return [{
         fade: !this.noFade,
@@ -18771,6 +19347,28 @@ var BModal = /*#__PURE__*/Vue.extend({
     computeIgnoreEnforceFocusSelector: function computeIgnoreEnforceFocusSelector() {
       // Normalize to an single selector with selectors separated by `,`
       return concat(this.ignoreEnforceFocusSelector).filter(identity).join(',').trim();
+    },
+    computedAttrs: function computedAttrs() {
+      // If the parent has a scoped style attribute, and the modal
+      // is portalled, add the scoped attribute to the modal wrapper
+      var scopedStyleAttrs = !this.static ? this.scopedStyleAttrs : {};
+      return _objectSpread2(_objectSpread2(_objectSpread2({}, scopedStyleAttrs), this.bvAttrs), {}, {
+        id: this.modalOuterId
+      });
+    },
+    computedModalAttrs: function computedModalAttrs() {
+      var isVisible = this.isVisible,
+          ariaLabel = this.ariaLabel;
+      return {
+        id: this.modalId,
+        role: 'dialog',
+        'aria-hidden': isVisible ? null : 'true',
+        'aria-modal': isVisible ? 'true' : null,
+        'aria-label': ariaLabel,
+        'aria-labelledby': this.hideHeader || ariaLabel || // TODO: Rename slot to `title` and deprecate `modal-title`
+        !(this.hasNormalizedSlot('modal-title') || this.titleHtml || this.title) ? null : this.modalTitleId,
+        'aria-describedby': this.modalBodyId
+      };
     }
   },
   watch: {
@@ -18782,7 +19380,7 @@ var BModal = /*#__PURE__*/Vue.extend({
   },
   created: function created() {
     // Define non-reactive properties
-    this._observer = null;
+    this.$_observer = null;
   },
   mounted: function mounted() {
     // Set initial z-index as queried from the DOM
@@ -18802,11 +19400,7 @@ var BModal = /*#__PURE__*/Vue.extend({
   },
   beforeDestroy: function beforeDestroy() {
     // Ensure everything is back to normal
-    if (this._observer) {
-      this._observer.disconnect();
-
-      this._observer = null;
-    }
+    this.setObserver(false);
 
     if (this.isVisible) {
       this.isVisible = false;
@@ -18815,6 +19409,15 @@ var BModal = /*#__PURE__*/Vue.extend({
     }
   },
   methods: {
+    setObserver: function setObserver() {
+      var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      this.$_observer && this.$_observer.disconnect();
+      this.$_observer = null;
+
+      if (on) {
+        this.$_observer = observeDom(this.$refs.content, this.checkModalOverflow.bind(this), OBSERVER_CONFIG);
+      }
+    },
     // Private method to update the v-model
     updateModel: function updateModel(val) {
       if (val !== this.visible) {
@@ -18824,16 +19427,16 @@ var BModal = /*#__PURE__*/Vue.extend({
     // Private method to create a BvModalEvent object
     buildEvent: function buildEvent(type) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      return new BvModalEvent(type, _objectSpread2({
+      return new BvModalEvent(type, _objectSpread2(_objectSpread2({
         // Default options
         cancelable: false,
         target: this.$refs.modal || this.$el || null,
         relatedTarget: null,
         trigger: null
-      }, options, {
+      }, options), {}, {
         // Options that can't be overridden
         vueTarget: this,
-        componentId: this.safeId()
+        componentId: this.modalId
       }));
     },
     // Public method to show modal
@@ -18908,12 +19511,7 @@ var BModal = /*#__PURE__*/Vue.extend({
       } // Stop observing for content changes
 
 
-      if (this._observer) {
-        this._observer.disconnect();
-
-        this._observer = null;
-      } // Trigger the hide transition
-
+      this.setObserver(false); // Trigger the hide transition
 
       this.isVisible = false; // Update the v-model
 
@@ -18932,24 +19530,19 @@ var BModal = /*#__PURE__*/Vue.extend({
       }
     },
     // Private method to get the current document active element
-    getActiveElement: function getActiveElement() {
-      if (isBrowser) {
-        var activeElement = document.activeElement; // Note: On IE 11, `document.activeElement` may be null.
-        // So we test it for truthiness first.
-        // https://github.com/bootstrap-vue/bootstrap-vue/issues/3206
-        // Returning focus to document.body may cause unwanted scrolls, so we
-        // exclude setting focus on body
+    getActiveElement: function getActiveElement$1() {
+      // Returning focus to `document.body` may cause unwanted scrolls,
+      // so we exclude setting focus on body
+      var activeElement = getActiveElement(isBrowser ? [document.body] : []); // Preset the fallback return focus value if it is not set
+      // `document.activeElement` should be the trigger element that was clicked or
+      // in the case of using the v-model, which ever element has current focus
+      // Will be overridden by some commands such as toggle, etc.
+      // Note: On IE 11, `document.activeElement` may be `null`
+      // So we test it for truthiness first
+      // https://github.com/bootstrap-vue/bootstrap-vue/issues/3206
 
-        if (activeElement && activeElement !== document.body && activeElement.focus) {
-          // Preset the fallback return focus value if it is not set
-          // `document.activeElement` should be the trigger element that was clicked or
-          // in the case of using the v-model, which ever element has current focus
-          // Will be overridden by some commands such as toggle, etc.
-          return activeElement;
-        }
-      }
 
-      return null;
+      return activeElement && activeElement.focus ? activeElement : null;
     },
     // Private method to finish showing modal
     doShow: function doShow() {
@@ -18974,9 +19567,9 @@ var BModal = /*#__PURE__*/Vue.extend({
         _this.updateModel(true);
 
         _this.$nextTick(function () {
-          // In a nextTick in case modal content is lazy
           // Observe changes in modal content and adjust if necessary
-          _this._observer = observeDom(_this.$refs.content, _this.checkModalOverflow.bind(_this), OBSERVER_CONFIG);
+          // In a `$nextTick()` in case modal content is lazy
+          _this.setObserver(true);
         });
       });
     },
@@ -19138,7 +19731,7 @@ var BModal = /*#__PURE__*/Vue.extend({
       } // Otherwise focus the modal content container
 
 
-      content.focus({
+      attemptFocus(content, {
         preventScroll: true
       });
     },
@@ -19153,18 +19746,18 @@ var BModal = /*#__PURE__*/Vue.extend({
     },
     // Root listener handlers
     showHandler: function showHandler(id, triggerEl) {
-      if (id === this.safeId()) {
+      if (id === this.modalId) {
         this.return_focus = triggerEl || this.getActiveElement();
         this.show();
       }
     },
     hideHandler: function hideHandler(id) {
-      if (id === this.safeId()) {
+      if (id === this.modalId) {
         this.hide('event');
       }
     },
     toggleHandler: function toggleHandler(id, triggerEl) {
-      if (id === this.safeId()) {
+      if (id === this.modalId) {
         this.toggle(triggerEl);
       }
     },
@@ -19233,18 +19826,17 @@ var BModal = /*#__PURE__*/Vue.extend({
     },
     makeModal: function makeModal(h) {
       // Modal header
-      var header = h();
+      var $header = h();
 
       if (!this.hideHeader) {
         // TODO: Rename slot to `header` and deprecate `modal-header`
-        var modalHeader = this.normalizeSlot('modal-header', this.slotScope);
+        var $modalHeader = this.normalizeSlot('modal-header', this.slotScope);
 
-        if (!modalHeader) {
-          var closeButton = h();
+        if (!$modalHeader) {
+          var $closeButton = h();
 
           if (!this.hideHeaderClose) {
-            closeButton = h(BButtonClose, {
-              ref: 'close-button',
+            $closeButton = h(BButtonClose, {
               props: {
                 content: this.headerCloseContent,
                 disabled: this.isTransitioning,
@@ -19253,129 +19845,120 @@ var BModal = /*#__PURE__*/Vue.extend({
               },
               on: {
                 click: this.onClose
-              }
+              },
+              ref: 'close-button'
             }, // TODO: Rename slot to `header-close` and deprecate `modal-header-close`
             [this.normalizeSlot('modal-header-close')]);
           }
 
-          var domProps = // TODO: Rename slot to `title` and deprecate `modal-title`
-          !this.hasNormalizedSlot('modal-title') && this.titleHtml ? {
-            innerHTML: this.titleHtml
-          } : {};
-          modalHeader = [h(this.titleTag, {
+          $modalHeader = [h(this.titleTag, {
             staticClass: 'modal-title',
             class: this.titleClasses,
             attrs: {
-              id: this.safeId('__BV_modal_title_')
+              id: this.modalTitleId
             },
-            domProps: domProps
+            // TODO: Rename slot to `title` and deprecate `modal-title`
+            domProps: this.hasNormalizedSlot('modal-title') ? {} : htmlOrText(this.titleHtml, this.title)
           }, // TODO: Rename slot to `title` and deprecate `modal-title`
-          [this.normalizeSlot('modal-title', this.slotScope) || stripTags(this.title)]), closeButton];
+          [this.normalizeSlot('modal-title', this.slotScope)]), $closeButton];
         }
 
-        header = h('header', {
-          ref: 'header',
+        $header = h('header', {
           staticClass: 'modal-header',
           class: this.headerClasses,
           attrs: {
-            id: this.safeId('__BV_modal_header_')
-          }
-        }, [modalHeader]);
+            id: this.modalHeaderId
+          },
+          ref: 'header'
+        }, [$modalHeader]);
       } // Modal body
 
 
-      var body = h('div', {
-        ref: 'body',
+      var $body = h('div', {
         staticClass: 'modal-body',
         class: this.bodyClasses,
         attrs: {
-          id: this.safeId('__BV_modal_body_')
-        }
+          id: this.modalBodyId
+        },
+        ref: 'body'
       }, this.normalizeSlot('default', this.slotScope)); // Modal footer
 
-      var footer = h();
+      var $footer = h();
 
       if (!this.hideFooter) {
         // TODO: Rename slot to `footer` and deprecate `modal-footer`
-        var modalFooter = this.normalizeSlot('modal-footer', this.slotScope);
+        var $modalFooter = this.normalizeSlot('modal-footer', this.slotScope);
 
-        if (!modalFooter) {
-          var cancelButton = h();
+        if (!$modalFooter) {
+          var $cancelButton = h();
 
           if (!this.okOnly) {
-            var cancelHtml = this.cancelTitleHtml ? {
-              innerHTML: this.cancelTitleHtml
-            } : null;
-            cancelButton = h(BButton, {
-              ref: 'cancel-button',
+            $cancelButton = h(BButton, {
               props: {
                 variant: this.cancelVariant,
                 size: this.buttonSize,
                 disabled: this.cancelDisabled || this.busy || this.isTransitioning
               },
+              // TODO: Rename slot to `cancel-button` and deprecate `modal-cancel`
+              domProps: this.hasNormalizedSlot('modal-cancel') ? {} : htmlOrText(this.cancelTitleHtml, this.cancelTitle),
               on: {
                 click: this.onCancel
-              }
-            }, [// TODO: Rename slot to `cancel-button` and deprecate `modal-cancel`
-            this.normalizeSlot('modal-cancel') || (cancelHtml ? h('span', {
-              domProps: cancelHtml
-            }) : stripTags(this.cancelTitle))]);
+              },
+              ref: 'cancel-button'
+            }, // TODO: Rename slot to `cancel-button` and deprecate `modal-cancel`
+            this.normalizeSlot('modal-cancel'));
           }
 
-          var okHtml = this.okTitleHtml ? {
-            innerHTML: this.okTitleHtml
-          } : null;
-          var okButton = h(BButton, {
-            ref: 'ok-button',
+          var $okButton = h(BButton, {
             props: {
               variant: this.okVariant,
               size: this.buttonSize,
               disabled: this.okDisabled || this.busy || this.isTransitioning
             },
+            // TODO: Rename slot to `ok-button` and deprecate `modal-ok`
+            domProps: this.hasNormalizedSlot('modal-ok') ? {} : htmlOrText(this.okTitleHtml, this.okTitle),
             on: {
               click: this.onOk
-            }
-          }, [// TODO: Rename slot to `ok-button` and deprecate `modal-ok`
-          this.normalizeSlot('modal-ok') || (okHtml ? h('span', {
-            domProps: okHtml
-          }) : stripTags(this.okTitle))]);
-          modalFooter = [cancelButton, okButton];
+            },
+            ref: 'ok-button'
+          }, // TODO: Rename slot to `ok-button` and deprecate `modal-ok`
+          this.normalizeSlot('modal-ok'));
+          $modalFooter = [$cancelButton, $okButton];
         }
 
-        footer = h('footer', {
-          ref: 'footer',
+        $footer = h('footer', {
           staticClass: 'modal-footer',
           class: this.footerClasses,
           attrs: {
-            id: this.safeId('__BV_modal_footer_')
-          }
-        }, [modalFooter]);
+            id: this.modalFooterId
+          },
+          ref: 'footer'
+        }, [$modalFooter]);
       } // Assemble modal content
 
 
-      var modalContent = h('div', {
-        ref: 'content',
+      var $modalContent = h('div', {
         staticClass: 'modal-content',
         class: this.contentClass,
         attrs: {
-          role: 'document',
-          id: this.safeId('__BV_modal_content_'),
+          id: this.modalContentId,
           tabindex: '-1'
-        }
-      }, [header, body, footer]); // Tab trap to prevent page from scrolling to next element in
-      // tab index during enforce focus tab cycle
+        },
+        ref: 'content'
+      }, [$header, $body, $footer]); // Tab traps to prevent page from scrolling to next element in
+      // tab index during enforce-focus tab cycle
 
-      var tabTrapTop = h();
-      var tabTrapBottom = h();
+      var $tabTrapTop = h();
+      var $tabTrapBottom = h();
 
       if (this.isVisible && !this.noEnforceFocus) {
-        tabTrapTop = h('span', {
+        $tabTrapTop = h('span', {
           ref: 'topTrap',
           attrs: {
             tabindex: '0'
           }
         });
-        tabTrapBottom = h('span', {
+        $tabTrapBottom = h('span', {
           ref: 'bottomTrap',
           attrs: {
             tabindex: '0'
@@ -19384,46 +19967,35 @@ var BModal = /*#__PURE__*/Vue.extend({
       } // Modal dialog wrapper
 
 
-      var modalDialog = h('div', {
-        ref: 'dialog',
+      var $modalDialog = h('div', {
         staticClass: 'modal-dialog',
         class: this.dialogClasses,
         on: {
           mousedown: this.onDialogMousedown
-        }
-      }, [tabTrapTop, modalContent, tabTrapBottom]); // Modal
+        },
+        ref: 'dialog'
+      }, [$tabTrapTop, $modalContent, $tabTrapBottom]); // Modal
 
-      var modal = h('div', {
-        ref: 'modal',
+      var $modal = h('div', {
         staticClass: 'modal',
         class: this.modalClasses,
         style: this.modalStyles,
-        directives: [{
-          name: 'show',
-          rawName: 'v-show',
-          value: this.isVisible,
-          expression: 'isVisible'
-        }],
-        attrs: {
-          id: this.safeId(),
-          role: 'dialog',
-          'aria-hidden': this.isVisible ? null : 'true',
-          'aria-modal': this.isVisible ? 'true' : null,
-          'aria-label': this.ariaLabel,
-          'aria-labelledby': this.hideHeader || this.ariaLabel || // TODO: Rename slot to `title` and deprecate `modal-title`
-          !(this.hasNormalizedSlot('modal-title') || this.titleHtml || this.title) ? null : this.safeId('__BV_modal_title_'),
-          'aria-describedby': this.safeId('__BV_modal_body_')
-        },
+        attrs: this.computedModalAttrs,
         on: {
           keydown: this.onEsc,
           click: this.onClickOut
-        }
-      }, [modalDialog]); // Wrap modal in transition
-      // Sadly, we can't use BVTransition here due to the differences in
-      // transition durations for .modal and .modal-dialog. Not until
-      // issue https://github.com/vuejs/vue/issues/9986 is resolved
+        },
+        directives: [{
+          name: 'show',
+          value: this.isVisible
+        }],
+        ref: 'modal'
+      }, [$modalDialog]); // Wrap modal in transition
+      // Sadly, we can't use `BVTransition` here due to the differences in
+      // transition durations for `.modal` and `.modal-dialog`
+      // At least until https://github.com/vuejs/vue/issues/9986 is resolved
 
-      modal = h('transition', {
+      $modal = h('transition', {
         props: {
           enterClass: '',
           enterToClass: '',
@@ -19440,36 +20012,31 @@ var BModal = /*#__PURE__*/Vue.extend({
           leave: this.onLeave,
           afterLeave: this.onAfterLeave
         }
-      }, [modal]); // Modal backdrop
+      }, [$modal]); // Modal backdrop
 
-      var backdrop = h();
+      var $backdrop = h();
 
       if (!this.hideBackdrop && this.isVisible) {
-        backdrop = h('div', {
+        $backdrop = h('div', {
           staticClass: 'modal-backdrop',
           attrs: {
-            id: this.safeId('__BV_modal_backdrop_')
+            id: this.modalBackdropId
           }
         }, // TODO: Rename slot to `backdrop` and deprecate `modal-backdrop`
-        [this.normalizeSlot('modal-backdrop')]);
+        this.normalizeSlot('modal-backdrop'));
       }
 
-      backdrop = h(BVTransition, {
+      $backdrop = h(BVTransition, {
         props: {
           noFade: this.noFade
         }
-      }, [backdrop]); // If the parent has a scoped style attribute, and the modal
-      // is portalled, add the scoped attribute to the modal wrapper
-
-      var scopedStyleAttrs = !this.static ? this.scopedStyleAttrs : {}; // Assemble modal and backdrop in an outer <div>
+      }, [$backdrop]); // Assemble modal and backdrop in an outer <div>
 
       return h('div', {
-        key: "modal-outer-".concat(this._uid),
         style: this.modalOuterStyle,
-        attrs: _objectSpread2({}, scopedStyleAttrs, {}, this.$attrs, {
-          id: this.safeId('__BV_modal_outer_')
-        })
-      }, [modal, backdrop]);
+        attrs: this.computedAttrs,
+        key: "modal-outer-".concat(this._uid)
+      }, [$modal, $backdrop]);
     }
   },
   render: function render(h) {
@@ -19602,7 +20169,7 @@ var PROP_NAME_PRIV = '_bv__modal'; // Base modal props that are allowed
 // Prop ID is allowed, but really only should be used for testing
 // We need to add it in explicitly as it comes from the `idMixin`
 
-var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$I, ['busy', 'lazy', 'noStacking', "static", 'visible'])))); // Fallback event resolver (returns undefined)
+var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$J, ['busy', 'lazy', 'noStacking', "static", 'visible'])))); // Fallback event resolver (returns undefined)
 
 var defaultResolver = function defaultResolver() {}; // Map prop names to modal slot names
 
@@ -19689,11 +20256,11 @@ var plugin = function plugin(Vue) {
       // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
       parent: $parent,
       // Preset the prop values
-      propsData: _objectSpread2({}, filterOptions(getComponentConfig('BModal') || {}), {
+      propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions(getComponentConfig('BModal') || {})), {}, {
         // Defaults that user can override
         hideHeaderClose: true,
         hideHeader: !(props.title || props.titleHtml)
-      }, omit(props, keys(propsToSlots)), {
+      }, omit(props, keys(propsToSlots))), {}, {
         // Props that can't be overridden
         lazy: false,
         busy: false,
@@ -19747,7 +20314,7 @@ var plugin = function plugin(Vue) {
       return;
     }
 
-    return asyncMsgBox($parent, _objectSpread2({}, filterOptions(options), {
+    return asyncMsgBox($parent, _objectSpread2(_objectSpread2({}, filterOptions(options)), {}, {
       msgBoxContent: content
     }), resolver);
   }; // BvModal instance class
@@ -19808,7 +20375,7 @@ var plugin = function plugin(Vue) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         // Pick the modal props we support from options
-        var props = _objectSpread2({}, options, {
+        var props = _objectSpread2(_objectSpread2({}, options), {}, {
           // Add in overrides and our content prop
           okOnly: true,
           okDisabled: false,
@@ -19829,7 +20396,7 @@ var plugin = function plugin(Vue) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
         // Set the modal props we support from options
-        var props = _objectSpread2({}, options, {
+        var props = _objectSpread2(_objectSpread2({}, options), {}, {
           // Add in overrides and our content prop
           okOnly: false,
           okDisabled: false,
@@ -19856,9 +20423,8 @@ var plugin = function plugin(Vue) {
     }
   }); // Define our read-only `$bvModal` instance property
   // Placed in an if just in case in HMR mode
-  // eslint-disable-next-line no-prototype-builtins
 
-  if (!Vue.prototype.hasOwnProperty(PROP_NAME$2)) {
+  if (!hasOwnProperty(Vue.prototype, PROP_NAME$2)) {
     defineProperty(Vue.prototype, PROP_NAME$2, {
       get: function get() {
         /* istanbul ignore next */
@@ -19891,7 +20457,7 @@ var ModalPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var props$J = {
+var props$K = {
   tag: {
     type: String,
     default: 'ul'
@@ -19941,7 +20507,7 @@ var computeJustifyContent = function computeJustifyContent(value) {
 var BNav = /*#__PURE__*/Vue.extend({
   name: 'BNav',
   functional: true,
-  props: props$J,
+  props: props$K,
   render: function render(h, _ref) {
     var _class;
 
@@ -19963,12 +20529,13 @@ var BNav = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$K = propsFactory(); // @vue/component
+var props$L = omit(props$1, ['event', 'routerTag']); // --- Main component ---
+// @vue/component
 
 var BNavItem = /*#__PURE__*/Vue.extend({
   name: 'BNavItem',
   functional: true,
-  props: _objectSpread2({}, props$K, {
+  props: _objectSpread2(_objectSpread2({}, props$L), {}, {
     linkAttrs: {
       type: Object,
       default: function _default() {}
@@ -19997,12 +20564,12 @@ var BNavItem = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$L = {}; // @vue/component
+var props$M = {}; // @vue/component
 
 var BNavText = /*#__PURE__*/Vue.extend({
   name: 'BNavText',
   functional: true,
-  props: props$L,
+  props: props$M,
   render: function render(h, _ref) {
     var data = _ref.data,
         children = _ref.children;
@@ -20012,7 +20579,7 @@ var BNavText = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$M = _objectSpread2({}, omit(props$p, ['inline']), {
+var props$N = _objectSpread2(_objectSpread2({}, omit(props$q, ['inline'])), {}, {
   formClass: {
     type: [String, Array, Object] // default: null
 
@@ -20022,7 +20589,7 @@ var props$M = _objectSpread2({}, omit(props$p, ['inline']), {
 var BNavForm = /*#__PURE__*/Vue.extend({
   name: 'BNavForm',
   functional: true,
-  props: props$M,
+  props: props$N,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -20036,7 +20603,7 @@ var BNavForm = /*#__PURE__*/Vue.extend({
     data.on = {};
     var $form = h(BForm, {
       class: props.formClass,
-      props: _objectSpread2({}, props, {
+      props: _objectSpread2(_objectSpread2({}, props), {}, {
         inline: true
       }),
       attrs: attrs,
@@ -20048,13 +20615,17 @@ var BNavForm = /*#__PURE__*/Vue.extend({
   }
 });
 
-var props$N = pluckProps(['text', 'html', 'menuClass', 'toggleClass', 'noCaret', 'role', 'lazy'], props$k); // @vue/component
+var props$O = pluckProps(['text', 'html', 'menuClass', 'toggleClass', 'noCaret', 'role', 'lazy'], props$l); // --- Main component ---
+// @vue/component
 
 var BNavItemDropdown = /*#__PURE__*/Vue.extend({
   name: 'BNavItemDropdown',
   mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
-  props: props$N,
+  props: props$O,
   computed: {
+    toggleId: function toggleId() {
+      return this.safeId('_BV_toggle_');
+    },
     isNav: function isNav() {
       // Signal to dropdown mixin that we are in a navbar
       return true;
@@ -20077,41 +20648,45 @@ var BNavItemDropdown = /*#__PURE__*/Vue.extend({
     }
   },
   render: function render(h) {
-    var button = h(BLink, {
-      ref: 'toggle',
+    var toggleId = this.toggleId,
+        visible = this.visible;
+    var $toggle = h(BLink, {
       staticClass: 'nav-link dropdown-toggle',
       class: this.toggleClasses,
       props: {
-        href: '#',
+        href: "#".concat(this.id || ''),
         disabled: this.disabled
       },
       attrs: {
-        id: this.safeId('_BV_button_'),
+        id: toggleId,
+        role: 'button',
         'aria-haspopup': 'true',
-        'aria-expanded': this.visible ? 'true' : 'false'
+        'aria-expanded': visible ? 'true' : 'false'
       },
       on: {
         mousedown: this.onMousedown,
         click: this.toggle,
         keydown: this.toggle // Handle ENTER, SPACE and DOWN
 
-      }
-    }, [this.$slots['button-content'] || this.$slots.text || h('span', {
+      },
+      ref: 'toggle'
+    }, [// TODO: The `text` slot is deprecated in favor of the `button-content` slot
+    this.normalizeSlot(['button-content', 'text']) || h('span', {
       domProps: htmlOrText(this.html, this.text)
     })]);
-    var menu = h('ul', {
+    var $menu = h('ul', {
       staticClass: 'dropdown-menu',
       class: this.menuClasses,
-      ref: 'menu',
       attrs: {
         tabindex: '-1',
-        'aria-labelledby': this.safeId('_BV_button_')
+        'aria-labelledby': toggleId
       },
       on: {
         keydown: this.onKeydown // Handle UP, DOWN and ESC
 
-      }
-    }, !this.lazy || this.visible ? this.normalizeSlot('default', {
+      },
+      ref: 'menu'
+    }, !this.lazy || visible ? this.normalizeSlot('default', {
       hide: this.hide
     }) : [h()]);
     return h('li', {
@@ -20120,7 +20695,7 @@ var BNavItemDropdown = /*#__PURE__*/Vue.extend({
       attrs: {
         id: this.safeId()
       }
-    }, [button, menu]);
+    }, [$toggle, $menu]);
   }
 });
 
@@ -20140,8 +20715,9 @@ var NavPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$t = 'BNavbar';
-var props$O = {
+var NAME$v = 'BNavbar'; // --- Props ---
+
+var props$P = {
   tag: {
     type: String,
     default: 'nav'
@@ -20153,7 +20729,7 @@ var props$O = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$t, 'variant');
+      return getComponentConfig(NAME$v, 'variant');
     }
   },
   toggleable: {
@@ -20171,12 +20747,13 @@ var props$O = {
     type: Boolean,
     default: false
   }
-}; // @vue/component
+}; // --- Main component ---
+// @vue/component
 
 var BNavbar = /*#__PURE__*/Vue.extend({
-  name: NAME$t,
+  name: NAME$v,
   mixins: [normalizeSlotMixin],
-  props: props$O,
+  props: props$P,
   provide: function provide() {
     return {
       bvNavbar: this
@@ -20207,13 +20784,13 @@ var BNavbar = /*#__PURE__*/Vue.extend({
         'sticky-top': this.sticky
       }, _defineProperty(_ref, "navbar-".concat(this.type), this.type), _defineProperty(_ref, "bg-".concat(this.variant), this.variant), _defineProperty(_ref, "fixed-".concat(this.fixed), this.fixed), _ref), this.breakpointClass],
       attrs: {
-        role: this.tag === 'nav' ? null : 'navigation'
+        role: isTag(this.tag, 'nav') ? null : 'navigation'
       }
     }, [this.normalizeSlot('default')]);
   }
 });
 
-var props$P = pluckProps(['tag', 'fill', 'justified', 'align', 'small'], props$J); // -- Utils --
+var props$Q = pluckProps(['tag', 'fill', 'justified', 'align', 'small'], props$K); // -- Utils --
 
 var computeJustifyContent$1 = function computeJustifyContent(value) {
   // Normalize value
@@ -20225,7 +20802,7 @@ var computeJustifyContent$1 = function computeJustifyContent(value) {
 var BNavbarNav = /*#__PURE__*/Vue.extend({
   name: 'BNavbarNav',
   functional: true,
-  props: props$P,
+  props: props$Q,
   render: function render(h, _ref) {
     var _class;
 
@@ -20242,20 +20819,21 @@ var BNavbarNav = /*#__PURE__*/Vue.extend({
   }
 });
 
-var linkProps$4 = propsFactory();
+var linkProps$4 = omit(props$1, ['event', 'routerTag']);
 linkProps$4.href.default = undefined;
 linkProps$4.to.default = undefined;
-var props$Q = _objectSpread2({}, linkProps$4, {
+var props$R = _objectSpread2({
   tag: {
     type: String,
     default: 'div'
   }
-}); // @vue/component
+}, linkProps$4); // --- Main component ---
+// @vue/component
 
 var BNavbarBrand = /*#__PURE__*/Vue.extend({
   name: 'BNavbarBrand',
   functional: true,
-  props: props$Q,
+  props: props$R,
   render: function render(h, _ref) {
     var props = _ref.props,
         data = _ref.data,
@@ -20269,29 +20847,30 @@ var BNavbarBrand = /*#__PURE__*/Vue.extend({
   }
 });
 
-//   Switch to using `VBToggle` directive, will reduce code footprint
-//   Although the `click` event will no longer be cancellable
-//   Instead add `disabled` prop, and have `VBToggle` check element
-//   disabled state
-// --- Constants ---
-
-var NAME$u = 'BNavbarToggle';
+var NAME$w = 'BNavbarToggle';
 var CLASS_NAME$2 = 'navbar-toggler'; // --- Main component ---
 // @vue/component
 
 var BNavbarToggle = /*#__PURE__*/Vue.extend({
-  name: NAME$u,
+  name: NAME$w,
+  directives: {
+    BToggle: VBToggle
+  },
   mixins: [listenOnRootMixin, normalizeSlotMixin],
   props: {
     label: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$u, 'label');
+        return getComponentConfig(NAME$w, 'label');
       }
     },
     target: {
       type: String,
       required: true
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data: function data() {
@@ -20305,33 +20884,40 @@ var BNavbarToggle = /*#__PURE__*/Vue.extend({
   },
   methods: {
     onClick: function onClick(evt) {
-      this.$emit('click', evt);
-
-      if (!evt.defaultPrevented) {
-        this.emitOnRoot(EVENT_TOGGLE, this.target);
+      if (!this.disabled) {
+        // Emit courtesy `click` event
+        this.$emit('click', evt);
       }
     },
     handleStateEvt: function handleStateEvt(id, state) {
+      // We listen for state events so that we can pass the
+      // boolean expanded state to the default scoped slot
       if (id === this.target) {
         this.toggleState = state;
       }
     }
   },
   render: function render(h) {
-    var expanded = this.toggleState;
+    var disabled = this.disabled;
     return h('button', {
       staticClass: CLASS_NAME$2,
+      class: {
+        disabled: disabled
+      },
+      directives: [{
+        name: 'BToggle',
+        value: this.target
+      }],
       attrs: {
         type: 'button',
-        'aria-label': this.label,
-        'aria-controls': this.target,
-        'aria-expanded': toString$1(expanded)
+        disabled: disabled,
+        'aria-label': this.label
       },
       on: {
         click: this.onClick
       }
     }, [this.normalizeSlot('default', {
-      expanded: expanded
+      expanded: this.toggleState
     }) || h('span', {
       staticClass: "".concat(CLASS_NAME$2, "-icon")
     })]);
@@ -20353,10 +20939,10 @@ var NavbarPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$v = 'BSpinner'; // @vue/component
+var NAME$x = 'BSpinner'; // @vue/component
 
 var BSpinner = /*#__PURE__*/Vue.extend({
-  name: NAME$v,
+  name: NAME$x,
   functional: true,
   props: {
     type: {
@@ -20371,7 +20957,7 @@ var BSpinner = /*#__PURE__*/Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$v, 'variant');
+        return getComponentConfig(NAME$x, 'variant');
       }
     },
     small: {
@@ -20538,7 +21124,7 @@ var BOverlay = /*#__PURE__*/Vue.extend({
       var $background = h('div', {
         staticClass: 'position-absolute',
         class: [this.computedVariant, this.computedRounded],
-        style: _objectSpread2({}, positionCover, {
+        style: _objectSpread2(_objectSpread2({}, positionCover), {}, {
           opacity: this.opacity,
           backgroundColor: this.bgColor || null,
           backdropFilter: this.blur ? "blur(".concat(this.blur, ")") : null
@@ -20563,9 +21149,14 @@ var BOverlay = /*#__PURE__*/Vue.extend({
           'position-absolute': !this.noWrap || this.noWrap && !this.fixed,
           'position-fixed': this.noWrap && this.fixed
         },
-        style: _objectSpread2({}, positionCover, {
+        style: _objectSpread2(_objectSpread2({}, positionCover), {}, {
           zIndex: this.zIndex || 10
-        })
+        }),
+        on: {
+          click: function click(evt) {
+            return _this.$emit('click', evt);
+          }
+        }
       }, [$background, $content]);
     } // Wrap in a fade transition
 
@@ -20659,7 +21250,7 @@ var onSpaceKey = function onSpaceKey(evt) {
 }; // --- Props ---
 
 
-var props$R = {
+var props$S = {
   disabled: {
     type: Boolean,
     default: false
@@ -20797,7 +21388,7 @@ var paginationMixin = {
     prop: 'value',
     event: 'input'
   },
-  props: props$R,
+  props: props$S,
   data: function data() {
     // `-1` signifies no page initially selected
     var currentPage = toInteger(this.value, 0);
@@ -20855,7 +21446,7 @@ var paginationMixin = {
           numberOfLinks = limit - (firstNumber ? 0 : 1);
         }
 
-        numberOfLinks = Math.min(numberOfLinks, limit);
+        numberOfLinks = mathMin(numberOfLinks, limit);
       } else if (numberOfPages - currentPage + 2 < limit && limit > ELLIPSIS_THRESHOLD) {
         if (!hideEllipsis || firstNumber) {
           showFirstDots = true;
@@ -20871,7 +21462,7 @@ var paginationMixin = {
           showLastDots = !!(!hideEllipsis || lastNumber);
         }
 
-        startNumber = currentPage - Math.floor(numberOfLinks / 2);
+        startNumber = currentPage - mathFloor(numberOfLinks / 2);
       } // Sanity checks
 
       /* istanbul ignore if */
@@ -20901,14 +21492,14 @@ var paginationMixin = {
 
       if (limit <= ELLIPSIS_THRESHOLD) {
         if (firstNumber && startNumber === 1) {
-          numberOfLinks = Math.min(numberOfLinks + 1, numberOfPages, limit + 1);
+          numberOfLinks = mathMin(numberOfLinks + 1, numberOfPages, limit + 1);
         } else if (lastNumber && numberOfPages === startNumber + numberOfLinks - 1) {
-          startNumber = Math.max(startNumber - 1, 1);
-          numberOfLinks = Math.min(numberOfPages - startNumber + 1, numberOfPages, limit + 1);
+          startNumber = mathMax(startNumber - 1, 1);
+          numberOfLinks = mathMin(numberOfPages - startNumber + 1, numberOfPages, limit + 1);
         }
       }
 
-      numberOfLinks = Math.min(numberOfLinks, numberOfPages - startNumber + 1);
+      numberOfLinks = mathMin(numberOfLinks, numberOfPages - startNumber + 1);
       return {
         showFirstDots: showFirstDots,
         showLastDots: showLastDots,
@@ -21013,9 +21604,6 @@ var paginationMixin = {
         return isVisible(btn);
       });
     },
-    setBtnFocus: function setBtnFocus(btn) {
-      btn.focus();
-    },
     focusCurrent: function focusCurrent() {
       var _this2 = this;
 
@@ -21025,9 +21613,7 @@ var paginationMixin = {
           return toInteger(getAttr(el, 'aria-posinset'), 0) === _this2.computedCurrentPage;
         });
 
-        if (btn && btn.focus) {
-          _this2.setBtnFocus(btn);
-        } else {
+        if (!attemptFocus(btn)) {
           // Fallback if current page is not in button list
           _this2.focusFirst();
         }
@@ -21042,9 +21628,7 @@ var paginationMixin = {
           return !isDisabled(el);
         });
 
-        if (btn && btn.focus && btn !== document.activeElement) {
-          _this3.setBtnFocus(btn);
-        }
+        attemptFocus(btn);
       });
     },
     focusLast: function focusLast() {
@@ -21056,9 +21640,7 @@ var paginationMixin = {
           return !isDisabled(el);
         });
 
-        if (btn && btn.focus && btn !== document.activeElement) {
-          _this4.setBtnFocus(btn);
-        }
+        attemptFocus(btn);
       });
     },
     focusPrev: function focusPrev() {
@@ -21068,10 +21650,10 @@ var paginationMixin = {
       this.$nextTick(function () {
         var buttons = _this5.getButtons();
 
-        var idx = buttons.indexOf(document.activeElement);
+        var index = buttons.indexOf(getActiveElement());
 
-        if (idx > 0 && !isDisabled(buttons[idx - 1]) && buttons[idx - 1].focus) {
-          _this5.setBtnFocus(buttons[idx - 1]);
+        if (index > 0 && !isDisabled(buttons[index - 1])) {
+          attemptFocus(buttons[index - 1]);
         }
       });
     },
@@ -21082,11 +21664,10 @@ var paginationMixin = {
       this.$nextTick(function () {
         var buttons = _this6.getButtons();
 
-        var idx = buttons.indexOf(document.activeElement);
-        var cnt = buttons.length - 1;
+        var index = buttons.indexOf(getActiveElement());
 
-        if (idx < cnt && !isDisabled(buttons[idx + 1]) && buttons[idx + 1].focus) {
-          _this6.setBtnFocus(buttons[idx + 1]);
+        if (index < buttons.length - 1 && !isDisabled(buttons[index + 1])) {
+          attemptFocus(buttons[index + 1]);
         }
       });
     }
@@ -21299,14 +21880,14 @@ var paginationMixin = {
   }
 };
 
-var NAME$w = 'BPagination';
+var NAME$y = 'BPagination';
 var DEFAULT_PER_PAGE = 20;
 var DEFAULT_TOTAL_ROWS = 0;
-var props$S = {
+var props$T = {
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$w, 'size');
+      return getComponentConfig(NAME$y, 'size');
     }
   },
   perPage: {
@@ -21325,23 +21906,23 @@ var props$S = {
 // Sanitize the provided per page number (converting to a number)
 
 var sanitizePerPage = function sanitizePerPage(val) {
-  return Math.max(toInteger(val) || DEFAULT_PER_PAGE, 1);
+  return mathMax(toInteger(val) || DEFAULT_PER_PAGE, 1);
 }; // Sanitize the provided total rows number (converting to a number)
 
 
 var sanitizeTotalRows = function sanitizeTotalRows(val) {
-  return Math.max(toInteger(val) || DEFAULT_TOTAL_ROWS, 0);
+  return mathMax(toInteger(val) || DEFAULT_TOTAL_ROWS, 0);
 }; // The render function is brought in via the `paginationMixin`
 // @vue/component
 
 
 var BPagination = /*#__PURE__*/Vue.extend({
-  name: NAME$w,
+  name: NAME$y,
   mixins: [paginationMixin],
-  props: props$S,
+  props: props$T,
   computed: {
     numberOfPages: function numberOfPages() {
-      var result = Math.ceil(sanitizeTotalRows(this.totalRows) / sanitizePerPage(this.perPage));
+      var result = mathCeil(sanitizeTotalRows(this.totalRows) / sanitizePerPage(this.perPage));
       return result < 1 ? 1 : result;
     },
     pageSizeNumberOfPages: function pageSizeNumberOfPages() {
@@ -21414,8 +21995,8 @@ var BPagination = /*#__PURE__*/Vue.extend({
         // Keep the current button focused if possible
         var target = evt.target;
 
-        if (isVisible(target) && _this2.$el.contains(target) && target.focus) {
-          target.focus();
+        if (isVisible(target) && _this2.$el.contains(target)) {
+          attemptFocus(target);
         } else {
           _this2.focusCurrent();
         }
@@ -21441,16 +22022,15 @@ var PaginationPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$x = 'BPaginationNav'; // Sanitize the provided number of pages (converting to a number)
+var NAME$z = 'BPaginationNav'; // --- Props ---
 
-var sanitizeNumberOfPages = function sanitizeNumberOfPages(value) {
-  return Math.max(toInteger(value, 0), 1);
-};
-var props$T = {
+var _linkProps = omit(props$1, ['event', 'routerTag']);
+
+var props$U = _objectSpread2({
   size: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$x, 'size');
+      return getComponentConfig(NAME$z, 'size');
     }
   },
   numberOfPages: {
@@ -21462,7 +22042,7 @@ var props$T = {
       var number = toInteger(value, 0);
 
       if (number < 1) {
-        warn('Prop "number-of-pages" must be a number greater than "0"', NAME$x);
+        warn('Prop "number-of-pages" must be a number greater than "0"', NAME$z);
         return false;
       }
 
@@ -21494,32 +22074,21 @@ var props$T = {
     // Disable auto page number detection if true
     type: Boolean,
     default: false
-  },
-  // router-link specific props
-  activeClass: {
-    type: String // default: undefined
-
-  },
-  exact: {
-    type: Boolean,
-    default: false
-  },
-  exactActiveClass: {
-    type: String // default: undefined
-
-  },
-  // nuxt-link specific prop(s)
-  noPrefetch: {
-    type: Boolean,
-    default: false
   }
-}; // The render function is brought in via the pagination mixin
+}, _linkProps); // --- Utility methods ---
+// Sanitize the provided number of pages (converting to a number)
+
+
+var sanitizeNumberOfPages = function sanitizeNumberOfPages(value) {
+  return mathMax(toInteger(value, 0), 1);
+}; // --- Main component ---
+// The render function is brought in via the pagination mixin
 // @vue/component
 
 var BPaginationNav = /*#__PURE__*/Vue.extend({
-  name: NAME$x,
+  name: NAME$z,
   mixins: [paginationMixin],
-  props: props$T,
+  props: props$U,
   computed: {
     // Used by render function to trigger wrapping in '<nav>' element
     isNav: function isNav() {
@@ -21595,13 +22164,11 @@ var BPaginationNav = /*#__PURE__*/Vue.extend({
         _this5.$emit('change', pageNum);
       });
       this.$nextTick(function () {
-        // Done in a nextTick() to ensure rendering complete
-        try {
-          // Emulate native link click page reloading behaviour by blurring the
-          // paginator and returning focus to the document
-          var target = evt.currentTarget || evt.target;
-          target.blur();
-        } catch (e) {}
+        // Emulate native link click page reloading behaviour by blurring the
+        // paginator and returning focus to the document
+        // Done in a `nextTick()` to ensure rendering complete
+        var target = evt.currentTarget || evt.target;
+        attemptBlur(target);
       });
     },
     getPageInfo: function getPageInfo(pageNum) {
@@ -21653,20 +22220,8 @@ var BPaginationNav = /*#__PURE__*/Vue.extend({
       return info.link;
     },
     linkProps: function linkProps(pageNum) {
+      var props = pluckProps(_linkProps, this);
       var link = this.makeLink(pageNum);
-      var props = {
-        target: this.target || null,
-        rel: this.rel || null,
-        disabled: this.disabled,
-        // The following props are only used if BLink detects router
-        exact: this.exact,
-        activeClass: this.activeClass,
-        exactActiveClass: this.exactActiveClass,
-        append: this.append,
-        replace: this.replace,
-        // nuxt-link specific prop
-        noPrefetch: this.noPrefetch
-      };
 
       if (this.useRouter || isObject(link)) {
         props.to = link;
@@ -21791,7 +22346,7 @@ var PaginationNavPlugin = /*#__PURE__*/pluginFactory({
 });
 
 // Base on-demand component for tooltip / popover templates
-var NAME$y = 'BVPopper';
+var NAME$A = 'BVPopper';
 var AttachmentMap$1 = {
   AUTO: 'auto',
   TOP: 'top',
@@ -21824,7 +22379,7 @@ var OffsetMap = {
 }; // @vue/component
 
 var BVPopper = /*#__PURE__*/Vue.extend({
-  name: NAME$y,
+  name: NAME$A,
   props: {
     target: {
       // Element that the tooltip/popover is positioned relative to
@@ -21944,10 +22499,10 @@ var BVPopper = /*#__PURE__*/Vue.extend({
   updated: function updated() {
     // Update popper if needed
     // TODO: Should this be a watcher on `this.popperConfig` instead?
-    this.popperUpdate();
+    this.updatePopper();
   },
   beforeDestroy: function beforeDestroy() {
-    this.popperDestroy();
+    this.destroyPopper();
   },
   destroyed: function destroyed() {
     // Make sure template is removed from DOM
@@ -21991,16 +22546,16 @@ var BVPopper = /*#__PURE__*/Vue.extend({
       return this.offset;
     },
     popperCreate: function popperCreate(el) {
-      this.popperDestroy(); // We use `el` rather than `this.$el` just in case the original
+      this.destroyPopper(); // We use `el` rather than `this.$el` just in case the original
       // mountpoint root element type was changed by the template
 
       this.$_popper = new Popper(this.target, el, this.popperConfig);
     },
-    popperDestroy: function popperDestroy() {
+    destroyPopper: function destroyPopper() {
       this.$_popper && this.$_popper.destroy();
       this.$_popper = null;
     },
-    popperUpdate: function popperUpdate() {
+    updatePopper: function updatePopper() {
       this.$_popper && this.$_popper.scheduleUpdate();
     },
     popperPlacementChange: function popperPlacementChange(data) {
@@ -22045,10 +22600,10 @@ var BVPopper = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$z = 'BVTooltipTemplate'; // @vue/component
+var NAME$B = 'BVTooltipTemplate'; // @vue/component
 
 var BVTooltipTemplate = /*#__PURE__*/Vue.extend({
-  name: NAME$z,
+  name: NAME$B,
   extends: BVPopper,
   mixins: [scopedStyleAttrsMixin],
   props: {
@@ -22152,7 +22707,7 @@ var BVTooltipTemplate = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$A = 'BVTooltip'; // Modal container selector for appending tooltip/popover
+var NAME$C = 'BVTooltip'; // Modal container selector for appending tooltip/popover
 
 var MODAL_SELECTOR = '.modal-content'; // Modal `$root` hidden event
 
@@ -22213,11 +22768,11 @@ var templateData = {
 }; // @vue/component
 
 var BVTooltip = /*#__PURE__*/Vue.extend({
-  name: NAME$A,
+  name: NAME$C,
   props: {// None
   },
   data: function data() {
-    return _objectSpread2({}, templateData, {
+    return _objectSpread2(_objectSpread2({}, templateData), {}, {
       // State management data
       activeTrigger: {
         // manual: false,
@@ -22244,10 +22799,10 @@ var BVTooltip = /*#__PURE__*/Vue.extend({
       };
 
       if (isPlainObject(this.delay)) {
-        delay.show = Math.max(toInteger(this.delay.show, 0), 0);
-        delay.hide = Math.max(toInteger(this.delay.hide, 0), 0);
+        delay.show = mathMax(toInteger(this.delay.show, 0), 0);
+        delay.hide = mathMax(toInteger(this.delay.hide, 0), 0);
       } else if (isNumber(this.delay) || isString(this.delay)) {
-        delay.show = delay.hide = Math.max(toInteger(this.delay, 0), 0);
+        delay.show = delay.hide = mathMax(toInteger(this.delay, 0), 0);
       }
 
       return delay;
@@ -22463,7 +23018,7 @@ var BVTooltip = /*#__PURE__*/Vue.extend({
       this.localPlacementTarget = null;
 
       try {
-        this.$_tip && this.$_tip.$destroy();
+        this.$_tip.$destroy();
       } catch (_unused) {}
 
       this.$_tip = null;
@@ -22688,16 +23243,12 @@ var BVTooltip = /*#__PURE__*/Vue.extend({
       return this.isDropdown() && target && select(DROPDOWN_OPEN_SELECTOR, target);
     },
     clearHoverTimeout: function clearHoverTimeout() {
-      if (this.$_hoverTimeout) {
-        clearTimeout(this.$_hoverTimeout);
-        this.$_hoverTimeout = null;
-      }
+      clearTimeout(this.$_hoverTimeout);
+      this.$_hoverTimeout = null;
     },
     clearVisibilityInterval: function clearVisibilityInterval() {
-      if (this.$_visibleInterval) {
-        clearInterval(this.$_visibleInterval);
-        this.$_visibleInterval = null;
-      }
+      clearInterval(this.$_visibleInterval);
+      this.$_visibleInterval = null;
     },
     clearActiveTriggers: function clearActiveTriggers() {
       for (var trigger in this.activeTrigger) {
@@ -22926,13 +23477,13 @@ var BVTooltip = /*#__PURE__*/Vue.extend({
         this.enter(evt);
       } else if (type === 'focusin' && arrayIncludes(triggers, 'focus')) {
         // `focusin` is a bubbling event
-        // `evt` includes `relatedTarget` (element loosing focus)
+        // `evt` includes `relatedTarget` (element losing focus)
         this.enter(evt);
       } else if (type === 'focusout' && (arrayIncludes(triggers, 'focus') || arrayIncludes(triggers, 'blur')) || type === 'mouseleave' && arrayIncludes(triggers, 'hover')) {
         // `focusout` is a bubbling event
         // `mouseleave` is a non-bubbling event
         // `tip` is the template (will be null if not open)
-        var tip = this.getTemplateElement(); // `evtTarget` is the element which is loosing focus/hover and
+        var tip = this.getTemplateElement(); // `evtTarget` is the element which is losing focus/hover and
 
         var evtTarget = evt.target; // `relatedTarget` is the element gaining focus/hover
 
@@ -22992,18 +23543,15 @@ var BVTooltip = /*#__PURE__*/Vue.extend({
       if (!this.$_enabled || this.dropdownOpen()) {
         /* istanbul ignore next */
         return;
-      }
+      } // Get around a WebKit bug where `click` does not trigger focus events
+      // On most browsers, `click` triggers a `focusin`/`focus` event first
+      // Needed so that trigger 'click blur' works on iOS
+      // https://github.com/bootstrap-vue/bootstrap-vue/issues/5099
+      // We use `currentTarget` rather than `target` to trigger on the
+      // element, not the inner content
 
-      try {
-        // Get around a WebKit bug where `click` does not trigger focus events
-        // On most browsers, `click` triggers a `focusin`/`focus` event first
-        // Needed so that trigger 'click blur' works on iOS
-        // https://github.com/bootstrap-vue/bootstrap-vue/issues/5099
-        // We use `currentTarget` rather than `target` to trigger on the
-        // element, not the inner content
-        evt.currentTarget.focus();
-      } catch (_unused2) {}
 
+      attemptFocus(evt.currentTarget);
       this.activeTrigger.click = !this.activeTrigger.click;
 
       if (this.isWithActiveTrigger) {
@@ -23108,10 +23656,10 @@ var BVTooltip = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$B = 'BTooltip'; // @vue/component
+var NAME$D = 'BTooltip'; // @vue/component
 
 var BTooltip = /*#__PURE__*/Vue.extend({
-  name: NAME$B,
+  name: NAME$D,
   props: {
     title: {
       type: String // default: undefined
@@ -23148,19 +23696,19 @@ var BTooltip = /*#__PURE__*/Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$B, 'variant');
+        return getComponentConfig(NAME$D, 'variant');
       }
     },
     customClass: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$B, 'customClass');
+        return getComponentConfig(NAME$D, 'customClass');
       }
     },
     delay: {
       type: [Number, Object, String],
       default: function _default() {
-        return getComponentConfig(NAME$B, 'delay');
+        return getComponentConfig(NAME$D, 'delay');
       }
     },
     boundary: {
@@ -23169,13 +23717,13 @@ var BTooltip = /*#__PURE__*/Vue.extend({
       // Object: Vue component
       type: [String, HTMLElement, Object],
       default: function _default() {
-        return getComponentConfig(NAME$B, 'boundary');
+        return getComponentConfig(NAME$D, 'boundary');
       }
     },
     boundaryPadding: {
       type: [Number, String],
       default: function _default() {
-        return getComponentConfig(NAME$B, 'boundaryPadding');
+        return getComponentConfig(NAME$D, 'boundaryPadding');
       }
     },
     offset: {
@@ -23254,12 +23802,12 @@ var BTooltip = /*#__PURE__*/Vue.extend({
   },
   watch: {
     show: function show(_show, oldVal) {
-      if (_show !== oldVal && _show !== this.localShow && this.$_bv_toolpop) {
+      if (_show !== oldVal && _show !== this.localShow && this.$_toolpop) {
         if (_show) {
-          this.$_bv_toolpop.show();
+          this.$_toolpop.show();
         } else {
           // We use `forceHide()` to override any active triggers
-          this.$_bv_toolpop.forceHide();
+          this.$_toolpop.forceHide();
         }
       }
     },
@@ -23278,8 +23826,8 @@ var BTooltip = /*#__PURE__*/Vue.extend({
       var _this = this;
 
       this.$nextTick(function () {
-        if (_this.$_bv_toolpop) {
-          _this.$_bv_toolpop.updateData(_this.templateData);
+        if (_this.$_toolpop) {
+          _this.$_toolpop.updateData(_this.templateData);
         }
       });
     },
@@ -23289,8 +23837,8 @@ var BTooltip = /*#__PURE__*/Vue.extend({
     }
   },
   created: function created() {
-    // Non reactive properties
-    this.$_bv_toolpop = null;
+    // Create private non-reactive props
+    this.$_toolpop = null;
   },
   updated: function updated() {
     // Update the `propData` object
@@ -23304,8 +23852,10 @@ var BTooltip = /*#__PURE__*/Vue.extend({
     this.$off('disable', this.doDisable);
     this.$off('enable', this.doEnable); // Destroy the tip instance
 
-    this.$_bv_toolpop && this.$_bv_toolpop.$destroy();
-    this.$_bv_toolpop = null;
+    if (this.$_toolpop) {
+      this.$_toolpop.$destroy();
+      this.$_toolpop = null;
+    }
   },
   mounted: function mounted() {
     var _this2 = this;
@@ -23323,7 +23873,7 @@ var BTooltip = /*#__PURE__*/Vue.extend({
 
       var scopeId = getScopeId(_this2) || getScopeId(_this2.$parent); // Create the instance
 
-      var $toolpop = _this2.$_bv_toolpop = new Component({
+      var $toolpop = _this2.$_toolpop = new Component({
         parent: _this2,
         // Pass down the scoped style ID
         _scopeId: scopeId || undefined
@@ -23357,7 +23907,7 @@ var BTooltip = /*#__PURE__*/Vue.extend({
 
 
       if (_this2.localShow) {
-        _this2.$_bv_toolpop && _this2.$_bv_toolpop.show();
+        $toolpop.show();
       }
     });
   },
@@ -23429,16 +23979,16 @@ var BTooltip = /*#__PURE__*/Vue.extend({
     },
     // --- Local event listeners ---
     doOpen: function doOpen() {
-      !this.localShow && this.$_bv_toolpop && this.$_bv_toolpop.show();
+      !this.localShow && this.$_toolpop && this.$_toolpop.show();
     },
     doClose: function doClose() {
-      this.localShow && this.$_bv_toolpop && this.$_bv_toolpop.hide();
+      this.localShow && this.$_toolpop && this.$_toolpop.hide();
     },
     doDisable: function doDisable() {
-      this.$_bv_toolpop && this.$_bv_toolpop.disable();
+      this.$_toolpop && this.$_toolpop.disable();
     },
     doEnable: function doEnable() {
-      this.$_bv_toolpop && this.$_bv_toolpop.enable();
+      this.$_toolpop && this.$_toolpop.enable();
     }
   },
   render: function render(h) {
@@ -23450,10 +24000,10 @@ var BTooltip = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$C = 'BVPopoverTemplate'; // @vue/component
+var NAME$E = 'BVPopoverTemplate'; // @vue/component
 
 var BVPopoverTemplate = /*#__PURE__*/Vue.extend({
-  name: NAME$C,
+  name: NAME$E,
   extends: BVTooltipTemplate,
   computed: {
     templateType: function templateType() {
@@ -23496,10 +24046,10 @@ var BVPopoverTemplate = /*#__PURE__*/Vue.extend({
 });
 
 // Popover "Class" (Built as a renderless Vue instance)
-var NAME$D = 'BVPopover'; // @vue/component
+var NAME$F = 'BVPopover'; // @vue/component
 
 var BVPopover = /*#__PURE__*/Vue.extend({
-  name: NAME$D,
+  name: NAME$F,
   extends: BVTooltip,
   computed: {
     // Overwrites BVTooltip
@@ -23515,9 +24065,9 @@ var BVPopover = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$E = 'BPopover';
+var NAME$G = 'BPopover';
 var BPopover = /*#__PURE__*/Vue.extend({
-  name: NAME$E,
+  name: NAME$G,
   extends: BTooltip,
   inheritAttrs: false,
   props: {
@@ -23540,19 +24090,19 @@ var BPopover = /*#__PURE__*/Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$E, 'variant');
+        return getComponentConfig(NAME$G, 'variant');
       }
     },
     customClass: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$E, 'customClass');
+        return getComponentConfig(NAME$G, 'customClass');
       }
     },
     delay: {
       type: [Number, Object, String],
       default: function _default() {
-        return getComponentConfig(NAME$E, 'delay');
+        return getComponentConfig(NAME$G, 'delay');
       }
     },
     boundary: {
@@ -23561,13 +24111,13 @@ var BPopover = /*#__PURE__*/Vue.extend({
       // Object: Vue component
       type: [String, HTMLElement, Object],
       default: function _default() {
-        return getComponentConfig(NAME$E, 'boundary');
+        return getComponentConfig(NAME$G, 'boundary');
       }
     },
     boundaryPadding: {
       type: [Number, String],
       default: function _default() {
-        return getComponentConfig(NAME$E, 'boundaryPadding');
+        return getComponentConfig(NAME$G, 'boundaryPadding');
       }
     }
   },
@@ -23646,7 +24196,7 @@ var parseBindings = function parseBindings(bindings, vnode)
     config.content = bindings.value;
   } else if (isPlainObject(bindings.value)) {
     // Value is config object, so merge
-    config = _objectSpread2({}, config, {}, bindings.value);
+    config = _objectSpread2(_objectSpread2({}, config), bindings.value);
   } // If argument, assume element ID of container element
 
 
@@ -23858,10 +24408,11 @@ var PopoverPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$F = 'BProgressBar'; // @vue/component
+var NAME$H = 'BProgressBar'; // --- Main component ---
+// @vue/component
 
 var BProgressBar = /*#__PURE__*/Vue.extend({
-  name: NAME$F,
+  name: NAME$H,
   mixins: [normalizeSlotMixin],
   inject: {
     bvProgress: {
@@ -23897,7 +24448,7 @@ var BProgressBar = /*#__PURE__*/Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$F, 'variant');
+        return getComponentConfig(NAME$H, 'variant');
       }
     },
     striped: {
@@ -23938,11 +24489,11 @@ var BProgressBar = /*#__PURE__*/Vue.extend({
     computedPrecision: function computedPrecision() {
       // Prefer our precision over parent setting
       // Default to `0` for invalid values (`-x`, `NaN`)
-      return Math.max(toInteger(this.precision, toInteger(this.bvProgress.precision, 0)), 0);
+      return mathMax(toInteger(this.precision, toInteger(this.bvProgress.precision, 0)), 0);
     },
     computedProgress: function computedProgress() {
       var precision = this.computedPrecision;
-      var p = Math.pow(10, precision);
+      var p = mathPow(10, precision);
       return toFixed(100 * p * this.computedValue / this.computedMax / p, precision);
     },
     computedVariant: function computedVariant() {
@@ -23967,18 +24518,21 @@ var BProgressBar = /*#__PURE__*/Vue.extend({
     }
   },
   render: function render(h) {
-    var childNodes = h();
+    var label = this.label,
+        labelHtml = this.labelHtml,
+        computedValue = this.computedValue,
+        computedPrecision = this.computedPrecision;
+    var $content = h();
+    var domProps = {};
 
     if (this.hasNormalizedSlot('default')) {
-      childNodes = this.normalizeSlot('default');
-    } else if (this.label || this.labelHtml) {
-      childNodes = h('span', {
-        domProps: htmlOrText(this.labelHtml, this.label)
-      });
+      $content = this.normalizeSlot('default');
+    } else if (label || labelHtml) {
+      domProps = htmlOrText(labelHtml, label);
     } else if (this.computedShowProgress) {
-      childNodes = this.computedProgress;
+      $content = this.computedProgress;
     } else if (this.computedShowValue) {
-      childNodes = toFixed(this.computedValue, this.computedPrecision);
+      $content = toFixed(computedValue, computedPrecision);
     }
 
     return h('div', {
@@ -23989,16 +24543,17 @@ var BProgressBar = /*#__PURE__*/Vue.extend({
         role: 'progressbar',
         'aria-valuemin': '0',
         'aria-valuemax': toString$1(this.computedMax),
-        'aria-valuenow': toFixed(this.computedValue, this.computedPrecision)
-      }
-    }, [childNodes]);
+        'aria-valuenow': toFixed(computedValue, computedPrecision)
+      },
+      domProps: domProps
+    }, [$content]);
   }
 });
 
-var NAME$G = 'BProgress'; // @vue/component
+var NAME$I = 'BProgress'; // @vue/component
 
 var BProgress = /*#__PURE__*/Vue.extend({
-  name: NAME$G,
+  name: NAME$I,
   mixins: [normalizeSlotMixin],
   provide: function provide() {
     return {
@@ -24010,7 +24565,7 @@ var BProgress = /*#__PURE__*/Vue.extend({
     variant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$G, 'variant');
+        return getComponentConfig(NAME$I, 'variant');
       }
     },
     striped: {
@@ -24086,7 +24641,7 @@ var ProgressPlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$H = 'BSidebar';
+var NAME$J = 'BSidebar';
 var CLASS_NAME$3 = 'b-sidebar'; // --- Render methods ---
 
 var renderHeaderTitle = function renderHeaderTitle(h, ctx) {
@@ -24176,12 +24731,14 @@ var renderBackdrop = function renderBackdrop(h, ctx) {
     return h();
   }
 
+  var backdropVariant = ctx.backdropVariant;
   return h('div', {
     directives: [{
       name: 'show',
       value: ctx.localShow
     }],
     staticClass: 'b-sidebar-backdrop',
+    class: _defineProperty({}, "bg-".concat(backdropVariant), !!backdropVariant),
     on: {
       click: ctx.onBackdropClick
     }
@@ -24191,8 +24748,9 @@ var renderBackdrop = function renderBackdrop(h, ctx) {
 
 
 var BSidebar = /*#__PURE__*/Vue.extend({
-  name: NAME$H,
-  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
+  name: NAME$J,
+  // Mixin order is important!
+  mixins: [attrsMixin, idMixin, listenOnRootMixin, normalizeSlotMixin],
   inheritAttrs: false,
   model: {
     prop: 'visible',
@@ -24210,25 +24768,25 @@ var BSidebar = /*#__PURE__*/Vue.extend({
     bgVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$H, 'bgVariant');
+        return getComponentConfig(NAME$J, 'bgVariant');
       }
     },
     textVariant: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$H, 'textVariant');
+        return getComponentConfig(NAME$J, 'textVariant');
       }
     },
     shadow: {
       type: [Boolean, String],
       default: function _default() {
-        return getComponentConfig(NAME$H, 'shadow');
+        return getComponentConfig(NAME$J, 'shadow');
       }
     },
     width: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$H, 'width');
+        return getComponentConfig(NAME$J, 'width');
       }
     },
     zIndex: {
@@ -24252,7 +24810,7 @@ var BSidebar = /*#__PURE__*/Vue.extend({
     tag: {
       type: String,
       default: function _default() {
-        return getComponentConfig(NAME$H, 'tag');
+        return getComponentConfig(NAME$J, 'tag');
       }
     },
     sidebarClass: {
@@ -24272,9 +24830,15 @@ var BSidebar = /*#__PURE__*/Vue.extend({
 
     },
     backdrop: {
-      // If true, shows a basic backdrop
+      // If `true`, shows a basic backdrop
       type: Boolean,
       default: false
+    },
+    backdropVariant: {
+      type: String,
+      default: function _default() {
+        return getComponentConfig(NAME$J, 'backdropVariant');
+      }
     },
     noSlide: {
       type: Boolean,
@@ -24339,6 +24903,23 @@ var BSidebar = /*#__PURE__*/Vue.extend({
         right: this.right,
         hide: this.hide
       };
+    },
+    computedTile: function computedTile() {
+      return this.normalizeSlot('title', this.slotScope) || toString$1(this.title) || null;
+    },
+    titleId: function titleId() {
+      return this.computedTile ? this.safeId('__title__') : null;
+    },
+    computedAttrs: function computedAttrs() {
+      return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        id: this.safeId(),
+        tabindex: '-1',
+        role: 'dialog',
+        'aria-modal': this.backdrop ? 'true' : 'false',
+        'aria-hidden': this.localShow ? null : 'true',
+        'aria-label': this.ariaLabel || null,
+        'aria-labelledby': this.ariaLabelledby || this.titleId || null
+      });
     }
   },
   watch: {
@@ -24438,10 +25019,7 @@ var BSidebar = /*#__PURE__*/Vue.extend({
     /* istanbul ignore next */
     {
       var tabables = getTabables(this.$refs.content);
-
-      try {
-        tabables.reverse()[0].focus();
-      } catch (_unused) {}
+      attemptFocus(tabables.reverse()[0]);
     },
 
     /* istanbul ignore next */
@@ -24449,35 +25027,24 @@ var BSidebar = /*#__PURE__*/Vue.extend({
     /* istanbul ignore next */
     {
       var tabables = getTabables(this.$refs.content);
-
-      try {
-        tabables[0].focus();
-      } catch (_unused2) {}
+      attemptFocus(tabables[0]);
     },
     onBeforeEnter: function onBeforeEnter() {
-      this.$_returnFocusEl = null;
-
-      try {
-        this.$_returnFocusEl = document.activeElement || null;
-      } catch (_unused3) {} // Trigger lazy render
-
+      // Returning focus to `document.body` may cause unwanted scrolls,
+      // so we exclude setting focus on body
+      this.$_returnFocusEl = getActiveElement(isBrowser ? [document.body] : []); // Trigger lazy render
 
       this.isOpen = true;
     },
     onAfterEnter: function onAfterEnter(el) {
-      try {
-        if (!contains(el, document.activeElement)) {
-          el.focus();
-        }
-      } catch (_unused4) {}
+      if (!contains(el, getActiveElement())) {
+        attemptFocus(el);
+      }
 
       this.$emit('shown');
     },
     onAfterLeave: function onAfterLeave() {
-      try {
-        this.$_returnFocusEl.focus();
-      } catch (_unused5) {}
-
+      attemptFocus(this.$_returnFocusEl);
       this.$_returnFocusEl = null; // Trigger lazy render
 
       this.isOpen = false;
@@ -24489,11 +25056,6 @@ var BSidebar = /*#__PURE__*/Vue.extend({
 
     var localShow = this.localShow;
     var shadow = this.shadow === '' ? true : this.shadow;
-    var title = this.normalizeSlot('title', this.slotScope) || toString$1(this.title) || null;
-    var titleId = title ? this.safeId('__title__') : null;
-    var ariaLabel = this.ariaLabel || null; // `ariaLabel` takes precedence over `ariaLabelledby`
-
-    var ariaLabelledby = this.ariaLabelledby || titleId || null;
     var $sidebar = h(this.tag, {
       ref: 'content',
       directives: [{
@@ -24504,15 +25066,7 @@ var BSidebar = /*#__PURE__*/Vue.extend({
       class: [(_ref = {
         shadow: shadow === true
       }, _defineProperty(_ref, "shadow-".concat(shadow), shadow && shadow !== true), _defineProperty(_ref, "".concat(CLASS_NAME$3, "-right"), this.right), _defineProperty(_ref, "bg-".concat(this.bgVariant), !!this.bgVariant), _defineProperty(_ref, "text-".concat(this.textVariant), !!this.textVariant), _ref), this.sidebarClass],
-      attrs: _objectSpread2({}, this.$attrs, {
-        id: this.safeId(),
-        tabindex: '-1',
-        role: 'dialog',
-        'aria-modal': this.backdrop ? 'true' : 'false',
-        'aria-hidden': localShow ? null : 'true',
-        'aria-label': ariaLabel,
-        'aria-labelledby': ariaLabelledby
-      }),
+      attrs: this.computedAttrs,
       style: {
         width: this.width
       }
@@ -24567,12 +25121,6 @@ var BSidebar = /*#__PURE__*/Vue.extend({
   }
 });
 
-var VBTogglePlugin = /*#__PURE__*/pluginFactory({
-  directives: {
-    VBToggle: VBToggle
-  }
-});
-
 var SidebarPlugin = /*#__PURE__*/pluginFactory({
   components: {
     BSidebar: BSidebar
@@ -24593,8 +25141,8 @@ var SpinnerPlugin = /*#__PURE__*/pluginFactory({
 var hasListenerMixin = {
   methods: {
     hasListener: function hasListener(name) {
-      // Only includes listeners registerd via `v-on:name`
-      var $listeners = this.$listeners || {}; // Includes `v-on:name` and `this.$on('name')` registerd listeners
+      // Only includes listeners registered via `v-on:name`
+      var $listeners = this.$listeners || {}; // Includes `v-on:name` and `this.$on('name')` registered listeners
       // Note this property is not part of the public Vue API, but it is
       // the only way to determine if a listener was added via `vm.$on`
 
@@ -24820,8 +25368,8 @@ var itemsMixin = {
         filter: this.localFilter,
         sortBy: this.localSortBy,
         sortDesc: this.localSortDesc,
-        perPage: Math.max(toInteger(this.perPage, 0), 0),
-        currentPage: Math.max(toInteger(this.currentPage, 0), 1),
+        perPage: mathMax(toInteger(this.perPage, 0), 0),
+        currentPage: mathMax(toInteger(this.currentPage, 0), 1),
         apiUrl: this.apiUrl
       };
     }
@@ -25041,8 +25589,7 @@ var filteringMixin = {
     // Watch for debounce being set to 0
     computedFilterDebounce: function computedFilterDebounce(newVal) {
       if (!newVal && this.$_filterTimer) {
-        clearTimeout(this.$_filterTimer);
-        this.$_filterTimer = null;
+        this.clearFilterTimer();
         this.localFilter = this.filterSanitize(this.filter);
       }
     },
@@ -25055,8 +25602,7 @@ var filteringMixin = {
         var _this = this;
 
         var timeout = this.computedFilterDebounce;
-        clearTimeout(this.$_filterTimer);
-        this.$_filterTimer = null;
+        this.clearFilterTimer();
 
         if (timeout && timeout > 0) {
           // If we have a debounce time, delay the update of `localFilter`
@@ -25105,7 +25651,7 @@ var filteringMixin = {
   created: function created() {
     var _this2 = this;
 
-    // Create non-reactive prop where we store the debounce timer id
+    // Create private non-reactive props
     this.$_filterTimer = null; // If filter is "pre-set", set the criteria
     // This will trigger any watchers/dependents
     // this.localFilter = this.filterSanitize(this.filter)
@@ -25119,10 +25665,13 @@ var filteringMixin = {
   beforeDestroy: function beforeDestroy()
   /* istanbul ignore next */
   {
-    clearTimeout(this.$_filterTimer);
-    this.$_filterTimer = null;
+    this.clearFilterTimer();
   },
   methods: {
+    clearFilterTimer: function clearFilterTimer() {
+      clearTimeout(this.$_filterTimer);
+      this.$_filterTimer = null;
+    },
     filterSanitize: function filterSanitize(criteria) {
       // Sanitizes filter criteria based on internal or external filtering
       if (this.localFiltering && !this.localFilterFn && !(isString(criteria) || isRegExp(criteria))) {
@@ -25376,7 +25925,7 @@ var sortingMixin = {
       var sortCompare = this.sortCompare;
       var localSorting = this.localSorting;
 
-      var sortOptions = _objectSpread2({}, this.sortCompareOptions, {
+      var sortOptions = _objectSpread2(_objectSpread2({}, this.sortCompareOptions), {}, {
         usage: 'sort'
       });
 
@@ -25589,8 +26138,8 @@ var paginationMixin$1 = {
     },
     paginatedItems: function paginatedItems() {
       var items = this.sortedItems || this.filteredItems || this.localItems || [];
-      var currentPage = Math.max(toInteger(this.currentPage, 1), 1);
-      var perPage = Math.max(toInteger(this.perPage, 0), 0); // Apply local pagination
+      var currentPage = mathMax(toInteger(this.currentPage, 1), 1);
+      var perPage = mathMax(toInteger(this.perPage, 0), 0); // Apply local pagination
 
       if (this.localPaging && !!perPage) {
         // Grab the current page of data (which may be past filtered items limit)
@@ -25605,7 +26154,7 @@ var paginationMixin$1 = {
 
 var captionMixin = {
   props: {
-    // `caption-top` is part of table-redere mixin (styling)
+    // `caption-top` is part of table-render mixin (styling)
     // captionTop: {
     //   type: Boolean,
     //   default: false
@@ -25627,24 +26176,20 @@ var captionMixin = {
   },
   methods: {
     renderCaption: function renderCaption() {
-      var h = this.$createElement; // Build the caption
-
-      var $captionSlot = this.normalizeSlot('table-caption');
+      var caption = this.caption,
+          captionHtml = this.captionHtml;
+      var h = this.$createElement;
       var $caption = h();
+      var hasCaptionSlot = this.hasNormalizedSlot('table-caption');
 
-      if ($captionSlot || this.caption || this.captionHtml) {
-        var data = {
+      if (hasCaptionSlot || caption || captionHtml) {
+        $caption = h('caption', {
           key: 'caption',
           attrs: {
             id: this.captionId
-          }
-        };
-
-        if (!$captionSlot) {
-          data.domProps = htmlOrText(this.captionHtml, this.caption);
-        }
-
-        $caption = h('caption', data, [$captionSlot]);
+          },
+          domProps: hasCaptionSlot ? {} : htmlOrText(captionHtml, caption)
+        }, this.normalizeSlot('table-caption'));
       }
 
       return $caption;
@@ -25726,18 +26271,22 @@ var textSelectionActive = function textSelectionActive() {
   sel.containsNode(el, true) : false;
 };
 
-var props$U = {
+var props$V = {
   headVariant: {
     // Also sniffed by <b-tr> / <b-td> / <b-th>
     type: String,
-    // supported values: 'lite', 'dark', or null
+    // Supported values: 'lite', 'dark', or null
     default: null
   }
-}; // @vue/component
+}; // TODO:
+//   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+//   to the child elements, so this can be converted to a functional component
+// @vue/component
 
 var BThead = /*#__PURE__*/Vue.extend({
   name: 'BThead',
-  mixins: [normalizeSlotMixin],
+  // Mixin order is important!
+  mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
   inheritAttrs: false,
   provide: function provide() {
     return {
@@ -25756,7 +26305,7 @@ var BThead = /*#__PURE__*/Vue.extend({
       }
     }
   },
-  props: props$U,
+  props: props$V,
   computed: {
     isThead: function isThead() {
       // Sniffed by <b-tr> / <b-td> / <b-th>
@@ -25797,7 +26346,7 @@ var BThead = /*#__PURE__*/Vue.extend({
     theadAttrs: function theadAttrs() {
       return _objectSpread2({
         role: 'rowgroup'
-      }, this.$attrs);
+      }, this.bvAttrs);
     }
   },
   render: function render(h) {
@@ -25805,22 +26354,26 @@ var BThead = /*#__PURE__*/Vue.extend({
       class: this.theadClasses,
       attrs: this.theadAttrs,
       // Pass down any native listeners
-      on: this.$listeners
+      on: this.bvListeners
     }, this.normalizeSlot('default'));
   }
 });
 
-var props$V = {
+var props$W = {
   footVariant: {
     type: String,
-    // supported values: 'lite', 'dark', or null
+    // Supported values: 'lite', 'dark', or null
     default: null
   }
-}; // @vue/component
+}; // TODO:
+//   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+//   to the child elements, so this can be converted to a functional component
+// @vue/component
 
 var BTfoot = /*#__PURE__*/Vue.extend({
   name: 'BTfoot',
-  mixins: [normalizeSlotMixin],
+  // Mixin order is important!
+  mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
   inheritAttrs: false,
   provide: function provide() {
     return {
@@ -25839,15 +26392,13 @@ var BTfoot = /*#__PURE__*/Vue.extend({
       }
     }
   },
-  props: props$V,
+  props: props$W,
   computed: {
     isTfoot: function isTfoot() {
       // Sniffed by <b-tr> / <b-td> / <b-th>
       return true;
     },
-    isDark: function isDark()
-    /* istanbul ignore next: Not currently sniffed in tests */
-    {
+    isDark: function isDark() {
       // Sniffed by <b-tr> / <b-td> / <b-th>
       return this.bvTable.dark;
     },
@@ -25870,9 +26421,7 @@ var BTfoot = /*#__PURE__*/Vue.extend({
       // background color inheritance with Bootstrap v4 table CSS
       return !this.isStacked && this.bvTable.stickyHeader;
     },
-    tableVariant: function tableVariant()
-    /* istanbul ignore next: Not currently sniffed in tests */
-    {
+    tableVariant: function tableVariant() {
       // Sniffed by <b-tr> / <b-td> / <b-th>
       return this.bvTable.tableVariant;
     },
@@ -25882,7 +26431,7 @@ var BTfoot = /*#__PURE__*/Vue.extend({
     tfootAttrs: function tfootAttrs() {
       return _objectSpread2({
         role: 'rowgroup'
-      }, this.$attrs);
+      }, this.bvAttrs);
     }
   },
   render: function render(h) {
@@ -25890,23 +26439,27 @@ var BTfoot = /*#__PURE__*/Vue.extend({
       class: this.tfootClasses,
       attrs: this.tfootAttrs,
       // Pass down any native listeners
-      on: this.$listeners
+      on: this.bvListeners
     }, this.normalizeSlot('default'));
   }
 });
 
-var props$W = {
+var props$X = {
   variant: {
     type: String,
     default: null
   }
 };
 var LIGHT = 'light';
-var DARK = 'dark'; // @vue/component
+var DARK = 'dark'; // TODO:
+//   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+//   to the child elements, so this can be converted to a functional component
+// @vue/component
 
 var BTr = /*#__PURE__*/Vue.extend({
   name: 'BTr',
-  mixins: [normalizeSlotMixin],
+  // Mixin order is important!
+  mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
   inheritAttrs: false,
   provide: function provide() {
     return {
@@ -25923,7 +26476,7 @@ var BTr = /*#__PURE__*/Vue.extend({
       }
     }
   },
-  props: props$W,
+  props: props$X,
   computed: {
     inTbody: function inTbody() {
       // Sniffed by <b-td> / <b-th>
@@ -25985,7 +26538,7 @@ var BTr = /*#__PURE__*/Vue.extend({
     trAttrs: function trAttrs() {
       return _objectSpread2({
         role: 'row'
-      }, this.$attrs);
+      }, this.bvAttrs);
     }
   },
   render: function render(h) {
@@ -25993,10 +26546,12 @@ var BTr = /*#__PURE__*/Vue.extend({
       class: this.trClasses,
       attrs: this.trAttrs,
       // Pass native listeners to child
-      on: this.$listeners
+      on: this.bvListeners
     }, this.normalizeSlot('default'));
   }
 });
+
+// Parse a rowspan or colspan into a digit (or `null` if < `1` )
 
 var parseSpan = function parseSpan(value) {
   value = toInteger(value, 0);
@@ -26007,9 +26562,10 @@ var parseSpan = function parseSpan(value) {
 
 var spanValidator = function spanValidator(val) {
   return isUndefinedOrNull(val) || parseSpan(val) > 0;
-};
+}; // --- Props ---
 
-var props$X = {
+
+var props$Y = {
   variant: {
     type: String,
     default: null
@@ -26032,11 +26588,16 @@ var props$X = {
     type: Boolean,
     default: false
   }
-}; // @vue/component
+}; // --- Main component ---
+// TODO:
+//   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+//   to the child elements, so this can be converted to a functional component
+// @vue/component
 
 var BTd = /*#__PURE__*/Vue.extend({
   name: 'BTableCell',
-  mixins: [normalizeSlotMixin],
+  // Mixin order is important!
+  mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
   inheritAttrs: false,
   inject: {
     bvTableTr: {
@@ -26048,7 +26609,7 @@ var BTd = /*#__PURE__*/Vue.extend({
       }
     }
   },
-  props: props$X,
+  props: props$Y,
   computed: {
     tag: function tag() {
       // Overridden by <b-th>
@@ -26101,11 +26662,7 @@ var BTd = /*#__PURE__*/Vue.extend({
     headVariant: function headVariant() {
       return this.bvTableTr.headVariant;
     },
-
-    /* istanbul ignore next: need to add in tests for footer variant */
-    footVariant: function footVariant()
-    /* istanbul ignore next: need to add in tests for footer variant */
-    {
+    footVariant: function footVariant() {
       return this.bvTableTr.footVariant;
     },
     tableVariant: function tableVariant() {
@@ -26120,10 +26677,9 @@ var BTd = /*#__PURE__*/Vue.extend({
     cellClasses: function cellClasses() {
       // We use computed props here for improved performance by caching
       // the results of the string interpolation
-      // TODO: need to add handling for footVariant
       var variant = this.variant;
 
-      if (!variant && this.isStickyHeader && !this.headVariant || !variant && this.isStickyColumn) {
+      if (!variant && this.isStickyHeader && !this.headVariant || !variant && this.isStickyColumn && this.inTfoot && !this.footVariant || !variant && this.isStickyColumn && this.inThead && !this.headVariant || !variant && this.isStickyColumn && this.inTbody) {
         // Needed for sticky-header mode as Bootstrap v4 table cells do
         // not inherit parent's background-color. Boo!
         variant = this.rowVariant || this.tableVariant || 'b-table-default';
@@ -26147,18 +26703,18 @@ var BTd = /*#__PURE__*/Vue.extend({
         // Header or footer cells
         role = 'columnheader';
         scope = colspan > 0 ? 'colspan' : 'col';
-      } else if (this.tag === 'th') {
+      } else if (isTag(this.tag, 'th')) {
         // th's in tbody
         role = 'rowheader';
         scope = rowspan > 0 ? 'rowgroup' : 'row';
       }
 
-      return _objectSpread2({
+      return _objectSpread2(_objectSpread2({
         colspan: colspan,
         rowspan: rowspan,
         role: role,
         scope: scope
-      }, this.$attrs, {
+      }, this.bvAttrs), {}, {
         // Add in the stacked cell label data-attribute if in
         // stacked mode (if a stacked heading label is provided)
         'data-label': this.isStackedCell && !isUndefinedOrNull(this.stackedHeading) ?
@@ -26173,10 +26729,14 @@ var BTd = /*#__PURE__*/Vue.extend({
       class: this.cellClasses,
       attrs: this.cellAttrs,
       // Transfer any native listeners
-      on: this.$listeners
+      on: this.bvListeners
     }, [this.isStackedCell ? h('div', [content]) : content]);
   }
 });
+
+//   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+//   to the child elements, so this can be converted to a functional component
+// @vue/component
 
 var BTh = /*#__PURE__*/Vue.extend({
   name: 'BTh',
@@ -26239,19 +26799,30 @@ var theadMixin = {
 
       var isFoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var h = this.$createElement;
-      var fields = this.computedFields || [];
+      var fields = this.computedFields || []; // In always stacked mode, we don't bother rendering the head/foot
+      // Or if no field headings (empty table)
 
       if (this.isStackedAlways || fields.length === 0) {
-        // In always stacked mode, we don't bother rendering the head/foot
-        // Or if no field headings (empty table)
         return h();
-      } // Reference to `selectAllRows` and `clearSelected()`, if table is selectable
+      }
 
+      var isSortable = this.isSortable,
+          isSelectable = this.isSelectable,
+          headVariant = this.headVariant,
+          footVariant = this.footVariant,
+          headRowVariant = this.headRowVariant,
+          footRowVariant = this.footRowVariant;
+      var hasHeadClickListener = isSortable || this.hasListener('head-clicked'); // Reference to `selectAllRows` and `clearSelected()`, if table is selectable
 
-      var selectAllRows = this.isSelectable ? this.selectAllRows : function () {};
-      var clearSelected = this.isSelectable ? this.clearSelected : function () {}; // Helper function to generate a field <th> cell
+      var selectAllRows = isSelectable ? this.selectAllRows : noop;
+      var clearSelected = isSelectable ? this.clearSelected : noop; // Helper function to generate a field <th> cell
 
       var makeCell = function makeCell(field, colIndex) {
+        var label = field.label,
+            labelHtml = field.labelHtml,
+            variant = field.variant,
+            stickyColumn = field.stickyColumn,
+            key = field.key;
         var ariaLabel = null;
 
         if (!field.label.trim() && !field.headerTitle) {
@@ -26262,16 +26833,14 @@ var theadMixin = {
           ariaLabel = startCase(field.key);
         }
 
-        var hasHeadClickListener = _this.hasListener('head-clicked') || _this.isSortable;
-
-        var handlers = {};
+        var on = {};
 
         if (hasHeadClickListener) {
-          handlers.click = function (evt) {
+          on.click = function (evt) {
             _this.headClicked(evt, field, isFoot);
           };
 
-          handlers.keydown = function (evt) {
+          on.keydown = function (evt) {
             var keyCode = evt.keyCode;
 
             if (keyCode === KEY_CODES.ENTER || keyCode === KEY_CODES.SPACE) {
@@ -26280,72 +26849,70 @@ var theadMixin = {
           };
         }
 
-        var sortAttrs = _this.isSortable ? _this.sortTheadThAttrs(field.key, field, isFoot) : {};
-        var sortClass = _this.isSortable ? _this.sortTheadThClasses(field.key, field, isFoot) : null;
-        var sortLabel = _this.isSortable ? _this.sortTheadThLabel(field.key, field, isFoot) : null;
+        var sortAttrs = isSortable ? _this.sortTheadThAttrs(key, field, isFoot) : {};
+        var sortClass = isSortable ? _this.sortTheadThClasses(key, field, isFoot) : null;
+        var sortLabel = isSortable ? _this.sortTheadThLabel(key, field, isFoot) : null;
         var data = {
-          key: field.key,
           class: [_this.fieldClasses(field), sortClass],
           props: {
-            variant: field.variant,
-            stickyColumn: field.stickyColumn
+            variant: variant,
+            stickyColumn: stickyColumn
           },
           style: field.thStyle || {},
-          attrs: _objectSpread2({
+          attrs: _objectSpread2(_objectSpread2({
             // We only add a tabindex of 0 if there is a head-clicked listener
             tabindex: hasHeadClickListener ? '0' : null,
             abbr: field.headerAbbr || null,
             title: field.headerTitle || null,
             'aria-colindex': colIndex + 1,
             'aria-label': ariaLabel
-          }, _this.getThValues(null, field.key, field.thAttr, isFoot ? 'foot' : 'head', {}), {}, sortAttrs),
-          on: handlers
+          }, _this.getThValues(null, key, field.thAttr, isFoot ? 'foot' : 'head', {})), sortAttrs),
+          on: on,
+          key: key
         }; // Handle edge case where in-document templates are used with new
         // `v-slot:name` syntax where the browser lower-cases the v-slot's
         // name (attributes become lower cased when parsed by the browser)
         // We have replaced the square bracket syntax with round brackets
         // to prevent confusion with dynamic slot names
 
-        var slotNames = ["head(".concat(field.key, ")"), "head(".concat(field.key.toLowerCase(), ")"), 'head()'];
+        var slotNames = ["head(".concat(key, ")"), "head(".concat(key.toLowerCase(), ")"), 'head()']; // Footer will fallback to header slot names
 
         if (isFoot) {
-          // Footer will fallback to header slot names
-          slotNames = ["foot(".concat(field.key, ")"), "foot(".concat(field.key.toLowerCase(), ")"), 'foot()'].concat(_toConsumableArray(slotNames));
+          slotNames = ["foot(".concat(key, ")"), "foot(".concat(key.toLowerCase(), ")"), 'foot()'].concat(_toConsumableArray(slotNames));
         }
 
         var scope = {
-          label: field.label,
-          column: field.key,
+          label: label,
+          column: key,
           field: field,
           isFoot: isFoot,
           // Add in row select methods
           selectAllRows: selectAllRows,
           clearSelected: clearSelected
         };
-        var content = _this.normalizeSlot(slotNames, scope) || (field.labelHtml ? h('div', {
-          domProps: htmlOrText(field.labelHtml)
-        }) : field.label);
-        var srLabel = sortLabel ? h('span', {
+        var $content = _this.normalizeSlot(slotNames, scope) || h('div', {
+          domProps: htmlOrText(labelHtml, label)
+        });
+        var $srLabel = sortLabel ? h('span', {
           staticClass: 'sr-only'
         }, " (".concat(sortLabel, ")")) : null; // Return the header cell
 
-        return h(BTh, data, [content, srLabel].filter(identity));
+        return h(BTh, data, [$content, $srLabel].filter(identity));
       }; // Generate the array of <th> cells
 
 
-      var $cells = fields.map(makeCell).filter(identity); // Genrate the row(s)
+      var $cells = fields.map(makeCell).filter(identity); // Generate the row(s)
 
       var $trs = [];
 
       if (isFoot) {
-        var trProps = {
-          variant: isUndefinedOrNull(this.footRowVariant) ? this.headRowVariant :
-          /* istanbul ignore next */
-          this.footRowVariant
-        };
         $trs.push(h(BTr, {
           class: this.tfootTrClass,
-          props: trProps
+          props: {
+            variant: isUndefinedOrNull(footRowVariant) ? headRowVariant :
+            /* istanbul ignore next */
+            footRowVariant
+          }
         }, $cells));
       } else {
         var scope = {
@@ -26359,7 +26926,7 @@ var theadMixin = {
         $trs.push(h(BTr, {
           class: this.theadTrClass,
           props: {
-            variant: this.headRowVariant
+            variant: headRowVariant
           }
         }, $cells));
       }
@@ -26368,9 +26935,9 @@ var theadMixin = {
         key: isFoot ? 'bv-tfoot' : 'bv-thead',
         class: (isFoot ? this.tfootClass : this.theadClass) || null,
         props: isFoot ? {
-          footVariant: this.footVariant || this.headVariant || null
+          footVariant: footVariant || headVariant || null
         } : {
-          headVariant: this.headVariant || null
+          headVariant: headVariant || null
         }
       }, $trs);
     }
@@ -26431,7 +26998,7 @@ var tfootMixin = {
   }
 };
 
-var props$Y = {
+var props$Z = {
   tbodyTransitionProps: {
     type: Object // default: undefined
 
@@ -26440,11 +27007,15 @@ var props$Y = {
     type: Object // default: undefined
 
   }
-}; // @vue/component
+}; // TODO:
+//   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
+//   to the child elements, so this can be converted to a functional component
+// @vue/component
 
 var BTbody = /*#__PURE__*/Vue.extend({
   name: 'BTbody',
-  mixins: [normalizeSlotMixin],
+  // Mixin order is important!
+  mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
   inheritAttrs: false,
   provide: function provide() {
     return {
@@ -26463,7 +27034,7 @@ var BTbody = /*#__PURE__*/Vue.extend({
       }
     }
   },
-  props: props$Y,
+  props: props$Z,
   computed: {
     isTbody: function isTbody() {
       // Sniffed by <b-tr> / <b-td> / <b-th>
@@ -26492,9 +27063,7 @@ var BTbody = /*#__PURE__*/Vue.extend({
       // background color inheritance with Bootstrap v4 table CSS
       return !this.isStacked && this.bvTable.stickyHeader;
     },
-    tableVariant: function tableVariant()
-    /* istanbul ignore next: Not currently sniffed in tests */
-    {
+    tableVariant: function tableVariant() {
       // Sniffed by <b-tr> / <b-td> / <b-th>
       return this.bvTable.tableVariant;
     },
@@ -26504,10 +27073,10 @@ var BTbody = /*#__PURE__*/Vue.extend({
     tbodyAttrs: function tbodyAttrs() {
       return _objectSpread2({
         role: 'rowgroup'
-      }, this.$attrs);
+      }, this.bvAttrs);
     },
     tbodyProps: function tbodyProps() {
-      return this.tbodyTransitionProps ? _objectSpread2({}, this.tbodyTransitionProps, {
+      return this.tbodyTransitionProps ? _objectSpread2(_objectSpread2({}, this.tbodyTransitionProps), {}, {
         tag: 'tbody'
       }) : {};
     }
@@ -26519,13 +27088,12 @@ var BTbody = /*#__PURE__*/Vue.extend({
     };
 
     if (this.isTransitionGroup) {
-      // We use native listeners if a transition group
-      // for any delegated events
+      // We use native listeners if a transition group for any delegated events
       data.on = this.tbodyTransitionHandlers || {};
-      data.nativeOn = this.$listeners || {};
+      data.nativeOn = this.bvListeners;
     } else {
       // Otherwise we place any listeners on the tbody element
-      data.on = this.$listeners || {};
+      data.on = this.bvListeners;
     }
 
     return h(this.isTransitionGroup ? 'transition-group' : 'tbody', data, this.normalizeSlot('default'));
@@ -26767,9 +27335,9 @@ var tbodyRowMixin = {
         props: {
           variant: item._rowVariant || null
         },
-        attrs: _objectSpread2({
+        attrs: _objectSpread2(_objectSpread2({
           id: rowId
-        }, userTrAttrs, {
+        }, userTrAttrs), {}, {
           // Users cannot override the following attributes
           tabindex: hasRowClickHandler ? '0' : null,
           'data-pk': primaryKeyValue || null,
@@ -26840,7 +27408,7 @@ var tbodyRowMixin = {
           props: {
             variant: item._rowVariant || null
           },
-          attrs: _objectSpread2({}, userDetailsTrAttrs, {
+          attrs: _objectSpread2(_objectSpread2({}, userDetailsTrAttrs), {}, {
             // Users cannot override the following attributes
             id: detailsId,
             tabindex: '-1'
@@ -26862,7 +27430,7 @@ var tbodyRowMixin = {
   }
 };
 
-var props$Z = _objectSpread2({}, props$Y, {
+var props$_ = _objectSpread2(_objectSpread2({}, props$Z), {}, {
   tbodyClass: {
     type: [String, Array, Object] // default: undefined
 
@@ -26871,7 +27439,10 @@ var props$Z = _objectSpread2({}, props$Y, {
 
 var tbodyMixin = {
   mixins: [tbodyRowMixin],
-  props: props$Z,
+  props: props$_,
+  beforeDestroy: function beforeDestroy() {
+    this.$_bodyFieldSlotNameCache = null;
+  },
   methods: {
     // Helper methods
     getTbodyTrs: function getTbodyTrs() {
@@ -26922,7 +27493,7 @@ var tbodyMixin = {
       // Keyboard navigation and row click emulation
       var target = evt.target;
 
-      if (this.tbodyRowEvtStopped(evt) || target.tagName !== 'TR' || target !== document.activeElement || target.tabIndex !== 0) {
+      if (this.tbodyRowEvtStopped(evt) || target.tagName !== 'TR' || !isActiveElement(target) || target.tabIndex !== 0) {
         // Early exit if not an item row TR
         return;
       }
@@ -26946,16 +27517,16 @@ var tbodyMixin = {
 
           if (keyCode === KEY_CODES.HOME || shift && keyCode === KEY_CODES.UP) {
             // Focus first row
-            trs[0].focus();
+            attemptFocus(trs[0]);
           } else if (keyCode === KEY_CODES.END || shift && keyCode === KEY_CODES.DOWN) {
             // Focus last row
-            trs[trs.length - 1].focus();
+            attemptFocus(trs[trs.length - 1]);
           } else if (keyCode === KEY_CODES.UP && rowIndex > 0) {
             // Focus previous row
-            trs[rowIndex - 1].focus();
+            attemptFocus(trs[rowIndex - 1]);
           } else if (keyCode === KEY_CODES.DOWN && rowIndex < trs.length - 1) {
             // Focus next row
-            trs[rowIndex + 1].focus();
+            attemptFocus(trs[rowIndex + 1]);
           }
         }
       }
@@ -27102,15 +27673,23 @@ var emptyMixin = {
     renderEmpty: function renderEmpty() {
       var h = this.$createElement;
       var items = this.computedItems;
-      var $empty;
+      var $empty = h();
 
       if (this.showEmpty && (!items || items.length === 0) && !(this.computedBusy && this.hasNormalizedSlot('table-busy'))) {
+        var isFiltered = this.isFiltered,
+            emptyText = this.emptyText,
+            emptyHtml = this.emptyHtml,
+            emptyFilteredText = this.emptyFilteredText,
+            emptyFilteredHtml = this.emptyFilteredHtml,
+            computedFields = this.computedFields,
+            tbodyTrClass = this.tbodyTrClass,
+            tbodyTrAttr = this.tbodyTrAttr;
         $empty = this.normalizeSlot(this.isFiltered ? 'emptyfiltered' : 'empty', {
-          emptyFilteredHtml: this.emptyFilteredHtml,
-          emptyFilteredText: this.emptyFilteredText,
-          emptyHtml: this.emptyHtml,
-          emptyText: this.emptyText,
-          fields: this.computedFields,
+          emptyFilteredHtml: emptyFilteredHtml,
+          emptyFilteredText: emptyFilteredText,
+          emptyHtml: emptyHtml,
+          emptyText: emptyText,
+          fields: computedFields,
           // Not sure why this is included, as it will always be an empty array
           items: this.computedItems
         });
@@ -27118,13 +27697,13 @@ var emptyMixin = {
         if (!$empty) {
           $empty = h('div', {
             class: ['text-center', 'my-2'],
-            domProps: this.isFiltered ? htmlOrText(this.emptyFilteredHtml, this.emptyFilteredText) : htmlOrText(this.emptyHtml, this.emptyText)
+            domProps: isFiltered ? htmlOrText(emptyFilteredHtml, emptyFilteredText) : htmlOrText(emptyHtml, emptyText)
           });
         }
 
         $empty = h(BTd, {
           props: {
-            colspan: this.computedFields.length || null
+            colspan: computedFields.length || null
           }
         }, [h('div', {
           attrs: {
@@ -27133,18 +27712,18 @@ var emptyMixin = {
           }
         }, [$empty])]);
         $empty = h(BTr, {
-          key: this.isFiltered ? 'b-empty-filtered-row' : 'b-empty-row',
           staticClass: 'b-table-empty-row',
-          class: [isFunction(this.tbodyTrClass) ?
+          class: [isFunction(tbodyTrClass) ?
           /* istanbul ignore next */
-          this.tbodyTrClass(null, 'row-empty') : this.tbodyTrClass],
-          attrs: isFunction(this.tbodyTrAttr) ?
+          this.tbodyTrClass(null, 'row-empty') : tbodyTrClass],
+          attrs: isFunction(tbodyTrAttr) ?
           /* istanbul ignore next */
-          this.tbodyTrAttr(null, 'row-empty') : this.tbodyTrAttr
+          this.tbodyTrAttr(null, 'row-empty') : tbodyTrAttr,
+          key: isFiltered ? 'b-empty-filtered-row' : 'b-empty-row'
         }, [$empty]);
       }
 
-      return $empty || h();
+      return $empty;
     }
   }
 };
@@ -27464,7 +28043,7 @@ var selectableMixin = {
       } else if (selectMode === 'range') {
         if (this.selectedLastRow > -1 && evt.shiftKey) {
           // range
-          for (var idx = Math.min(this.selectedLastRow, index); idx <= Math.max(this.selectedLastRow, index); idx++) {
+          for (var idx = mathMin(this.selectedLastRow, index); idx <= mathMax(this.selectedLastRow, index); idx++) {
             selectedRows[idx] = true;
           }
 
@@ -27685,6 +28264,8 @@ var tableRendererMixin = {
   // Don't place attributes on root element automatically,
   // as table could be wrapped in responsive `<div>`
   inheritAttrs: false,
+  // Mixin order is important!
+  mixins: [attrsMixin],
   provide: function provide() {
     return {
       bvTable: this
@@ -27789,7 +28370,7 @@ var tableRendererMixin = {
     },
     tableAttrs: function tableAttrs() {
       // Preserve user supplied aria-describedby, if provided in `$attrs`
-      var adb = [(this.$attrs || {})['aria-describedby'], this.captionId].filter(identity).join(' ') || null;
+      var adb = [(this.bvAttrs || {})['aria-describedby'], this.captionId].filter(identity).join(' ') || null;
       var items = this.computedItems;
       var filteredItems = this.filteredItems;
       var fields = this.computedFields;
@@ -27800,15 +28381,15 @@ var tableRendererMixin = {
         'aria-describedby': adb
       };
       var rowCount = items && filteredItems && filteredItems.length > items.length ? toString$1(filteredItems.length) : null;
-      return _objectSpread2({
+      return _objectSpread2(_objectSpread2(_objectSpread2({
         // We set `aria-rowcount` before merging in `$attrs`,
         // in case user has supplied their own
         'aria-rowcount': rowCount
-      }, this.$attrs, {
+      }, this.bvAttrs), {}, {
         // Now we can override any `$attrs` here
         id: this.safeId(),
         role: 'table'
-      }, ariaAttrs, {}, selectableAttrs);
+      }, ariaAttrs), selectableAttrs);
     }
   },
   render: function render(h) {
@@ -27850,10 +28431,11 @@ var tableRendererMixin = {
 var BTable = /*#__PURE__*/Vue.extend({
   name: 'BTable',
   // Order of mixins is important!
-  // They are merged from first to last, followed by this component.
-  mixins: [// Required Mixins
-  hasListenerMixin, idMixin, normalizeSlotMixin, itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Features Mixins
-  stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin] // render function provided by table-renderer mixin
+  // They are merged from first to last, followed by this component
+  mixins: [// General mixins
+  attrsMixin, hasListenerMixin, idMixin, normalizeSlotMixin, // Required table mixins
+  itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Table features mixins
+  stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin] // Render function is provided by table-renderer mixin
 
 });
 
@@ -27915,7 +28497,7 @@ var TablePlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var navProps = omit(props$J, ['tabs', 'isNavBar', 'cardHeader']); // -- Utils --
+var navProps = omit(props$K, ['tabs', 'isNavBar', 'cardHeader']); // -- Utils --
 // Filter function to filter out disabled tabs
 
 var notDisabled = function notDisabled(tab) {
@@ -27978,9 +28560,7 @@ var BTabButtonHelper = /*#__PURE__*/Vue.extend({
   },
   methods: {
     focus: function focus() {
-      if (this.$refs && this.$refs.link && this.$refs.link.focus) {
-        this.$refs.link.focus();
-      }
+      attemptFocus(this.$refs.link);
     },
     handleEvt: function handleEvt(evt) {
       var stop = function stop() {
@@ -28040,7 +28620,7 @@ var BTabButtonHelper = /*#__PURE__*/Vue.extend({
       props: {
         disabled: this.tab.disabled
       },
-      attrs: _objectSpread2({}, this.tab.titleLinkAttributes, {
+      attrs: _objectSpread2(_objectSpread2({}, this.tab.titleLinkAttributes), {}, {
         role: 'tab',
         id: this.id,
         // Roving tab index when keynav enabled
@@ -28077,7 +28657,7 @@ var BTabs = /*#__PURE__*/Vue.extend({
     prop: 'value',
     event: 'input'
   },
-  props: _objectSpread2({}, navProps, {
+  props: _objectSpread2(_objectSpread2({}, navProps), {}, {
     tag: {
       type: String,
       default: 'div'
@@ -28245,8 +28825,9 @@ var BTabs = /*#__PURE__*/Vue.extend({
   created: function created() {
     var _this4 = this;
 
-    this.currentTab = toInteger(this.value, -1);
-    this._bvObserver = null; // For SSR and to make sure only a single tab is shown on mount
+    // Create private non-reactive props
+    this.$_observer = null;
+    this.currentTab = toInteger(this.value, -1); // For SSR and to make sure only a single tab is shown on mount
     // We wrap this in a `$nextTick()` to ensure the child tabs have been created
 
     this.$nextTick(function () {
@@ -28310,11 +28891,12 @@ var BTabs = /*#__PURE__*/Vue.extend({
         return t !== tab;
       });
     },
+    // DOM observer is needed to detect changes in order of tabs
     setObserver: function setObserver(on) {
-      // DOM observer is needed to detect changes in order of tabs
+      this.$_observer && this.$_observer.disconnect();
+      this.$_observer = null;
+
       if (on) {
-        // Make sure no existing observer running
-        this.setObserver(false);
         var self = this;
         /* istanbul ignore next: difficult to test mutation observer in JSDOM */
 
@@ -28329,18 +28911,12 @@ var BTabs = /*#__PURE__*/Vue.extend({
         }; // Watch for changes to <b-tab> sub components
 
 
-        this._bvObserver = observeDom(this.$refs.tabsContainer, handler, {
+        this.$_observer = observeDom(this.$refs.tabsContainer, handler, {
           childList: true,
           subtree: false,
           attributes: true,
           attributeFilter: ['id']
         });
-      } else {
-        if (this._bvObserver && this._bvObserver.disconnect) {
-          this._bvObserver.disconnect();
-        }
-
-        this._bvObserver = null;
       }
     },
     getTabs: function getTabs() {
@@ -28484,11 +29060,7 @@ var BTabs = /*#__PURE__*/Vue.extend({
 
       // Wrap in `$nextTick()` to ensure DOM has completed rendering/updating before focusing
       this.$nextTick(function () {
-        var button = _this8.getButtonForTab(tab);
-
-        if (button && button.focus) {
-          button.focus();
-        }
+        attemptFocus(_this8.getButtonForTab(tab));
       });
     },
     // Emit a click event on a specified <b-tab> component instance
@@ -28513,7 +29085,7 @@ var BTabs = /*#__PURE__*/Vue.extend({
     },
     // Move to previous non-disabled tab
     previousTab: function previousTab(focus) {
-      var currentIndex = Math.max(this.currentTab, 0);
+      var currentIndex = mathMax(this.currentTab, 0);
       var tab = this.tabs.slice(0, currentIndex).reverse().find(notDisabled);
 
       if (this.activateTab(tab) && focus) {
@@ -28523,7 +29095,7 @@ var BTabs = /*#__PURE__*/Vue.extend({
     },
     // Move to next non-disabled tab
     nextTab: function nextTab(focus) {
-      var currentIndex = Math.max(this.currentTab, -1);
+      var currentIndex = mathMax(this.currentTab, -1);
       var tab = this.tabs.slice(currentIndex + 1).find(notDisabled);
 
       if (this.activateTab(tab) && focus) {
@@ -28855,8 +29427,8 @@ var TimePlugin = /*#__PURE__*/pluginFactory({
   }
 });
 
-var NAME$I = 'BToaster';
-var props$_ = {
+var NAME$K = 'BToaster';
+var props$$ = {
   name: {
     type: String,
     required: true
@@ -28864,13 +29436,13 @@ var props$_ = {
   ariaLive: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$I, 'ariaLive');
+      return getComponentConfig(NAME$K, 'ariaLive');
     }
   },
   ariaAtomic: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$I, 'ariaAtomic');
+      return getComponentConfig(NAME$K, 'ariaAtomic');
     } // Allowed: 'true' or 'false' or null
 
   },
@@ -28878,7 +29450,7 @@ var props$_ = {
     // Aria role
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$I, 'role');
+      return getComponentConfig(NAME$K, 'role');
     }
   }
   /*
@@ -28923,8 +29495,8 @@ var DefaultTransition = /*#__PURE__*/Vue.extend({
 }); // @vue/component
 
 var BToaster = /*#__PURE__*/Vue.extend({
-  name: NAME$I,
-  props: props$_,
+  name: NAME$K,
+  props: props$$,
   data: function data() {
     return {
       // We don't render on SSR or if a an existing target found
@@ -28996,10 +29568,11 @@ var BToaster = /*#__PURE__*/Vue.extend({
   }
 });
 
-var NAME$J = 'BToast';
+var NAME$L = 'BToast';
 var MIN_DURATION = 1000; // --- Props ---
 
-var props$$ = {
+var linkProps$5 = pick(props$1, ['href', 'to']);
+var props$10 = _objectSpread2({
   id: {
     // Even though the ID prop is provided by idMixin, we
     // add it here for $bvToast props filtering
@@ -29013,7 +29586,7 @@ var props$$ = {
   toaster: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$J, 'toaster');
+      return getComponentConfig(NAME$L, 'toaster');
     }
   },
   visible: {
@@ -29023,7 +29596,7 @@ var props$$ = {
   variant: {
     type: String,
     default: function _default() {
-      return getComponentConfig(NAME$J, 'variant');
+      return getComponentConfig(NAME$L, 'variant');
     }
   },
   isStatus: {
@@ -29042,7 +29615,7 @@ var props$$ = {
   autoHideDelay: {
     type: [Number, String],
     default: function _default() {
-      return getComponentConfig(NAME$J, 'autoHideDelay');
+      return getComponentConfig(NAME$L, 'autoHideDelay');
     }
   },
   noCloseButton: {
@@ -29064,45 +29637,37 @@ var props$$ = {
   toastClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$J, 'toastClass');
+      return getComponentConfig(NAME$L, 'toastClass');
     }
   },
   headerClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$J, 'headerClass');
+      return getComponentConfig(NAME$L, 'headerClass');
     }
   },
   bodyClass: {
     type: [String, Object, Array],
     default: function _default() {
-      return getComponentConfig(NAME$J, 'bodyClass');
+      return getComponentConfig(NAME$L, 'bodyClass');
     }
-  },
-  href: {
-    type: String // default: null
-
-  },
-  to: {
-    type: [String, Object] // default: null
-
   },
   static: {
     // Render the toast in place, rather than in a portal-target
     type: Boolean,
     default: false
   }
-}; // @vue/component
+}, linkProps$5); // @vue/component
 
 var BToast = /*#__PURE__*/Vue.extend({
-  name: NAME$J,
-  mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
+  name: NAME$L,
+  mixins: [attrsMixin, idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
   inheritAttrs: false,
   model: {
     prop: 'visible',
     event: 'change'
   },
-  props: props$$,
+  props: props$10,
   data: function data() {
     return {
       isMounted: false,
@@ -29131,7 +29696,7 @@ var BToast = /*#__PURE__*/Vue.extend({
     },
     computedDuration: function computedDuration() {
       // Minimum supported duration is 1 second
-      return Math.max(toInteger(this.autoHideDelay, 0), MIN_DURATION);
+      return mathMax(toInteger(this.autoHideDelay, 0), MIN_DURATION);
     },
     computedToaster: function computedToaster() {
       return String(this.toaster);
@@ -29143,6 +29708,12 @@ var BToast = /*#__PURE__*/Vue.extend({
         beforeLeave: this.onBeforeLeave,
         afterLeave: this.onAfterLeave
       };
+    },
+    computedAttrs: function computedAttrs() {
+      return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        id: this.safeId(),
+        tabindex: '0'
+      });
     }
   },
   watch: {
@@ -29249,11 +29820,11 @@ var BToast = /*#__PURE__*/Vue.extend({
     },
     buildEvent: function buildEvent(type) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      return new BvEvent(type, _objectSpread2({
+      return new BvEvent(type, _objectSpread2(_objectSpread2({
         cancelable: false,
         target: this.$el || null,
         relatedTarget: null
-      }, options, {
+      }, options), {}, {
         vueTarget: this,
         componentId: this.safeId()
       }));
@@ -29308,7 +29879,7 @@ var BToast = /*#__PURE__*/Vue.extend({
 
       if (passed > 0) {
         this.clearDismissTimer();
-        this.resumeDismiss = Math.max(this.computedDuration - passed, MIN_DURATION);
+        this.resumeDismiss = mathMax(this.computedDuration - passed, MIN_DURATION);
       }
     },
     onUnPause: function onUnPause() {
@@ -29390,15 +29961,12 @@ var BToast = /*#__PURE__*/Vue.extend({
       } // Toast body
 
 
-      var isLink = this.href || this.to;
-      var $body = h(isLink ? BLink : 'div', {
+      var link = isLink(this);
+      var $body = h(link ? BLink : 'div', {
         staticClass: 'toast-body',
         class: this.bodyClass,
-        props: isLink ? {
-          to: this.to,
-          href: this.href
-        } : {},
-        on: isLink ? {
+        props: link ? pluckProps(linkProps$5, this) : {},
+        on: link ? {
           click: this.onLinkClick
         } : {}
       }, [this.normalizeSlot('default', this.slotScope) || h()]); // Build the toast
@@ -29408,10 +29976,7 @@ var BToast = /*#__PURE__*/Vue.extend({
         ref: 'toast',
         staticClass: 'toast',
         class: this.toastClass,
-        attrs: _objectSpread2({}, this.$attrs, {
-          tabindex: '0',
-          id: this.safeId()
-        })
+        attrs: this.computedAttrs
       }, [$header, $body]);
       return $toast;
     }
@@ -29438,7 +30003,7 @@ var BToast = /*#__PURE__*/Vue.extend({
       ref: 'b-toast',
       staticClass: 'b-toast',
       class: this.bToastClasses,
-      attrs: _objectSpread2({}, scopedStyleAttrs, {
+      attrs: _objectSpread2(_objectSpread2({}, scopedStyleAttrs), {}, {
         id: this.safeId('_toast_outer'),
         role: this.isHiding ? null : this.isStatus ? 'status' : 'alert',
         'aria-live': this.isHiding ? null : this.isStatus ? 'polite' : 'assertive',
@@ -29459,7 +30024,7 @@ var PROP_NAME_PRIV$1 = '_bv__toast'; // Base toast props that are allowed
 // Prop ID is allowed, but really only should be used for testing
 // We need to add it in explicitly as it comes from the `idMixin`
 
-var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$$, ['static', 'visible'])))); // Map prop names to toast slot names
+var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$10, ['static', 'visible'])))); // Map prop names to toast slot names
 
 var propsToSlots$1 = {
   toastContent: 'default',
@@ -29534,7 +30099,7 @@ var plugin$1 = function plugin(Vue) {
       // We set parent as the local VM so these toasts can emit events on the
       // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
       parent: $parent,
-      propsData: _objectSpread2({}, filterOptions$1(getComponentConfig('BToast') || {}), {}, omit(props, keys(propsToSlots$1)), {
+      propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions$1(getComponentConfig('BToast') || {})), omit(props, keys(propsToSlots$1))), {}, {
         // Props that can't be overridden
         static: false,
         visible: true
@@ -29591,7 +30156,7 @@ var plugin$1 = function plugin(Vue) {
           return;
         }
 
-        makeToast(_objectSpread2({}, filterOptions$1(options), {
+        makeToast(_objectSpread2(_objectSpread2({}, filterOptions$1(options)), {}, {
           toastContent: content
         }), this._vm);
       } // shows a `<b-toast>` component with the specified ID
@@ -29625,9 +30190,8 @@ var plugin$1 = function plugin(Vue) {
     }
   }); // Define our read-only `$bvToast` instance property
   // Placed in an if just in case in HMR mode
-  // eslint-disable-next-line no-prototype-builtins
 
-  if (!Vue.prototype.hasOwnProperty(PROP_NAME$3)) {
+  if (!hasOwnProperty(Vue.prototype, PROP_NAME$3)) {
     defineProperty(Vue.prototype, PROP_NAME$3, {
       get: function get() {
         /* istanbul ignore next */
@@ -29718,7 +30282,7 @@ var parseBindings$1 = function parseBindings(bindings, vnode)
     config.title = bindings.value;
   } else if (isPlainObject(bindings.value)) {
     // Value is config object, so merge
-    config = _objectSpread2({}, config, {}, bindings.value);
+    config = _objectSpread2(_objectSpread2({}, config), bindings.value);
   } // If title is not provided, try title attribute
 
 
@@ -29993,7 +30557,7 @@ var VBModalPlugin = /*#__PURE__*/pluginFactory({
  * Constants / Defaults
  */
 
-var NAME$K = 'v-b-scrollspy';
+var NAME$M = 'v-b-scrollspy';
 var ACTIVATE_EVENT = 'bv::scrollspy::activate';
 var Default = {
   element: 'body',
@@ -30049,7 +30613,7 @@ var typeCheckConfig = function typeCheckConfig(componentName, config, configType
 /* istanbul ignore next: not easy to test */
 {
   for (var property in configTypes) {
-    if (Object.prototype.hasOwnProperty.call(configTypes, property)) {
+    if (hasOwnProperty(configTypes, property)) {
       var expectedTypes = configTypes[property];
       var value = config[property];
       var valueType = value && isElement(value) ? 'element' : toType$1(value); // handle Vue instances
@@ -30087,8 +30651,8 @@ var ScrollSpy
     this.$activeTarget = null;
     this.$scrollHeight = 0;
     this.$resizeTimeout = null;
-    this.$obs_scroller = null;
-    this.$obs_targets = null;
+    this.$scrollerObserver = null;
+    this.$targetsObserver = null;
     this.$root = $root || null;
     this.$config = null;
     this.updateConfig(config);
@@ -30103,7 +30667,7 @@ var ScrollSpy
         this.$scroller = null;
       }
 
-      var cfg = _objectSpread2({}, this.constructor.Default, {}, config);
+      var cfg = _objectSpread2(_objectSpread2({}, this.constructor.Default), config);
 
       if ($root) {
         this.$root = $root;
@@ -30182,18 +30746,13 @@ var ScrollSpy
       var _this3 = this;
 
       // We observe both the scroller for content changes, and the target links
-      if (this.$obs_scroller) {
-        this.$obs_scroller.disconnect();
-        this.$obs_scroller = null;
-      }
-
-      if (this.$obs_targets) {
-        this.$obs_targets.disconnect();
-        this.$obs_targets = null;
-      }
+      this.$scrollerObserver && this.$scrollerObserver.disconnect();
+      this.$targetsObserver && this.$targetsObserver.disconnect();
+      this.$scrollerObserver = null;
+      this.$targetsObserver = null;
 
       if (on) {
-        this.$obs_targets = observeDom(this.$el, function () {
+        this.$targetsObserver = observeDom(this.$el, function () {
           _this3.handleEvent('mutation');
         }, {
           subtree: true,
@@ -30201,7 +30760,7 @@ var ScrollSpy
           attributes: true,
           attributeFilter: ['href']
         });
-        this.$obs_scroller = observeDom(this.getScroller(), function () {
+        this.$scrollerObserver = observeDom(this.getScroller(), function () {
           _this3.handleEvent('mutation');
         }, {
           subtree: true,
@@ -30230,7 +30789,7 @@ var ScrollSpy
       };
 
       if (type === 'scroll') {
-        if (!this.$obs_scroller) {
+        if (!this.$scrollerObserver) {
           // Just in case we are added to the DOM before the scroll target is
           // We re-instantiate our listeners, just in case
           this.listen();
@@ -30375,7 +30934,7 @@ var ScrollSpy
   }, {
     key: "getScrollHeight",
     value: function getScrollHeight() {
-      return this.getScroller().scrollHeight || Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      return this.getScroller().scrollHeight || mathMax(document.body.scrollHeight, document.documentElement.scrollHeight);
     }
   }, {
     key: "getOffsetHeight",
@@ -30471,7 +31030,7 @@ var ScrollSpy
   }], [{
     key: "Name",
     get: function get() {
-      return NAME$K;
+      return NAME$M;
     }
   }, {
     key: "Default",
@@ -30523,7 +31082,7 @@ var parseBindings$2 = function parseBindings(bindings)
     config.element = bindings.value;
   } else if (isNumber(bindings.value)) {
     // Value is offset
-    config.offset = Math.round(bindings.value);
+    config.offset = mathRound(bindings.value);
   } else if (isObject(bindings.value)) {
     // Value is config object
     // Filter the object based on our supported config options
@@ -30650,7 +31209,7 @@ var BIconstack = /*#__PURE__*/Vue.extend({
         children = _ref.children;
     return h(BVIconBase, vueFunctionalDataMerge.mergeData(data, {
       staticClass: 'b-iconstack',
-      props: _objectSpread2({}, props, {
+      props: _objectSpread2(_objectSpread2({}, props), {}, {
         stacked: false
       })
     }), children);
@@ -30686,22 +31245,54 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconArrowClockwise: BIconArrowClockwise,
     BIconArrowCounterclockwise: BIconArrowCounterclockwise,
     BIconArrowDown: BIconArrowDown,
+    BIconArrowDownCircle: BIconArrowDownCircle,
+    BIconArrowDownCircleFill: BIconArrowDownCircleFill,
     BIconArrowDownLeft: BIconArrowDownLeft,
+    BIconArrowDownLeftCircle: BIconArrowDownLeftCircle,
+    BIconArrowDownLeftCircleFill: BIconArrowDownLeftCircleFill,
+    BIconArrowDownLeftSquare: BIconArrowDownLeftSquare,
+    BIconArrowDownLeftSquareFill: BIconArrowDownLeftSquareFill,
     BIconArrowDownRight: BIconArrowDownRight,
+    BIconArrowDownRightCircle: BIconArrowDownRightCircle,
+    BIconArrowDownRightCircleFill: BIconArrowDownRightCircleFill,
+    BIconArrowDownRightSquare: BIconArrowDownRightSquare,
+    BIconArrowDownRightSquareFill: BIconArrowDownRightSquareFill,
     BIconArrowDownShort: BIconArrowDownShort,
+    BIconArrowDownSquare: BIconArrowDownSquare,
+    BIconArrowDownSquareFill: BIconArrowDownSquareFill,
+    BIconArrowDownUp: BIconArrowDownUp,
     BIconArrowLeft: BIconArrowLeft,
+    BIconArrowLeftCircle: BIconArrowLeftCircle,
+    BIconArrowLeftCircleFill: BIconArrowLeftCircleFill,
     BIconArrowLeftRight: BIconArrowLeftRight,
     BIconArrowLeftShort: BIconArrowLeftShort,
+    BIconArrowLeftSquare: BIconArrowLeftSquare,
+    BIconArrowLeftSquareFill: BIconArrowLeftSquareFill,
     BIconArrowRepeat: BIconArrowRepeat,
     BIconArrowReturnLeft: BIconArrowReturnLeft,
     BIconArrowReturnRight: BIconArrowReturnRight,
     BIconArrowRight: BIconArrowRight,
+    BIconArrowRightCircle: BIconArrowRightCircle,
+    BIconArrowRightCircleFill: BIconArrowRightCircleFill,
     BIconArrowRightShort: BIconArrowRightShort,
+    BIconArrowRightSquare: BIconArrowRightSquare,
+    BIconArrowRightSquareFill: BIconArrowRightSquareFill,
     BIconArrowUp: BIconArrowUp,
-    BIconArrowUpDown: BIconArrowUpDown,
+    BIconArrowUpCircle: BIconArrowUpCircle,
+    BIconArrowUpCircleFill: BIconArrowUpCircleFill,
     BIconArrowUpLeft: BIconArrowUpLeft,
+    BIconArrowUpLeftCircle: BIconArrowUpLeftCircle,
+    BIconArrowUpLeftCircleFill: BIconArrowUpLeftCircleFill,
+    BIconArrowUpLeftSquare: BIconArrowUpLeftSquare,
+    BIconArrowUpLeftSquareFill: BIconArrowUpLeftSquareFill,
     BIconArrowUpRight: BIconArrowUpRight,
+    BIconArrowUpRightCircle: BIconArrowUpRightCircle,
+    BIconArrowUpRightCircleFill: BIconArrowUpRightCircleFill,
+    BIconArrowUpRightSquare: BIconArrowUpRightSquare,
+    BIconArrowUpRightSquareFill: BIconArrowUpRightSquareFill,
     BIconArrowUpShort: BIconArrowUpShort,
+    BIconArrowUpSquare: BIconArrowUpSquare,
+    BIconArrowUpSquareFill: BIconArrowUpSquareFill,
     BIconArrowsAngleContract: BIconArrowsAngleContract,
     BIconArrowsAngleExpand: BIconArrowsAngleExpand,
     BIconArrowsCollapse: BIconArrowsCollapse,
@@ -30710,6 +31301,7 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconArrowsMove: BIconArrowsMove,
     BIconAspectRatio: BIconAspectRatio,
     BIconAspectRatioFill: BIconAspectRatioFill,
+    BIconAsterisk: BIconAsterisk,
     BIconAt: BIconAt,
     BIconAward: BIconAward,
     BIconAwardFill: BIconAwardFill,
@@ -30718,9 +31310,18 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconBackspaceReverse: BIconBackspaceReverse,
     BIconBackspaceReverseFill: BIconBackspaceReverseFill,
     BIconBag: BIconBag,
+    BIconBagCheck: BIconBagCheck,
+    BIconBagDash: BIconBagDash,
     BIconBagFill: BIconBagFill,
+    BIconBagPlus: BIconBagPlus,
     BIconBarChart: BIconBarChart,
     BIconBarChartFill: BIconBarChartFill,
+    BIconBasket: BIconBasket,
+    BIconBasket2: BIconBasket2,
+    BIconBasket2Fill: BIconBasket2Fill,
+    BIconBasket3: BIconBasket3,
+    BIconBasket3Fill: BIconBasket3Fill,
+    BIconBasketFill: BIconBasketFill,
     BIconBattery: BIconBattery,
     BIconBatteryCharging: BIconBatteryCharging,
     BIconBatteryFull: BIconBatteryFull,
@@ -30743,6 +31344,7 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconBootstrapReboot: BIconBootstrapReboot,
     BIconBoundingBox: BIconBoundingBox,
     BIconBoundingBoxCircles: BIconBoundingBoxCircles,
+    BIconBox: BIconBox,
     BIconBoxArrowDown: BIconBoxArrowDown,
     BIconBoxArrowDownLeft: BIconBoxArrowDownLeft,
     BIconBoxArrowDownRight: BIconBoxArrowDownRight,
@@ -30759,6 +31361,7 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconBoxArrowUp: BIconBoxArrowUp,
     BIconBoxArrowUpLeft: BIconBoxArrowUpLeft,
     BIconBoxArrowUpRight: BIconBoxArrowUpRight,
+    BIconBoxSeam: BIconBoxSeam,
     BIconBraces: BIconBraces,
     BIconBriefcase: BIconBriefcase,
     BIconBriefcaseFill: BIconBriefcaseFill,
@@ -30776,10 +31379,41 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconBuilding: BIconBuilding,
     BIconBullseye: BIconBullseye,
     BIconCalendar: BIconCalendar,
+    BIconCalendar2: BIconCalendar2,
+    BIconCalendar2Check: BIconCalendar2Check,
+    BIconCalendar2CheckFill: BIconCalendar2CheckFill,
+    BIconCalendar2Date: BIconCalendar2Date,
+    BIconCalendar2DateFill: BIconCalendar2DateFill,
+    BIconCalendar2Day: BIconCalendar2Day,
+    BIconCalendar2DayFill: BIconCalendar2DayFill,
+    BIconCalendar2Fill: BIconCalendar2Fill,
+    BIconCalendar2Minus: BIconCalendar2Minus,
+    BIconCalendar2MinusFill: BIconCalendar2MinusFill,
+    BIconCalendar2Month: BIconCalendar2Month,
+    BIconCalendar2MonthFill: BIconCalendar2MonthFill,
+    BIconCalendar2Plus: BIconCalendar2Plus,
+    BIconCalendar2PlusFill: BIconCalendar2PlusFill,
+    BIconCalendar3: BIconCalendar3,
+    BIconCalendar3Fill: BIconCalendar3Fill,
+    BIconCalendar4: BIconCalendar4,
+    BIconCalendarCheck: BIconCalendarCheck,
+    BIconCalendarCheckFill: BIconCalendarCheckFill,
+    BIconCalendarDate: BIconCalendarDate,
+    BIconCalendarDateFill: BIconCalendarDateFill,
+    BIconCalendarDay: BIconCalendarDay,
+    BIconCalendarDayFill: BIconCalendarDayFill,
     BIconCalendarFill: BIconCalendarFill,
+    BIconCalendarMinus: BIconCalendarMinus,
+    BIconCalendarMinusFill: BIconCalendarMinusFill,
+    BIconCalendarMonth: BIconCalendarMonth,
+    BIconCalendarMonthFill: BIconCalendarMonthFill,
+    BIconCalendarPlus: BIconCalendarPlus,
+    BIconCalendarPlusFill: BIconCalendarPlusFill,
     BIconCamera: BIconCamera,
     BIconCameraVideo: BIconCameraVideo,
     BIconCameraVideoFill: BIconCameraVideoFill,
+    BIconCameraVideoOff: BIconCameraVideoOff,
+    BIconCameraVideoOffFill: BIconCameraVideoOffFill,
     BIconCapslock: BIconCapslock,
     BIconCapslockFill: BIconCapslockFill,
     BIconCardChecklist: BIconCardChecklist,
@@ -30789,12 +31423,28 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconCardText: BIconCardText,
     BIconCaretDown: BIconCaretDown,
     BIconCaretDownFill: BIconCaretDownFill,
+    BIconCaretDownSquare: BIconCaretDownSquare,
+    BIconCaretDownSquareFill: BIconCaretDownSquareFill,
     BIconCaretLeft: BIconCaretLeft,
     BIconCaretLeftFill: BIconCaretLeftFill,
+    BIconCaretLeftSquare: BIconCaretLeftSquare,
+    BIconCaretLeftSquareFill: BIconCaretLeftSquareFill,
     BIconCaretRight: BIconCaretRight,
     BIconCaretRightFill: BIconCaretRightFill,
+    BIconCaretRightSquare: BIconCaretRightSquare,
+    BIconCaretRightSquareFill: BIconCaretRightSquareFill,
     BIconCaretUp: BIconCaretUp,
     BIconCaretUpFill: BIconCaretUpFill,
+    BIconCaretUpSquare: BIconCaretUpSquare,
+    BIconCaretUpSquareFill: BIconCaretUpSquareFill,
+    BIconCart: BIconCart,
+    BIconCart2: BIconCart2,
+    BIconCart3: BIconCart3,
+    BIconCart4: BIconCart4,
+    BIconCartCheck: BIconCartCheck,
+    BIconCartDash: BIconCartDash,
+    BIconCartFill: BIconCartFill,
+    BIconCartPlus: BIconCartPlus,
     BIconChat: BIconChat,
     BIconChatDots: BIconChatDots,
     BIconChatDotsFill: BIconChatDotsFill,
@@ -30808,9 +31458,15 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconChatSquareQuote: BIconChatSquareQuote,
     BIconChatSquareQuoteFill: BIconChatSquareQuoteFill,
     BIconCheck: BIconCheck,
+    BIconCheck2: BIconCheck2,
+    BIconCheck2All: BIconCheck2All,
+    BIconCheck2Circle: BIconCheck2Circle,
+    BIconCheck2Square: BIconCheck2Square,
     BIconCheckAll: BIconCheckAll,
-    BIconCheckBox: BIconCheckBox,
     BIconCheckCircle: BIconCheckCircle,
+    BIconCheckCircleFill: BIconCheckCircleFill,
+    BIconCheckSquare: BIconCheckSquare,
+    BIconCheckSquareFill: BIconCheckSquareFill,
     BIconChevronBarContract: BIconChevronBarContract,
     BIconChevronBarDown: BIconChevronBarDown,
     BIconChevronBarExpand: BIconChevronBarExpand,
@@ -30843,6 +31499,8 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconCloud: BIconCloud,
     BIconCloudDownload: BIconCloudDownload,
     BIconCloudFill: BIconCloudFill,
+    BIconCloudSlash: BIconCloudSlash,
+    BIconCloudSlashFill: BIconCloudSlashFill,
     BIconCloudUpload: BIconCloudUpload,
     BIconCode: BIconCode,
     BIconCodeSlash: BIconCodeSlash,
@@ -30859,6 +31517,7 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconController: BIconController,
     BIconCreditCard: BIconCreditCard,
     BIconCrop: BIconCrop,
+    BIconCup: BIconCup,
     BIconCursor: BIconCursor,
     BIconCursorFill: BIconCursorFill,
     BIconCursorText: BIconCursorText,
@@ -30872,6 +31531,8 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconDiamondHalf: BIconDiamondHalf,
     BIconDisplay: BIconDisplay,
     BIconDisplayFill: BIconDisplayFill,
+    BIconDoorClosed: BIconDoorClosed,
+    BIconDoorClosedFill: BIconDoorClosedFill,
     BIconDot: BIconDot,
     BIconDownload: BIconDownload,
     BIconDroplet: BIconDroplet,
@@ -30882,6 +31543,14 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconEggFried: BIconEggFried,
     BIconEject: BIconEject,
     BIconEjectFill: BIconEjectFill,
+    BIconEmojiAngry: BIconEmojiAngry,
+    BIconEmojiDizzy: BIconEmojiDizzy,
+    BIconEmojiFrown: BIconEmojiFrown,
+    BIconEmojiLaughing: BIconEmojiLaughing,
+    BIconEmojiNeutral: BIconEmojiNeutral,
+    BIconEmojiSmile: BIconEmojiSmile,
+    BIconEmojiSmileUpsideDown: BIconEmojiSmileUpsideDown,
+    BIconEmojiSunglasses: BIconEmojiSunglasses,
     BIconEnvelope: BIconEnvelope,
     BIconEnvelopeFill: BIconEnvelopeFill,
     BIconEnvelopeOpen: BIconEnvelopeOpen,
@@ -30973,11 +31642,23 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconGrid3x3Gap: BIconGrid3x3Gap,
     BIconGrid3x3GapFill: BIconGrid3x3GapFill,
     BIconGridFill: BIconGridFill,
+    BIconGripHorizontal: BIconGripHorizontal,
+    BIconGripVertical: BIconGripVertical,
     BIconHammer: BIconHammer,
+    BIconHandIndex: BIconHandIndex,
+    BIconHandIndexThumb: BIconHandIndexThumb,
+    BIconHandThumbsDown: BIconHandThumbsDown,
+    BIconHandThumbsUp: BIconHandThumbsUp,
+    BIconHandbag: BIconHandbag,
+    BIconHandbagFill: BIconHandbagFill,
     BIconHash: BIconHash,
+    BIconHeadphones: BIconHeadphones,
     BIconHeart: BIconHeart,
     BIconHeartFill: BIconHeartFill,
     BIconHeartHalf: BIconHeartHalf,
+    BIconHexagon: BIconHexagon,
+    BIconHexagonFill: BIconHexagonFill,
+    BIconHexagonHalf: BIconHexagonHalf,
     BIconHouse: BIconHouse,
     BIconHouseDoor: BIconHouseDoor,
     BIconHouseDoorFill: BIconHouseDoorFill,
@@ -31035,6 +31716,8 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconMicFill: BIconMicFill,
     BIconMicMute: BIconMicMute,
     BIconMicMuteFill: BIconMicMuteFill,
+    BIconMinecart: BIconMinecart,
+    BIconMinecartLoaded: BIconMinecartLoaded,
     BIconMoon: BIconMoon,
     BIconMusicNote: BIconMusicNote,
     BIconMusicNoteBeamed: BIconMusicNoteBeamed,
@@ -31057,12 +31740,12 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconPentagonFill: BIconPentagonFill,
     BIconPentagonHalf: BIconPentagonHalf,
     BIconPeople: BIconPeople,
-    BIconPeopleCircle: BIconPeopleCircle,
     BIconPeopleFill: BIconPeopleFill,
     BIconPerson: BIconPerson,
     BIconPersonBoundingBox: BIconPersonBoundingBox,
     BIconPersonCheck: BIconPersonCheck,
     BIconPersonCheckFill: BIconPersonCheckFill,
+    BIconPersonCircle: BIconPersonCircle,
     BIconPersonDash: BIconPersonDash,
     BIconPersonDashFill: BIconPersonDashFill,
     BIconPersonFill: BIconPersonFill,
@@ -31096,6 +31779,8 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconQuestionOctagonFill: BIconQuestionOctagonFill,
     BIconQuestionSquare: BIconQuestionSquare,
     BIconQuestionSquareFill: BIconQuestionSquareFill,
+    BIconReceipt: BIconReceipt,
+    BIconReceiptCutoff: BIconReceiptCutoff,
     BIconReply: BIconReply,
     BIconReplyAll: BIconReplyAll,
     BIconReplyAllFill: BIconReplyAllFill,
@@ -31108,8 +31793,12 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconShieldLock: BIconShieldLock,
     BIconShieldLockFill: BIconShieldLockFill,
     BIconShieldShaded: BIconShieldShaded,
+    BIconShieldSlash: BIconShieldSlash,
+    BIconShieldSlashFill: BIconShieldSlashFill,
     BIconShift: BIconShift,
     BIconShiftFill: BIconShiftFill,
+    BIconShop: BIconShop,
+    BIconShopWindow: BIconShopWindow,
     BIconShuffle: BIconShuffle,
     BIconSkipBackward: BIconSkipBackward,
     BIconSkipBackwardFill: BIconSkipBackwardFill,
@@ -31167,6 +31856,8 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconTriangleFill: BIconTriangleFill,
     BIconTriangleHalf: BIconTriangleHalf,
     BIconTrophy: BIconTrophy,
+    BIconTruck: BIconTruck,
+    BIconTruckFlatbed: BIconTruckFlatbed,
     BIconTv: BIconTv,
     BIconTvFill: BIconTvFill,
     BIconType: BIconType,
@@ -31180,6 +31871,8 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconUnion: BIconUnion,
     BIconUnlock: BIconUnlock,
     BIconUnlockFill: BIconUnlockFill,
+    BIconUpc: BIconUpc,
+    BIconUpcScan: BIconUpcScan,
     BIconUpload: BIconUpload,
     BIconViewList: BIconViewList,
     BIconViewStacked: BIconViewStacked,
@@ -31187,10 +31880,13 @@ var IconsPlugin = /*#__PURE__*/pluginFactoryNoConfig({
     BIconVolumeDownFill: BIconVolumeDownFill,
     BIconVolumeMute: BIconVolumeMute,
     BIconVolumeMuteFill: BIconVolumeMuteFill,
+    BIconVolumeOff: BIconVolumeOff,
+    BIconVolumeOffFill: BIconVolumeOffFill,
     BIconVolumeUp: BIconVolumeUp,
     BIconVolumeUpFill: BIconVolumeUpFill,
     BIconVr: BIconVr,
     BIconWallet: BIconWallet,
+    BIconWallet2: BIconWallet2,
     BIconWatch: BIconWatch,
     BIconWifi: BIconWifi,
     BIconWindow: BIconWindow,
@@ -31216,7 +31912,7 @@ var BootstrapVueIcons = /*#__PURE__*/pluginFactoryNoConfig({
   NAME: 'BootstrapVueIcons'
 }); // --- END AUTO-GENERATED FILE ---
 
-var NAME$L = 'BootstrapVue'; // --- BootstrapVue installer ---
+var NAME$N = 'BootstrapVue'; // --- BootstrapVue installer ---
 
 var install = /*#__PURE__*/installFactory({
   plugins: {
@@ -31227,7 +31923,7 @@ var install = /*#__PURE__*/installFactory({
 
 var BootstrapVue = /*#__PURE__*/{
   install: install,
-  NAME: NAME$L
+  NAME: NAME$N
 }; // --- Named exports for BvConfigPlugin ---
 
 exports.AlertPlugin = AlertPlugin;
@@ -31236,6 +31932,7 @@ exports.AvatarPlugin = AvatarPlugin;
 exports.BAlert = BAlert;
 exports.BAspect = BAspect;
 exports.BAvatar = BAvatar;
+exports.BAvatarGroup = BAvatarGroup;
 exports.BBadge = BBadge;
 exports.BBreadcrumb = BBreadcrumb;
 exports.BBreadcrumbItem = BBreadcrumbItem;
@@ -31310,22 +32007,54 @@ exports.BIconArrowBarUp = BIconArrowBarUp;
 exports.BIconArrowClockwise = BIconArrowClockwise;
 exports.BIconArrowCounterclockwise = BIconArrowCounterclockwise;
 exports.BIconArrowDown = BIconArrowDown;
+exports.BIconArrowDownCircle = BIconArrowDownCircle;
+exports.BIconArrowDownCircleFill = BIconArrowDownCircleFill;
 exports.BIconArrowDownLeft = BIconArrowDownLeft;
+exports.BIconArrowDownLeftCircle = BIconArrowDownLeftCircle;
+exports.BIconArrowDownLeftCircleFill = BIconArrowDownLeftCircleFill;
+exports.BIconArrowDownLeftSquare = BIconArrowDownLeftSquare;
+exports.BIconArrowDownLeftSquareFill = BIconArrowDownLeftSquareFill;
 exports.BIconArrowDownRight = BIconArrowDownRight;
+exports.BIconArrowDownRightCircle = BIconArrowDownRightCircle;
+exports.BIconArrowDownRightCircleFill = BIconArrowDownRightCircleFill;
+exports.BIconArrowDownRightSquare = BIconArrowDownRightSquare;
+exports.BIconArrowDownRightSquareFill = BIconArrowDownRightSquareFill;
 exports.BIconArrowDownShort = BIconArrowDownShort;
+exports.BIconArrowDownSquare = BIconArrowDownSquare;
+exports.BIconArrowDownSquareFill = BIconArrowDownSquareFill;
+exports.BIconArrowDownUp = BIconArrowDownUp;
 exports.BIconArrowLeft = BIconArrowLeft;
+exports.BIconArrowLeftCircle = BIconArrowLeftCircle;
+exports.BIconArrowLeftCircleFill = BIconArrowLeftCircleFill;
 exports.BIconArrowLeftRight = BIconArrowLeftRight;
 exports.BIconArrowLeftShort = BIconArrowLeftShort;
+exports.BIconArrowLeftSquare = BIconArrowLeftSquare;
+exports.BIconArrowLeftSquareFill = BIconArrowLeftSquareFill;
 exports.BIconArrowRepeat = BIconArrowRepeat;
 exports.BIconArrowReturnLeft = BIconArrowReturnLeft;
 exports.BIconArrowReturnRight = BIconArrowReturnRight;
 exports.BIconArrowRight = BIconArrowRight;
+exports.BIconArrowRightCircle = BIconArrowRightCircle;
+exports.BIconArrowRightCircleFill = BIconArrowRightCircleFill;
 exports.BIconArrowRightShort = BIconArrowRightShort;
+exports.BIconArrowRightSquare = BIconArrowRightSquare;
+exports.BIconArrowRightSquareFill = BIconArrowRightSquareFill;
 exports.BIconArrowUp = BIconArrowUp;
-exports.BIconArrowUpDown = BIconArrowUpDown;
+exports.BIconArrowUpCircle = BIconArrowUpCircle;
+exports.BIconArrowUpCircleFill = BIconArrowUpCircleFill;
 exports.BIconArrowUpLeft = BIconArrowUpLeft;
+exports.BIconArrowUpLeftCircle = BIconArrowUpLeftCircle;
+exports.BIconArrowUpLeftCircleFill = BIconArrowUpLeftCircleFill;
+exports.BIconArrowUpLeftSquare = BIconArrowUpLeftSquare;
+exports.BIconArrowUpLeftSquareFill = BIconArrowUpLeftSquareFill;
 exports.BIconArrowUpRight = BIconArrowUpRight;
+exports.BIconArrowUpRightCircle = BIconArrowUpRightCircle;
+exports.BIconArrowUpRightCircleFill = BIconArrowUpRightCircleFill;
+exports.BIconArrowUpRightSquare = BIconArrowUpRightSquare;
+exports.BIconArrowUpRightSquareFill = BIconArrowUpRightSquareFill;
 exports.BIconArrowUpShort = BIconArrowUpShort;
+exports.BIconArrowUpSquare = BIconArrowUpSquare;
+exports.BIconArrowUpSquareFill = BIconArrowUpSquareFill;
 exports.BIconArrowsAngleContract = BIconArrowsAngleContract;
 exports.BIconArrowsAngleExpand = BIconArrowsAngleExpand;
 exports.BIconArrowsCollapse = BIconArrowsCollapse;
@@ -31334,6 +32063,7 @@ exports.BIconArrowsFullscreen = BIconArrowsFullscreen;
 exports.BIconArrowsMove = BIconArrowsMove;
 exports.BIconAspectRatio = BIconAspectRatio;
 exports.BIconAspectRatioFill = BIconAspectRatioFill;
+exports.BIconAsterisk = BIconAsterisk;
 exports.BIconAt = BIconAt;
 exports.BIconAward = BIconAward;
 exports.BIconAwardFill = BIconAwardFill;
@@ -31342,9 +32072,18 @@ exports.BIconBackspaceFill = BIconBackspaceFill;
 exports.BIconBackspaceReverse = BIconBackspaceReverse;
 exports.BIconBackspaceReverseFill = BIconBackspaceReverseFill;
 exports.BIconBag = BIconBag;
+exports.BIconBagCheck = BIconBagCheck;
+exports.BIconBagDash = BIconBagDash;
 exports.BIconBagFill = BIconBagFill;
+exports.BIconBagPlus = BIconBagPlus;
 exports.BIconBarChart = BIconBarChart;
 exports.BIconBarChartFill = BIconBarChartFill;
+exports.BIconBasket = BIconBasket;
+exports.BIconBasket2 = BIconBasket2;
+exports.BIconBasket2Fill = BIconBasket2Fill;
+exports.BIconBasket3 = BIconBasket3;
+exports.BIconBasket3Fill = BIconBasket3Fill;
+exports.BIconBasketFill = BIconBasketFill;
 exports.BIconBattery = BIconBattery;
 exports.BIconBatteryCharging = BIconBatteryCharging;
 exports.BIconBatteryFull = BIconBatteryFull;
@@ -31368,6 +32107,7 @@ exports.BIconBootstrapFill = BIconBootstrapFill;
 exports.BIconBootstrapReboot = BIconBootstrapReboot;
 exports.BIconBoundingBox = BIconBoundingBox;
 exports.BIconBoundingBoxCircles = BIconBoundingBoxCircles;
+exports.BIconBox = BIconBox;
 exports.BIconBoxArrowDown = BIconBoxArrowDown;
 exports.BIconBoxArrowDownLeft = BIconBoxArrowDownLeft;
 exports.BIconBoxArrowDownRight = BIconBoxArrowDownRight;
@@ -31384,6 +32124,7 @@ exports.BIconBoxArrowRight = BIconBoxArrowRight;
 exports.BIconBoxArrowUp = BIconBoxArrowUp;
 exports.BIconBoxArrowUpLeft = BIconBoxArrowUpLeft;
 exports.BIconBoxArrowUpRight = BIconBoxArrowUpRight;
+exports.BIconBoxSeam = BIconBoxSeam;
 exports.BIconBraces = BIconBraces;
 exports.BIconBriefcase = BIconBriefcase;
 exports.BIconBriefcaseFill = BIconBriefcaseFill;
@@ -31401,10 +32142,41 @@ exports.BIconBucketFill = BIconBucketFill;
 exports.BIconBuilding = BIconBuilding;
 exports.BIconBullseye = BIconBullseye;
 exports.BIconCalendar = BIconCalendar;
+exports.BIconCalendar2 = BIconCalendar2;
+exports.BIconCalendar2Check = BIconCalendar2Check;
+exports.BIconCalendar2CheckFill = BIconCalendar2CheckFill;
+exports.BIconCalendar2Date = BIconCalendar2Date;
+exports.BIconCalendar2DateFill = BIconCalendar2DateFill;
+exports.BIconCalendar2Day = BIconCalendar2Day;
+exports.BIconCalendar2DayFill = BIconCalendar2DayFill;
+exports.BIconCalendar2Fill = BIconCalendar2Fill;
+exports.BIconCalendar2Minus = BIconCalendar2Minus;
+exports.BIconCalendar2MinusFill = BIconCalendar2MinusFill;
+exports.BIconCalendar2Month = BIconCalendar2Month;
+exports.BIconCalendar2MonthFill = BIconCalendar2MonthFill;
+exports.BIconCalendar2Plus = BIconCalendar2Plus;
+exports.BIconCalendar2PlusFill = BIconCalendar2PlusFill;
+exports.BIconCalendar3 = BIconCalendar3;
+exports.BIconCalendar3Fill = BIconCalendar3Fill;
+exports.BIconCalendar4 = BIconCalendar4;
+exports.BIconCalendarCheck = BIconCalendarCheck;
+exports.BIconCalendarCheckFill = BIconCalendarCheckFill;
+exports.BIconCalendarDate = BIconCalendarDate;
+exports.BIconCalendarDateFill = BIconCalendarDateFill;
+exports.BIconCalendarDay = BIconCalendarDay;
+exports.BIconCalendarDayFill = BIconCalendarDayFill;
 exports.BIconCalendarFill = BIconCalendarFill;
+exports.BIconCalendarMinus = BIconCalendarMinus;
+exports.BIconCalendarMinusFill = BIconCalendarMinusFill;
+exports.BIconCalendarMonth = BIconCalendarMonth;
+exports.BIconCalendarMonthFill = BIconCalendarMonthFill;
+exports.BIconCalendarPlus = BIconCalendarPlus;
+exports.BIconCalendarPlusFill = BIconCalendarPlusFill;
 exports.BIconCamera = BIconCamera;
 exports.BIconCameraVideo = BIconCameraVideo;
 exports.BIconCameraVideoFill = BIconCameraVideoFill;
+exports.BIconCameraVideoOff = BIconCameraVideoOff;
+exports.BIconCameraVideoOffFill = BIconCameraVideoOffFill;
 exports.BIconCapslock = BIconCapslock;
 exports.BIconCapslockFill = BIconCapslockFill;
 exports.BIconCardChecklist = BIconCardChecklist;
@@ -31414,12 +32186,28 @@ exports.BIconCardList = BIconCardList;
 exports.BIconCardText = BIconCardText;
 exports.BIconCaretDown = BIconCaretDown;
 exports.BIconCaretDownFill = BIconCaretDownFill;
+exports.BIconCaretDownSquare = BIconCaretDownSquare;
+exports.BIconCaretDownSquareFill = BIconCaretDownSquareFill;
 exports.BIconCaretLeft = BIconCaretLeft;
 exports.BIconCaretLeftFill = BIconCaretLeftFill;
+exports.BIconCaretLeftSquare = BIconCaretLeftSquare;
+exports.BIconCaretLeftSquareFill = BIconCaretLeftSquareFill;
 exports.BIconCaretRight = BIconCaretRight;
 exports.BIconCaretRightFill = BIconCaretRightFill;
+exports.BIconCaretRightSquare = BIconCaretRightSquare;
+exports.BIconCaretRightSquareFill = BIconCaretRightSquareFill;
 exports.BIconCaretUp = BIconCaretUp;
 exports.BIconCaretUpFill = BIconCaretUpFill;
+exports.BIconCaretUpSquare = BIconCaretUpSquare;
+exports.BIconCaretUpSquareFill = BIconCaretUpSquareFill;
+exports.BIconCart = BIconCart;
+exports.BIconCart2 = BIconCart2;
+exports.BIconCart3 = BIconCart3;
+exports.BIconCart4 = BIconCart4;
+exports.BIconCartCheck = BIconCartCheck;
+exports.BIconCartDash = BIconCartDash;
+exports.BIconCartFill = BIconCartFill;
+exports.BIconCartPlus = BIconCartPlus;
 exports.BIconChat = BIconChat;
 exports.BIconChatDots = BIconChatDots;
 exports.BIconChatDotsFill = BIconChatDotsFill;
@@ -31433,9 +32221,15 @@ exports.BIconChatSquareFill = BIconChatSquareFill;
 exports.BIconChatSquareQuote = BIconChatSquareQuote;
 exports.BIconChatSquareQuoteFill = BIconChatSquareQuoteFill;
 exports.BIconCheck = BIconCheck;
+exports.BIconCheck2 = BIconCheck2;
+exports.BIconCheck2All = BIconCheck2All;
+exports.BIconCheck2Circle = BIconCheck2Circle;
+exports.BIconCheck2Square = BIconCheck2Square;
 exports.BIconCheckAll = BIconCheckAll;
-exports.BIconCheckBox = BIconCheckBox;
 exports.BIconCheckCircle = BIconCheckCircle;
+exports.BIconCheckCircleFill = BIconCheckCircleFill;
+exports.BIconCheckSquare = BIconCheckSquare;
+exports.BIconCheckSquareFill = BIconCheckSquareFill;
 exports.BIconChevronBarContract = BIconChevronBarContract;
 exports.BIconChevronBarDown = BIconChevronBarDown;
 exports.BIconChevronBarExpand = BIconChevronBarExpand;
@@ -31468,6 +32262,8 @@ exports.BIconClockHistory = BIconClockHistory;
 exports.BIconCloud = BIconCloud;
 exports.BIconCloudDownload = BIconCloudDownload;
 exports.BIconCloudFill = BIconCloudFill;
+exports.BIconCloudSlash = BIconCloudSlash;
+exports.BIconCloudSlashFill = BIconCloudSlashFill;
 exports.BIconCloudUpload = BIconCloudUpload;
 exports.BIconCode = BIconCode;
 exports.BIconCodeSlash = BIconCodeSlash;
@@ -31484,6 +32280,7 @@ exports.BIconConeStriped = BIconConeStriped;
 exports.BIconController = BIconController;
 exports.BIconCreditCard = BIconCreditCard;
 exports.BIconCrop = BIconCrop;
+exports.BIconCup = BIconCup;
 exports.BIconCursor = BIconCursor;
 exports.BIconCursorFill = BIconCursorFill;
 exports.BIconCursorText = BIconCursorText;
@@ -31497,6 +32294,8 @@ exports.BIconDiamondFill = BIconDiamondFill;
 exports.BIconDiamondHalf = BIconDiamondHalf;
 exports.BIconDisplay = BIconDisplay;
 exports.BIconDisplayFill = BIconDisplayFill;
+exports.BIconDoorClosed = BIconDoorClosed;
+exports.BIconDoorClosedFill = BIconDoorClosedFill;
 exports.BIconDot = BIconDot;
 exports.BIconDownload = BIconDownload;
 exports.BIconDroplet = BIconDroplet;
@@ -31507,6 +32306,14 @@ exports.BIconEggFill = BIconEggFill;
 exports.BIconEggFried = BIconEggFried;
 exports.BIconEject = BIconEject;
 exports.BIconEjectFill = BIconEjectFill;
+exports.BIconEmojiAngry = BIconEmojiAngry;
+exports.BIconEmojiDizzy = BIconEmojiDizzy;
+exports.BIconEmojiFrown = BIconEmojiFrown;
+exports.BIconEmojiLaughing = BIconEmojiLaughing;
+exports.BIconEmojiNeutral = BIconEmojiNeutral;
+exports.BIconEmojiSmile = BIconEmojiSmile;
+exports.BIconEmojiSmileUpsideDown = BIconEmojiSmileUpsideDown;
+exports.BIconEmojiSunglasses = BIconEmojiSunglasses;
 exports.BIconEnvelope = BIconEnvelope;
 exports.BIconEnvelopeFill = BIconEnvelopeFill;
 exports.BIconEnvelopeOpen = BIconEnvelopeOpen;
@@ -31598,11 +32405,23 @@ exports.BIconGrid3x3 = BIconGrid3x3;
 exports.BIconGrid3x3Gap = BIconGrid3x3Gap;
 exports.BIconGrid3x3GapFill = BIconGrid3x3GapFill;
 exports.BIconGridFill = BIconGridFill;
+exports.BIconGripHorizontal = BIconGripHorizontal;
+exports.BIconGripVertical = BIconGripVertical;
 exports.BIconHammer = BIconHammer;
+exports.BIconHandIndex = BIconHandIndex;
+exports.BIconHandIndexThumb = BIconHandIndexThumb;
+exports.BIconHandThumbsDown = BIconHandThumbsDown;
+exports.BIconHandThumbsUp = BIconHandThumbsUp;
+exports.BIconHandbag = BIconHandbag;
+exports.BIconHandbagFill = BIconHandbagFill;
 exports.BIconHash = BIconHash;
+exports.BIconHeadphones = BIconHeadphones;
 exports.BIconHeart = BIconHeart;
 exports.BIconHeartFill = BIconHeartFill;
 exports.BIconHeartHalf = BIconHeartHalf;
+exports.BIconHexagon = BIconHexagon;
+exports.BIconHexagonFill = BIconHexagonFill;
+exports.BIconHexagonHalf = BIconHexagonHalf;
 exports.BIconHouse = BIconHouse;
 exports.BIconHouseDoor = BIconHouseDoor;
 exports.BIconHouseDoorFill = BIconHouseDoorFill;
@@ -31660,6 +32479,8 @@ exports.BIconMic = BIconMic;
 exports.BIconMicFill = BIconMicFill;
 exports.BIconMicMute = BIconMicMute;
 exports.BIconMicMuteFill = BIconMicMuteFill;
+exports.BIconMinecart = BIconMinecart;
+exports.BIconMinecartLoaded = BIconMinecartLoaded;
 exports.BIconMoon = BIconMoon;
 exports.BIconMusicNote = BIconMusicNote;
 exports.BIconMusicNoteBeamed = BIconMusicNoteBeamed;
@@ -31682,12 +32503,12 @@ exports.BIconPentagon = BIconPentagon;
 exports.BIconPentagonFill = BIconPentagonFill;
 exports.BIconPentagonHalf = BIconPentagonHalf;
 exports.BIconPeople = BIconPeople;
-exports.BIconPeopleCircle = BIconPeopleCircle;
 exports.BIconPeopleFill = BIconPeopleFill;
 exports.BIconPerson = BIconPerson;
 exports.BIconPersonBoundingBox = BIconPersonBoundingBox;
 exports.BIconPersonCheck = BIconPersonCheck;
 exports.BIconPersonCheckFill = BIconPersonCheckFill;
+exports.BIconPersonCircle = BIconPersonCircle;
 exports.BIconPersonDash = BIconPersonDash;
 exports.BIconPersonDashFill = BIconPersonDashFill;
 exports.BIconPersonFill = BIconPersonFill;
@@ -31721,6 +32542,8 @@ exports.BIconQuestionOctagon = BIconQuestionOctagon;
 exports.BIconQuestionOctagonFill = BIconQuestionOctagonFill;
 exports.BIconQuestionSquare = BIconQuestionSquare;
 exports.BIconQuestionSquareFill = BIconQuestionSquareFill;
+exports.BIconReceipt = BIconReceipt;
+exports.BIconReceiptCutoff = BIconReceiptCutoff;
 exports.BIconReply = BIconReply;
 exports.BIconReplyAll = BIconReplyAll;
 exports.BIconReplyAllFill = BIconReplyAllFill;
@@ -31733,8 +32556,12 @@ exports.BIconShieldFill = BIconShieldFill;
 exports.BIconShieldLock = BIconShieldLock;
 exports.BIconShieldLockFill = BIconShieldLockFill;
 exports.BIconShieldShaded = BIconShieldShaded;
+exports.BIconShieldSlash = BIconShieldSlash;
+exports.BIconShieldSlashFill = BIconShieldSlashFill;
 exports.BIconShift = BIconShift;
 exports.BIconShiftFill = BIconShiftFill;
+exports.BIconShop = BIconShop;
+exports.BIconShopWindow = BIconShopWindow;
 exports.BIconShuffle = BIconShuffle;
 exports.BIconSkipBackward = BIconSkipBackward;
 exports.BIconSkipBackwardFill = BIconSkipBackwardFill;
@@ -31792,6 +32619,8 @@ exports.BIconTriangle = BIconTriangle;
 exports.BIconTriangleFill = BIconTriangleFill;
 exports.BIconTriangleHalf = BIconTriangleHalf;
 exports.BIconTrophy = BIconTrophy;
+exports.BIconTruck = BIconTruck;
+exports.BIconTruckFlatbed = BIconTruckFlatbed;
 exports.BIconTv = BIconTv;
 exports.BIconTvFill = BIconTvFill;
 exports.BIconType = BIconType;
@@ -31805,6 +32634,8 @@ exports.BIconTypeUnderline = BIconTypeUnderline;
 exports.BIconUnion = BIconUnion;
 exports.BIconUnlock = BIconUnlock;
 exports.BIconUnlockFill = BIconUnlockFill;
+exports.BIconUpc = BIconUpc;
+exports.BIconUpcScan = BIconUpcScan;
 exports.BIconUpload = BIconUpload;
 exports.BIconViewList = BIconViewList;
 exports.BIconViewStacked = BIconViewStacked;
@@ -31812,10 +32643,13 @@ exports.BIconVolumeDown = BIconVolumeDown;
 exports.BIconVolumeDownFill = BIconVolumeDownFill;
 exports.BIconVolumeMute = BIconVolumeMute;
 exports.BIconVolumeMuteFill = BIconVolumeMuteFill;
+exports.BIconVolumeOff = BIconVolumeOff;
+exports.BIconVolumeOffFill = BIconVolumeOffFill;
 exports.BIconVolumeUp = BIconVolumeUp;
 exports.BIconVolumeUpFill = BIconVolumeUpFill;
 exports.BIconVr = BIconVr;
 exports.BIconWallet = BIconWallet;
+exports.BIconWallet2 = BIconWallet2;
 exports.BIconWatch = BIconWatch;
 exports.BIconWifi = BIconWifi;
 exports.BIconWindow = BIconWindow;
@@ -31917,7 +32751,7 @@ exports.LinkPlugin = LinkPlugin;
 exports.ListGroupPlugin = ListGroupPlugin;
 exports.MediaPlugin = MediaPlugin;
 exports.ModalPlugin = ModalPlugin;
-exports.NAME = NAME$L;
+exports.NAME = NAME$N;
 exports.NavPlugin = NavPlugin;
 exports.NavbarPlugin = NavbarPlugin;
 exports.OverlayPlugin = OverlayPlugin;
