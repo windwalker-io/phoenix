@@ -42,6 +42,13 @@ abstract class PhoenixScript extends AbstractPhoenixScript
     public static $domReady = [];
 
     /**
+     * Property $initialise.
+     *
+     * @var  array
+     */
+    public static $initialise = [];
+
+    /**
      * phoenix
      *
      * @param string $variable
@@ -57,11 +64,13 @@ abstract class PhoenixScript extends AbstractPhoenixScript
             JQueryScript::core();
             CoreScript::csrfToken();
 
-            static::addJS(static::phoenixName() . '/js/phoenix/phoenix.min.js');
+            static::addJS(static::phoenixName() . '/js/phoenix/phoenix.min.js', ['rel' => 'phoenix']);
 
             static::data('windwalker.debug', WINDWALKER_DEBUG);
             static::data('phoenix.date', [
-                'timezone' => Ioc::getConfig()->get('system.timezone'),
+                'timestamp' => time(),
+                'timezone' => Ioc::getConfig()->get('system.timezone', 'UTC'),
+                'server_timezone' => Ioc::getConfig()->get('system.server_timezone', 'UTC'),
                 'empty' => Chronos::getNullDate()
             ]);
             static::data('phoenix.uri', array_merge(
@@ -102,8 +111,10 @@ $variable.use([$ui, PhoenixHelper, PhoenixRouter, PhoenixTranslator, PhoenixAjax
 $variable.Uri = window.$variable.data('phoenix.uri');
 JS;
 
-            static::internalJS($js);
+            static::addInitialise($js);
         }
+
+        static::addJS('https://phoenix_body');
     }
 
     /**
@@ -726,6 +737,27 @@ JS;
         }
 
         static::$domReady[$name] = $code;
+    }
+
+    /**
+     * addInitialise
+     *
+     * @param string      $code
+     * @param string|null $name
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function addInitialise(string $code, ?string $name = null): void
+    {
+        static $uid = 0;
+
+        if ($name === null) {
+            $name = (string) $uid++;
+        }
+
+        static::$initialise[$name] = $code;
     }
 
     /**

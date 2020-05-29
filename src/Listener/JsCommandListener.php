@@ -34,7 +34,15 @@ class JsCommandListener
         if (PhoenixScript::$data !== []) {
             $store = json_encode(PhoenixScript::$data, WINDWALKER_DEBUG ? JSON_PRETTY_PRINT : 0);
 
-            $asset->internalJS("jQuery.data(document, $store);");
+            PhoenixScript::addInitialise("jQuery.data(document, $store);");
+        }
+
+        $scripts = &$asset->getScripts();
+
+        foreach ($scripts as $url => &$script) {
+            if ($url === 'https://phoenix_body') {
+                $script['options']['body'] = implode("\n", PhoenixScript::$initialise);
+            }
         }
 
         if (is_array(PhoenixScript::$domReady) && count(PhoenixScript::$domReady) > 0) {
