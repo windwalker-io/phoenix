@@ -747,7 +747,7 @@ JS;
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.34
      */
     public static function addInitialise(string $code, ?string $name = null): void
     {
