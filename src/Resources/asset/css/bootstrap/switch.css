@@ -9,7 +9,11 @@
   /* The slider */
   /* Rounded sliders */ }
   .phoenix-switch input {
-    display: none; }
+    width: 0;
+    height: 0; }
+    .phoenix-switch input:focus {
+      -webkit-box-shadow: none !important;
+              box-shadow: none !important; }
   .phoenix-switch .switch-slider {
     position: absolute;
     cursor: pointer;
@@ -20,6 +24,9 @@
     -webkit-transition: .4s;
     -o-transition: .4s;
     transition: .4s; }
+  .phoenix-switch input:focus + .switch-slider {
+    -webkit-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
   .phoenix-switch .switch-slider.bg-default {
     background-color: #ccc; }
   .phoenix-switch .switch-slider:before {

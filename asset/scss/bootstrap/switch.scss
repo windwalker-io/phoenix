@@ -9,7 +9,12 @@
 
   /* Hide default HTML checkbox */
   input {
-    display: none;
+    width: 0;
+    height: 0;
+
+    &:focus {
+      box-shadow: none !important;
+    }
   }
 
   /* The slider */
@@ -22,6 +27,10 @@
     bottom: 0;
     -webkit-transition: .4s;
     transition: .4s;
+  }
+
+  input:focus + .switch-slider {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
   }
 
   .switch-slider.bg-default {
