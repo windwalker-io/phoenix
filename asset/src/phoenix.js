@@ -77,11 +77,19 @@
     }
 
     data(name, value) {
+      this.trigger('phoenix.data', name, value);
+
       if (value === undefined) {
-        return $(document).data(name);
+        const res = $(document).data(name);
+
+        this.trigger('phoenix.data.get', name, res);
+
+        return res;
       }
 
       $(document).data(name, value);
+
+      this.trigger('phoenix.data.set', name, value);
 
       return this;
     }
