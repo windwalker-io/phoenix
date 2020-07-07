@@ -342,6 +342,60 @@ select[readonly].select2-hidden-accessible + .select2-container .select2-selecti
 }
 CSS
             );
+
+            /*
+             * Some workaround to fix select2 issues.
+             * [1]: https://github.com/select2/select2/issues/4653#issuecomment-358944224
+             * [2]: https://github.com/select2/select2/issues/4384#issuecomment-228464364
+             */
+            $js = <<<JS
+function PhoenixSelect2Extended(selector, options) {
+  $(selector).select2(options);
+
+  // Fix for 4.0.3 [1]
+  $(selector).on('select2:close', function () {
+    var input = $(this).parent().find('.select2-search__field').focus();
+    setTimeout(function () {
+      input.focus();
+    }, 100);
+  });
+
+  // Fix for select2 v4.RC1 [2]
+  $(selector).each(function () {
+    var select2Container = $(this).data('select2').$container;
+
+    var select = $(this);
+    var p = select.attr('placeholder') || select.attr('data-placeholder');
+
+    function updatePlaceholder() {
+      setTimeout(function () {
+        if (p) {
+          if (select.attr('multiple')) {
+            select2Container.find('.select2-search__field').attr('placeholder', p);
+          } else {
+            select2Container.find('.select2-selection__placeholder').text(p);
+          }
+        } else {
+          select.find('option[value=""]').each(function () {
+            if ($(this).text().trim()) {
+              select2Container.find('.select2-selection__placeholder').text($(this).text());
+              return false;
+            }
+          });
+        }
+      }, 0);
+    }
+
+    select.on('change', function () {
+      updatePlaceholder();
+    });
+
+    updatePlaceholder();
+  });
+}
+JS;
+
+            static::internalJS($js);
         }
 
         if ($selector !== null && !static::inited(__METHOD__, get_defined_vars())) {
@@ -358,48 +412,7 @@ CSS
 
             $optionsString = static::getJSObject($defaultOptions, $options);
 
-            /*
-             * Some workaround to fix select2 issues.
-             * [1]: https://github.com/select2/select2/issues/4653#issuecomment-358944224
-             * [2]: https://github.com/select2/select2/issues/4384#issuecomment-228464364
-             */
-            $js = <<<JS
-// Select2 for: `$selector`
-$('{$selector}').select2($optionsString);
-
-// Fix for 4.0.3 [1]
-$('{$selector}').on('select2:close', function () {
-  var input = $(this).parent().find('.select2-search__field').focus();
-  setTimeout(function () {
-    input.focus();
-  }, 100);
-});
-
-// Fix for select2 v4.RC1 [2]
-$('{$selector}').each(function () {
-  var \$select2Container = $(this).data('select2').\$container;
-
-  var select = $(this);
-  var p = select.attr('placeholder');
-
-  if (p) {
-    if (select.attr('multiple')) {
-      \$select2Container.find('.select2-search__field').attr('placeholder', p);
-    } else {
-      \$select2Container.find('.select2-selection__placeholder').text(p);
-    }
-  } else {
-    select.find('option[value=""]').each(function () {
-      if ($(this).text().trim()) {
-        \$select2Container.find('.select2-selection__placeholder').text($(this).text());
-        return false;
-      }
-    });
-  }
-});
-JS;
-
-            static::domready($js);
+            static::internalJS("PhoenixSelect2Extended('$selector', $optionsString);");
         }
     }
 
