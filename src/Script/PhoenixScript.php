@@ -362,7 +362,7 @@ function PhoenixSelect2Extended(selector, options) {
 
   // Fix for select2 v4.RC1 [2]
   $(selector).each(function () {
-    var select2Container = $(this).data('select2').$container;
+    var select2Container = $(this).data('select2').\$container;
 
     var select = $(this);
     var p = select.attr('placeholder') || select.attr('data-placeholder');
