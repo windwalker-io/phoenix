@@ -11,6 +11,7 @@ namespace Phoenix\Script;
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The BootstrapScript class.
@@ -87,17 +88,27 @@ abstract class BootstrapScript extends AbstractPhoenixScript
      * tooltip
      *
      * @param string $selector
+     * @param array  $options
      *
      * @return  void
      */
-    public static function tooltip($selector = '.hasTooltip, .has-tooltip')
+    public static function tooltip($selector = '.hasTooltip, .has-tooltip', array $options = [])
     {
         if (!static::inited(__METHOD__)) {
             static::script();
         }
 
         if (!static::inited(__METHOD__, func_get_args())) {
-            PhoenixScript::domready("$('{$selector}').tooltip();");
+            $optionsString = json_encode(
+                static::mergeOptions(
+                    [
+                        'boundary' => 'window'
+                    ],
+                    $options
+                )
+            );
+
+            PhoenixScript::domready("$('{$selector}').tooltip($optionsString);");
         }
     }
 
