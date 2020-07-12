@@ -4,7 +4,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2020 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Phoenix\Middleware;
@@ -19,7 +19,7 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
 /**
  * The KeepUrlQueryMiddleware class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8.38
  */
 class KeepUrlQueryMiddleware extends AbstractWebMiddleware
 {
@@ -45,7 +45,7 @@ class KeepUrlQueryMiddleware extends AbstractWebMiddleware
         $filter  = $this->getOption('filter', 'cmd');
         $routeEnabled = $this->getOption('route_enabled');
         $afterHook    = $this->getOption('after_hook');
-        $viewHook    = $this->getOption('view_hook');
+        $viewHook     = $this->getOption('view_hook');
 
         if (!$key) {
             throw new \LogicException('Please set key');
