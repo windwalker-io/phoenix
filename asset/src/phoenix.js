@@ -70,7 +70,7 @@
 
     trigger(event, ...args) {
       return this.tap(super.trigger(event, ...args), () => {
-        if (this.data('windwalker.debug')) {
+        if ($(document).data('windwalker.debug')) {
           console.debug(`[Phoenix Event] ${event}`, args, this.listeners(event));
         }
       });

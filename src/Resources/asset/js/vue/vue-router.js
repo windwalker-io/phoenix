@@ -1,5 +1,5 @@
 /*!
-  * vue-router v3.3.2
+  * vue-router v3.3.4
   * (c) 2020 Evan You
   * @license MIT
   */
@@ -2031,7 +2031,9 @@
       from,
       to,
       NavigationFailureType.redirected,
-      ("Redirected from \"" + (from.fullPath) + "\" to \"" + (stringifyRoute(to)) + "\" via a navigation guard.")
+      ("Redirected when going from \"" + (from.fullPath) + "\" to \"" + (stringifyRoute(
+        to
+      )) + "\" via a navigation guard.")
     )
   }
 
@@ -2151,9 +2153,17 @@
         }
         if (err && !this$1.ready) {
           this$1.ready = true;
-          this$1.readyErrorCbs.forEach(function (cb) {
-            cb(err);
-          });
+          // Initial redirection should still trigger the onReady onSuccess
+          // https://github.com/vuejs/vue-router/issues/3225
+          if (!isRouterError(err, NavigationFailureType.redirected)) {
+            this$1.readyErrorCbs.forEach(function (cb) {
+              cb(err);
+            });
+          } else {
+            this$1.readyCbs.forEach(function (cb) {
+              cb(route);
+            });
+          }
         }
       }
     );
@@ -2179,10 +2189,13 @@
       }
       onAbort && onAbort(err);
     };
+    var lastRouteIndex = route.matched.length - 1;
+    var lastCurrentIndex = current.matched.length - 1;
     if (
       isSameRoute(route, current) &&
       // in the case the route map has been dynamically appended to
-      route.matched.length === current.matched.length
+      lastRouteIndex === lastCurrentIndex &&
+      route.matched[lastRouteIndex] === current.matched[lastCurrentIndex]
     ) {
       this.ensureURL();
       return abort(createNavigationDuplicatedError(current, route))
@@ -3000,7 +3013,7 @@
   }
 
   VueRouter.install = install;
-  VueRouter.version = '3.3.2';
+  VueRouter.version = '3.3.4';
 
   if (inBrowser && window.Vue) {
     window.Vue.use(VueRouter);

@@ -206,7 +206,8 @@ CSS;
             $jsOptions = static::getJSObject(
                 [
                     'size' => $options['size'] ?? 'modal-xl',
-                    'resize' => $options['auto_size'] ?? null
+                    'resize' => $options['auto_size'] ?? null,
+                    'height' => $options['height'] ?? 500
                 ]
             );
 

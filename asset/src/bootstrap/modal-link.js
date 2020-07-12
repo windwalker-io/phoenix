@@ -45,6 +45,9 @@ $(() => {
     }
 
     open(href, options = {}) {
+      options = $.extend(true, {}, this.options, options);
+      let height = '';
+
       if (options.resize != null) {
         let onload;
         this.iframe.on('load', onload = () => {
@@ -52,6 +55,8 @@ $(() => {
 
           this.iframe.off('load', onload);
         });
+      } else if (options.height != null) {
+        height = options.height;
       }
 
       if (options.size != null) {
@@ -61,7 +66,7 @@ $(() => {
           .addClass(options.size);
       }
 
-      this.iframe.css('height', '');
+      this.iframe.css('height', height);
       this.iframe.attr('src', href);
       this.modal.modal('show');
     }
@@ -72,13 +77,15 @@ $(() => {
     }
 
     resize(iframe) {
-      const height = iframe.contentWindow.document.documentElement.scrollHeight;
+      setTimeout(() => {
+        let height = iframe.contentWindow.document.documentElement.scrollHeight;
 
-      if (height < 500) {
-        return;
-      }
+        if (height < 500) {
+          height = 500;
+        }
 
-      iframe.style.height = height + 'px';
+        iframe.style.height = height + 'px';
+      }, 30);
     }
   }
 
