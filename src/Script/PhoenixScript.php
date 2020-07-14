@@ -858,6 +858,7 @@ JS;
             );
 
             $event = $options['event'] ?? 'submit';
+            $spinnerClass = $options['spinner_class'] ?? 'spinner-border spinner-border-sm';
 
             static::domready(
                 <<<JS
@@ -879,7 +880,8 @@ $('$formSelector').on('$event', function (e) {
       .filter('[data-clicked]')
       .find('$iconSelector')
       .removeClass()
-      .addClass('spinner-border spinner-border-sm');
+      .addClass('$spinnerClass')
+      .css({ width: '1em', height: '1em', 'border-width': '.15em' });
   }, 0);
 });
 JS
