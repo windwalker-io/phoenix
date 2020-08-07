@@ -13,6 +13,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
 use Windwalker\Core\Router\MainRouter;
+use Windwalker\DI\ClassMeta;
 use Windwalker\Event\Event;
 use Windwalker\Utilities\Classes\OptionAccessTrait;
 
@@ -43,7 +44,7 @@ class KeepUrlQueryMiddleware extends AbstractWebMiddleware
         $key     = $this->getOption('key');
         $def     = $this->getOption('default');
         $filter  = $this->getOption('filter', 'cmd');
-        $routeEnabled = $this->getOption('route_enabled');
+        $routeEnabled = $this->getOption('route_enabled', true);
         $afterHook    = $this->getOption('after_hook');
         $viewHook     = $this->getOption('view_hook');
 
@@ -73,14 +74,15 @@ class KeepUrlQueryMiddleware extends AbstractWebMiddleware
 
             /** @var MainRouter $router */
             $router = $event['router'];
+            $route = $router->getRoute($route);
 
-            $hasMiddleware = $router::hasMiddleware($router->getRoute($route), static::class);
-
-            if ($hasMiddleware) {
-                $queries = $event['queries'];
-                if ($value && empty($queries['type'])) {
-                    $queries[$key]    = $value;
-                    $event['queries'] = $queries;
+            foreach ((array) $route->getExtra('middlewares') as $item) {
+                if ($this->isSame($item)) {
+                    $queries = $event['queries'];
+                    if ($value && empty($queries[$key])) {
+                        $queries[$key]    = $value;
+                        $event['queries'] = $queries;
+                    }
                 }
             }
         });
@@ -99,5 +101,34 @@ class KeepUrlQueryMiddleware extends AbstractWebMiddleware
         }
 
         return $next($request, $response);
+    }
+
+    /**
+     * isSame
+     *
+     * @param string|ClassMeta|object $middleware
+     *
+     * @return  bool
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function isSame($middleware): bool
+    {
+        if (!ClassMeta::isSameClass(static::class, $middleware)) {
+            return false;
+        }
+        
+        if (!$middleware instanceof AbstractWebMiddleware) {
+            $middleware = $this->app->getContainer()->newInstance($middleware);
+        }
+
+        if (!$middleware instanceof static) {
+            return false;
+        }
+
+        return $middleware->getOption('key') === $this->getOption('key');
     }
 }
