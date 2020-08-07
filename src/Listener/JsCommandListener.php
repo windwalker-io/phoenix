@@ -10,7 +10,11 @@ namespace Phoenix\Listener;
 
 use Phoenix\Script\PhoenixScript;
 use Windwalker\Core\Asset\AssetManager;
+use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Router\MainRouter;
+use Windwalker\DI\Annotation\Inject;
 use Windwalker\Event\Event;
+use Windwalker\Ioc;
 
 /**
  * The JsStorageListener class.
@@ -28,6 +32,35 @@ class JsCommandListener
      */
     public function onAssetRenderScripts(Event $event)
     {
+        $package = PackageHelper::getCurrentPackage();
+        $router = $package->router ?? null;
+
+        if ($router) {
+            // Push routes
+            foreach ($router->getRouter()->getRoutes() as $route) {
+                if ($route->getExtra('package') !== $package->name) {
+                    continue;
+                }
+
+                $handler = $route->getExtra(PhoenixScript::PUSH_TO_JS_ROUTE);
+
+                if (!$handler) {
+                    continue;
+                }
+
+                if (is_callable($handler)) {
+                    $handler($route);
+                } else {
+                    $name = explode('@', $route->getName());
+
+                    PhoenixScript::addRoute(
+                        array_pop($name),
+                        $router->to($route->getName())->full()
+                    );
+                }
+            }
+        }
+
         /** @var AssetManager $asset */
         $asset = $event['asset'];
 

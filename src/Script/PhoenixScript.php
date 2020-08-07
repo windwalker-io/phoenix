@@ -27,6 +27,8 @@ use Windwalker\Utilities\ArrayHelper;
  */
 abstract class PhoenixScript extends AbstractPhoenixScript
 {
+    public const PUSH_TO_JS_ROUTE = 'push_to_js_route';
+
     /**
      * Property store.
      *
