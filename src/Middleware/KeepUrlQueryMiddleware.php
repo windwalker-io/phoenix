@@ -113,7 +113,7 @@ class KeepUrlQueryMiddleware extends AbstractWebMiddleware
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.39
      */
     protected function isSame($middleware): bool
     {
