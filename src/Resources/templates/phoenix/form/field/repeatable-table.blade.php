@@ -64,6 +64,7 @@ $hasKey = (bool) $form->getField('key');
     </table>
 
     <div class="d-none">
+        <?php unset($attrs['value']) ?>
         {!! new \Windwalker\Dom\HtmlElement('div', null, $attrs) !!}
     </div>
 </div>
