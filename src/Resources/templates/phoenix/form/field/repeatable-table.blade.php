@@ -26,12 +26,14 @@ $hasKey = (bool) $form->getField('key');
                     {!! $subField->getLabel() !!}
                 </th>
             @endforeach
+            @if (!$attrs['disabled'])
             <th class="text-right">
                 <button type="button" class="btn btn-sm btn-success btn-primary"
                     @click="addItem(-1)">
                     <span class="fa fa-plus"></span>
                 </button>
             </th>
+            @endif
         </tr>
         </thead>
         <tbody v-model="items" is="{{ $field->sortable() ? 'draggable' : 'tbody' }}" element="tbody"
@@ -49,6 +51,7 @@ $hasKey = (bool) $form->getField('key');
                         {!! $subField->renderInput() !!}
                     </td>
                 @endforeach
+                @if (!$attrs['disabled'])
                 <td class="text-nowrap text-right" width="1%">
                     <button type="button" class="btn btn-sm btn-success btn-primary"
                         @click="addItem(i)">
@@ -59,6 +62,7 @@ $hasKey = (bool) $form->getField('key');
                         <span class="fa fa-trash"></span>
                     </button>
                 </td>
+                @endif
             </tr>
         </tbody>
     </table>

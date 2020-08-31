@@ -16,7 +16,8 @@
       fields: [],
       ensureFirstRow: 0,
       singleArray: false,
-      hasKey: false
+      hasKey: false,
+      attrs: {}
     },
     created: function created() {
       this.items.map(this.prepareItem);
@@ -72,6 +73,10 @@
       prepareItem: function prepareItem(item) {
         if (!item.__key) {
           item.__key = Phoenix.uniqid();
+        }
+
+        if (this.attrs.disabled) {
+          item.__disabled = this.attrs.disabled;
         }
 
         return item;

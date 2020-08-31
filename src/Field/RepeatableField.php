@@ -140,7 +140,8 @@ class RepeatableField extends AbstractField
             $field->attr(':id', sprintf("getId(i, item, '%s')", $field->getName()));
             $field->attr(':name', sprintf("getName(i, item, '%s')", $field->getName()));
 
-            $field->attr(':disabled', 'item.__disabled');
+            $field->attr(':disabled', 'attrs.disabled');
+            $field->disabled($this->get('disabled'));
 
             $field->setValue(null);
 
@@ -215,6 +216,7 @@ class RepeatableField extends AbstractField
         $ensureFirstRow = (int) $this->ensureFirstRow();
         $values = Asset::getJSObject($values);
         $fields = Asset::getJSObject($fields);
+        $attrsString = Asset::getJSObject($attrs);
 
         $js = <<<JS
 $(function () {
@@ -225,7 +227,8 @@ $(function () {
       id: '$id',
       items: $values,
       fields: $fields,
-      ensureFirstRow: $ensureFirstRow
+      ensureFirstRow: $ensureFirstRow,
+      attrs: $attrsString
     }
   });
   

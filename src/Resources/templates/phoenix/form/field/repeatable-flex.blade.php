@@ -12,6 +12,7 @@ $form->setRenderer($field->getForm()->getRenderer());
 $singleArray = $field->singleArray();
 
 $hasKey = (bool) $form->getField('key');
+
 ?>
 <div id="{{ $field->getId() }}-wrap" class="phoenix-repeatable"
     data-has-key="{{ (int) $hasKey }}" data-single-array="{{ (int) $singleArray }}">
@@ -24,12 +25,14 @@ $hasKey = (bool) $form->getField('key');
             <th width="">
                 {{ $field->get('placeholder') }}
             </th>
+            @if (!$attrs['disabled'])
             <th class="text-right" width="1%">
                 <button type="button" class="btn btn-sm btn-success btn-primary"
                     @click="addItem(-1)">
                     <span class="fa fa-plus"></span>
                 </button>
             </th>
+            @endif
         </tr>
         </thead>
         <tbody v-model="items" is="{{ $field->sortable() ? 'draggable' : 'tbody' }}" element="tbody"
@@ -51,6 +54,7 @@ $hasKey = (bool) $form->getField('key');
                         @endforeach
                     </div>
                 </td>
+                @if (!$attrs['disabled'])
                 <td class="text-nowrap text-right" width="1%">
                     <button type="button" class="btn btn-sm btn-success btn-primary"
                         @click="addItem(i)">
@@ -61,6 +65,7 @@ $hasKey = (bool) $form->getField('key');
                         <span class="fa fa-trash"></span>
                     </button>
                 </td>
+                @endif
             </tr>
         </tbody>
     </table>
