@@ -10,7 +10,9 @@
   /* Rounded sliders */ }
   .phoenix-switch input {
     width: 0;
-    height: 0; }
+    height: 0;
+    position: relative;
+    left: 30px; }
     .phoenix-switch input:focus {
       -webkit-box-shadow: none !important;
               box-shadow: none !important; }

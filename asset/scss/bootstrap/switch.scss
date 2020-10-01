@@ -11,6 +11,8 @@
   input {
     width: 0;
     height: 0;
+    position: relative;
+    left: 30px;
 
     &:focus {
       box-shadow: none !important;
