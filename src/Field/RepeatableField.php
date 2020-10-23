@@ -29,6 +29,7 @@ use function Windwalker\arr;
  * @method  mixed|$this  ensureFirstRow(bool $value = null)
  * @method  mixed|$this  singleArray(bool $value = null)
  * @method  mixed|$this  placeholder(string $value = null)
+ * @method  mixed|$this  max(int $value)
  *
  * @since  1.4.2
  */
@@ -217,6 +218,7 @@ class RepeatableField extends AbstractField
         $values = Asset::getJSObject($values);
         $fields = Asset::getJSObject($fields);
         $attrsString = Asset::getJSObject($attrs);
+        $max = Asset::getJSObject($this->max());
 
         $js = <<<JS
 $(function () {
@@ -228,7 +230,8 @@ $(function () {
       items: $values,
       fields: $fields,
       ensureFirstRow: $ensureFirstRow,
-      attrs: $attrsString
+      attrs: $attrsString,
+      max: $max
     }
   });
   
@@ -253,6 +256,7 @@ JS;
             'ensureFirstRow',
             'singleArray',
             'placeholder',
+            'max'
         ]);
     }
 }

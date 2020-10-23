@@ -17,7 +17,8 @@
       ensureFirstRow: 0,
       singleArray: false,
       hasKey: false,
-      attrs: {}
+      attrs: {},
+      max: null
     },
     created: function created() {
       this.items.map(this.prepareItem);
@@ -90,7 +91,14 @@
         }
       }
     },
-    computed: {//
+    computed: {
+      canAdd: function canAdd() {
+        if (this.max !== null && this.max <= this.items.length) {
+          return false;
+        }
+
+        return true;
+      }
     }
   };
 })();

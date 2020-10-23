@@ -28,6 +28,7 @@ $hasKey = (bool) $form->getField('key');
             @if (!$attrs['disabled'])
             <th class="text-right" width="1%">
                 <button type="button" class="btn btn-sm btn-success btn-primary"
+                    :disabled="!canAdd"
                     @click="addItem(-1)">
                     <span class="fa fa-plus"></span>
                 </button>
@@ -57,7 +58,9 @@ $hasKey = (bool) $form->getField('key');
                 @if (!$attrs['disabled'])
                 <td class="text-nowrap text-right" width="1%">
                     <button type="button" class="btn btn-sm btn-success btn-primary"
-                        @click="addItem(i)">
+                        @click="addItem(i)"
+                        :disabled="!canAdd"
+                    >
                         <span class="fa fa-plus"></span>
                     </button>
                     <button type="button" class="btn btn-sm btn-success btn-danger"

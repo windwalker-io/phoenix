@@ -16,7 +16,8 @@
       ensureFirstRow: 0,
       singleArray: false,
       hasKey: false,
-      attrs: {}
+      attrs: {},
+      max: null,
     },
     created() {
       this.items.map(this.prepareItem);
@@ -96,7 +97,13 @@
     },
 
     computed: {
-      //
+      canAdd() {
+        if (this.max !== null && this.max <= this.items.length) {
+          return false;
+        }
+
+        return true;
+      }
     }
   };
 })();
