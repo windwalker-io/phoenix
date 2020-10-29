@@ -26,7 +26,7 @@ $hasKey = (bool) $form->getField('key');
                     {!! $subField->getLabel() !!}
                 </th>
             @endforeach
-            @if (!$attrs['disabled'])
+            @if (!$attrs['disabled'] && !$attrs['readonly'])
             <th class="text-right">
                 <button type="button" class="btn btn-sm btn-success btn-primary"
                     :disabled="!canAdd"
@@ -52,7 +52,7 @@ $hasKey = (bool) $form->getField('key');
                         {!! $subField->renderInput() !!}
                     </td>
                 @endforeach
-                @if (!$attrs['disabled'])
+                @if (!$attrs['disabled'] && !$attrs['readonly'])
                 <td class="text-nowrap text-right" width="1%">
                     <button type="button" class="btn btn-sm btn-success btn-primary"
                         @click="addItem(i)"

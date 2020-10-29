@@ -142,7 +142,9 @@ class RepeatableField extends AbstractField
             $field->attr(':name', sprintf("getName(i, item, '%s')", $field->getName()));
 
             $field->attr(':disabled', 'attrs.disabled');
+            $field->attr(':readonly', 'attrs.readonly');
             $field->disabled($this->get('disabled'));
+            $field->readonly($this->get('readonly'));
 
             $field->setValue(null);
 

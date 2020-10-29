@@ -25,7 +25,7 @@ $hasKey = (bool) $form->getField('key');
             <th width="">
                 {{ $field->get('placeholder') }}
             </th>
-            @if (!$attrs['disabled'])
+            @if (!$attrs['disabled'] && !$attrs['readonly'])
             <th class="text-right" width="1%">
                 <button type="button" class="btn btn-sm btn-success btn-primary"
                     :disabled="!canAdd"
@@ -55,7 +55,7 @@ $hasKey = (bool) $form->getField('key');
                         @endforeach
                     </div>
                 </td>
-                @if (!$attrs['disabled'])
+                @if (!$attrs['disabled'] && !$attrs['readonly'])
                 <td class="text-nowrap text-right" width="1%">
                     <button type="button" class="btn btn-sm btn-success btn-primary"
                         @click="addItem(i)"
