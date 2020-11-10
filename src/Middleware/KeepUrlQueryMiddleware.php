@@ -93,7 +93,7 @@ class KeepUrlQueryMiddleware extends AbstractWebMiddleware
 
         if (is_callable($viewHook)) {
             $this->app->listen(
-                'onViewBeforeRender',
+                'onViewPrepareData',
                 function (Event $event) use ($response, $request, $value, $viewHook) {
                     $viewHook($event['view'], $value, $this->options, $request, $response);
                 }
