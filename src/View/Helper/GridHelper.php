@@ -244,7 +244,7 @@ class GridHelper
 	 *
 	 * @return string Link element.
 	 */
-	public function foreignLink($title = null, $url, $attribs = array(), $options = array())
+	public function foreignLink($title = null, $url = '', $attribs = array(), $options = array())
 	{
 		$defaultAttribs['href']   = $url;
 		$defaultAttribs['class']  = 'text-muted muted';
