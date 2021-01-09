@@ -1014,7 +1014,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * appendWhere
      *
      * @param   string|array $conditions
-     * @param   array        ...$args
+     * @param   mixed        ...$args
      *
      * @return static
      */
@@ -1160,7 +1160,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      * appendHaving
      *
      * @param string|array $conditions
-     * @param array        ...$args
+     * @param mixed        ...$args
      *
      * @return static
      */
