@@ -1,5 +1,299 @@
-!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports,require("vue")):"function"==typeof define&&define.amd?define(["exports","vue"],n):n((e="undefined"!=typeof globalThis?globalThis:e||self).VueCompositionAPI={},e.Vue)}(this,(function(e,n){"use strict";function t(e){return e&&"object"==typeof e&&"default"in e?e:{default:e}}var r=t(n);function o(e){return"function"==typeof e&&/native code/.test(e.toString())}var i="undefined"!=typeof Symbol&&o(Symbol)&&"undefined"!=typeof Reflect&&o(Reflect.ownKeys),u=function(e){return e},a={enumerable:!0,configurable:!0,get:u,set:u};function f(e,n,t){var r=t.get,o=t.set;a.get=r||u,a.set=o||u,Object.defineProperty(e,n,a)}function c(e,n,t,r){Object.defineProperty(e,n,{value:t,enumerable:!!r,writable:!0,configurable:!0})}function l(e,n){return Object.hasOwnProperty.call(e,n)}function s(e){return Array.isArray(e)}function v(e){var n=parseFloat(String(e));return n>=0&&Math.floor(n)===n&&isFinite(e)}function d(e){return"[object Object]"===function(e){return Object.prototype.toString.call(e)}(e)}function p(e){return"function"==typeof e}function y(e,n){r.default.util.warn(e,n)}var _=void 0;try{var b=require("vue");b&&w(b)?_=b:b&&"default"in b&&w(b.default)&&(_=b.default)}catch(e){}var g=null,h=null,m="__composition_api_installed__";function w(e){return e&&"function"==typeof e&&"Vue"===e.name}function $(){return g}function j(e){h=e}function O(){return h?S(h):null}var x,k=new WeakMap;function S(e){if(k.has(e))return k.get(e);var n={proxy:e,update:e.$forceUpdate,uid:e._uid,emit:e.$emit.bind(e),parent:null,root:null};return["data","props","attrs","refs","vnode","slots"].forEach((function(t){f(n,t,{get:function(){return e["$"+t]}})})),f(n,"isMounted",{get:function(){return e._isMounted}}),f(n,"isUnmounted",{get:function(){return e._isDestroyed}}),f(n,"isDeactivated",{get:function(){return e._inactive}}),f(n,"emitted",{get:function(){return e._events}}),k.set(e,n),e.$parent&&(n.parent=S(e.$parent)),e.$root&&(n.root=S(e.$root)),n}function R(e){var n=O();return null==n?void 0:n.proxy}function E(e,n){void 0===n&&(n={});var t=e.config.silent;e.config.silent=!0;var r=new e(n);return e.config.silent=t,r}function M(e,n){return function(){for(var t=[],r=0;r<arguments.length;r++)t[r]=arguments[r];return e.$scopedSlots[n]?e.$scopedSlots[n].apply(e,t):y("slots."+n+'() got called outside of the "render()" scope',e)}}var P=function(){return(P=Object.assign||function(e){for(var n,t=1,r=arguments.length;t<r;t++)for(var o in n=arguments[t])Object.prototype.hasOwnProperty.call(n,o)&&(e[o]=n[o]);return e}).apply(this,arguments)};
-/*! *****************************************************************************
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vue'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.VueCompositionAPI = {}, global.Vue));
+}(this, (function (exports, Vue) { 'use strict';
+
+  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+  var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
+
+  var toString = function (x) { return Object.prototype.toString.call(x); };
+  function isNative(Ctor) {
+      return typeof Ctor === 'function' && /native code/.test(Ctor.toString());
+  }
+  var hasSymbol = typeof Symbol !== 'undefined' &&
+      isNative(Symbol) &&
+      typeof Reflect !== 'undefined' &&
+      isNative(Reflect.ownKeys);
+  var noopFn = function (_) { return _; };
+  var sharedPropertyDefinition = {
+      enumerable: true,
+      configurable: true,
+      get: noopFn,
+      set: noopFn,
+  };
+  function proxy(target, key, _a) {
+      var get = _a.get, set = _a.set;
+      sharedPropertyDefinition.get = get || noopFn;
+      sharedPropertyDefinition.set = set || noopFn;
+      Object.defineProperty(target, key, sharedPropertyDefinition);
+  }
+  function def(obj, key, val, enumerable) {
+      Object.defineProperty(obj, key, {
+          value: val,
+          enumerable: !!enumerable,
+          writable: true,
+          configurable: true,
+      });
+  }
+  function hasOwn(obj, key) {
+      return Object.hasOwnProperty.call(obj, key);
+  }
+  function assert(condition, msg) {
+      if (!condition)
+          throw new Error("[vue-composition-api] " + msg);
+  }
+  function isPrimitive(value) {
+      return (typeof value === 'string' ||
+          typeof value === 'number' ||
+          // $flow-disable-line
+          typeof value === 'symbol' ||
+          typeof value === 'boolean');
+  }
+  function isArray(x) {
+      return Array.isArray(x);
+  }
+  function isValidArrayIndex(val) {
+      var n = parseFloat(String(val));
+      return n >= 0 && Math.floor(n) === n && isFinite(val);
+  }
+  function isObject(val) {
+      return val !== null && typeof val === 'object';
+  }
+  function isPlainObject(x) {
+      return toString(x) === '[object Object]';
+  }
+  function isFunction(x) {
+      return typeof x === 'function';
+  }
+  function isUndef(v) {
+      return v === undefined || v === null;
+  }
+  function warn(msg, vm) {
+      Vue__default['default'].util.warn(msg, vm);
+  }
+  function logError(err, vm, info) {
+      {
+          warn("Error in " + info + ": \"" + err.toString() + "\"", vm);
+      }
+      if (typeof window !== 'undefined' && typeof console !== 'undefined') {
+          console.error(err);
+      }
+      else {
+          throw err;
+      }
+  }
+
+  var vueDependency = undefined;
+  try {
+      var requiredVue = require('vue');
+      if (requiredVue && isVue(requiredVue)) {
+          vueDependency = requiredVue;
+      }
+      else if (requiredVue &&
+          'default' in requiredVue &&
+          isVue(requiredVue.default)) {
+          vueDependency = requiredVue.default;
+      }
+  }
+  catch (_a) {
+      // not available
+  }
+  var vueConstructor = null;
+  var currentInstance = null;
+  var PluginInstalledFlag = '__composition_api_installed__';
+  function isVue(obj) {
+      return obj && typeof obj === 'function' && obj.name === 'Vue';
+  }
+  function isVueRegistered(Vue) {
+      return hasOwn(Vue, PluginInstalledFlag);
+  }
+  function getVueConstructor() {
+      {
+          assert(vueConstructor, "must call Vue.use(VueCompositionAPI) before using any function.");
+      }
+      return vueConstructor;
+  }
+  // returns registered vue or `vue` dependency
+  function getRegisteredVueOrDefault() {
+      var constructor = vueConstructor || vueDependency;
+      {
+          assert(constructor, "No vue dependency found.");
+      }
+      return constructor;
+  }
+  function setVueConstructor(Vue) {
+      // @ts-ignore
+      if ( vueConstructor && Vue.__proto__ !== vueConstructor.__proto__) {
+          warn('Another instance of vue installed');
+      }
+      vueConstructor = Vue;
+      Object.defineProperty(Vue, PluginInstalledFlag, {
+          configurable: true,
+          writable: true,
+          value: true,
+      });
+  }
+  function setCurrentInstance(vm) {
+      // currentInstance?.$scopedSlots
+      currentInstance = vm;
+  }
+  function getCurrentVue2Instance() {
+      return currentInstance;
+  }
+  function getCurrentInstance() {
+      if (currentInstance) {
+          return toVue3ComponentInstance(currentInstance);
+      }
+      return null;
+  }
+  var instanceMapCache = new WeakMap();
+  function toVue3ComponentInstance(vue2Instance) {
+      if (instanceMapCache.has(vue2Instance)) {
+          return instanceMapCache.get(vue2Instance);
+      }
+      var instance = {
+          proxy: vue2Instance,
+          update: vue2Instance.$forceUpdate,
+          uid: vue2Instance._uid,
+          // $emit is defined on prototype and it expected to be bound
+          emit: vue2Instance.$emit.bind(vue2Instance),
+          parent: null,
+          root: null,
+      };
+      // map vm.$props =
+      var instanceProps = [
+          'data',
+          'props',
+          'attrs',
+          'refs',
+          'vnode',
+          'slots',
+      ];
+      instanceProps.forEach(function (prop) {
+          proxy(instance, prop, {
+              get: function () {
+                  return vue2Instance["$" + prop];
+              },
+          });
+      });
+      proxy(instance, 'isMounted', {
+          get: function () {
+              // @ts-expect-error private api
+              return vue2Instance._isMounted;
+          },
+      });
+      proxy(instance, 'isUnmounted', {
+          get: function () {
+              // @ts-expect-error private api
+              return vue2Instance._isDestroyed;
+          },
+      });
+      proxy(instance, 'isDeactivated', {
+          get: function () {
+              // @ts-expect-error private api
+              return vue2Instance._inactive;
+          },
+      });
+      proxy(instance, 'emitted', {
+          get: function () {
+              // @ts-expect-error private api
+              return vue2Instance._events;
+          },
+      });
+      instanceMapCache.set(vue2Instance, instance);
+      if (vue2Instance.$parent) {
+          instance.parent = toVue3ComponentInstance(vue2Instance.$parent);
+      }
+      if (vue2Instance.$root) {
+          instance.root = toVue3ComponentInstance(vue2Instance.$root);
+      }
+      return instance;
+  }
+
+  function currentVMInFn(hook) {
+      var vm = getCurrentInstance();
+      if ( !vm) {
+          warn(hook + " is called when there is no active component instance to be " +
+              "associated with. " +
+              "Lifecycle injection APIs can only be used during execution of setup().");
+      }
+      return vm === null || vm === void 0 ? void 0 : vm.proxy;
+  }
+  function defineComponentInstance(Ctor, options) {
+      if (options === void 0) { options = {}; }
+      var silent = Ctor.config.silent;
+      Ctor.config.silent = true;
+      var vm = new Ctor(options);
+      Ctor.config.silent = silent;
+      return vm;
+  }
+  function isComponentInstance(obj) {
+      var Vue = getVueConstructor();
+      return Vue && obj instanceof Vue;
+  }
+  function createSlotProxy(vm, slotName) {
+      return function () {
+          var args = [];
+          for (var _i = 0; _i < arguments.length; _i++) {
+              args[_i] = arguments[_i];
+          }
+          if (!vm.$scopedSlots[slotName]) {
+              return warn("slots." + slotName + "() got called outside of the \"render()\" scope", vm);
+          }
+          return vm.$scopedSlots[slotName].apply(vm, args);
+      };
+  }
+  function resolveSlots(slots, normalSlots) {
+      var res;
+      if (!slots) {
+          res = {};
+      }
+      else if (slots._normalized) {
+          // fast path 1: child component re-render only, parent did not change
+          return slots._normalized;
+      }
+      else {
+          res = {};
+          for (var key in slots) {
+              if (slots[key] && key[0] !== '$') {
+                  res[key] = true;
+              }
+          }
+      }
+      // expose normal slots on scopedSlots
+      for (var key in normalSlots) {
+          if (!(key in res)) {
+              res[key] = true;
+          }
+      }
+      return res;
+  }
+  var vueInternalClasses;
+  var getVueInternalClasses = function () {
+      if (!vueInternalClasses) {
+          var vm = defineComponentInstance(getVueConstructor(), {
+              computed: {
+                  value: function () {
+                      return 0;
+                  },
+              },
+          });
+          // to get Watcher class
+          var Watcher = vm._computedWatchers.value.constructor;
+          // to get Dep class
+          var Dep = vm._data.__ob__.dep.constructor;
+          vueInternalClasses = {
+              Watcher: Watcher,
+              Dep: Dep,
+          };
+          vm.$destroy();
+      }
+      return vueInternalClasses;
+  };
+
+  /*! *****************************************************************************
   Copyright (c) Microsoft Corporation.
 
   Permission to use, copy, modify, and/or distribute this software for any
@@ -12,4 +306,1509 @@
   LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
   OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
   PERFORMANCE OF THIS SOFTWARE.
-  ***************************************************************************** */function C(e){var n="function"==typeof Symbol&&Symbol.iterator,t=n&&e[n],r=0;if(t)return t.call(e);if(e&&"number"==typeof e.length)return{next:function(){return e&&r>=e.length&&(e=void 0),{value:e&&e[r++],done:!e}}};throw new TypeError(n?"Object is not iterable.":"Symbol.iterator is not defined.")}function A(e,n){var t="function"==typeof Symbol&&e[Symbol.iterator];if(!t)return e;var r,o,i=t.call(e),u=[];try{for(;(void 0===n||n-- >0)&&!(r=i.next()).done;)u.push(r.value)}catch(e){o={error:e}}finally{try{r&&!r.done&&(t=i.return)&&t.call(i)}finally{if(o)throw o.error}}return u}function D(){for(var e=[],n=0;n<arguments.length;n++)e=e.concat(A(arguments[n]));return e}function U(e){return i?Symbol.for(e):e}var V=U("composition-api.preFlushQueue"),B=U("composition-api.postFlushQueue"),W="composition-api.refKey",T=new WeakMap,z=new WeakMap,F=new WeakMap,I=function(e){f(this,"value",{get:e.get,set:e.set})};function K(e,n){var t=new I(e),r=Object.seal(t);return F.set(r,!0),r}function q(e){var n;if(Q(e))return e;var t=te(((n={})[W]=e,n));return K({get:function(){return t[W]},set:function(e){return t[W]=e}})}function Q(e){return e instanceof I}function J(e){return Q(e)?e.value:e}function N(e){if(!d(e))return e;var n={};for(var t in e)n[t]=G(e,t);return n}function G(e,n){var t=e[n];return Q(t)?t:K({get:function(){return e[n]},set:function(t){return e[n]=t}})}function H(e){var n;return Boolean((null==e?void 0:e.__ob__)&&(null===(n=e.__ob__)||void 0===n?void 0:n.__raw__))}function L(e){var n;return Boolean((null==e?void 0:e.__ob__)&&!(null===(n=e.__ob__)||void 0===n?void 0:n.__raw__))}function X(e){if(!(!d(e)||H(e)||Array.isArray(e)||Q(e)||function(e){var n=$();return n&&e instanceof n}(e)||T.has(e))){T.set(e,!0);for(var n=Object.keys(e),t=0;t<n.length;t++)Y(e,n[t])}}function Y(e,n,t){if("__ob__"!==n&&!H(e[n])){var r,o,i=Object.getOwnPropertyDescriptor(e,n);if(i){if(!1===i.configurable)return;r=i.get,o=i.set,r&&!o||2!==arguments.length||(t=e[n])}X(t),Object.defineProperty(e,n,{enumerable:!0,configurable:!0,get:function(){var o=r?r.call(e):t;return n!==W&&Q(o)?o.value:o},set:function(i){if(!r||o){var u=r?r.call(e):t;n!==W&&Q(u)&&!Q(i)?u.value=i:o?o.call(e,i):t=i,X(i)}}})}}function Z(e){var n,t=g||_;t.observable?n=t.observable(e):n=E(t,{data:{$$state:e}})._data.$$state;return l(n,"__ob__")||c(n,"__ob__",function(e){void 0===e&&(e={});return{value:e,dep:{notify:u,depend:u,addSub:u,removeSub:u}}}(n)),n}function ee(){return Z({}).__ob__}function ne(e){var n,t;if(!d(e)&&!s(e)||H(e)||!Object.isExtensible(e))return e;var r=Z({});X(r);var o=r.__ob__,i=function(n){var t,i,u=e[n],a=Object.getOwnPropertyDescriptor(e,n);if(a){if(!1===a.configurable)return"continue";t=a.get,i=a.set}Object.defineProperty(r,n,{enumerable:!0,configurable:!0,get:function(){var n,r=t?t.call(e):u;return null===(n=o.dep)||void 0===n||n.depend(),r},set:function(n){var r;t&&!i||(i?i.call(e,n):u=n,null===(r=o.dep)||void 0===r||r.notify())}})};try{for(var u=C(Object.keys(e)),a=u.next();!a.done;a=u.next()){i(a.value)}}catch(e){n={error:e}}finally{try{a&&!a.done&&(t=u.return)&&t.call(u)}finally{if(n)throw n.error}}return r}function te(e){if(!d(e)&&!s(e)||H(e)||!Object.isExtensible(e))return e;var n=Z(e);return X(n),n}function re(e){return function(n){var t,r=R(((t=e)[0].toUpperCase(),t.slice(1)));r&&function(e,n,t,r){var o=n.$options,i=e.config.optionMergeStrategies[t];o[t]=i(o[t],function(e,n){return function(){for(var t,r=[],o=0;o<arguments.length;o++)r[o]=arguments[o];var i=null===(t=O())||void 0===t?void 0:t.proxy;j(e);try{return n.apply(void 0,D(r))}finally{j(i)}}}(n,r))}($(),r,e,n)}}var oe,ie=re("beforeMount"),ue=re("mounted"),ae=re("beforeUpdate"),fe=re("updated"),ce=re("beforeDestroy"),le=re("destroyed"),se=re("errorCaptured"),ve=re("activated"),de=re("deactivated"),pe=re("serverPrefetch");function ye(){ge(this,V)}function _e(){ge(this,B)}function be(){var e,n=null===(e=O())||void 0===e?void 0:e.proxy;return n?function(e){return void 0!==e[V]}(n)||function(e){e[V]=[],e[B]=[],e.$on("hook:beforeUpdate",ye),e.$on("hook:updated",_e)}(n):(oe||(oe=E($())),n=oe),n}function ge(e,n){for(var t=e[n],r=0;r<t.length;r++)t[r]();t.length=0}function he(e,n,t){var r=function(){e.$nextTick((function(){e[V].length&&ge(e,V),e[B].length&&ge(e,B)}))};switch(t){case"pre":r(),e[V].push(n);break;case"post":r(),e[B].push(n);break;default:!function(e,n){if(!e)throw new Error("[vue-composition-api] "+n)}(!1,'flush must be one of ["post", "pre", "sync"], but got '+t)}}function me(e,n){var t=e.teardown;e.teardown=function(){for(var r=[],o=0;o<arguments.length;o++)r[o]=arguments[o];t.apply(e,r),n()}}function we(e,n,t,r){var o,i,a=r.flush,f="sync"===a,c=function(e){i=function(){try{e()}catch(e){!function(e,n,t){if("undefined"==typeof window||"undefined"==typeof console)throw e;console.error(e)}(e)}}},l=function(){i&&(i(),i=null)},s=function(n){return f||e===oe?n:function(){for(var t=[],r=0;r<arguments.length;r++)t[r]=arguments[r];return he(e,(function(){n.apply(void 0,D(t))}),a)}};if(null===t){var v=!1,d=function(e,n,t,r){var o=e._watchers.length;return e.$watch(n,t,{immediate:r.immediateInvokeCallback,deep:r.deep,lazy:r.noRun,sync:r.sync,before:r.before}),e._watchers[o]}(e,(function(){if(!v)try{v=!0,n(c)}finally{v=!1}}),u,{deep:r.deep||!1,sync:f,before:l});me(d,l),d.lazy=!1;var _=d.get.bind(d);return d.get=s(_),function(){d.teardown()}}var b,g=r.deep;Array.isArray(n)?b=function(){return n.map((function(e){return Q(e)?e.value:e()}))}:Q(n)?b=function(){return n.value}:L(n)?(b=function(){return n},g=!0):p(n)?b=n:(b=u,y("Invalid watch source: "+JSON.stringify(n)+".\n      A watch source can only be a getter/effect function, a ref, a reactive object, or an array of these types.",e));var h=function(e,n){l(),t(e,n,c)},m=s(h);if(r.immediate){var w=m,$=function(e,n){$=w,h(e,n)};m=function(e,n){$(e,n)}}var j=e.$watch(b,m,{immediate:r.immediate,deep:g,sync:f}),O=e._watchers[e._watchers.length-1];return L(O.value)&&(null===(o=O.value.__ob__)||void 0===o?void 0:o.dep)&&g&&O.value.__ob__.dep.addSub({update:function(){O.run()}}),me(O,l),function(){j()}}var $e={};var je={},Oe=function(e){var n;void 0===e&&(e="$style");var t=O();if(!t)return je;var r=null===(n=t.proxy)||void 0===n?void 0:n[e];return r||je},xe=Oe;var ke;var Se={set:function(e,n,t){(e.__composition_api_state__=e.__composition_api_state__||{})[n]=t},get:function(e,n){return(e.__composition_api_state__||{})[n]}};function Re(e){var n=Se.get(e,"rawBindings")||{};if(n&&Object.keys(n).length){for(var t=e.$refs,r=Se.get(e,"refs")||[],o=0;o<r.length;o++){var i=n[f=r[o]];!t[f]&&i&&Q(i)&&(i.value=null)}var u=Object.keys(t),a=[];for(o=0;o<u.length;o++){var f;i=n[f=u[o]];t[f]&&i&&Q(i)&&(i.value=t[f],a.push(f))}Se.set(e,"refs",a)}}function Ee(e,n){var t=e.$options._parentVnode;if(t){for(var r=Se.get(e,"slots")||[],o=function(e,n){var t;if(e){if(e._normalized)return e._normalized;for(var r in t={},e)e[r]&&"$"!==r[0]&&(t[r]=!0)}else t={};for(var r in n)r in t||(t[r]=!0);return t}(t.data.scopedSlots,e.$slots),i=0;i<r.length;i++){o[a=r[i]]||delete n[a]}var u=Object.keys(o);for(i=0;i<u.length;i++){var a;n[a=u[i]]||(n[a]=M(e,a))}Se.set(e,"slots",u)}}function Me(e,n,t){var r=h;j(e);try{return n(e)}catch(e){if(!t)throw e;t(e)}finally{j(r)}}function Pe(e){function n(e){if(d(e)&&!Q(e)&&!L(e)&&!H(e)){var t=$().util.defineReactive;Object.keys(e).forEach((function(r){var o=e[r];t(e,r,o),o&&n(o)}))}}function t(e,n){return void 0===n&&(n=new Map),n.has(e)?n.get(e):(n.set(e,!1),Array.isArray(e)&&L(e)?(n.set(e,!0),!0):!(!d(e)||H(e))&&Object.keys(e).some((function(r){return t(e[r],n)})))}e.mixin({beforeCreate:function(){var e=this,r=e.$options,o=r.setup,i=r.render;i&&(r.render=function(){for(var n=this,t=[],r=0;r<arguments.length;r++)t[r]=arguments[r];return Me(e,(function(){return i.apply(n,t)}))});if(!o)return;if("function"!=typeof o)return;var u=r.data;r.data=function(){return function(e,r){void 0===r&&(r={});var o,i=e.$options.setup,u=function(e){var n={slots:{}},t=["attrs"],r=["emit"];return["root","parent","refs","listeners","isServer","ssrContext"].forEach((function(t){var r="$"+t;f(n,t,{get:function(){return e[r]},set:function(){y("Cannot assign to '"+t+"' because it is a read-only property",e)}})})),t.forEach((function(t){var r="$"+t;f(n,t,{get:function(){var n,t,o=te({}),i=e[r],u=function(n){f(o,n,{get:function(){return e[r][n]}})};try{for(var a=C(Object.keys(i)),c=a.next();!c.done;c=a.next()){u(c.value)}}catch(e){n={error:e}}finally{try{c&&!c.done&&(t=a.return)&&t.call(a)}finally{if(n)throw n.error}}return o},set:function(){y("Cannot assign to '"+t+"' because it is a read-only property",e)}})})),r.forEach((function(t){var r="$"+t;f(n,t,{get:function(){return function(){for(var n=[],t=0;t<arguments.length;t++)n[t]=arguments[t];e[r].apply(e,n)}}})})),n}(e);if(c(r,"__ob__",ee()),Ee(e,u.slots),Me(e,(function(){o=i(r,u)})),!o)return;if(p(o)){var a=o;return void(e.$options.render=function(){return Ee(e,u.slots),Me(e,(function(){return a()}))})}if(d(o)){L(o)&&(o=N(o)),Se.set(e,"rawBindings",o);var v=o;Object.keys(v).forEach((function(r){var o,i=v[r];Q(i)||(L(i)?s(i)&&(i=q(i)):p(i)?i=i.bind(e):null===(o=i)||"object"!=typeof o?i=q(i):t(i)&&n(i)),function(e,n,t){var r=e.$options.props;n in e||r&&l(r,n)||(Q(t)?f(e,n,{get:function(){return t.value},set:function(e){t.value=e}}):e[n]=t)}(e,r,i)}))}}(e,e.$props),"function"==typeof u?u.call(e,e):u||{}}},mounted:function(){Re(this)},updated:function(){Re(this)}})}function Ce(e,n){if(!e)return n;if(!n)return e;for(var t,r,o,u=i?Reflect.ownKeys(e):Object.keys(e),a=0;a<u.length;a++)"__ob__"!==(t=u[a])&&(r=n[t],o=e[t],l(n,t)?r!==o&&d(r)&&!Q(r)&&d(o)&&!Q(o)&&Ce(o,r):n[t]=o);return n}function Ae(e){(function(e){return l(e,m)})(e)||(e.config.optionMergeStrategies.setup=function(e,n){return function(t,r){return Ce("function"==typeof e?e(t,r)||{}:void 0,"function"==typeof n?n(t,r)||{}:void 0)}},function(e){g=e,Object.defineProperty(e,m,{configurable:!0,writable:!0,value:!0})}(e),Pe(e))}var De={install:function(e){return Ae(e)}};"undefined"!=typeof window&&window.Vue&&window.Vue.use(De),e.computed=function(e){var n,t,r,o,i,a=null===(n=O())||void 0===n?void 0:n.proxy;if("function"==typeof e?t=e:(t=e.get,r=e.set),a&&!a.$isServer){var f,c=function(){if(!x){var e=E($(),{computed:{value:function(){return 0}}}),n=e._computedWatchers.value.constructor,t=e._data.__ob__.dep.constructor;x={Watcher:n,Dep:t},e.$destroy()}return x}(),l=c.Watcher,s=c.Dep;i=function(){return f||(f=new l(a,t,u,{lazy:!0})),f.dirty&&f.evaluate(),s.target&&f.depend(),f.value},o=function(e){r&&r(e)}}else{var v=E($(),{computed:{$$state:{get:t,set:r}}});a&&a.$on("hook:destroyed",(function(){return v.$destroy()})),i=function(){return v.$$state},o=function(e){v.$$state=e}}return K({get:i,set:o})},e.createApp=function(e,n){void 0===n&&(n=void 0);var t=$(),r=void 0;return{config:t.config,use:t.use.bind(t),mixin:t.mixin.bind(t),component:t.component.bind(t),directive:t.directive.bind(t),mount:function(o,i){return r||((r=new t(P({propsData:n},e))).$mount(o,i),r)},unmount:function(){r&&(r.$destroy(),r=void 0)}}},e.customRef=function(e){var n=q(0);return K(e((function(){n.value}),(function(){++n.value})))},e.default=De,e.defineComponent=function(e){return e},e.del=function(e,n){if($().util.warn,Array.isArray(e)&&v(n))e.splice(n,1);else{var t=e.__ob__;e._isVue||t&&t.vmCount||l(e,n)&&(delete e[n],t&&t.dep.notify())}},e.getCurrentInstance=O,e.h=function(){for(var e,n=[],t=0;t<arguments.length;t++)n[t]=arguments[t];var r=null===(e=O())||void 0===e?void 0:e.proxy;return r?r.$createElement.apply(r,n):(y("`createElement()` has been called outside of render function."),ke||(ke=E($()).$createElement),ke.apply(ke,n))},e.inject=function(e,n,t){var r;if(void 0===t&&(t=!1),!e)return n;var o=null===(r=O())||void 0===r?void 0:r.proxy;if(o){var i=function(e,n){for(var t=n;t;){if(t._provided&&l(t._provided,e))return t._provided[e];t=t.$parent}return $e}(e,o);return i!==$e?i:t&&p(n)?n():n}y("inject() can only be used inside setup() or functional components.")},e.isRaw=H,e.isReactive=L,e.isReadonly=function(e){return F.has(e)},e.isRef=Q,e.markRaw=function(e){if(!d(e)&&!s(e)||!Object.isExtensible(e))return e;var n=ee();return n.__raw__=!0,c(e,"__ob__",n),z.set(e,!0),e},e.nextTick=function(){for(var e,n=[],t=0;t<arguments.length;t++)n[t]=arguments[t];return null===(e=$())||void 0===e?void 0:e.nextTick.apply(this,n)},e.onActivated=ve,e.onBeforeMount=ie,e.onBeforeUnmount=ce,e.onBeforeUpdate=ae,e.onDeactivated=de,e.onErrorCaptured=se,e.onMounted=ue,e.onServerPrefetch=pe,e.onUnmounted=le,e.onUpdated=fe,e.provide=function(e,n){var t=R();if(t){if(!t._provided){var r={};Object.defineProperty(t,"_provided",{get:function(){return r},set:function(e){return Object.assign(r,e)}})}t._provided[e]=n}},e.proxyRefs=function(e){var n,t,r;if(L(e))return e;var o=te(((n={})[W]=e,n)),i=function(e){f(o,e,{get:function(){return Q(o[e])?o[e].value:o[e]},set:function(n){if(Q(o[e]))return o[e].value=J(n);o[e]=J(n)}})};try{for(var u=C(Object.keys(e)),a=u.next();!a.done;a=u.next()){i(a.value)}}catch(e){t={error:e}}finally{try{a&&!a.done&&(r=u.return)&&r.call(u)}finally{if(t)throw t.error}}return o},e.reactive=te,e.readonly=function(e){return e},e.ref=q,e.set=function(e,n,t){var r=$().util,o=(r.warn,r.defineReactive);if(s(e)&&v(n))return e.length=Math.max(e.length,n),e.splice(n,1,t),t;if(n in e&&!(n in Object.prototype))return e[n]=t,t;var i=e.__ob__;return e._isVue||i&&i.vmCount?t:i?(o(i.value,n,t),Y(e,n,t),i.dep.notify(),t):(e[n]=t,t)},e.shallowReactive=ne,e.shallowReadonly=function(e){var n,t;if(!d(e)&&!s(e)||!Object.isExtensible(e))return e;var r={},o=te({}).__ob__,i=function(n){var t,i=e[n],u=Object.getOwnPropertyDescriptor(e,n);if(u){if(!1===u.configurable)return"continue";t=u.get}Object.defineProperty(r,n,{enumerable:!0,configurable:!0,get:function(){var n=t?t.call(e):i;return o.dep.depend(),n},set:function(e){}})};try{for(var u=C(Object.keys(e)),a=u.next();!a.done;a=u.next()){i(a.value)}}catch(e){n={error:e}}finally{try{a&&!a.done&&(t=u.return)&&t.call(u)}finally{if(n)throw n.error}}return F.set(r,!0),r},e.shallowRef=function(e){var n;if(Q(e))return e;var t=ne(((n={})[W]=e,n));return K({get:function(){return t[W]},set:function(e){return t[W]=e}})},e.toRaw=function(e){var n,t;return H(e)||!Object.isExtensible(e)?e:(null===(t=null===(n=e)||void 0===n?void 0:n.__ob__)||void 0===t?void 0:t.value)||e},e.toRef=G,e.toRefs=N,e.triggerRef=function(e){Q(e)&&(e.value=e.value)},e.unref=J,e.useCSSModule=xe,e.useCssModule=Oe,e.version="1.0.0-beta.25",e.warn=function(e){var n;y(e,null===(n=O())||void 0===n?void 0:n.proxy)},e.watch=function(e,n,t){var r=null;"function"==typeof n?r=n:(t=n,r=null);var o=function(e){return P({immediate:!1,deep:!1,flush:"pre"},e)}(t);return we(be(),e,r,o)},e.watchEffect=function(e,n){var t=function(e){return P({immediate:!0,deep:!1,flush:"pre"},e)}(n);return we(be(),e,null,t)},Object.defineProperty(e,"__esModule",{value:!0})}));
+  ***************************************************************************** */
+
+  var __assign = function() {
+      __assign = Object.assign || function __assign(t) {
+          for (var s, i = 1, n = arguments.length; i < n; i++) {
+              s = arguments[i];
+              for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+          }
+          return t;
+      };
+      return __assign.apply(this, arguments);
+  };
+
+  function __values(o) {
+      var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+      if (m) return m.call(o);
+      if (o && typeof o.length === "number") return {
+          next: function () {
+              if (o && i >= o.length) o = void 0;
+              return { value: o && o[i++], done: !o };
+          }
+      };
+      throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+  }
+
+  function __read(o, n) {
+      var m = typeof Symbol === "function" && o[Symbol.iterator];
+      if (!m) return o;
+      var i = m.call(o), r, ar = [], e;
+      try {
+          while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+      }
+      catch (error) { e = { error: error }; }
+      finally {
+          try {
+              if (r && !r.done && (m = i["return"])) m.call(i);
+          }
+          finally { if (e) throw e.error; }
+      }
+      return ar;
+  }
+
+  function __spread() {
+      for (var ar = [], i = 0; i < arguments.length; i++)
+          ar = ar.concat(__read(arguments[i]));
+      return ar;
+  }
+
+  function createSymbol(name) {
+      return hasSymbol ? Symbol.for(name) : name;
+  }
+  var WatcherPreFlushQueueKey = createSymbol('composition-api.preFlushQueue');
+  var WatcherPostFlushQueueKey = createSymbol('composition-api.postFlushQueue');
+  // must be a string, symbol key is ignored in reactive
+  var RefKey = 'composition-api.refKey';
+
+  var accessModifiedSet = new WeakMap();
+  var rawSet = new WeakMap();
+  var readonlySet = new WeakMap();
+
+  var RefImpl = /** @class */ (function () {
+      function RefImpl(_a) {
+          var get = _a.get, set = _a.set;
+          proxy(this, 'value', {
+              get: get,
+              set: set,
+          });
+      }
+      return RefImpl;
+  }());
+  function createRef(options, readonly) {
+      var r = new RefImpl(options);
+      // seal the ref, this could prevent ref from being observed
+      // It's safe to seal the ref, since we really shouldn't extend it.
+      // related issues: #79
+      var sealed = Object.seal(r);
+      readonlySet.set(sealed, true);
+      return sealed;
+  }
+  function ref(raw) {
+      var _a;
+      if (isRef(raw)) {
+          return raw;
+      }
+      var value = reactive((_a = {}, _a[RefKey] = raw, _a));
+      return createRef({
+          get: function () { return value[RefKey]; },
+          set: function (v) { return (value[RefKey] = v); },
+      });
+  }
+  function isRef(value) {
+      return value instanceof RefImpl;
+  }
+  function unref(ref) {
+      return isRef(ref) ? ref.value : ref;
+  }
+  function toRefs(obj) {
+      if ( !isReactive(obj)) {
+          warn("toRefs() expects a reactive object but received a plain one.");
+      }
+      if (!isPlainObject(obj))
+          return obj;
+      var ret = {};
+      for (var key in obj) {
+          ret[key] = toRef(obj, key);
+      }
+      return ret;
+  }
+  function customRef(factory) {
+      var version = ref(0);
+      return createRef(factory(function () { return void version.value; }, function () {
+          ++version.value;
+      }));
+  }
+  function toRef(object, key) {
+      var v = object[key];
+      if (isRef(v))
+          return v;
+      return createRef({
+          get: function () { return object[key]; },
+          set: function (v) { return (object[key] = v); },
+      });
+  }
+  function shallowRef(raw) {
+      var _a;
+      if (isRef(raw)) {
+          return raw;
+      }
+      var value = shallowReactive((_a = {}, _a[RefKey] = raw, _a));
+      return createRef({
+          get: function () { return value[RefKey]; },
+          set: function (v) { return (value[RefKey] = v); },
+      });
+  }
+  function triggerRef(value) {
+      if (!isRef(value))
+          return;
+      value.value = value.value;
+  }
+  function proxyRefs(objectWithRefs) {
+      var _a, e_1, _b;
+      if (isReactive(objectWithRefs)) {
+          return objectWithRefs;
+      }
+      var value = reactive((_a = {}, _a[RefKey] = objectWithRefs, _a));
+      var _loop_1 = function (key) {
+          proxy(value, key, {
+              get: function () {
+                  if (isRef(value[key])) {
+                      return value[key].value;
+                  }
+                  return value[key];
+              },
+              set: function (v) {
+                  if (isRef(value[key])) {
+                      return (value[key].value = unref(v));
+                  }
+                  value[key] = unref(v);
+              },
+          });
+      };
+      try {
+          for (var _c = __values(Object.keys(objectWithRefs)), _d = _c.next(); !_d.done; _d = _c.next()) {
+              var key = _d.value;
+              _loop_1(key);
+          }
+      }
+      catch (e_1_1) { e_1 = { error: e_1_1 }; }
+      finally {
+          try {
+              if (_d && !_d.done && (_b = _c.return)) _b.call(_c);
+          }
+          finally { if (e_1) throw e_1.error; }
+      }
+      return value;
+  }
+
+  function isRaw(obj) {
+      var _a;
+      return Boolean((obj === null || obj === void 0 ? void 0 : obj.__ob__) && ((_a = obj.__ob__) === null || _a === void 0 ? void 0 : _a.__raw__));
+  }
+  function isReactive(obj) {
+      var _a;
+      return Boolean((obj === null || obj === void 0 ? void 0 : obj.__ob__) && !((_a = obj.__ob__) === null || _a === void 0 ? void 0 : _a.__raw__));
+  }
+  /**
+   * Proxing property access of target.
+   * We can do unwrapping and other things here.
+   */
+  function setupAccessControl(target) {
+      if (!isPlainObject(target) ||
+          isRaw(target) ||
+          Array.isArray(target) ||
+          isRef(target) ||
+          isComponentInstance(target) ||
+          accessModifiedSet.has(target))
+          return;
+      accessModifiedSet.set(target, true);
+      var keys = Object.keys(target);
+      for (var i = 0; i < keys.length; i++) {
+          defineAccessControl(target, keys[i]);
+      }
+  }
+  /**
+   * Auto unwrapping when access property
+   */
+  function defineAccessControl(target, key, val) {
+      if (key === '__ob__')
+          return;
+      if (isRaw(target[key]))
+          return;
+      var getter;
+      var setter;
+      var property = Object.getOwnPropertyDescriptor(target, key);
+      if (property) {
+          if (property.configurable === false) {
+              return;
+          }
+          getter = property.get;
+          setter = property.set;
+          if ((!getter || setter) /* not only have getter */ &&
+              arguments.length === 2) {
+              val = target[key];
+          }
+      }
+      setupAccessControl(val);
+      Object.defineProperty(target, key, {
+          enumerable: true,
+          configurable: true,
+          get: function getterHandler() {
+              var value = getter ? getter.call(target) : val;
+              // if the key is equal to RefKey, skip the unwrap logic
+              if (key !== RefKey && isRef(value)) {
+                  return value.value;
+              }
+              else {
+                  return value;
+              }
+          },
+          set: function setterHandler(newVal) {
+              if (getter && !setter)
+                  return;
+              var value = getter ? getter.call(target) : val;
+              // If the key is equal to RefKey, skip the unwrap logic
+              // If and only if "value" is ref and "newVal" is not a ref,
+              // the assignment should be proxied to "value" ref.
+              if (key !== RefKey && isRef(value) && !isRef(newVal)) {
+                  value.value = newVal;
+              }
+              else if (setter) {
+                  setter.call(target, newVal);
+              }
+              else {
+                  val = newVal;
+              }
+              setupAccessControl(newVal);
+          },
+      });
+  }
+  function observe(obj) {
+      var Vue = getRegisteredVueOrDefault();
+      var observed;
+      if (Vue.observable) {
+          observed = Vue.observable(obj);
+      }
+      else {
+          var vm = defineComponentInstance(Vue, {
+              data: {
+                  $$state: obj,
+              },
+          });
+          observed = vm._data.$$state;
+      }
+      // in SSR, there is no __ob__. Mock for reactivity check
+      if (!hasOwn(observed, '__ob__')) {
+          def(observed, '__ob__', mockObserver(observed));
+      }
+      return observed;
+  }
+  function createObserver() {
+      return observe({}).__ob__;
+  }
+  function mockObserver(value) {
+      if (value === void 0) { value = {}; }
+      return {
+          value: value,
+          dep: {
+              notify: noopFn,
+              depend: noopFn,
+              addSub: noopFn,
+              removeSub: noopFn,
+          },
+      };
+  }
+  function shallowReactive(obj) {
+      var e_1, _a;
+      if ( !obj) {
+          warn('"shallowReactive()" is called without provide an "object".');
+          return;
+      }
+      if (!(isPlainObject(obj) || isArray(obj)) ||
+          isRaw(obj) ||
+          !Object.isExtensible(obj)) {
+          return obj;
+      }
+      var observed = observe({});
+      setupAccessControl(observed);
+      var ob = observed.__ob__;
+      var _loop_1 = function (key) {
+          var val = obj[key];
+          var getter;
+          var setter;
+          var property = Object.getOwnPropertyDescriptor(obj, key);
+          if (property) {
+              if (property.configurable === false) {
+                  return "continue";
+              }
+              getter = property.get;
+              setter = property.set;
+          }
+          Object.defineProperty(observed, key, {
+              enumerable: true,
+              configurable: true,
+              get: function getterHandler() {
+                  var _a;
+                  var value = getter ? getter.call(obj) : val;
+                  (_a = ob.dep) === null || _a === void 0 ? void 0 : _a.depend();
+                  return value;
+              },
+              set: function setterHandler(newVal) {
+                  var _a;
+                  if (getter && !setter)
+                      return;
+                  if (setter) {
+                      setter.call(obj, newVal);
+                  }
+                  else {
+                      val = newVal;
+                  }
+                  (_a = ob.dep) === null || _a === void 0 ? void 0 : _a.notify();
+              },
+          });
+      };
+      try {
+          for (var _b = __values(Object.keys(obj)), _c = _b.next(); !_c.done; _c = _b.next()) {
+              var key = _c.value;
+              _loop_1(key);
+          }
+      }
+      catch (e_1_1) { e_1 = { error: e_1_1 }; }
+      finally {
+          try {
+              if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+          }
+          finally { if (e_1) throw e_1.error; }
+      }
+      return observed;
+  }
+  /**
+   * Make obj reactivity
+   */
+  function reactive(obj) {
+      if ( !obj) {
+          warn('"reactive()" is called without provide an "object".');
+          // @ts-ignore
+          return;
+      }
+      if (!(isPlainObject(obj) || isArray(obj)) ||
+          isRaw(obj) ||
+          !Object.isExtensible(obj)) {
+          return obj;
+      }
+      var observed = observe(obj);
+      setupAccessControl(observed);
+      return observed;
+  }
+  /**
+   * Make sure obj can't be a reactive
+   */
+  function markRaw(obj) {
+      if (!(isPlainObject(obj) || isArray(obj)) || !Object.isExtensible(obj)) {
+          return obj;
+      }
+      // set the vue observable flag at obj
+      var ob = createObserver();
+      ob.__raw__ = true;
+      def(obj, '__ob__', ob);
+      // mark as Raw
+      rawSet.set(obj, true);
+      return obj;
+  }
+  function toRaw(observed) {
+      var _a, _b;
+      if (isRaw(observed) || !Object.isExtensible(observed)) {
+          return observed;
+      }
+      return ((_b = (_a = observed) === null || _a === void 0 ? void 0 : _a.__ob__) === null || _b === void 0 ? void 0 : _b.value) || observed;
+  }
+
+  function isReadonly(obj) {
+      return readonlySet.has(obj);
+  }
+  /**
+   * **In @vue/composition-api, `reactive` only provides type-level readonly check**
+   *
+   * Creates a readonly copy of the original object. Note the returned copy is not
+   * made reactive, but `readonly` can be called on an already reactive object.
+   */
+  function readonly(target) {
+      return target;
+  }
+  function shallowReadonly(obj) {
+      var e_1, _a;
+      if (!(isPlainObject(obj) || isArray(obj)) || !Object.isExtensible(obj)) {
+          return obj;
+      }
+      var readonlyObj = {};
+      var source = reactive({});
+      var ob = source.__ob__;
+      var _loop_1 = function (key) {
+          var val = obj[key];
+          var getter;
+          var property = Object.getOwnPropertyDescriptor(obj, key);
+          if (property) {
+              if (property.configurable === false) {
+                  return "continue";
+              }
+              getter = property.get;
+          }
+          Object.defineProperty(readonlyObj, key, {
+              enumerable: true,
+              configurable: true,
+              get: function getterHandler() {
+                  var value = getter ? getter.call(obj) : val;
+                  ob.dep.depend();
+                  return value;
+              },
+              set: function (v) {
+                  {
+                      warn("Set operation on key \"" + key + "\" failed: target is readonly.");
+                  }
+              },
+          });
+      };
+      try {
+          for (var _b = __values(Object.keys(obj)), _c = _b.next(); !_c.done; _c = _b.next()) {
+              var key = _c.value;
+              _loop_1(key);
+          }
+      }
+      catch (e_1_1) { e_1 = { error: e_1_1 }; }
+      finally {
+          try {
+              if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+          }
+          finally { if (e_1) throw e_1.error; }
+      }
+      readonlySet.set(readonlyObj, true);
+      return readonlyObj;
+  }
+
+  /**
+   * Set a property on an object. Adds the new property, triggers change
+   * notification and intercept it's subsequent access if the property doesn't
+   * already exist.
+   */
+  function set(target, key, val) {
+      var Vue = getVueConstructor();
+      var _a = Vue.util, warn = _a.warn, defineReactive = _a.defineReactive;
+      if ( (isUndef(target) || isPrimitive(target))) {
+          warn("Cannot set reactive property on undefined, null, or primitive value: " + target);
+      }
+      if (isArray(target) && isValidArrayIndex(key)) {
+          target.length = Math.max(target.length, key);
+          target.splice(key, 1, val);
+          return val;
+      }
+      if (key in target && !(key in Object.prototype)) {
+          target[key] = val;
+          return val;
+      }
+      var ob = target.__ob__;
+      if (target._isVue || (ob && ob.vmCount)) {
+          
+              warn('Avoid adding reactive properties to a Vue instance or its root $data ' +
+                  'at runtime - declare it upfront in the data option.');
+          return val;
+      }
+      if (!ob) {
+          target[key] = val;
+          return val;
+      }
+      defineReactive(ob.value, key, val);
+      // IMPORTANT: define access control before trigger watcher
+      defineAccessControl(target, key, val);
+      ob.dep.notify();
+      return val;
+  }
+
+  /**
+   * Delete a property and trigger change if necessary.
+   */
+  function del(target, key) {
+      var Vue = getVueConstructor();
+      var warn = Vue.util.warn;
+      if ( (isUndef(target) || isPrimitive(target))) {
+          warn("Cannot delete reactive property on undefined, null, or primitive value: " + target);
+      }
+      if (Array.isArray(target) && isValidArrayIndex(key)) {
+          target.splice(key, 1);
+          return;
+      }
+      var ob = target.__ob__;
+      if (target._isVue || (ob && ob.vmCount)) {
+          
+              warn('Avoid deleting properties on a Vue instance or its root $data ' +
+                  '- just set it to null.');
+          return;
+      }
+      if (!hasOwn(target, key)) {
+          return;
+      }
+      delete target[key];
+      if (!ob) {
+          return;
+      }
+      ob.dep.notify();
+  }
+
+  var genName = function (name) { return "on" + (name[0].toUpperCase() + name.slice(1)); };
+  function createLifeCycle(lifeCyclehook) {
+      return function (callback) {
+          var vm = currentVMInFn(genName(lifeCyclehook));
+          if (vm) {
+              injectHookOption(getVueConstructor(), vm, lifeCyclehook, callback);
+          }
+      };
+  }
+  function injectHookOption(Vue, vm, hook, val) {
+      var options = vm.$options;
+      var mergeFn = Vue.config.optionMergeStrategies[hook];
+      options[hook] = mergeFn(options[hook], wrapHookCall(vm, val));
+  }
+  function wrapHookCall(vm, fn) {
+      return function () {
+          var _a;
+          var args = [];
+          for (var _i = 0; _i < arguments.length; _i++) {
+              args[_i] = arguments[_i];
+          }
+          var preVm = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
+          setCurrentInstance(vm);
+          try {
+              return fn.apply(void 0, __spread(args));
+          }
+          finally {
+              setCurrentInstance(preVm);
+          }
+      };
+  }
+  // export const onCreated = createLifeCycle('created');
+  var onBeforeMount = createLifeCycle('beforeMount');
+  var onMounted = createLifeCycle('mounted');
+  var onBeforeUpdate = createLifeCycle('beforeUpdate');
+  var onUpdated = createLifeCycle('updated');
+  var onBeforeUnmount = createLifeCycle('beforeDestroy');
+  var onUnmounted = createLifeCycle('destroyed');
+  var onErrorCaptured = createLifeCycle('errorCaptured');
+  var onActivated = createLifeCycle('activated');
+  var onDeactivated = createLifeCycle('deactivated');
+  var onServerPrefetch = createLifeCycle('serverPrefetch');
+
+  var fallbackVM;
+  function flushPreQueue() {
+      flushQueue(this, WatcherPreFlushQueueKey);
+  }
+  function flushPostQueue() {
+      flushQueue(this, WatcherPostFlushQueueKey);
+  }
+  function hasWatchEnv(vm) {
+      return vm[WatcherPreFlushQueueKey] !== undefined;
+  }
+  function installWatchEnv(vm) {
+      vm[WatcherPreFlushQueueKey] = [];
+      vm[WatcherPostFlushQueueKey] = [];
+      vm.$on('hook:beforeUpdate', flushPreQueue);
+      vm.$on('hook:updated', flushPostQueue);
+  }
+  function getWatcherOption(options) {
+      return __assign({
+          immediate: false,
+          deep: false,
+          flush: 'pre',
+      }, options);
+  }
+  function getWatchEffectOption(options) {
+      return __assign({
+          immediate: true,
+          deep: false,
+          flush: 'pre',
+      }, options);
+  }
+  function getWatcherVM() {
+      var _a;
+      var vm = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
+      if (!vm) {
+          if (!fallbackVM) {
+              fallbackVM = defineComponentInstance(getVueConstructor());
+          }
+          vm = fallbackVM;
+      }
+      else if (!hasWatchEnv(vm)) {
+          installWatchEnv(vm);
+      }
+      return vm;
+  }
+  function flushQueue(vm, key) {
+      var queue = vm[key];
+      for (var index = 0; index < queue.length; index++) {
+          queue[index]();
+      }
+      queue.length = 0;
+  }
+  function queueFlushJob(vm, fn, mode) {
+      // flush all when beforeUpdate and updated are not fired
+      var fallbackFlush = function () {
+          vm.$nextTick(function () {
+              if (vm[WatcherPreFlushQueueKey].length) {
+                  flushQueue(vm, WatcherPreFlushQueueKey);
+              }
+              if (vm[WatcherPostFlushQueueKey].length) {
+                  flushQueue(vm, WatcherPostFlushQueueKey);
+              }
+          });
+      };
+      switch (mode) {
+          case 'pre':
+              fallbackFlush();
+              vm[WatcherPreFlushQueueKey].push(fn);
+              break;
+          case 'post':
+              fallbackFlush();
+              vm[WatcherPostFlushQueueKey].push(fn);
+              break;
+          default:
+              assert(false, "flush must be one of [\"post\", \"pre\", \"sync\"], but got " + mode);
+              break;
+      }
+  }
+  function createVueWatcher(vm, getter, callback, options) {
+      var index = vm._watchers.length;
+      // @ts-ignore: use undocumented options
+      vm.$watch(getter, callback, {
+          immediate: options.immediateInvokeCallback,
+          deep: options.deep,
+          lazy: options.noRun,
+          sync: options.sync,
+          before: options.before,
+      });
+      return vm._watchers[index];
+  }
+  // We have to monkeypatch the teardown function so Vue will run
+  // runCleanup() when it tears down the watcher on unmounted.
+  function patchWatcherTeardown(watcher, runCleanup) {
+      var _teardown = watcher.teardown;
+      watcher.teardown = function () {
+          var args = [];
+          for (var _i = 0; _i < arguments.length; _i++) {
+              args[_i] = arguments[_i];
+          }
+          _teardown.apply(watcher, args);
+          runCleanup();
+      };
+  }
+  function createWatcher(vm, source, cb, options) {
+      var _a;
+      var flushMode = options.flush;
+      var isSync = flushMode === 'sync';
+      var cleanup;
+      var registerCleanup = function (fn) {
+          cleanup = function () {
+              try {
+                  fn();
+              }
+              catch (error) {
+                  logError(error, vm, 'onCleanup()');
+              }
+          };
+      };
+      // cleanup before running getter again
+      var runCleanup = function () {
+          if (cleanup) {
+              cleanup();
+              cleanup = null;
+          }
+      };
+      var createScheduler = function (fn) {
+          if (isSync ||
+              /* without a current active instance, ignore pre|post mode */ vm ===
+                  fallbackVM) {
+              return fn;
+          }
+          return (function () {
+              var args = [];
+              for (var _i = 0; _i < arguments.length; _i++) {
+                  args[_i] = arguments[_i];
+              }
+              return queueFlushJob(vm, function () {
+                  fn.apply(void 0, __spread(args));
+              }, flushMode);
+          });
+      };
+      // effect watch
+      if (cb === null) {
+          var running_1 = false;
+          var getter_1 = function () {
+              // preventing the watch callback being call in the same execution
+              if (running_1) {
+                  return;
+              }
+              try {
+                  running_1 = true;
+                  source(registerCleanup);
+              }
+              finally {
+                  running_1 = false;
+              }
+          };
+          var watcher_1 = createVueWatcher(vm, getter_1, noopFn, {
+              deep: options.deep || false,
+              sync: isSync,
+              before: runCleanup,
+          });
+          patchWatcherTeardown(watcher_1, runCleanup);
+          // enable the watcher update
+          watcher_1.lazy = false;
+          var originGet = watcher_1.get.bind(watcher_1);
+          // always run watchEffect
+          watcher_1.get = createScheduler(originGet);
+          return function () {
+              watcher_1.teardown();
+          };
+      }
+      var deep = options.deep;
+      var getter;
+      if (Array.isArray(source)) {
+          getter = function () { return source.map(function (s) { return (isRef(s) ? s.value : s()); }); };
+      }
+      else if (isRef(source)) {
+          getter = function () { return source.value; };
+      }
+      else if (isReactive(source)) {
+          getter = function () { return source; };
+          deep = true;
+      }
+      else if (isFunction(source)) {
+          getter = source;
+      }
+      else {
+          getter = noopFn;
+          warn("Invalid watch source: " + JSON.stringify(source) + ".\n      A watch source can only be a getter/effect function, a ref, a reactive object, or an array of these types.", vm);
+      }
+      var applyCb = function (n, o) {
+          // cleanup before running cb again
+          runCleanup();
+          cb(n, o, registerCleanup);
+      };
+      var callback = createScheduler(applyCb);
+      if (options.immediate) {
+          var originalCallback_1 = callback;
+          // `shiftCallback` is used to handle the first sync effect run.
+          // The subsequent callbacks will redirect to `callback`.
+          var shiftCallback_1 = function (n, o) {
+              shiftCallback_1 = originalCallback_1;
+              applyCb(n, o);
+          };
+          callback = function (n, o) {
+              shiftCallback_1(n, o);
+          };
+      }
+      // @ts-ignore: use undocumented option "sync"
+      var stop = vm.$watch(getter, callback, {
+          immediate: options.immediate,
+          deep: deep,
+          sync: isSync,
+      });
+      // Once again, we have to hack the watcher for proper teardown
+      var watcher = vm._watchers[vm._watchers.length - 1];
+      // if the return value is reactive and deep:true
+      // watch for changes, this might happen when new key is added
+      if (isReactive(watcher.value) && ((_a = watcher.value.__ob__) === null || _a === void 0 ? void 0 : _a.dep) && deep) {
+          watcher.value.__ob__.dep.addSub({
+              update: function () {
+                  // this will force the source to be revaluated and the callback
+                  // executed if needed
+                  watcher.run();
+              },
+          });
+      }
+      patchWatcherTeardown(watcher, runCleanup);
+      return function () {
+          stop();
+      };
+  }
+  function watchEffect(effect, options) {
+      var opts = getWatchEffectOption(options);
+      var vm = getWatcherVM();
+      return createWatcher(vm, effect, null, opts);
+  }
+  // implementation
+  function watch(source, cb, options) {
+      var callback = null;
+      if (typeof cb === 'function') {
+          // source watch
+          callback = cb;
+      }
+      else {
+          // effect watch
+          {
+              warn("`watch(fn, options?)` signature has been moved to a separate API. " +
+                  "Use `watchEffect(fn, options?)` instead. `watch` now only " +
+                  "supports `watch(source, cb, options?) signature.");
+          }
+          options = cb;
+          callback = null;
+      }
+      var opts = getWatcherOption(options);
+      var vm = getWatcherVM();
+      return createWatcher(vm, source, callback, opts);
+  }
+
+  // implement
+  function computed(options) {
+      var _a;
+      var vm = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
+      var get, set;
+      if (typeof options === 'function') {
+          get = options;
+      }
+      else {
+          get = options.get;
+          set = options.set;
+      }
+      var computedSetter;
+      var computedGetter;
+      if (vm && !vm.$isServer) {
+          var _b = getVueInternalClasses(), Watcher_1 = _b.Watcher, Dep_1 = _b.Dep;
+          var watcher_1;
+          computedGetter = function () {
+              if (!watcher_1) {
+                  watcher_1 = new Watcher_1(vm, get, noopFn, { lazy: true });
+              }
+              if (watcher_1.dirty) {
+                  watcher_1.evaluate();
+              }
+              if (Dep_1.target) {
+                  watcher_1.depend();
+              }
+              return watcher_1.value;
+          };
+          computedSetter = function (v) {
+              if ( !set) {
+                  warn('Write operation failed: computed value is readonly.', vm);
+                  return;
+              }
+              if (set) {
+                  set(v);
+              }
+          };
+      }
+      else {
+          // fallback
+          var computedHost_1 = defineComponentInstance(getVueConstructor(), {
+              computed: {
+                  $$state: {
+                      get: get,
+                      set: set,
+                  },
+              },
+          });
+          vm && vm.$on('hook:destroyed', function () { return computedHost_1.$destroy(); });
+          computedGetter = function () { return computedHost_1.$$state; };
+          computedSetter = function (v) {
+              if ( !set) {
+                  warn('Write operation failed: computed value is readonly.', vm);
+                  return;
+              }
+              computedHost_1.$$state = v;
+          };
+      }
+      return createRef({
+          get: computedGetter,
+          set: computedSetter,
+      });
+  }
+
+  var NOT_FOUND = {};
+  function resolveInject(provideKey, vm) {
+      var source = vm;
+      while (source) {
+          // @ts-ignore
+          if (source._provided && hasOwn(source._provided, provideKey)) {
+              //@ts-ignore
+              return source._provided[provideKey];
+          }
+          source = source.$parent;
+      }
+      return NOT_FOUND;
+  }
+  function provide(key, value) {
+      var vm = currentVMInFn('provide');
+      if (!vm)
+          return;
+      if (!vm._provided) {
+          var provideCache_1 = {};
+          Object.defineProperty(vm, '_provided', {
+              get: function () { return provideCache_1; },
+              set: function (v) { return Object.assign(provideCache_1, v); },
+          });
+      }
+      vm._provided[key] = value;
+  }
+  function inject(key, defaultValue, treatDefaultAsFactory) {
+      var _a;
+      if (treatDefaultAsFactory === void 0) { treatDefaultAsFactory = false; }
+      if (!key) {
+          return defaultValue;
+      }
+      var vm = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
+      if (!vm) {
+          warn("inject() can only be used inside setup() or functional components.");
+          return;
+      }
+      var val = resolveInject(key, vm);
+      if (val !== NOT_FOUND) {
+          return val;
+      }
+      if (defaultValue === undefined && true) {
+          warn("Injection \"" + String(key) + "\" not found", vm);
+      }
+      return treatDefaultAsFactory && isFunction(defaultValue)
+          ? defaultValue()
+          : defaultValue;
+  }
+
+  var EMPTY_OBJ =  Object.freeze({})
+      ;
+  var useCssModule = function (name) {
+      var _a;
+      if (name === void 0) { name = '$style'; }
+      var instance = getCurrentInstance();
+      if (!instance) {
+           warn("useCssModule must be called inside setup()");
+          return EMPTY_OBJ;
+      }
+      var mod = (_a = instance.proxy) === null || _a === void 0 ? void 0 : _a[name];
+      if (!mod) {
+          
+              warn("Current instance does not have CSS module named \"" + name + "\".");
+          return EMPTY_OBJ;
+      }
+      return mod;
+  };
+  /**
+   * @deprecated use `useCssModule` instead.
+   */
+  var useCSSModule = useCssModule;
+
+  function createApp(rootComponent, rootProps) {
+      if (rootProps === void 0) { rootProps = undefined; }
+      var V = getVueConstructor();
+      var mountedVM = undefined;
+      return {
+          config: V.config,
+          use: V.use.bind(V),
+          mixin: V.mixin.bind(V),
+          component: V.component.bind(V),
+          directive: V.directive.bind(V),
+          mount: function (el, hydrating) {
+              if (!mountedVM) {
+                  mountedVM = new V(__assign({ propsData: rootProps }, rootComponent));
+                  mountedVM.$mount(el, hydrating);
+                  return mountedVM;
+              }
+              else {
+                  {
+                      warn("App has already been mounted.\n" +
+                          "If you want to remount the same app, move your app creation logic " +
+                          "into a factory function and create fresh app instances for each " +
+                          "mount - e.g. `const createMyApp = () => createApp(App)`");
+                  }
+                  return mountedVM;
+              }
+          },
+          unmount: function () {
+              if (mountedVM) {
+                  mountedVM.$destroy();
+                  mountedVM = undefined;
+              }
+              else {
+                  warn("Cannot unmount an app that is not mounted.");
+              }
+          },
+      };
+  }
+
+  var nextTick = function nextTick() {
+      var _a;
+      var args = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+      }
+      return (_a = getVueConstructor()) === null || _a === void 0 ? void 0 : _a.nextTick.apply(this, args);
+  };
+
+  var fallbackCreateElement;
+  var createElement = function createElement() {
+      var _a;
+      var args = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+      }
+      var instance = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
+      if (!instance) {
+          warn('`createElement()` has been called outside of render function.');
+          if (!fallbackCreateElement) {
+              fallbackCreateElement = defineComponentInstance(getVueConstructor())
+                  .$createElement;
+          }
+          return fallbackCreateElement.apply(fallbackCreateElement, args);
+      }
+      return instance.$createElement.apply(instance, args);
+  };
+
+  /**
+   * Displays a warning message (using console.error) with a stack trace if the
+   * function is called inside of active component.
+   *
+   * @param message warning message to be displayed
+   */
+  function warn$1(message) {
+      var _a;
+      warn(message, (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy);
+  }
+
+  function set$1(vm, key, value) {
+      var state = (vm.__composition_api_state__ =
+          vm.__composition_api_state__ || {});
+      state[key] = value;
+  }
+  function get(vm, key) {
+      return (vm.__composition_api_state__ || {})[key];
+  }
+  var vmStateManager = {
+      set: set$1,
+      get: get,
+  };
+
+  function asVmProperty(vm, propName, propValue) {
+      var props = vm.$options.props;
+      if (!(propName in vm) && !(props && hasOwn(props, propName))) {
+          if (isRef(propValue)) {
+              proxy(vm, propName, {
+                  get: function () { return propValue.value; },
+                  set: function (val) {
+                      propValue.value = val;
+                  },
+              });
+          }
+          else {
+              // @ts-ignore
+              vm[propName] = propValue;
+          }
+          {
+              // expose binding to Vue Devtool as a data property
+              // delay this until state has been resolved to prevent repeated works
+              vm.$nextTick(function () {
+                  if (isRef(propValue)) {
+                      proxy(vm._data, propName, {
+                          get: function () { return propValue.value; },
+                          set: function (val) {
+                              propValue.value = val;
+                          },
+                      });
+                  }
+                  else {
+                      vm._data[propName] = propValue;
+                  }
+              });
+          }
+      }
+      else {
+          if (props && hasOwn(props, propName)) {
+              warn("The setup binding property \"" + propName + "\" is already declared as a prop.", vm);
+          }
+          else {
+              warn("The setup binding property \"" + propName + "\" is already declared.", vm);
+          }
+      }
+  }
+  function updateTemplateRef(vm) {
+      var rawBindings = vmStateManager.get(vm, 'rawBindings') || {};
+      if (!rawBindings || !Object.keys(rawBindings).length)
+          return;
+      var refs = vm.$refs;
+      var oldRefKeys = vmStateManager.get(vm, 'refs') || [];
+      for (var index = 0; index < oldRefKeys.length; index++) {
+          var key = oldRefKeys[index];
+          var setupValue = rawBindings[key];
+          if (!refs[key] && setupValue && isRef(setupValue)) {
+              setupValue.value = null;
+          }
+      }
+      var newKeys = Object.keys(refs);
+      var validNewKeys = [];
+      for (var index = 0; index < newKeys.length; index++) {
+          var key = newKeys[index];
+          var setupValue = rawBindings[key];
+          if (refs[key] && setupValue && isRef(setupValue)) {
+              setupValue.value = refs[key];
+              validNewKeys.push(key);
+          }
+      }
+      vmStateManager.set(vm, 'refs', validNewKeys);
+  }
+  function resolveScopedSlots(vm, slotsProxy) {
+      var parentVNode = vm.$options._parentVnode;
+      if (!parentVNode)
+          return;
+      var prevSlots = vmStateManager.get(vm, 'slots') || [];
+      var curSlots = resolveSlots(parentVNode.data.scopedSlots, vm.$slots);
+      // remove staled slots
+      for (var index = 0; index < prevSlots.length; index++) {
+          var key = prevSlots[index];
+          if (!curSlots[key]) {
+              delete slotsProxy[key];
+          }
+      }
+      // proxy fresh slots
+      var slotNames = Object.keys(curSlots);
+      for (var index = 0; index < slotNames.length; index++) {
+          var key = slotNames[index];
+          if (!slotsProxy[key]) {
+              slotsProxy[key] = createSlotProxy(vm, key);
+          }
+      }
+      vmStateManager.set(vm, 'slots', slotNames);
+  }
+  function activateCurrentInstance(vm, fn, onError) {
+      var preVm = getCurrentVue2Instance();
+      setCurrentInstance(vm);
+      try {
+          return fn(vm);
+      }
+      catch (err) {
+          if (onError) {
+              onError(err);
+          }
+          else {
+              throw err;
+          }
+      }
+      finally {
+          setCurrentInstance(preVm);
+      }
+  }
+
+  function mixin(Vue) {
+      Vue.mixin({
+          beforeCreate: functionApiInit,
+          mounted: function () {
+              updateTemplateRef(this);
+          },
+          updated: function () {
+              updateTemplateRef(this);
+          },
+      });
+      /**
+       * Vuex init hook, injected into each instances init hooks list.
+       */
+      function functionApiInit() {
+          var vm = this;
+          var $options = vm.$options;
+          var setup = $options.setup, render = $options.render;
+          if (render) {
+              // keep currentInstance accessible for createElement
+              $options.render = function () {
+                  var _this = this;
+                  var args = [];
+                  for (var _i = 0; _i < arguments.length; _i++) {
+                      args[_i] = arguments[_i];
+                  }
+                  return activateCurrentInstance(vm, function () { return render.apply(_this, args); });
+              };
+          }
+          if (!setup) {
+              return;
+          }
+          if (typeof setup !== 'function') {
+              {
+                  warn('The "setup" option should be a function that returns a object in component definitions.', vm);
+              }
+              return;
+          }
+          var data = $options.data;
+          // wrapper the data option, so we can invoke setup before data get resolved
+          $options.data = function wrappedData() {
+              initSetup(vm, vm.$props);
+              return typeof data === 'function'
+                  ? data.call(vm, vm)
+                  : data || {};
+          };
+      }
+      function initSetup(vm, props) {
+          if (props === void 0) { props = {}; }
+          var setup = vm.$options.setup;
+          var ctx = createSetupContext(vm);
+          // fake reactive for `toRefs(props)`
+          def(props, '__ob__', createObserver());
+          // resolve scopedSlots and slots to functions
+          // @ts-expect-error
+          resolveScopedSlots(vm, ctx.slots);
+          var binding;
+          activateCurrentInstance(vm, function () {
+              // make props to be fake reactive, this is for `toRefs(props)`
+              binding = setup(props, ctx);
+          });
+          if (!binding)
+              return;
+          if (isFunction(binding)) {
+              // keep typescript happy with the binding type.
+              var bindingFunc_1 = binding;
+              // keep currentInstance accessible for createElement
+              vm.$options.render = function () {
+                  // @ts-expect-error
+                  resolveScopedSlots(vm, ctx.slots);
+                  return activateCurrentInstance(vm, function () { return bindingFunc_1(); });
+              };
+              return;
+          }
+          else if (isPlainObject(binding)) {
+              if (isReactive(binding)) {
+                  binding = toRefs(binding);
+              }
+              vmStateManager.set(vm, 'rawBindings', binding);
+              var bindingObj_1 = binding;
+              Object.keys(bindingObj_1).forEach(function (name) {
+                  var bindingValue = bindingObj_1[name];
+                  if (!isRef(bindingValue)) {
+                      if (!isReactive(bindingValue)) {
+                          if (isFunction(bindingValue)) {
+                              bindingValue = bindingValue.bind(vm);
+                          }
+                          else if (!isObject(bindingValue)) {
+                              bindingValue = ref(bindingValue);
+                          }
+                          else if (hasReactiveArrayChild(bindingValue)) {
+                              // creates a custom reactive properties without make the object explicitly reactive
+                              // NOTE we should try to avoid this, better implementation needed
+                              customReactive(bindingValue);
+                          }
+                      }
+                      else if (isArray(bindingValue)) {
+                          bindingValue = ref(bindingValue);
+                      }
+                  }
+                  asVmProperty(vm, name, bindingValue);
+              });
+              return;
+          }
+          {
+              assert(false, "\"setup\" must return a \"Object\" or a \"Function\", got \"" + Object.prototype.toString
+                  .call(binding)
+                  .slice(8, -1) + "\"");
+          }
+      }
+      function customReactive(target) {
+          if (!isPlainObject(target) ||
+              isRef(target) ||
+              isReactive(target) ||
+              isRaw(target))
+              return;
+          var Vue = getVueConstructor();
+          var defineReactive = Vue.util.defineReactive;
+          Object.keys(target).forEach(function (k) {
+              var val = target[k];
+              defineReactive(target, k, val);
+              if (val) {
+                  customReactive(val);
+              }
+              return;
+          });
+      }
+      function hasReactiveArrayChild(target, visited) {
+          if (visited === void 0) { visited = new Map(); }
+          if (visited.has(target)) {
+              return visited.get(target);
+          }
+          visited.set(target, false);
+          if (Array.isArray(target) && isReactive(target)) {
+              visited.set(target, true);
+              return true;
+          }
+          if (!isPlainObject(target) || isRaw(target)) {
+              return false;
+          }
+          return Object.keys(target).some(function (x) {
+              return hasReactiveArrayChild(target[x], visited);
+          });
+      }
+      function createSetupContext(vm) {
+          var ctx = { slots: {} };
+          var propsPlain = [
+              'root',
+              'parent',
+              'refs',
+              'listeners',
+              'isServer',
+              'ssrContext',
+          ];
+          var propsReactiveProxy = ['attrs'];
+          var methodReturnVoid = ['emit'];
+          propsPlain.forEach(function (key) {
+              var srcKey = "$" + key;
+              proxy(ctx, key, {
+                  get: function () { return vm[srcKey]; },
+                  set: function () {
+                      warn("Cannot assign to '" + key + "' because it is a read-only property", vm);
+                  },
+              });
+          });
+          propsReactiveProxy.forEach(function (key) {
+              var srcKey = "$" + key;
+              proxy(ctx, key, {
+                  get: function () {
+                      var e_1, _a;
+                      var data = reactive({});
+                      var source = vm[srcKey];
+                      var _loop_1 = function (attr) {
+                          proxy(data, attr, {
+                              get: function () {
+                                  // to ensure it always return the latest value
+                                  return vm[srcKey][attr];
+                              },
+                          });
+                      };
+                      try {
+                          for (var _b = __values(Object.keys(source)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                              var attr = _c.value;
+                              _loop_1(attr);
+                          }
+                      }
+                      catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                      finally {
+                          try {
+                              if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                          }
+                          finally { if (e_1) throw e_1.error; }
+                      }
+                      return data;
+                  },
+                  set: function () {
+                      warn("Cannot assign to '" + key + "' because it is a read-only property", vm);
+                  },
+              });
+          });
+          methodReturnVoid.forEach(function (key) {
+              var srcKey = "$" + key;
+              proxy(ctx, key, {
+                  get: function () {
+                      return function () {
+                          var args = [];
+                          for (var _i = 0; _i < arguments.length; _i++) {
+                              args[_i] = arguments[_i];
+                          }
+                          var fn = vm[srcKey];
+                          fn.apply(vm, args);
+                      };
+                  },
+              });
+          });
+          return ctx;
+      }
+  }
+
+  /**
+   * Helper that recursively merges two data objects together.
+   */
+  function mergeData(from, to) {
+      if (!from)
+          return to;
+      if (!to)
+          return from;
+      var key;
+      var toVal;
+      var fromVal;
+      var keys = hasSymbol ? Reflect.ownKeys(from) : Object.keys(from);
+      for (var i = 0; i < keys.length; i++) {
+          key = keys[i];
+          // in case the object is already observed...
+          if (key === '__ob__')
+              continue;
+          toVal = to[key];
+          fromVal = from[key];
+          if (!hasOwn(to, key)) {
+              to[key] = fromVal;
+          }
+          else if (toVal !== fromVal &&
+              isPlainObject(toVal) &&
+              !isRef(toVal) &&
+              isPlainObject(fromVal) &&
+              !isRef(fromVal)) {
+              mergeData(fromVal, toVal);
+          }
+      }
+      return to;
+  }
+  function install(Vue) {
+      if (isVueRegistered(Vue)) {
+          {
+              assert(false, 'already installed. Vue.use(VueCompositionAPI) should be called only once.');
+          }
+          return;
+      }
+      {
+          if (Vue.version) {
+              if (Vue.version[0] !== '2' || Vue.version[1] !== '.') {
+                  assert(false, "only works with Vue 2, v" + Vue.version + " found.");
+              }
+          }
+          else {
+              warn('Vue version not found');
+          }
+      }
+      Vue.config.optionMergeStrategies.setup = function (parent, child) {
+          return function mergedSetupFn(props, context) {
+              return mergeData(typeof parent === 'function' ? parent(props, context) || {} : undefined, typeof child === 'function' ? child(props, context) || {} : undefined);
+          };
+      };
+      setVueConstructor(Vue);
+      mixin(Vue);
+  }
+  var Plugin = {
+      install: function (Vue) { return install(Vue); },
+  };
+
+  // implementation, close to no-op
+  function defineComponent(options) {
+      return options;
+  }
+
+  var version = "1.0.0-beta.25";
+  // auto install when using CDN
+  if (typeof window !== 'undefined' && window.Vue) {
+      window.Vue.use(Plugin);
+  }
+
+  exports.computed = computed;
+  exports.createApp = createApp;
+  exports.customRef = customRef;
+  exports.default = Plugin;
+  exports.defineComponent = defineComponent;
+  exports.del = del;
+  exports.getCurrentInstance = getCurrentInstance;
+  exports.h = createElement;
+  exports.inject = inject;
+  exports.isRaw = isRaw;
+  exports.isReactive = isReactive;
+  exports.isReadonly = isReadonly;
+  exports.isRef = isRef;
+  exports.markRaw = markRaw;
+  exports.nextTick = nextTick;
+  exports.onActivated = onActivated;
+  exports.onBeforeMount = onBeforeMount;
+  exports.onBeforeUnmount = onBeforeUnmount;
+  exports.onBeforeUpdate = onBeforeUpdate;
+  exports.onDeactivated = onDeactivated;
+  exports.onErrorCaptured = onErrorCaptured;
+  exports.onMounted = onMounted;
+  exports.onServerPrefetch = onServerPrefetch;
+  exports.onUnmounted = onUnmounted;
+  exports.onUpdated = onUpdated;
+  exports.provide = provide;
+  exports.proxyRefs = proxyRefs;
+  exports.reactive = reactive;
+  exports.readonly = readonly;
+  exports.ref = ref;
+  exports.set = set;
+  exports.shallowReactive = shallowReactive;
+  exports.shallowReadonly = shallowReadonly;
+  exports.shallowRef = shallowRef;
+  exports.toRaw = toRaw;
+  exports.toRef = toRef;
+  exports.toRefs = toRefs;
+  exports.triggerRef = triggerRef;
+  exports.unref = unref;
+  exports.useCSSModule = useCSSModule;
+  exports.useCssModule = useCssModule;
+  exports.version = version;
+  exports.warn = warn$1;
+  exports.watch = watch;
+  exports.watchEffect = watchEffect;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+})));

@@ -31,7 +31,7 @@ abstract class VueScript extends AbstractPhoenixScript
             static::addJS(static::phoenixName() . '/js/vue/vue.min.js');
         }
 
-        if (!static::inited(__METHOD__) && $compositionApi) {
+        if (!static::inited(__METHOD__, $compositionApi) && $compositionApi) {
             static::addJS(static::phoenixName() . '/js/vue/composition-api/vue-composition-api.min.js');
         }
     }
