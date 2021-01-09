@@ -26,6 +26,7 @@
         "@babel/plugin-proposal-optional-chaining": "^7.7.5",
         "@babel/preset-env": "^7.2.0",
         "@claviska/jquery-minicolors": "^2.2.6",
+        "@vue/composition-api": "^1.0.0-beta.25",
         "backbone": "*",
         "bootstrap": "^4.0.0",
         "bootstrap-vue": "^2.0.0-rc.16",

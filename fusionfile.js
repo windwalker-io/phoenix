@@ -178,6 +178,10 @@ fusion.task('install', function () {
 
   // URL Polyfill
   fusion.copy(`${nodePath}/url-polyfill/*.js`, `${destPath}/js/core/`);
+
+  // Vue Composition API
+  fusion.copy(`${nodePath}/@vue/composition-api/dist/vue-composition-api.js`, `${destPath}/js/vue/composition-api/vue-composition-api.min.js`);
+  fusion.copy(`${nodePath}/@vue/composition-api/dist/vue-composition-api.prod.js`, `${destPath}/js/vue/composition-api/vue-composition-api.js`);
 });
 
 fusion.default(['js', 'scss', 'phoenix']);

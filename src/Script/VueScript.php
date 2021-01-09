@@ -25,10 +25,14 @@ abstract class VueScript extends AbstractPhoenixScript
      *
      * @return  void
      */
-    public static function core()
+    public static function core(bool $compositionApi = false)
     {
         if (!static::inited(__METHOD__)) {
             static::addJS(static::phoenixName() . '/js/vue/vue.min.js');
+        }
+
+        if (!static::inited(__METHOD__) && $compositionApi) {
+            static::addJS(static::phoenixName() . '/js/vue/composition-api/vue-composition-api.min.js');
         }
     }
 
