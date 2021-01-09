@@ -1,9 +1,9 @@
 /*!
- * BootstrapVue 2.18.0
+ * BootstrapVue 2.21.2
  *
  * @link https://bootstrap-vue.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
- * @copyright (c) 2016-2020 BootstrapVue
+ * @copyright (c) 2016-2021 BootstrapVue
  * @license MIT
  * https://github.com/bootstrap-vue/bootstrap-vue/blob/master/LICENSE
  */
@@ -343,41 +343,40 @@
 
   var e=function(){return (e=Object.assign||function(e){for(var t,r=1,s=arguments.length;r<s;r++)for(var a in t=arguments[r])Object.prototype.hasOwnProperty.call(t,a)&&(e[a]=t[a]);return e}).apply(this,arguments)},t={kebab:/-(\w)/g,styleProp:/:(.*)/,styleList:/;(?![^(]*\))/g};function r(e,t){return t?t.toUpperCase():""}function s(e){for(var s,a={},c=0,o=e.split(t.styleList);c<o.length;c++){var n=o[c].split(t.styleProp),i=n[0],l=n[1];(i=i.trim())&&("string"==typeof l&&(l=l.trim()),a[(s=i,s.replace(t.kebab,r))]=l);}return a}function a(){for(var t,r,a={},c=arguments.length;c--;)for(var o=0,n=Object.keys(arguments[c]);o<n.length;o++)switch(t=n[o]){case"class":case"style":case"directives":if(Array.isArray(a[t])||(a[t]=[]),"style"===t){var i=void 0;i=Array.isArray(arguments[c].style)?arguments[c].style:[arguments[c].style];for(var l=0;l<i.length;l++){var y=i[l];"string"==typeof y&&(i[l]=s(y));}arguments[c].style=i;}a[t]=a[t].concat(arguments[c][t]);break;case"staticClass":if(!arguments[c][t])break;void 0===a[t]&&(a[t]=""),a[t]&&(a[t]+=" "),a[t]+=arguments[c][t].trim();break;case"on":case"nativeOn":a[t]||(a[t]={});for(var p=0,f=Object.keys(arguments[c][t]||{});p<f.length;p++)r=f[p],a[t][r]?a[t][r]=[].concat(a[t][r],arguments[c][t][r]):a[t][r]=arguments[c][t][r];break;case"attrs":case"props":case"domProps":case"scopedSlots":case"staticStyle":case"hook":case"transition":a[t]||(a[t]={}),a[t]=e({},arguments[c][t],a[t]);break;case"slot":case"key":case"ref":case"tag":case"show":case"keepAlive":default:a[t]||(a[t]=arguments[c][t]);}return a}
 
-  /**
-   * Utilities to get information about the current environment
-   */
-  // --- Constants ---
-  var hasWindowSupport = typeof window !== 'undefined';
-  var hasDocumentSupport = typeof document !== 'undefined';
-  var hasNavigatorSupport = typeof navigator !== 'undefined';
-  var hasPromiseSupport = typeof Promise !== 'undefined';
+  var COMPONENT_UID_KEY = '_uid';
+
+  var HAS_WINDOW_SUPPORT = typeof window !== 'undefined';
+  var HAS_DOCUMENT_SUPPORT = typeof document !== 'undefined';
+  var HAS_NAVIGATOR_SUPPORT = typeof navigator !== 'undefined';
+  var HAS_PROMISE_SUPPORT = typeof Promise !== 'undefined';
   /* istanbul ignore next: JSDOM always returns false */
 
-  var hasMutationObserverSupport = typeof MutationObserver !== 'undefined' || typeof WebKitMutationObserver !== 'undefined' || typeof MozMutationObserver !== 'undefined';
-  var isBrowser = hasWindowSupport && hasDocumentSupport && hasNavigatorSupport; // Browser type sniffing
+  var HAS_MUTATION_OBSERVER_SUPPORT = typeof MutationObserver !== 'undefined' || typeof WebKitMutationObserver !== 'undefined' || typeof MozMutationObserver !== 'undefined';
+  var IS_BROWSER = HAS_WINDOW_SUPPORT && HAS_DOCUMENT_SUPPORT && HAS_NAVIGATOR_SUPPORT;
+  var WINDOW = HAS_WINDOW_SUPPORT ? window : {};
+  var DOCUMENT = HAS_DOCUMENT_SUPPORT ? document : {};
+  var NAVIGATOR = HAS_NAVIGATOR_SUPPORT ? navigator : {};
+  var USER_AGENT = (NAVIGATOR.userAgent || '').toLowerCase();
+  var IS_JSDOM = USER_AGENT.indexOf('jsdom') > 0;
+  var IS_IE = /msie|trident/.test(USER_AGENT); // Determine if the browser supports the option passive for events
 
-  var userAgent = isBrowser ? window.navigator.userAgent.toLowerCase() : '';
-  var isJSDOM = userAgent.indexOf('jsdom') > 0;
-  var isIE = /msie|trident/.test(userAgent); // Determine if the browser supports the option passive for events
-
-  var hasPassiveEventSupport = function () {
+  var HAS_PASSIVE_EVENT_SUPPORT = function () {
     var passiveEventSupported = false;
 
-    if (isBrowser) {
+    if (IS_BROWSER) {
       try {
         var options = {
+          // This function will be called when the browser
+          // attempts to access the passive property
           get passive() {
-            // This function will be called when the browser
-            // attempts to access the passive property.
-
             /* istanbul ignore next: will never be called in JSDOM */
             passiveEventSupported = true;
           }
 
         };
-        window.addEventListener('test', options, options);
-        window.removeEventListener('test', options, options);
-      } catch (err) {
+        WINDOW.addEventListener('test', options, options);
+        WINDOW.removeEventListener('test', options, options);
+      } catch (_unused) {
         /* istanbul ignore next: will never be called in JSDOM */
         passiveEventSupported = false;
       }
@@ -385,281 +384,22 @@
 
     return passiveEventSupported;
   }();
-  var hasTouchSupport = isBrowser && ('ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0);
-  var hasPointerEventSupport = isBrowser && Boolean(window.PointerEvent || window.MSPointerEvent);
+  var HAS_TOUCH_SUPPORT = IS_BROWSER && ('ontouchstart' in DOCUMENT.documentElement || NAVIGATOR.maxTouchPoints > 0);
+  var HAS_POINTER_EVENT_SUPPORT = IS_BROWSER && Boolean(WINDOW.PointerEvent || WINDOW.MSPointerEvent);
   /* istanbul ignore next: JSDOM only checks for 'IntersectionObserver' */
 
-  var hasIntersectionObserverSupport = isBrowser && 'IntersectionObserver' in window && 'IntersectionObserverEntry' in window && // Edge 15 and UC Browser lack support for `isIntersecting`
-  // but we an use intersectionRatio > 0 instead
+  var HAS_INTERACTION_OBSERVER_SUPPORT = IS_BROWSER && 'IntersectionObserver' in WINDOW && 'IntersectionObserverEntry' in WINDOW && // Edge 15 and UC Browser lack support for `isIntersecting`
+  // but we an use `intersectionRatio > 0` instead
   // 'isIntersecting' in window.IntersectionObserverEntry.prototype &&
-  'intersectionRatio' in window.IntersectionObserverEntry.prototype; // --- Getters ---
+  'intersectionRatio' in WINDOW.IntersectionObserverEntry.prototype;
 
-  var getEnv = function getEnv(key) {
-    var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    var env = typeof process !== 'undefined' && process ? process.env || {} : {};
-
-    if (!key) {
-      /* istanbul ignore next */
-      return env;
-    }
-
-    return env[key] || fallback;
-  };
-  var getNoWarn = function getNoWarn() {
-    return getEnv('BOOTSTRAP_VUE_NO_WARN') || getEnv('NODE_ENV') === 'production';
-  };
-
-  var w = hasWindowSupport ? window : {};
-  var Element$1 = hasWindowSupport ? w.Element : /*#__PURE__*/function (_Object) {
-    _inherits(Element, _Object);
-
-    var _super = _createSuper(Element);
-
-    function Element() {
-      _classCallCheck(this, Element);
-
-      return _super.apply(this, arguments);
-    }
-
-    return Element;
-  }( /*#__PURE__*/_wrapNativeSuper(Object));
-  var HTMLElement = hasWindowSupport ? w.HTMLElement : /*#__PURE__*/function (_Element) {
-    _inherits(HTMLElement, _Element);
-
-    var _super2 = _createSuper(HTMLElement);
-
-    function HTMLElement() {
-      _classCallCheck(this, HTMLElement);
-
-      return _super2.apply(this, arguments);
-    }
-
-    return HTMLElement;
-  }(Element$1);
-  var SVGElement = hasWindowSupport ? w.SVGElement : /*#__PURE__*/function (_Element2) {
-    _inherits(SVGElement, _Element2);
-
-    var _super3 = _createSuper(SVGElement);
-
-    function SVGElement() {
-      _classCallCheck(this, SVGElement);
-
-      return _super3.apply(this, arguments);
-    }
-
-    return SVGElement;
-  }(Element$1);
-  var File = hasWindowSupport ? w.File : /*#__PURE__*/function (_Object2) {
-    _inherits(File, _Object2);
-
-    var _super4 = _createSuper(File);
-
-    function File() {
-      _classCallCheck(this, File);
-
-      return _super4.apply(this, arguments);
-    }
-
-    return File;
-  }( /*#__PURE__*/_wrapNativeSuper(Object));
-
-  var toType = function toType(val) {
-    return _typeof(val);
-  };
-  var toRawType = function toRawType(val) {
-    return Object.prototype.toString.call(val).slice(8, -1);
-  };
-  var isUndefined = function isUndefined(val) {
-    return val === undefined;
-  };
-  var isNull = function isNull(val) {
-    return val === null;
-  };
-  var isUndefinedOrNull = function isUndefinedOrNull(val) {
-    return isUndefined(val) || isNull(val);
-  };
-  var isFunction = function isFunction(val) {
-    return toType(val) === 'function';
-  };
-  var isBoolean = function isBoolean(val) {
-    return toType(val) === 'boolean';
-  };
-  var isString = function isString(val) {
-    return toType(val) === 'string';
-  };
-  var isNumber = function isNumber(val) {
-    return toType(val) === 'number';
-  }; // Is a value number like (i.e. a number or a number as string)
-
-  var isNumeric = function isNumeric(value) {
-    return !isNaN(parseInt(value, 10));
-  };
-  var isArray = function isArray(val) {
-    return Array.isArray(val);
-  }; // Quick object check
-  // This is primarily used to tell Objects from primitive values
-  // when we know the value is a JSON-compliant type
-  // Note object could be a complex type like array, Date, etc.
-
-  var isObject = function isObject(obj) {
-    return obj !== null && _typeof(obj) === 'object';
-  }; // Strict object type check
-  // Only returns true for plain JavaScript objects
-
-  var isPlainObject = function isPlainObject(obj) {
-    return Object.prototype.toString.call(obj) === '[object Object]';
-  };
-  var isDate = function isDate(val) {
-    return val instanceof Date;
-  };
-  var isEvent = function isEvent(val) {
-    return val instanceof Event;
-  };
-  var isFile = function isFile(val) {
-    return val instanceof File;
-  };
-  var isRegExp = function isRegExp(val) {
-    return toRawType(val) === 'RegExp';
-  };
-  var isPromise = function isPromise(val) {
-    return !isUndefinedOrNull(val) && isFunction(val.then) && isFunction(val.catch);
-  };
-
-  var assign = function assign() {
-    return Object.assign.apply(Object, arguments);
-  };
-  var create = function create(proto, optionalProps) {
-    return Object.create(proto, optionalProps);
-  };
-  var defineProperties = function defineProperties(obj, props) {
-    return Object.defineProperties(obj, props);
-  };
-  var defineProperty = function defineProperty(obj, prop, descriptor) {
-    return Object.defineProperty(obj, prop, descriptor);
-  };
-  var freeze = function freeze(obj) {
-    return Object.freeze(obj);
-  };
-  var getOwnPropertyNames = function getOwnPropertyNames(obj) {
-    return Object.getOwnPropertyNames(obj);
-  };
-  var keys = function keys(obj) {
-    return Object.keys(obj);
-  }; // --- "Instance" ---
-
-  var hasOwnProperty = function hasOwnProperty(obj, prop) {
-    return Object.prototype.hasOwnProperty.call(obj, prop);
-  };
-  var toString = function toString(obj) {
-    return Object.prototype.toString.call(obj);
-  }; // --- Utilities ---
-
-  /**
-   * Shallow copy an object. If the passed in object
-   * is null or undefined, returns an empty object
-   */
-
-  var clone = function clone(obj) {
-    return _objectSpread2({}, obj);
-  };
-  /**
-   * Return a shallow copy of object with the specified properties only
-   * @link https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
-   */
-
-  var pick = function pick(obj, props) {
-    return keys(obj).filter(function (key) {
-      return props.indexOf(key) !== -1;
-    }).reduce(function (result, key) {
-      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
-    }, {});
-  };
-  /**
-   * Return a shallow copy of object with the specified properties omitted
-   * @link https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
-   */
-
-  var omit = function omit(obj, props) {
-    return keys(obj).filter(function (key) {
-      return props.indexOf(key) === -1;
-    }).reduce(function (result, key) {
-      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
-    }, {});
-  };
-  /**
-   * Merges two object deeply together
-   * @link https://gist.github.com/Salakar/1d7137de9cb8b704e48a
-   */
-
-  var mergeDeep = function mergeDeep(target, source) {
-    if (isObject(target) && isObject(source)) {
-      keys(source).forEach(function (key) {
-        if (isObject(source[key])) {
-          if (!target[key] || !isObject(target[key])) {
-            target[key] = source[key];
-          }
-
-          mergeDeep(target[key], source[key]);
-        } else {
-          assign(target, _defineProperty({}, key, source[key]));
-        }
-      });
-    }
-
-    return target;
-  };
-  /**
-   * Convenience method to create a read-only descriptor
-   */
-
-  var readonlyDescriptor = function readonlyDescriptor() {
-    return {
-      enumerable: true,
-      configurable: false,
-      writable: false
-    };
-  };
-  /**
-   * Deep-freezes and object, making it immutable / read-only
-   * Returns the same object passed-in, but frozen
-   * Freezes inner object/array/values first
-   * Note: This method will not work for property values using `Symbol()` as a key
-   * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
-   */
-
-  var deepFreeze = function deepFreeze(obj) {
-    // Retrieve the property names defined on object/array
-    // Note: `keys` will ignore properties that are keyed by a `Symbol()`
-    var props = keys(obj); // Iterate over each prop and recursively freeze it
-
-    props.forEach(function (prop) {
-      var value = obj[prop]; // If value is a plain object or array, we deepFreeze it
-
-      obj[prop] = value && (isPlainObject(value) || isArray(value)) ? deepFreeze(value) : value;
-    });
-    return freeze(obj);
-  };
-
-  var cloneDeep = function cloneDeep(obj) {
-    var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : obj;
-
-    if (isArray(obj)) {
-      return obj.reduce(function (result, val) {
-        return [].concat(_toConsumableArray(result), [cloneDeep(val, val)]);
-      }, []);
-    }
-
-    if (isPlainObject(obj)) {
-      return keys(obj).reduce(function (result, key) {
-        return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
-      }, {});
-    }
-
-    return defaultValue;
-  };
+  var NAME = 'BvConfig';
+  var PROP_NAME = '$bvConfig';
+  var DEFAULT_BREAKPOINT = ['xs', 'sm', 'md', 'lg', 'xl'];
 
   // --- General ---
   var RX_ARRAY_NOTATION = /\[(\d+)]/g;
+  var RX_BV_PREFIX = /^(BV?)/;
   var RX_DIGITS = /^\d+$/;
   var RX_EXTENSION = /^\..+/;
   var RX_HASH = /^#/;
@@ -700,6 +440,228 @@
   var RX_ICON_PREFIX = /^BIcon/; // --- Locale ---
 
   var RX_STRIP_LOCALE_MODS = /-u-.+/;
+
+  /* istanbul ignore next */
+
+  var Element = HAS_WINDOW_SUPPORT ? WINDOW.Element : /*#__PURE__*/function (_Object) {
+    _inherits(Element, _Object);
+
+    var _super = _createSuper(Element);
+
+    function Element() {
+      _classCallCheck(this, Element);
+
+      return _super.apply(this, arguments);
+    }
+
+    return Element;
+  }( /*#__PURE__*/_wrapNativeSuper(Object));
+  /* istanbul ignore next */
+
+  var HTMLElement = HAS_WINDOW_SUPPORT ? WINDOW.HTMLElement : /*#__PURE__*/function (_Element) {
+    _inherits(HTMLElement, _Element);
+
+    var _super2 = _createSuper(HTMLElement);
+
+    function HTMLElement() {
+      _classCallCheck(this, HTMLElement);
+
+      return _super2.apply(this, arguments);
+    }
+
+    return HTMLElement;
+  }(Element);
+  /* istanbul ignore next */
+
+  var SVGElement = HAS_WINDOW_SUPPORT ? WINDOW.SVGElement : /*#__PURE__*/function (_Element2) {
+    _inherits(SVGElement, _Element2);
+
+    var _super3 = _createSuper(SVGElement);
+
+    function SVGElement() {
+      _classCallCheck(this, SVGElement);
+
+      return _super3.apply(this, arguments);
+    }
+
+    return SVGElement;
+  }(Element);
+  /* istanbul ignore next */
+
+  var File = HAS_WINDOW_SUPPORT ? WINDOW.File : /*#__PURE__*/function (_Object2) {
+    _inherits(File, _Object2);
+
+    var _super4 = _createSuper(File);
+
+    function File() {
+      _classCallCheck(this, File);
+
+      return _super4.apply(this, arguments);
+    }
+
+    return File;
+  }( /*#__PURE__*/_wrapNativeSuper(Object));
+
+  var toType = function toType(value) {
+    return _typeof(value);
+  };
+  var toRawType = function toRawType(value) {
+    return Object.prototype.toString.call(value).slice(8, -1);
+  };
+  var isUndefined = function isUndefined(value) {
+    return value === undefined;
+  };
+  var isNull = function isNull(value) {
+    return value === null;
+  };
+  var isUndefinedOrNull = function isUndefinedOrNull(value) {
+    return isUndefined(value) || isNull(value);
+  };
+  var isFunction = function isFunction(value) {
+    return toType(value) === 'function';
+  };
+  var isBoolean = function isBoolean(value) {
+    return toType(value) === 'boolean';
+  };
+  var isString = function isString(value) {
+    return toType(value) === 'string';
+  };
+  var isNumber = function isNumber(value) {
+    return toType(value) === 'number';
+  };
+  var isNumeric = function isNumeric(value) {
+    return RX_NUMBER.test(String(value));
+  };
+  var isArray = function isArray(value) {
+    return Array.isArray(value);
+  }; // Quick object check
+  // This is primarily used to tell Objects from primitive values
+  // when we know the value is a JSON-compliant type
+  // Note object could be a complex type like array, Date, etc.
+
+  var isObject = function isObject(obj) {
+    return obj !== null && _typeof(obj) === 'object';
+  }; // Strict object type check
+  // Only returns true for plain JavaScript objects
+
+  var isPlainObject = function isPlainObject(obj) {
+    return Object.prototype.toString.call(obj) === '[object Object]';
+  };
+  var isDate = function isDate(value) {
+    return value instanceof Date;
+  };
+  var isEvent = function isEvent(value) {
+    return value instanceof Event;
+  };
+  var isFile = function isFile(value) {
+    return value instanceof File;
+  };
+  var isRegExp = function isRegExp(value) {
+    return toRawType(value) === 'RegExp';
+  };
+  var isPromise = function isPromise(value) {
+    return !isUndefinedOrNull(value) && isFunction(value.then) && isFunction(value.catch);
+  };
+
+  var assign = function assign() {
+    return Object.assign.apply(Object, arguments);
+  };
+  var create = function create(proto, optionalProps) {
+    return Object.create(proto, optionalProps);
+  };
+  var defineProperties = function defineProperties(obj, props) {
+    return Object.defineProperties(obj, props);
+  };
+  var defineProperty = function defineProperty(obj, prop, descriptor) {
+    return Object.defineProperty(obj, prop, descriptor);
+  };
+  var getOwnPropertyNames = function getOwnPropertyNames(obj) {
+    return Object.getOwnPropertyNames(obj);
+  };
+  var keys = function keys(obj) {
+    return Object.keys(obj);
+  }; // --- "Instance" ---
+
+  var hasOwnProperty = function hasOwnProperty(obj, prop) {
+    return Object.prototype.hasOwnProperty.call(obj, prop);
+  };
+  var toString = function toString(obj) {
+    return Object.prototype.toString.call(obj);
+  }; // --- Utilities ---
+  // Shallow copy an object
+
+  var clone = function clone(obj) {
+    return _objectSpread2({}, obj);
+  }; // Return a shallow copy of object with the specified properties only
+  // See: https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
+
+  var pick = function pick(obj, props) {
+    return keys(obj).filter(function (key) {
+      return props.indexOf(key) !== -1;
+    }).reduce(function (result, key) {
+      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
+    }, {});
+  }; // Return a shallow copy of object with the specified properties omitted
+  // See: https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
+
+  var omit = function omit(obj, props) {
+    return keys(obj).filter(function (key) {
+      return props.indexOf(key) === -1;
+    }).reduce(function (result, key) {
+      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
+    }, {});
+  }; // Merges two object deeply together
+  // See: https://gist.github.com/Salakar/1d7137de9cb8b704e48a
+
+  var mergeDeep = function mergeDeep(target, source) {
+    if (isObject(target) && isObject(source)) {
+      keys(source).forEach(function (key) {
+        if (isObject(source[key])) {
+          if (!target[key] || !isObject(target[key])) {
+            target[key] = source[key];
+          }
+
+          mergeDeep(target[key], source[key]);
+        } else {
+          assign(target, _defineProperty({}, key, source[key]));
+        }
+      });
+    }
+
+    return target;
+  }; // Returns a shallow copy of the object with keys in sorted order
+
+  var sortKeys = function sortKeys(obj) {
+    return keys(obj).sort().reduce(function (result, key) {
+      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
+    }, {});
+  }; // Convenience method to create a read-only descriptor
+
+  var readonlyDescriptor = function readonlyDescriptor() {
+    return {
+      enumerable: true,
+      configurable: false,
+      writable: false
+    };
+  };
+
+  var cloneDeep = function cloneDeep(obj) {
+    var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : obj;
+
+    if (isArray(obj)) {
+      return obj.reduce(function (result, val) {
+        return [].concat(_toConsumableArray(result), [cloneDeep(val, val)]);
+      }, []);
+    }
+
+    if (isPlainObject(obj)) {
+      return keys(obj).reduce(function (result, key) {
+        return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
+      }, {});
+    }
+
+    return defaultValue;
+  };
 
   var identity = function identity(x) {
     return x;
@@ -760,8 +722,26 @@
 
   var get = function get(obj, path) {
     var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    var val = getRaw(obj, path);
-    return isUndefinedOrNull(val) ? defaultValue : val;
+    var value = getRaw(obj, path);
+    return isUndefinedOrNull(value) ? defaultValue : value;
+  };
+
+  /**
+   * Utilities to get information about the current environment
+   */
+  var getEnv = function getEnv(key) {
+    var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    var env = typeof process !== 'undefined' && process ? process.env || {} : {};
+
+    if (!key) {
+      /* istanbul ignore next */
+      return env;
+    }
+
+    return env[key] || fallback;
+  };
+  var getNoWarn = function getNoWarn() {
+    return getEnv('BOOTSTRAP_VUE_NO_WARN') || getEnv('NODE_ENV') === 'production';
   };
 
   /**
@@ -786,7 +766,7 @@
 
   var warnNotClient = function warnNotClient(source) {
     /* istanbul ignore else */
-    if (isBrowser) {
+    if (IS_BROWSER) {
       return false;
     } else {
       warn("".concat(source, ": Can not be called during SSR."));
@@ -801,7 +781,7 @@
 
   var warnNoPromiseSupport = function warnNoPromiseSupport(source) {
     /* istanbul ignore else */
-    if (hasPromiseSupport) {
+    if (HAS_PROMISE_SUPPORT) {
       return false;
     } else {
       warn("".concat(source, ": Requires Promise support."));
@@ -816,7 +796,7 @@
 
   var warnNoMutationObserverSupport = function warnNoMutationObserverSupport(source) {
     /* istanbul ignore else */
-    if (hasMutationObserverSupport) {
+    if (HAS_MUTATION_OBSERVER_SUPPORT) {
       return false;
     } else {
       warn("".concat(source, ": Requires MutationObserver support."));
@@ -824,469 +804,52 @@
     }
   };
 
-  var NAME_ALERT = 'BAlert';
-  var NAME_ASPECT = 'BAspect';
-  var NAME_AVATAR = 'BAvatar';
-  var NAME_AVATAR_GROUP = 'BAvatarGroup';
-  var NAME_BADGE = 'BBadge';
-  var NAME_BREADCRUMB = 'BBreadcrumb';
-  var NAME_BREADCRUMB_ITEM = 'BBreadcrumbItem';
-  var NAME_BREADCRUMB_LINK = 'BBreadcrumbLink';
-  var NAME_BUTTON = 'BButton';
-  var NAME_BUTTON_CLOSE = 'BButtonClose';
-  var NAME_BUTTON_GROUP = 'BButtonGroup';
-  var NAME_BUTTON_TOOLBAR = 'BButtonToolbar';
-  var NAME_CALENDAR = 'BCalendar';
-  var NAME_CARD = 'BCard';
-  var NAME_CARD_BODY = 'BCardBody';
-  var NAME_CARD_FOOTER = 'BCardFooter';
-  var NAME_CARD_GROUP = 'BCardGroup';
-  var NAME_CARD_HEADER = 'BCardHeader';
-  var NAME_CARD_IMG = 'BCardImg';
-  var NAME_CARD_IMG_LAZY = 'BCardImgLazy';
-  var NAME_CARD_SUB_TITLE = 'BCardSubTitle';
-  var NAME_CARD_TEXT = 'BCardText';
-  var NAME_CARD_TITLE = 'BCardTitle';
-  var NAME_CAROUSEL = 'BCarousel';
-  var NAME_CAROUSEL_SLIDE = 'BCarouselSlide';
-  var NAME_COL = 'BCol';
-  var NAME_COLLAPSE = 'BCollapse';
-  var NAME_COLLAPSE_HELPER = 'BVCollapse';
-  var NAME_CONTAINER = 'BContainer';
-  var NAME_DROPDOWN = 'BDropdown';
-  var NAME_DROPDOWN_DIVIDER = 'BDropdownDivider';
-  var NAME_DROPDOWN_FORM = 'BDropdownForm';
-  var NAME_DROPDOWN_GROUP = 'BDropdownGroup';
-  var NAME_DROPDOWN_HEADER = 'BDropdownHeader';
-  var NAME_DROPDOWN_ITEM = 'BDropdownItem';
-  var NAME_DROPDOWN_ITEM_BUTTON = 'BDropdownItemButton';
-  var NAME_DROPDOWN_TEXT = 'BDropdownText';
-  var NAME_EMBED = 'BEmbed';
-  var NAME_FORM = 'BForm';
-  var NAME_FORM_BUTTON_LABEL_CONTROL = 'BVFormBtnLabelControl';
-  var NAME_FORM_CHECKBOX = 'BFormCheckbox';
-  var NAME_FORM_CHECKBOX_GROUP = 'BFormCheckboxGroup';
-  var NAME_FORM_DATALIST = 'BFormDatalist';
-  var NAME_FORM_DATEPICKER = 'BFormDatepicker';
-  var NAME_FORM_FILE = 'BFormFile';
-  var NAME_FORM_GROUP = 'BFormGroup';
-  var NAME_FORM_INPUT = 'BFormInput';
-  var NAME_FORM_INVALID_FEEDBACK = 'BFormInvalidFeedback';
-  var NAME_FORM_RADIO = 'BFormRadio';
-  var NAME_FORM_RADIO_GROUP = 'BFormRadioGroup';
-  var NAME_FORM_RATING = 'BFormRating';
-  var NAME_FORM_RATING_STAR = 'BVFormRatingStar';
-  var NAME_FORM_ROW = 'BFormRow';
-  var NAME_FORM_SELECT = 'BFormSelect';
-  var NAME_FORM_SELECT_OPTION = 'BFormSelectOption';
-  var NAME_FORM_SELECT_OPTION_GROUP = 'BFormSelectOptionGroup';
-  var NAME_FORM_SPINBUTTON = 'BFormSpinbutton';
-  var NAME_FORM_TAG = 'BFormTag';
-  var NAME_FORM_TAGS = 'BFormTags';
-  var NAME_FORM_TEXT = 'BFormText';
-  var NAME_FORM_TEXTAREA = 'BFormTextarea';
-  var NAME_FORM_TIMEPICKER = 'BFormTimepicker';
-  var NAME_FORM_VALID_FEEDBACK = 'BFormValidFeedback';
-  var NAME_ICON = 'BIcon';
-  var NAME_ICONSTACK = 'BIconstack';
-  var NAME_ICON_BASE = 'BIconBase';
-  var NAME_IMG = 'BImg';
-  var NAME_IMG_LAZY = 'BImgLazy';
-  var NAME_INPUT_GROUP = 'BInputGroup';
-  var NAME_INPUT_GROUP_ADDON = 'BInputGroupAddon';
-  var NAME_INPUT_GROUP_APPEND = 'BInputGroupAppend';
-  var NAME_INPUT_GROUP_PREPEND = 'BInputGroupPrepend';
-  var NAME_INPUT_GROUP_TEXT = 'BInputGroupText';
-  var NAME_JUMBOTRON = 'BJumbotron';
-  var NAME_LINK = 'BLink';
-  var NAME_LIST_GROUP = 'BListGroup';
-  var NAME_LIST_GROUP_ITEM = 'BListGroupItem';
-  var NAME_MEDIA = 'BMedia';
-  var NAME_MEDIA_ASIDE = 'BMediaAside';
-  var NAME_MEDIA_BODY = 'BMediaBody';
-  var NAME_MODAL = 'BModal';
-  var NAME_MSG_BOX = 'BMsgBox';
-  var NAME_NAV = 'BNav';
-  var NAME_NAVBAR = 'BNavbar';
-  var NAME_NAVBAR_BRAND = 'BNavbarBrand';
-  var NAME_NAVBAR_NAV = 'BNavbarNav';
-  var NAME_NAVBAR_TOGGLE = 'BNavbarToggle';
-  var NAME_NAV_FORM = 'BNavForm';
-  var NAME_NAV_ITEM = 'BNavItem';
-  var NAME_NAV_ITEM_DROPDOWN = 'BNavItemDropdown';
-  var NAME_NAV_TEXT = 'BNavText';
-  var NAME_OVERLAY = 'BOverlay';
-  var NAME_PAGINATION = 'BPagination';
-  var NAME_PAGINATION_NAV = 'BPaginationNav';
-  var NAME_POPOVER = 'BPopover';
-  var NAME_POPOVER_HELPER = 'BVPopover';
-  var NAME_POPOVER_TEMPLATE = 'BVPopoverTemplate';
-  var NAME_POPPER = 'BVPopper';
-  var NAME_PROGRESS = 'BProgress';
-  var NAME_PROGRESS_BAR = 'BProgressBar';
-  var NAME_ROW = 'BRow';
-  var NAME_SIDEBAR = 'BSidebar';
-  var NAME_SKELETON = 'BSkeleton';
-  var NAME_SKELETON_ICON = 'BSkeletonIcon';
-  var NAME_SKELETON_IMG = 'BSkeletonImg';
-  var NAME_SKELETON_TABLE = 'BSkeletonTable';
-  var NAME_SKELETON_WRAPPER = 'BSkeletonWrapper';
-  var NAME_SPINNER = 'BSpinner';
-  var NAME_TAB = 'BTab';
-  var NAME_TABLE = 'BTable';
-  var NAME_TABLE_CELL = 'BTableCell';
-  var NAME_TABLE_LITE = 'BTableLite';
-  var NAME_TABLE_SIMPLE = 'BTableSimple';
-  var NAME_TABS = 'BTabs';
-  var NAME_TAB_BUTTON_HELPER = 'BVTabButton';
-  var NAME_TBODY = 'BTbody';
-  var NAME_TFOOT = 'BTfoot';
-  var NAME_TH = 'BTh';
-  var NAME_THEAD = 'BThead';
-  var NAME_TIME = 'BTime';
-  var NAME_TOAST = 'BToast';
-  var NAME_TOASTER = 'BToaster';
-  var NAME_TOAST_POP = 'BVToastPop';
-  var NAME_TOOLTIP = 'BTooltip';
-  var NAME_TOOLTIP_HELPER = 'BVTooltip';
-  var NAME_TOOLTIP_TEMPLATE = 'BVTooltipTemplate';
-  var NAME_TR = 'BTr';
-  var NAME_TRANSITION = 'BVTransition';
-  var NAME_TRANSPORTER_SINGLE = 'BTransporterSingle';
-  var NAME_TRANSPORTER_TARGET_SINGLE = 'BTransporterTargetSingle';
-
-  var _deepFreeze;
-  // NOTES
-  //
-  // The global config SHALL NOT be used to set defaults for Boolean props, as the props
-  // would loose their semantic meaning, and force people writing 3rd party components to
-  // explicitly set a true or false value using the v-bind syntax on boolean props
-  //
-  // Supported config values (depending on the prop's supported type(s)):
-  // `String`, `Array`, `Object`, `null` or `undefined`
-  // BREAKPOINT DEFINITIONS
-  //
-  // Some components (`<b-col>` and `<b-form-group>`) generate props based on breakpoints,
-  // and this occurs when the component is first loaded (evaluated), which may happen
-  // before the config is created/modified
-  //
-  // To get around this we make these components' props async (lazy evaluation)
-  // The component definition is only called/executed when the first access to the
-  // component is used (and cached on subsequent uses)
-  // PROP DEFAULTS
-  //
-  // For default values on props, we use the default value factory function approach so
-  // that the default values are pulled in at each component instantiation
-  //
-  //  props: {
-  //    variant: {
-  //      type: String,
-  //      default: () => getConfigComponent('BAlert', 'variant')
-  //    }
-  //  }
-  //
-  // We also provide a cached getter for breakpoints, which are "frozen" on first access
-  // prettier-ignore
-
-  var DEFAULTS = deepFreeze((_deepFreeze = {
-    // Breakpoints
-    breakpoints: ['xs', 'sm', 'md', 'lg', 'xl'],
-    // Form controls
-    formControls: {
-      size: undefined
-    }
-  }, _defineProperty(_deepFreeze, NAME_ALERT, {
-    dismissLabel: 'Close',
-    variant: 'info'
-  }), _defineProperty(_deepFreeze, NAME_AVATAR, {
-    variant: 'secondary',
-    badgeVariant: 'primary'
-  }), _defineProperty(_deepFreeze, NAME_BADGE, {
-    variant: 'secondary'
-  }), _defineProperty(_deepFreeze, NAME_BUTTON, {
-    size: undefined,
-    variant: 'secondary'
-  }), _defineProperty(_deepFreeze, NAME_BUTTON_CLOSE, {
-    content: '&times;',
-    // `textVariant` is `undefined` to inherit the current text color
-    textVariant: undefined,
-    ariaLabel: 'Close'
-  }), _defineProperty(_deepFreeze, NAME_CALENDAR, {
-    selectedVariant: 'primary',
-    // Defaults to `selectedVariant`
-    todayVariant: undefined,
-    navButtonVariant: 'secondary',
-    // BFormDate will choose these first if not provided in BFormDate section
-    labelPrevDecade: 'Previous decade',
-    labelPrevYear: 'Previous year',
-    labelPrevMonth: 'Previous month',
-    labelCurrentMonth: 'Current month',
-    labelNextMonth: 'Next month',
-    labelNextYear: 'Next year',
-    labelNextDecade: 'Next decade',
-    labelToday: 'Today',
-    labelSelected: 'Selected date',
-    labelNoDateSelected: 'No date selected',
-    labelCalendar: 'Calendar',
-    labelNav: 'Calendar navigation',
-    labelHelp: 'Use cursor keys to navigate calendar dates'
-  }), _defineProperty(_deepFreeze, NAME_CARD_SUB_TITLE, {
-    // `<b-card>` and `<b-card-body>` also inherit this prop
-    subTitleTextVariant: 'muted'
-  }), _defineProperty(_deepFreeze, NAME_CAROUSEL, {
-    labelPrev: 'Previous Slide',
-    labelNext: 'Next Slide',
-    labelGotoSlide: 'Goto Slide',
-    labelIndicators: 'Select a slide to display'
-  }), _defineProperty(_deepFreeze, NAME_DROPDOWN, {
-    toggleText: 'Toggle Dropdown',
-    size: undefined,
-    variant: 'secondary',
-    splitVariant: undefined
-  }), _defineProperty(_deepFreeze, NAME_FORM_DATEPICKER, {
-    // BFormDatepicker will choose from BCalendar first if not provided here
-    selectedVariant: undefined,
-    todayVariant: undefined,
-    navButtonVariant: undefined,
-    labelPrevDecade: undefined,
-    labelPrevYear: undefined,
-    labelPrevMonth: undefined,
-    labelCurrentMonth: undefined,
-    labelNextMonth: undefined,
-    labelNextYear: undefined,
-    labelNextDecade: undefined,
-    labelToday: undefined,
-    labelSelected: undefined,
-    labelNoDateSelected: undefined,
-    labelCalendar: undefined,
-    labelNav: undefined,
-    labelHelp: undefined,
-    // These props are specific to BFormDatepicker
-    labelTodayButton: 'Select today',
-    labelResetButton: 'Reset',
-    labelCloseButton: 'Close'
-  }), _defineProperty(_deepFreeze, NAME_FORM_FILE, {
-    browseText: 'Browse',
-    // Chrome default file prompt
-    placeholder: 'No file chosen',
-    dropPlaceholder: 'Drop files here',
-    noDropPlaceholder: 'Not allowed'
-  }), _defineProperty(_deepFreeze, NAME_FORM_RATING, {
-    variant: null,
-    color: null
-  }), _defineProperty(_deepFreeze, NAME_FORM_TAG, {
-    removeLabel: 'Remove tag',
-    variant: 'secondary'
-  }), _defineProperty(_deepFreeze, NAME_FORM_TAGS, {
-    addButtonText: 'Add',
-    addButtonVariant: 'outline-secondary',
-    duplicateTagText: 'Duplicate tag(s)',
-    invalidTagText: 'Invalid tag(s)',
-    limitTagsText: 'Tag limit reached',
-    placeholder: 'Add tag...',
-    tagRemoveLabel: 'Remove tag',
-    tagRemovedLabel: 'Tag removed',
-    tagVariant: 'secondary'
-  }), _defineProperty(_deepFreeze, NAME_FORM_TEXT, {
-    textVariant: 'muted'
-  }), _defineProperty(_deepFreeze, NAME_FORM_TIMEPICKER, {
-    // Fallback to BTime
-    labelNoTimeSelected: undefined,
-    labelSelected: undefined,
-    labelHours: undefined,
-    labelMinutes: undefined,
-    labelSeconds: undefined,
-    labelAmpm: undefined,
-    labelAm: undefined,
-    labelPm: undefined,
-    // Fallback to BTime then BFormSpinbutton
-    labelDecrement: undefined,
-    labelIncrement: undefined,
-    // These props are specific to BFormTimepicker
-    labelNowButton: 'Select now',
-    labelResetButton: 'Reset',
-    labelCloseButton: 'Close'
-  }), _defineProperty(_deepFreeze, NAME_FORM_SPINBUTTON, {
-    labelDecrement: 'Decrement',
-    labelIncrement: 'Increment'
-  }), _defineProperty(_deepFreeze, NAME_IMG, {
-    blankColor: 'transparent'
-  }), _defineProperty(_deepFreeze, NAME_IMG_LAZY, {
-    blankColor: 'transparent'
-  }), _defineProperty(_deepFreeze, NAME_INPUT_GROUP, {
-    size: undefined
-  }), _defineProperty(_deepFreeze, NAME_JUMBOTRON, {
-    bgVariant: undefined,
-    borderVariant: undefined,
-    textVariant: undefined
-  }), _defineProperty(_deepFreeze, NAME_LINK, {
-    routerComponentName: undefined
-  }), _defineProperty(_deepFreeze, NAME_LIST_GROUP_ITEM, {
-    variant: undefined
-  }), _defineProperty(_deepFreeze, NAME_MODAL, {
-    titleTag: 'h5',
-    size: 'md',
-    headerBgVariant: undefined,
-    headerBorderVariant: undefined,
-    headerTextVariant: undefined,
-    headerCloseVariant: undefined,
-    bodyBgVariant: undefined,
-    bodyTextVariant: undefined,
-    footerBgVariant: undefined,
-    footerBorderVariant: undefined,
-    footerTextVariant: undefined,
-    cancelTitle: 'Cancel',
-    cancelVariant: 'secondary',
-    okTitle: 'OK',
-    okVariant: 'primary',
-    headerCloseContent: '&times;',
-    headerCloseLabel: 'Close'
-  }), _defineProperty(_deepFreeze, NAME_NAVBAR, {
-    variant: null
-  }), _defineProperty(_deepFreeze, NAME_NAVBAR_TOGGLE, {
-    label: 'Toggle navigation'
-  }), _defineProperty(_deepFreeze, NAME_PAGINATION, {
-    size: undefined
-  }), _defineProperty(_deepFreeze, NAME_PAGINATION_NAV, {
-    size: undefined
-  }), _defineProperty(_deepFreeze, NAME_POPOVER, {
-    boundary: 'scrollParent',
-    boundaryPadding: 5,
-    customClass: undefined,
-    delay: 50,
-    variant: undefined
-  }), _defineProperty(_deepFreeze, NAME_PROGRESS, {
-    variant: undefined
-  }), _defineProperty(_deepFreeze, NAME_PROGRESS_BAR, {
-    variant: undefined
-  }), _defineProperty(_deepFreeze, NAME_SPINNER, {
-    variant: undefined
-  }), _defineProperty(_deepFreeze, NAME_SKELETON, {
-    animation: 'wave'
-  }), _defineProperty(_deepFreeze, NAME_SKELETON_ICON, {
-    animation: 'wave'
-  }), _defineProperty(_deepFreeze, NAME_SIDEBAR, {
-    bgVariant: 'light',
-    textVariant: 'dark',
-    shadow: false,
-    width: undefined,
-    tag: 'div',
-    backdropVariant: 'dark'
-  }), _defineProperty(_deepFreeze, NAME_TABLE, {
-    selectedVariant: 'active',
-    headVariant: undefined,
-    footVariant: undefined
-  }), _defineProperty(_deepFreeze, NAME_TIME, {
-    labelNoTimeSelected: 'No time selected',
-    labelSelected: 'Selected time',
-    labelHours: 'Hours',
-    labelMinutes: 'Minutes',
-    labelSeconds: 'Seconds',
-    labelAmpm: 'AM/PM',
-    // It would be nice to be able to get these from Intl.DateTimeFormat somehow
-    labelAm: 'AM',
-    labelPm: 'PM',
-    // The following inherit from BFormSpinbutton if not provided
-    labelIncrement: undefined,
-    labelDecrement: undefined
-  }), _defineProperty(_deepFreeze, NAME_TOAST, {
-    toaster: 'b-toaster-top-right',
-    autoHideDelay: 5000,
-    variant: undefined,
-    toastClass: undefined,
-    headerClass: undefined,
-    bodyClass: undefined
-  }), _defineProperty(_deepFreeze, NAME_TOASTER, {
-    ariaLive: undefined,
-    ariaAtomic: undefined,
-    role: undefined
-  }), _defineProperty(_deepFreeze, NAME_TOOLTIP, {
-    boundary: 'scrollParent',
-    boundaryPadding: 5,
-    customClass: undefined,
-    delay: 50,
-    variant: undefined
-  }), _deepFreeze));
-
-  var NAME = 'BvConfig';
-  var PROP_NAME = '$bvConfig'; // Config manager class
-
   var BvConfig = /*#__PURE__*/function () {
     function BvConfig() {
       _classCallCheck(this, BvConfig);
 
-      // TODO: pre-populate with default config values (needs updated tests)
-      // this.$_config = cloneDeep(DEFAULTS)
       this.$_config = {};
-      this.$_cachedBreakpoints = null;
-    }
-    /* istanbul ignore next */
+    } // Method to merge in user config parameters
 
 
     _createClass(BvConfig, [{
-      key: "getDefaults",
-      // Returns the defaults
-
-      /* istanbul ignore next */
-      value: function getDefaults()
-      /* istanbul ignore next */
-      {
-        return this.defaults;
-      } // Method to merge in user config parameters
-
-    }, {
       key: "setConfig",
       value: function setConfig() {
         var _this = this;
 
         var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
+        /* istanbul ignore next */
         if (!isPlainObject(config)) {
-          /* istanbul ignore next */
           return;
         }
 
         var configKeys = getOwnPropertyNames(config);
-        configKeys.forEach(function (cmpName) {
+        configKeys.forEach(function (key) {
           /* istanbul ignore next */
-          if (!hasOwnProperty(DEFAULTS, cmpName)) {
-            warn("Unknown config property \"".concat(cmpName, "\""), NAME);
-            return;
-          }
+          var subConfig = config[key];
 
-          var cmpConfig = config[cmpName];
-
-          if (cmpName === 'breakpoints') {
-            // Special case for breakpoints
-            var breakpoints = config.breakpoints;
+          if (key === 'breakpoints') {
             /* istanbul ignore if */
-
-            if (!isArray(breakpoints) || breakpoints.length < 2 || breakpoints.some(function (b) {
+            if (!isArray(subConfig) || subConfig.length < 2 || subConfig.some(function (b) {
               return !isString(b) || b.length === 0;
             })) {
               warn('"breakpoints" must be an array of at least 2 breakpoint names', NAME);
             } else {
-              _this.$_config.breakpoints = cloneDeep(breakpoints);
+              _this.$_config[key] = cloneDeep(subConfig);
             }
-          } else if (isPlainObject(cmpConfig)) {
+          } else if (isPlainObject(subConfig)) {
             // Component prop defaults
-            var props = getOwnPropertyNames(cmpConfig);
-            props.forEach(function (prop) {
-              /* istanbul ignore if */
-              if (!hasOwnProperty(DEFAULTS[cmpName], prop)) {
-                warn("Unknown config property \"".concat(cmpName, ".").concat(prop, "\""), NAME);
-              } else {
-                // TODO: If we pre-populate the config with defaults, we can skip this line
-                _this.$_config[cmpName] = _this.$_config[cmpName] || {};
-
-                if (!isUndefined(cmpConfig[prop])) {
-                  _this.$_config[cmpName][prop] = cloneDeep(cmpConfig[prop]);
-                }
+            _this.$_config[key] = getOwnPropertyNames(subConfig).reduce(function (config, prop) {
+              if (!isUndefined(subConfig[prop])) {
+                config[prop] = cloneDeep(subConfig[prop]);
               }
-            });
+
+              return config;
+            }, _this.$_config[key] || {});
           }
         });
-      } // Clear the config. For testing purposes only
+      } // Clear the config
 
     }, {
       key: "resetConfig",
@@ -1298,29 +861,13 @@
       key: "getConfig",
       value: function getConfig() {
         return cloneDeep(this.$_config);
-      }
+      } // Returns a deep copy of the config value
+
     }, {
       key: "getConfigValue",
       value: function getConfigValue(key) {
-        // First we try the user config, and if key not found we fall back to default value
-        // NOTE: If we deep clone DEFAULTS into config, then we can skip the fallback for get
-        return cloneDeep(getRaw(this.$_config, key, getRaw(DEFAULTS, key)));
-      }
-    }, {
-      key: "defaults",
-
-      /* istanbul ignore next */
-      get: function get()
-      /* istanbul ignore next */
-      {
-        return DEFAULTS;
-      }
-    }], [{
-      key: "Defaults",
-      get: function get()
-      /* istanbul ignore next */
-      {
-        return DEFAULTS;
+        var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+        return cloneDeep(getRaw(this.$_config, key, defaultValue));
       }
     }]);
 
@@ -1331,12 +878,12 @@
   var setConfig = function setConfig() {
     var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var Vue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Vue__default['default'];
-    // Ensure we have a $bvConfig Object on the Vue prototype.
-    // We set on Vue and OurVue just in case consumer has not set an alias of `vue`.
+    // Ensure we have a `$bvConfig` Object on the Vue prototype
+    // We set on Vue and OurVue just in case consumer has not set an alias of `vue`
     Vue.prototype[PROP_NAME] = Vue__default['default'].prototype[PROP_NAME] = Vue.prototype[PROP_NAME] || Vue__default['default'].prototype[PROP_NAME] || new BvConfig(); // Apply the config values
 
     Vue.prototype[PROP_NAME].setConfig(config);
-  }; // Method for resetting the user config. Exported for testing purposes only.
+  }; // Method for resetting the user config
 
   /**
    * Checks if there are multiple instances of Vue, and warns (once) about possible issues.
@@ -1348,7 +895,7 @@
     var MULTIPLE_VUE_WARNING = ['Multiple instances of Vue detected!', 'You may need to set up an alias for Vue in your bundler config.', 'See: https://bootstrap-vue.org/docs#using-module-bundlers'].join('\n');
     return function (Vue) {
       /* istanbul ignore next */
-      if (!checkMultipleVueWarned && Vue__default['default'] !== Vue && !isJSDOM) {
+      if (!checkMultipleVueWarned && Vue__default['default'] !== Vue && !IS_JSDOM) {
         warn(MULTIPLE_VUE_WARNING);
       }
 
@@ -1473,67 +1020,307 @@
 
   var vueUse = function vueUse(VuePlugin) {
     /* istanbul ignore next */
-    if (hasWindowSupport && window.Vue) {
+    if (HAS_WINDOW_SUPPORT && window.Vue) {
       window.Vue.use(VuePlugin);
     }
     /* istanbul ignore next */
 
 
-    if (hasWindowSupport && VuePlugin.NAME) {
+    if (HAS_WINDOW_SUPPORT && VuePlugin.NAME) {
       window[VuePlugin.NAME] = VuePlugin;
     }
   };
 
-  var memoize = function memoize(fn) {
-    var cache = create(null);
-    return function () {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
+  // Component names
+  var NAME_ALERT = 'BAlert';
+  var NAME_ASPECT = 'BAspect';
+  var NAME_AVATAR = 'BAvatar';
+  var NAME_AVATAR_GROUP = 'BAvatarGroup';
+  var NAME_BADGE = 'BBadge';
+  var NAME_BREADCRUMB = 'BBreadcrumb';
+  var NAME_BREADCRUMB_ITEM = 'BBreadcrumbItem';
+  var NAME_BREADCRUMB_LINK = 'BBreadcrumbLink';
+  var NAME_BUTTON = 'BButton';
+  var NAME_BUTTON_CLOSE = 'BButtonClose';
+  var NAME_BUTTON_GROUP = 'BButtonGroup';
+  var NAME_BUTTON_TOOLBAR = 'BButtonToolbar';
+  var NAME_CALENDAR = 'BCalendar';
+  var NAME_CARD = 'BCard';
+  var NAME_CARD_BODY = 'BCardBody';
+  var NAME_CARD_FOOTER = 'BCardFooter';
+  var NAME_CARD_GROUP = 'BCardGroup';
+  var NAME_CARD_HEADER = 'BCardHeader';
+  var NAME_CARD_IMG = 'BCardImg';
+  var NAME_CARD_IMG_LAZY = 'BCardImgLazy';
+  var NAME_CARD_SUB_TITLE = 'BCardSubTitle';
+  var NAME_CARD_TEXT = 'BCardText';
+  var NAME_CARD_TITLE = 'BCardTitle';
+  var NAME_CAROUSEL = 'BCarousel';
+  var NAME_CAROUSEL_SLIDE = 'BCarouselSlide';
+  var NAME_COL = 'BCol';
+  var NAME_COLLAPSE = 'BCollapse';
+  var NAME_CONTAINER = 'BContainer';
+  var NAME_DROPDOWN = 'BDropdown';
+  var NAME_DROPDOWN_DIVIDER = 'BDropdownDivider';
+  var NAME_DROPDOWN_FORM = 'BDropdownForm';
+  var NAME_DROPDOWN_GROUP = 'BDropdownGroup';
+  var NAME_DROPDOWN_HEADER = 'BDropdownHeader';
+  var NAME_DROPDOWN_ITEM = 'BDropdownItem';
+  var NAME_DROPDOWN_ITEM_BUTTON = 'BDropdownItemButton';
+  var NAME_DROPDOWN_TEXT = 'BDropdownText';
+  var NAME_EMBED = 'BEmbed';
+  var NAME_FORM = 'BForm';
+  var NAME_FORM_CHECKBOX = 'BFormCheckbox';
+  var NAME_FORM_CHECKBOX_GROUP = 'BFormCheckboxGroup';
+  var NAME_FORM_DATALIST = 'BFormDatalist';
+  var NAME_FORM_DATEPICKER = 'BFormDatepicker';
+  var NAME_FORM_FILE = 'BFormFile';
+  var NAME_FORM_GROUP = 'BFormGroup';
+  var NAME_FORM_INPUT = 'BFormInput';
+  var NAME_FORM_INVALID_FEEDBACK = 'BFormInvalidFeedback';
+  var NAME_FORM_RADIO = 'BFormRadio';
+  var NAME_FORM_RADIO_GROUP = 'BFormRadioGroup';
+  var NAME_FORM_RATING = 'BFormRating';
+  var NAME_FORM_ROW = 'BFormRow';
+  var NAME_FORM_SELECT = 'BFormSelect';
+  var NAME_FORM_SELECT_OPTION = 'BFormSelectOption';
+  var NAME_FORM_SELECT_OPTION_GROUP = 'BFormSelectOptionGroup';
+  var NAME_FORM_SPINBUTTON = 'BFormSpinbutton';
+  var NAME_FORM_TAG = 'BFormTag';
+  var NAME_FORM_TAGS = 'BFormTags';
+  var NAME_FORM_TEXT = 'BFormText';
+  var NAME_FORM_TEXTAREA = 'BFormTextarea';
+  var NAME_FORM_TIMEPICKER = 'BFormTimepicker';
+  var NAME_FORM_VALID_FEEDBACK = 'BFormValidFeedback';
+  var NAME_ICON = 'BIcon';
+  var NAME_ICONSTACK = 'BIconstack';
+  var NAME_ICON_BASE = 'BIconBase';
+  var NAME_IMG = 'BImg';
+  var NAME_IMG_LAZY = 'BImgLazy';
+  var NAME_INPUT_GROUP = 'BInputGroup';
+  var NAME_INPUT_GROUP_ADDON = 'BInputGroupAddon';
+  var NAME_INPUT_GROUP_APPEND = 'BInputGroupAppend';
+  var NAME_INPUT_GROUP_PREPEND = 'BInputGroupPrepend';
+  var NAME_INPUT_GROUP_TEXT = 'BInputGroupText';
+  var NAME_JUMBOTRON = 'BJumbotron';
+  var NAME_LINK = 'BLink';
+  var NAME_LIST_GROUP = 'BListGroup';
+  var NAME_LIST_GROUP_ITEM = 'BListGroupItem';
+  var NAME_MEDIA = 'BMedia';
+  var NAME_MEDIA_ASIDE = 'BMediaAside';
+  var NAME_MEDIA_BODY = 'BMediaBody';
+  var NAME_MODAL = 'BModal';
+  var NAME_MSG_BOX = 'BMsgBox';
+  var NAME_NAV = 'BNav';
+  var NAME_NAVBAR = 'BNavbar';
+  var NAME_NAVBAR_BRAND = 'BNavbarBrand';
+  var NAME_NAVBAR_NAV = 'BNavbarNav';
+  var NAME_NAVBAR_TOGGLE = 'BNavbarToggle';
+  var NAME_NAV_FORM = 'BNavForm';
+  var NAME_NAV_ITEM = 'BNavItem';
+  var NAME_NAV_ITEM_DROPDOWN = 'BNavItemDropdown';
+  var NAME_NAV_TEXT = 'BNavText';
+  var NAME_OVERLAY = 'BOverlay';
+  var NAME_PAGINATION = 'BPagination';
+  var NAME_PAGINATION_NAV = 'BPaginationNav';
+  var NAME_POPOVER = 'BPopover';
+  var NAME_PROGRESS = 'BProgress';
+  var NAME_PROGRESS_BAR = 'BProgressBar';
+  var NAME_ROW = 'BRow';
+  var NAME_SIDEBAR = 'BSidebar';
+  var NAME_SKELETON = 'BSkeleton';
+  var NAME_SKELETON_ICON = 'BSkeletonIcon';
+  var NAME_SKELETON_IMG = 'BSkeletonImg';
+  var NAME_SKELETON_TABLE = 'BSkeletonTable';
+  var NAME_SKELETON_WRAPPER = 'BSkeletonWrapper';
+  var NAME_SPINNER = 'BSpinner';
+  var NAME_TAB = 'BTab';
+  var NAME_TABLE = 'BTable';
+  var NAME_TABLE_CELL = 'BTableCell';
+  var NAME_TABLE_LITE = 'BTableLite';
+  var NAME_TABLE_SIMPLE = 'BTableSimple';
+  var NAME_TABS = 'BTabs';
+  var NAME_TBODY = 'BTbody';
+  var NAME_TFOOT = 'BTfoot';
+  var NAME_TH = 'BTh';
+  var NAME_THEAD = 'BThead';
+  var NAME_TIME = 'BTime';
+  var NAME_TOAST = 'BToast';
+  var NAME_TOASTER = 'BToaster';
+  var NAME_TOOLTIP = 'BTooltip';
+  var NAME_TR = 'BTr'; // Helper component names
 
-      var argsKey = JSON.stringify(args);
-      return cache[argsKey] = cache[argsKey] || fn.apply(null, args);
-    };
+  var NAME_COLLAPSE_HELPER = 'BVCollapse';
+  var NAME_FORM_BUTTON_LABEL_CONTROL = 'BVFormBtnLabelControl';
+  var NAME_FORM_RATING_STAR = 'BVFormRatingStar';
+  var NAME_POPOVER_HELPER = 'BVPopover';
+  var NAME_POPOVER_TEMPLATE = 'BVPopoverTemplate';
+  var NAME_POPPER = 'BVPopper';
+  var NAME_TAB_BUTTON_HELPER = 'BVTabButton';
+  var NAME_TOAST_POP = 'BVToastPop';
+  var NAME_TOOLTIP_HELPER = 'BVTooltip';
+  var NAME_TOOLTIP_TEMPLATE = 'BVTooltipTemplate';
+  var NAME_TRANSITION = 'BVTransition';
+  var NAME_TRANSPORTER = 'BVTransporter';
+  var NAME_TRANSPORTER_TARGET = 'BVTransporterTarget';
+
+  var EVENT_NAME_ACTIVATE_TAB = 'activate-tab';
+  var EVENT_NAME_BLUR = 'blur';
+  var EVENT_NAME_CANCEL = 'cancel';
+  var EVENT_NAME_CHANGE = 'change';
+  var EVENT_NAME_CHANGED = 'changed';
+  var EVENT_NAME_CLICK = 'click';
+  var EVENT_NAME_CLOSE = 'close';
+  var EVENT_NAME_CONTEXT = 'context';
+  var EVENT_NAME_CONTEXT_CHANGED = 'context-changed';
+  var EVENT_NAME_DESTROYED = 'destroyed';
+  var EVENT_NAME_DISABLE = 'disable';
+  var EVENT_NAME_DISABLED = 'disabled';
+  var EVENT_NAME_DISMISSED = 'dismissed';
+  var EVENT_NAME_DISMISS_COUNT_DOWN = 'dismiss-count-down';
+  var EVENT_NAME_ENABLE = 'enable';
+  var EVENT_NAME_ENABLED = 'enabled';
+  var EVENT_NAME_FILTERED = 'filtered';
+  var EVENT_NAME_FIRST = 'first';
+  var EVENT_NAME_FOCUSIN = 'focusin';
+  var EVENT_NAME_FOCUSOUT = 'focusout';
+  var EVENT_NAME_HEAD_CLICKED = 'head-clicked';
+  var EVENT_NAME_HIDDEN = 'hidden';
+  var EVENT_NAME_HIDE = 'hide';
+  var EVENT_NAME_IMG_ERROR = 'img-error';
+  var EVENT_NAME_INPUT = 'input';
+  var EVENT_NAME_LAST = 'last';
+  var EVENT_NAME_MOUSEENTER = 'mouseenter';
+  var EVENT_NAME_MOUSELEAVE = 'mouseleave';
+  var EVENT_NAME_NEXT = 'next';
+  var EVENT_NAME_OK = 'ok';
+  var EVENT_NAME_OPEN = 'open';
+  var EVENT_NAME_PAGE_CLICK = 'page-click';
+  var EVENT_NAME_PAUSED = 'paused';
+  var EVENT_NAME_PREV = 'prev';
+  var EVENT_NAME_REFRESH = 'refresh';
+  var EVENT_NAME_REFRESHED = 'refreshed';
+  var EVENT_NAME_REMOVE = 'remove';
+  var EVENT_NAME_ROW_CLICKED = 'row-clicked';
+  var EVENT_NAME_ROW_CONTEXTMENU = 'row-contextmenu';
+  var EVENT_NAME_ROW_DBLCLICKED = 'row-dblclicked';
+  var EVENT_NAME_ROW_HOVERED = 'row-hovered';
+  var EVENT_NAME_ROW_MIDDLE_CLICKED = 'row-middle-clicked';
+  var EVENT_NAME_ROW_SELECTED = 'row-selected';
+  var EVENT_NAME_ROW_UNHOVERED = 'row-unhovered';
+  var EVENT_NAME_SELECTED = 'selected';
+  var EVENT_NAME_SHOW = 'show';
+  var EVENT_NAME_SHOWN = 'shown';
+  var EVENT_NAME_SLIDING_END = 'sliding-end';
+  var EVENT_NAME_SLIDING_START = 'sliding-start';
+  var EVENT_NAME_SORT_CHANGED = 'sort-changed';
+  var EVENT_NAME_TAG_STATE = 'tag-state';
+  var EVENT_NAME_TOGGLE = 'toggle';
+  var EVENT_NAME_UNPAUSED = 'unpaused';
+  var EVENT_NAME_UPDATE = 'update';
+  var HOOK_EVENT_NAME_BEFORE_DESTROY = 'hook:beforeDestroy';
+  var HOOK_EVENT_NAME_DESTROYED = 'hook:destroyed';
+  var MODEL_EVENT_NAME_PREFIX = 'update:';
+  var ROOT_EVENT_NAME_PREFIX = 'bv';
+  var ROOT_EVENT_NAME_SEPARATOR = '::';
+  var EVENT_OPTIONS_PASSIVE = {
+    passive: true
+  };
+  var EVENT_OPTIONS_NO_CAPTURE = {
+    passive: true,
+    capture: false
   };
 
-  var PROP_NAME$1 = '$bvConfig';
-  var VueProto = Vue__default['default'].prototype; // --- Getter methods ---
+  // General types
+  var PROP_TYPE_ANY = undefined;
+  var PROP_TYPE_ARRAY = Array;
+  var PROP_TYPE_BOOLEAN = Boolean;
+  var PROP_TYPE_DATE = Date;
+  var PROP_TYPE_FUNCTION = Function;
+  var PROP_TYPE_NUMBER = Number;
+  var PROP_TYPE_OBJECT = Object;
+  var PROP_TYPE_REG_EXP = RegExp;
+  var PROP_TYPE_STRING = String; // Multiple types
 
-  var getConfigValue = function getConfigValue(key) {
-    return VueProto[PROP_NAME$1] ? VueProto[PROP_NAME$1].getConfigValue(key) : cloneDeep(getRaw(DEFAULTS, key));
-  }; // Method to grab a config value for a particular component
+  var PROP_TYPE_ARRAY_FUNCTION = [PROP_TYPE_ARRAY, PROP_TYPE_FUNCTION];
+  var PROP_TYPE_ARRAY_OBJECT = [PROP_TYPE_ARRAY, PROP_TYPE_OBJECT];
+  var PROP_TYPE_ARRAY_OBJECT_STRING = [PROP_TYPE_ARRAY, PROP_TYPE_OBJECT, PROP_TYPE_STRING];
+  var PROP_TYPE_ARRAY_STRING = [PROP_TYPE_ARRAY, PROP_TYPE_STRING];
+  var PROP_TYPE_BOOLEAN_NUMBER = [PROP_TYPE_BOOLEAN, PROP_TYPE_NUMBER];
+  var PROP_TYPE_BOOLEAN_NUMBER_STRING = [PROP_TYPE_BOOLEAN, PROP_TYPE_NUMBER, PROP_TYPE_STRING];
+  var PROP_TYPE_BOOLEAN_STRING = [PROP_TYPE_BOOLEAN, PROP_TYPE_STRING];
+  var PROP_TYPE_DATE_STRING = [PROP_TYPE_DATE, PROP_TYPE_STRING];
+  var PROP_TYPE_FUNCTION_STRING = [PROP_TYPE_FUNCTION, PROP_TYPE_STRING];
+  var PROP_TYPE_NUMBER_STRING = [PROP_TYPE_NUMBER, PROP_TYPE_STRING];
+  var PROP_TYPE_NUMBER_OBJECT_STRING = [PROP_TYPE_NUMBER, PROP_TYPE_OBJECT, PROP_TYPE_STRING];
+  var PROP_TYPE_OBJECT_FUNCTION = [PROP_TYPE_OBJECT, PROP_TYPE_FUNCTION];
+  var PROP_TYPE_OBJECT_STRING = [PROP_TYPE_OBJECT, PROP_TYPE_STRING];
 
-  var getComponentConfig = function getComponentConfig(cmpName) {
-    var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    // Return the particular config value for key for if specified,
-    // otherwise we return the full config (or an empty object if not found)
-    return key ? getConfigValue("".concat(cmpName, ".").concat(key)) : getConfigValue(cmpName) || {};
-  }; // Convenience method for getting all breakpoint names
+  var SLOT_NAME_ADD_BUTTON_TEXT = 'add-button-text';
+  var SLOT_NAME_APPEND = 'append';
+  var SLOT_NAME_ASIDE = 'aside';
+  var SLOT_NAME_BADGE = 'badge';
+  var SLOT_NAME_BOTTOM_ROW = 'bottom-row';
+  var SLOT_NAME_BUTTON_CONTENT = 'button-content';
+  var SLOT_NAME_CUSTOM_FOOT = 'custom-foot';
+  var SLOT_NAME_DECREMENT = 'decrement';
+  var SLOT_NAME_DEFAULT = 'default';
+  var SLOT_NAME_DESCRIPTION = 'description';
+  var SLOT_NAME_DISMISS = 'dismiss';
+  var SLOT_NAME_DROP_PLACEHOLDER = 'drop-placeholder';
+  var SLOT_NAME_ELLIPSIS_TEXT = 'ellipsis-text';
+  var SLOT_NAME_EMPTY = 'empty';
+  var SLOT_NAME_EMPTYFILTERED = 'emptyfiltered';
+  var SLOT_NAME_FILE_NAME = 'file-name';
+  var SLOT_NAME_FIRST = 'first';
+  var SLOT_NAME_FIRST_TEXT = 'first-text';
+  var SLOT_NAME_FOOTER = 'footer';
+  var SLOT_NAME_HEADER = 'header';
+  var SLOT_NAME_HEADER_CLOSE = 'header-close';
+  var SLOT_NAME_ICON_CLEAR = 'icon-clear';
+  var SLOT_NAME_ICON_EMPTY = 'icon-empty';
+  var SLOT_NAME_ICON_FULL = 'icon-full';
+  var SLOT_NAME_ICON_HALF = 'icon-half';
+  var SLOT_NAME_IMG = 'img';
+  var SLOT_NAME_INCREMENT = 'increment';
+  var SLOT_NAME_INVALID_FEEDBACK = 'invalid-feedback';
+  var SLOT_NAME_LABEL = 'label';
+  var SLOT_NAME_LAST_TEXT = 'last-text';
+  var SLOT_NAME_LEAD = 'lead';
+  var SLOT_NAME_LOADING = 'loading';
+  var SLOT_NAME_MODAL_BACKDROP = 'modal-backdrop';
+  var SLOT_NAME_MODAL_CANCEL = 'modal-cancel';
+  var SLOT_NAME_MODAL_FOOTER = 'modal-footer';
+  var SLOT_NAME_MODAL_HEADER = 'modal-header';
+  var SLOT_NAME_MODAL_HEADER_CLOSE = 'modal-header-close';
+  var SLOT_NAME_MODAL_OK = 'modal-ok';
+  var SLOT_NAME_MODAL_TITLE = 'modal-title';
+  var SLOT_NAME_NAV_NEXT_DECADE = 'nav-next-decade';
+  var SLOT_NAME_NAV_NEXT_MONTH = 'nav-next-month';
+  var SLOT_NAME_NAV_NEXT_YEAR = 'nav-next-year';
+  var SLOT_NAME_NAV_PEV_DECADE = 'nav-prev-decade';
+  var SLOT_NAME_NAV_PEV_MONTH = 'nav-prev-month';
+  var SLOT_NAME_NAV_PEV_YEAR = 'nav-prev-year';
+  var SLOT_NAME_NAV_THIS_MONTH = 'nav-this-month';
+  var SLOT_NAME_NEXT_TEXT = 'next-text';
+  var SLOT_NAME_OVERLAY = 'overlay';
+  var SLOT_NAME_PAGE = 'page';
+  var SLOT_NAME_PLACEHOLDER = 'placeholder';
+  var SLOT_NAME_PREPEND = 'prepend';
+  var SLOT_NAME_PREV_TEXT = 'prev-text';
+  var SLOT_NAME_ROW_DETAILS = 'row-details';
+  var SLOT_NAME_TABLE_BUSY = 'table-busy';
+  var SLOT_NAME_TABLE_CAPTION = 'table-caption';
+  var SLOT_NAME_TABLE_COLGROUP = 'table-colgroup';
+  var SLOT_NAME_TABS_END = 'tabs-end';
+  var SLOT_NAME_TABS_START = 'tabs-start';
+  var SLOT_NAME_TEXT = 'text';
+  var SLOT_NAME_THEAD_TOP = 'thead-top';
+  var SLOT_NAME_TITLE = 'title';
+  var SLOT_NAME_TOAST_TITLE = 'toast-title';
+  var SLOT_NAME_TOP_ROW = 'top-row';
+  var SLOT_NAME_VALID_FEEDBACK = 'valid-feedback';
 
-  var getBreakpoints = function getBreakpoints() {
-    return getConfigValue('breakpoints');
-  }; // Private function for caching / locking-in breakpoint names
-
-  var _getBreakpointsCached = memoize(function () {
-    return getBreakpoints();
-  }); // Convenience method for getting all breakpoint names.
-  // Caches the results after first access.
-
-
-  var getBreakpointsCached = function getBreakpointsCached() {
-    return cloneDeep(_getBreakpointsCached());
-  }; // Convenience method for getting breakpoints with
-  // the smallest breakpoint set as ''.
-  // Useful for components that create breakpoint specific props.
-  // Caches the results after first access.
-
-  var getBreakpointsUpCached = memoize(function () {
-    var breakpoints = getBreakpointsCached();
-    breakpoints[0] = '';
-    return breakpoints;
-  }); // Convenience method for getting breakpoints with
-
-  // --- Static ---
   var from = function from() {
     return Array.from.apply(Array, arguments);
   }; // --- Instance ---
@@ -1549,17 +1336,22 @@
     return Array.prototype.concat.apply([], args);
   }; // --- Utilities ---
 
-  var createAndFillArray = function createAndFillArray(size, value) {
-    return Array(size).fill(value);
+  var createArray = function createArray(length, fillFn) {
+    var mapFn = isFunction(fillFn) ? fillFn : function () {
+      return fillFn;
+    };
+    return Array.apply(null, {
+      length: length
+    }).map(mapFn);
   };
   var flatten = function flatten(array) {
     return array.reduce(function (result, item) {
-      return result.concat(item);
+      return concat(result, item);
     }, []);
   };
   var flattenDeep = function flattenDeep(array) {
     return array.reduce(function (result, item) {
-      return result.concat(Array.isArray(item) ? flattenDeep(item) : item);
+      return concat(result, Array.isArray(item) ? flattenDeep(item) : item);
     }, []);
   };
 
@@ -1641,23 +1433,19 @@
     return toString$1(str).toLowerCase();
   }; // Upper case a string
 
+  var ELEMENT_PROTO = Element.prototype;
   var TABABLE_SELECTOR = ['button', '[href]:not(.disabled)', 'input', 'select', 'textarea', '[tabindex]', '[contenteditable]'].map(function (s) {
     return "".concat(s, ":not(:disabled):not([disabled])");
-  }).join(', ');
-  var w$1 = hasWindowSupport ? window : {};
-  var d = hasDocumentSupport ? document : {};
-  var elProto = typeof Element !== 'undefined' ? Element.prototype : {}; // --- Normalization utils ---
+  }).join(', '); // --- Normalization utils ---
   // See: https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
 
   /* istanbul ignore next */
 
-  var matchesEl = elProto.matches || elProto.msMatchesSelector || elProto.webkitMatchesSelector; // See: https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+  var matchesEl = ELEMENT_PROTO.matches || ELEMENT_PROTO.msMatchesSelector || ELEMENT_PROTO.webkitMatchesSelector; // See: https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
 
   /* istanbul ignore next */
 
-  var closestEl = elProto.closest || function (sel)
-  /* istanbul ignore next */
-  {
+  var closestEl = ELEMENT_PROTO.closest || function (sel) {
     var el = this;
 
     do {
@@ -1674,14 +1462,14 @@
 
   /* istanbul ignore next: JSDOM always returns the first option */
 
-  var requestAF = w$1.requestAnimationFrame || w$1.webkitRequestAnimationFrame || w$1.mozRequestAnimationFrame || w$1.msRequestAnimationFrame || w$1.oRequestAnimationFrame || // Fallback, but not a true polyfill
+  var requestAF = WINDOW.requestAnimationFrame || WINDOW.webkitRequestAnimationFrame || WINDOW.mozRequestAnimationFrame || WINDOW.msRequestAnimationFrame || WINDOW.oRequestAnimationFrame || // Fallback, but not a true polyfill
   // Only needed for Opera Mini
 
   /* istanbul ignore next */
   function (cb) {
     return setTimeout(cb, 16);
   };
-  var MutationObs = w$1.MutationObserver || w$1.WebKitMutationObserver || w$1.MozMutationObserver || null; // --- Utils ---
+  var MutationObs = WINDOW.MutationObserver || WINDOW.WebKitMutationObserver || WINDOW.MozMutationObserver || null; // --- Utils ---
   // Remove a node from DOM
 
   var removeNode = function removeNode(el) {
@@ -1694,7 +1482,7 @@
 
   var getActiveElement = function getActiveElement() {
     var excludes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var activeElement = d.activeElement;
+    var activeElement = DOCUMENT.activeElement;
     return activeElement && !excludes.some(function (el) {
       return el === activeElement;
     }) ? activeElement : null;
@@ -1709,7 +1497,7 @@
   }; // Determine if an HTML element is visible - Faster than CSS check
 
   var isVisible = function isVisible(el) {
-    if (!isElement(el) || !el.parentNode || !contains(d.body, el)) {
+    if (!isElement(el) || !el.parentNode || !contains(DOCUMENT.body, el)) {
       // Note this can fail for shadow dom elements since they
       // are not a direct descendant of document.body
       return false;
@@ -1741,11 +1529,11 @@
   }; // Select all elements matching selector. Returns `[]` if none found
 
   var selectAll = function selectAll(selector, root) {
-    return from((isElement(root) ? root : d).querySelectorAll(selector));
+    return from((isElement(root) ? root : DOCUMENT).querySelectorAll(selector));
   }; // Select a single element, returns `null` if not found
 
   var select = function select(selector, root) {
-    return (isElement(root) ? root : d).querySelector(selector) || null;
+    return (isElement(root) ? root : DOCUMENT).querySelector(selector) || null;
   }; // Determine if an element matches a selector
 
   var matches = function matches(el, selector) {
@@ -1771,7 +1559,7 @@
   }; // Get an element given an ID
 
   var getById = function getById(id) {
-    return d.getElementById(/^#/.test(id) ? id.slice(1) : id) || null;
+    return DOCUMENT.getElementById(/^#/.test(id) ? id.slice(1) : id) || null;
   }; // Add a class to an element
 
   var addClass = function addClass(el, className) {
@@ -1852,14 +1640,16 @@
   /* istanbul ignore next: getComputedStyle() doesn't work in JSDOM */
 
   var getCS = function getCS(el) {
-    return hasWindowSupport && isElement(el) ? w$1.getComputedStyle(el) : {};
+    var getComputedStyle = WINDOW.getComputedStyle;
+    return getComputedStyle && isElement(el) ? getComputedStyle(el) : {};
   }; // Returns a `Selection` object representing the range of text selected
   // Returns `null` if no window support is given
 
   /* istanbul ignore next: getSelection() doesn't work in JSDOM */
 
   var getSel = function getSel() {
-    return hasWindowSupport && w$1.getSelection ? w$1.getSelection() : null;
+    var getSelection = WINDOW.getSelection;
+    return getSelection ? WINDOW.getSelection() : null;
   }; // Return an element's offset with respect to document element
   // https://j11y.io/jquery/#v=git&fn=jQuery.fn.offset
 
@@ -1956,93 +1746,178 @@
     return !isActiveElement(el);
   };
 
-  var NO_FADE_PROPS = {
-    name: '',
-    enterClass: '',
-    enterActiveClass: '',
-    enterToClass: 'show',
-    leaveClass: 'show',
-    leaveActiveClass: '',
-    leaveToClass: ''
+  var memoize = function memoize(fn) {
+    var cache = create(null);
+    return function () {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      var argsKey = JSON.stringify(args);
+      return cache[argsKey] = cache[argsKey] || fn.apply(null, args);
+    };
   };
 
-  var FADE_PROPS = _objectSpread2(_objectSpread2({}, NO_FADE_PROPS), {}, {
-    enterActiveClass: 'fade',
-    leaveActiveClass: 'fade'
-  }); // @vue/component
+  var VueProto = Vue__default['default'].prototype; // --- Getter methods ---
+
+  var getConfigValue = function getConfigValue(key) {
+    var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+    var bvConfig = VueProto[PROP_NAME];
+    return bvConfig ? bvConfig.getConfigValue(key, defaultValue) : cloneDeep(defaultValue);
+  }; // Method to grab a config value for a particular component
+
+  var getComponentConfig = function getComponentConfig(key) {
+    var propKey = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    var defaultValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+    // Return the particular config value for key if specified,
+    // otherwise we return the full config (or an empty object if not found)
+    return propKey ? getConfigValue("".concat(key, ".").concat(propKey), defaultValue) : getConfigValue(key, {});
+  }; // Get all breakpoint names
+
+  var getBreakpoints = function getBreakpoints() {
+    return getConfigValue('breakpoints', DEFAULT_BREAKPOINT);
+  }; // Private method for caching breakpoint names
+
+  var _getBreakpointsCached = memoize(function () {
+    return getBreakpoints();
+  }); // Get all breakpoint names (cached)
 
 
-  var BVTransition = /*#__PURE__*/Vue__default['default'].extend({
-    name: NAME_TRANSITION,
-    functional: true,
-    props: {
-      noFade: {
-        // Only applicable to the built in transition
-        // Has no effect if `trans-props` provided
-        type: Boolean,
-        default: false
-      },
-      appear: {
-        // Has no effect if `trans-props` provided
-        type: Boolean,
-        default: false
-      },
-      mode: {
-        // Can be overridden by user supplied trans-props
-        type: String // default: undefined
+  var getBreakpointsCached = function getBreakpointsCached() {
+    return cloneDeep(_getBreakpointsCached());
+  }; // Get breakpoints with the smallest breakpoint set as ''
+  // Useful for components that create breakpoint specific props
 
-      },
-      // For user supplied transitions (if needed)
-      transProps: {
-        type: Object,
-        default: null
-      }
-    },
-    render: function render(h, _ref) {
-      var children = _ref.children,
-          data = _ref.data,
-          props = _ref.props;
-      var transProps = props.transProps;
+  var getBreakpointsUpCached = memoize(function () {
+    var breakpoints = getBreakpointsCached();
+    breakpoints[0] = '';
+    return breakpoints;
+  }); // Get breakpoints with the largest breakpoint set as ''
 
-      if (!isPlainObject(transProps)) {
-        transProps = props.noFade ? NO_FADE_PROPS : FADE_PROPS;
+  var prefixPropName = function prefixPropName(prefix, value) {
+    return prefix + upperFirst(value);
+  }; // Remove a prefix from a property
 
-        if (props.appear) {
-          // Default the appear classes to equal the enter classes
-          transProps = _objectSpread2(_objectSpread2({}, transProps), {}, {
-            appear: true,
-            appearClass: transProps.enterClass,
-            appearActiveClass: transProps.enterActiveClass,
-            appearToClass: transProps.enterToClass
-          });
-        }
-      }
+  var unprefixPropName = function unprefixPropName(prefix, value) {
+    return lowerFirst(value.replace(prefix, ''));
+  }; // Suffix can be a falsey value so nothing is appended to string
+  // (helps when looping over props & some shouldn't change)
+  // Use data last parameters to allow for currying
 
-      transProps = _objectSpread2(_objectSpread2({
-        mode: props.mode
-      }, transProps), {}, {
-        // We always need `css` true
-        css: true
-      });
-      return h('transition', // Any transition event listeners will get merged here
-      a(data, {
-        props: transProps
-      }), children);
+  var suffixPropName = function suffixPropName(suffix, value) {
+    return value + (suffix ? upperFirst(suffix) : '');
+  }; // Generates a prop object
+
+  var makeProp = function makeProp() {
+    var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : PROP_TYPE_ANY;
+    var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+    var requiredOrValidator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
+    var validator = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : undefined;
+    var required = requiredOrValidator === true;
+    validator = required ? validator : requiredOrValidator;
+    return _objectSpread2(_objectSpread2(_objectSpread2({}, type ? {
+      type: type
+    } : {}), required ? {
+      required: required
+    } : isUndefined(value) ? {} : {
+      default: isObject(value) ? function () {
+        return value;
+      } : value
+    }), isUndefined(validator) ? {} : {
+      validator: validator
+    });
+  }; // Copies props from one array/object to a new array/object
+  // Prop values are also cloned as new references to prevent possible
+  // mutation of original prop object values
+  // Optionally accepts a function to transform the prop name
+
+  var copyProps = function copyProps(props) {
+    var transformFn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : identity;
+
+    if (isArray(props)) {
+      return props.map(transformFn);
     }
-  });
 
-  var SLOT_NAME_APPEND = 'append';
-  var SLOT_NAME_BUTTON_CONTENT = 'button-content';
-  var SLOT_NAME_DEFAULT = 'default';
-  var SLOT_NAME_DESCRIPTION = 'description';
-  var SLOT_NAME_FIRST = 'first';
-  var SLOT_NAME_FOOTER = 'footer';
-  var SLOT_NAME_HEADER = 'header';
-  var SLOT_NAME_LABEL = 'label';
-  var SLOT_NAME_LEAD = 'lead';
-  var SLOT_NAME_PREPEND = 'prepend';
-  var SLOT_NAME_TEXT = 'text';
-  var SLOT_NAME_TITLE = 'title';
+    var copied = {};
+
+    for (var prop in props) {
+      /* istanbul ignore else */
+      if (hasOwnProperty(props, prop)) {
+        // If the prop value is an object, do a shallow clone
+        // to prevent potential mutations to the original object
+        copied[transformFn(prop)] = isObject(props[prop]) ? clone(props[prop]) : props[prop];
+      }
+    }
+
+    return copied;
+  }; // Given an array of properties or an object of property keys,
+  // plucks all the values off the target object, returning a new object
+  // that has props that reference the original prop values
+
+  var pluckProps = function pluckProps(keysToPluck, objToPluck) {
+    var transformFn = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : identity;
+    return (isArray(keysToPluck) ? keysToPluck.slice() : keys(keysToPluck)).reduce(function (memo, prop) {
+      memo[transformFn(prop)] = objToPluck[prop];
+      return memo;
+    }, {});
+  }; // Make a prop object configurable by global configuration
+  // Replaces the current `default` key of each prop with a `getComponentConfig()`
+  // call that falls back to the current default value of the prop
+
+  var makePropConfigurable = function makePropConfigurable(prop, key, componentKey) {
+    return _objectSpread2(_objectSpread2({}, cloneDeep(prop)), {}, {
+      default: function bvConfigurablePropDefault() {
+        var value = getComponentConfig(componentKey, key, prop.default);
+        return isFunction(value) ? value() : value;
+      }
+    });
+  }; // Make a props object configurable by global configuration
+  // Replaces the current `default` key of each prop with a `getComponentConfig()`
+  // call that falls back to the current default value of the prop
+
+  var makePropsConfigurable = function makePropsConfigurable(props, componentKey) {
+    return keys(props).reduce(function (result, key) {
+      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, makePropConfigurable(props[key], key, componentKey)));
+    }, {});
+  }; // Get function name we use in `makePropConfigurable()`
+  // for the prop default value override to compare
+  // against in `hasPropFunction()`
+
+  var configurablePropDefaultFnName = makePropConfigurable({}, '', '').default.name; // Detect wether the given value is currently a function
+  // and isn't the props default function
+
+  var hasPropFunction = function hasPropFunction(fn) {
+    return isFunction(fn) && fn.name !== configurablePropDefaultFnName;
+  };
+
+  var makeModelMixin = function makeModelMixin(prop) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$type = _ref.type,
+        type = _ref$type === void 0 ? PROP_TYPE_ANY : _ref$type,
+        _ref$defaultValue = _ref.defaultValue,
+        defaultValue = _ref$defaultValue === void 0 ? undefined : _ref$defaultValue,
+        _ref$validator = _ref.validator,
+        validator = _ref$validator === void 0 ? undefined : _ref$validator,
+        _ref$event = _ref.event,
+        event = _ref$event === void 0 ? EVENT_NAME_INPUT : _ref$event;
+
+    var props = _defineProperty({}, prop, makeProp(type, defaultValue, validator)); // @vue/component
+
+
+    var mixin = Vue__default['default'].extend({
+      model: {
+        prop: prop,
+        event: event
+      },
+      props: props
+    });
+    return {
+      mixin: mixin,
+      props: props,
+      prop: prop,
+      event: event
+    };
+  };
 
   // In functional components, `slots` is a function so it must be called
   // first before passing to the below methods. `scopedSlots` is always an
@@ -2077,7 +1952,6 @@
    * @returns {Array|undefined} VNodes
    */
 
-
   var normalizeSlot = function normalizeSlot(names) {
     var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     var $scopedSlots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -2093,36 +1967,39 @@
 
 
     return isFunction(slot) ? slot(scope) : slot;
-  }; // Named exports
+  };
 
-  var normalizeSlotMixin = {
+  var normalizeSlotMixin = Vue__default['default'].extend({
     methods: {
+      // Returns `true` if the either a `$scopedSlot` or `$slot` exists with the specified name
+      // `name` can be a string name or an array of names
       hasNormalizedSlot: function hasNormalizedSlot$1() {
         var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : SLOT_NAME_DEFAULT;
-        // Returns true if the either a $scopedSlot or $slot exists with the specified name
-        // `name` can be a string name or an array of names
-        return hasNormalizedSlot(name, this.$scopedSlots, this.$slots);
+        var scopedSlots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.$scopedSlots;
+        var slots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.$slots;
+        return hasNormalizedSlot(name, scopedSlots, slots);
       },
+      // Returns an array of rendered VNodes if slot found, otherwise `undefined`
+      // `name` can be a string name or an array of names
       normalizeSlot: function normalizeSlot$1() {
         var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : SLOT_NAME_DEFAULT;
         var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var scopedSlots = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.$scopedSlots;
+        var slots = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : this.$slots;
 
-        // Returns an array of rendered VNodes if slot found.
-        // Returns undefined if not found.
-        // `name` can be a string name or an array of names
-        var vNodes = normalizeSlot(name, scope, this.$scopedSlots, this.$slots);
+        var vNodes = normalizeSlot(name, scope, scopedSlots, slots);
 
         return vNodes ? concat(vNodes) : vNodes;
       }
     }
-  };
+  });
 
   // Normalize event options based on support of passive option
   // Exported only for testing purposes
 
   var parseEventOptions = function parseEventOptions(options) {
     /* istanbul ignore else: can't test in JSDOM, as it supports passive */
-    if (hasPassiveEventSupport) {
+    if (HAS_PASSIVE_EVENT_SUPPORT) {
       return isObject(options) ? options : {
         capture: !!options || false
       };
@@ -2132,15 +2009,15 @@
     }
   }; // Attach an event listener to an element
 
-  var eventOn = function eventOn(el, evtName, handler, options) {
+  var eventOn = function eventOn(el, eventName, handler, options) {
     if (el && el.addEventListener) {
-      el.addEventListener(evtName, handler, parseEventOptions(options));
+      el.addEventListener(eventName, handler, parseEventOptions(options));
     }
   }; // Remove an event listener from an element
 
-  var eventOff = function eventOff(el, evtName, handler, options) {
+  var eventOff = function eventOff(el, eventName, handler, options) {
     if (el && el.removeEventListener) {
-      el.removeEventListener(evtName, handler, parseEventOptions(options));
+      el.removeEventListener(eventName, handler, parseEventOptions(options));
     }
   }; // Utility method to add/remove a event listener based on first argument (boolean)
   // It passes all other arguments to the `eventOn()` or `eventOff` method
@@ -2155,7 +2032,7 @@
     method.apply(void 0, args);
   }; // Utility method to prevent the default event handling and propagation
 
-  var stopEvent = function stopEvent(evt) {
+  var stopEvent = function stopEvent(event) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
         _ref$preventDefault = _ref.preventDefault,
         preventDefault = _ref$preventDefault === void 0 ? true : _ref$preventDefault,
@@ -2165,42 +2042,42 @@
         immediatePropagation = _ref$immediatePropaga === void 0 ? false : _ref$immediatePropaga;
 
     if (preventDefault) {
-      evt.preventDefault();
+      event.preventDefault();
     }
 
     if (propagation) {
-      evt.stopPropagation();
+      event.stopPropagation();
     }
 
     if (immediatePropagation) {
-      evt.stopImmediatePropagation();
+      event.stopImmediatePropagation();
     }
+  }; // Helper method to convert a component/directive name to a base event name
+  // `getBaseEventName('BNavigationItem')` => 'navigation-item'
+  // `getBaseEventName('BVToggle')` => 'toggle'
+
+  var getBaseEventName = function getBaseEventName(value) {
+    return kebabCase(value.replace(RX_BV_PREFIX, ''));
+  }; // Get a root event name by component/directive and event name
+  // `getBaseEventName('BModal', 'show')` => 'bv::modal::show'
+
+
+  var getRootEventName = function getRootEventName(name, eventName) {
+    return [ROOT_EVENT_NAME_PREFIX, getBaseEventName(name), eventName].join(ROOT_EVENT_NAME_SEPARATOR);
+  }; // Get a root action event name by component/directive and action name
+  // `getRootActionEventName('BModal', 'show')` => 'bv::show::modal'
+
+  var getRootActionEventName = function getRootActionEventName(name, actionName) {
+    return [ROOT_EVENT_NAME_PREFIX, actionName, getBaseEventName(name)].join(ROOT_EVENT_NAME_SEPARATOR);
   };
 
-  var props = {
-    content: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_BUTTON_CLOSE, 'content');
-      }
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    ariaLabel: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_BUTTON_CLOSE, 'ariaLabel');
-      }
-    },
-    textVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_BUTTON_CLOSE, 'textVariant');
-      }
-    }
-  }; // @vue/component
+  var props = makePropsConfigurable({
+    ariaLabel: makeProp(PROP_TYPE_STRING, 'Close'),
+    content: makeProp(PROP_TYPE_STRING, '&times;'),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    textVariant: makeProp(PROP_TYPE_STRING)
+  }, NAME_BUTTON_CLOSE); // --- Main component ---
+  // @vue/component
 
   var BButtonClose = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BUTTON_CLOSE,
@@ -2222,12 +2099,12 @@
           'aria-label': props.ariaLabel ? String(props.ariaLabel) : null
         },
         on: {
-          click: function click(evt) {
+          click: function click(event) {
             // Ensure click on button HTML content is also disabled
 
             /* istanbul ignore if: bug in JSDOM still emits click on inner element */
-            if (props.disabled && isEvent(evt)) {
-              stopEvent(evt);
+            if (props.disabled && isEvent(event)) {
+              stopEvent(event);
             }
           }
         }
@@ -2242,6 +2119,85 @@
       return h('button', a(data, componentData), normalizeSlot(SLOT_NAME_DEFAULT, {}, $scopedSlots, $slots));
     }
   });
+
+  var NO_FADE_PROPS = {
+    name: '',
+    enterClass: '',
+    enterActiveClass: '',
+    enterToClass: 'show',
+    leaveClass: 'show',
+    leaveActiveClass: '',
+    leaveToClass: ''
+  };
+
+  var FADE_PROPS = _objectSpread2(_objectSpread2({}, NO_FADE_PROPS), {}, {
+    enterActiveClass: 'fade',
+    leaveActiveClass: 'fade'
+  }); // --- Props ---
+
+
+  var props$1 = {
+    // Has no effect if `trans-props` provided
+    appear: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Can be overridden by user supplied `trans-props`
+    mode: makeProp(PROP_TYPE_STRING),
+    // Only applicable to the built in transition
+    // Has no effect if `trans-props` provided
+    noFade: makeProp(PROP_TYPE_BOOLEAN, false),
+    // For user supplied transitions (if needed)
+    transProps: makeProp(PROP_TYPE_OBJECT)
+  }; // --- Main component ---
+  // @vue/component
+
+  var BVTransition = /*#__PURE__*/Vue__default['default'].extend({
+    name: NAME_TRANSITION,
+    functional: true,
+    props: props$1,
+    render: function render(h, _ref) {
+      var children = _ref.children,
+          data = _ref.data,
+          props = _ref.props;
+      var transProps = props.transProps;
+
+      if (!isPlainObject(transProps)) {
+        transProps = props.noFade ? NO_FADE_PROPS : FADE_PROPS;
+
+        if (props.appear) {
+          // Default the appear classes to equal the enter classes
+          transProps = _objectSpread2(_objectSpread2({}, transProps), {}, {
+            appear: true,
+            appearClass: transProps.enterClass,
+            appearActiveClass: transProps.enterActiveClass,
+            appearToClass: transProps.enterToClass
+          });
+        }
+      }
+
+      transProps = _objectSpread2(_objectSpread2({
+        mode: props.mode
+      }, transProps), {}, {
+        // We always need `css` true
+        css: true
+      });
+      return h('transition', // Any transition event listeners will get merged here
+      a(data, {
+        props: transProps
+      }), children);
+    }
+  });
+
+  var _watch;
+
+  var _makeModelMixin = makeModelMixin('show', {
+    type: PROP_TYPE_BOOLEAN_NUMBER_STRING,
+    defaultValue: false
+  }),
+      modelMixin = _makeModelMixin.mixin,
+      modelProps = _makeModelMixin.props,
+      MODEL_PROP_NAME = _makeModelMixin.prop,
+      MODEL_EVENT_NAME = _makeModelMixin.event; // --- Helper methods ---
+  // Convert `show` value to a number
+
 
   var parseCountDown = function parseCountDown(show) {
     if (show === '' || isBoolean(show)) {
@@ -2264,103 +2220,76 @@
     }
 
     return !!show;
-  }; // @vue/component
+  }; // --- Props ---
 
+
+  var props$2 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, modelProps), {}, {
+    dismissLabel: makeProp(PROP_TYPE_STRING, 'Close'),
+    dismissible: makeProp(PROP_TYPE_BOOLEAN, false),
+    fade: makeProp(PROP_TYPE_BOOLEAN, false),
+    variant: makeProp(PROP_TYPE_STRING, 'info')
+  })), NAME_ALERT); // --- Main component ---
+  // @vue/component
 
   var BAlert = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_ALERT,
-    mixins: [normalizeSlotMixin],
-    model: {
-      prop: 'show',
-      event: 'input'
-    },
-    props: {
-      variant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_ALERT, 'variant');
-        }
-      },
-      dismissible: {
-        type: Boolean,
-        default: false
-      },
-      dismissLabel: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_ALERT, 'dismissLabel');
-        }
-      },
-      show: {
-        type: [Boolean, Number, String],
-        default: false
-      },
-      fade: {
-        type: Boolean,
-        default: false
-      }
-    },
+    mixins: [modelMixin, normalizeSlotMixin],
+    props: props$2,
     data: function data() {
       return {
         countDown: 0,
-        countDownTimeout: null,
         // If initially shown, we need to set these for SSR
-        localShow: parseShow(this.show)
+        localShow: parseShow(this[MODEL_PROP_NAME])
       };
     },
-    watch: {
-      show: function show(newVal) {
-        this.countDown = parseCountDown(newVal);
-        this.localShow = parseShow(newVal);
-      },
-      countDown: function countDown(newVal) {
-        var _this = this;
+    watch: (_watch = {}, _defineProperty(_watch, MODEL_PROP_NAME, function (newValue) {
+      this.countDown = parseCountDown(newValue);
+      this.localShow = parseShow(newValue);
+    }), _defineProperty(_watch, "countDown", function countDown(newValue) {
+      var _this = this;
 
-        this.clearCountDownInterval();
+      this.clearCountDownInterval();
+      var show = this[MODEL_PROP_NAME]; // Ignore if `show` transitions to a boolean value
 
-        if (isNumeric(this.show)) {
-          // Ignore if this.show transitions to a boolean value.
-          this.$emit('dismiss-count-down', newVal);
+      if (isNumeric(show)) {
+        this.$emit(EVENT_NAME_DISMISS_COUNT_DOWN, newValue); // Update the v-model if needed
 
-          if (this.show !== newVal) {
-            // Update the v-model if needed
-            this.$emit('input', newVal);
-          }
+        if (show !== newValue) {
+          this.$emit(MODEL_EVENT_NAME, newValue);
+        }
 
-          if (newVal > 0) {
-            this.localShow = true;
-            this.countDownTimeout = setTimeout(function () {
-              _this.countDown--;
-            }, 1000);
-          } else {
-            // Slightly delay the hide to allow any UI updates
-            this.$nextTick(function () {
-              requestAF(function () {
-                _this.localShow = false;
-              });
+        if (newValue > 0) {
+          this.localShow = true;
+          this.$_countDownTimeout = setTimeout(function () {
+            _this.countDown--;
+          }, 1000);
+        } else {
+          // Slightly delay the hide to allow any UI updates
+          this.$nextTick(function () {
+            requestAF(function () {
+              _this.localShow = false;
             });
-          }
-        }
-      },
-      localShow: function localShow(newVal) {
-        if (!newVal && (this.dismissible || isNumeric(this.show))) {
-          // Only emit dismissed events for dismissible or auto dismissing alerts
-          this.$emit('dismissed');
-        }
-
-        if (!isNumeric(this.show) && this.show !== newVal) {
-          // Only emit booleans if we weren't passed a number via `this.show`
-          this.$emit('input', newVal);
+          });
         }
       }
-    },
+    }), _defineProperty(_watch, "localShow", function localShow(newValue) {
+      var show = this[MODEL_PROP_NAME]; // Only emit dismissed events for dismissible or auto-dismissing alerts
+
+      if (!newValue && (this.dismissible || isNumeric(show))) {
+        this.$emit(EVENT_NAME_DISMISSED);
+      } // Only emit booleans if we weren't passed a number via v-model
+
+
+      if (!isNumeric(show) && show !== newValue) {
+        this.$emit(MODEL_EVENT_NAME, newValue);
+      }
+    }), _watch),
     created: function created() {
-      this.countDown = parseCountDown(this.show);
-      this.localShow = parseShow(this.show);
-    },
-    mounted: function mounted() {
-      this.countDown = parseCountDown(this.show);
-      this.localShow = parseShow(this.show);
+      // Create private non-reactive props
+      this.$_filterTimer = null;
+      var show = this[MODEL_PROP_NAME];
+      this.countDown = parseCountDown(show);
+      this.localShow = parseShow(show);
     },
     beforeDestroy: function beforeDestroy() {
       this.clearCountDownInterval();
@@ -2372,50 +2301,49 @@
         this.localShow = false;
       },
       clearCountDownInterval: function clearCountDownInterval() {
-        if (this.countDownTimeout) {
-          clearTimeout(this.countDownTimeout);
-          this.countDownTimeout = null;
-        }
+        clearTimeout(this.$_countDownTimeout);
+        this.$_countDownTimeout = null;
       }
     },
     render: function render(h) {
-      var $alert; // undefined
+      var $alert = h();
 
       if (this.localShow) {
-        var $dismissBtn = h();
+        var dismissible = this.dismissible,
+            variant = this.variant;
+        var $dismissButton = h();
 
-        if (this.dismissible) {
+        if (dismissible) {
           // Add dismiss button
-          $dismissBtn = h(BButtonClose, {
+          $dismissButton = h(BButtonClose, {
             attrs: {
               'aria-label': this.dismissLabel
             },
             on: {
               click: this.dismiss
             }
-          }, [this.normalizeSlot('dismiss')]);
+          }, [this.normalizeSlot(SLOT_NAME_DISMISS)]);
         }
 
         $alert = h('div', {
-          key: this._uid,
           staticClass: 'alert',
           class: _defineProperty({
-            'alert-dismissible': this.dismissible
-          }, "alert-".concat(this.variant), this.variant),
+            'alert-dismissible': dismissible
+          }, "alert-".concat(variant), variant),
           attrs: {
             role: 'alert',
             'aria-live': 'polite',
             'aria-atomic': true
-          }
-        }, [$dismissBtn, this.normalizeSlot()]);
-        $alert = [$alert];
+          },
+          key: this[COMPONENT_UID_KEY]
+        }, [$dismissButton, this.normalizeSlot()]);
       }
 
       return h(BVTransition, {
         props: {
           noFade: !this.fade
         }
-      }, $alert);
+      }, [$alert]);
     }
   });
 
@@ -2434,23 +2362,20 @@
   var mathPow = Math.pow;
   var mathRound = Math.round;
 
-  var CLASS_NAME = 'b-aspect'; // --- Main Component ---
+  var CLASS_NAME = 'b-aspect'; // --- Props ---
+
+  var props$3 = makePropsConfigurable({
+    // Accepts a number (i.e. `16 / 9`, `1`, `4 / 3`)
+    // Or a string (i.e. '16/9', '16:9', '4:3' '1:1')
+    aspect: makeProp(PROP_TYPE_NUMBER_STRING, '1:1'),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_ASPECT); // --- Main component ---
+  // @vue/component
 
   var BAspect = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_ASPECT,
     mixins: [normalizeSlotMixin],
-    props: {
-      aspect: {
-        // Accepts a number (i.e. `16 / 9`, `1`, `4 / 3`)
-        // Or a string (i.e. '16/9', '16:9', '4:3' '1:1')
-        type: [Number, String],
-        default: '1:1'
-      },
-      tag: {
-        type: String,
-        default: 'div'
-      }
-    },
+    props: props$3,
     computed: {
       padding: function padding() {
         var aspect = this.aspect;
@@ -2487,7 +2412,7 @@
         style: {
           marginLeft: '-100%'
         }
-      }, [this.normalizeSlot()]);
+      }, this.normalizeSlot());
       return h(this.tag, {
         staticClass: "".concat(CLASS_NAME, " d-flex")
       }, [$sizer, $content]);
@@ -2499,54 +2424,6 @@
       BAspect: BAspect
     }
   });
-
-  var prefixPropName = function prefixPropName(prefix, value) {
-    return prefix + upperFirst(value);
-  }; // Remove a prefix from a property
-
-  var unprefixPropName = function unprefixPropName(prefix, value) {
-    return lowerFirst(value.replace(prefix, ''));
-  }; // Suffix can be a falsey value so nothing is appended to string
-  // (helps when looping over props & some shouldn't change)
-  // Use data last parameters to allow for currying
-
-  var suffixPropName = function suffixPropName(suffix, str) {
-    return str + (suffix ? upperFirst(suffix) : '');
-  }; // Copies props from one array/object to a new array/object
-  // Prop values are also cloned as new references to prevent possible
-  // mutation of original prop object values
-  // Optionally accepts a function to transform the prop name
-
-  var copyProps = function copyProps(props) {
-    var transformFn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : identity;
-
-    if (isArray(props)) {
-      return props.map(transformFn);
-    }
-
-    var copied = {};
-
-    for (var prop in props) {
-      /* istanbul ignore else */
-      if (hasOwnProperty(props, prop)) {
-        // If the prop value is an object, do a shallow clone
-        // to prevent potential mutations to the original object
-        copied[transformFn(prop)] = isObject(props[prop]) ? clone(props[prop]) : props[prop];
-      }
-    }
-
-    return copied;
-  }; // Given an array of properties or an object of property keys,
-  // plucks all the values off the target object, returning a new object
-  // that has props that reference the original prop values
-
-  var pluckProps = function pluckProps(keysToPluck, objToPluck) {
-    var transformFn = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : identity;
-    return (isArray(keysToPluck) ? keysToPluck.slice() : keys(keysToPluck)).reduce(function (memo, prop) {
-      memo[transformFn(prop)] = objToPluck[prop];
-      return memo;
-    }, {});
-  };
 
   var ANCHOR_TAG = 'a'; // Method to replace reserved chars
 
@@ -2570,19 +2447,19 @@
     }
 
     var query = keys(obj).map(function (key) {
-      var val = obj[key];
+      var value = obj[key];
 
-      if (isUndefined(val)) {
+      if (isUndefined(value)) {
         return '';
-      } else if (isNull(val)) {
+      } else if (isNull(value)) {
         return encode(key);
-      } else if (isArray(val)) {
-        return val.reduce(function (results, val2) {
-          if (isNull(val2)) {
+      } else if (isArray(value)) {
+        return value.reduce(function (results, value2) {
+          if (isNull(value2)) {
             results.push(encode(key));
-          } else if (!isUndefined(val2)) {
+          } else if (!isUndefined(value2)) {
             // Faster than string interpolation
-            results.push(encode(key) + '=' + encode(val2));
+            results.push(encode(key) + '=' + encode(value2));
           }
 
           return results;
@@ -2590,7 +2467,7 @@
       } // Faster than string interpolation
 
 
-      return encode(key) + '=' + encode(val);
+      return encode(key) + '=' + encode(value);
     })
     /* must check for length, as we only want to filter empty strings, not things that look falsey! */
     .filter(function (x) {
@@ -2609,14 +2486,14 @@
     query.split('&').forEach(function (param) {
       var parts = param.replace(RX_PLUS, ' ').split('=');
       var key = decode(parts.shift());
-      var val = parts.length > 0 ? decode(parts.join('=')) : null;
+      var value = parts.length > 0 ? decode(parts.join('=')) : null;
 
       if (isUndefined(parsed[key])) {
-        parsed[key] = val;
+        parsed[key] = value;
       } else if (isArray(parsed[key])) {
-        parsed[key].push(val);
+        parsed[key].push(value);
       } else {
-        parsed[key] = [parsed[key], val];
+        parsed[key] = [parsed[key], value];
       }
     });
     return parsed;
@@ -2627,13 +2504,10 @@
   var isRouterLink = function isRouterLink(tag) {
     return !!(tag && !isTag(tag, 'a'));
   };
-  var computeTag = function computeTag() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        to = _ref.to,
+  var computeTag = function computeTag(_ref, thisOrParent) {
+    var to = _ref.to,
         disabled = _ref.disabled,
         routerComponentName = _ref.routerComponentName;
-
-    var thisOrParent = arguments.length > 1 ? arguments[1] : undefined;
     var hasRouter = !!thisOrParent.$router;
 
     if (!hasRouter || hasRouter && (disabled || !to)) {
@@ -2695,6 +2569,221 @@
 
     return fallback;
   };
+
+  // Base attributes needed on all icons
+
+  var BASE_ATTRS = {
+    viewBox: '0 0 16 16',
+    width: '1em',
+    height: '1em',
+    focusable: 'false',
+    role: 'img',
+    'aria-label': 'icon'
+  }; // Attributes that are nulled out when stacked
+
+  var STACKED_ATTRS = {
+    width: null,
+    height: null,
+    focusable: null,
+    role: null,
+    'aria-label': null
+  }; // --- Props ---
+
+  var props$4 = {
+    animation: makeProp(PROP_TYPE_STRING),
+    content: makeProp(PROP_TYPE_STRING),
+    flipH: makeProp(PROP_TYPE_BOOLEAN, false),
+    flipV: makeProp(PROP_TYPE_BOOLEAN, false),
+    fontScale: makeProp(PROP_TYPE_NUMBER_STRING, 1),
+    rotate: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    scale: makeProp(PROP_TYPE_NUMBER_STRING, 1),
+    shiftH: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    shiftV: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    stacked: makeProp(PROP_TYPE_BOOLEAN, false),
+    title: makeProp(PROP_TYPE_STRING),
+    variant: makeProp(PROP_TYPE_STRING)
+  }; // --- Main component ---
+  // Shared private base component to reduce bundle/runtime size
+  // @vue/component
+
+  var BVIconBase = /*#__PURE__*/Vue__default['default'].extend({
+    name: NAME_ICON_BASE,
+    functional: true,
+    props: props$4,
+    render: function render(h, _ref) {
+      var _class;
+
+      var data = _ref.data,
+          props = _ref.props,
+          children = _ref.children;
+      var animation = props.animation,
+          content = props.content,
+          flipH = props.flipH,
+          flipV = props.flipV,
+          stacked = props.stacked,
+          title = props.title,
+          variant = props.variant;
+      var fontScale = mathMax(toFloat(props.fontScale, 1), 0) || 1;
+      var scale = mathMax(toFloat(props.scale, 1), 0) || 1;
+      var rotate = toFloat(props.rotate, 0);
+      var shiftH = toFloat(props.shiftH, 0);
+      var shiftV = toFloat(props.shiftV, 0); // Compute the transforms
+      // Note that order is important as SVG transforms are applied in order from
+      // left to right and we want flipping/scale to occur before rotation
+      // Note shifting is applied separately
+      // Assumes that the viewbox is `0 0 16 16` (`8 8` is the center)
+
+      var hasScale = flipH || flipV || scale !== 1;
+      var hasTransforms = hasScale || rotate;
+      var hasShift = shiftH || shiftV;
+      var hasContent = !isUndefinedOrNull(content);
+      var transforms = [hasTransforms ? 'translate(8 8)' : null, hasScale ? "scale(".concat((flipH ? -1 : 1) * scale, " ").concat((flipV ? -1 : 1) * scale, ")") : null, rotate ? "rotate(".concat(rotate, ")") : null, hasTransforms ? 'translate(-8 -8)' : null].filter(identity); // We wrap the content in a `<g>` for handling the transforms (except shift)
+
+      var $inner = h('g', {
+        attrs: {
+          transform: transforms.join(' ') || null
+        },
+        domProps: hasContent ? {
+          innerHTML: content || ''
+        } : {}
+      }, children); // If needed, we wrap in an additional `<g>` in order to handle the shifting
+
+      if (hasShift) {
+        $inner = h('g', {
+          attrs: {
+            transform: "translate(".concat(16 * shiftH / 16, " ").concat(-16 * shiftV / 16, ")")
+          }
+        }, [$inner]);
+      } // Wrap in an additional `<g>` for proper animation handling if stacked
+
+
+      if (stacked) {
+        $inner = h('g', [$inner]);
+      }
+
+      var $title = title ? h('title', title) : null;
+      var $content = [$title, $inner].filter(identity);
+      return h('svg', a({
+        staticClass: 'b-icon bi',
+        class: (_class = {}, _defineProperty(_class, "text-".concat(variant), variant), _defineProperty(_class, "b-icon-animation-".concat(animation), animation), _class),
+        attrs: BASE_ATTRS,
+        style: stacked ? {} : {
+          fontSize: fontScale === 1 ? null : "".concat(fontScale * 100, "%")
+        }
+      }, // Merge in user supplied data
+      data, // If icon is stacked, null-out some attrs
+      stacked ? {
+        attrs: STACKED_ATTRS
+      } : {}, // These cannot be overridden by users
+      {
+        attrs: {
+          xmlns: stacked ? null : 'http://www.w3.org/2000/svg',
+          fill: 'currentColor'
+        }
+      }), $content);
+    }
+  });
+
+  /**
+   * Icon component generator function
+   *
+   * @param {string} icon name (minus the leading `BIcon`)
+   * @param {string} raw `innerHTML` for SVG
+   * @return {VueComponent}
+   */
+
+  var makeIcon = function makeIcon(name, content) {
+    // For performance reason we pre-compute some values, so that
+    // they are not computed on each render of the icon component
+    var kebabName = kebabCase(name);
+    var iconName = "BIcon".concat(pascalCase(name));
+    var iconNameClass = "bi-".concat(kebabName);
+    var iconTitle = kebabName.replace(/-/g, ' ');
+    var svgContent = trim(content || '');
+    return /*#__PURE__*/Vue__default['default'].extend({
+      name: iconName,
+      functional: true,
+      props: omit(props$4, ['content']),
+      render: function render(h, _ref) {
+        var data = _ref.data,
+            props = _ref.props;
+        return h(BVIconBase, a( // Defaults
+        {
+          props: {
+            title: iconTitle
+          },
+          attrs: {
+            'aria-label': iconTitle
+          }
+        }, // User data
+        data, // Required data
+        {
+          staticClass: iconNameClass,
+          props: _objectSpread2(_objectSpread2({}, props), {}, {
+            content: svgContent
+          })
+        }));
+      }
+    });
+  };
+
+  // --- BEGIN AUTO-GENERATED FILE ---
+  var BIconBlank=/*#__PURE__*/makeIcon('Blank','');// --- Bootstrap Icons ---
+  var BIconCalendar=/*#__PURE__*/makeIcon('Calendar','<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>');// eslint-disable-next-line
+  var BIconCalendarFill=/*#__PURE__*/makeIcon('CalendarFill','<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5h16V4H0V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5z"/>');// eslint-disable-next-line
+  var BIconChevronBarLeft=/*#__PURE__*/makeIcon('ChevronBarLeft','<path fill-rule="evenodd" d="M11.854 3.646a.5.5 0 0 1 0 .708L8.207 8l3.647 3.646a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708 0zM4.5 1a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 1 0v-13a.5.5 0 0 0-.5-.5z"/>');// eslint-disable-next-line
+  var BIconChevronDoubleLeft=/*#__PURE__*/makeIcon('ChevronDoubleLeft','<path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>');// eslint-disable-next-line
+  var BIconChevronDown=/*#__PURE__*/makeIcon('ChevronDown','<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>');// eslint-disable-next-line
+  var BIconChevronLeft=/*#__PURE__*/makeIcon('ChevronLeft','<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>');// eslint-disable-next-line
+  var BIconChevronUp=/*#__PURE__*/makeIcon('ChevronUp','<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>');// eslint-disable-next-line
+  var BIconCircleFill=/*#__PURE__*/makeIcon('CircleFill','<circle cx="8" cy="8" r="8"/>');// eslint-disable-next-line
+  var BIconClock=/*#__PURE__*/makeIcon('Clock','<path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>');// eslint-disable-next-line
+  var BIconClockFill=/*#__PURE__*/makeIcon('ClockFill','<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>');// eslint-disable-next-line
+  var BIconDash=/*#__PURE__*/makeIcon('Dash','<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>');// eslint-disable-next-line
+  var BIconPersonFill=/*#__PURE__*/makeIcon('PersonFill','<path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>');// eslint-disable-next-line
+  var BIconPlus=/*#__PURE__*/makeIcon('Plus','<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>');// eslint-disable-next-line
+  var BIconStar=/*#__PURE__*/makeIcon('Star','<path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>');// eslint-disable-next-line
+  var BIconStarFill=/*#__PURE__*/makeIcon('StarFill','<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>');// eslint-disable-next-line
+  var BIconStarHalf=/*#__PURE__*/makeIcon('StarHalf','<path d="M5.354 5.119L7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.55.55 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.519.519 0 0 1-.146.05c-.341.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.171-.403.59.59 0 0 1 .084-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027c.08 0 .16.018.232.056l3.686 1.894-.694-3.957a.564.564 0 0 1 .163-.505l2.906-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.002 2.223 8 2.226v9.8z"/>');// eslint-disable-next-line
+  var BIconX=/*#__PURE__*/makeIcon('X','<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>');// eslint-disable-next-line
+  // --- END AUTO-GENERATED FILE ---
+
+  var findIconComponent = function findIconComponent(ctx, iconName) {
+    if (!ctx) {
+      return null;
+    }
+
+    var components = (ctx.$options || {}).components;
+    var iconComponent = components[iconName];
+    return iconComponent || findIconComponent(ctx.$parent, iconName);
+  }; // --- Props ---
+
+
+  var iconProps = omit(props$4, ['content']);
+  var props$5 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, iconProps), {}, {
+    icon: makeProp(PROP_TYPE_STRING)
+  })), NAME_ICON); // --- Main component ---
+  // Helper BIcon component
+  // Requires the requested icon component to be installed
+  // @vue/component
+
+  var BIcon = /*#__PURE__*/Vue__default['default'].extend({
+    name: NAME_ICON,
+    functional: true,
+    props: props$5,
+    render: function render(h, _ref) {
+      var data = _ref.data,
+          props = _ref.props,
+          parent = _ref.parent;
+      var icon = pascalCase(trim(props.icon || '')).replace(RX_ICON_PREFIX, ''); // If parent context exists, we check to see if the icon has been registered
+      // either locally in the parent component, or globally at the `$root` level
+      // If not registered, we render a blank icon
+
+      return h(icon ? findIconComponent(parent, "BIcon".concat(icon)) || BIconBlank : BIconBlank, a(data, {
+        props: pluckProps(iconProps, props)
+      }));
+    }
+  });
 
   var CODE_BACKSPACE = 8;
   var CODE_DELETE = 46;
@@ -2809,113 +2898,130 @@
     };
   };
   var makePropCacheMixin = function makePropCacheMixin(propName, proxyPropName) {
-    return {
+    return Vue__default['default'].extend({
       data: function data() {
         return _defineProperty({}, proxyPropName, cloneDeep(this[propName]));
       },
       watch: _defineProperty({}, propName, makePropWatcher(proxyPropName))
-    };
+    });
   };
 
   var attrsMixin = makePropCacheMixin('$attrs', 'bvAttrs');
 
+  var listenOnRootMixin = Vue__default['default'].extend({
+    methods: {
+      /**
+       * Safely register event listeners on the root Vue node
+       * While Vue automatically removes listeners for individual components,
+       * when a component registers a listener on root and is destroyed,
+       * this orphans a callback because the node is gone,
+       * but the root does not clear the callback
+       *
+       * When registering a `$root` listener, it also registers a listener on
+       * the component's `beforeDestroy()` hook to automatically remove the
+       * event listener from the `$root` instance
+       *
+       * @param {string} event
+       * @param {function} callback
+       */
+      listenOnRoot: function listenOnRoot(event, callback) {
+        var _this = this;
+
+        this.$root.$on(event, callback);
+        this.$on(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
+          _this.$root.$off(event, callback);
+        });
+      },
+
+      /**
+       * Safely register a `$once()` event listener on the root Vue node
+       * While Vue automatically removes listeners for individual components,
+       * when a component registers a listener on root and is destroyed,
+       * this orphans a callback because the node is gone,
+       * but the root does not clear the callback
+       *
+       * When registering a $root listener, it also registers a listener on
+       * the component's `beforeDestroy` hook to automatically remove the
+       * event listener from the $root instance.
+       *
+       * @param {string} event
+       * @param {function} callback
+       */
+      listenOnRootOnce: function listenOnRootOnce(event, callback) {
+        var _this2 = this;
+
+        this.$root.$once(event, callback);
+        this.$on(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
+          _this2.$root.$off(event, callback);
+        });
+      },
+
+      /**
+       * Convenience method for calling `vm.$emit()` on `vm.$root`
+       *
+       * @param {string} event
+       * @param {*} args
+       */
+      emitOnRoot: function emitOnRoot(event) {
+        var _this$$root;
+
+        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        (_this$$root = this.$root).$emit.apply(_this$$root, [event].concat(args));
+      }
+    }
+  });
+
   var listenersMixin = makePropCacheMixin('$listeners', 'bvListeners');
 
-  // <router-link> specific props
+  var ROOT_EVENT_NAME_CLICKED = getRootEventName(NAME_LINK, 'clicked'); // --- Props ---
+  // `<router-link>` specific props
 
   var routerLinkProps = {
-    to: {
-      type: [String, Object],
-      default: null
-    },
-    append: {
-      type: Boolean,
-      default: false
-    },
-    replace: {
-      type: Boolean,
-      default: false
-    },
-    event: {
-      type: [String, Array],
-      default: 'click'
-    },
-    activeClass: {
-      type: String // default: undefined
-
-    },
-    exact: {
-      type: Boolean,
-      default: false
-    },
-    exactActiveClass: {
-      type: String // default: undefined
-
-    },
-    routerTag: {
-      type: String,
-      default: 'a'
-    }
-  }; // <nuxt-link> specific props
+    activeClass: makeProp(PROP_TYPE_STRING),
+    append: makeProp(PROP_TYPE_BOOLEAN, false),
+    event: makeProp(PROP_TYPE_ARRAY_STRING, EVENT_NAME_CLICK),
+    exact: makeProp(PROP_TYPE_BOOLEAN, false),
+    exactActiveClass: makeProp(PROP_TYPE_STRING),
+    replace: makeProp(PROP_TYPE_BOOLEAN, false),
+    routerTag: makeProp(PROP_TYPE_STRING, 'a'),
+    to: makeProp(PROP_TYPE_OBJECT_STRING)
+  }; // `<nuxt-link>` specific props
 
   var nuxtLinkProps = {
-    prefetch: {
-      type: Boolean,
-      // Must be `null` to fall back to the value defined in the
-      // `nuxt.config.js` configuration file for `router.prefetchLinks`
-      // We convert `null` to `undefined`, so that Nuxt.js will use the
-      // compiled default. Vue treats `undefined` as default of `false`
-      // for Boolean props, so we must set it as `null` here to be a
-      // true tri-state prop
-      default: null
-    },
-    noPrefetch: {
-      type: Boolean,
-      default: false
-    }
-  };
-  var props$1 = _objectSpread2(_objectSpread2(_objectSpread2({
-    href: {
-      type: String,
-      default: null
-    },
-    rel: {
-      type: String,
-      // Must be `null` if no value provided
-      default: null
-    },
-    target: {
-      type: String,
-      default: '_self'
-    },
-    active: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  }, routerLinkProps), nuxtLinkProps), {}, {
+    noPrefetch: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Must be `null` to fall back to the value defined in the
+    // `nuxt.config.js` configuration file for `router.prefetchLinks`
+    // We convert `null` to `undefined`, so that Nuxt.js will use the
+    // compiled default
+    // Vue treats `undefined` as default of `false` for Boolean props,
+    // so we must set it as `null` here to be a true tri-state prop
+    prefetch: makeProp(PROP_TYPE_BOOLEAN, null)
+  }; // All `<b-link>` props
+
+  var props$6 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, nuxtLinkProps), routerLinkProps), {}, {
+    active: makeProp(PROP_TYPE_BOOLEAN, false),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    href: makeProp(PROP_TYPE_STRING),
+    // Must be `null` if no value provided
+    rel: makeProp(PROP_TYPE_STRING, null),
     // To support 3rd party router links based on `<router-link>` (i.e. `g-link` for Gridsome)
     // Default is to auto choose between `<router-link>` and `<nuxt-link>`
     // Gridsome doesn't provide a mechanism to auto detect and has caveats
     // such as not supporting FQDN URLs or hash only URLs
-    routerComponentName: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_LINK, 'routerComponentName');
-      }
-    }
-  }); // --- Main component ---
+    routerComponentName: makeProp(PROP_TYPE_STRING),
+    target: makeProp(PROP_TYPE_STRING, '_self')
+  })), NAME_LINK); // --- Main component ---
   // @vue/component
 
   var BLink = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_LINK,
     // Mixin order is important!
-    mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
+    mixins: [attrsMixin, listenersMixin, listenOnRootMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    props: props$1,
+    props: props$6,
     computed: {
       computedTag: function computedTag() {
         // We don't pass `this` as the first arg as we need reactivity of the props
@@ -2985,25 +3091,25 @@
       }
     },
     methods: {
-      onClick: function onClick(evt) {
+      onClick: function onClick(event) {
         var _arguments = arguments;
-        var evtIsEvent = isEvent(evt);
+        var eventIsEvent = isEvent(event);
         var isRouterLink = this.isRouterLink;
         var suppliedHandler = this.bvListeners.click;
 
-        if (evtIsEvent && this.disabled) {
+        if (eventIsEvent && this.disabled) {
           // Stop event from bubbling up
           // Kill the event loop attached to this specific `EventTarget`
           // Needed to prevent `vue-router` for doing its thing
-          stopEvent(evt, {
+          stopEvent(event, {
             immediatePropagation: true
           });
         } else {
           /* istanbul ignore next: difficult to test, but we know it works */
-          if (isRouterLink && evt.currentTarget.__vue__) {
+          if (isRouterLink && event.currentTarget.__vue__) {
             // Router links do not emit instance `click` events, so we
-            // add in an `$emit('click', evt)` on its Vue instance
-            evt.currentTarget.__vue__.$emit('click', evt);
+            // add in an `$emit('click', event)` on its Vue instance
+            event.currentTarget.__vue__.$emit(EVENT_NAME_CLICK, event);
           } // Call the suppliedHandler(s), if any provided
 
 
@@ -3013,13 +3119,15 @@
             handler.apply(void 0, _toConsumableArray(_arguments));
           }); // Emit the global `$root` click event
 
-          this.$root.$emit('clicked::link', evt);
+          this.emitOnRoot(ROOT_EVENT_NAME_CLICKED, event); // TODO: Remove deprecated 'clicked::link' event with next major release
+
+          this.emitOnRoot('clicked::link', event);
         } // Stop scroll-to-top behavior or navigation on
         // regular links when href is just '#'
 
 
-        if (evtIsEvent && !isRouterLink && this.computedHref === '#') {
-          stopEvent(evt, {
+        if (eventIsEvent && !isRouterLink && this.computedHref === '#') {
+          stopEvent(event, {
             propagation: false
           });
         }
@@ -3045,62 +3153,30 @@
     }
   });
 
-  var linkProps = omit(props$1, ['event', 'routerTag']);
+  var linkProps = omit(props$6, ['event', 'routerTag']);
   delete linkProps.href.default;
   delete linkProps.to.default;
-  var btnProps = {
-    block: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_BUTTON, 'size');
-      }
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_BUTTON, 'variant');
-      }
-    },
-    type: {
-      type: String,
-      default: 'button'
-    },
-    tag: {
-      type: String,
-      default: 'button'
-    },
-    pill: {
-      type: Boolean,
-      default: false
-    },
-    squared: {
-      type: Boolean,
-      default: false
-    },
-    pressed: {
-      // Tri-state: `true`, `false` or `null`
-      // => On, off, not a toggle
-      type: Boolean,
-      default: null
-    }
-  };
-  var props$2 = _objectSpread2(_objectSpread2({}, btnProps), linkProps); // --- Helper methods ---
+  var props$7 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps), {}, {
+    block: makeProp(PROP_TYPE_BOOLEAN, false),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    pill: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Tri-state: `true`, `false` or `null`
+    // => On, off, not a toggle
+    pressed: makeProp(PROP_TYPE_BOOLEAN, null),
+    size: makeProp(PROP_TYPE_STRING),
+    squared: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'button'),
+    type: makeProp(PROP_TYPE_STRING, 'button'),
+    variant: makeProp(PROP_TYPE_STRING, 'secondary')
+  })), NAME_BUTTON); // --- Helper methods ---
   // Focus handler for toggle buttons
   // Needs class of 'focus' when focused
 
-  var handleFocus = function handleFocus(evt) {
-    if (evt.type === 'focusin') {
-      addClass(evt.target, 'focus');
-    } else if (evt.type === 'focusout') {
-      removeClass(evt.target, 'focus');
+  var handleFocus = function handleFocus(event) {
+    if (event.type === 'focusin') {
+      addClass(event.target, 'focus');
+    } else if (event.type === 'focusout') {
+      removeClass(event.target, 'focus');
     }
   }; // Is the requested button a link?
   // If tag prop is set to `a`, we use a <b-link> to get proper disabled handling
@@ -3129,7 +3205,7 @@
   var computeClass = function computeClass(props) {
     var _ref;
 
-    return ["btn-".concat(props.variant || getComponentConfig(NAME_BUTTON, 'variant')), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
+    return ["btn-".concat(props.variant || 'secondary'), (_ref = {}, _defineProperty(_ref, "btn-".concat(props.size), props.size), _defineProperty(_ref, 'btn-block', props.block), _defineProperty(_ref, 'rounded-pill', props.pill), _defineProperty(_ref, 'rounded-0', props.squared && !props.pill), _defineProperty(_ref, "disabled", props.disabled), _defineProperty(_ref, "active", props.pressed), _ref)];
   }; // Compute the link props to pass to b-link (if required)
 
 
@@ -3180,7 +3256,7 @@
   var BButton = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BUTTON,
     functional: true,
-    props: props$2,
+    props: props$7,
     render: function render(h, _ref2) {
       var props = _ref2.props,
           data = _ref2.data,
@@ -3191,7 +3267,7 @@
       var nonStandardTag = isNonStandardTag(props);
       var hashLink = link && props.href === '#';
       var on = {
-        keydown: function keydown(evt) {
+        keydown: function keydown(event) {
           // When the link is a `href="#"` or a non-standard tag (has `role="button"`),
           // we add a keydown handlers for CODE_SPACE/CODE_ENTER
 
@@ -3200,20 +3276,20 @@
             return;
           }
 
-          var keyCode = evt.keyCode; // Add CODE_SPACE handler for `href="#"` and CODE_ENTER handler for non-standard tags
+          var keyCode = event.keyCode; // Add CODE_SPACE handler for `href="#"` and CODE_ENTER handler for non-standard tags
 
           if (keyCode === CODE_SPACE || keyCode === CODE_ENTER && nonStandardTag) {
-            var target = evt.currentTarget || evt.target;
-            stopEvent(evt, {
+            var target = event.currentTarget || event.target;
+            stopEvent(event, {
               propagation: false
             });
             target.click();
           }
         },
-        click: function click(evt) {
+        click: function click(event) {
           /* istanbul ignore if: blink/button disabled should handle this */
-          if (props.disabled && isEvent(evt)) {
-            stopEvent(evt);
+          if (props.disabled && isEvent(event)) {
+            stopEvent(event);
           } else if (toggle && listeners && listeners['update:pressed']) {
             // Send `.sync` updates to any "pressed" prop (if `.sync` listeners)
             // `concat()` will normalize the value to an array without
@@ -3243,349 +3319,37 @@
     }
   });
 
-  var commonIconProps = {
-    title: {
-      type: String // default: null
-
-    },
-    variant: {
-      type: String,
-      default: null
-    },
-    fontScale: {
-      type: [Number, String],
-      default: 1
-    },
-    scale: {
-      type: [Number, String],
-      default: 1
-    },
-    rotate: {
-      type: [Number, String],
-      default: 0
-    },
-    flipH: {
-      type: Boolean,
-      default: false
-    },
-    flipV: {
-      type: Boolean,
-      default: false
-    },
-    shiftH: {
-      type: [Number, String],
-      default: 0
-    },
-    shiftV: {
-      type: [Number, String],
-      default: 0
-    },
-    animation: {
-      type: String,
-      default: null
-    }
-  }; // Base attributes needed on all icons
-
-  var baseAttrs = {
-    viewBox: '0 0 16 16',
-    width: '1em',
-    height: '1em',
-    focusable: 'false',
-    role: 'img',
-    'aria-label': 'icon'
-  }; // Attributes that are nulled out when stacked
-
-  var stackedAttrs = {
-    width: null,
-    height: null,
-    focusable: null,
-    role: null,
-    'aria-label': null
-  }; // Shared private base component to reduce bundle/runtime size
-  // @vue/component
-
-  var BVIconBase = /*#__PURE__*/Vue__default['default'].extend({
-    name: NAME_ICON_BASE,
-    functional: true,
-    props: _objectSpread2({
-      content: {
-        type: String
-      },
-      stacked: {
-        type: Boolean,
-        default: false
-      }
-    }, commonIconProps),
-    render: function render(h, _ref) {
-      var _class;
-
-      var data = _ref.data,
-          props = _ref.props,
-          children = _ref.children;
-      var fontScale = mathMax(toFloat(props.fontScale, 1), 0) || 1;
-      var scale = mathMax(toFloat(props.scale, 1), 0) || 1;
-      var rotate = toFloat(props.rotate, 0);
-      var shiftH = toFloat(props.shiftH, 0);
-      var shiftV = toFloat(props.shiftV, 0);
-      var flipH = props.flipH;
-      var flipV = props.flipV;
-      var animation = props.animation; // Compute the transforms
-      // Note that order is important as SVG transforms are applied in order from
-      // left to right and we want flipping/scale to occur before rotation
-      // Note shifting is applied separately
-      // Assumes that the viewbox is `0 0 16 16` (`8 8` is the center)
-
-      var hasScale = flipH || flipV || scale !== 1;
-      var hasTransforms = hasScale || rotate;
-      var hasShift = shiftH || shiftV;
-      var transforms = [hasTransforms ? 'translate(8 8)' : null, hasScale ? "scale(".concat((flipH ? -1 : 1) * scale, " ").concat((flipV ? -1 : 1) * scale, ")") : null, rotate ? "rotate(".concat(rotate, ")") : null, hasTransforms ? 'translate(-8 -8)' : null].filter(identity); // Handling stacked icons
-
-      var isStacked = props.stacked;
-      var hasContent = !isUndefinedOrNull(props.content); // We wrap the content in a `<g>` for handling the transforms (except shift)
-
-      var $inner = h('g', {
-        attrs: {
-          transform: transforms.join(' ') || null
-        },
-        domProps: hasContent ? {
-          innerHTML: props.content || ''
-        } : {}
-      }, children); // If needed, we wrap in an additional `<g>` in order to handle the shifting
-
-      if (hasShift) {
-        $inner = h('g', {
-          attrs: {
-            transform: "translate(".concat(16 * shiftH / 16, " ").concat(-16 * shiftV / 16, ")")
-          }
-        }, [$inner]);
-      }
-
-      if (isStacked) {
-        // Wrap in an additional `<g>` for proper
-        // animation handling if stacked
-        $inner = h('g', {}, [$inner]);
-      }
-
-      var $title = props.title ? h('title', props.title) : null;
-      return h('svg', a({
-        staticClass: 'b-icon bi',
-        class: (_class = {}, _defineProperty(_class, "text-".concat(props.variant), !!props.variant), _defineProperty(_class, "b-icon-animation-".concat(animation), !!animation), _class),
-        attrs: baseAttrs,
-        style: isStacked ? {} : {
-          fontSize: fontScale === 1 ? null : "".concat(fontScale * 100, "%")
-        }
-      }, // Merge in user supplied data
-      data, // If icon is stacked, null out some attrs
-      isStacked ? {
-        attrs: stackedAttrs
-      } : {}, // These cannot be overridden by users
-      {
-        attrs: {
-          xmlns: isStacked ? null : 'http://www.w3.org/2000/svg',
-          fill: 'currentColor'
-        }
-      }), [$title, $inner]);
-    }
-  });
-
-  /**
-   * Icon component generator function
-   *
-   * @param {string} icon name (minus the leading `BIcon`)
-   * @param {string} raw `innerHTML` for SVG
-   * @return {VueComponent}
-   */
-
-  var makeIcon = function makeIcon(name, content) {
-    // For performance reason we pre-compute some values, so that
-    // they are not computed on each render of the icon component
-    var kebabName = kebabCase(name);
-    var iconName = "BIcon".concat(pascalCase(name));
-    var iconNameClass = "bi-".concat(kebabName);
-    var iconTitle = kebabName.replace(/-/g, ' ');
-    var svgContent = trim(content || ''); // Return the icon component definition
-
-    return /*#__PURE__*/Vue__default['default'].extend({
-      name: iconName,
-      functional: true,
-      props: _objectSpread2(_objectSpread2({}, commonIconProps), {}, {
-        stacked: {
-          type: Boolean,
-          default: false
-        }
-      }),
-      render: function render(h, _ref) {
-        var data = _ref.data,
-            props = _ref.props;
-        return h(BVIconBase, a( // Defaults
-        {
-          props: {
-            title: iconTitle
-          },
-          attrs: {
-            'aria-label': iconTitle
-          }
-        }, // User data
-        data, // Required data
-        {
-          staticClass: iconNameClass,
-          props: _objectSpread2(_objectSpread2({}, props), {}, {
-            content: svgContent
-          })
-        }));
-      }
-    });
-  };
-
-  // --- BEGIN AUTO-GENERATED FILE ---
-  var BIconBlank=/*#__PURE__*/makeIcon('Blank','');// --- Bootstrap Icons ---
-  var BIconCalendar=/*#__PURE__*/makeIcon('Calendar','<path fill-rule="evenodd" d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>');// eslint-disable-next-line
-  var BIconCalendarFill=/*#__PURE__*/makeIcon('CalendarFill','<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5h16V4H0V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5z"/>');// eslint-disable-next-line
-  var BIconChevronBarLeft=/*#__PURE__*/makeIcon('ChevronBarLeft','<path fill-rule="evenodd" d="M11.854 3.646a.5.5 0 0 1 0 .708L8.207 8l3.647 3.646a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708 0zM4.5 1a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 1 0v-13a.5.5 0 0 0-.5-.5z"/>');// eslint-disable-next-line
-  var BIconChevronDoubleLeft=/*#__PURE__*/makeIcon('ChevronDoubleLeft','<path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/><path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>');// eslint-disable-next-line
-  var BIconChevronDown=/*#__PURE__*/makeIcon('ChevronDown','<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>');// eslint-disable-next-line
-  var BIconChevronLeft=/*#__PURE__*/makeIcon('ChevronLeft','<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>');// eslint-disable-next-line
-  var BIconChevronUp=/*#__PURE__*/makeIcon('ChevronUp','<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>');// eslint-disable-next-line
-  var BIconCircleFill=/*#__PURE__*/makeIcon('CircleFill','<circle cx="8" cy="8" r="8"/>');// eslint-disable-next-line
-  var BIconClock=/*#__PURE__*/makeIcon('Clock','<path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm8-7A8 8 0 1 1 0 8a8 8 0 0 1 16 0z"/><path fill-rule="evenodd" d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>');// eslint-disable-next-line
-  var BIconClockFill=/*#__PURE__*/makeIcon('ClockFill','<path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>');// eslint-disable-next-line
-  var BIconDash=/*#__PURE__*/makeIcon('Dash','<path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>');// eslint-disable-next-line
-  var BIconPersonFill=/*#__PURE__*/makeIcon('PersonFill','<path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>');// eslint-disable-next-line
-  var BIconPlus=/*#__PURE__*/makeIcon('Plus','<path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>');// eslint-disable-next-line
-  var BIconStar=/*#__PURE__*/makeIcon('Star','<path fill-rule="evenodd" d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>');// eslint-disable-next-line
-  var BIconStarFill=/*#__PURE__*/makeIcon('StarFill','<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>');// eslint-disable-next-line
-  var BIconStarHalf=/*#__PURE__*/makeIcon('StarHalf','<path fill-rule="evenodd" d="M5.354 5.119L7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.55.55 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.519.519 0 0 1-.146.05c-.341.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.171-.403.59.59 0 0 1 .084-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027c.08 0 .16.018.232.056l3.686 1.894-.694-3.957a.564.564 0 0 1 .163-.505l2.906-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.002 2.223 8 2.226v9.8z"/>');// eslint-disable-next-line
-  var BIconX=/*#__PURE__*/makeIcon('X','<path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>');// eslint-disable-next-line
-  // --- END AUTO-GENERATED FILE ---
-
-  var findIconComponent = function findIconComponent(ctx, iconName) {
-    if (!ctx) {
-      return null;
-    }
-
-    var components = (ctx.$options || {}).components;
-    var iconComponent = components[iconName];
-    return iconComponent || findIconComponent(ctx.$parent, iconName);
-  }; // Helper BIcon component
-  // Requires the requested icon component to be installed
-
-
-  var BIcon = /*#__PURE__*/Vue__default['default'].extend({
-    name: NAME_ICON,
-    functional: true,
-    props: _objectSpread2(_objectSpread2({
-      icon: {
-        type: String,
-        default: null
-      }
-    }, commonIconProps), {}, {
-      stacked: {
-        type: Boolean,
-        default: false
-      }
-    }),
-    render: function render(h, _ref) {
-      var data = _ref.data,
-          props = _ref.props,
-          parent = _ref.parent;
-      var icon = pascalCase(trim(props.icon || '')).replace(RX_ICON_PREFIX, ''); // If parent context exists, we check to see if the icon has been registered
-      // either locally in the parent component, or globally at the `$root` level
-      // If not registered, we render a blank icon
-
-      return h(icon ? findIconComponent(parent, "BIcon".concat(icon)) || BIconBlank : BIconBlank, a(data, {
-        props: _objectSpread2(_objectSpread2({}, props), {}, {
-          icon: null
-        })
-      }));
-    }
-  });
-
   var CLASS_NAME$1 = 'b-avatar';
   var SIZES = ['sm', null, 'lg'];
   var FONT_SIZE_SCALE = 0.4;
-  var BADGE_FONT_SIZE_SCALE = FONT_SIZE_SCALE * 0.7; // --- Props ---
-
-  var linkProps$1 = omit(props$1, ['active', 'event', 'routerTag']);
-
-  var props$3 = _objectSpread2(_objectSpread2({
-    src: {
-      type: String // default: null
-
-    },
-    text: {
-      type: String // default: null
-
-    },
-    icon: {
-      type: String // default: null
-
-    },
-    alt: {
-      type: String,
-      default: 'avatar'
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_AVATAR, 'variant');
-      }
-    },
-    size: {
-      type: [Number, String],
-      default: null
-    },
-    square: {
-      type: Boolean,
-      default: false
-    },
-    rounded: {
-      type: [Boolean, String],
-      default: false
-    },
-    button: {
-      type: Boolean,
-      default: false
-    },
-    buttonType: {
-      type: String,
-      default: 'button'
-    },
-    badge: {
-      type: [Boolean, String],
-      default: false
-    },
-    badgeVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_AVATAR, 'badgeVariant');
-      }
-    },
-    badgeTop: {
-      type: Boolean,
-      default: false
-    },
-    badgeLeft: {
-      type: Boolean,
-      default: false
-    },
-    badgeOffset: {
-      type: String,
-      default: '0px'
-    }
-  }, linkProps$1), {}, {
-    ariaLabel: {
-      type: String // default: null
-
-    }
-  }); // --- Utility methods ---
-
+  var BADGE_FONT_SIZE_SCALE = FONT_SIZE_SCALE * 0.7; // --- Helper methods ---
 
   var computeSize = function computeSize(value) {
     // Parse to number when value is a float-like string
-    value = isString(value) && RX_NUMBER.test(value) ? toFloat(value, 0) : value; // Convert all numbers to pixel values
+    value = isString(value) && isNumeric(value) ? toFloat(value, 0) : value; // Convert all numbers to pixel values
 
     return isNumber(value) ? "".concat(value, "px") : value || null;
-  }; // --- Main component ---
+  }; // --- Props ---
+
+  var linkProps$1 = omit(props$6, ['active', 'event', 'routerTag']);
+  var props$8 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$1), {}, {
+    alt: makeProp(PROP_TYPE_STRING, 'avatar'),
+    ariaLabel: makeProp(PROP_TYPE_STRING),
+    badge: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    badgeLeft: makeProp(PROP_TYPE_BOOLEAN, false),
+    badgeOffset: makeProp(PROP_TYPE_STRING),
+    badgeTop: makeProp(PROP_TYPE_BOOLEAN, false),
+    badgeVariant: makeProp(PROP_TYPE_STRING, 'primary'),
+    button: makeProp(PROP_TYPE_BOOLEAN, false),
+    buttonType: makeProp(PROP_TYPE_STRING, 'button'),
+    icon: makeProp(PROP_TYPE_STRING),
+    rounded: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    size: makeProp(PROP_TYPE_NUMBER_STRING),
+    square: makeProp(PROP_TYPE_BOOLEAN, false),
+    src: makeProp(PROP_TYPE_STRING),
+    text: makeProp(PROP_TYPE_STRING),
+    variant: makeProp(PROP_TYPE_STRING, 'secondary')
+  })), NAME_AVATAR); // --- Main component ---
   // @vue/component
 
   var BAvatar = /*#__PURE__*/Vue__default['default'].extend({
@@ -3596,7 +3360,7 @@
         default: null
       }
     },
-    props: props$3,
+    props: props$8,
     data: function data() {
       return {
         localSrc: this.src || null
@@ -3651,19 +3415,19 @@
       }
     },
     watch: {
-      src: function src(newSrc, oldSrc) {
-        if (newSrc !== oldSrc) {
-          this.localSrc = newSrc || null;
+      src: function src(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.localSrc = newValue || null;
         }
       }
     },
     methods: {
-      onImgError: function onImgError(evt) {
+      onImgError: function onImgError(event) {
         this.localSrc = null;
-        this.$emit('img-error', evt);
+        this.$emit(EVENT_NAME_IMG_ERROR, event);
       },
-      onClick: function onClick(evt) {
-        this.$emit('click', evt);
+      onClick: function onClick(event) {
+        this.$emit(EVENT_NAME_CLICK, event);
       }
     },
     render: function render(h) {
@@ -3737,15 +3501,15 @@
       }
 
       var $badge = h();
-      var hasBadgeSlot = this.hasNormalizedSlot('badge');
+      var hasBadgeSlot = this.hasNormalizedSlot(SLOT_NAME_BADGE);
 
       if (badge || badge === '' || hasBadgeSlot) {
         var badgeText = badge === true ? '' : badge;
         $badge = h('span', {
           staticClass: 'b-avatar-badge',
-          class: _defineProperty({}, "badge-".concat(badgeVariant), !!badgeVariant),
+          class: _defineProperty({}, "badge-".concat(badgeVariant), badgeVariant),
           style: badgeStyle
-        }, [hasBadgeSlot ? this.normalizeSlot('badge') : badgeText]);
+        }, [hasBadgeSlot ? this.normalizeSlot(SLOT_NAME_BADGE) : badgeText]);
       }
 
       var componentData = {
@@ -3771,6 +3535,18 @@
     }
   });
 
+  var props$9 = makePropsConfigurable({
+    overlap: makeProp(PROP_TYPE_NUMBER_STRING, 0.3),
+    // Child avatars will prefer this prop (if set) over their own
+    rounded: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    // Child avatars will always use this over their own size
+    size: makeProp(PROP_TYPE_STRING),
+    // Child avatars will prefer this prop (if set) over their own
+    square: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    // Child avatars will prefer this variant over their own
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_AVATAR_GROUP); // --- Main component ---
   // @vue/component
 
   var BAvatarGroup = /*#__PURE__*/Vue__default['default'].extend({
@@ -3781,36 +3557,7 @@
         bvAvatarGroup: this
       };
     },
-    props: {
-      variant: {
-        // Child avatars will prefer this variant over their own
-        type: String,
-        default: null
-      },
-      size: {
-        // Child avatars will always use this over their own size
-        type: String,
-        default: null
-      },
-      overlap: {
-        type: [Number, String],
-        default: 0.3
-      },
-      square: {
-        // Child avatars will prefer this prop (if set) over their own
-        type: Boolean,
-        default: false
-      },
-      rounded: {
-        // Child avatars will prefer this prop (if set) over their own
-        type: [Boolean, String],
-        default: false
-      },
-      tag: {
-        type: String,
-        default: 'div'
-      }
-    },
+    props: props$9,
     computed: {
       computedSize: function computedSize() {
         return computeSize(this.size);
@@ -3831,7 +3578,7 @@
       var $inner = h('div', {
         staticClass: 'b-avatar-group-inner',
         style: this.paddingStyle
-      }, [this.normalizeSlot()]);
+      }, this.normalizeSlot());
       return h(this.tag, {
         staticClass: 'b-avatar-group',
         attrs: {
@@ -3848,47 +3595,38 @@
     }
   });
 
-  var linkProps$2 = omit(props$1, ['event', 'routerTag']);
+  var linkProps$2 = omit(props$6, ['event', 'routerTag']);
   delete linkProps$2.href.default;
   delete linkProps$2.to.default;
-  var props$4 = _objectSpread2({
-    tag: {
-      type: String,
-      default: 'span'
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_BADGE, 'variant');
-      }
-    },
-    pill: {
-      type: Boolean,
-      default: false
-    }
-  }, linkProps$2); // --- Main component ---
+  var props$a = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$2), {}, {
+    pill: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'span'),
+    variant: makeProp(PROP_TYPE_STRING, 'secondary')
+  })), NAME_BADGE); // --- Main component ---
   // @vue/component
 
   var BBadge = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BADGE,
     functional: true,
-    props: props$4,
+    props: props$a,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var active = props.active,
+          disabled = props.disabled;
       var link = isLink(props);
       var tag = link ? BLink : props.tag;
-      var componentData = {
+      var variant = props.variant || 'secondary';
+      return h(tag, a(data, {
         staticClass: 'badge',
-        class: [props.variant ? "badge-".concat(props.variant) : 'badge-secondary', {
+        class: ["badge-".concat(variant), {
           'badge-pill': props.pill,
-          active: props.active,
-          disabled: props.disabled
+          active: active,
+          disabled: disabled
         }],
         props: link ? pluckProps(linkProps$2, props) : {}
-      };
-      return h(tag, a(data, componentData), children);
+      }), children);
     }
   });
 
@@ -3911,26 +3649,17 @@
     } : {};
   };
 
-  var props$5 = _objectSpread2({
-    text: {
-      type: String,
-      default: null
-    },
-    html: {
-      type: String,
-      default: null
-    },
-    ariaCurrent: {
-      type: String,
-      default: 'location'
-    }
-  }, omit(props$1, ['event', 'routerTag'])); // --- Main component ---
+  var props$b = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, omit(props$6, ['event', 'routerTag'])), {}, {
+    ariaCurrent: makeProp(PROP_TYPE_STRING, 'location'),
+    html: makeProp(PROP_TYPE_STRING),
+    text: makeProp(PROP_TYPE_STRING)
+  })), NAME_BREADCRUMB_LINK); // --- Main component ---
   // @vue/component
 
   var BBreadcrumbLink = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BREADCRUMB_LINK,
     functional: true,
-    props: props$5,
+    props: props$b,
     render: function render(h, _ref) {
       var suppliedProps = _ref.props,
           data = _ref.data,
@@ -3941,7 +3670,7 @@
         attrs: {
           'aria-current': active ? suppliedProps.ariaCurrent : null
         },
-        props: pluckProps(props$5, suppliedProps)
+        props: pluckProps(props$b, suppliedProps)
       };
 
       if (!children) {
@@ -3952,10 +3681,13 @@
     }
   });
 
+  var props$c = makePropsConfigurable(props$b, NAME_BREADCRUMB_ITEM); // --- Main component ---
+  // @vue/component
+
   var BBreadcrumbItem = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BREADCRUMB_ITEM,
     functional: true,
-    props: props$5,
+    props: props$c,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -3971,42 +3703,43 @@
     }
   });
 
-  var props$6 = {
-    items: {
-      type: Array,
-      default: null
-    }
-  }; // @vue/component
+  var props$d = makePropsConfigurable({
+    items: makeProp(PROP_TYPE_ARRAY)
+  }, NAME_BREADCRUMB); // --- Main component ---
+  // @vue/component
 
   var BBreadcrumb = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BREADCRUMB,
     functional: true,
-    props: props$6,
+    props: props$d,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      var childNodes = children; // Build child nodes from items if given.
+      var items = props.items; // Build child nodes from items, if given
 
-      if (isArray(props.items)) {
+      var childNodes = children;
+
+      if (isArray(items)) {
         var activeDefined = false;
-        childNodes = props.items.map(function (item, idx) {
+        childNodes = items.map(function (item, idx) {
           if (!isObject(item)) {
             item = {
               text: toString$1(item)
             };
-          } // Copy the value here so we can normalize it.
+          } // Copy the value here so we can normalize it
 
 
-          var active = item.active;
+          var _item = item,
+              active = _item.active;
 
           if (active) {
             activeDefined = true;
-          }
+          } // Auto-detect active by position in list
+
 
           if (!active && !activeDefined) {
-            // Auto-detect active by position in list.
-            active = idx + 1 === props.items.length;
+            active = idx + 1 === items.length;
           }
 
           return h(BBreadcrumbItem, {
@@ -4040,31 +3773,18 @@
     }
   });
 
-  var props$7 = {
-    vertical: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_BUTTON, 'size');
-      }
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    ariaRole: {
-      type: String,
-      default: 'group'
-    }
-  }; // @vue/component
+  var props$e = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, pick(props$7, ['size'])), {}, {
+    ariaRole: makeProp(PROP_TYPE_STRING, 'group'),
+    size: makeProp(PROP_TYPE_STRING),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    vertical: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_BUTTON_GROUP); // --- Main component ---
+  // @vue/component
 
   var BButtonGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BUTTON_GROUP,
     functional: true,
-    props: props$7,
+    props: props$e,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -4088,22 +3808,18 @@
     }
   });
 
-  var ITEM_SELECTOR = ['.btn:not(.disabled):not([disabled]):not(.dropdown-item)', '.form-control:not(.disabled):not([disabled])', 'select:not(.disabled):not([disabled])', 'input[type="checkbox"]:not(.disabled)', 'input[type="radio"]:not(.disabled)'].join(','); // --- Main component ---
+  var ITEM_SELECTOR = ['.btn:not(.disabled):not([disabled]):not(.dropdown-item)', '.form-control:not(.disabled):not([disabled])', 'select:not(.disabled):not([disabled])', 'input[type="checkbox"]:not(.disabled)', 'input[type="radio"]:not(.disabled)'].join(','); // --- Props ---
+
+  var props$f = makePropsConfigurable({
+    justify: makeProp(PROP_TYPE_BOOLEAN, false),
+    keyNav: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, NAME_BUTTON_TOOLBAR); // --- Main component ---
   // @vue/component
 
   var BButtonToolbar = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BUTTON_TOOLBAR,
     mixins: [normalizeSlotMixin],
-    props: {
-      justify: {
-        type: Boolean,
-        default: false
-      },
-      keyNav: {
-        type: Boolean,
-        default: false
-      }
-    },
+    props: props$f,
     mounted: function mounted() {
       // Pre-set the tabindexes if the markup does not include
       // `tabindex="-1"` on the toolbar items
@@ -4126,18 +3842,18 @@
         var items = this.getItems();
         attemptFocus(items[0]);
       },
-      focusPrev: function focusPrev(evt) {
+      focusPrev: function focusPrev(event) {
         var items = this.getItems();
-        var index = items.indexOf(evt.target);
+        var index = items.indexOf(event.target);
 
         if (index > -1) {
           items = items.slice(0, index).reverse();
           attemptFocus(items[0]);
         }
       },
-      focusNext: function focusNext(evt) {
+      focusNext: function focusNext(event) {
         var items = this.getItems();
-        var index = items.indexOf(evt.target);
+        var index = items.indexOf(event.target);
 
         if (index > -1) {
           items = items.slice(index + 1);
@@ -4148,28 +3864,29 @@
         var items = this.getItems().reverse();
         attemptFocus(items[0]);
       },
-      onFocusin: function onFocusin(evt) {
+      onFocusin: function onFocusin(event) {
         var $el = this.$el;
 
-        if (evt.target === $el && !contains($el, evt.relatedTarget)) {
-          stopEvent(evt);
-          this.focusFirst(evt);
+        if (event.target === $el && !contains($el, event.relatedTarget)) {
+          stopEvent(event);
+          this.focusFirst(event);
         }
       },
-      onKeydown: function onKeydown(evt) {
-        var keyCode = evt.keyCode,
-            shiftKey = evt.shiftKey;
+      onKeydown: function onKeydown(event) {
+        var keyCode = event.keyCode,
+            shiftKey = event.shiftKey;
 
         if (keyCode === CODE_UP || keyCode === CODE_LEFT) {
-          stopEvent(evt);
-          shiftKey ? this.focusFirst(evt) : this.focusPrev(evt);
+          stopEvent(event);
+          shiftKey ? this.focusFirst(event) : this.focusPrev(event);
         } else if (keyCode === CODE_DOWN || keyCode === CODE_RIGHT) {
-          stopEvent(evt);
-          shiftKey ? this.focusLast(evt) : this.focusNext(evt);
+          stopEvent(event);
+          shiftKey ? this.focusLast(event) : this.focusNext(event);
         }
       }
     },
     render: function render(h) {
+      var keyNav = this.keyNav;
       return h('div', {
         staticClass: 'btn-toolbar',
         class: {
@@ -4177,9 +3894,9 @@
         },
         attrs: {
           role: 'toolbar',
-          tabindex: this.keyNav ? '0' : null
+          tabindex: keyNav ? '0' : null
         },
-        on: this.keyNav ? {
+        on: keyNav ? {
           focusin: this.onFocusin,
           keydown: this.onKeydown
         } : {}
@@ -4350,16 +4067,14 @@
   };
 
   // SSR safe client-side ID attribute generation
-  // ID's can only be generated client-side, after mount
-  // `this._uid` is not synched between server and client
-  // @vue/component
-  var idMixin = {
-    props: {
-      id: {
-        type: String // default: null
 
-      }
-    },
+  var props$g = {
+    id: makeProp(PROP_TYPE_STRING)
+  }; // --- Mixin ---
+  // @vue/component
+
+  var idMixin = Vue__default['default'].extend({
+    props: props$g,
     data: function data() {
       return {
         localId_: null
@@ -4392,255 +4107,111 @@
       this.$nextTick(function () {
         // Update DOM with auto-generated ID after mount
         // to prevent SSR hydration errors
-        _this.localId_ = "__BVID__".concat(_this._uid);
+        _this.localId_ = "__BVID__".concat(_this[COMPONENT_UID_KEY]);
       });
     }
-  };
+  });
 
+  var _watch$1;
+
+  var _makeModelMixin$1 = makeModelMixin('value', {
+    type: PROP_TYPE_DATE_STRING
+  }),
+      modelMixin$1 = _makeModelMixin$1.mixin,
+      modelProps$1 = _makeModelMixin$1.props,
+      MODEL_PROP_NAME$1 = _makeModelMixin$1.prop,
+      MODEL_EVENT_NAME$1 = _makeModelMixin$1.event; // --- Props ---
+
+
+  var props$h = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$1), {}, {
+    ariaControls: makeProp(PROP_TYPE_STRING),
+    // Makes calendar the full width of its parent container
+    block: makeProp(PROP_TYPE_BOOLEAN, false),
+    dateDisabledFn: makeProp(PROP_TYPE_FUNCTION),
+    // `Intl.DateTimeFormat` object
+    dateFormatOptions: makeProp(PROP_TYPE_OBJECT, {
+      year: DATE_FORMAT_NUMERIC,
+      month: CALENDAR_LONG,
+      day: DATE_FORMAT_NUMERIC,
+      weekday: CALENDAR_LONG
+    }),
+    // Function to set a class of (classes) on the date cell
+    // if passed a string or an array
+    // TODO:
+    //   If the function returns an object, look for class prop for classes,
+    //   and other props for handling events/details/descriptions
+    dateInfoFn: makeProp(PROP_TYPE_FUNCTION),
+    // 'ltr', 'rtl', or `null` (for auto detect)
+    direction: makeProp(PROP_TYPE_STRING),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    // When `true`, renders a comment node, but keeps the component instance active
+    // Mainly for <b-form-date>, so that we can get the component's value and locale
+    // But we might just use separate date formatters, using the resolved locale
+    // (adjusted for the gregorian calendar)
+    hidden: makeProp(PROP_TYPE_BOOLEAN, false),
+    // When `true` makes the selected date header `sr-only`
+    hideHeader: makeProp(PROP_TYPE_BOOLEAN, false),
+    // This specifies the calendar year/month/day that will be shown when
+    // first opening the datepicker if no v-model value is provided
+    // Default is the current date (or `min`/`max`)
+    initialDate: makeProp(PROP_TYPE_DATE_STRING),
+    // Labels for buttons and keyboard shortcuts
+    labelCalendar: makeProp(PROP_TYPE_STRING, 'Calendar'),
+    labelCurrentMonth: makeProp(PROP_TYPE_STRING, 'Current month'),
+    labelHelp: makeProp(PROP_TYPE_STRING, 'Use cursor keys to navigate calendar dates'),
+    labelNav: makeProp(PROP_TYPE_STRING, 'Calendar navigation'),
+    labelNextDecade: makeProp(PROP_TYPE_STRING, 'Next decade'),
+    labelNextMonth: makeProp(PROP_TYPE_STRING, 'Next month'),
+    labelNextYear: makeProp(PROP_TYPE_STRING, 'Next year'),
+    labelNoDateSelected: makeProp(PROP_TYPE_STRING, 'No date selected'),
+    labelPrevDecade: makeProp(PROP_TYPE_STRING, 'Previous decade'),
+    labelPrevMonth: makeProp(PROP_TYPE_STRING, 'Previous month'),
+    labelPrevYear: makeProp(PROP_TYPE_STRING, 'Previous year'),
+    labelSelected: makeProp(PROP_TYPE_STRING, 'Selected date'),
+    labelToday: makeProp(PROP_TYPE_STRING, 'Today'),
+    // Locale(s) to use
+    // Default is to use page/browser default setting
+    locale: makeProp(PROP_TYPE_ARRAY_STRING),
+    max: makeProp(PROP_TYPE_DATE_STRING),
+    min: makeProp(PROP_TYPE_DATE_STRING),
+    // Variant color to use for the navigation buttons
+    navButtonVariant: makeProp(PROP_TYPE_STRING, 'secondary'),
+    // Disable highlighting today's date
+    noHighlightToday: makeProp(PROP_TYPE_BOOLEAN, false),
+    noKeyNav: makeProp(PROP_TYPE_BOOLEAN, false),
+    readonly: makeProp(PROP_TYPE_BOOLEAN, false),
+    roleDescription: makeProp(PROP_TYPE_STRING),
+    // Variant color to use for the selected date
+    selectedVariant: makeProp(PROP_TYPE_STRING, 'primary'),
+    // When `true` enables the decade navigation buttons
+    showDecadeNav: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Day of week to start calendar on
+    // `0` (Sunday), `1` (Monday), ... `6` (Saturday)
+    startWeekday: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    // Variant color to use for today's date (defaults to `selectedVariant`)
+    todayVariant: makeProp(PROP_TYPE_STRING),
+    // Always return the `v-model` value as a date object
+    valueAsDate: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Format of the weekday names at the top of the calendar
+    // `short` is typically a 3 letter abbreviation,
+    // `narrow` is typically a single letter
+    // `long` is the full week day name
+    // Although some locales may override this (i.e `ar`, etc.)
+    weekdayHeaderFormat: makeProp(PROP_TYPE_STRING, CALENDAR_SHORT, function (value) {
+      return arrayIncludes([CALENDAR_LONG, CALENDAR_SHORT, CALENDAR_NARROW], value);
+    }),
+    // Has no effect if prop `block` is set
+    width: makeProp(PROP_TYPE_STRING, '270px')
+  })), NAME_CALENDAR); // --- Main component ---
   // @vue/component
 
   var BCalendar = Vue__default['default'].extend({
     name: NAME_CALENDAR,
     // Mixin order is important!
-    mixins: [attrsMixin, idMixin, normalizeSlotMixin],
-    model: {
-      // Even though this is the default that Vue assumes, we need
-      // to add it for the docs to reflect that this is the model
-      // And also for some validation libraries to work
-      prop: 'value',
-      event: 'input'
-    },
-    props: {
-      value: {
-        type: [String, Date] // default: null
-
-      },
-      valueAsDate: {
-        // Always return the `v-model` value as a date object
-        type: Boolean,
-        default: false
-      },
-      initialDate: {
-        // This specifies the calendar year/month/day that will be shown when
-        // first opening the datepicker if no v-model value is provided
-        // Default is the current date (or `min`/`max`)
-        type: [String, Date] // default: null
-
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      min: {
-        type: [String, Date] // default: null
-
-      },
-      max: {
-        type: [String, Date] // default: null
-
-      },
-      dateDisabledFn: {
-        type: Function // default: null
-
-      },
-      startWeekday: {
-        // `0` (Sunday), `1` (Monday), ... `6` (Saturday)
-        // Day of week to start calendar on
-        type: [Number, String],
-        default: 0
-      },
-      locale: {
-        // Locale(s) to use
-        // Default is to use page/browser default setting
-        type: [String, Array] // default: null
-
-      },
-      direction: {
-        // 'ltr', 'rtl', or `null` (for auto detect)
-        type: String // default: null
-
-      },
-      selectedVariant: {
-        // Variant color to use for the selected date
-        type: String,
-        default: getComponentConfig(NAME_CALENDAR, 'selectedVariant')
-      },
-      todayVariant: {
-        // Variant color to use for today's date (defaults to `selectedVariant`)
-        type: String,
-        default: getComponentConfig(NAME_CALENDAR, 'todayVariant')
-      },
-      navButtonVariant: {
-        // Variant color to use for the navigation buttons
-        type: String,
-        default: getComponentConfig(NAME_CALENDAR, 'navButtonVariant')
-      },
-      noHighlightToday: {
-        // Disable highlighting today's date
-        type: Boolean,
-        default: false
-      },
-      dateInfoFn: {
-        // Function to set a class of (classes) on the date cell
-        // if passed a string or an array
-        // TODO:
-        //   If the function returns an object, look for class prop for classes,
-        //   and other props for handling events/details/descriptions
-        type: Function // default: null
-
-      },
-      width: {
-        // Has no effect if prop `block` is set
-        type: String,
-        default: '270px'
-      },
-      block: {
-        // Makes calendar the full width of its parent container
-        type: Boolean,
-        default: false
-      },
-      hideHeader: {
-        // When true makes the selected date header `sr-only`
-        type: Boolean,
-        default: false
-      },
-      showDecadeNav: {
-        // When `true` enables the decade navigation buttons
-        type: Boolean,
-        default: false
-      },
-      hidden: {
-        // When `true`, renders a comment node, but keeps the component instance active
-        // Mainly for <b-form-date>, so that we can get the component's value and locale
-        // But we might just use separate date formatters, using the resolved locale
-        // (adjusted for the gregorian calendar)
-        type: Boolean,
-        default: false
-      },
-      ariaControls: {
-        type: String // default: null
-
-      },
-      noKeyNav: {
-        type: Boolean,
-        default: false
-      },
-      roleDescription: {
-        type: String // default: null
-
-      },
-      // Labels for buttons and keyboard shortcuts
-      labelPrevDecade: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelPrevDecade');
-        }
-      },
-      labelPrevYear: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelPrevYear');
-        }
-      },
-      labelPrevMonth: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelPrevMonth');
-        }
-      },
-      labelCurrentMonth: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelCurrentMonth');
-        }
-      },
-      labelNextMonth: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelNextMonth');
-        }
-      },
-      labelNextYear: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelNextYear');
-        }
-      },
-      labelNextDecade: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelNextDecade');
-        }
-      },
-      labelToday: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelToday');
-        }
-      },
-      labelSelected: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelSelected');
-        }
-      },
-      labelNoDateSelected: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelNoDateSelected');
-        }
-      },
-      labelCalendar: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelCalendar');
-        }
-      },
-      labelNav: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelNav');
-        }
-      },
-      labelHelp: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CALENDAR, 'labelHelp');
-        }
-      },
-      dateFormatOptions: {
-        // `Intl.DateTimeFormat` object
-        // Note: This value is *not* to be placed in the global config
-        type: Object,
-        default: function _default() {
-          return {
-            year: DATE_FORMAT_NUMERIC,
-            month: CALENDAR_LONG,
-            day: DATE_FORMAT_NUMERIC,
-            weekday: CALENDAR_LONG
-          };
-        }
-      },
-      weekdayHeaderFormat: {
-        // Format of the weekday names at the top of the calendar
-        // Note: This value is *not* to be placed in the global config
-        type: String,
-        // `short` is typically a 3 letter abbreviation,
-        // `narrow` is typically a single letter
-        // `long` is the full week day name
-        // Although some locales may override this (i.e `ar`, etc.)
-        default: CALENDAR_SHORT,
-        validator: function validator(value) {
-          return arrayIncludes([CALENDAR_LONG, CALENDAR_SHORT, CALENDAR_NARROW], value);
-        }
-      }
-    },
+    mixins: [attrsMixin, idMixin, modelMixin$1, normalizeSlotMixin],
+    props: props$h,
     data: function data() {
-      var selected = formatYMD(this.value) || '';
+      var selected = formatYMD(this[MODEL_PROP_NAME$1]) || '';
       return {
         // Selected date
         selectedYMD: selected,
@@ -4697,6 +4268,19 @@
       computedLocale: function computedLocale() {
         // Returns the resolved locale used by the calendar
         return resolveLocale(concat(this.locale).filter(identity), CALENDAR_GREGORY);
+      },
+      computedDateDisabledFn: function computedDateDisabledFn() {
+        var dateDisabledFn = this.dateDisabledFn;
+        return hasPropFunction(dateDisabledFn) ? dateDisabledFn : function () {
+          return false;
+        };
+      },
+      // TODO: Change `dateInfoFn` to handle events and notes as well as classes
+      computedDateInfoFn: function computedDateInfoFn() {
+        var dateInfoFn = this.dateInfoFn;
+        return hasPropFunction(dateInfoFn) ? dateInfoFn : function () {
+          return {};
+        };
       },
       calendarLocale: function calendarLocale() {
         // This locale enforces the gregorian calendar (for use in formatter functions)
@@ -4797,21 +4381,20 @@
         };
       },
       dateDisabled: function dateDisabled() {
+        var _this = this;
+
         // Returns a function for validating if a date is within range
         // We grab this variables first to ensure a new function ref
         // is generated when the props value changes
         // We do this as we need to trigger the calendar computed prop
         // to update when these props update
-        var rangeFn = this.dateOutOfRange;
-        var disabledFn = isFunction(this.dateDisabledFn) ? this.dateDisabledFn : function () {
-          return false;
-        }; // Return the function ref
+        var rangeFn = this.dateOutOfRange; // Return the function ref
 
         return function (date) {
           // Handle both `YYYY-MM-DD` and `Date` objects
           date = parseYMD(date);
           var ymd = formatYMD(date);
-          return !!(rangeFn(date) || disabledFn(ymd, date));
+          return !!(rangeFn(date) || _this.computedDateDisabledFn(ymd, date));
         };
       },
       // Computed props that return date formatter functions
@@ -4911,11 +4494,7 @@
         var daysInMonth = this.calendarDaysInMonth;
         var startIndex = firstDay.getDay(); // `0`..`6`
 
-        var weekOffset = (this.computedWeekStarts > startIndex ? 7 : 0) - this.computedWeekStarts; // TODO: Change `dateInfoFn` to handle events and notes as well as classes
-
-        var dateInfoFn = isFunction(this.dateInfoFn) ? this.dateInfoFn : function () {
-          return {};
-        }; // Build the calendar matrix
+        var weekOffset = (this.computedWeekStarts > startIndex ? 7 : 0) - this.computedWeekStarts; // Build the calendar matrix
 
         var currentDay = 0 - weekOffset - startIndex;
 
@@ -4931,7 +4510,7 @@
             var dayYMD = formatYMD(date);
             var dayDisabled = this.dateDisabled(date); // TODO: This could be a normalizer method
 
-            var dateInfo = dateInfoFn(dayYMD, parseYMD(dayYMD));
+            var dateInfo = this.computedDateInfoFn(dayYMD, parseYMD(dayYMD));
             dateInfo = isString(dateInfo) || isArray(dateInfo) ?
             /* istanbul ignore next */
             {
@@ -4960,51 +4539,46 @@
         return matrix;
       },
       calendarHeadings: function calendarHeadings() {
-        var _this = this;
+        var _this2 = this;
 
         return this.calendar[0].map(function (d) {
           return {
-            text: _this.formatWeekdayNameShort(parseYMD(d.ymd)),
-            label: _this.formatWeekdayName(parseYMD(d.ymd))
+            text: _this2.formatWeekdayNameShort(parseYMD(d.ymd)),
+            label: _this2.formatWeekdayName(parseYMD(d.ymd))
           };
         });
       }
     },
-    watch: {
-      value: function value(newVal, oldVal) {
-        var selected = formatYMD(newVal) || '';
-        var old = formatYMD(oldVal) || '';
+    watch: (_watch$1 = {}, _defineProperty(_watch$1, MODEL_PROP_NAME$1, function (newValue, oldValue) {
+      var selected = formatYMD(newValue) || '';
+      var old = formatYMD(oldValue) || '';
 
-        if (!datesEqual(selected, old)) {
-          this.activeYMD = selected || this.activeYMD;
-          this.selectedYMD = selected;
-        }
-      },
-      selectedYMD: function selectedYMD(newYMD, oldYMD) {
-        // TODO:
-        //   Should we compare to `formatYMD(this.value)` and emit
-        //   only if they are different?
-        if (newYMD !== oldYMD) {
-          this.$emit('input', this.valueAsDate ? parseYMD(newYMD) || null : newYMD || '');
-        }
-      },
-      context: function context(newVal, oldVal) {
-        if (!looseEqual(newVal, oldVal)) {
-          this.$emit('context', newVal);
-        }
-      },
-      hidden: function hidden(newVal) {
-        // Reset the active focused day when hidden
-        this.activeYMD = this.selectedYMD || formatYMD(this.value || this.constrainDate(this.initialDate || this.getToday())); // Enable/disable the live regions
-
-        this.setLive(!newVal);
+      if (!datesEqual(selected, old)) {
+        this.activeYMD = selected || this.activeYMD;
+        this.selectedYMD = selected;
       }
-    },
+    }), _defineProperty(_watch$1, "selectedYMD", function selectedYMD(newYMD, oldYMD) {
+      // TODO:
+      //   Should we compare to `formatYMD(this.value)` and emit
+      //   only if they are different?
+      if (newYMD !== oldYMD) {
+        this.$emit(MODEL_EVENT_NAME$1, this.valueAsDate ? parseYMD(newYMD) || null : newYMD || '');
+      }
+    }), _defineProperty(_watch$1, "context", function context(newValue, oldValue) {
+      if (!looseEqual(newValue, oldValue)) {
+        this.$emit(EVENT_NAME_CONTEXT, newValue);
+      }
+    }), _defineProperty(_watch$1, "hidden", function hidden(newValue) {
+      // Reset the active focused day when hidden
+      this.activeYMD = this.selectedYMD || formatYMD(this[MODEL_PROP_NAME$1] || this.constrainDate(this.initialDate || this.getToday())); // Enable/disable the live regions
+
+      this.setLive(!newValue);
+    }), _watch$1),
     created: function created() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.$nextTick(function () {
-        _this2.$emit('context', _this2.context);
+        _this3.$emit(EVENT_NAME_CONTEXT, _this3.context);
       });
     },
     mounted: function mounted() {
@@ -5012,16 +4586,12 @@
     },
 
     /* istanbul ignore next */
-    activated: function activated()
-    /* istanbul ignore next */
-    {
+    activated: function activated() {
       this.setLive(true);
     },
 
     /* istanbul ignore next */
-    deactivated: function deactivated()
-    /* istanbul ignore next */
-    {
+    deactivated: function deactivated() {
       this.setLive(false);
     },
     beforeDestroy: function beforeDestroy() {
@@ -5041,12 +4611,12 @@
       },
       // Private methods
       setLive: function setLive(on) {
-        var _this3 = this;
+        var _this4 = this;
 
         if (on) {
           this.$nextTick(function () {
             requestAF(function () {
-              _this3.isLive = true;
+              _this4.isLive = true;
             });
           });
         } else {
@@ -5062,20 +4632,20 @@
         return constrainDate(date, this.computedMin, this.computedMax);
       },
       emitSelected: function emitSelected(date) {
-        var _this4 = this;
+        var _this5 = this;
 
         // Performed in a `$nextTick()` to (probably) ensure
         // the input event has emitted first
         this.$nextTick(function () {
-          _this4.$emit('selected', formatYMD(date) || '', parseYMD(date) || null);
+          _this5.$emit(EVENT_NAME_SELECTED, formatYMD(date) || '', parseYMD(date) || null);
         });
       },
       // Event handlers
-      setGridFocusFlag: function setGridFocusFlag(evt) {
+      setGridFocusFlag: function setGridFocusFlag(event) {
         // Sets the gridHasFocus flag to make date "button" look focused
-        this.gridHasFocus = !this.disabled && evt.type === 'focus';
+        this.gridHasFocus = !this.disabled && event.type === 'focus';
       },
-      onKeydownWrapper: function onKeydownWrapper(evt) {
+      onKeydownWrapper: function onKeydownWrapper(event) {
         // Calendar keyboard navigation
         // Handles PAGEUP/PAGEDOWN/END/HOME/LEFT/UP/RIGHT/DOWN
         // Focuses grid after updating
@@ -5084,16 +4654,16 @@
           return;
         }
 
-        var altKey = evt.altKey,
-            ctrlKey = evt.ctrlKey,
-            keyCode = evt.keyCode;
+        var altKey = event.altKey,
+            ctrlKey = event.ctrlKey,
+            keyCode = event.keyCode;
 
         if (!arrayIncludes([CODE_PAGEUP, CODE_PAGEDOWN, CODE_END, CODE_HOME, CODE_LEFT, CODE_UP, CODE_RIGHT, CODE_DOWN], keyCode)) {
           /* istanbul ignore next */
           return;
         }
 
-        stopEvent(evt);
+        stopEvent(event);
         var activeDate = createDate(this.activeDate);
         var checkDate = createDate(this.activeDate);
         var day = activeDate.getDate();
@@ -5152,13 +4722,13 @@
 
         this.focus();
       },
-      onKeydownGrid: function onKeydownGrid(evt) {
+      onKeydownGrid: function onKeydownGrid(event) {
         // Pressing enter/space on grid to select active date
-        var keyCode = evt.keyCode;
+        var keyCode = event.keyCode;
         var activeDate = this.activeDate;
 
         if (keyCode === CODE_ENTER || keyCode === CODE_SPACE) {
-          stopEvent(evt);
+          stopEvent(event);
 
           if (!this.disabled && !this.readonly && !this.dateDisabled(activeDate)) {
             this.selectedYMD = formatYMD(activeDate);
@@ -5218,7 +4788,7 @@
       }
     },
     render: function render(h) {
-      var _this5 = this;
+      var _this6 = this;
 
       // If `hidden` prop is set, render just a placeholder node
       if (this.hidden) {
@@ -5299,32 +4869,32 @@
         flipH: !isRTL
       });
 
-      var $prevDecadeIcon = this.normalizeSlot('nav-prev-decade', navScope) || h(BIconChevronBarLeft, {
+      var $prevDecadeIcon = this.normalizeSlot(SLOT_NAME_NAV_PEV_DECADE, navScope) || h(BIconChevronBarLeft, {
         props: navPrevProps
       });
-      var $prevYearIcon = this.normalizeSlot('nav-prev-year', navScope) || h(BIconChevronDoubleLeft, {
+      var $prevYearIcon = this.normalizeSlot(SLOT_NAME_NAV_PEV_YEAR, navScope) || h(BIconChevronDoubleLeft, {
         props: navPrevProps
       });
-      var $prevMonthIcon = this.normalizeSlot('nav-prev-month', navScope) || h(BIconChevronLeft, {
+      var $prevMonthIcon = this.normalizeSlot(SLOT_NAME_NAV_PEV_MONTH, navScope) || h(BIconChevronLeft, {
         props: navPrevProps
       });
-      var $thisMonthIcon = this.normalizeSlot('nav-this-month', navScope) || h(BIconCircleFill, {
+      var $thisMonthIcon = this.normalizeSlot(SLOT_NAME_NAV_THIS_MONTH, navScope) || h(BIconCircleFill, {
         props: navProps
       });
-      var $nextMonthIcon = this.normalizeSlot('nav-next-month', navScope) || h(BIconChevronLeft, {
+      var $nextMonthIcon = this.normalizeSlot(SLOT_NAME_NAV_NEXT_MONTH, navScope) || h(BIconChevronLeft, {
         props: navNextProps
       });
-      var $nextYearIcon = this.normalizeSlot('nav-next-year', navScope) || h(BIconChevronDoubleLeft, {
+      var $nextYearIcon = this.normalizeSlot(SLOT_NAME_NAV_NEXT_YEAR, navScope) || h(BIconChevronDoubleLeft, {
         props: navNextProps
       });
-      var $nextDecadeIcon = this.normalizeSlot('nav-next-decade', navScope) || h(BIconChevronBarLeft, {
+      var $nextDecadeIcon = this.normalizeSlot(SLOT_NAME_NAV_NEXT_DECADE, navScope) || h(BIconChevronBarLeft, {
         props: navNextProps
       }); // Utility to create the date navigation buttons
 
       var makeNavBtn = function makeNavBtn(content, label, handler, btnDisabled, shortcut) {
         return h('button', {
           staticClass: 'btn btn-sm border-0 flex-fill',
-          class: [_this5.computedNavButtonVariant, {
+          class: [_this6.computedNavButtonVariant, {
             disabled: btnDisabled
           }],
           attrs: {
@@ -5359,7 +4929,6 @@
       }, [hideDecadeNav ? h() : makeNavBtn($prevDecadeIcon, this.labelPrevDecade, this.gotoPrevDecade, this.prevDecadeDisabled, 'Ctrl+Alt+PageDown'), makeNavBtn($prevYearIcon, this.labelPrevYear, this.gotoPrevYear, this.prevYearDisabled, 'Alt+PageDown'), makeNavBtn($prevMonthIcon, this.labelPrevMonth, this.gotoPrevMonth, this.prevMonthDisabled, 'PageDown'), makeNavBtn($thisMonthIcon, this.labelCurrentMonth, this.gotoCurrentMonth, this.thisMonthDisabled, 'Home'), makeNavBtn($nextMonthIcon, this.labelNextMonth, this.gotoNextMonth, this.nextMonthDisabled, 'PageUp'), makeNavBtn($nextYearIcon, this.labelNextYear, this.gotoNextYear, this.nextYearDisabled, 'Alt+PageUp'), hideDecadeNav ? h() : makeNavBtn($nextDecadeIcon, this.labelNextDecade, this.gotoNextDecade, this.nextDecadeDisabled, 'Ctrl+Alt+PageUp')]); // Caption for calendar grid
 
       var $gridCaption = h('header', {
-        key: 'grid-caption',
         staticClass: 'b-calendar-grid-caption text-center font-weight-bold',
         class: {
           'text-muted': disabled
@@ -5368,7 +4937,8 @@
           id: gridCaptionId,
           'aria-live': isLive ? 'polite' : null,
           'aria-atomic': isLive ? 'true' : null
-        }
+        },
+        key: 'grid-caption'
       }, this.formatYearMonth(this.calendarFirstDay)); // Calendar weekday headings
 
       var $gridWeekDays = h('div', {
@@ -5378,7 +4948,6 @@
         }
       }, this.calendarHeadings.map(function (d, idx) {
         return h('small', {
-          key: idx,
           staticClass: 'col text-truncate',
           class: {
             'text-muted': disabled
@@ -5386,7 +4955,8 @@
           attrs: {
             title: d.label === d.text ? null : d.label,
             'aria-label': d.label
-          }
+          },
+          key: idx
         }, d.text);
       })); // Calendar day grid
 
@@ -5404,20 +4974,19 @@
             // Should we add some classes to signify if today/selected/etc?
             class: (_class = {
               // Give the fake button a focus ring
-              focus: isActive && _this5.gridHasFocus,
+              focus: isActive && _this6.gridHasFocus,
               // Styling
               disabled: day.isDisabled || disabled,
               active: isSelected
-            }, _defineProperty(_class, _this5.computedVariant, isSelected), _defineProperty(_class, _this5.computedTodayVariant, isToday && highlightToday && !isSelected && day.isThisMonth), _defineProperty(_class, 'btn-outline-light', !(isToday && highlightToday) && !isSelected && !isActive), _defineProperty(_class, 'btn-light', !(isToday && highlightToday) && !isSelected && isActive), _defineProperty(_class, 'text-muted', !day.isThisMonth && !isSelected), _defineProperty(_class, 'text-dark', !(isToday && highlightToday) && !isSelected && !isActive && day.isThisMonth), _defineProperty(_class, 'font-weight-bold', (isSelected || day.isThisMonth) && !day.isDisabled), _class),
+            }, _defineProperty(_class, _this6.computedVariant, isSelected), _defineProperty(_class, _this6.computedTodayVariant, isToday && highlightToday && !isSelected && day.isThisMonth), _defineProperty(_class, 'btn-outline-light', !(isToday && highlightToday) && !isSelected && !isActive), _defineProperty(_class, 'btn-light', !(isToday && highlightToday) && !isSelected && isActive), _defineProperty(_class, 'text-muted', !day.isThisMonth && !isSelected), _defineProperty(_class, 'text-dark', !(isToday && highlightToday) && !isSelected && !isActive && day.isThisMonth), _defineProperty(_class, 'font-weight-bold', (isSelected || day.isThisMonth) && !day.isDisabled), _class),
             on: {
               click: function click() {
-                return _this5.onClickDay(day);
+                return _this6.onClickDay(day);
               }
             }
           }, day.day);
           return h('div', // Cell with button
           {
-            key: dIndex,
             staticClass: 'col p-0',
             class: day.isDisabled ? 'bg-light' : day.info.class || '',
             attrs: {
@@ -5428,30 +4997,31 @@
               // Only days in the month are presented as buttons to screen readers
               'aria-hidden': day.isThisMonth ? null : 'true',
               'aria-disabled': day.isDisabled || disabled ? 'true' : null,
-              'aria-label': [day.label, isSelected ? "(".concat(_this5.labelSelected, ")") : null, isToday ? "(".concat(_this5.labelToday, ")") : null].filter(identity).join(' '),
+              'aria-label': [day.label, isSelected ? "(".concat(_this6.labelSelected, ")") : null, isToday ? "(".concat(_this6.labelToday, ")") : null].filter(identity).join(' '),
               // NVDA doesn't convey `aria-selected`, but does `aria-current`,
               // ChromeVox doesn't convey `aria-current`, but does `aria-selected`,
               // so we set both attributes for robustness
               'aria-selected': isSelected ? 'true' : null,
               'aria-current': isSelected ? 'date' : null
-            }
+            },
+            key: dIndex
           }, [$btn]);
         }); // Return the week "row"
         // We use the first day of the weeks YMD value as a
         // key for efficient DOM patching / element re-use
 
         return h('div', {
-          key: week[0].ymd,
-          staticClass: 'row no-gutters'
+          staticClass: 'row no-gutters',
+          key: week[0].ymd
         }, $cells);
       });
       $gridBody = h('div', {
         // A key is only required on the body if we add in transition support
-        // key: this.activeYMD.slice(0, -3),
         staticClass: 'b-calendar-grid-body',
         style: disabled ? {
           pointerEvents: 'none'
-        } : {}
+        } : {} // key: this.activeYMD.slice(0, -3)
+
       }, $gridBody);
       var $gridHelp = h('footer', {
         staticClass: 'b-calendar-grid-help border-top small text-muted text-center bg-light',
@@ -5462,7 +5032,6 @@
         staticClass: 'small'
       }, this.labelHelp)]);
       var $grid = h('div', {
-        ref: 'grid',
         staticClass: 'b-calendar-grid form-control h-auto text-center',
         attrs: {
           id: gridId,
@@ -5483,7 +5052,8 @@
           keydown: this.onKeydownGrid,
           focus: this.setGridFocusFlag,
           blur: this.setGridFocusFlag
-        }
+        },
+        ref: 'grid'
       }, [$gridCaption, $gridWeekDays, $gridBody, $gridHelp]); // Optional bottom slot
 
       var $slot = this.normalizeSlot();
@@ -5529,43 +5099,28 @@
     }
   });
 
+  var props$i = makePropsConfigurable({
+    bgVariant: makeProp(PROP_TYPE_STRING),
+    borderVariant: makeProp(PROP_TYPE_STRING),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    textVariant: makeProp(PROP_TYPE_STRING)
+  }, NAME_CARD); // --- Mixin ---
   // @vue/component
-  var cardMixin = {
-    props: {
-      tag: {
-        type: String,
-        default: 'div'
-      },
-      bgVariant: {
-        type: String // default: null
 
-      },
-      borderVariant: {
-        type: String // default: null
+  var cardMixin = Vue__default['default'].extend({
+    props: props$i
+  });
 
-      },
-      textVariant: {
-        type: String // default: null
-
-      }
-    }
-  };
-
-  var props$8 = {
-    title: {
-      type: String // default: null
-
-    },
-    titleTag: {
-      type: String,
-      default: 'h4'
-    }
-  }; // @vue/component
+  var props$j = makePropsConfigurable({
+    title: makeProp(PROP_TYPE_STRING),
+    titleTag: makeProp(PROP_TYPE_STRING, 'h4')
+  }, NAME_CARD_TITLE); // --- Main component ---
+  // @vue/component
 
   var BCardTitle = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_TITLE,
     functional: true,
-    props: props$8,
+    props: props$j,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -5576,27 +5131,17 @@
     }
   });
 
-  var props$9 = {
-    subTitle: {
-      type: String // default: null
-
-    },
-    subTitleTag: {
-      type: String,
-      default: 'h6'
-    },
-    subTitleTextVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_CARD_SUB_TITLE, 'subTitleTextVariant');
-      }
-    }
-  }; // @vue/component
+  var props$k = makePropsConfigurable({
+    subTitle: makeProp(PROP_TYPE_STRING),
+    subTitleTag: makeProp(PROP_TYPE_STRING, 'h6'),
+    subTitleTextVariant: makeProp(PROP_TYPE_STRING, 'muted')
+  }, NAME_CARD_SUB_TITLE); // --- Main component ---
+  // @vue/component
 
   var BCardSubTitle = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_SUB_TITLE,
     functional: true,
-    props: props$9,
+    props: props$k,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -5608,41 +5153,38 @@
     }
   });
 
-  var props$a = _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'body'))), {}, {
-    bodyClass: {
-      type: [String, Object, Array] // default: null
-
-    }
-  }, props$8), props$9), {}, {
-    overlay: {
-      type: Boolean,
-      default: false
-    }
-  }); // @vue/component
+  var props$l = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$j), props$k), copyProps(props$i, prefixPropName.bind(null, 'body'))), {}, {
+    bodyClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    overlay: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_CARD_BODY); // --- Main component ---
+  // @vue/component
 
   var BCardBody = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_BODY,
     functional: true,
-    props: props$a,
+    props: props$l,
     render: function render(h, _ref) {
       var _ref2;
 
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      var cardTitle = h();
-      var cardSubTitle = h();
-      var cardContent = children || [h()];
+      var bodyBgVariant = props.bodyBgVariant,
+          bodyBorderVariant = props.bodyBorderVariant,
+          bodyTextVariant = props.bodyTextVariant;
+      var $title = h();
 
       if (props.title) {
-        cardTitle = h(BCardTitle, {
-          props: pluckProps(props$8, props)
+        $title = h(BCardTitle, {
+          props: pluckProps(props$j, props)
         });
       }
 
+      var $subTitle = h();
+
       if (props.subTitle) {
-        cardSubTitle = h(BCardSubTitle, {
-          props: pluckProps(props$9, props),
+        $subTitle = h(BCardSubTitle, {
+          props: pluckProps(props$k, props),
           class: ['mb-2']
         });
       }
@@ -5651,31 +5193,22 @@
         staticClass: 'card-body',
         class: [(_ref2 = {
           'card-img-overlay': props.overlay
-        }, _defineProperty(_ref2, "bg-".concat(props.bodyBgVariant), props.bodyBgVariant), _defineProperty(_ref2, "border-".concat(props.bodyBorderVariant), props.bodyBorderVariant), _defineProperty(_ref2, "text-".concat(props.bodyTextVariant), props.bodyTextVariant), _ref2), props.bodyClass || {}]
-      }), [cardTitle, cardSubTitle].concat(_toConsumableArray(cardContent)));
+        }, _defineProperty(_ref2, "bg-".concat(bodyBgVariant), bodyBgVariant), _defineProperty(_ref2, "border-".concat(bodyBorderVariant), bodyBorderVariant), _defineProperty(_ref2, "text-".concat(bodyTextVariant), bodyTextVariant), _ref2), props.bodyClass]
+      }), [$title, $subTitle, children]);
     }
   });
 
-  var props$b = _objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'header'))), {}, {
-    header: {
-      type: String // default: null
-
-    },
-    headerHtml: {
-      type: String // default: null
-
-    },
-    headerClass: {
-      type: [String, Object, Array] // default: null
-
-    }
-  }); // --- Main component ---
+  var props$m = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, copyProps(props$i, prefixPropName.bind(null, 'header'))), {}, {
+    header: makeProp(PROP_TYPE_STRING),
+    headerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    headerHtml: makeProp(PROP_TYPE_STRING)
+  })), NAME_CARD_HEADER); // --- Main component ---
   // @vue/component
 
   var BCardHeader = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_HEADER,
     functional: true,
-    props: props$b,
+    props: props$m,
     render: function render(h, _ref) {
       var _ref2;
 
@@ -5693,26 +5226,17 @@
     }
   });
 
-  var props$c = _objectSpread2(_objectSpread2({}, copyProps(cardMixin.props, prefixPropName.bind(null, 'footer'))), {}, {
-    footer: {
-      type: String // default: null
-
-    },
-    footerHtml: {
-      type: String // default: null
-
-    },
-    footerClass: {
-      type: [String, Object, Array] // default: null
-
-    }
-  }); // --- Main component ---
+  var props$n = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, copyProps(props$i, prefixPropName.bind(null, 'footer'))), {}, {
+    footer: makeProp(PROP_TYPE_STRING),
+    footerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    footerHtml: makeProp(PROP_TYPE_STRING)
+  })), NAME_CARD_FOOTER); // --- Main component ---
   // @vue/component
 
   var BCardFooter = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_FOOTER,
     functional: true,
-    props: props$c,
+    props: props$n,
     render: function render(h, _ref) {
       var _ref2;
 
@@ -5730,58 +5254,132 @@
     }
   });
 
-  var props$d = {
-    src: {
-      type: String,
-      required: true
-    },
-    alt: {
-      type: String,
-      default: null
-    },
-    top: {
-      type: Boolean,
-      default: false
-    },
-    bottom: {
-      type: Boolean,
-      default: false
-    },
-    start: {
-      type: Boolean,
-      default: false
-    },
-    left: {
-      // alias of 'start'
-      type: Boolean,
-      default: false
-    },
-    end: {
-      type: Boolean,
-      default: false
-    },
-    right: {
-      // alias of 'end'
-      type: Boolean,
-      default: false
-    },
-    height: {
-      type: [Number, String] // default: null
+  // Blank image with fill template
 
-    },
-    width: {
-      type: [Number, String] // default: null
+  var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>'; // --- Helper methods ---
 
+  var makeBlankImgSrc = function makeBlankImgSrc(width, height, color) {
+    var src = encodeURIComponent(BLANK_TEMPLATE.replace('%{w}', toString$1(width)).replace('%{h}', toString$1(height)).replace('%{f}', color));
+    return "data:image/svg+xml;charset=UTF-8,".concat(src);
+  }; // --- Props ---
+
+
+  var props$o = makePropsConfigurable({
+    alt: makeProp(PROP_TYPE_STRING),
+    blank: makeProp(PROP_TYPE_BOOLEAN, false),
+    blankColor: makeProp(PROP_TYPE_STRING, 'transparent'),
+    block: makeProp(PROP_TYPE_BOOLEAN, false),
+    center: makeProp(PROP_TYPE_BOOLEAN, false),
+    fluid: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Gives fluid images class `w-100` to make them grow to fit container
+    fluidGrow: makeProp(PROP_TYPE_BOOLEAN, false),
+    height: makeProp(PROP_TYPE_NUMBER_STRING),
+    left: makeProp(PROP_TYPE_BOOLEAN, false),
+    right: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Possible values:
+    //   `false`: no rounding of corners
+    //   `true`: slightly rounded corners
+    //   'top': top corners rounded
+    //   'right': right corners rounded
+    //   'bottom': bottom corners rounded
+    //   'left': left corners rounded
+    //   'circle': circle/oval
+    //   '0': force rounding off
+    rounded: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    sizes: makeProp(PROP_TYPE_ARRAY_STRING),
+    src: makeProp(PROP_TYPE_STRING),
+    srcset: makeProp(PROP_TYPE_ARRAY_STRING),
+    thumbnail: makeProp(PROP_TYPE_BOOLEAN, false),
+    width: makeProp(PROP_TYPE_NUMBER_STRING)
+  }, NAME_IMG); // --- Main component ---
+  // @vue/component
+
+  var BImg = /*#__PURE__*/Vue__default['default'].extend({
+    name: NAME_IMG,
+    functional: true,
+    props: props$o,
+    render: function render(h, _ref) {
+      var _class;
+
+      var props = _ref.props,
+          data = _ref.data;
+      var alt = props.alt,
+          src = props.src,
+          block = props.block,
+          fluidGrow = props.fluidGrow,
+          rounded = props.rounded;
+      var width = toInteger(props.width) || null;
+      var height = toInteger(props.height) || null;
+      var align = null;
+      var srcset = concat(props.srcset).filter(identity).join(',');
+      var sizes = concat(props.sizes).filter(identity).join(',');
+
+      if (props.blank) {
+        if (!height && width) {
+          height = width;
+        } else if (!width && height) {
+          width = height;
+        }
+
+        if (!width && !height) {
+          width = 1;
+          height = 1;
+        } // Make a blank SVG image
+
+
+        src = makeBlankImgSrc(width, height, props.blankColor || 'transparent'); // Disable srcset and sizes
+
+        srcset = null;
+        sizes = null;
+      }
+
+      if (props.left) {
+        align = 'float-left';
+      } else if (props.right) {
+        align = 'float-right';
+      } else if (props.center) {
+        align = 'mx-auto';
+        block = true;
+      }
+
+      return h('img', a(data, {
+        attrs: {
+          src: src,
+          alt: alt,
+          width: width ? toString$1(width) : null,
+          height: height ? toString$1(height) : null,
+          srcset: srcset || null,
+          sizes: sizes || null
+        },
+        class: (_class = {
+          'img-thumbnail': props.thumbnail,
+          'img-fluid': props.fluid || fluidGrow,
+          'w-100': fluidGrow,
+          rounded: rounded === '' || rounded === true
+        }, _defineProperty(_class, "rounded-".concat(rounded), isString(rounded) && rounded !== ''), _defineProperty(_class, align, align), _defineProperty(_class, 'd-block', block), _class)
+      }));
     }
-  }; // @vue/component
+  });
+
+  var props$p = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, pick(props$o, ['src', 'alt', 'width', 'height', 'left', 'right'])), {}, {
+    bottom: makeProp(PROP_TYPE_BOOLEAN, false),
+    end: makeProp(PROP_TYPE_BOOLEAN, false),
+    start: makeProp(PROP_TYPE_BOOLEAN, false),
+    top: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_CARD_IMG); // --- Main component ---
+  // @vue/component
 
   var BCardImg = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_IMG,
     functional: true,
-    props: props$d,
+    props: props$p,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
+      var src = props.src,
+          alt = props.alt,
+          width = props.width,
+          height = props.height;
       var baseClass = 'card-img';
 
       if (props.top) {
@@ -5795,34 +5393,29 @@
       }
 
       return h('img', a(data, {
-        class: [baseClass],
+        class: baseClass,
         attrs: {
-          src: props.src || null,
-          alt: props.alt,
-          height: props.height || null,
-          width: props.width || null
+          src: src,
+          alt: alt,
+          width: width,
+          height: height
         }
       }));
     }
   });
 
-  var cardImgProps = copyProps(props$d, prefixPropName.bind(null, 'img'));
+  var cardImgProps = copyProps(props$p, prefixPropName.bind(null, 'img'));
   cardImgProps.imgSrc.required = false;
-  var props$e = _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$a), props$b), props$c), cardImgProps), copyProps(cardMixin.props)), {}, {
-    align: {
-      type: String // default: null
-
-    },
-    noBody: {
-      type: Boolean,
-      default: false
-    }
-  }); // @vue/component
+  var props$q = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$l), props$m), props$n), cardImgProps), props$i), {}, {
+    align: makeProp(PROP_TYPE_STRING),
+    noBody: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_CARD); // --- Main component ---
+  // @vue/component
 
   var BCard = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD,
     functional: true,
-    props: props$e,
+    props: props$q,
     render: function render(h, _ref) {
       var _class;
 
@@ -5867,7 +5460,7 @@
 
       if (hasHeaderSlot || header || headerHtml) {
         $header = h(BCardHeader, {
-          props: pluckProps(props$b, props),
+          props: pluckProps(props$m, props),
           domProps: hasHeaderSlot ? {} : htmlOrText(headerHtml, header)
         }, normalizeSlot(SLOT_NAME_HEADER, slotScope, $scopedSlots, $slots));
       }
@@ -5876,7 +5469,7 @@
 
       if (!props.noBody) {
         $content = h(BCardBody, {
-          props: pluckProps(props$a, props)
+          props: pluckProps(props$l, props)
         }, $content); // When the `overlap` prop is set we need to wrap the `<b-card-img>` and `<b-card-body>`
         // into a relative positioned wrapper to don't distract a potential header or footer
 
@@ -5895,7 +5488,7 @@
 
       if (hasFooterSlot || footer || footerHtml) {
         $footer = h(BCardFooter, {
-          props: pluckProps(props$c, props),
+          props: pluckProps(props$n, props),
           domProps: hasHeaderSlot ? {} : htmlOrText(footerHtml, footer)
         }, normalizeSlot(SLOT_NAME_FOOTER, slotScope, $scopedSlots, $slots));
       }
@@ -5981,9 +5574,7 @@
 
     }, {
       key: "handler",
-      value: function handler(entries)
-      /* istanbul ignore next: IntersectionObserver not supported in JSDOM */
-      {
+      value: function handler(entries) {
         var entry = entries ? entries[0] : {};
         var isIntersecting = Boolean(entry.isIntersecting || entry.intersectionRatio > 0.0);
 
@@ -6079,269 +5670,50 @@
     unbind: unbind
   };
 
-  // Blank image with fill template
+  var _watch$2;
 
-  var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>';
-  var props$f = {
-    src: {
-      type: String // default: null
+  var MODEL_PROP_NAME_SHOW = 'show';
+  var MODEL_EVENT_NAME_SHOW = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SHOW; // --- Props ---
 
-    },
-    srcset: {
-      type: [String, Array] // default: null
-
-    },
-    sizes: {
-      type: [String, Array] // default: null
-
-    },
-    alt: {
-      type: String,
-      default: null
-    },
-    width: {
-      type: [Number, String] // default: null
-
-    },
-    height: {
-      type: [Number, String] // default: null
-
-    },
-    block: {
-      type: Boolean,
-      default: false
-    },
-    fluid: {
-      type: Boolean,
-      default: false
-    },
-    fluidGrow: {
-      // Gives fluid images class `w-100` to make them grow to fit container
-      type: Boolean,
-      default: false
-    },
-    rounded: {
-      // rounded can be:
-      //   false: no rounding of corners
-      //   true: slightly rounded corners
-      //   'top': top corners rounded
-      //   'right': right corners rounded
-      //   'bottom': bottom corners rounded
-      //   'left': left corners rounded
-      //   'circle': circle/oval
-      //   '0': force rounding off
-      type: [Boolean, String],
-      default: false
-    },
-    thumbnail: {
-      type: Boolean,
-      default: false
-    },
-    left: {
-      type: Boolean,
-      default: false
-    },
-    right: {
-      type: Boolean,
-      default: false
-    },
-    center: {
-      type: Boolean,
-      default: false
-    },
-    blank: {
-      type: Boolean,
-      default: false
-    },
-    blankColor: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_IMG, 'blankColor');
-      }
-    }
-  }; // --- Helper methods ---
-
-  var makeBlankImgSrc = function makeBlankImgSrc(width, height, color) {
-    var src = encodeURIComponent(BLANK_TEMPLATE.replace('%{w}', toString$1(width)).replace('%{h}', toString$1(height)).replace('%{f}', color));
-    return "data:image/svg+xml;charset=UTF-8,".concat(src);
-  }; // @vue/component
-
-
-  var BImg = /*#__PURE__*/Vue__default['default'].extend({
-    name: NAME_IMG,
-    functional: true,
-    props: props$f,
-    render: function render(h, _ref) {
-      var _class;
-
-      var props = _ref.props,
-          data = _ref.data;
-      var src = props.src;
-      var width = toInteger(props.width) || null;
-      var height = toInteger(props.height) || null;
-      var align = null;
-      var block = props.block;
-      var srcset = concat(props.srcset).filter(identity).join(',');
-      var sizes = concat(props.sizes).filter(identity).join(',');
-
-      if (props.blank) {
-        if (!height && width) {
-          height = width;
-        } else if (!width && height) {
-          width = height;
-        }
-
-        if (!width && !height) {
-          width = 1;
-          height = 1;
-        } // Make a blank SVG image
-
-
-        src = makeBlankImgSrc(width, height, props.blankColor || 'transparent'); // Disable srcset and sizes
-
-        srcset = null;
-        sizes = null;
-      }
-
-      if (props.left) {
-        align = 'float-left';
-      } else if (props.right) {
-        align = 'float-right';
-      } else if (props.center) {
-        align = 'mx-auto';
-        block = true;
-      }
-
-      return h('img', a(data, {
-        attrs: {
-          src: src,
-          alt: props.alt,
-          width: width ? toString$1(width) : null,
-          height: height ? toString$1(height) : null,
-          srcset: srcset || null,
-          sizes: sizes || null
-        },
-        class: (_class = {
-          'img-thumbnail': props.thumbnail,
-          'img-fluid': props.fluid || props.fluidGrow,
-          'w-100': props.fluidGrow,
-          rounded: props.rounded === '' || props.rounded === true
-        }, _defineProperty(_class, "rounded-".concat(props.rounded), isString(props.rounded) && props.rounded !== ''), _defineProperty(_class, align, align), _defineProperty(_class, 'd-block', block), _class)
-      }));
-    }
-  });
-
-  var props$g = {
-    src: {
-      type: String,
-      required: true
-    },
-    srcset: {
-      type: [String, Array] // default: null
-
-    },
-    sizes: {
-      type: [String, Array] // default: null
-
-    },
-    alt: {
-      type: String // default: null
-
-    },
-    width: {
-      type: [Number, String] // default: null
-
-    },
-    height: {
-      type: [Number, String] // default: null
-
-    },
-    blankSrc: {
-      // If null, a blank image is generated
-      type: String,
-      default: null
-    },
-    blankColor: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_IMG_LAZY, 'blankColor');
-      }
-    },
-    blankWidth: {
-      type: [Number, String] // default: null
-
-    },
-    blankHeight: {
-      type: [Number, String] // default: null
-
-    },
-    show: {
-      type: Boolean,
-      default: false
-    },
-    fluid: {
-      type: Boolean,
-      default: false
-    },
-    fluidGrow: {
-      type: Boolean,
-      default: false
-    },
-    block: {
-      type: Boolean,
-      default: false
-    },
-    thumbnail: {
-      type: Boolean,
-      default: false
-    },
-    rounded: {
-      type: [Boolean, String],
-      default: false
-    },
-    left: {
-      type: Boolean,
-      default: false
-    },
-    right: {
-      type: Boolean,
-      default: false
-    },
-    center: {
-      type: Boolean,
-      default: false
-    },
-    offset: {
-      // Distance away from viewport (in pixels) before being
-      // considered "visible"
-      type: [Number, String],
-      default: 360
-    }
-  }; // @vue/component
+  var imgProps = omit(props$o, ['blank']);
+  var props$r = makePropsConfigurable(_objectSpread2(_objectSpread2({}, imgProps), {}, _defineProperty({
+    blankColor: makeProp(PROP_TYPE_STRING, 'transparent'),
+    blankHeight: makeProp(PROP_TYPE_NUMBER_STRING),
+    // If `null`, a blank image is generated
+    blankSrc: makeProp(PROP_TYPE_STRING, null),
+    blankWidth: makeProp(PROP_TYPE_NUMBER_STRING),
+    // Distance away from viewport (in pixels)
+    // before being considered "visible"
+    offset: makeProp(PROP_TYPE_NUMBER_STRING, 360)
+  }, MODEL_PROP_NAME_SHOW, makeProp(PROP_TYPE_BOOLEAN, false))), NAME_IMG_LAZY); // --- Main component ---
+  // @vue/component
 
   var BImgLazy = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_IMG_LAZY,
     directives: {
-      bVisible: VBVisible
+      'b-visible': VBVisible
     },
-    props: props$g,
+    props: props$r,
     data: function data() {
       return {
-        isShown: this.show
+        isShown: this[MODEL_PROP_NAME_SHOW]
       };
     },
     computed: {
       computedSrc: function computedSrc() {
-        return !this.blankSrc || this.isShown ? this.src : this.blankSrc;
+        var blankSrc = this.blankSrc;
+        return !blankSrc || this.isShown ? this.src : blankSrc;
       },
       computedBlank: function computedBlank() {
         return !(this.isShown || this.blankSrc);
       },
       computedWidth: function computedWidth() {
-        return this.isShown ? this.width : this.blankWidth || this.width;
+        var width = this.width;
+        return this.isShown ? width : this.blankWidth || width;
       },
       computedHeight: function computedHeight() {
-        return this.isShown ? this.height : this.blankHeight || this.height;
+        var height = this.height;
+        return this.isShown ? height : this.blankHeight || height;
       },
       computedSrcset: function computedSrcset() {
         var srcset = concat(this.srcset).filter(identity).join(',');
@@ -6352,33 +5724,29 @@
         return !this.blankSrc || this.isShown ? sizes : null;
       }
     },
-    watch: {
-      show: function show(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          // If IntersectionObserver support is not available, image is always shown
-          var visible = hasIntersectionObserverSupport ? newVal : true;
-          this.isShown = visible;
+    watch: (_watch$2 = {}, _defineProperty(_watch$2, MODEL_PROP_NAME_SHOW, function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        // If `IntersectionObserver` support is not available, image is always shown
+        var visible = HAS_INTERACTION_OBSERVER_SUPPORT ? newValue : true;
+        this.isShown = visible; // Ensure the show prop is synced (when no `IntersectionObserver`)
 
-          if (visible !== newVal) {
-            // Ensure the show prop is synced (when no IntersectionObserver)
-            this.$nextTick(this.updateShowProp);
-          }
-        }
-      },
-      isShown: function isShown(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          // Update synched show prop
-          this.updateShowProp();
+        if (visible !== newValue) {
+          this.$nextTick(this.updateShowProp);
         }
       }
-    },
+    }), _defineProperty(_watch$2, "isShown", function isShown(newValue, oldValue) {
+      // Update synched show prop
+      if (newValue !== oldValue) {
+        this.updateShowProp();
+      }
+    }), _watch$2),
     mounted: function mounted() {
-      // If IntersectionObserver is not available, image is always shown
-      this.isShown = hasIntersectionObserverSupport ? this.show : true;
+      // If `IntersectionObserver` is not available, image is always shown
+      this.isShown = HAS_INTERACTION_OBSERVER_SUPPORT ? this[MODEL_PROP_NAME_SHOW] : true;
     },
     methods: {
       updateShowProp: function updateShowProp() {
-        this.$emit('update:show', this.isShown);
+        this.$emit(MODEL_EVENT_NAME_SHOW, this.isShown);
       },
       doShow: function doShow(visible) {
         // If IntersectionObserver is not supported, the callback
@@ -6407,66 +5775,26 @@
 
       return h(BImg, {
         directives: directives,
-        props: {
+        props: _objectSpread2({
           // Computed value props
           src: this.computedSrc,
           blank: this.computedBlank,
           width: this.computedWidth,
           height: this.computedHeight,
           srcset: this.computedSrcset || null,
-          sizes: this.computedSizes || null,
-          // Passthrough props
-          alt: this.alt,
-          blankColor: this.blankColor,
-          fluid: this.fluid,
-          fluidGrow: this.fluidGrow,
-          block: this.block,
-          thumbnail: this.thumbnail,
-          rounded: this.rounded,
-          left: this.left,
-          right: this.right,
-          center: this.center
-        }
+          sizes: this.computedSizes || null
+        }, pluckProps(imgProps, this.$props))
       });
     }
   });
 
-  // The `omit()` util creates a new object, so we can just pass the original props
-
-  var lazyProps = omit(props$g, ['left', 'right', 'center', 'block', 'rounded', 'thumbnail', 'fluid', 'fluidGrow']);
-  var props$h = _objectSpread2(_objectSpread2({}, lazyProps), {}, {
-    top: {
-      type: Boolean,
-      default: false
-    },
-    bottom: {
-      type: Boolean,
-      default: false
-    },
-    start: {
-      type: Boolean,
-      default: false
-    },
-    left: {
-      // alias of 'start'
-      type: Boolean,
-      default: false
-    },
-    end: {
-      type: Boolean,
-      default: false
-    },
-    right: {
-      // alias of 'end'
-      type: Boolean,
-      default: false
-    }
-  }); // @vue/component
+  var props$s = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, omit(props$r, keys(props$o))), omit(props$p, ['src', 'alt', 'width', 'height']))), NAME_CARD_IMG_LAZY); // --- Main component ---
+  // @vue/component
 
   var BCardImgLazy = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_IMG_LAZY,
     functional: true,
-    props: props$h,
+    props: props$s,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
@@ -6480,33 +5808,25 @@
         baseClass += '-bottom';
       } else if (props.left || props.start) {
         baseClass += '-left';
-      } // False out the left/center/right props before passing to b-img-lazy
-
-
-      var lazyProps = _objectSpread2(_objectSpread2({}, props), {}, {
-        left: false,
-        right: false,
-        center: false
-      });
+      }
 
       return h(BImgLazy, a(data, {
         class: [baseClass],
-        props: lazyProps
+        // Exclude `left` and `right` props before passing to `<b-img-lazy>`
+        props: omit(props, ['left', 'right'])
       }));
     }
   });
 
-  var props$i = {
-    textTag: {
-      type: String,
-      default: 'p'
-    }
-  }; // @vue/component
+  var props$t = makePropsConfigurable({
+    textTag: makeProp(PROP_TYPE_STRING, 'p')
+  }, NAME_CARD_TEXT); // --- Main component ---
+  // @vue/component
 
   var BCardText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_TEXT,
     functional: true,
-    props: props$i,
+    props: props$t,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -6517,25 +5837,17 @@
     }
   });
 
-  var props$j = {
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    deck: {
-      type: Boolean,
-      default: false
-    },
-    columns: {
-      type: Boolean,
-      default: false
-    }
-  }; // @vue/component
+  var props$u = makePropsConfigurable({
+    columns: makeProp(PROP_TYPE_BOOLEAN, false),
+    deck: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_CARD_GROUP); // --- Main component ---
+  // @vue/component
 
   var BCardGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_GROUP,
     functional: true,
-    props: props$j,
+    props: props$u,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -6560,14 +5872,6 @@
       BCardGroup: BCardGroup
     }
   });
-
-  var EVENT_OPTIONS_PASSIVE = {
-    passive: true
-  };
-  var EVENT_OPTIONS_NO_CAPTURE = {
-    passive: true,
-    capture: false
-  };
 
   var noop = function noop() {};
 
@@ -6641,6 +5945,18 @@
     return obs;
   };
 
+  var _watch$3;
+
+  var _makeModelMixin$2 = makeModelMixin('value', {
+    type: PROP_TYPE_NUMBER,
+    defaultValue: 0
+  }),
+      modelMixin$2 = _makeModelMixin$2.mixin,
+      modelProps$2 = _makeModelMixin$2.props,
+      MODEL_PROP_NAME$2 = _makeModelMixin$2.prop,
+      MODEL_EVENT_NAME$2 = _makeModelMixin$2.event; // Slide directional classes
+
+
   var DIRECTION = {
     next: {
       dirClass: 'carousel-item-left',
@@ -6668,7 +5984,8 @@
     MozTransition: 'transitionend',
     OTransition: 'otransitionend oTransitionEnd',
     transition: 'transitionend'
-  }; // Return the browser specific transitionEnd event name
+  }; // --- Helper methods ---
+  // Return the browser specific transitionEnd event name
 
   var getTransitionEndEvent = function getTransitionEndEvent(el) {
     for (var name in TransitionEndEvents) {
@@ -6681,105 +5998,47 @@
 
 
     return null;
-  }; // @vue/component
+  }; // --- Props ---
 
+
+  var props$v = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$2), {}, {
+    background: makeProp(PROP_TYPE_STRING),
+    controls: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Enable cross-fade animation instead of slide animation
+    fade: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Sniffed by carousel-slide
+    imgHeight: makeProp(PROP_TYPE_NUMBER_STRING),
+    // Sniffed by carousel-slide
+    imgWidth: makeProp(PROP_TYPE_NUMBER_STRING),
+    indicators: makeProp(PROP_TYPE_BOOLEAN, false),
+    interval: makeProp(PROP_TYPE_NUMBER, 5000),
+    labelGotoSlide: makeProp(PROP_TYPE_STRING, 'Goto slide'),
+    labelIndicators: makeProp(PROP_TYPE_STRING, 'Select a slide to display'),
+    labelNext: makeProp(PROP_TYPE_STRING, 'Next slide'),
+    labelPrev: makeProp(PROP_TYPE_STRING, 'Previous slide'),
+    // Disable slide/fade animation
+    noAnimation: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Disable pause on hover
+    noHoverPause: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Sniffed by carousel-slide
+    noTouch: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Disable wrapping/looping when start/end is reached
+    noWrap: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_CAROUSEL); // --- Main component ---
+  // @vue/component
 
   var BCarousel = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CAROUSEL,
-    mixins: [idMixin, normalizeSlotMixin],
+    mixins: [idMixin, modelMixin$2, normalizeSlotMixin],
     provide: function provide() {
       return {
         bvCarousel: this
       };
     },
-    model: {
-      prop: 'value',
-      event: 'input'
-    },
-    props: {
-      labelPrev: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CAROUSEL, 'labelPrev');
-        }
-      },
-      labelNext: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CAROUSEL, 'labelNext');
-        }
-      },
-      labelGotoSlide: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CAROUSEL, 'labelGotoSlide');
-        }
-      },
-      labelIndicators: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_CAROUSEL, 'labelIndicators');
-        }
-      },
-      interval: {
-        type: Number,
-        default: 5000
-      },
-      indicators: {
-        type: Boolean,
-        default: false
-      },
-      controls: {
-        type: Boolean,
-        default: false
-      },
-      noAnimation: {
-        // Disable slide/fade animation
-        type: Boolean,
-        default: false
-      },
-      fade: {
-        // Enable cross-fade animation instead of slide animation
-        type: Boolean,
-        default: false
-      },
-      noWrap: {
-        // Disable wrapping/looping when start/end is reached
-        type: Boolean,
-        default: false
-      },
-      noTouch: {
-        // Sniffed by carousel-slide
-        type: Boolean,
-        default: false
-      },
-      noHoverPause: {
-        // Disable pause on hover
-        type: Boolean,
-        default: false
-      },
-      imgWidth: {
-        // Sniffed by carousel-slide
-        type: [Number, String] // default: undefined
-
-      },
-      imgHeight: {
-        // Sniffed by carousel-slide
-        type: [Number, String] // default: undefined
-
-      },
-      background: {
-        type: String // default: undefined
-
-      },
-      value: {
-        type: Number,
-        default: 0
-      }
-    },
+    props: props$v,
     data: function data() {
       return {
-        index: this.value || 0,
+        index: this[MODEL_PROP_NAME$2] || 0,
         isSliding: false,
         transitionEndEvent: null,
         slides: [],
@@ -6795,41 +6054,36 @@
         return this.slides.length;
       }
     },
-    watch: {
-      value: function value(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.setSlide(toInteger(newVal, 0));
-        }
-      },
-      interval: function interval(newVal, oldVal) {
-        if (newVal === oldVal) {
-          /* istanbul ignore next */
-          return;
-        }
-
-        if (!newVal) {
-          // Pausing slide show
-          this.pause(false);
-        } else {
-          // Restarting or Changing interval
-          this.pause(true);
-          this.start(false);
-        }
-      },
-      isPaused: function isPaused(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.$emit(newVal ? 'paused' : 'unpaused');
-        }
-      },
-      index: function index(to, from) {
-        if (to === from || this.isSliding) {
-          /* istanbul ignore next */
-          return;
-        }
-
-        this.doSlide(to, from);
+    watch: (_watch$3 = {}, _defineProperty(_watch$3, MODEL_PROP_NAME$2, function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.setSlide(toInteger(newValue, 0));
       }
-    },
+    }), _defineProperty(_watch$3, "interval", function interval(newValue, oldValue) {
+      /* istanbul ignore next */
+      if (newValue === oldValue) {
+        return;
+      }
+
+      if (!newValue) {
+        // Pausing slide show
+        this.pause(false);
+      } else {
+        // Restarting or Changing interval
+        this.pause(true);
+        this.start(false);
+      }
+    }), _defineProperty(_watch$3, "isPaused", function isPaused(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.$emit(newValue ? EVENT_NAME_PAUSED : EVENT_NAME_UNPAUSED);
+      }
+    }), _defineProperty(_watch$3, "index", function index(to, from) {
+      /* istanbul ignore next */
+      if (to === from || this.isSliding) {
+        return;
+      }
+
+      this.doSlide(to, from);
+    }), _watch$3),
     created: function created() {
       // Create private non-reactive props
       this.$_interval = null;
@@ -6899,7 +6153,7 @@
         // Don't animate when page is not visible
 
         /* istanbul ignore if: difficult to test */
-        if (isBrowser && document.visibilityState && document.hidden) {
+        if (IS_BROWSER && document.visibilityState && document.hidden) {
           return;
         }
 
@@ -6915,7 +6169,7 @@
 
         if (this.isSliding) {
           // Schedule slide after sliding complete
-          this.$once('sliding-end', function () {
+          this.$once(EVENT_NAME_SLIDING_END, function () {
             // Wrap in `requestAF()` to allow the slide to properly finish to avoid glitching
             requestAF(function () {
               return _this.setSlide(slide, direction);
@@ -6930,8 +6184,8 @@
         this.index = slide >= numSlides ? noWrap ? numSlides - 1 : 0 : slide < 0 ? noWrap ? 0 : numSlides - 1 : slide; // Ensure the v-model is synched up if no-wrap is enabled
         // and user tried to slide pass either ends
 
-        if (noWrap && this.index !== slide && this.index !== this.value) {
-          this.$emit('input', this.index);
+        if (noWrap && this.index !== slide && this.index !== this[MODEL_PROP_NAME$2]) {
+          this.$emit(MODEL_EVENT_NAME$2, this.index);
         }
       },
       // Previous slide
@@ -6943,16 +6197,16 @@
         this.setSlide(this.index + 1, 'next');
       },
       // Pause auto rotation
-      pause: function pause(evt) {
-        if (!evt) {
+      pause: function pause(event) {
+        if (!event) {
           this.isPaused = true;
         }
 
         this.clearInterval();
       },
       // Start auto rotate slides
-      start: function start(evt) {
-        if (!evt) {
+      start: function start(event) {
+        if (!event) {
           this.isPaused = false;
         }
         /* istanbul ignore next: most likely will never happen, but just in case */
@@ -6967,9 +6221,7 @@
       // Restart auto rotate slides when focus/hover leaves the carousel
 
       /* istanbul ignore next */
-      restart: function restart()
-      /* istanbul ignore next: difficult to test */
-      {
+      restart: function restart() {
         if (!this.$el.contains(getActiveElement())) {
           this.start();
         }
@@ -6998,9 +6250,9 @@
           this.pause(false);
         }
 
-        this.$emit('sliding-start', to); // Update v-model
+        this.$emit(EVENT_NAME_SLIDING_START, to); // Update v-model
 
-        this.$emit('input', this.index);
+        this.$emit(MODEL_EVENT_NAME$2, this.index);
 
         if (this.noAnimation) {
           addClass(nextSlide, 'active');
@@ -7008,7 +6260,7 @@
           this.isSliding = false; // Notify ourselves that we're done sliding (slid)
 
           this.$nextTick(function () {
-            return _this2.$emit('sliding-end', to);
+            return _this2.$emit(EVENT_NAME_SLIDING_END, to);
           });
         } else {
           addClass(nextSlide, overlayClass); // Trigger a reflow of next slide
@@ -7031,8 +6283,8 @@
             if (_this2.transitionEndEvent) {
               var events = _this2.transitionEndEvent.split(/\s+/);
 
-              events.forEach(function (evt) {
-                return eventOff(nextSlide, evt, onceTransEnd, EVENT_OPTIONS_NO_CAPTURE);
+              events.forEach(function (event) {
+                return eventOff(nextSlide, event, onceTransEnd, EVENT_OPTIONS_NO_CAPTURE);
               });
             }
 
@@ -7052,7 +6304,7 @@
             _this2.direction = null; // Notify ourselves that we're done sliding (slid)
 
             _this2.$nextTick(function () {
-              return _this2.$emit('sliding-end', to);
+              return _this2.$emit(EVENT_NAME_SLIDING_END, to);
             });
           }; // Set up transitionend handler
 
@@ -7111,19 +6363,17 @@
 
         return DIRECTION[direction];
       },
-      handleClick: function handleClick(evt, fn) {
-        var keyCode = evt.keyCode;
+      handleClick: function handleClick(event, fn) {
+        var keyCode = event.keyCode;
 
-        if (evt.type === 'click' || keyCode === CODE_SPACE || keyCode === CODE_ENTER) {
-          stopEvent(evt);
+        if (event.type === 'click' || keyCode === CODE_SPACE || keyCode === CODE_ENTER) {
+          stopEvent(event);
           fn();
         }
       },
 
-      /* istanbul ignore next */
-      handleSwipe: function handleSwipe()
       /* istanbul ignore next: JSDOM doesn't support touch events */
-      {
+      handleSwipe: function handleSwipe() {
         var absDeltaX = mathAbs(this.touchDeltaX);
 
         if (absDeltaX <= SWIPE_THRESHOLD) {
@@ -7144,35 +6394,29 @@
         }
       },
 
-      /* istanbul ignore next */
-      touchStart: function touchStart(evt)
       /* istanbul ignore next: JSDOM doesn't support touch events */
-      {
-        if (hasPointerEventSupport && PointerType[evt.pointerType.toUpperCase()]) {
-          this.touchStartX = evt.clientX;
-        } else if (!hasPointerEventSupport) {
-          this.touchStartX = evt.touches[0].clientX;
+      touchStart: function touchStart(event) {
+        if (HAS_POINTER_EVENT_SUPPORT && PointerType[event.pointerType.toUpperCase()]) {
+          this.touchStartX = event.clientX;
+        } else if (!HAS_POINTER_EVENT_SUPPORT) {
+          this.touchStartX = event.touches[0].clientX;
         }
       },
 
-      /* istanbul ignore next */
-      touchMove: function touchMove(evt)
       /* istanbul ignore next: JSDOM doesn't support touch events */
-      {
+      touchMove: function touchMove(event) {
         // Ensure swiping with one touch and not pinching
-        if (evt.touches && evt.touches.length > 1) {
+        if (event.touches && event.touches.length > 1) {
           this.touchDeltaX = 0;
         } else {
-          this.touchDeltaX = evt.touches[0].clientX - this.touchStartX;
+          this.touchDeltaX = event.touches[0].clientX - this.touchStartX;
         }
       },
 
-      /* istanbul ignore next */
-      touchEnd: function touchEnd(evt)
       /* istanbul ignore next: JSDOM doesn't support touch events */
-      {
-        if (hasPointerEventSupport && PointerType[evt.pointerType.toUpperCase()]) {
-          this.touchDeltaX = evt.clientX - this.touchStartX;
+      touchEnd: function touchEnd(event) {
+        if (HAS_POINTER_EVENT_SUPPORT && PointerType[event.pointerType.toUpperCase()]) {
+          this.touchDeltaX = event.clientX - this.touchStartX;
         }
 
         this.handleSwipe(); // If it's a touch-enabled device, mouseenter/leave are fired as
@@ -7191,158 +6435,140 @@
     render: function render(h) {
       var _this3 = this;
 
-      // Wrapper for slides
-      var inner = h('div', {
-        ref: 'inner',
-        class: ['carousel-inner'],
+      var indicators = this.indicators,
+          background = this.background,
+          noAnimation = this.noAnimation,
+          noHoverPause = this.noHoverPause,
+          noTouch = this.noTouch,
+          index = this.index,
+          isSliding = this.isSliding,
+          pause = this.pause,
+          restart = this.restart,
+          touchStart = this.touchStart,
+          touchEnd = this.touchEnd;
+      var idInner = this.safeId('__BV_inner_'); // Wrapper for slides
+
+      var $inner = h('div', {
+        staticClass: 'carousel-inner',
         attrs: {
-          id: this.safeId('__BV_inner_'),
+          id: idInner,
           role: 'list'
-        }
+        },
+        ref: 'inner'
       }, [this.normalizeSlot()]); // Prev and next controls
 
-      var controls = h();
+      var $controls = h();
 
       if (this.controls) {
-        var prevHandler = function prevHandler(evt) {
-          /* istanbul ignore next */
-          if (!_this3.isSliding) {
-            _this3.handleClick(evt, _this3.prev);
-          } else {
-            stopEvent(evt, {
-              propagation: false
-            });
-          }
+        var makeControl = function makeControl(direction, label, handler) {
+          var handlerWrapper = function handlerWrapper(event) {
+            /* istanbul ignore next */
+            if (!isSliding) {
+              _this3.handleClick(event, handler);
+            } else {
+              stopEvent(event, {
+                propagation: false
+              });
+            }
+          };
+
+          return h('a', {
+            staticClass: "carousel-control-".concat(direction),
+            attrs: {
+              href: '#',
+              role: 'button',
+              'aria-controls': idInner,
+              'aria-disabled': isSliding ? 'true' : null
+            },
+            on: {
+              click: handlerWrapper,
+              keydown: handlerWrapper
+            }
+          }, [h('span', {
+            staticClass: "carousel-control-".concat(direction, "-icon"),
+            attrs: {
+              'aria-hidden': 'true'
+            }
+          }), h('span', {
+            class: 'sr-only'
+          }, [label])]);
         };
 
-        var nextHandler = function nextHandler(evt) {
-          /* istanbul ignore next */
-          if (!_this3.isSliding) {
-            _this3.handleClick(evt, _this3.next);
-          } else {
-            stopEvent(evt, {
-              propagation: false
-            });
-          }
-        };
-
-        controls = [h('a', {
-          class: ['carousel-control-prev'],
-          attrs: {
-            href: '#',
-            role: 'button',
-            'aria-controls': this.safeId('__BV_inner_'),
-            'aria-disabled': this.isSliding ? 'true' : null
-          },
-          on: {
-            click: prevHandler,
-            keydown: prevHandler
-          }
-        }, [h('span', {
-          class: ['carousel-control-prev-icon'],
-          attrs: {
-            'aria-hidden': 'true'
-          }
-        }), h('span', {
-          class: ['sr-only']
-        }, [this.labelPrev])]), h('a', {
-          class: ['carousel-control-next'],
-          attrs: {
-            href: '#',
-            role: 'button',
-            'aria-controls': this.safeId('__BV_inner_'),
-            'aria-disabled': this.isSliding ? 'true' : null
-          },
-          on: {
-            click: nextHandler,
-            keydown: nextHandler
-          }
-        }, [h('span', {
-          class: ['carousel-control-next-icon'],
-          attrs: {
-            'aria-hidden': 'true'
-          }
-        }), h('span', {
-          class: ['sr-only']
-        }, [this.labelNext])])];
+        $controls = [makeControl('prev', this.labelPrev, this.prev), makeControl('next', this.labelNext, this.next)];
       } // Indicators
 
 
-      var indicators = h('ol', {
-        class: ['carousel-indicators'],
+      var $indicators = h('ol', {
+        staticClass: 'carousel-indicators',
         directives: [{
           name: 'show',
-          rawName: 'v-show',
-          value: this.indicators,
-          expression: 'indicators'
+          value: indicators
         }],
         attrs: {
           id: this.safeId('__BV_indicators_'),
-          'aria-hidden': this.indicators ? 'false' : 'true',
+          'aria-hidden': indicators ? 'false' : 'true',
           'aria-label': this.labelIndicators,
-          'aria-owns': this.safeId('__BV_inner_')
+          'aria-owns': idInner
         }
-      }, this.slides.map(function (slide, n) {
+      }, this.slides.map(function (slide, i) {
+        var handler = function handler(event) {
+          _this3.handleClick(event, function () {
+            _this3.setSlide(i);
+          });
+        };
+
         return h('li', {
-          key: "slide_".concat(n),
           class: {
-            active: n === _this3.index
+            active: i === index
           },
           attrs: {
             role: 'button',
-            id: _this3.safeId("__BV_indicator_".concat(n + 1, "_")),
-            tabindex: _this3.indicators ? '0' : '-1',
-            'aria-current': n === _this3.index ? 'true' : 'false',
-            'aria-label': "".concat(_this3.labelGotoSlide, " ").concat(n + 1),
-            'aria-describedby': _this3.slides[n].id || null,
-            'aria-controls': _this3.safeId('__BV_inner_')
+            id: _this3.safeId("__BV_indicator_".concat(i + 1, "_")),
+            tabindex: indicators ? '0' : '-1',
+            'aria-current': i === index ? 'true' : 'false',
+            'aria-label': "".concat(_this3.labelGotoSlide, " ").concat(i + 1),
+            'aria-describedby': slide.id || null,
+            'aria-controls': idInner
           },
           on: {
-            click: function click(evt) {
-              _this3.handleClick(evt, function () {
-                _this3.setSlide(n);
-              });
-            },
-            keydown: function keydown(evt) {
-              _this3.handleClick(evt, function () {
-                _this3.setSlide(n);
-              });
-            }
-          }
+            click: handler,
+            keydown: handler
+          },
+          key: "slide_".concat(i)
         });
       }));
       var on = {
-        mouseenter: this.noHoverPause ? noop : this.pause,
-        mouseleave: this.noHoverPause ? noop : this.restart,
-        focusin: this.pause,
-        focusout: this.restart,
-        keydown: function keydown(evt) {
-          if (/input|textarea/i.test(evt.target.tagName)) {
-            /* istanbul ignore next */
+        mouseenter: noHoverPause ? noop : pause,
+        mouseleave: noHoverPause ? noop : restart,
+        focusin: pause,
+        focusout: restart,
+        keydown: function keydown(event) {
+          /* istanbul ignore next */
+          if (/input|textarea/i.test(event.target.tagName)) {
             return;
           }
 
-          var keyCode = evt.keyCode;
+          var keyCode = event.keyCode;
 
           if (keyCode === CODE_LEFT || keyCode === CODE_RIGHT) {
-            stopEvent(evt);
+            stopEvent(event);
 
             _this3[keyCode === CODE_LEFT ? 'prev' : 'next']();
           }
         }
       }; // Touch support event handlers for environment
 
-      if (!this.noTouch && hasTouchSupport) {
+      if (HAS_TOUCH_SUPPORT && !noTouch) {
         // Attach appropriate listeners (prepend event name with '&' for passive mode)
 
         /* istanbul ignore next: JSDOM doesn't support touch events */
-        if (hasPointerEventSupport) {
-          on['&pointerdown'] = this.touchStart;
-          on['&pointerup'] = this.touchEnd;
+        if (HAS_POINTER_EVENT_SUPPORT) {
+          on['&pointerdown'] = touchStart;
+          on['&pointerup'] = touchEnd;
         } else {
-          on['&touchstart'] = this.touchStart;
+          on['&touchstart'] = touchStart;
           on['&touchmove'] = this.touchMove;
-          on['&touchend'] = this.touchEnd;
+          on['&touchend'] = touchEnd;
         }
       } // Return the carousel
 
@@ -7350,81 +6576,42 @@
       return h('div', {
         staticClass: 'carousel',
         class: {
-          slide: !this.noAnimation,
-          'carousel-fade': !this.noAnimation && this.fade,
-          'pointer-event': !this.noTouch && hasTouchSupport && hasPointerEventSupport
+          slide: !noAnimation,
+          'carousel-fade': !noAnimation && this.fade,
+          'pointer-event': HAS_TOUCH_SUPPORT && HAS_POINTER_EVENT_SUPPORT && !noTouch
         },
         style: {
-          background: this.background
+          background: background
         },
         attrs: {
           role: 'region',
           id: this.safeId(),
-          'aria-busy': this.isSliding ? 'true' : 'false'
+          'aria-busy': isSliding ? 'true' : 'false'
         },
         on: on
-      }, [inner, controls, indicators]);
+      }, [$inner, $controls, $indicators]);
     }
   });
 
-  var imgProps = {
-    imgSrc: {
-      type: String // default: undefined
-
-    },
-    imgAlt: {
-      type: String // default: undefined
-
-    },
-    imgWidth: {
-      type: [Number, String] // default: undefined
-
-    },
-    imgHeight: {
-      type: [Number, String] // default: undefined
-
-    },
-    imgBlank: {
-      type: Boolean,
-      default: false
-    },
-    imgBlankColor: {
-      type: String,
-      default: 'transparent'
-    }
+  var imgProps$1 = {
+    imgAlt: makeProp(PROP_TYPE_STRING),
+    imgBlank: makeProp(PROP_TYPE_BOOLEAN, false),
+    imgBlankColor: makeProp(PROP_TYPE_STRING, 'transparent'),
+    imgHeight: makeProp(PROP_TYPE_NUMBER_STRING),
+    imgSrc: makeProp(PROP_TYPE_STRING),
+    imgWidth: makeProp(PROP_TYPE_NUMBER_STRING)
   };
-  var props$k = _objectSpread2(_objectSpread2({}, imgProps), {}, {
-    contentVisibleUp: {
-      type: String
-    },
-    contentTag: {
-      type: String,
-      default: 'div'
-    },
-    caption: {
-      type: String
-    },
-    captionHtml: {
-      type: String
-    },
-    captionTag: {
-      type: String,
-      default: 'h3'
-    },
-    text: {
-      type: String
-    },
-    textHtml: {
-      type: String
-    },
-    textTag: {
-      type: String,
-      default: 'p'
-    },
-    background: {
-      type: String
-    }
-  }); // --- Main component ---
+  var props$w = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), imgProps$1), {}, {
+    background: makeProp(PROP_TYPE_STRING),
+    caption: makeProp(PROP_TYPE_STRING),
+    captionHtml: makeProp(PROP_TYPE_STRING),
+    captionTag: makeProp(PROP_TYPE_STRING, 'h3'),
+    contentTag: makeProp(PROP_TYPE_STRING, 'div'),
+    contentVisibleUp: makeProp(PROP_TYPE_STRING),
+    text: makeProp(PROP_TYPE_STRING),
+    textHtml: makeProp(PROP_TYPE_STRING),
+    textTag: makeProp(PROP_TYPE_STRING, 'p')
+  })), NAME_CAROUSEL_SLIDE); // --- Main component ---
   // @vue/component
 
   var BCarouselSlide = /*#__PURE__*/Vue__default['default'].extend({
@@ -7432,15 +6619,15 @@
     mixins: [idMixin, normalizeSlotMixin],
     inject: {
       bvCarousel: {
+        // Explicitly disable touch if not a child of carousel
         default: function _default() {
           return {
-            // Explicitly disable touch if not a child of carousel
             noTouch: true
           };
         }
       }
     },
-    props: props$k,
+    props: props$w,
     computed: {
       contentClasses: function contentClasses() {
         return [this.contentVisibleUp ? 'd-none' : '', this.contentVisibleUp ? "d-".concat(this.contentVisibleUp, "-block") : ''];
@@ -7455,23 +6642,23 @@
       }
     },
     render: function render(h) {
-      var $img = this.normalizeSlot('img');
+      var $img = this.normalizeSlot(SLOT_NAME_IMG);
 
       if (!$img && (this.imgSrc || this.imgBlank)) {
         var on = {}; // Touch support event handler
 
         /* istanbul ignore if: difficult to test in JSDOM */
 
-        if (!this.bvCarousel.noTouch && hasTouchSupport) {
-          on.dragstart = function (evt) {
-            return stopEvent(evt, {
+        if (!this.bvCarousel.noTouch && HAS_TOUCH_SUPPORT) {
+          on.dragstart = function (event) {
+            return stopEvent(event, {
               propagation: false
             });
           };
         }
 
         $img = h(BImg, {
-          props: _objectSpread2(_objectSpread2({}, pluckProps(imgProps, this.$props, unprefixPropName.bind(null, 'img'))), {}, {
+          props: _objectSpread2(_objectSpread2({}, pluckProps(imgProps$1, this.$props, unprefixPropName.bind(null, 'img'))), {}, {
             width: this.computedWidth,
             height: this.computedHeight,
             fluidGrow: true,
@@ -7491,7 +6678,7 @@
       this.normalizeSlot() || false];
       var $content = h();
 
-      if ($contentChildren.some(Boolean)) {
+      if ($contentChildren.some(identity)) {
         $content = h(this.contentTag, {
           staticClass: 'carousel-caption',
           class: this.contentClasses
@@ -7522,7 +6709,10 @@
     }
   });
 
+  var CLASS_NAME_SHOW = 'show';
+
   // Generic collapse transion helper component
+  // Transition event handler helpers
 
   var onEnter = function onEnter(el) {
     setStyle(el, 'height', 0); // In a `requestAF()` for `appear` to work
@@ -7547,7 +6737,8 @@
 
   var onAfterLeave = function onAfterLeave(el) {
     removeStyle(el, 'height');
-  }; // Default transition props
+  }; // --- Constants ---
+  // Default transition props
   // `appear` will use the enter classes
 
 
@@ -7567,18 +6758,18 @@
     afterEnter: onAfterEnter,
     leave: onLeave,
     afterLeave: onAfterLeave
-  }; // @vue/component
+  }; // --- Main component ---
+
+  var props$x = {
+    // // If `true` (and `visible` is `true` on mount), animate initially visible
+    appear: makeProp(PROP_TYPE_BOOLEAN, false)
+  }; // --- Main component ---
+  // @vue/component
 
   var BVCollapse = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_COLLAPSE_HELPER,
     functional: true,
-    props: {
-      appear: {
-        // If `true` (and `visible` is `true` on mount), animate initially visible
-        type: Boolean,
-        default: false
-      }
-    },
+    props: props$x,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -7594,72 +6785,257 @@
     }
   });
 
+  var _watch$4;
+
+  var ROOT_ACTION_EVENT_NAME_TOGGLE = getRootActionEventName(NAME_COLLAPSE, 'toggle');
+  var ROOT_ACTION_EVENT_NAME_REQUEST_STATE = getRootActionEventName(NAME_COLLAPSE, 'request-state');
+  var ROOT_EVENT_NAME_ACCORDION = getRootEventName(NAME_COLLAPSE, 'accordion');
+  var ROOT_EVENT_NAME_STATE = getRootEventName(NAME_COLLAPSE, 'state');
+  var ROOT_EVENT_NAME_SYNC_STATE = getRootEventName(NAME_COLLAPSE, 'sync-state');
+
+  var _makeModelMixin$3 = makeModelMixin('visible', {
+    type: PROP_TYPE_BOOLEAN,
+    defaultValue: false
+  }),
+      modelMixin$3 = _makeModelMixin$3.mixin,
+      modelProps$3 = _makeModelMixin$3.props,
+      MODEL_PROP_NAME$3 = _makeModelMixin$3.prop,
+      MODEL_EVENT_NAME$3 = _makeModelMixin$3.event; // --- Props ---
+
+
+  var props$y = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$3), {}, {
+    // If `true` (and `visible` is `true` on mount), animate initially visible
+    accordion: makeProp(PROP_TYPE_STRING),
+    appear: makeProp(PROP_TYPE_BOOLEAN, false),
+    isNav: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  })), NAME_COLLAPSE); // --- Main component ---
   // @vue/component
-  var listenOnRootMixin = {
-    methods: {
-      /**
-       * Safely register event listeners on the root Vue node
-       * While Vue automatically removes listeners for individual components,
-       * when a component registers a listener on root and is destroyed,
-       * this orphans a callback because the node is gone,
-       * but the root does not clear the callback
-       *
-       * When registering a `$root` listener, it also registers a listener on
-       * the component's `beforeDestroy()` hook to automatically remove the
-       * event listener from the `$root` instance
-       *
-       * @param {string} event
-       * @param {function} callback
-       */
-      listenOnRoot: function listenOnRoot(event, callback) {
+
+  var BCollapse = /*#__PURE__*/Vue__default['default'].extend({
+    name: NAME_COLLAPSE,
+    mixins: [idMixin, modelMixin$3, normalizeSlotMixin, listenOnRootMixin],
+    props: props$y,
+    data: function data() {
+      return {
+        show: this[MODEL_PROP_NAME$3],
+        transitioning: false
+      };
+    },
+    computed: {
+      classObject: function classObject() {
+        var transitioning = this.transitioning;
+        return {
+          'navbar-collapse': this.isNav,
+          collapse: !transitioning,
+          show: this.show && !transitioning
+        };
+      },
+      slotScope: function slotScope() {
         var _this = this;
 
-        this.$root.$on(event, callback);
-        this.$on('hook:beforeDestroy', function () {
-          _this.$root.$off(event, callback);
-        });
+        return {
+          visible: this.show,
+          close: function close() {
+            _this.show = false;
+          }
+        };
+      }
+    },
+    watch: (_watch$4 = {}, _defineProperty(_watch$4, MODEL_PROP_NAME$3, function (newValue) {
+      if (newValue !== this.show) {
+        this.show = newValue;
+      }
+    }), _defineProperty(_watch$4, "show", function show(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.emitState();
+      }
+    }), _watch$4),
+    created: function created() {
+      this.show = this[MODEL_PROP_NAME$3];
+    },
+    mounted: function mounted() {
+      var _this2 = this;
+
+      this.show = this[MODEL_PROP_NAME$3]; // Listen for toggle events to open/close us
+
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_TOGGLE, this.handleToggleEvt); // Listen to other collapses for accordion events
+
+      this.listenOnRoot(ROOT_EVENT_NAME_ACCORDION, this.handleAccordionEvt);
+
+      if (this.isNav) {
+        // Set up handlers
+        this.setWindowEvents(true);
+        this.handleResize();
+      }
+
+      this.$nextTick(function () {
+        _this2.emitState();
+      }); // Listen for "Sync state" requests from `v-b-toggle`
+
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_REQUEST_STATE, function (id) {
+        if (id === _this2.safeId()) {
+          _this2.$nextTick(_this2.emitSync);
+        }
+      });
+    },
+    updated: function updated() {
+      // Emit a private event every time this component updates to ensure
+      // the toggle button is in sync with the collapse's state
+      // It is emitted regardless if the visible state changes
+      this.emitSync();
+    },
+
+    /* istanbul ignore next */
+    deactivated: function deactivated() {
+      if (this.isNav) {
+        this.setWindowEvents(false);
+      }
+    },
+
+    /* istanbul ignore next */
+    activated: function activated() {
+      if (this.isNav) {
+        this.setWindowEvents(true);
+      }
+
+      this.emitSync();
+    },
+    beforeDestroy: function beforeDestroy() {
+      // Trigger state emit if needed
+      this.show = false;
+
+      if (this.isNav && IS_BROWSER) {
+        this.setWindowEvents(false);
+      }
+    },
+    methods: {
+      setWindowEvents: function setWindowEvents(on) {
+        eventOnOff(on, window, 'resize', this.handleResize, EVENT_OPTIONS_NO_CAPTURE);
+        eventOnOff(on, window, 'orientationchange', this.handleResize, EVENT_OPTIONS_NO_CAPTURE);
       },
-
-      /**
-       * Safely register a `$once()` event listener on the root Vue node
-       * While Vue automatically removes listeners for individual components,
-       * when a component registers a listener on root and is destroyed,
-       * this orphans a callback because the node is gone,
-       * but the root does not clear the callback
-       *
-       * When registering a $root listener, it also registers a listener on
-       * the component's `beforeDestroy` hook to automatically remove the
-       * event listener from the $root instance.
-       *
-       * @param {string} event
-       * @param {function} callback
-       */
-      listenOnRootOnce: function listenOnRootOnce(event, callback) {
-        var _this2 = this;
-
-        this.$root.$once(event, callback);
-        this.$on('hook:beforeDestroy', function () {
-          _this2.$root.$off(event, callback);
-        });
+      toggle: function toggle() {
+        this.show = !this.show;
       },
+      onEnter: function onEnter() {
+        this.transitioning = true; // This should be moved out so we can add cancellable events
 
-      /**
-       * Convenience method for calling `vm.$emit()` on `vm.$root`
-       *
-       * @param {string} event
-       * @param {*} args
-       */
-      emitOnRoot: function emitOnRoot(event) {
-        var _this$$root;
+        this.$emit(EVENT_NAME_SHOW);
+      },
+      onAfterEnter: function onAfterEnter() {
+        this.transitioning = false;
+        this.$emit(EVENT_NAME_SHOWN);
+      },
+      onLeave: function onLeave() {
+        this.transitioning = true; // This should be moved out so we can add cancellable events
 
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
+        this.$emit(EVENT_NAME_HIDE);
+      },
+      onAfterLeave: function onAfterLeave() {
+        this.transitioning = false;
+        this.$emit(EVENT_NAME_HIDDEN);
+      },
+      emitState: function emitState() {
+        var show = this.show,
+            accordion = this.accordion;
+        var id = this.safeId();
+        this.$emit(MODEL_EVENT_NAME$3, show); // Let `v-b-toggle` know the state of this collapse
+
+        this.emitOnRoot(ROOT_EVENT_NAME_STATE, id, show);
+
+        if (accordion && show) {
+          // Tell the other collapses in this accordion to close
+          this.emitOnRoot(ROOT_EVENT_NAME_ACCORDION, id, accordion);
+        }
+      },
+      emitSync: function emitSync() {
+        // Emit a private event every time this component updates to ensure
+        // the toggle button is in sync with the collapse's state
+        // It is emitted regardless if the visible state changes
+        this.emitOnRoot(ROOT_EVENT_NAME_SYNC_STATE, this.safeId(), this.show);
+      },
+      checkDisplayBlock: function checkDisplayBlock() {
+        // Check to see if the collapse has `display: block !important` set
+        // We can't set `display: none` directly on `this.$el`, as it would
+        // trigger a new transition to start (or cancel a current one)
+        var $el = this.$el;
+        var restore = hasClass($el, CLASS_NAME_SHOW);
+        removeClass($el, CLASS_NAME_SHOW);
+        var isBlock = getCS($el).display === 'block';
+
+        if (restore) {
+          addClass($el, CLASS_NAME_SHOW);
         }
 
-        (_this$$root = this.$root).$emit.apply(_this$$root, [event].concat(args));
+        return isBlock;
+      },
+      clickHandler: function clickHandler(event) {
+        var el = event.target; // If we are in a nav/navbar, close the collapse when non-disabled link clicked
+
+        /* istanbul ignore next: can't test `getComputedStyle()` in JSDOM */
+
+        if (!this.isNav || !el || getCS(this.$el).display !== 'block') {
+          return;
+        } // Only close the collapse if it is not forced to be `display: block !important`
+
+
+        if ((matches(el, '.nav-link,.dropdown-item') || closest('.nav-link,.dropdown-item', el)) && !this.checkDisplayBlock()) {
+          this.show = false;
+        }
+      },
+      handleToggleEvt: function handleToggleEvt(id) {
+        if (id === this.safeId()) {
+          this.toggle();
+        }
+      },
+      handleAccordionEvt: function handleAccordionEvt(openedId, openAccordion) {
+        var accordion = this.accordion,
+            show = this.show;
+
+        if (!accordion || accordion !== openAccordion) {
+          return;
+        }
+
+        var isThis = openedId === this.safeId(); // Open this collapse if not shown or
+        // close this collapse if shown
+
+        if (isThis && !show || !isThis && show) {
+          this.toggle();
+        }
+      },
+      handleResize: function handleResize() {
+        // Handler for orientation/resize to set collapsed state in nav/navbar
+        this.show = getCS(this.$el).display === 'block';
       }
+    },
+    render: function render(h) {
+      var appear = this.appear;
+      var $content = h(this.tag, {
+        class: this.classObject,
+        directives: [{
+          name: 'show',
+          value: this.show
+        }],
+        attrs: {
+          id: this.safeId()
+        },
+        on: {
+          click: this.clickHandler
+        }
+      }, this.normalizeSlot(SLOT_NAME_DEFAULT, this.slotScope));
+      return h(BVCollapse, {
+        props: {
+          appear: appear
+        },
+        on: {
+          enter: this.onEnter,
+          afterEnter: this.onAfterEnter,
+          leave: this.onLeave,
+          afterLeave: this.onAfterLeave
+        }
+      }, [$content]);
     }
-  };
+  });
 
   // Classes to apply to trigger element
 
@@ -7686,15 +7062,15 @@
 
   var STYLE_OVERFLOW_ANCHOR = 'overflow-anchor'; // Emitted control event for collapse (emitted to collapse)
 
-  var EVENT_TOGGLE = 'bv::toggle::collapse'; // Listen to event for toggle state update (emitted by collapse)
+  var ROOT_ACTION_EVENT_NAME_TOGGLE$1 = getRootActionEventName(NAME_COLLAPSE, 'toggle'); // Listen to event for toggle state update (emitted by collapse)
 
-  var EVENT_STATE = 'bv::collapse::state'; // Private event emitted on `$root` to ensure the toggle state is always synced
+  var ROOT_EVENT_NAME_STATE$1 = getRootEventName(NAME_COLLAPSE, 'state'); // Private event emitted on `$root` to ensure the toggle state is always synced
   // Gets emitted even if the state of b-collapse has not changed
   // This event is NOT to be documented as people should not be using it
 
-  var EVENT_STATE_SYNC = 'bv::collapse::sync::state'; // Private event we send to collapse to request state update sync event
+  var ROOT_EVENT_NAME_SYNC_STATE$1 = getRootEventName(NAME_COLLAPSE, 'sync-state'); // Private event we send to collapse to request state update sync event
 
-  var EVENT_STATE_REQUEST = 'bv::request::collapse::state';
+  var ROOT_ACTION_EVENT_NAME_REQUEST_STATE$1 = getRootActionEventName(NAME_COLLAPSE, 'request-state');
   var KEYDOWN_KEY_CODES = [CODE_ENTER, CODE_SPACE]; // --- Helper methods ---
 
   var isNonStandardTag$1 = function isNonStandardTag(el) {
@@ -7745,11 +7121,11 @@
     removeClickListener(el);
 
     if (vnode.context) {
-      var handler = function handler(evt) {
-        if (!(evt.type === 'keydown' && !arrayIncludes(KEYDOWN_KEY_CODES, evt.keyCode)) && !isDisabled(el)) {
+      var handler = function handler(event) {
+        if (!(event.type === 'keydown' && !arrayIncludes(KEYDOWN_KEY_CODES, event.keyCode)) && !isDisabled(el)) {
           var targets = el[BV_TOGGLE_TARGETS] || [];
           targets.forEach(function (target) {
-            vnode.context.$root.$emit(EVENT_TOGGLE, target);
+            vnode.context.$root.$emit(ROOT_ACTION_EVENT_NAME_TOGGLE$1, target);
           });
         }
       };
@@ -7765,7 +7141,7 @@
 
   var removeRootListeners = function removeRootListeners(el, vnode) {
     if (el[BV_TOGGLE_ROOT_HANDLER] && vnode.context) {
-      vnode.context.$root.$off([EVENT_STATE, EVENT_STATE_SYNC], el[BV_TOGGLE_ROOT_HANDLER]);
+      vnode.context.$root.$off([ROOT_EVENT_NAME_STATE$1, ROOT_EVENT_NAME_SYNC_STATE$1], el[BV_TOGGLE_ROOT_HANDLER]);
     }
 
     el[BV_TOGGLE_ROOT_HANDLER] = null;
@@ -7787,7 +7163,7 @@
 
       el[BV_TOGGLE_ROOT_HANDLER] = handler; // Listen for toggle state changes (public) and sync (private)
 
-      vnode.context.$root.$on([EVENT_STATE, EVENT_STATE_SYNC], handler);
+      vnode.context.$root.$on([ROOT_EVENT_NAME_STATE$1, ROOT_EVENT_NAME_SYNC_STATE$1], handler);
     }
   };
 
@@ -7813,7 +7189,7 @@
 
   var handleUpdate = function handleUpdate(el, binding, vnode) {
     /* istanbul ignore next: should never happen */
-    if (!isBrowser || !vnode.context) {
+    if (!IS_BROWSER || !vnode.context) {
       return;
     } // If element is not a button or link, we add `role="button"`
     // and `tabindex="0"` for accessibility reasons
@@ -7863,7 +7239,7 @@
       // ensure expanded state is correct (in most cases)
 
       targets.forEach(function (target) {
-        vnode.context.$root.$emit(EVENT_STATE_REQUEST, target);
+        vnode.context.$root.$emit(ROOT_ACTION_EVENT_NAME_REQUEST_STATE$1, target);
       });
     }
   };
@@ -7904,267 +7280,6 @@
     }
   };
 
-  // Accordion event name we emit on `$root`
-
-  var EVENT_ACCORDION = 'bv::collapse::accordion'; // --- Main component ---
-  // @vue/component
-
-  var BCollapse = /*#__PURE__*/Vue__default['default'].extend({
-    name: NAME_COLLAPSE,
-    mixins: [idMixin, listenOnRootMixin, normalizeSlotMixin],
-    model: {
-      prop: 'visible',
-      event: 'input'
-    },
-    props: {
-      isNav: {
-        type: Boolean,
-        default: false
-      },
-      accordion: {
-        type: String // default: null
-
-      },
-      visible: {
-        type: Boolean,
-        default: false
-      },
-      tag: {
-        type: String,
-        default: 'div'
-      },
-      appear: {
-        // If `true` (and `visible` is `true` on mount), animate initially visible
-        type: Boolean,
-        default: false
-      }
-    },
-    data: function data() {
-      return {
-        show: this.visible,
-        transitioning: false
-      };
-    },
-    computed: {
-      classObject: function classObject() {
-        return {
-          'navbar-collapse': this.isNav,
-          collapse: !this.transitioning,
-          show: this.show && !this.transitioning
-        };
-      }
-    },
-    watch: {
-      visible: function visible(newVal) {
-        if (newVal !== this.show) {
-          this.show = newVal;
-        }
-      },
-      show: function show(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.emitState();
-        }
-      }
-    },
-    created: function created() {
-      this.show = this.visible;
-    },
-    mounted: function mounted() {
-      var _this = this;
-
-      this.show = this.visible; // Listen for toggle events to open/close us
-
-      this.listenOnRoot(EVENT_TOGGLE, this.handleToggleEvt); // Listen to other collapses for accordion events
-
-      this.listenOnRoot(EVENT_ACCORDION, this.handleAccordionEvt);
-
-      if (this.isNav) {
-        // Set up handlers
-        this.setWindowEvents(true);
-        this.handleResize();
-      }
-
-      this.$nextTick(function () {
-        _this.emitState();
-      }); // Listen for "Sync state" requests from `v-b-toggle`
-
-      this.listenOnRoot(EVENT_STATE_REQUEST, function (id) {
-        if (id === _this.safeId()) {
-          _this.$nextTick(_this.emitSync);
-        }
-      });
-    },
-    updated: function updated() {
-      // Emit a private event every time this component updates to ensure
-      // the toggle button is in sync with the collapse's state
-      // It is emitted regardless if the visible state changes
-      this.emitSync();
-    },
-
-    /* istanbul ignore next */
-    deactivated: function deactivated()
-    /* istanbul ignore next */
-    {
-      if (this.isNav) {
-        this.setWindowEvents(false);
-      }
-    },
-
-    /* istanbul ignore next */
-    activated: function activated()
-    /* istanbul ignore next */
-    {
-      if (this.isNav) {
-        this.setWindowEvents(true);
-      }
-
-      this.emitSync();
-    },
-    beforeDestroy: function beforeDestroy() {
-      // Trigger state emit if needed
-      this.show = false;
-
-      if (this.isNav && isBrowser) {
-        this.setWindowEvents(false);
-      }
-    },
-    methods: {
-      setWindowEvents: function setWindowEvents(on) {
-        eventOnOff(on, window, 'resize', this.handleResize, EVENT_OPTIONS_NO_CAPTURE);
-        eventOnOff(on, window, 'orientationchange', this.handleResize, EVENT_OPTIONS_NO_CAPTURE);
-      },
-      toggle: function toggle() {
-        this.show = !this.show;
-      },
-      onEnter: function onEnter() {
-        this.transitioning = true; // This should be moved out so we can add cancellable events
-
-        this.$emit('show');
-      },
-      onAfterEnter: function onAfterEnter() {
-        this.transitioning = false;
-        this.$emit('shown');
-      },
-      onLeave: function onLeave() {
-        this.transitioning = true; // This should be moved out so we can add cancellable events
-
-        this.$emit('hide');
-      },
-      onAfterLeave: function onAfterLeave() {
-        this.transitioning = false;
-        this.$emit('hidden');
-      },
-      emitState: function emitState() {
-        this.$emit('input', this.show); // Let `v-b-toggle` know the state of this collapse
-
-        this.emitOnRoot(EVENT_STATE, this.safeId(), this.show);
-
-        if (this.accordion && this.show) {
-          // Tell the other collapses in this accordion to close
-          this.emitOnRoot(EVENT_ACCORDION, this.safeId(), this.accordion);
-        }
-      },
-      emitSync: function emitSync() {
-        // Emit a private event every time this component updates to ensure
-        // the toggle button is in sync with the collapse's state
-        // It is emitted regardless if the visible state changes
-        this.emitOnRoot(EVENT_STATE_SYNC, this.safeId(), this.show);
-      },
-      checkDisplayBlock: function checkDisplayBlock() {
-        // Check to see if the collapse has `display: block !important` set
-        // We can't set `display: none` directly on `this.$el`, as it would
-        // trigger a new transition to start (or cancel a current one)
-        var restore = hasClass(this.$el, 'show');
-        removeClass(this.$el, 'show');
-        var isBlock = getCS(this.$el).display === 'block';
-
-        if (restore) {
-          addClass(this.$el, 'show');
-        }
-
-        return isBlock;
-      },
-      clickHandler: function clickHandler(evt) {
-        // If we are in a nav/navbar, close the collapse when non-disabled link clicked
-        var el = evt.target;
-
-        if (!this.isNav || !el || getCS(this.$el).display !== 'block') {
-          /* istanbul ignore next: can't test getComputedStyle in JSDOM */
-          return;
-        }
-
-        if (matches(el, '.nav-link,.dropdown-item') || closest('.nav-link,.dropdown-item', el)) {
-          if (!this.checkDisplayBlock()) {
-            // Only close the collapse if it is not forced to be `display: block !important`
-            this.show = false;
-          }
-        }
-      },
-      handleToggleEvt: function handleToggleEvt(target) {
-        if (target !== this.safeId()) {
-          return;
-        }
-
-        this.toggle();
-      },
-      handleAccordionEvt: function handleAccordionEvt(openedId, accordion) {
-        if (!this.accordion || accordion !== this.accordion) {
-          return;
-        }
-
-        if (openedId === this.safeId()) {
-          // Open this collapse if not shown
-          if (!this.show) {
-            this.toggle();
-          }
-        } else {
-          // Close this collapse if shown
-          if (this.show) {
-            this.toggle();
-          }
-        }
-      },
-      handleResize: function handleResize() {
-        // Handler for orientation/resize to set collapsed state in nav/navbar
-        this.show = getCS(this.$el).display === 'block';
-      }
-    },
-    render: function render(h) {
-      var _this2 = this;
-
-      var scope = {
-        visible: this.show,
-        close: function close() {
-          return _this2.show = false;
-        }
-      };
-      var content = h(this.tag, {
-        class: this.classObject,
-        directives: [{
-          name: 'show',
-          value: this.show
-        }],
-        attrs: {
-          id: this.safeId()
-        },
-        on: {
-          click: this.clickHandler
-        }
-      }, [this.normalizeSlot(SLOT_NAME_DEFAULT, scope)]);
-      return h(BVCollapse, {
-        props: {
-          appear: this.appear
-        },
-        on: {
-          enter: this.onEnter,
-          afterEnter: this.onAfterEnter,
-          leave: this.onLeave,
-          afterLeave: this.onAfterLeave
-        }
-      }, [content]);
-    }
-  });
-
   var VBTogglePlugin = /*#__PURE__*/pluginFactory({
     directives: {
       VBToggle: VBToggle
@@ -8204,12 +7319,12 @@
    * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
    * SOFTWARE.
    */
-  var isBrowser$1 = typeof window !== 'undefined' && typeof document !== 'undefined' && typeof navigator !== 'undefined';
+  var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined' && typeof navigator !== 'undefined';
 
   var timeoutDuration = function () {
     var longerTimeoutBrowsers = ['Edge', 'Trident', 'Firefox'];
     for (var i = 0; i < longerTimeoutBrowsers.length; i += 1) {
-      if (isBrowser$1 && navigator.userAgent.indexOf(longerTimeoutBrowsers[i]) >= 0) {
+      if (isBrowser && navigator.userAgent.indexOf(longerTimeoutBrowsers[i]) >= 0) {
         return 1;
       }
     }
@@ -8243,7 +7358,7 @@
     };
   }
 
-  var supportsMicroTasks = isBrowser$1 && window.Promise;
+  var supportsMicroTasks = isBrowser && window.Promise;
 
   /**
   * Create a debounced version of a method, that's asynchronously deferred
@@ -8345,8 +7460,8 @@
     return reference && reference.referenceNode ? reference.referenceNode : reference;
   }
 
-  var isIE11 = isBrowser$1 && !!(window.MSInputMethodContext && document.documentMode);
-  var isIE10 = isBrowser$1 && /MSIE 10/.test(navigator.userAgent);
+  var isIE11 = isBrowser && !!(window.MSInputMethodContext && document.documentMode);
+  var isIE10 = isBrowser && /MSIE 10/.test(navigator.userAgent);
 
   /**
    * Determines if the browser is Internet Explorer
@@ -8355,7 +7470,7 @@
    * @param {Number} version to check
    * @returns {Boolean} isIE
    */
-  function isIE$1(version) {
+  function isIE(version) {
     if (version === 11) {
       return isIE11;
     }
@@ -8377,7 +7492,7 @@
       return document.documentElement;
     }
 
-    var noOffsetParent = isIE$1(10) ? document.body : null;
+    var noOffsetParent = isIE(10) ? document.body : null;
 
     // NOTE: 1 DOM access here
     var offsetParent = element.offsetParent || null;
@@ -8532,13 +7647,13 @@
   }
 
   function getSize(axis, body, html, computedStyle) {
-    return Math.max(body['offset' + axis], body['scroll' + axis], html['client' + axis], html['offset' + axis], html['scroll' + axis], isIE$1(10) ? parseInt(html['offset' + axis]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Top' : 'Left')]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Bottom' : 'Right')]) : 0);
+    return Math.max(body['offset' + axis], body['scroll' + axis], html['client' + axis], html['offset' + axis], html['scroll' + axis], isIE(10) ? parseInt(html['offset' + axis]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Top' : 'Left')]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Bottom' : 'Right')]) : 0);
   }
 
   function getWindowSizes(document) {
     var body = document.body;
     var html = document.documentElement;
-    var computedStyle = isIE$1(10) && getComputedStyle(html);
+    var computedStyle = isIE(10) && getComputedStyle(html);
 
     return {
       height: getSize('Height', body, html, computedStyle),
@@ -8631,7 +7746,7 @@
     // considered in DOM in some circumstances...
     // This isn't reproducible in IE10 compatibility mode of IE11
     try {
-      if (isIE$1(10)) {
+      if (isIE(10)) {
         rect = element.getBoundingClientRect();
         var scrollTop = getScroll(element, 'top');
         var scrollLeft = getScroll(element, 'left');
@@ -8676,7 +7791,7 @@
   function getOffsetRectRelativeToArbitraryNode(children, parent) {
     var fixedPosition = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-    var isIE10 = isIE$1(10);
+    var isIE10 = isIE(10);
     var isHTML = parent.nodeName === 'HTML';
     var childrenRect = getBoundingClientRect(children);
     var parentRect = getBoundingClientRect(parent);
@@ -8779,7 +7894,7 @@
 
   function getFixedPositionOffsetParent(element) {
     // This check is needed to avoid errors in case one of the elements isn't defined for any reason
-    if (!element || !element.parentElement || isIE$1()) {
+    if (!element || !element.parentElement || isIE()) {
       return document.documentElement;
     }
     var el = element.parentElement;
@@ -9448,7 +8563,7 @@
     };
   }
 
-  var isFirefox = isBrowser$1 && /Firefox/i.test(navigator.userAgent);
+  var isFirefox = isBrowser && /Firefox/i.test(navigator.userAgent);
 
   /**
    * @function
@@ -10863,9 +9978,9 @@
     }]);
 
     return BvEvent;
-  }(); // Named Exports
+  }();
 
-  var clickOutMixin = {
+  var clickOutMixin = Vue__default['default'].extend({
     data: function data() {
       return {
         listenForClickOut: false
@@ -10900,24 +10015,22 @@
         eventOn(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, EVENT_OPTIONS_NO_CAPTURE);
       }
     },
-    beforeDestroy: function beforeDestroy()
-    /* istanbul ignore next */
-    {
+    beforeDestroy: function beforeDestroy() {
       eventOff(this.clickOutElement, this.clickOutEventName, this._clickOutHandler, EVENT_OPTIONS_NO_CAPTURE);
     },
     methods: {
-      isClickOut: function isClickOut(evt) {
-        return !contains(this.$el, evt.target);
+      isClickOut: function isClickOut(event) {
+        return !contains(this.$el, event.target);
       },
-      _clickOutHandler: function _clickOutHandler(evt) {
-        if (this.clickOutHandler && this.isClickOut(evt)) {
-          this.clickOutHandler(evt);
+      _clickOutHandler: function _clickOutHandler(event) {
+        if (this.clickOutHandler && this.isClickOut(event)) {
+          this.clickOutHandler(event);
         }
       }
     }
-  };
+  });
 
-  var focusInMixin = {
+  var focusInMixin = Vue__default['default'].extend({
     data: function data() {
       return {
         listenForFocusIn: false
@@ -10947,30 +10060,25 @@
         eventOn(this.focusInElement, 'focusin', this._focusInHandler, EVENT_OPTIONS_NO_CAPTURE);
       }
     },
-    beforeDestroy: function beforeDestroy()
-    /* istanbul ignore next */
-    {
+    beforeDestroy: function beforeDestroy() {
       eventOff(this.focusInElement, 'focusin', this._focusInHandler, EVENT_OPTIONS_NO_CAPTURE);
     },
     methods: {
-      _focusInHandler: function _focusInHandler(evt) {
+      _focusInHandler: function _focusInHandler(event) {
         if (this.focusInHandler) {
-          this.focusInHandler(evt);
+          this.focusInHandler(event);
         }
       }
     }
-  };
+  });
 
-  // Root dropdown event names
-
-  var ROOT_EVENT_PREFIX = 'bv::dropdown::';
-  var ROOT_EVENT_SHOWN = "".concat(ROOT_EVENT_PREFIX, "shown");
-  var ROOT_EVENT_HIDDEN = "".concat(ROOT_EVENT_PREFIX, "hidden"); // CSS selectors
+  var ROOT_EVENT_NAME_SHOWN = getRootEventName(NAME_DROPDOWN, EVENT_NAME_SHOWN);
+  var ROOT_EVENT_NAME_HIDDEN = getRootEventName(NAME_DROPDOWN, EVENT_NAME_HIDDEN); // CSS selectors
 
   var SELECTOR_FORM_CHILD = '.dropdown form';
   var SELECTOR_ITEM = ['.dropdown-item', '.b-dropdown-form'].map(function (selector) {
     return "".concat(selector, ":not(.disabled):not([disabled])");
-  }).join(', '); // --- Utility methods ---
+  }).join(', '); // --- Helper methods ---
   // Return an array of visible items
 
   var filterVisibles = function filterVisibles(els) {
@@ -10978,51 +10086,30 @@
   }; // --- Props ---
 
 
-  var commonProps = {
-    dropup: {
-      // place on top if possible
-      type: Boolean,
-      default: false
-    },
-    dropright: {
-      // place right if possible
-      type: Boolean,
-      default: false
-    },
-    dropleft: {
-      // place left if possible
-      type: Boolean,
-      default: false
-    },
-    right: {
-      // Right align menu (default is left align)
-      type: Boolean,
-      default: false
-    },
-    offset: {
-      // Number of pixels to offset menu, or a CSS unit value (i.e. `1px`, `1rem`, etc.)
-      type: [Number, String],
-      default: 0
-    },
-    noFlip: {
-      // Disable auto-flipping of menu from bottom <=> top
-      type: Boolean,
-      default: false
-    },
-    popperOpts: {
-      type: Object,
-      default: function _default() {}
-    },
-    boundary: {
-      // String: `scrollParent`, `window` or `viewport`
-      // HTMLElement: HTML Element reference
-      type: [String, HTMLElement],
-      default: 'scrollParent'
-    }
-  }; // @vue/component
+  var props$z = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$g), {}, {
+    // String: `scrollParent`, `window` or `viewport`
+    // HTMLElement: HTML Element reference
+    boundary: makeProp([HTMLElement, PROP_TYPE_STRING], 'scrollParent'),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Place left if possible
+    dropleft: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Place right if possible
+    dropright: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Place on top if possible
+    dropup: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Disable auto-flipping of menu from bottom <=> top
+    noFlip: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Number of pixels or a CSS unit value to offset menu
+    // (i.e. `1px`, `1rem`, etc.)
+    offset: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    popperOpts: makeProp(PROP_TYPE_OBJECT, {}),
+    // Right align menu (default is left align)
+    right: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_DROPDOWN); // --- Mixin ---
+  // @vue/component
 
-  var dropdownMixin = {
-    mixins: [idMixin, clickOutMixin, focusInMixin],
+  var dropdownMixin = Vue__default['default'].extend({
+    mixins: [idMixin, listenOnRootMixin, clickOutMixin, focusInMixin],
     provide: function provide() {
       return {
         bvDropdown: this
@@ -11033,12 +10120,7 @@
         default: null
       }
     },
-    props: _objectSpread2(_objectSpread2({}, commonProps), {}, {
-      disabled: {
-        type: Boolean,
-        default: false
-      }
-    }),
+    props: props$z,
     data: function data() {
       return {
         visible: false,
@@ -11079,26 +10161,26 @@
         }
 
         if (newValue !== oldValue) {
-          var evtName = newValue ? 'show' : 'hide';
-          var bvEvt = new BvEvent(evtName, {
+          var eventName = newValue ? EVENT_NAME_SHOW : EVENT_NAME_HIDE;
+          var bvEvent = new BvEvent(eventName, {
             cancelable: true,
             vueTarget: this,
             target: this.$refs.menu,
             relatedTarget: null,
             componentId: this.safeId ? this.safeId() : this.id || null
           });
-          this.emitEvent(bvEvt);
+          this.emitEvent(bvEvent);
 
-          if (bvEvt.defaultPrevented) {
+          if (bvEvent.defaultPrevented) {
             // Reset value and exit if canceled
             this.visibleChangePrevented = true;
             this.visible = oldValue; // Just in case a child element triggered `this.hide(true)`
 
-            this.$off('hidden', this.focusToggler);
+            this.$off(EVENT_NAME_HIDDEN, this.focusToggler);
             return;
           }
 
-          if (evtName === 'show') {
+          if (newValue) {
             this.showMenu();
           } else {
             this.hideMenu();
@@ -11115,12 +10197,11 @@
     created: function created() {
       // Create private non-reactive props
       this.$_popper = null;
+      this.$_hideTimeout = null;
     },
 
     /* istanbul ignore next */
-    deactivated: function deactivated()
-    /* istanbul ignore next: not easy to test */
-    {
+    deactivated: function deactivated() {
       // In case we are inside a `<keep-alive>`
       this.visible = false;
       this.whileOpenListen(false);
@@ -11130,13 +10211,14 @@
       this.visible = false;
       this.whileOpenListen(false);
       this.destroyPopper();
+      this.clearHideTimeout();
     },
     methods: {
       // Event emitter
-      emitEvent: function emitEvent(bvEvt) {
-        var type = bvEvt.type;
-        this.$emit(type, bvEvt);
-        this.$root.$emit("".concat(ROOT_EVENT_PREFIX).concat(type), bvEvt);
+      emitEvent: function emitEvent(bvEvent) {
+        var type = bvEvent.type;
+        this.emitOnRoot(getRootEventName(NAME_DROPDOWN, type), bvEvent);
+        this.$emit(type, bvEvent);
       },
       showMenu: function showMenu() {
         var _this = this;
@@ -11162,7 +10244,7 @@
         } // Ensure other menus are closed
 
 
-        this.$root.$emit(ROOT_EVENT_SHOWN, this); // Enable listeners
+        this.emitOnRoot(ROOT_EVENT_NAME_SHOWN, this); // Enable listeners
 
         this.whileOpenListen(true); // Wrap in `$nextTick()` to ensure menu is fully rendered/shown
 
@@ -11171,13 +10253,13 @@
           _this.focusMenu(); // Emit the shown event
 
 
-          _this.$emit('shown');
+          _this.$emit(EVENT_NAME_SHOWN);
         });
       },
       hideMenu: function hideMenu() {
         this.whileOpenListen(false);
-        this.$root.$emit(ROOT_EVENT_HIDDEN, this);
-        this.$emit('hidden');
+        this.emitOnRoot(ROOT_EVENT_NAME_HIDDEN, this);
+        this.$emit(EVENT_NAME_HIDDEN);
         this.destroyPopper();
       },
       createPopper: function createPopper(element) {
@@ -11191,12 +10273,14 @@
       },
       // Instructs popper to re-computes the dropdown position
       // useful if the content changes size
-      updatePopper: function updatePopper()
-      /* istanbul ignore next: not easy to test */
-      {
+      updatePopper: function updatePopper() {
         try {
           this.$_popper.scheduleUpdate();
         } catch (_unused) {}
+      },
+      clearHideTimeout: function clearHideTimeout() {
+        clearTimeout(this.$_hideTimeout);
+        this.$_hideTimeout = null;
       },
       getPopperConfig: function getPopperConfig() {
         var placement = PLACEMENT_BOTTOM_START;
@@ -11240,17 +10324,17 @@
         this.listenForFocusIn = isOpen; // Hide the dropdown when another dropdown is opened
 
         var method = isOpen ? '$on' : '$off';
-        this.$root[method](ROOT_EVENT_SHOWN, this.rootCloseListener);
+        this.$root[method](ROOT_EVENT_NAME_SHOWN, this.rootCloseListener);
       },
       rootCloseListener: function rootCloseListener(vm) {
         if (vm !== this) {
           this.visible = false;
         }
       },
+      // Public method to show dropdown
       show: function show() {
         var _this2 = this;
 
-        // Public method to show dropdown
         if (this.disabled) {
           return;
         } // Wrap in a `requestAF()` to allow any previous
@@ -11261,12 +10345,12 @@
           _this2.visible = true;
         });
       },
+      // Public method to hide dropdown
       hide: function hide() {
         var refocus = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-        // Public method to hide dropdown
+        /* istanbul ignore next */
         if (this.disabled) {
-          /* istanbul ignore next */
           return;
         }
 
@@ -11274,16 +10358,16 @@
 
         if (refocus) {
           // Child element is closing the dropdown on click
-          this.$once('hidden', this.focusToggler);
+          this.$once(EVENT_NAME_HIDDEN, this.focusToggler);
         }
       },
       // Called only by a button that toggles the menu
-      toggle: function toggle(evt) {
-        evt = evt || {}; // Early exit when not a click event or ENTER, SPACE or DOWN were pressed
+      toggle: function toggle(event) {
+        event = event || {}; // Early exit when not a click event or ENTER, SPACE or DOWN were pressed
 
-        var _evt = evt,
-            type = _evt.type,
-            keyCode = _evt.keyCode;
+        var _event = event,
+            type = _event.type,
+            keyCode = _event.keyCode;
 
         if (type !== 'click' && !(type === 'keydown' && [CODE_ENTER, CODE_SPACE, CODE_DOWN].indexOf(keyCode) !== -1)) {
           /* istanbul ignore next */
@@ -11297,8 +10381,8 @@
           return;
         }
 
-        this.$emit('toggle', evt);
-        stopEvent(evt); // Toggle visibility
+        this.$emit(EVENT_NAME_TOGGLE, event);
+        stopEvent(event); // Toggle visibility
 
         if (this.visible) {
           this.hide(true);
@@ -11309,9 +10393,7 @@
       // Mousedown handler for the toggle
 
       /* istanbul ignore next */
-      onMousedown: function onMousedown(evt)
-      /* istanbul ignore next */
-      {
+      onMousedown: function onMousedown(event) {
         // We prevent the 'mousedown' event for the toggle to stop the
         // 'focusin' event from being fired
         // The event would otherwise be picked up by the global 'focusin'
@@ -11320,75 +10402,80 @@
         // The 'click' event will still be fired and we handle closing
         // other dropdowns there too
         // See https://github.com/bootstrap-vue/bootstrap-vue/issues/4328
-        stopEvent(evt, {
+        stopEvent(event, {
           propagation: false
         });
       },
       // Called from dropdown menu context
-      onKeydown: function onKeydown(evt) {
-        var keyCode = evt.keyCode;
+      onKeydown: function onKeydown(event) {
+        var keyCode = event.keyCode;
 
         if (keyCode === CODE_ESC) {
           // Close on ESC
-          this.onEsc(evt);
+          this.onEsc(event);
         } else if (keyCode === CODE_DOWN) {
           // Down Arrow
-          this.focusNext(evt, false);
+          this.focusNext(event, false);
         } else if (keyCode === CODE_UP) {
           // Up Arrow
-          this.focusNext(evt, true);
+          this.focusNext(event, true);
         }
       },
       // If user presses ESC, close the menu
-      onEsc: function onEsc(evt) {
+      onEsc: function onEsc(event) {
         if (this.visible) {
           this.visible = false;
-          stopEvent(evt); // Return focus to original trigger button
+          stopEvent(event); // Return focus to original trigger button
 
-          this.$once('hidden', this.focusToggler);
+          this.$once(EVENT_NAME_HIDDEN, this.focusToggler);
         }
       },
       // Called only in split button mode, for the split button
-      onSplitClick: function onSplitClick(evt) {
+      onSplitClick: function onSplitClick(event) {
         /* istanbul ignore next */
         if (this.disabled) {
           this.visible = false;
           return;
         }
 
-        this.$emit('click', evt);
+        this.$emit(EVENT_NAME_CLICK, event);
       },
       // Shared hide handler between click-out and focus-in events
-      hideHandler: function hideHandler(evt) {
-        var target = evt.target;
+      hideHandler: function hideHandler(event) {
+        var _this3 = this;
+
+        var target = event.target;
 
         if (this.visible && !contains(this.$refs.menu, target) && !contains(this.toggler, target)) {
-          this.hide();
+          this.clearHideTimeout();
+          this.$_hideTimeout = setTimeout(function () {
+            return _this3.hide();
+          }, this.inNavbar ? 300 : 0);
         }
       },
       // Document click-out listener
-      clickOutHandler: function clickOutHandler(evt) {
-        this.hideHandler(evt);
+      clickOutHandler: function clickOutHandler(event) {
+        this.hideHandler(event);
       },
       // Document focus-in listener
-      focusInHandler: function focusInHandler(evt) {
-        this.hideHandler(evt);
+      focusInHandler: function focusInHandler(event) {
+        this.hideHandler(event);
       },
       // Keyboard nav
-      focusNext: function focusNext(evt, up) {
-        var _this3 = this;
+      focusNext: function focusNext(event, up) {
+        var _this4 = this;
 
         // Ignore key up/down on form elements
-        var target = evt.target;
+        var target = event.target;
 
-        if (!this.visible || evt && closest(SELECTOR_FORM_CHILD, target)) {
+        if (!this.visible || event && closest(SELECTOR_FORM_CHILD, target)) {
           /* istanbul ignore next: should never happen */
           return;
         }
 
-        stopEvent(evt);
+        stopEvent(event);
         this.$nextTick(function () {
-          var items = _this3.getItems();
+          var items = _this4.getItems();
 
           if (items.length < 1) {
             /* istanbul ignore next: should never happen */
@@ -11408,7 +10495,7 @@
             index = 0;
           }
 
-          _this3.focusItem(index, items);
+          _this4.focusItem(index, items);
         });
       },
       focusItem: function focusItem(index, items) {
@@ -11425,108 +10512,45 @@
         attemptFocus(this.$refs.menu);
       },
       focusToggler: function focusToggler() {
-        var _this4 = this;
+        var _this5 = this;
 
         this.$nextTick(function () {
-          attemptFocus(_this4.toggler);
+          attemptFocus(_this5.toggler);
         });
       }
     }
-  };
+  });
 
-  var props$l = {
-    text: {
-      type: String // default: null
-
-    },
-    html: {
-      type: String // default: null
-
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_DROPDOWN, 'variant');
-      }
-    },
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_DROPDOWN, 'size');
-      }
-    },
-    block: {
-      type: Boolean,
-      default: false
-    },
-    menuClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    toggleTag: {
-      type: String,
-      default: 'button'
-    },
-    toggleText: {
-      // This really should be toggleLabel
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_DROPDOWN, 'toggleText');
-      }
-    },
-    toggleClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    noCaret: {
-      type: Boolean,
-      default: false
-    },
-    split: {
-      type: Boolean,
-      default: false
-    },
-    splitHref: {
-      type: String // default: undefined
-
-    },
-    splitTo: {
-      type: [String, Object] // default: undefined
-
-    },
-    splitVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_DROPDOWN, 'splitVariant');
-      }
-    },
-    splitClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    splitButtonType: {
-      type: String,
-      default: 'button',
-      validator: function validator(value) {
-        return arrayIncludes(['button', 'submit', 'reset'], value);
-      }
-    },
-    lazy: {
-      // If true, only render menu contents when open
-      type: Boolean,
-      default: false
-    },
-    role: {
-      type: String,
-      default: 'menu'
-    }
-  }; // --- Main component ---
+  var props$A = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$z), {}, {
+    block: makeProp(PROP_TYPE_BOOLEAN, false),
+    html: makeProp(PROP_TYPE_STRING),
+    // If `true`, only render menu contents when open
+    lazy: makeProp(PROP_TYPE_BOOLEAN, false),
+    menuClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    noCaret: makeProp(PROP_TYPE_BOOLEAN, false),
+    role: makeProp(PROP_TYPE_STRING, 'menu'),
+    size: makeProp(PROP_TYPE_STRING),
+    split: makeProp(PROP_TYPE_BOOLEAN, false),
+    splitButtonType: makeProp(PROP_TYPE_STRING, 'button', function (value) {
+      return arrayIncludes(['button', 'submit', 'reset'], value);
+    }),
+    splitClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    splitHref: makeProp(PROP_TYPE_STRING),
+    splitTo: makeProp(PROP_TYPE_OBJECT_STRING),
+    splitVariant: makeProp(PROP_TYPE_STRING),
+    text: makeProp(PROP_TYPE_STRING),
+    toggleClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    toggleTag: makeProp(PROP_TYPE_STRING, 'button'),
+    // TODO: This really should be `toggleLabel`
+    toggleText: makeProp(PROP_TYPE_STRING, 'Toggle dropdown'),
+    variant: makeProp(PROP_TYPE_STRING, 'secondary')
+  })), NAME_DROPDOWN); // --- Main component ---
   // @vue/component
 
   var BDropdown = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN,
     mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
-    props: props$l,
+    props: props$A,
     computed: {
       dropdownClasses: function dropdownClasses() {
         var block = this.block,
@@ -11572,9 +10596,8 @@
         block: block,
         disabled: disabled
       };
-      var buttonContentSlotName = 'button-content';
-      var $buttonChildren = this.normalizeSlot(buttonContentSlotName);
-      var buttonContentDomProps = this.hasNormalizedSlot(buttonContentSlotName) ? {} : htmlOrText(this.html, this.text);
+      var $buttonChildren = this.normalizeSlot(SLOT_NAME_BUTTON_CONTENT);
+      var buttonContentDomProps = this.hasNormalizedSlot(SLOT_NAME_BUTTON_CONTENT) ? {} : htmlOrText(this.html, this.text);
       var $split = h();
 
       if (split) {
@@ -11662,7 +10685,12 @@
     }
   });
 
-  var props$m = omit(props$1, ['event', 'routerTag']); // @vue/component
+  var linkProps$3 = omit(props$6, ['event', 'routerTag']);
+  var props$B = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$3), {}, {
+    linkClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    variant: makeProp(PROP_TYPE_STRING)
+  })), NAME_DROPDOWN_ITEM); // --- Main component ---
+  // @vue/component
 
   var BDropdownItem = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_ITEM,
@@ -11673,16 +10701,7 @@
       }
     },
     inheritAttrs: false,
-    props: _objectSpread2(_objectSpread2({}, props$m), {}, {
-      linkClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      variant: {
-        type: String // default: null
-
-      }
-    }),
+    props: props$B,
     computed: {
       computedAttrs: function computedAttrs() {
         return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
@@ -11701,8 +10720,8 @@
           }
         });
       },
-      onClick: function onClick(evt) {
-        this.$emit('click', evt);
+      onClick: function onClick(event) {
+        this.$emit(EVENT_NAME_CLICK, event);
         this.closeDropdown();
       }
     },
@@ -11711,15 +10730,18 @@
           variant = this.variant,
           active = this.active,
           disabled = this.disabled,
-          onClick = this.onClick;
+          onClick = this.onClick,
+          bvAttrs = this.bvAttrs;
       return h('li', {
+        class: bvAttrs.class,
+        style: bvAttrs.style,
         attrs: {
           role: 'presentation'
         }
       }, [h(BLink, {
         staticClass: 'dropdown-item',
         class: [linkClass, _defineProperty({}, "text-".concat(variant), variant && !(active || disabled))],
-        props: this.$props,
+        props: pluckProps(linkProps$3, this.$props),
         attrs: this.computedAttrs,
         on: {
           click: onClick
@@ -11729,28 +10751,14 @@
     }
   });
 
-  var props$n = {
-    active: {
-      type: Boolean,
-      default: false
-    },
-    activeClass: {
-      type: String,
-      default: 'active'
-    },
-    buttonClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    variant: {
-      type: String // default: null
-
-    }
-  }; // @vue/component
+  var props$C = makePropsConfigurable({
+    active: makeProp(PROP_TYPE_BOOLEAN, false),
+    activeClass: makeProp(PROP_TYPE_STRING, 'active'),
+    buttonClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_DROPDOWN_ITEM_BUTTON); // --- Main component ---
+  // @vue/component
 
   var BDropdownItemButton = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_ITEM_BUTTON,
@@ -11761,7 +10769,7 @@
       }
     },
     inheritAttrs: false,
-    props: props$n,
+    props: props$C,
     computed: {
       computedAttrs: function computedAttrs() {
         return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
@@ -11777,21 +10785,26 @@
           this.bvDropdown.hide(true);
         }
       },
-      onClick: function onClick(evt) {
-        this.$emit('click', evt);
+      onClick: function onClick(event) {
+        this.$emit(EVENT_NAME_CLICK, event);
         this.closeDropdown();
       }
     },
     render: function render(h) {
       var _ref;
 
+      var active = this.active,
+          variant = this.variant,
+          bvAttrs = this.bvAttrs;
       return h('li', {
+        class: bvAttrs.class,
+        style: bvAttrs.style,
         attrs: {
           role: 'presentation'
         }
       }, [h('button', {
         staticClass: 'dropdown-item',
-        class: [this.buttonClass, (_ref = {}, _defineProperty(_ref, this.activeClass, this.active), _defineProperty(_ref, "text-".concat(this.variant), this.variant && !(this.active || this.disabled)), _ref)],
+        class: [this.buttonClass, (_ref = {}, _defineProperty(_ref, this.activeClass, active), _defineProperty(_ref, "text-".concat(variant), variant && !(active || this.disabled)), _ref)],
         attrs: this.computedAttrs,
         on: {
           click: this.onClick
@@ -11801,70 +10814,58 @@
     }
   });
 
-  var props$o = {
-    id: {
-      type: String // default: null
-
-    },
-    tag: {
-      type: String,
-      default: 'header'
-    },
-    variant: {
-      type: String // default: null
-
-    }
-  }; // @vue/component
+  var props$D = makePropsConfigurable({
+    id: makeProp(PROP_TYPE_STRING),
+    tag: makeProp(PROP_TYPE_STRING, 'header'),
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_DROPDOWN_HEADER); // --- Main component ---
+  // @vue/component
 
   var BDropdownHeader = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_HEADER,
     functional: true,
-    props: props$o,
+    props: props$D,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      var $attrs = data.attrs || {};
-      data.attrs = {};
-      return h('li', a(data, {
+      var tag = props.tag,
+          variant = props.variant;
+      return h('li', a(omit(data, ['attrs']), {
         attrs: {
           role: 'presentation'
         }
-      }), [h(props.tag, {
+      }), [h(tag, {
         staticClass: 'dropdown-header',
-        class: _defineProperty({}, "text-".concat(props.variant), props.variant),
-        attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
+        class: _defineProperty({}, "text-".concat(variant), variant),
+        attrs: _objectSpread2(_objectSpread2({}, data.attrs || {}), {}, {
           id: props.id || null,
-          role: 'heading'
+          role: isTag(tag, 'header') ? null : 'heading'
         }),
         ref: 'header'
       }, children)]);
     }
   });
 
-  var props$p = {
-    tag: {
-      type: String,
-      default: 'hr'
-    }
-  }; // @vue/component
+  var props$E = makePropsConfigurable({
+    tag: makeProp(PROP_TYPE_STRING, 'hr')
+  }, NAME_DROPDOWN_DIVIDER); // --- Main component ---
+  // @vue/component
 
   var BDropdownDivider = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_DIVIDER,
     functional: true,
-    props: props$p,
+    props: props$E,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
-      var $attrs = data.attrs || {};
-      data.attrs = {};
-      return h('li', a(data, {
+      return h('li', a(omit(data, ['attrs']), {
         attrs: {
           role: 'presentation'
         }
       }), [h(props.tag, {
         staticClass: 'dropdown-divider',
-        attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
+        attrs: _objectSpread2(_objectSpread2({}, data.attrs || {}), {}, {
           role: 'separator',
           'aria-orientation': 'horizontal'
         }),
@@ -11873,29 +10874,18 @@
     }
   });
 
-  var props$q = {
-    id: {
-      type: String // default: null
-
-    },
-    inline: {
-      type: Boolean,
-      default: false
-    },
-    novalidate: {
-      type: Boolean,
-      default: false
-    },
-    validated: {
-      type: Boolean,
-      default: false
-    }
-  }; // @vue/component
+  var props$F = makePropsConfigurable({
+    id: makeProp(PROP_TYPE_STRING),
+    inline: makeProp(PROP_TYPE_BOOLEAN, false),
+    novalidate: makeProp(PROP_TYPE_BOOLEAN, false),
+    validated: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, NAME_FORM); // --- Main component ---
+  // @vue/component
 
   var BForm = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM,
     functional: true,
-    props: props$q,
+    props: props$F,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11913,65 +10903,53 @@
     }
   });
 
+  var props$G = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$F), {}, {
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    formClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
+  })), NAME_DROPDOWN_FORM); // --- Main component ---
+  // @vue/component
+
   var BDropdownForm = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_FORM,
     functional: true,
-    props: _objectSpread2(_objectSpread2({}, props$q), {}, {
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      formClass: {
-        type: [String, Object, Array] // default: null
-
-      }
-    }),
+    props: props$G,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
+          listeners = _ref.listeners,
           children = _ref.children;
-      var $attrs = data.attrs || {};
-      var $listeners = data.on || {};
-      data.attrs = {};
-      data.on = {};
-      return h('li', a(data, {
+      return h('li', a(omit(data, ['attrs', 'on']), {
         attrs: {
           role: 'presentation'
         }
       }), [h(BForm, {
-        ref: 'form',
         staticClass: 'b-dropdown-form',
         class: [props.formClass, {
           disabled: props.disabled
         }],
         props: props,
-        attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
+        attrs: _objectSpread2(_objectSpread2({}, data.attrs || {}), {}, {
           disabled: props.disabled,
           // Tab index of -1 for keyboard navigation
           tabindex: props.disabled ? null : '-1'
         }),
-        on: $listeners
+        on: listeners,
+        ref: 'form'
       }, children)]);
     }
   });
 
+  var props$H = makePropsConfigurable({
+    tag: makeProp(PROP_TYPE_STRING, 'p'),
+    textClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_DROPDOWN_TEXT); // --- Main component ---
+  // @vue/component
+
   var BDropdownText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_TEXT,
     functional: true,
-    props: {
-      tag: {
-        type: String,
-        default: 'p'
-      },
-      textClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      variant: {
-        type: String // default: null
-
-      }
-    },
+    props: props$H,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11979,9 +10957,7 @@
       var tag = props.tag,
           textClass = props.textClass,
           variant = props.variant;
-      var attrs = data.attrs || {};
-      data.attrs = {};
-      return h('li', a(data, {
+      return h('li', a(omit(data, ['attrs']), {
         attrs: {
           role: 'presentation'
         }
@@ -11989,80 +10965,64 @@
         staticClass: 'b-dropdown-text',
         class: [textClass, _defineProperty({}, "text-".concat(variant), variant)],
         props: props,
-        attrs: attrs,
+        attrs: data.attrs || {},
         ref: 'text'
       }, children)]);
     }
   });
 
-  var props$r = {
-    id: {
-      type: String // default: null
-
-    },
-    header: {
-      type: String // default: null
-
-    },
-    headerTag: {
-      type: String,
-      default: 'header'
-    },
-    headerVariant: {
-      type: String // default: null
-
-    },
-    headerClasses: {
-      type: [String, Array, Object] // default: null
-
-    },
-    ariaDescribedby: {
-      type: String // default: null
-
-    }
-  }; // @vue/component
+  var props$I = makePropsConfigurable({
+    ariaDescribedby: makeProp(PROP_TYPE_STRING),
+    header: makeProp(PROP_TYPE_STRING),
+    headerClasses: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    headerTag: makeProp(PROP_TYPE_STRING, 'header'),
+    headerVariant: makeProp(PROP_TYPE_STRING),
+    id: makeProp(PROP_TYPE_STRING)
+  }, NAME_DROPDOWN_GROUP); // --- Main component ---
+  // @vue/component
 
   var BDropdownGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_GROUP,
     functional: true,
-    props: props$r,
+    props: props$I,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           slots = _ref.slots,
           scopedSlots = _ref.scopedSlots;
+      var id = props.id,
+          variant = props.variant,
+          header = props.header,
+          headerTag = props.headerTag;
       var $slots = slots();
       var $scopedSlots = scopedSlots || {};
-      var $attrs = data.attrs || {};
-      data.attrs = {};
-      var header;
-      var headerId = null;
+      var slotScope = {};
+      var headerId = id ? "_bv_".concat(id, "_group_dd_header") : null;
+      var $header = h();
 
-      if (hasNormalizedSlot(SLOT_NAME_HEADER, $scopedSlots, $slots) || props.header) {
-        headerId = props.id ? "_bv_".concat(props.id, "_group_dd_header") : null;
-        header = h(props.headerTag, {
+      if (hasNormalizedSlot(SLOT_NAME_HEADER, $scopedSlots, $slots) || header) {
+        $header = h(headerTag, {
           staticClass: 'dropdown-header',
-          class: [props.headerClasses, _defineProperty({}, "text-".concat(props.variant), props.variant)],
+          class: [props.headerClasses, _defineProperty({}, "text-".concat(variant), variant)],
           attrs: {
             id: headerId,
-            role: 'heading'
+            role: isTag(headerTag, 'header') ? null : 'heading'
           }
-        }, normalizeSlot(SLOT_NAME_HEADER, {}, $scopedSlots, $slots) || props.header);
+        }, normalizeSlot(SLOT_NAME_HEADER, slotScope, $scopedSlots, $slots) || header);
       }
 
-      var adb = [headerId, props.ariaDescribedBy].filter(identity).join(' ').trim();
-      return h('li', a(data, {
+      return h('li', a(omit(data, ['attrs']), {
         attrs: {
           role: 'presentation'
         }
-      }), [header || h(), h('ul', {
+      }), [$header, h('ul', {
         staticClass: 'list-unstyled',
-        attrs: _objectSpread2(_objectSpread2({}, $attrs), {}, {
-          id: props.id || null,
+        attrs: _objectSpread2(_objectSpread2({}, data.attrs || {}), {}, {
+          id: id,
           role: 'group',
-          'aria-describedby': adb || null
+          'aria-describedby': [headerId, props.ariaDescribedBy].filter(identity).join(' ').trim() || null
         })
-      }, normalizeSlot(SLOT_NAME_DEFAULT, {}, $scopedSlots, $slots))]);
+      }, normalizeSlot(SLOT_NAME_DEFAULT, slotScope, $scopedSlots, $slots))]);
     }
   });
 
@@ -12089,38 +11049,31 @@
     }
   });
 
-  var props$s = {
-    type: {
-      type: String,
-      default: 'iframe',
-      validator: function validator(str) {
-        return arrayIncludes(['iframe', 'embed', 'video', 'object', 'img', 'b-img', 'b-img-lazy'], str);
-      }
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    aspect: {
-      type: String,
-      default: '16by9'
-    }
-  }; // @vue/component
+  var TYPES = ['iframe', 'embed', 'video', 'object', 'img', 'b-img', 'b-img-lazy']; // --- Props ---
+
+  var props$J = makePropsConfigurable({
+    aspect: makeProp(PROP_TYPE_STRING, '16by9'),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    type: makeProp(PROP_TYPE_STRING, 'iframe', function (value) {
+      return arrayIncludes(TYPES, value);
+    })
+  }, NAME_EMBED); // --- Main component ---
+  // @vue/component
 
   var BEmbed = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_EMBED,
     functional: true,
-    props: props$s,
+    props: props$J,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var aspect = props.aspect;
       return h(props.tag, {
-        ref: data.ref,
         staticClass: 'embed-responsive',
-        class: _defineProperty({}, "embed-responsive-".concat(props.aspect), props.aspect)
-      }, [h(props.type, a(data, {
-        ref: '',
+        class: _defineProperty({}, "embed-responsive-".concat(aspect), aspect),
+        ref: data.ref
+      }, [h(props.type, a(omit(data, ['ref']), {
         staticClass: 'embed-responsive-item'
       }), children)]);
     }
@@ -12132,33 +11085,19 @@
     }
   });
 
-  var OPTIONS_OBJECT_DEPRECATED_MSG = 'Setting prop "options" to an object is deprecated. Use the array format instead.'; // @vue/component
+  var OPTIONS_OBJECT_DEPRECATED_MSG = 'Setting prop "options" to an object is deprecated. Use the array format instead.'; // --- Props ---
 
-  var formOptionsMixin = {
-    props: {
-      options: {
-        type: [Array, Object],
-        default: function _default() {
-          return [];
-        }
-      },
-      valueField: {
-        type: String,
-        default: 'value'
-      },
-      textField: {
-        type: String,
-        default: 'text'
-      },
-      htmlField: {
-        type: String,
-        default: 'html'
-      },
-      disabledField: {
-        type: String,
-        default: 'disabled'
-      }
-    },
+  var props$K = makePropsConfigurable({
+    disabledField: makeProp(PROP_TYPE_STRING, 'disabled'),
+    htmlField: makeProp(PROP_TYPE_STRING, 'html'),
+    options: makeProp(PROP_TYPE_ARRAY_OBJECT, []),
+    textField: makeProp(PROP_TYPE_STRING, 'text'),
+    valueField: makeProp(PROP_TYPE_STRING, 'value')
+  }, 'formOptionControls'); // --- Mixin ---
+  // @vue/component
+
+  var formOptionsMixin = Vue__default['default'].extend({
+    props: props$K,
     computed: {
       formOptions: function formOptions() {
         return this.normalizeOptions(this.options);
@@ -12210,18 +11149,20 @@
         return [];
       }
     }
-  };
+  });
+
+  var props$L = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$K), {}, {
+    id: makeProp(PROP_TYPE_STRING, undefined, true) // Required
+
+  })), NAME_FORM_DATALIST); // --- Main component ---
+  // @vue/component
 
   var BFormDatalist = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_DATALIST,
     mixins: [formOptionsMixin, normalizeSlotMixin],
-    props: {
-      id: {
-        type: String,
-        required: true
-      }
-    },
+    props: props$L,
     render: function render(h) {
+      var id = this.id;
       var $options = this.formOptions.map(function (option, index) {
         var value = option.value,
             text = option.text,
@@ -12238,37 +11179,24 @@
       });
       return h('datalist', {
         attrs: {
-          id: this.id
+          id: id
         }
       }, [$options, this.normalizeSlot()]);
     }
   });
 
-  var props$t = {
-    id: {
-      type: String // default: null
-
-    },
-    tag: {
-      type: String,
-      default: 'small'
-    },
-    textVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_FORM_TEXT, 'textVariant');
-      }
-    },
-    inline: {
-      type: Boolean,
-      default: false
-    }
-  }; // @vue/component
+  var props$M = makePropsConfigurable({
+    id: makeProp(PROP_TYPE_STRING),
+    inline: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'small'),
+    textVariant: makeProp(PROP_TYPE_STRING, 'muted')
+  }, NAME_FORM_TEXT); // --- Main component ---
+  // @vue/component
 
   var BFormText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TEXT,
     functional: true,
-    props: props$t,
+    props: props$M,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -12284,131 +11212,93 @@
     }
   });
 
-  var props$u = {
-    id: {
-      type: String // default: null
-
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    tooltip: {
-      type: Boolean,
-      default: false
-    },
-    forceShow: {
-      type: Boolean,
-      default: false
-    },
-    state: {
-      // Tri-state prop: `true`, `false`, or `null`
-      type: Boolean,
-      default: null
-    },
-    ariaLive: {
-      type: String // default: null
-
-    },
-    role: {
-      type: String // default: null
-
-    }
-  }; // @vue/component
+  var props$N = makePropsConfigurable({
+    ariaLive: makeProp(PROP_TYPE_STRING),
+    forceShow: makeProp(PROP_TYPE_BOOLEAN, false),
+    id: makeProp(PROP_TYPE_STRING),
+    role: makeProp(PROP_TYPE_STRING),
+    // Tri-state prop: `true`, `false`, or `null`
+    state: makeProp(PROP_TYPE_BOOLEAN, null),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    tooltip: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, NAME_FORM_INVALID_FEEDBACK); // --- Main component ---
+  // @vue/component
 
   var BFormInvalidFeedback = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_INVALID_FEEDBACK,
     functional: true,
-    props: props$u,
+    props: props$N,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var tooltip = props.tooltip,
+          ariaLive = props.ariaLive;
       var show = props.forceShow === true || props.state === false;
       return h(props.tag, a(data, {
         class: {
-          'invalid-feedback': !props.tooltip,
-          'invalid-tooltip': props.tooltip,
-          'd-block': show
+          'd-block': show,
+          'invalid-feedback': !tooltip,
+          'invalid-tooltip': tooltip
         },
         attrs: {
           id: props.id || null,
           role: props.role || null,
-          'aria-live': props.ariaLive || null,
-          'aria-atomic': props.ariaLive ? 'true' : null
+          'aria-live': ariaLive || null,
+          'aria-atomic': ariaLive ? 'true' : null
         }
       }), children);
     }
   });
 
-  var props$v = {
-    id: {
-      type: String // default: null
-
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    tooltip: {
-      type: Boolean,
-      default: false
-    },
-    forceShow: {
-      type: Boolean,
-      default: false
-    },
-    state: {
-      // Tri-state prop: `true`, `false`, or `null`
-      type: Boolean,
-      default: null
-    },
-    ariaLive: {
-      type: String // default: null
-
-    },
-    role: {
-      type: String // default: null
-
-    }
-  }; // @vue/component
+  var props$O = makePropsConfigurable({
+    ariaLive: makeProp(PROP_TYPE_STRING),
+    forceShow: makeProp(PROP_TYPE_BOOLEAN, false),
+    id: makeProp(PROP_TYPE_STRING),
+    role: makeProp(PROP_TYPE_STRING),
+    // Tri-state prop: `true`, `false`, or `null`
+    state: makeProp(PROP_TYPE_BOOLEAN, null),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    tooltip: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, NAME_FORM_VALID_FEEDBACK); // --- Main component ---
+  // @vue/component
 
   var BFormValidFeedback = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_VALID_FEEDBACK,
     functional: true,
-    props: props$v,
+    props: props$O,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var tooltip = props.tooltip,
+          ariaLive = props.ariaLive;
       var show = props.forceShow === true || props.state === true;
       return h(props.tag, a(data, {
         class: {
-          'valid-feedback': !props.tooltip,
-          'valid-tooltip': props.tooltip,
-          'd-block': show
+          'd-block': show,
+          'valid-feedback': !tooltip,
+          'valid-tooltip': tooltip
         },
         attrs: {
           id: props.id || null,
           role: props.role || null,
-          'aria-live': props.ariaLive || null,
-          'aria-atomic': props.ariaLive ? 'true' : null
+          'aria-live': ariaLive || null,
+          'aria-atomic': ariaLive ? 'true' : null
         }
       }), children);
     }
   });
 
-  var props$w = {
-    tag: {
-      type: String,
-      default: 'div'
-    }
-  }; // @vue/component
+  var props$P = makePropsConfigurable({
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_FORM_ROW); // --- Main component ---
+  // @vue/component
 
   var BFormRow = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_ROW,
     functional: true,
-    props: props$w,
+    props: props$P,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -12433,10 +11323,9 @@
     }
   }); // BFormRow is not exported here as a named export, as it is exported by Layout
 
-  var looseIndexOf = function looseIndexOf(arr, val) {
-    // Assumes that the first argument is an array
-    for (var i = 0; i < arr.length; i++) {
-      if (looseEqual(arr[i], val)) {
+  var looseIndexOf = function looseIndexOf(array, value) {
+    for (var i = 0; i < array.length; i++) {
+      if (looseEqual(array[i], value)) {
         return i;
       }
     }
@@ -12444,34 +11333,20 @@
     return -1;
   };
 
-  var SELECTOR = 'input, textarea, select'; // @vue/component
+  var SELECTOR = 'input, textarea, select'; // --- Props ---
 
-  var formMixin = {
-    props: {
-      name: {
-        type: String // default: undefined
+  var props$Q = makePropsConfigurable({
+    autofocus: makeProp(PROP_TYPE_BOOLEAN, false),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    form: makeProp(PROP_TYPE_STRING),
+    id: makeProp(PROP_TYPE_STRING),
+    name: makeProp(PROP_TYPE_STRING),
+    required: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, 'formControls'); // --- Mixin ---
+  // @vue/component
 
-      },
-      id: {
-        type: String // default: undefined
-
-      },
-      disabled: {
-        type: Boolean
-      },
-      required: {
-        type: Boolean,
-        default: false
-      },
-      form: {
-        type: String // default: null
-
-      },
-      autofocus: {
-        type: Boolean,
-        default: false
-      }
-    },
+  var formControlMixin = Vue__default['default'].extend({
+    props: props$Q,
     mounted: function mounted() {
       this.handleAutofocus();
     },
@@ -12499,56 +11374,103 @@
         });
       }
     }
-  };
+  });
 
-  var formRadioCheckMixin = {
-    mixins: [attrsMixin, normalizeSlotMixin],
-    inheritAttrs: false,
-    model: {
-      prop: 'checked',
-      event: 'input'
-    },
-    props: {
-      value: {// Value when checked
-        // type: Object,
-        // default: undefined
-      },
-      checked: {// This is the v-model
-        // type: Object,
-        // default: undefined
-      },
-      inline: {
-        type: Boolean,
-        default: false
-      },
-      plain: {
-        type: Boolean,
-        default: false
-      },
-      button: {
-        // Only applicable in standalone mode (non group)
-        type: Boolean,
-        default: false
-      },
-      buttonVariant: {
-        // Only applicable when rendered with button style
-        type: String // default: null
+  var props$R = makePropsConfigurable({
+    plain: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, 'formControls'); // --- Mixin ---
+  // @vue/component
 
-      },
-      ariaLabel: {
-        // Placed on the input if present.
-        type: String // default: null
-
-      },
-      ariaLabelledby: {
-        // Placed on the input if present.
-        type: String // default: null
-
+  var formCustomMixin = Vue__default['default'].extend({
+    props: props$R,
+    computed: {
+      custom: function custom() {
+        return !this.plain;
       }
-    },
+    }
+  });
+
+  var props$S = makePropsConfigurable({
+    size: makeProp(PROP_TYPE_STRING)
+  }, 'formControls'); // --- Mixin ---
+  // @vue/component
+
+  var formSizeMixin = Vue__default['default'].extend({
+    props: props$S,
+    computed: {
+      sizeFormClass: function sizeFormClass() {
+        return [this.size ? "form-control-".concat(this.size) : null];
+      }
+    }
+  });
+
+  /* Form control contextual state class computation
+   *
+   * Returned class is either 'is-valid' or 'is-invalid' based on the 'state' prop
+   * state can be one of five values:
+   *  - true for is-valid
+   *  - false for is-invalid
+   *  - null for no contextual state
+   */
+
+  var props$T = makePropsConfigurable({
+    // Tri-state prop: true, false, null (or undefined)
+    state: makeProp(PROP_TYPE_BOOLEAN, null)
+  }, 'formState'); // --- Mixin ---
+  // @vue/component
+
+  var formStateMixin = Vue__default['default'].extend({
+    props: props$T,
+    computed: {
+      computedState: function computedState() {
+        // If not a boolean, ensure that value is null
+        return isBoolean(this.state) ? this.state : null;
+      },
+      stateClass: function stateClass() {
+        var state = this.computedState;
+        return state === true ? 'is-valid' : state === false ? 'is-invalid' : null;
+      },
+      computedAriaInvalid: function computedAriaInvalid() {
+        var ariaInvalid = this.ariaInvalid;
+
+        if (ariaInvalid === true || ariaInvalid === 'true' || ariaInvalid === '') {
+          return 'true';
+        }
+
+        return this.computedState === false ? 'true' : ariaInvalid;
+      }
+    }
+  });
+
+  var _watch$5, _methods;
+
+  var _makeModelMixin$4 = makeModelMixin('checked', {
+    defaultValue: null
+  }),
+      modelMixin$4 = _makeModelMixin$4.mixin,
+      modelProps$4 = _makeModelMixin$4.props,
+      MODEL_PROP_NAME$4 = _makeModelMixin$4.prop,
+      MODEL_EVENT_NAME$4 = _makeModelMixin$4.event;
+
+  var props$U = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$4), props$Q), props$S), props$T), props$R), {}, {
+    ariaLabel: makeProp(PROP_TYPE_STRING),
+    ariaLabelledby: makeProp(PROP_TYPE_STRING),
+    // Only applicable in standalone mode (non group)
+    button: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Only applicable when rendered with button style
+    buttonVariant: makeProp(PROP_TYPE_STRING),
+    inline: makeProp(PROP_TYPE_BOOLEAN, false),
+    value: makeProp(PROP_TYPE_ANY)
+  })), 'formRadioCheckControls'); // --- Mixin ---
+  // @vue/component
+
+  var formRadioCheckMixin = Vue__default['default'].extend({
+    mixins: [attrsMixin, idMixin, modelMixin$4, normalizeSlotMixin, formControlMixin, formSizeMixin, formStateMixin, formCustomMixin],
+    inheritAttrs: false,
+    props: props$U,
     data: function data() {
       return {
-        localChecked: this.isGroup ? this.bvGroup.checked : this.checked,
+        localChecked: this.isGroup ? this.bvGroup[MODEL_PROP_NAME$4] : this[MODEL_PROP_NAME$4],
         hasFocus: false
       };
     },
@@ -12557,17 +11479,23 @@
         get: function get() {
           return this.isGroup ? this.bvGroup.localChecked : this.localChecked;
         },
-        set: function set(val) {
+        set: function set(value) {
           if (this.isGroup) {
-            this.bvGroup.localChecked = val;
+            this.bvGroup.localChecked = value;
           } else {
-            this.localChecked = val;
+            this.localChecked = value;
           }
         }
       },
+      isChecked: function isChecked() {
+        return looseEqual(this.value, this.computedLocalChecked);
+      },
+      isRadio: function isRadio() {
+        return true;
+      },
       isGroup: function isGroup() {
         // Is this check/radio a child of check-group or radio-group?
-        return Boolean(this.bvGroup);
+        return !!this.bvGroup;
       },
       isBtnMode: function isBtnMode() {
         // Support button style in single input mode
@@ -12594,254 +11522,207 @@
         // Required only works when a name is provided for the input(s)
         // Child can only be required when parent is
         // Groups will always have a name (either user supplied or auto generated)
-        return this.getName && (this.isGroup ? this.bvGroup.required : this.required);
+        return this.computedName && (this.isGroup ? this.bvGroup.required : this.required);
       },
-      getName: function getName() {
+      computedName: function computedName() {
         // Group name preferred over local name
         return (this.isGroup ? this.bvGroup.groupName : this.name) || null;
       },
-      getForm: function getForm() {
+      computedForm: function computedForm() {
         return (this.isGroup ? this.bvGroup.form : this.form) || null;
       },
-      getSize: function getSize() {
+      computedSize: function computedSize() {
         return (this.isGroup ? this.bvGroup.size : this.size) || '';
       },
-      getState: function getState() {
-        return this.isGroup ? this.bvGroup.computedState : this.computedState;
+      computedState: function computedState() {
+        return this.isGroup ? this.bvGroup.computedState : isBoolean(this.state) ? this.state : null;
       },
-      getButtonVariant: function getButtonVariant() {
+      computedButtonVariant: function computedButtonVariant() {
         // Local variant preferred over group variant
-        if (this.buttonVariant) {
-          return this.buttonVariant;
-        } else if (this.isGroup && this.bvGroup.buttonVariant) {
-          return this.bvGroup.buttonVariant;
-        } // default variant
+        var buttonVariant = this.buttonVariant;
 
+        if (buttonVariant) {
+          return buttonVariant;
+        }
+
+        if (this.isGroup && this.bvGroup.buttonVariant) {
+          return this.bvGroup.buttonVariant;
+        }
 
         return 'secondary';
       },
       buttonClasses: function buttonClasses() {
         var _ref;
 
-        // Same for radio & check
-        return ['btn', "btn-".concat(this.getButtonVariant), (_ref = {}, _defineProperty(_ref, "btn-".concat(this.getSize), this.getSize), _defineProperty(_ref, "disabled", this.isDisabled), _defineProperty(_ref, "active", this.isChecked), _defineProperty(_ref, "focus", this.hasFocus), _ref)];
+        var computedSize = this.computedSize;
+        return ['btn', "btn-".concat(this.computedButtonVariant), (_ref = {}, _defineProperty(_ref, "btn-".concat(computedSize), computedSize), _defineProperty(_ref, "disabled", this.isDisabled), _defineProperty(_ref, "active", this.isChecked), _defineProperty(_ref, "focus", this.hasFocus), _ref)];
       },
       computedAttrs: function computedAttrs() {
+        var disabled = this.isDisabled,
+            required = this.isRequired;
         return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
           id: this.safeId(),
           type: this.isRadio ? 'radio' : 'checkbox',
-          name: this.getName,
-          form: this.getForm,
-          disabled: this.isDisabled,
-          required: this.isRequired,
-          'aria-required': this.isRequired || null,
+          name: this.computedName,
+          form: this.computedForm,
+          disabled: disabled,
+          required: required,
+          'aria-required': required || null,
           'aria-label': this.ariaLabel || null,
           'aria-labelledby': this.ariaLabelledby || null
         });
       }
     },
-    watch: {
-      checked: function checked(newValue) {
-        if (!looseEqual(newValue, this.computedLocalChecked)) {
-          this.computedLocalChecked = newValue;
+    watch: (_watch$5 = {}, _defineProperty(_watch$5, MODEL_PROP_NAME$4, function () {
+      this["".concat(MODEL_PROP_NAME$4, "Watcher")].apply(this, arguments);
+    }), _defineProperty(_watch$5, "computedLocalChecked", function computedLocalChecked() {
+      this.computedLocalCheckedWatcher.apply(this, arguments);
+    }), _watch$5),
+    methods: (_methods = {}, _defineProperty(_methods, "".concat(MODEL_PROP_NAME$4, "Watcher"), function Watcher(newValue) {
+      if (!looseEqual(newValue, this.computedLocalChecked)) {
+        this.computedLocalChecked = newValue;
+      }
+    }), _defineProperty(_methods, "computedLocalCheckedWatcher", function computedLocalCheckedWatcher(newValue, oldValue) {
+      if (!looseEqual(newValue, oldValue)) {
+        this.$emit(MODEL_EVENT_NAME$4, newValue);
+      }
+    }), _defineProperty(_methods, "handleChange", function handleChange(_ref2) {
+      var _this = this;
+
+      var checked = _ref2.target.checked;
+      var value = this.value;
+      var localChecked = checked ? value : null;
+      this.computedLocalChecked = value; // Fire events in a `$nextTick()` to ensure the `v-model` is updated
+
+      this.$nextTick(function () {
+        // Change is only emitted on user interaction
+        _this.$emit(EVENT_NAME_CHANGE, localChecked); // If this is a child of a group, we emit a change event on it as well
+
+
+        if (_this.isGroup) {
+          _this.bvGroup.$emit(EVENT_NAME_CHANGE, localChecked);
+        }
+      });
+    }), _defineProperty(_methods, "handleFocus", function handleFocus(event) {
+      // When in buttons mode, we need to add 'focus' class to label when input focused
+      // As it is the hidden input which has actual focus
+      if (event.target) {
+        if (event.type === 'focus') {
+          this.hasFocus = true;
+        } else if (event.type === 'blur') {
+          this.hasFocus = false;
         }
       }
-    },
-    methods: {
-      handleFocus: function handleFocus(evt) {
-        // When in buttons mode, we need to add 'focus' class to label when input focused
-        // As it is the hidden input which has actual focus
-        if (evt.target) {
-          if (evt.type === 'focus') {
-            this.hasFocus = true;
-          } else if (evt.type === 'blur') {
-            this.hasFocus = false;
-          }
-        }
-      },
-      // Convenience methods for focusing the input
-      focus: function focus() {
-        if (!this.isDisabled) {
-          attemptFocus(this.$refs.input);
-        }
-      },
-      blur: function blur() {
-        if (!this.isDisabled) {
-          attemptBlur(this.$refs.input);
-        }
+    }), _defineProperty(_methods, "focus", function focus() {
+      if (!this.isDisabled) {
+        attemptFocus(this.$refs.input);
       }
-    },
+    }), _defineProperty(_methods, "blur", function blur() {
+      if (!this.isDisabled) {
+        attemptBlur(this.$refs.input);
+      }
+    }), _methods),
     render: function render(h) {
-      var defaultSlot = this.normalizeSlot(); // Generate the input element
-
-      var on = {
-        change: this.handleChange
-      };
-
-      if (this.isBtnMode) {
-        // Handlers for focus styling when in button mode
-        on.focus = on.blur = this.handleFocus;
-      }
-
-      var input = h('input', {
-        ref: 'input',
-        key: 'input',
-        on: on,
-        class: {
-          'form-check-input': this.isPlain,
-          'custom-control-input': this.isCustom,
-          'is-valid': this.getState === true && !this.isBtnMode,
-          'is-invalid': this.getState === false && !this.isBtnMode,
+      var isRadio = this.isRadio,
+          isBtnMode = this.isBtnMode,
+          isPlain = this.isPlain,
+          isCustom = this.isCustom,
+          isInline = this.isInline,
+          isSwitch = this.isSwitch,
+          computedSize = this.computedSize,
+          bvAttrs = this.bvAttrs;
+      var $content = this.normalizeSlot();
+      var $input = h('input', {
+        class: [{
+          'form-check-input': isPlain,
+          'custom-control-input': isCustom,
           // https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
-          'position-static': this.isPlain && !defaultSlot
-        },
+          'position-static': isPlain && !$content
+        }, isBtnMode ? '' : this.stateClass],
         directives: [{
           name: 'model',
-          rawName: 'v-model',
-          value: this.computedLocalChecked,
-          expression: 'computedLocalChecked'
+          value: this.computedLocalChecked
         }],
         attrs: this.computedAttrs,
         domProps: {
           value: this.value,
           checked: this.isChecked
-        }
+        },
+        on: _objectSpread2({
+          change: this.handleChange
+        }, isBtnMode ? {
+          focus: this.handleFocus,
+          blur: this.handleFocus
+        } : {}),
+        key: 'input',
+        ref: 'input'
       });
 
-      if (this.isBtnMode) {
-        // Button mode
-        var button = h('label', {
+      if (isBtnMode) {
+        var $button = h('label', {
           class: this.buttonClasses
-        }, [input, defaultSlot]);
+        }, [$input, $content]);
 
         if (!this.isGroup) {
           // Standalone button mode, so wrap in 'btn-group-toggle'
           // and flag it as inline-block to mimic regular buttons
-          button = h('div', {
+          $button = h('div', {
             class: ['btn-group-toggle', 'd-inline-block']
-          }, [button]);
+          }, [$button]);
         }
 
-        return button;
-      } else {
-        // Not button mode
-        var label = h(); // If no label content in plain mode we dont render the label
-        // https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
-
-        if (!(this.isPlain && !defaultSlot)) {
-          label = h('label', {
-            class: {
-              'form-check-label': this.isPlain,
-              'custom-control-label': this.isCustom
-            },
-            attrs: {
-              for: this.safeId()
-            }
-          }, defaultSlot);
-        } // Wrap it in a div
+        return $button;
+      } // If no label content in plain mode we dont render the label
+      // See: https://github.com/bootstrap-vue/bootstrap-vue/issues/2911
 
 
-        return h('div', {
-          class: _defineProperty({
-            'form-check': this.isPlain,
-            'form-check-inline': this.isPlain && this.isInline,
-            'custom-control': this.isCustom,
-            'custom-control-inline': this.isCustom && this.isInline,
-            'custom-checkbox': this.isCustom && this.isCheck && !this.isSwitch,
-            'custom-switch': this.isSwitch,
-            'custom-radio': this.isCustom && this.isRadio
-          }, "b-custom-control-".concat(this.getSize), Boolean(this.getSize && !this.isBtnMode))
-        }, [input, label]);
+      var $label = h();
+
+      if (!(isPlain && !$content)) {
+        $label = h('label', {
+          class: {
+            'form-check-label': isPlain,
+            'custom-control-label': isCustom
+          },
+          attrs: {
+            for: this.safeId()
+          }
+        }, $content);
       }
+
+      return h('div', {
+        class: [_defineProperty({
+          'form-check': isPlain,
+          'form-check-inline': isPlain && isInline,
+          'custom-control': isCustom,
+          'custom-control-inline': isCustom && isInline,
+          'custom-checkbox': isCustom && !isRadio && !isSwitch,
+          'custom-switch': isSwitch,
+          'custom-radio': isCustom && isRadio
+        }, "b-custom-control-".concat(computedSize), computedSize && !isBtnMode), bvAttrs.class],
+        style: bvAttrs.style
+      }, [$input, $label]);
     }
-  };
+  });
 
-  var formSizeMixin = {
-    props: {
-      size: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig('formControls', 'size');
-        }
-      }
-    },
-    computed: {
-      sizeFormClass: function sizeFormClass() {
-        return [this.size ? "form-control-".concat(this.size) : null];
-      },
+  var _objectSpread2$1;
 
-      /* istanbul ignore next: don't think this is used */
-      sizeBtnClass: function sizeBtnClass() {
-        return [this.size ? "btn-".concat(this.size) : null];
-      }
-    }
-  };
+  var MODEL_PROP_NAME_INDETERMINATE = 'indeterminate';
+  var MODEL_EVENT_NAME_INDETERMINATE = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_INDETERMINATE; // --- Props ---
 
-  /* Form control contextual state class computation
-   *
-   * Returned class is either 'is-valid' or 'is-invalid' based on the 'state' prop
-   * state can be one of five values:
-   *  - true for is-valid
-   *  - false for is-invalid
-   *  - null for no contextual state
-   */
-
-  var formStateMixin = {
-    props: {
-      state: {
-        // Tri-state prop: true, false, null (or undefined)
-        type: Boolean,
-        default: null
-      }
-    },
-    computed: {
-      computedState: function computedState() {
-        // If not a boolean, ensure that value is null
-        return isBoolean(this.state) ? this.state : null;
-      },
-      stateClass: function stateClass() {
-        var state = this.computedState;
-        return state === true ? 'is-valid' : state === false ? 'is-invalid' : null;
-      }
-    }
-  };
+  var props$V = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$U), {}, (_objectSpread2$1 = {}, _defineProperty(_objectSpread2$1, MODEL_PROP_NAME_INDETERMINATE, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$1, "switch", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$1, "uncheckedValue", makeProp(PROP_TYPE_ANY, false)), _defineProperty(_objectSpread2$1, "value", makeProp(PROP_TYPE_ANY, true)), _objectSpread2$1))), NAME_FORM_CHECKBOX); // --- Main component ---
+  // @vue/component
 
   var BFormCheckbox = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_CHECKBOX,
-    mixins: [formRadioCheckMixin, // Includes shared render function
-    idMixin, formMixin, formSizeMixin, formStateMixin],
+    mixins: [formRadioCheckMixin],
     inject: {
       bvGroup: {
         from: 'bvCheckGroup',
-        default: false
-      }
-    },
-    props: {
-      value: {
-        // type: [String, Number, Boolean, Object],
-        default: true
-      },
-      uncheckedValue: {
-        // type: [String, Number, Boolean, Object],
-        // Not applicable in multi-check mode
-        default: false
-      },
-      indeterminate: {
-        // Not applicable in multi-check mode
-        type: Boolean,
-        default: false
-      },
-      switch: {
-        // Custom switch styling
-        type: Boolean,
-        default: false
-      },
-      checked: {
-        // v-model (Array when multiple checkboxes have same name)
-        // type: [String, Number, Boolean, Object, Array],
         default: null
       }
     },
+    props: props$V,
     computed: {
       isChecked: function isChecked() {
         var value = this.value,
@@ -12850,32 +11731,31 @@
       },
       isRadio: function isRadio() {
         return false;
-      },
-      isCheck: function isCheck() {
-        return true;
       }
     },
-    watch: {
-      computedLocalChecked: function computedLocalChecked(newValue, oldValue) {
+    watch: _defineProperty({}, MODEL_PROP_NAME_INDETERMINATE, function (newValue, oldValue) {
+      if (!looseEqual(newValue, oldValue)) {
+        this.setIndeterminate(newValue);
+      }
+    }),
+    mounted: function mounted() {
+      // Set initial indeterminate state
+      this.setIndeterminate(this[MODEL_PROP_NAME_INDETERMINATE]);
+    },
+    methods: {
+      computedLocalCheckedWatcher: function computedLocalCheckedWatcher(newValue, oldValue) {
         if (!looseEqual(newValue, oldValue)) {
-          this.$emit('input', newValue);
+          this.$emit(MODEL_EVENT_NAME$4, newValue);
           var $input = this.$refs.input;
 
           if ($input) {
-            this.$emit('update:indeterminate', $input.indeterminate);
+            this.$emit(MODEL_EVENT_NAME_INDETERMINATE, $input.indeterminate);
           }
         }
       },
-      indeterminate: function indeterminate(newVal) {
-        this.setIndeterminate(newVal);
-      }
-    },
-    mounted: function mounted() {
-      // Set initial indeterminate state
-      this.setIndeterminate(this.indeterminate);
-    },
-    methods: {
       handleChange: function handleChange(_ref) {
+        var _this = this;
+
         var _ref$target = _ref.target,
             checked = _ref$target.checked,
             indeterminate = _ref$target.indeterminate;
@@ -12898,16 +11778,19 @@
           localChecked = checked ? value : uncheckedValue;
         }
 
-        this.computedLocalChecked = localChecked; // Change is only emitted on user interaction
+        this.computedLocalChecked = localChecked; // Fire events in a `$nextTick()` to ensure the `v-model` is updated
 
-        this.$emit('change', localChecked); // If this is a child of `<form-checkbox-group>`,
-        // we emit a change event on it as well
+        this.$nextTick(function () {
+          // Change is only emitted on user interaction
+          _this.$emit(EVENT_NAME_CHANGE, localChecked); // If this is a child of a group, we emit a change event on it as well
 
-        if (this.isGroup) {
-          this.bvGroup.$emit('change', localChecked);
-        }
 
-        this.$emit('update:indeterminate', indeterminate);
+          if (_this.isGroup) {
+            _this.bvGroup.$emit(EVENT_NAME_CHANGE, localChecked);
+          }
+
+          _this.$emit(MODEL_EVENT_NAME_INDETERMINATE, indeterminate);
+        });
       },
       setIndeterminate: function setIndeterminate(state) {
         // Indeterminate only supported in single checkbox mode
@@ -12920,96 +11803,65 @@
         if ($input) {
           $input.indeterminate = state; // Emit update event to prop
 
-          this.$emit('update:indeterminate', state);
+          this.$emit(MODEL_EVENT_NAME_INDETERMINATE, state);
         }
       }
     }
   });
 
+  var props$W = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$Q), props$U), props$S), props$T)), NAME_FORM_RADIO); // --- Main component ---
+  // @vue/component
+
   var BFormRadio = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_RADIO,
     mixins: [idMixin, formRadioCheckMixin, // Includes shared render function
-    formMixin, formSizeMixin, formStateMixin],
+    formControlMixin, formSizeMixin, formStateMixin],
     inject: {
       bvGroup: {
         from: 'bvRadioGroup',
         default: false
       }
     },
-    props: {
-      checked: {
-        // v-model
-        // type: [String, Number, Boolean, Object],
-        default: null
-      }
-    },
-    computed: {
-      // Radio Groups can only have a single value, so determining if checked is simple
-      isChecked: function isChecked() {
-        return looseEqual(this.value, this.computedLocalChecked);
-      },
-      // Flags for form-radio-check mixin
-      isRadio: function isRadio() {
-        return true;
-      },
-      isCheck: function isCheck() {
-        return false;
-      }
-    },
+    props: props$W,
     watch: {
-      // Radio Groups can only have a single value, so our watchers are simple
-      computedLocalChecked: function computedLocalChecked() {
-        this.$emit('input', this.computedLocalChecked);
-      }
-    },
-    methods: {
-      handleChange: function handleChange(_ref) {
-        var checked = _ref.target.checked;
-        var value = this.value;
-        this.computedLocalChecked = value; // Change is only emitted on user interaction
-
-        this.$emit('change', checked ? value : null); // If this is a child of form-radio-group, we emit a change event on it as well
-
-        if (this.isGroup) {
-          this.bvGroup.$emit('change', checked ? value : null);
+      computedLocalChecked: function computedLocalChecked(newValue, oldValue) {
+        if (!looseEqual(newValue, oldValue)) {
+          this.$emit(MODEL_EVENT_NAME$4, newValue);
         }
       }
     }
   });
 
-  var formRadioCheckGroupMixin = {
-    mixins: [normalizeSlotMixin],
-    model: {
-      prop: 'checked',
-      event: 'input'
-    },
-    props: {
-      validated: {
-        type: Boolean,
-        default: false
-      },
-      ariaInvalid: {
-        type: [Boolean, String],
-        default: false
-      },
-      stacked: {
-        type: Boolean,
-        default: false
-      },
-      plain: {
-        type: Boolean,
-        default: false
-      },
-      buttons: {
-        // Render as button style
-        type: Boolean,
-        default: false
-      },
-      buttonVariant: {
-        // Only applicable when rendered with button style
-        type: String,
-        default: 'secondary'
-      }
+  var _watch$6;
+  // Attributes to pass down to checks/radios instead of applying them to the group
+
+  var PASS_DOWN_ATTRS = ['aria-describedby', 'aria-labelledby'];
+
+  var _makeModelMixin$5 = makeModelMixin('checked'),
+      modelMixin$5 = _makeModelMixin$5.mixin,
+      modelProps$5 = _makeModelMixin$5.props,
+      MODEL_PROP_NAME$5 = _makeModelMixin$5.prop,
+      MODEL_EVENT_NAME$5 = _makeModelMixin$5.event;
+
+  var props$X = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$5), props$Q), props$K), props$S), props$T), props$R), {}, {
+    ariaInvalid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    // Only applicable when rendered with button style
+    buttonVariant: makeProp(PROP_TYPE_STRING),
+    // Render as button style
+    buttons: makeProp(PROP_TYPE_BOOLEAN, false),
+    stacked: makeProp(PROP_TYPE_BOOLEAN, false),
+    validated: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), 'formRadioCheckGroups'); // --- Mixin ---
+  // @vue/component
+
+  var formRadioCheckGroupMixin = Vue__default['default'].extend({
+    mixins: [idMixin, modelMixin$5, normalizeSlotMixin, formControlMixin, formOptionsMixin, formSizeMixin, formStateMixin, formCustomMixin],
+    inheritAttrs: false,
+    props: props$X,
+    data: function data() {
+      return {
+        localChecked: this[MODEL_PROP_NAME$5]
+      };
     },
     computed: {
       inline: function inline() {
@@ -13017,54 +11869,56 @@
       },
       groupName: function groupName() {
         // Checks/Radios tied to the same model must have the same name,
-        // especially for ARIA accessibility.
+        // especially for ARIA accessibility
         return this.name || this.safeId();
       },
       groupClasses: function groupClasses() {
+        var inline = this.inline,
+            size = this.size,
+            validated = this.validated;
+        var classes = {
+          'was-validated': validated
+        };
+
         if (this.buttons) {
-          return ['btn-group-toggle', this.inline ? 'btn-group' : 'btn-group-vertical', this.size ? "btn-group-".concat(this.size) : '', this.validated ? "was-validated" : ''];
+          classes = [classes, 'btn-group-toggle', _defineProperty({
+            'btn-group': inline,
+            'btn-group-vertical': !inline
+          }, "btn-group-".concat(size), size)];
         }
 
-        return [this.validated ? "was-validated" : ''];
-      },
-      computedAriaInvalid: function computedAriaInvalid() {
-        var ariaInvalid = this.ariaInvalid;
-
-        if (ariaInvalid === true || ariaInvalid === 'true' || ariaInvalid === '') {
-          return 'true';
-        }
-
-        return this.computedState === false ? 'true' : null;
+        return classes;
       }
     },
-    watch: {
-      checked: function checked(newVal) {
-        if (!looseEqual(newVal, this.localChecked)) {
-          this.localChecked = newVal;
-        }
-      },
-      localChecked: function localChecked(newValue, oldValue) {
-        if (!looseEqual(newValue, oldValue)) {
-          this.$emit('input', newValue);
-        }
+    watch: (_watch$6 = {}, _defineProperty(_watch$6, MODEL_PROP_NAME$5, function (newValue) {
+      if (!looseEqual(newValue, this.localChecked)) {
+        this.localChecked = newValue;
       }
-    },
+    }), _defineProperty(_watch$6, "localChecked", function localChecked(newValue, oldValue) {
+      if (!looseEqual(newValue, oldValue)) {
+        this.$emit(MODEL_EVENT_NAME$5, newValue);
+      }
+    }), _watch$6),
     render: function render(h) {
       var _this = this;
 
+      var isRadioGroup = this.isRadioGroup;
+      var attrs = pick(this.$attrs, PASS_DOWN_ATTRS);
+      var optionComponent = isRadioGroup ? BFormRadio : BFormCheckbox;
       var $inputs = this.formOptions.map(function (option, index) {
         var key = "BV_option_".concat(index);
-        return h(_this.isRadioGroup ? BFormRadio : BFormCheckbox, {
+        return h(optionComponent, {
           props: {
-            id: _this.safeId(key),
-            value: option.value,
             // Individual radios or checks can be disabled in a group
-            disabled: option.disabled || false // We don't need to include these, since the input's will know they are inside here
-            // name: this.groupName,
+            disabled: option.disabled || false,
+            id: _this.safeId(key),
+            value: option.value // We don't need to include these, since the input's will know they are inside here
             // form: this.form || null,
+            // name: this.groupName,
             // required: Boolean(this.name && this.required)
 
           },
+          attrs: attrs,
           key: key
         }, [h('span', {
           domProps: htmlOrText(option.html, option.text)
@@ -13072,45 +11926,33 @@
       });
       return h('div', {
         class: [this.groupClasses, 'bv-no-focus-ring'],
-        attrs: {
-          id: this.safeId(),
-          role: this.isRadioGroup ? 'radiogroup' : 'group',
-          // Add `tabindex="-1"` to allow group to be focused if needed by screen readers
-          tabindex: '-1',
+        attrs: _objectSpread2(_objectSpread2({}, omit(this.$attrs, PASS_DOWN_ATTRS)), {}, {
+          'aria-invalid': this.computedAriaInvalid,
           'aria-required': this.required ? 'true' : null,
-          'aria-invalid': this.computedAriaInvalid
-        }
+          id: this.safeId(),
+          role: isRadioGroup ? 'radiogroup' : 'group',
+          // Add `tabindex="-1"` to allow group to be focused if needed by screen readers
+          tabindex: '-1'
+        })
       }, [this.normalizeSlot(SLOT_NAME_FIRST), $inputs, this.normalizeSlot()]);
     }
-  };
+  });
 
-  var props$x = {
-    switches: {
-      // Custom switch styling
-      type: Boolean,
-      default: false
-    },
-    checked: {
-      type: Array,
-      default: null
-    }
-  }; // @vue/component
+  var _objectSpread2$2;
+
+  var props$Y = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$X), {}, (_objectSpread2$2 = {}, _defineProperty(_objectSpread2$2, MODEL_PROP_NAME$5, makeProp(PROP_TYPE_ARRAY, [])), _defineProperty(_objectSpread2$2, "switches", makeProp(PROP_TYPE_BOOLEAN, false)), _objectSpread2$2))), NAME_FORM_CHECKBOX_GROUP); // --- Main component ---
+  // @vue/component
 
   var BFormCheckboxGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_CHECKBOX_GROUP,
-    mixins: [idMixin, formMixin, formRadioCheckGroupMixin, // Includes render function
-    formOptionsMixin, formSizeMixin, formStateMixin],
+    // Includes render function
+    mixins: [formRadioCheckGroupMixin],
     provide: function provide() {
       return {
         bvCheckGroup: this
       };
     },
-    props: props$x,
-    data: function data() {
-      return {
-        localChecked: this.checked || []
-      };
-    },
+    props: props$Y,
     computed: {
       isRadioGroup: function isRadioGroup() {
         return false;
@@ -13133,11 +11975,11 @@
 
   var PROP = '__BV_hover_handler__';
   var MOUSEENTER = 'mouseenter';
-  var MOUSELEAVE = 'mouseleave'; // --- Utility methods ---
+  var MOUSELEAVE = 'mouseleave'; // --- Helper methods ---
 
   var createListener = function createListener(handler) {
-    var listener = function listener(evt) {
-      handler(evt.type === MOUSEENTER, evt);
+    var listener = function listener(event) {
+      handler(event.type === MOUSEENTER, event);
     };
 
     listener.fn = handler;
@@ -13154,7 +11996,7 @@
     var _ref$value = _ref.value,
         handler = _ref$value === void 0 ? null : _ref$value;
 
-    if (isBrowser) {
+    if (IS_BROWSER) {
       var listener = el[PROP];
       var hasListener = isFunction(listener);
       var handlerChanged = !(hasListener && listener.fn === handler);
@@ -13182,94 +12024,35 @@
     }
   };
 
-  var dropdownProps = commonProps; // @vue/component
+  var props$Z = sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$S), props$T), omit(props$z, ['disabled'])), omit(props$Q, ['autofocus'])), {}, {
+    // When `true`, renders a `btn-group` wrapper and visually hides the label
+    buttonOnly: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Applicable in button mode only
+    buttonVariant: makeProp(PROP_TYPE_STRING, 'secondary'),
+    // This is the value shown in the label
+    // Defaults back to `value`
+    formattedValue: makeProp(PROP_TYPE_STRING),
+    // Value placed in `.sr-only` span inside label when value is present
+    labelSelected: makeProp(PROP_TYPE_STRING),
+    lang: makeProp(PROP_TYPE_STRING),
+    // Extra classes to apply to the `dropdown-menu` div
+    menuClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    // This is the value placed on the hidden input when no value selected
+    placeholder: makeProp(PROP_TYPE_STRING),
+    readonly: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Tri-state prop: `true`, `false` or `null`
+    rtl: makeProp(PROP_TYPE_BOOLEAN, null),
+    value: makeProp(PROP_TYPE_STRING, '')
+  })); // --- Main component ---
+  // @vue/component
 
   var BVFormBtnLabelControl = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_BUTTON_LABEL_CONTROL,
     directives: {
-      BHover: VBHover
+      'b-hover': VBHover
     },
-    mixins: [idMixin, normalizeSlotMixin, dropdownMixin],
-    props: {
-      value: {
-        // This is the value placed on the hidden input
-        type: String,
-        default: ''
-      },
-      formattedValue: {
-        // This is the value shown in the label
-        // Defaults back to `value`
-        type: String // default: null
-
-      },
-      placeholder: {
-        // This is the value placed on the hidden input when no value selected
-        type: String // default: null
-
-      },
-      labelSelected: {
-        // Value placed in sr-only span inside label when value is present
-        type: String // default: null
-
-      },
-      state: {
-        // Tri-state prop: `true`, `false`, or `null`
-        type: Boolean,
-        // We must explicitly default to `null` here otherwise
-        // Vue coerces `undefined` into Boolean `false`
-        default: null
-      },
-      size: {
-        type: String // default: null
-
-      },
-      name: {
-        type: String // default: null
-
-      },
-      form: {
-        type: String // default: null
-
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      required: {
-        type: Boolean,
-        default: false
-      },
-      lang: {
-        type: String // default: null
-
-      },
-      rtl: {
-        // Tri-state prop: `true`, `false` or `null`
-        type: Boolean,
-        // We must explicitly default to `null` here otherwise
-        // Vue coerces `undefined` into Boolean `false`
-        default: null
-      },
-      buttonOnly: {
-        // When true, renders a btn-group wrapper and visually hides the label
-        type: Boolean,
-        default: false
-      },
-      buttonVariant: {
-        // Applicable in button mode only
-        type: String,
-        default: 'secondary'
-      },
-      menuClass: {
-        // Extra classes to apply to the `dropdown-menu` div
-        type: [String, Array, Object] // default: null
-
-      }
-    },
+    mixins: [idMixin, formSizeMixin, formStateMixin, dropdownMixin, normalizeSlotMixin],
+    props: props$Z,
     data: function data() {
       return {
         isHovered: false,
@@ -13304,32 +12087,34 @@
           attemptBlur(this.$refs.toggle);
         }
       },
-      setFocus: function setFocus(evt) {
-        this.hasFocus = evt.type === 'focus';
+      setFocus: function setFocus(event) {
+        this.hasFocus = event.type === 'focus';
       },
       handleHover: function handleHover(hovered) {
         this.isHovered = hovered;
       }
     },
     render: function render(h) {
-      var _class, _class2, _ref;
+      var _class;
 
-      var idButton = this.idButton;
-      var idLabel = this.idLabel;
-      var idMenu = this.idMenu;
-      var idWrapper = this.idWrapper;
-      var disabled = this.disabled;
-      var readonly = this.readonly;
-      var required = this.required;
-      var isHovered = this.isHovered;
-      var hasFocus = this.hasFocus;
-      var state = this.state;
-      var visible = this.visible;
-      var size = this.size;
+      var idButton = this.idButton,
+          idLabel = this.idLabel,
+          idMenu = this.idMenu,
+          idWrapper = this.idWrapper,
+          disabled = this.disabled,
+          readonly = this.readonly,
+          required = this.required,
+          name = this.name,
+          state = this.state,
+          visible = this.visible,
+          size = this.size,
+          isHovered = this.isHovered,
+          hasFocus = this.hasFocus,
+          labelSelected = this.labelSelected,
+          buttonVariant = this.buttonVariant,
+          buttonOnly = this.buttonOnly;
       var value = toString$1(this.value) || '';
-      var labelSelected = this.labelSelected;
-      var buttonOnly = !!this.buttonOnly;
-      var buttonVariant = this.buttonVariant;
+      var invalid = state === false || required && !value;
       var btnScope = {
         isHovered: isHovered,
         hasFocus: hasFocus,
@@ -13337,16 +12122,15 @@
         opened: visible
       };
       var $button = h('button', {
-        ref: 'toggle',
         staticClass: 'btn',
-        class: (_class = {}, _defineProperty(_class, "btn-".concat(buttonVariant), buttonOnly), _defineProperty(_class, "btn-".concat(size), !!size), _defineProperty(_class, 'h-auto', !buttonOnly), _defineProperty(_class, 'dropdown-toggle', buttonOnly), _defineProperty(_class, 'dropdown-toggle-no-caret', buttonOnly), _class),
+        class: (_class = {}, _defineProperty(_class, "btn-".concat(buttonVariant), buttonOnly), _defineProperty(_class, "btn-".concat(size), size), _defineProperty(_class, 'h-auto', !buttonOnly), _defineProperty(_class, 'dropdown-toggle', buttonOnly), _defineProperty(_class, 'dropdown-toggle-no-caret', buttonOnly), _class),
         attrs: {
           id: idButton,
           type: 'button',
           disabled: disabled,
           'aria-haspopup': 'dialog',
           'aria-expanded': visible ? 'true' : 'false',
-          'aria-invalid': state === false || required && !value ? 'true' : null,
+          'aria-invalid': invalid ? 'true' : null,
           'aria-required': required ? 'true' : null
         },
         directives: [{
@@ -13360,7 +12144,8 @@
           // Handle ENTER, SPACE and DOWN
           '!focus': this.setFocus,
           '!blur': this.setFocus
-        }
+        },
+        ref: 'toggle'
       }, [this.hasNormalizedSlot(SLOT_NAME_BUTTON_CONTENT) ? this.normalizeSlot(SLOT_NAME_BUTTON_CONTENT, btnScope) :
       /* istanbul ignore next */
       h(BIconChevronDown, {
@@ -13371,11 +12156,11 @@
 
       var $hidden = h();
 
-      if (this.name && !disabled) {
+      if (name && !disabled) {
         $hidden = h('input', {
           attrs: {
             type: 'hidden',
-            name: this.name || null,
+            name: name || null,
             form: this.form || null,
             value: value
           }
@@ -13384,7 +12169,6 @@
 
 
       var $menu = h('div', {
-        ref: 'menu',
         staticClass: 'dropdown-menu',
         class: [this.menuClass, {
           show: visible,
@@ -13400,23 +12184,22 @@
         on: {
           keydown: this.onKeydown // Handle ESC
 
-        }
+        },
+        ref: 'menu'
       }, [this.normalizeSlot(SLOT_NAME_DEFAULT, {
         opened: visible
       })]); // Value label
 
       var $label = h('label', {
-        staticClass: 'form-control text-break text-wrap bg-transparent h-auto',
-        class: (_class2 = {
-          // Hidden in button only mode
-          'sr-only': buttonOnly,
-          // Mute the text if showing the placeholder
+        class: buttonOnly ? 'sr-only' // Hidden in button only mode
+        : ['form-control', // Mute the text if showing the placeholder
+        {
           'text-muted': !value
-        }, _defineProperty(_class2, "form-control-".concat(size), !!size), _defineProperty(_class2, 'is-invalid', state === false), _defineProperty(_class2, 'is-valid', state === true), _class2),
+        }, this.stateClass, this.sizeFormClass],
         attrs: {
           id: idLabel,
           for: idButton,
-          'aria-invalid': state === false || required && !value ? 'true' : null,
+          'aria-invalid': invalid ? 'true' : null,
           'aria-required': required ? 'true' : null
         },
         directives: [{
@@ -13428,8 +12211,8 @@
           // prevent menu from closing and re-opening
           '!click':
           /* istanbul ignore next */
-          function click(evt) {
-            stopEvent(evt, {
+          function click(event) {
+            stopEvent(event, {
               preventDefault: false
             });
           }
@@ -13441,10 +12224,14 @@
 
       return h('div', {
         staticClass: 'b-form-btn-label-control dropdown',
-        class: [this.directionClass, this.boundaryClass, (_ref = {
+        class: [this.directionClass, this.boundaryClass, [{
           'btn-group': buttonOnly,
-          'form-control': !buttonOnly
-        }, _defineProperty(_ref, "form-control-".concat(size), !!size && !buttonOnly), _defineProperty(_ref, 'd-flex', !buttonOnly), _defineProperty(_ref, 'h-auto', !buttonOnly), _defineProperty(_ref, 'align-items-stretch', !buttonOnly), _defineProperty(_ref, "focus", hasFocus && !buttonOnly), _defineProperty(_ref, "show", visible), _defineProperty(_ref, 'is-valid', state === true), _defineProperty(_ref, 'is-invalid', state === false), _ref)],
+          'form-control': !buttonOnly,
+          focus: hasFocus && !buttonOnly,
+          show: visible,
+          'is-valid': state === true,
+          'is-invalid': state === false
+        }, buttonOnly ? null : this.sizeFormClass]],
         attrs: {
           id: idWrapper,
           role: buttonOnly ? null : 'group',
@@ -13460,327 +12247,46 @@
     }
   });
 
-  var getConfigFallback = function getConfigFallback(prop) {
-    return getComponentConfig(NAME_FORM_DATEPICKER, prop) || getComponentConfig(NAME_CALENDAR, prop);
-  }; // We create our props as a mixin so that we can control
-  // where they appear in the props listing reference section
+  var _watch$7;
+
+  var _makeModelMixin$6 = makeModelMixin('value', {
+    type: PROP_TYPE_DATE_STRING
+  }),
+      modelMixin$6 = _makeModelMixin$6.mixin,
+      modelProps$6 = _makeModelMixin$6.props,
+      MODEL_PROP_NAME$6 = _makeModelMixin$6.prop,
+      MODEL_EVENT_NAME$6 = _makeModelMixin$6.event; // --- Props ---
 
 
-  var propsMixin = {
-    props: _objectSpread2({
-      value: {
-        type: [String, Date],
-        default: null
-      },
-      valueAsDate: {
-        type: Boolean,
-        default: false
-      },
-      resetValue: {
-        type: [String, Date] // default: null
-
-      },
-      initialDate: {
-        // This specifies the calendar year/month/day that will be shown when
-        // first opening the datepicker if no v-model value is provided
-        // Default is the current date (or `min`/`max`)
-        // Passed directly to <b-calendar>
-        type: [String, Date] // default: null
-
-      },
-      placeholder: {
-        type: String // Defaults to `labelNoDateSelected` from calendar context
-        // default: null
-
-      },
-      size: {
-        type: String // default: null
-
-      },
-      min: {
-        type: [String, Date] // default: null
-
-      },
-      max: {
-        type: [String, Date] // default: null
-
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      required: {
-        // If true adds the `aria-required` attribute
-        type: Boolean,
-        default: false
-      },
-      name: {
-        type: String // default: null
-
-      },
-      form: {
-        type: String // default: null
-
-      },
-      state: {
-        // Tri-state prop: `true`, `false` or `null`
-        type: Boolean,
-        default: null
-      },
-      dateDisabledFn: {
-        type: Function // default: null
-
-      },
-      noCloseOnSelect: {
-        type: Boolean,
-        default: false
-      },
-      hideHeader: {
-        type: Boolean,
-        default: false
-      },
-      showDecadeNav: {
-        // When `true` enables the decade navigation buttons
-        type: Boolean,
-        default: false
-      },
-      locale: {
-        type: [String, Array] // default: null
-
-      },
-      startWeekday: {
-        // `0` (Sunday), `1` (Monday), ... `6` (Saturday)
-        // Day of week to start calendar on
-        type: [Number, String],
-        default: 0
-      },
-      direction: {
-        type: String // default: null
-
-      },
-      buttonOnly: {
-        type: Boolean,
-        default: false
-      },
-      buttonVariant: {
-        // Applicable in button only mode
-        type: String,
-        default: 'secondary'
-      },
-      calendarWidth: {
-        // Width of the calendar dropdown
-        type: String,
-        default: '270px'
-      },
-      selectedVariant: {
-        // Variant color to use for the selected date
-        type: String,
-        default: function _default() {
-          return getConfigFallback('selectedVariant');
-        }
-      },
-      todayVariant: {
-        // Variant color to use for today's date (defaults to `selectedVariant`)
-        type: String,
-        default: function _default() {
-          return getConfigFallback('todayVariant');
-        }
-      },
-      navButtonVariant: {
-        // Variant color to use for the navigation buttons
-        type: String,
-        default: function _default() {
-          return getConfigFallback('navButtonVariant');
-        }
-      },
-      noHighlightToday: {
-        // Disable highlighting today's date
-        type: Boolean,
-        default: false
-      },
-      todayButton: {
-        type: Boolean,
-        default: false
-      },
-      labelTodayButton: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_DATEPICKER, 'labelTodayButton');
-        }
-      },
-      todayButtonVariant: {
-        type: String,
-        default: 'outline-primary'
-      },
-      resetButton: {
-        type: Boolean,
-        default: false
-      },
-      labelResetButton: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_DATEPICKER, 'labelResetButton');
-        }
-      },
-      resetButtonVariant: {
-        type: String,
-        default: 'outline-danger'
-      },
-      closeButton: {
-        type: Boolean,
-        default: false
-      },
-      labelCloseButton: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_DATEPICKER, 'labelCloseButton');
-        }
-      },
-      closeButtonVariant: {
-        type: String,
-        default: 'outline-secondary'
-      },
-      dateInfoFn: {
-        // Passed through to b-calendar
-        type: Function // default: undefined
-
-      },
-      // Labels for buttons and keyboard shortcuts
-      // These pick BCalendar global config if no BFormDate global config
-      labelPrevDecade: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelPrevDecade');
-        }
-      },
-      labelPrevYear: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelPrevYear');
-        }
-      },
-      labelPrevMonth: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelPrevMonth');
-        }
-      },
-      labelCurrentMonth: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelCurrentMonth');
-        }
-      },
-      labelNextMonth: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelNextMonth');
-        }
-      },
-      labelNextYear: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelNextYear');
-        }
-      },
-      labelNextDecade: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelNextDecade');
-        }
-      },
-      labelToday: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelToday');
-        }
-      },
-      labelSelected: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelSelected');
-        }
-      },
-      labelNoDateSelected: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelNoDateSelected');
-        }
-      },
-      labelCalendar: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelCalendar');
-        }
-      },
-      labelNav: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelNav');
-        }
-      },
-      labelHelp: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback('labelHelp');
-        }
-      },
-      dateFormatOptions: {
-        // `Intl.DateTimeFormat` object
-        // Note: This value is *not* to be placed in the global config
-        type: Object,
-        default: function _default() {
-          return {
-            year: DATE_FORMAT_NUMERIC,
-            month: CALENDAR_LONG,
-            day: DATE_FORMAT_NUMERIC,
-            weekday: CALENDAR_LONG
-          };
-        }
-      },
-      weekdayHeaderFormat: {
-        // Format of the weekday names at the top of the calendar
-        // Note: This value is *not* to be placed in the global config
-        type: String,
-        // `short` is typically a 3 letter abbreviation,
-        // `narrow` is typically a single letter
-        // `long` is the full week day name
-        // Although some locales may override this (i.e `ar`, etc.)
-        default: CALENDAR_SHORT,
-        validator: function validator(value) {
-          return arrayIncludes([CALENDAR_LONG, CALENDAR_SHORT, CALENDAR_NARROW], value);
-        }
-      },
-      // Dark mode
-      dark: {
-        type: Boolean,
-        default: false
-      },
-      // extra dropdown stuff
-      menuClass: {
-        type: [String, Array, Object] // default: null
-
-      }
-    }, dropdownProps)
-  }; // --- BFormDate component ---
+  var calendarProps = omit(props$h, ['block', 'hidden', 'id', 'noKeyNav', 'roleDescription', 'value', 'width']);
+  var formBtnLabelControlProps = omit(props$Z, ['formattedValue', 'id', 'lang', 'rtl', 'value']);
+  var props$_ = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$6), calendarProps), formBtnLabelControlProps), {}, {
+    // Width of the calendar dropdown
+    calendarWidth: makeProp(PROP_TYPE_STRING, '270px'),
+    closeButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    closeButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-secondary'),
+    // Dark mode
+    dark: makeProp(PROP_TYPE_BOOLEAN, false),
+    labelCloseButton: makeProp(PROP_TYPE_STRING, 'Close'),
+    labelResetButton: makeProp(PROP_TYPE_STRING, 'Reset'),
+    labelTodayButton: makeProp(PROP_TYPE_STRING, 'Select today'),
+    noCloseOnSelect: makeProp(PROP_TYPE_BOOLEAN, false),
+    resetButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    resetButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-danger'),
+    resetValue: makeProp(PROP_TYPE_DATE_STRING),
+    todayButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    todayButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-primary')
+  })), NAME_FORM_DATEPICKER); // --- Main component ---
   // @vue/component
 
   var BFormDatepicker = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_DATEPICKER,
-    // The mixins order determines the order of appearance in the props reference section
-    mixins: [idMixin, propsMixin],
-    model: {
-      prop: 'value',
-      event: 'input'
-    },
+    mixins: [idMixin, modelMixin$6],
+    props: props$_,
     data: function data() {
       return {
         // We always use `YYYY-MM-DD` value internally
-        localYMD: formatYMD(this.value) || '',
+        localYMD: formatYMD(this[MODEL_PROP_NAME$6]) || '',
         // If the popup is open
         isVisible: false,
         // Context data from BCalendar
@@ -13796,47 +12302,6 @@
         // Returns the `YYYY-MM` portion of the active calendar date
         return this.activeYMD.slice(0, -3);
       },
-      calendarProps: function calendarProps() {
-        // Use self for better minification, as `this` won't
-        // minimize and we reference it many times below
-        var self = this;
-        return {
-          hidden: !self.isVisible,
-          value: self.localYMD,
-          min: self.min,
-          max: self.max,
-          initialDate: self.initialDate,
-          readonly: self.readonly,
-          disabled: self.disabled,
-          locale: self.locale,
-          startWeekday: self.startWeekday,
-          direction: self.direction,
-          width: self.calendarWidth,
-          dateDisabledFn: self.dateDisabledFn,
-          selectedVariant: self.selectedVariant,
-          todayVariant: self.todayVariant,
-          navButtonVariant: self.navButtonVariant,
-          dateInfoFn: self.dateInfoFn,
-          hideHeader: self.hideHeader,
-          showDecadeNav: self.showDecadeNav,
-          noHighlightToday: self.noHighlightToday,
-          labelPrevDecade: self.labelPrevDecade,
-          labelPrevYear: self.labelPrevYear,
-          labelPrevMonth: self.labelPrevMonth,
-          labelCurrentMonth: self.labelCurrentMonth,
-          labelNextMonth: self.labelNextMonth,
-          labelNextYear: self.labelNextYear,
-          labelNextDecade: self.labelNextDecade,
-          labelToday: self.labelToday,
-          labelSelected: self.labelSelected,
-          labelNoDateSelected: self.labelNoDateSelected,
-          labelCalendar: self.labelCalendar,
-          labelNav: self.labelNav,
-          labelHelp: self.labelHelp,
-          dateFormatOptions: self.dateFormatOptions,
-          weekdayHeaderFormat: self.weekdayHeaderFormat
-        };
-      },
       computedLang: function computedLang() {
         return (this.localLocale || '').replace(/-u-.*$/i, '') || null;
       },
@@ -13844,29 +12309,23 @@
         return formatYMD(constrainDate(this.resetValue)) || '';
       }
     },
-    watch: {
-      value: function value(newVal) {
-        this.localYMD = formatYMD(newVal) || '';
-      },
-      localYMD: function localYMD(newVal) {
-        // We only update the v-model when the datepicker is open
-        if (this.isVisible) {
-          this.$emit('input', this.valueAsDate ? parseYMD(newVal) || null : newVal || '');
-        }
-      },
-      calendarYM: function calendarYM(newVal, oldVal)
-      /* istanbul ignore next */
-      {
-        // Displayed calendar month has changed
-        // So possibly the calendar height has changed...
-        // We need to update popper computed position
-        if (newVal !== oldVal && oldVal) {
-          try {
-            this.$refs.control.updatePopper();
-          } catch (_unused) {}
-        }
+    watch: (_watch$7 = {}, _defineProperty(_watch$7, MODEL_PROP_NAME$6, function (newValue) {
+      this.localYMD = formatYMD(newValue) || '';
+    }), _defineProperty(_watch$7, "localYMD", function localYMD(newValue) {
+      // We only update the v-model when the datepicker is open
+      if (this.isVisible) {
+        this.$emit(MODEL_EVENT_NAME$6, this.valueAsDate ? parseYMD(newValue) || null : newValue || '');
       }
-    },
+    }), _defineProperty(_watch$7, "calendarYM", function calendarYM(newValue, oldValue) {
+      // Displayed calendar month has changed
+      // So possibly the calendar height has changed...
+      // We need to update popper computed position
+      if (newValue !== oldValue && oldValue) {
+        try {
+          this.$refs.control.updatePopper();
+        } catch (_unused) {}
+      }
+    }), _watch$7),
     methods: {
       // Public methods
       focus: function focus() {
@@ -13915,7 +12374,7 @@
         this.localYMD = selectedYMD;
         this.activeYMD = activeYMD; // Re-emit the context event
 
-        this.$emit('context', ctx);
+        this.$emit(EVENT_NAME_CONTEXT, ctx);
       },
       onTodayButton: function onTodayButton() {
         // Set to today (or min/max if today is out of range)
@@ -13937,12 +12396,12 @@
         this.$nextTick(function () {
           attemptFocus(_this3.$refs.calendar);
 
-          _this3.$emit('shown');
+          _this3.$emit(EVENT_NAME_SHOWN);
         });
       },
       onHidden: function onHidden() {
         this.isVisible = false;
-        this.$emit('hidden');
+        this.$emit(EVENT_NAME_HIDDEN);
       },
       // Render helpers
       defaultButtonFn: function defaultButtonFn(_ref) {
@@ -13956,10 +12415,12 @@
       }
     },
     render: function render(h) {
-      var $scopedSlots = this.$scopedSlots;
-      var localYMD = this.localYMD;
-      var disabled = this.disabled;
-      var readonly = this.readonly;
+      var localYMD = this.localYMD,
+          disabled = this.disabled,
+          readonly = this.readonly,
+          dark = this.dark,
+          $props = this.$props,
+          $scopedSlots = this.$scopedSlots;
       var placeholder = isUndefinedOrNull(this.placeholder) ? this.labelNoDateSelected : this.placeholder; // Optional footer buttons
 
       var $footer = [];
@@ -13968,8 +12429,8 @@
         var label = this.labelTodayButton;
         $footer.push(h(BButton, {
           props: {
-            size: 'sm',
             disabled: disabled || readonly,
+            size: 'sm',
             variant: this.todayButtonVariant
           },
           attrs: {
@@ -13985,8 +12446,8 @@
         var _label = this.labelResetButton;
         $footer.push(h(BButton, {
           props: {
-            size: 'sm',
             disabled: disabled || readonly,
+            size: 'sm',
             variant: this.resetButtonVariant
           },
           attrs: {
@@ -14002,8 +12463,8 @@
         var _label2 = this.labelCloseButton;
         $footer.push(h(BButton, {
           props: {
-            size: 'sm',
             disabled: disabled,
+            size: 'sm',
             variant: this.closeButtonVariant
           },
           attrs: {
@@ -14026,41 +12487,43 @@
       }
 
       var $calendar = h(BCalendar, {
-        key: 'calendar',
-        ref: 'calendar',
         staticClass: 'b-form-date-calendar w-100',
-        props: this.calendarProps,
+        props: _objectSpread2(_objectSpread2({}, pluckProps(calendarProps, $props)), {}, {
+          hidden: !this.isVisible,
+          value: localYMD,
+          valueAsDate: false,
+          width: this.calendarWidth
+        }),
         on: {
           selected: this.onSelected,
           input: this.onInput,
           context: this.onContext
         },
-        scopedSlots: pick($scopedSlots, ['nav-prev-decade', 'nav-prev-year', 'nav-prev-month', 'nav-this-month', 'nav-next-month', 'nav-next-year', 'nav-next-decade'])
+        scopedSlots: pick($scopedSlots, ['nav-prev-decade', 'nav-prev-year', 'nav-prev-month', 'nav-this-month', 'nav-next-month', 'nav-next-year', 'nav-next-decade']),
+        key: 'calendar',
+        ref: 'calendar'
       }, $footer);
       return h(BVFormBtnLabelControl, {
-        ref: 'control',
         staticClass: 'b-form-datepicker',
-        props: _objectSpread2(_objectSpread2({}, this.$props), {}, {
-          // Overridden / computed props
-          id: this.safeId(),
-          rtl: this.isRTL,
-          lang: this.computedLang,
-          value: localYMD || '',
+        props: _objectSpread2(_objectSpread2({}, pluckProps(formBtnLabelControlProps, $props)), {}, {
           formattedValue: localYMD ? this.formattedValue : '',
-          placeholder: placeholder || '',
+          id: this.safeId(),
+          lang: this.computedLang,
           menuClass: [{
-            'bg-dark': !!this.dark,
-            'text-light': !!this.dark
-          }, this.menuClass]
+            'bg-dark': dark,
+            'text-light': dark
+          }, this.menuClass],
+          placeholder: placeholder,
+          rtl: this.isRTL,
+          value: localYMD
         }),
         on: {
           show: this.onShow,
           shown: this.onShown,
           hidden: this.onHidden
         },
-        scopedSlots: {
-          'button-content': $scopedSlots['button-content'] || this.defaultButtonFn
-        }
+        scopedSlots: _defineProperty({}, SLOT_NAME_BUTTON_CONTENT, $scopedSlots[SLOT_NAME_BUTTON_CONTENT] || this.defaultButtonFn),
+        ref: 'control'
       }, [$calendar]);
     }
   });
@@ -14072,20 +12535,25 @@
     }
   });
 
-  // @vue/component
-  var formCustomMixin = {
-    props: {
-      plain: {
-        type: Boolean,
-        default: false
+  var _watch$8;
+
+  var _makeModelMixin$7 = makeModelMixin('value', {
+    type: [PROP_TYPE_ARRAY, File],
+    defaultValue: null,
+    validator: function validator(value) {
+      /* istanbul ignore next */
+      if (value === '') {
+        warn(VALUE_EMPTY_DEPRECATED_MSG, NAME_FORM_FILE);
+        return true;
       }
-    },
-    computed: {
-      custom: function custom() {
-        return !this.plain;
-      }
+
+      return isUndefinedOrNull(value) || isValidValue(value);
     }
-  };
+  }),
+      modelMixin$7 = _makeModelMixin$7.mixin,
+      modelProps$7 = _makeModelMixin$7.props,
+      MODEL_PROP_NAME$7 = _makeModelMixin$7.prop,
+      MODEL_EVENT_NAME$7 = _makeModelMixin$7.event;
 
   var VALUE_EMPTY_DEPRECATED_MSG = 'Setting "value"/"v-model" to an empty string for reset is deprecated. Set to "null" instead.'; // --- Helper methods ---
 
@@ -14167,104 +12635,43 @@
 
       readDirectoryEntries();
     });
-  }; // @vue/component
+  }; // --- Props ---
 
+
+  var props$$ = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$7), props$Q), props$R), props$T), props$S), {}, {
+    accept: makeProp(PROP_TYPE_STRING, ''),
+    browseText: makeProp(PROP_TYPE_STRING, 'Browse'),
+    // Instruct input to capture from camera
+    capture: makeProp(PROP_TYPE_BOOLEAN, false),
+    directory: makeProp(PROP_TYPE_BOOLEAN, false),
+    dropPlaceholder: makeProp(PROP_TYPE_STRING, 'Drop files here'),
+    fileNameFormatter: makeProp(PROP_TYPE_FUNCTION),
+    multiple: makeProp(PROP_TYPE_BOOLEAN, false),
+    noDrop: makeProp(PROP_TYPE_BOOLEAN, false),
+    noDropPlaceholder: makeProp(PROP_TYPE_STRING, 'Not allowed'),
+    // TODO:
+    //   Should we deprecate this and only support flat file structures?
+    //   Nested file structures are only supported when files are dropped
+    //   A Chromium "bug" prevents `webkitEntries` from being populated
+    //   on the file input's `change` event and is marked as "WontFix"
+    //   Mozilla implemented the behavior the same way as Chromium
+    //   See: https://bugs.chromium.org/p/chromium/issues/detail?id=138987
+    //   See: https://bugzilla.mozilla.org/show_bug.cgi?id=1326031
+    noTraverse: makeProp(PROP_TYPE_BOOLEAN, false),
+    placeholder: makeProp(PROP_TYPE_STRING, 'No file chosen')
+  })), NAME_FORM_FILE); // --- Main component ---
+  // @vue/component
 
   var BFormFile = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_FILE,
-    mixins: [attrsMixin, idMixin, formMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$7, normalizeSlotMixin, formControlMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    model: {
-      prop: 'value',
-      event: 'input'
-    },
-    props: {
-      size: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig('BFormControl', 'size');
-        }
-      },
-      value: {
-        type: [File, Array],
-        default: null,
-        validator: function validator(value) {
-          /* istanbul ignore next */
-          if (value === '') {
-            warn(VALUE_EMPTY_DEPRECATED_MSG, NAME_FORM_FILE);
-            return true;
-          }
-
-          return isUndefinedOrNull(value) || isValidValue(value);
-        }
-      },
-      accept: {
-        type: String,
-        default: ''
-      },
-      // Instruct input to capture from camera
-      capture: {
-        type: Boolean,
-        default: false
-      },
-      placeholder: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_FILE, 'placeholder');
-        }
-      },
-      browseText: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_FILE, 'browseText');
-        }
-      },
-      dropPlaceholder: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_FILE, 'dropPlaceholder');
-        }
-      },
-      noDropPlaceholder: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_FILE, 'noDropPlaceholder');
-        }
-      },
-      multiple: {
-        type: Boolean,
-        default: false
-      },
-      directory: {
-        type: Boolean,
-        default: false
-      },
-      // TODO:
-      //   Should we deprecate this and only support flat file structures?
-      //   Nested file structures are only supported when files are dropped
-      //   A Chromium "bug" prevents `webkitEntries` from being populated
-      //   on the file input's `change` event and is marked as "WontFix"
-      //   Mozilla implemented the behavior the same way as Chromium
-      //   See: https://bugs.chromium.org/p/chromium/issues/detail?id=138987
-      //   See: https://bugzilla.mozilla.org/show_bug.cgi?id=1326031
-      noTraverse: {
-        type: Boolean,
-        default: false
-      },
-      noDrop: {
-        type: Boolean,
-        default: false
-      },
-      fileNameFormatter: {
-        type: Function,
-        default: null
-      }
-    },
+    props: props$$,
     data: function data() {
       return {
         files: [],
         dragging: false,
-        // IE 11 doesn't respect setting `evt.dataTransfer.dropEffect`,
+        // IE 11 doesn't respect setting `event.dataTransfer.dropEffect`,
         // so we handle it ourselves as well
         // https://stackoverflow.com/a/46915971/2744776
         dropAllowed: !this.noDrop,
@@ -14275,7 +12682,7 @@
       // Convert `accept` to an array of `[{ RegExpr, isMime }, ...]`
       computedAccept: function computedAccept() {
         var accept = this.accept;
-        accept = (accept || '').trim().split(/[,\s]+/).filter(Boolean); // Allow any file type/extension
+        accept = (accept || '').trim().split(/[,\s]+/).filter(identity); // Allow any file type/extension
 
         if (accept.length === 0) {
           return null;
@@ -14337,6 +12744,10 @@
           'aria-required': required ? 'true' : null
         });
       },
+      computedFileNameFormatter: function computedFileNameFormatter() {
+        var fileNameFormatter = this.fileNameFormatter;
+        return hasPropFunction(fileNameFormatter) ? fileNameFormatter : this.defaultFileNameFormatter;
+      },
       clonedFiles: function clonedFiles() {
         return cloneDeep(this.files);
       },
@@ -14349,15 +12760,14 @@
         });
       },
       labelContent: function labelContent() {
-        var h = this.$createElement; // Draging active
+        // Draging active
 
         /* istanbul ignore next: used by drag/drop which can't be tested easily */
-
         if (this.dragging && !this.noDrop) {
           return (// TODO: Add additional scope with file count, and other not-allowed reasons
-            this.normalizeSlot('drop-placeholder', {
+            this.normalizeSlot(SLOT_NAME_DROP_PLACEHOLDER, {
               allowed: this.dropAllowed
-            }) || (this.dropAllowed ? this.dropPlaceholder : h('span', {
+            }) || (this.dropAllowed ? this.dropPlaceholder : this.$createElement('span', {
               staticClass: 'text-danger'
             }, this.noDropPlaceholder))
           );
@@ -14365,48 +12775,55 @@
 
 
         if (this.files.length === 0) {
-          return this.normalizeSlot('placeholder') || this.placeholder;
-        } // There is a slot for formatting the files/names
+          return this.normalizeSlot(SLOT_NAME_PLACEHOLDER) || this.placeholder;
+        }
 
+        var flattenedFiles = this.flattenedFiles,
+            clonedFiles = this.clonedFiles,
+            fileNames = this.fileNames,
+            computedFileNameFormatter = this.computedFileNameFormatter; // There is a slot for formatting the files/names
 
-        if (this.hasNormalizedSlot('file-name')) {
-          return this.normalizeSlot('file-name', {
-            files: this.flattenedFiles,
-            filesTraversed: this.clonedFiles,
-            names: this.fileNames
+        if (this.hasNormalizedSlot(SLOT_NAME_FILE_NAME)) {
+          return this.normalizeSlot(SLOT_NAME_FILE_NAME, {
+            files: flattenedFiles,
+            filesTraversed: clonedFiles,
+            names: fileNames
           });
-        } // Use the user supplied formatter, or the built in one
+        }
 
-
-        return isFunction(this.fileNameFormatter) ? String(this.fileNameFormatter(this.flattenedFiles, this.clonedFiles)) : this.fileNames.join(', ');
+        return computedFileNameFormatter(flattenedFiles, clonedFiles, fileNames);
       }
     },
-    watch: {
-      value: function value(newValue) {
-        if (!newValue || isArray(newValue) && newValue.length === 0) {
-          this.reset();
-        }
-      },
-      files: function files(newValue, oldValue) {
-        if (!looseEqual(newValue, oldValue)) {
-          var multiple = this.multiple,
-              noTraverse = this.noTraverse;
-          var files = !multiple || noTraverse ? flattenDeep(newValue) : newValue;
-          this.$emit('input', multiple ? files : files[0] || null);
-        }
+    watch: (_watch$8 = {}, _defineProperty(_watch$8, MODEL_PROP_NAME$7, function (newValue) {
+      if (!newValue || isArray(newValue) && newValue.length === 0) {
+        this.reset();
       }
+    }), _defineProperty(_watch$8, "files", function files(newValue, oldValue) {
+      if (!looseEqual(newValue, oldValue)) {
+        var multiple = this.multiple,
+            noTraverse = this.noTraverse;
+        var files = !multiple || noTraverse ? flattenDeep(newValue) : newValue;
+        this.$emit(MODEL_EVENT_NAME$7, multiple ? files : files[0] || null);
+      }
+    }), _watch$8),
+    created: function created() {
+      // Create private non-reactive props
+      this.$_form = null;
     },
     mounted: function mounted() {
-      var _this = this;
-
       // Listen for form reset events, to reset the file input
       var $form = closest('form', this.$el);
 
       if ($form) {
         eventOn($form, 'reset', this.reset, EVENT_OPTIONS_PASSIVE);
-        this.$on('hook:beforeDestroy', function () {
-          eventOff($form, 'reset', _this.reset, EVENT_OPTIONS_PASSIVE);
-        });
+        this.$_form = $form;
+      }
+    },
+    beforeDestroy: function beforeDestroy() {
+      var $form = this.$_form;
+
+      if ($form) {
+        eventOff($form, 'reset', this.reset, EVENT_OPTIONS_PASSIVE);
       }
     },
     methods: {
@@ -14421,11 +12838,14 @@
         }) : true;
       },
       isFilesArrayValid: function isFilesArrayValid(files) {
-        var _this2 = this;
+        var _this = this;
 
         return isArray(files) ? files.every(function (file) {
-          return _this2.isFileValid(file);
+          return _this.isFileValid(file);
         }) : this.isFileValid(files);
+      },
+      defaultFileNameFormatter: function defaultFileNameFormatter(flattenedFiles, clonedFiles, fileNames) {
+        return fileNames.join(', ');
       },
       setFiles: function setFiles(files) {
         // Reset the dragging flags
@@ -14434,9 +12854,9 @@
 
         this.files = this.multiple ? this.directory ? files : flattenDeep(files) : flattenDeep(files).slice(0, 1);
       },
-      setInputFiles: function setInputFiles(files)
+
       /* istanbul ignore next: used by Drag/Drop */
-      {
+      setInputFiles: function setInputFiles(files) {
         // Try an set the file input files array so that `required`
         // constraint works for dropped files (will fail in IE11 though)
         // To be used only when dropping files
@@ -14484,36 +12904,36 @@
           this.setFiles(files);
         }
       },
-      focusHandler: function focusHandler(evt) {
+      focusHandler: function focusHandler(event) {
         // Bootstrap v4 doesn't have focus styling for custom file input
         // Firefox has a `[type=file]:focus ~ sibling` selector issue,
         // so we add a `focus` class to get around these bugs
-        if (this.plain || evt.type === 'focusout') {
+        if (this.plain || event.type === 'focusout') {
           this.hasFocus = false;
         } else {
           // Add focus styling for custom file input
           this.hasFocus = true;
         }
       },
-      onChange: function onChange(evt) {
-        var _this3 = this;
+      onChange: function onChange(event) {
+        var _this2 = this;
 
-        var type = evt.type,
-            target = evt.target,
-            _evt$dataTransfer = evt.dataTransfer,
-            dataTransfer = _evt$dataTransfer === void 0 ? {} : _evt$dataTransfer;
+        var type = event.type,
+            target = event.target,
+            _event$dataTransfer = event.dataTransfer,
+            dataTransfer = _event$dataTransfer === void 0 ? {} : _event$dataTransfer;
         var isDrop = type === 'drop'; // Always emit original event
 
-        this.$emit('change', evt);
+        this.$emit(EVENT_NAME_CHANGE, event);
         var items = from(dataTransfer.items || []);
 
-        if (hasPromiseSupport && items.length > 0 && !isNull(getDataTransferItemEntry(items[0]))) {
+        if (HAS_PROMISE_SUPPORT && items.length > 0 && !isNull(getDataTransferItemEntry(items[0]))) {
           // Drop handling for modern browsers
           // Supports nested directory structures in `directory` mode
 
           /* istanbul ignore next: not supported in JSDOM */
           getAllFileEntries(items, this.directory).then(function (files) {
-            return _this3.handleFiles(files, isDrop);
+            return _this2.handleFiles(files, isDrop);
           });
         } else {
           // Standard file input handling (native file input change event),
@@ -14526,11 +12946,11 @@
           this.handleFiles(files, isDrop);
         }
       },
-      onDragenter: function onDragenter(evt) {
-        stopEvent(evt);
+      onDragenter: function onDragenter(event) {
+        stopEvent(event);
         this.dragging = true;
-        var _evt$dataTransfer2 = evt.dataTransfer,
-            dataTransfer = _evt$dataTransfer2 === void 0 ? {} : _evt$dataTransfer2; // Early exit when the input or dropping is disabled
+        var _event$dataTransfer2 = event.dataTransfer,
+            dataTransfer = _event$dataTransfer2 === void 0 ? {} : _event$dataTransfer2; // Early exit when the input or dropping is disabled
 
         if (this.noDrop || this.disabled || !this.dropAllowed) {
           // Show deny feedback
@@ -14547,11 +12967,11 @@
       },
       // Note this event fires repeatedly while the mouse is over the dropzone at
       // intervals in the milliseconds, so avoid doing much processing in here
-      onDragover: function onDragover(evt) {
-        stopEvent(evt);
+      onDragover: function onDragover(event) {
+        stopEvent(event);
         this.dragging = true;
-        var _evt$dataTransfer3 = evt.dataTransfer,
-            dataTransfer = _evt$dataTransfer3 === void 0 ? {} : _evt$dataTransfer3; // Early exit when the input or dropping is disabled
+        var _event$dataTransfer3 = event.dataTransfer,
+            dataTransfer = _event$dataTransfer3 === void 0 ? {} : _event$dataTransfer3; // Early exit when the input or dropping is disabled
 
         if (this.noDrop || this.disabled || !this.dropAllowed) {
           // Show deny feedback
@@ -14566,32 +12986,32 @@
 
         dataTransfer.dropEffect = 'copy';
       },
-      onDragleave: function onDragleave(evt) {
-        var _this4 = this;
+      onDragleave: function onDragleave(event) {
+        var _this3 = this;
 
-        stopEvent(evt);
+        stopEvent(event);
         this.$nextTick(function () {
-          _this4.dragging = false; // Reset `dropAllowed` to default
+          _this3.dragging = false; // Reset `dropAllowed` to default
 
-          _this4.dropAllowed = !_this4.noDrop;
+          _this3.dropAllowed = !_this3.noDrop;
         });
       },
       // Triggered by a file drop onto drop target
-      onDrop: function onDrop(evt) {
-        var _this5 = this;
+      onDrop: function onDrop(event) {
+        var _this4 = this;
 
-        stopEvent(evt);
+        stopEvent(event);
         this.dragging = false; // Early exit when the input or dropping is disabled
 
         if (this.noDrop || this.disabled || !this.dropAllowed) {
           this.$nextTick(function () {
             // Reset `dropAllowed` to default
-            _this5.dropAllowed = !_this5.noDrop;
+            _this4.dropAllowed = !_this4.noDrop;
           });
           return;
         }
 
-        this.onChange(evt);
+        this.onChange(event);
       }
     },
     render: function render(h) {
@@ -14599,10 +13019,10 @@
           plain = this.plain,
           size = this.size,
           dragging = this.dragging,
-          stateClass = this.stateClass; // Form Input
+          stateClass = this.stateClass,
+          bvAttrs = this.bvAttrs; // Form Input
 
       var $input = h('input', {
-        ref: 'input',
         class: [{
           'form-control-file': plain,
           'custom-file-input': custom,
@@ -14620,7 +13040,8 @@
           focusin: this.focusHandler,
           focusout: this.focusHandler,
           reset: this.reset
-        }
+        },
+        ref: 'input'
       });
 
       if (plain) {
@@ -14649,7 +13070,8 @@
 
       return h('div', {
         staticClass: 'custom-file b-form-file',
-        class: [_defineProperty({}, "b-custom-control-".concat(size), size), stateClass],
+        class: [_defineProperty({}, "b-custom-control-".concat(size), size), stateClass, bvAttrs.class],
+        style: bvAttrs.style,
         attrs: {
           id: this.safeId('_BV_file_outer_')
         },
@@ -14725,75 +13147,58 @@
     }, '');
   };
 
-  var boolStrNum = function boolStrNum() {
-    return {
-      type: [Boolean, String, Number],
-      default: false
-    };
-  }; // Generates a prop object with a type of `[String, Number]`
+  var ALIGN_SELF_VALUES = ['auto', 'start', 'end', 'center', 'baseline', 'stretch']; // --- Helper methods ---
+  // Compute a breakpoint class name
 
-
-  var strNum = function strNum() {
-    return {
-      type: [String, Number],
-      default: null
-    };
-  }; // Compute a breakpoint class name
-
-
-  var computeBreakpoint = function computeBreakpoint(type, breakpoint, val) {
+  var computeBreakpoint = function computeBreakpoint(type, breakpoint, value) {
     var className = type;
 
-    if (isUndefinedOrNull(val) || val === false) {
+    if (isUndefinedOrNull(value) || value === false) {
       return undefined;
     }
 
     if (breakpoint) {
       className += "-".concat(breakpoint);
-    } // Handling the boolean style prop when accepting [Boolean, String, Number]
-    // means Vue will not convert <b-col sm></b-col> to sm: true for us.
-    // Since the default is false, an empty string indicates the prop's presence.
+    } // Handling the boolean style prop when accepting `[Boolean, String, Number]`
+    // means Vue will not convert `<b-col sm></b-col>` to `sm: true` for us
+    // Since the default is `false`, '' indicates the prop's presence
 
 
-    if (type === 'col' && (val === '' || val === true)) {
+    if (type === 'col' && (value === '' || value === true)) {
       // .col-md
       return lowerCase(className);
     } // .order-md-6
 
 
-    className += "-".concat(val);
+    className += "-".concat(value);
     return lowerCase(className);
   }; // Memoized function for better performance on generating class names
 
 
   var computeBreakpointClass = memoize(computeBreakpoint); // Cached copy of the breakpoint prop names
 
-  var breakpointPropMap = create(null); // Lazy evaled props factory for BCol
+  var breakpointPropMap = create(null); // --- Props ---
+  // Prop generator for lazy generation of props
 
   var generateProps = function generateProps() {
     // Grab the breakpoints from the cached config (exclude the '' (xs) breakpoint)
-    var breakpoints = getBreakpointsUpCached().filter(identity); // Supports classes like: .col-sm, .col-md-6, .col-lg-auto
+    var breakpoints = getBreakpointsUpCached().filter(identity); // i.e. 'col-sm', 'col-md-6', 'col-lg-auto', ...
 
-    var breakpointCol = breakpoints.reduce(function (propMap, breakpoint) {
-      if (breakpoint) {
-        // We filter out the '' breakpoint (xs), as making a prop name ''
-        // would not work. The `cols` prop is used for `xs`
-        propMap[breakpoint] = boolStrNum();
-      }
+    var breakpointCol = breakpoints.reduce(function (props, breakpoint) {
+      props[breakpoint] = makeProp(PROP_TYPE_BOOLEAN_NUMBER_STRING);
+      return props;
+    }, create(null)); // i.e. 'offset-md-1', 'offset-lg-12', ...
 
-      return propMap;
-    }, create(null)); // Supports classes like: .offset-md-1, .offset-lg-12
+    var breakpointOffset = breakpoints.reduce(function (props, breakpoint) {
+      props[suffixPropName(breakpoint, 'offset')] = makeProp(PROP_TYPE_NUMBER_STRING);
+      return props;
+    }, create(null)); // i.e. 'order-md-1', 'order-lg-12', ...
 
-    var breakpointOffset = breakpoints.reduce(function (propMap, breakpoint) {
-      propMap[suffixPropName(breakpoint, 'offset')] = strNum();
-      return propMap;
-    }, create(null)); // Supports classes like: .order-md-1, .order-lg-12
-
-    var breakpointOrder = breakpoints.reduce(function (propMap, breakpoint) {
-      propMap[suffixPropName(breakpoint, 'order')] = strNum();
-      return propMap;
-    }, create(null)); // For loop doesn't need to check hasOwnProperty
-    // when using an object created from null
+    var breakpointOrder = breakpoints.reduce(function (props, breakpoint) {
+      props[suffixPropName(breakpoint, 'order')] = makeProp(PROP_TYPE_NUMBER_STRING);
+      return props;
+    }, create(null)); // For loop doesn't need to check `.hasOwnProperty()`
+    // when using an object created from `null`
 
     breakpointPropMap = assign(create(null), {
       col: keys(breakpointCol),
@@ -14801,36 +13206,23 @@
       order: keys(breakpointOrder)
     }); // Return the generated props
 
-    return _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({
-      // Generic flexbox .col (xs)
-      col: {
-        type: Boolean,
-        default: false
-      },
-      // .col-[1-12]|auto  (xs)
-      cols: strNum()
-    }, breakpointCol), {}, {
-      offset: strNum()
-    }, breakpointOffset), {}, {
-      order: strNum()
-    }, breakpointOrder), {}, {
+    return makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, breakpointCol), breakpointOffset), breakpointOrder), {}, {
       // Flex alignment
-      alignSelf: {
-        type: String,
-        default: null,
-        validator: function validator(str) {
-          return arrayIncludes(['auto', 'start', 'end', 'center', 'baseline', 'stretch'], str);
-        }
-      },
-      tag: {
-        type: String,
-        default: 'div'
-      }
-    });
-  }; // We do not use Vue.extend here as that would evaluate the props
+      alignSelf: makeProp(PROP_TYPE_STRING, null, function (value) {
+        return arrayIncludes(ALIGN_SELF_VALUES, value);
+      }),
+      // Generic flexbox 'col' (xs)
+      col: makeProp(PROP_TYPE_BOOLEAN, false),
+      // i.e. 'col-1', 'col-2', 'col-auto', ...
+      cols: makeProp(PROP_TYPE_NUMBER_STRING),
+      offset: makeProp(PROP_TYPE_NUMBER_STRING),
+      order: makeProp(PROP_TYPE_NUMBER_STRING),
+      tag: makeProp(PROP_TYPE_STRING, 'div')
+    })), NAME_COL);
+  }; // --- Main component ---
+  // We do not use Vue.extend here as that would evaluate the props
   // immediately, which we do not want to happen
   // @vue/component
-
 
   var BCol = {
     name: NAME_COL,
@@ -14851,6 +13243,10 @@
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var cols = props.cols,
+          offset = props.offset,
+          order = props.order,
+          alignSelf = props.alignSelf;
       var classList = []; // Loop through `col`, `offset`, `order` breakpoint props
 
       for (var type in breakpointPropMap) {
@@ -14872,105 +13268,50 @@
       });
       classList.push((_classList$push = {
         // Default to .col if no other col-{bp}-* classes generated nor `cols` specified.
-        col: props.col || !hasColClasses && !props.cols
-      }, _defineProperty(_classList$push, "col-".concat(props.cols), props.cols), _defineProperty(_classList$push, "offset-".concat(props.offset), props.offset), _defineProperty(_classList$push, "order-".concat(props.order), props.order), _defineProperty(_classList$push, "align-self-".concat(props.alignSelf), props.alignSelf), _classList$push));
+        col: props.col || !hasColClasses && !cols
+      }, _defineProperty(_classList$push, "col-".concat(cols), cols), _defineProperty(_classList$push, "offset-".concat(offset), offset), _defineProperty(_classList$push, "order-".concat(order), order), _defineProperty(_classList$push, "align-self-".concat(alignSelf), alignSelf), _classList$push));
       return h(props.tag, a(data, {
         class: classList
       }), children);
     }
   };
 
-  // Selector for finding first input in the form-group
+  var INPUTS = ['input', 'select', 'textarea']; // Selector for finding first input in the form group
 
-  var INPUT_SELECTOR = 'input:not([disabled]),textarea:not([disabled]),select:not([disabled])'; // A list of interactive elements (tag names) inside `<b-form-group>`'s legend
+  var INPUT_SELECTOR = INPUTS.map(function (v) {
+    return "".concat(v, ":not([disabled])");
+  }).join(); // A list of interactive elements (tag names) inside `<b-form-group>`'s legend
 
-  var LEGEND_INTERACTIVE_ELEMENTS = ['input', 'select', 'textarea', 'label', 'button', 'a']; // -- BFormGroup prop factory -- used for lazy generation of props
-  // Memoize this function to return cached values to
-  // save time in computed functions
-
-  var makePropName = memoize(function () {
-    var breakpoint = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    var prefix = arguments.length > 1 ? arguments[1] : undefined;
-    return "".concat(prefix).concat(upperFirst(breakpoint));
-  }); // BFormGroup prop generator for lazy generation of props
+  var LEGEND_INTERACTIVE_ELEMENTS = [].concat(INPUTS, ['a', 'button', 'label']); // --- Props ---
+  // Prop generator for lazy generation of props
 
   var generateProps$1 = function generateProps() {
-    var CODE_BREAKPOINTS = getBreakpointsUpCached(); // Generate the `labelCol` breakpoint props
+    return makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$T), getBreakpointsUpCached().reduce(function (props, breakpoint) {
+      // i.e. 'content-cols', 'content-cols-sm', 'content-cols-md', ...
+      props[suffixPropName(breakpoint, 'contentCols')] = makeProp(PROP_TYPE_BOOLEAN_NUMBER_STRING); // i.e. 'label-align', 'label-align-sm', 'label-align-md', ...
 
-    var bpLabelColProps = CODE_BREAKPOINTS.reduce(function (props, breakpoint) {
-      // i.e. 'label-cols', 'label-cols-sm', 'label-cols-md', ...
-      props[makePropName(breakpoint, 'labelCols')] = {
-        type: [Number, String, Boolean],
-        default: breakpoint ? false : null
-      };
+      props[suffixPropName(breakpoint, 'labelAlign')] = makeProp(PROP_TYPE_STRING); // i.e. 'label-cols', 'label-cols-sm', 'label-cols-md', ...
+
+      props[suffixPropName(breakpoint, 'labelCols')] = makeProp(PROP_TYPE_BOOLEAN_NUMBER_STRING);
       return props;
-    }, create(null)); // Generate the `labelAlign` breakpoint props
-
-    var bpLabelAlignProps = CODE_BREAKPOINTS.reduce(function (props, breakpoint) {
-      // 'label-align', 'bel-align-sm', 'label-align-md', ...
-      props[makePropName(breakpoint, 'labelAlign')] = {
-        type: String // left, right, center
-        // default: null
-
-      };
-      return props;
-    }, create(null));
-    return _objectSpread2(_objectSpread2(_objectSpread2({
-      label: {
-        type: String // default: null
-
-      },
-      labelFor: {
-        type: String // default: null
-
-      },
-      labelSize: {
-        type: String // default: null
-
-      },
-      labelSrOnly: {
-        type: Boolean,
-        default: false
-      }
-    }, bpLabelColProps), bpLabelAlignProps), {}, {
-      labelClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      description: {
-        type: String // default: null
-
-      },
-      invalidFeedback: {
-        type: String // default: null
-
-      },
-      validFeedback: {
-        type: String // default: null
-
-      },
-      tooltip: {
-        // Enable tooltip style feedback
-        type: Boolean,
-        default: false
-      },
-      feedbackAriaLive: {
-        type: String,
-        default: 'assertive'
-      },
-      validated: {
-        type: Boolean,
-        default: false
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      }
-    });
-  }; // We do not use Vue.extend here as that would evaluate the props
+    }, create(null))), {}, {
+      description: makeProp(PROP_TYPE_STRING),
+      disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+      feedbackAriaLive: makeProp(PROP_TYPE_STRING, 'assertive'),
+      invalidFeedback: makeProp(PROP_TYPE_STRING),
+      label: makeProp(PROP_TYPE_STRING),
+      labelClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+      labelFor: makeProp(PROP_TYPE_STRING),
+      labelSize: makeProp(PROP_TYPE_STRING),
+      labelSrOnly: makeProp(PROP_TYPE_BOOLEAN, false),
+      tooltip: makeProp(PROP_TYPE_BOOLEAN, false),
+      validFeedback: makeProp(PROP_TYPE_STRING),
+      validated: makeProp(PROP_TYPE_BOOLEAN, false)
+    })), NAME_FORM_GROUP);
+  }; // --- Main component ---
+  // We do not use `Vue.extend()` here as that would evaluate the props
   // immediately, which we do not want to happen
   // @vue/component
-
 
   var BFormGroup = {
     name: NAME_FORM_GROUP,
@@ -14987,85 +13328,116 @@
 
     data: function data() {
       return {
-        describedByIds: ''
+        ariaDescribedby: null
       };
     },
     computed: {
-      labelColProps: function labelColProps() {
-        var _this = this;
-
-        var props = {};
-        getBreakpointsUpCached().forEach(function (breakpoint) {
-          // Grab the value if the label column breakpoint prop
-          var propVal = _this[makePropName(breakpoint, 'labelCols')]; // Handle case where the prop's value is an empty string,
-          // which represents `true`
-
-
-          propVal = propVal === '' ? true : propVal || false;
-
-          if (!isBoolean(propVal) && propVal !== 'auto') {
-            // Convert to column size to number
-            propVal = toInteger(propVal, 0); // Ensure column size is greater than `0`
-
-            propVal = propVal > 0 ? propVal : false;
-          }
-
-          if (propVal) {
-            // Add the prop to the list of props to give to `<b-col>`
-            // If breakpoint is '' (`labelCols` is `true`), then we use the
-            // col prop to make equal width at 'xs'
-            props[breakpoint || (isBoolean(propVal) ? 'col' : 'cols')] = propVal;
-          }
-        });
-        return props;
+      contentColProps: function contentColProps() {
+        return this.getColProps(this.$props, 'content');
       },
       labelAlignClasses: function labelAlignClasses() {
-        var _this2 = this;
-
-        var classes = [];
-        getBreakpointsUpCached().forEach(function (breakpoint) {
-          // Assemble the label column breakpoint align classes
-          var propVal = _this2[makePropName(breakpoint, 'labelAlign')] || null;
-
-          if (propVal) {
-            var className = breakpoint ? "text-".concat(breakpoint, "-").concat(propVal) : "text-".concat(propVal);
-            classes.push(className);
-          }
-        });
-        return classes;
+        return this.getAlignClasses(this.$props, 'label');
+      },
+      labelColProps: function labelColProps() {
+        return this.getColProps(this.$props, 'label');
       },
       isHorizontal: function isHorizontal() {
-        // Determine if the resultant form-group will be rendered
-        // horizontal (meaning it has label-col breakpoints)
-        return keys(this.labelColProps).length > 0;
+        // Determine if the form group will be rendered horizontal
+        // based on the existence of 'content-col' or 'label-col' props
+        return keys(this.contentColProps).length > 0 || keys(this.labelColProps).length > 0;
       }
     },
     watch: {
-      describedByIds: function describedByIds(newValue, oldValue) {
+      ariaDescribedby: function ariaDescribedby(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.setInputDescribedBy(newValue, oldValue);
+          this.updateAriaDescribedby(newValue, oldValue);
         }
       }
     },
     mounted: function mounted() {
-      var _this3 = this;
+      var _this = this;
 
       this.$nextTick(function () {
-        // Set the `aria-describedby` IDs on the input specified by `label-for`
+        // Set `aria-describedby` on the input specified by `labelFor`
         // We do this in a `$nextTick()` to ensure the children have finished rendering
-        _this3.setInputDescribedBy(_this3.describedByIds);
+        _this.updateAriaDescribedby(_this.ariaDescribedby);
       });
     },
     methods: {
-      legendClick: function legendClick(evt) {
-        // Don't do anything if labelFor is set
+      getAlignClasses: function getAlignClasses(props, prefix) {
+        return getBreakpointsUpCached().reduce(function (result, breakpoint) {
+          var propValue = props[suffixPropName(breakpoint, "".concat(prefix, "Align"))] || null;
+
+          if (propValue) {
+            result.push(['text', breakpoint, propValue].filter(identity).join('-'));
+          }
+
+          return result;
+        }, []);
+      },
+      getColProps: function getColProps(props, prefix) {
+        return getBreakpointsUpCached().reduce(function (result, breakpoint) {
+          var propValue = props[suffixPropName(breakpoint, "".concat(prefix, "Cols"))]; // Handle case where the prop's value is an empty string,
+          // which represents `true`
+
+          propValue = propValue === '' ? true : propValue || false;
+
+          if (!isBoolean(propValue) && propValue !== 'auto') {
+            // Convert to column size to number
+            propValue = toInteger(propValue, 0); // Ensure column size is greater than `0`
+
+            propValue = propValue > 0 ? propValue : false;
+          } // Add the prop to the list of props to give to `<b-col>`
+          // If breakpoint is '' (`${prefix}Cols` is `true`), then we use
+          // the 'col' prop to make equal width at 'xs'
+
+
+          if (propValue) {
+            result[breakpoint || (isBoolean(propValue) ? 'col' : 'cols')] = propValue;
+          }
+
+          return result;
+        }, {});
+      },
+      // Sets the `aria-describedby` attribute on the input if `labelFor` is set
+      // Optionally accepts a string of IDs to remove as the second parameter
+      // Preserves any `aria-describedby` value(s) user may have on input
+      updateAriaDescribedby: function updateAriaDescribedby(newValue, oldValue) {
+        var labelFor = this.labelFor;
+
+        if (IS_BROWSER && labelFor) {
+          // We need to escape `labelFor` since it can be user-provided
+          var $input = select("#".concat(cssEscape(labelFor)), this.$refs.content);
+
+          if ($input) {
+            var attr = 'aria-describedby';
+            var newIds = (newValue || '').split(RX_SPACE_SPLIT);
+            var oldIds = (oldValue || '').split(RX_SPACE_SPLIT); // Update ID list, preserving any original IDs
+            // and ensuring the ID's are unique
+
+            var ids = (getAttr($input, attr) || '').split(RX_SPACE_SPLIT).filter(function (id) {
+              return !arrayIncludes(oldIds, id);
+            }).concat(newIds).filter(function (id, index, ids) {
+              return ids.indexOf(id) === index;
+            }).filter(identity).join(' ').trim();
+
+            if (ids) {
+              setAttr($input, attr, ids);
+            } else {
+              removeAttr($input, attr);
+            }
+          }
+        }
+      },
+      onLegendClick: function onLegendClick(event) {
+        // Don't do anything if `labelFor` is set
 
         /* istanbul ignore next: clicking a label will focus the input, so no need to test */
         if (this.labelFor) {
           return;
         }
 
-        var target = evt.target;
+        var target = event.target;
         var tagName = target ? target.tagName : ''; // If clicked an interactive element inside legend,
         // we just let the default happen
 
@@ -15073,63 +13445,34 @@
 
         if (LEGEND_INTERACTIVE_ELEMENTS.indexOf(tagName) !== -1) {
           return;
-        }
+        } // If only a single input, focus it, emulating label behaviour
 
-        var inputs = selectAll(INPUT_SELECTOR, this.$refs.content).filter(isVisible); // If only a single input, focus it, emulating label behaviour
 
-        if (inputs && inputs.length === 1) {
+        var inputs = selectAll(INPUT_SELECTOR, this.$refs.content).filter(isVisible);
+
+        if (inputs.length === 1) {
           attemptFocus(inputs[0]);
-        }
-      },
-      // Sets the `aria-describedby` attribute on the input if label-for is set
-      // Optionally accepts a string of IDs to remove as the second parameter
-      // Preserves any `aria-describedby` value(s) user may have on input
-      setInputDescribedBy: function setInputDescribedBy(add, remove) {
-        if (this.labelFor && isBrowser) {
-          // We need to escape `labelFor` since it can be user-provided
-          var input = select("#".concat(cssEscape(this.labelFor)), this.$refs.content);
-
-          if (input) {
-            var adb = 'aria-describedby';
-            var ids = (getAttr(input, adb) || '').split(/\s+/);
-            add = (add || '').split(/\s+/);
-            remove = (remove || '').split(/\s+/); // Update ID list, preserving any original IDs
-            // and ensuring the ID's are unique
-
-            ids = ids.filter(function (id) {
-              return !arrayIncludes(remove, id);
-            }).concat(add).filter(Boolean);
-            ids = keys(ids.reduce(function (memo, id) {
-              return _objectSpread2(_objectSpread2({}, memo), {}, _defineProperty({}, id, true));
-            }, {})).join(' ').trim();
-
-            if (ids) {
-              setAttr(input, adb, ids);
-            } else {
-              // No IDs, so remove the attribute
-              removeAttr(input, adb);
-            }
-          }
         }
       }
     },
     render: function render(h) {
-      var labelFor = this.labelFor,
-          tooltip = this.tooltip,
+      var state = this.computedState,
           feedbackAriaLive = this.feedbackAriaLive,
-          state = this.computedState,
           isHorizontal = this.isHorizontal,
-          normalizeSlot = this.normalizeSlot;
+          labelFor = this.labelFor,
+          normalizeSlot = this.normalizeSlot,
+          safeId = this.safeId,
+          tooltip = this.tooltip;
+      var id = safeId();
       var isFieldset = !labelFor;
       var $label = h();
       var labelContent = normalizeSlot(SLOT_NAME_LABEL) || this.label;
-      var labelId = labelContent ? this.safeId('_BV_label_') : null;
+      var labelId = labelContent ? safeId('_BV_label_') : null;
 
       if (labelContent || isHorizontal) {
         var labelSize = this.labelSize,
             labelColProps = this.labelColProps;
-        var isLegend = isFieldset;
-        var labelTag = isLegend ? 'legend' : 'label';
+        var labelTag = isFieldset ? 'legend' : 'label';
 
         if (this.labelSrOnly) {
           if (labelContent) {
@@ -15147,45 +13490,45 @@
           }, [$label]);
         } else {
           $label = h(isHorizontal ? BCol : labelTag, {
-            on: isLegend ? {
-              click: this.legendClick
+            on: isFieldset ? {
+              click: this.onLegendClick
             } : {},
-            props: isHorizontal ? _objectSpread2({
+            props: isHorizontal ? _objectSpread2(_objectSpread2({}, labelColProps), {}, {
               tag: labelTag
-            }, labelColProps) : {},
+            }) : {},
             attrs: {
               id: labelId,
               for: labelFor || null,
               // We add a `tabindex` to legend so that screen readers
               // will properly read the `aria-labelledby` in IE
-              tabindex: isLegend ? '-1' : null
+              tabindex: isFieldset ? '-1' : null
             },
             class: [// Hide the focus ring on the legend
-            isLegend ? 'bv-no-focus-ring' : '', // When horizontal or if a legend is rendered, add 'col-form-label' class
+            isFieldset ? 'bv-no-focus-ring' : '', // When horizontal or if a legend is rendered, add 'col-form-label' class
             // for correct sizing as Bootstrap has inconsistent font styling for
-            // legend in non-horizontal form-groups
+            // legend in non-horizontal form groups
             // See: https://github.com/twbs/bootstrap/issues/27805
-            isHorizontal || isLegend ? 'col-form-label' : '', // Emulate label padding top of `0` on legend when not horizontal
-            !isHorizontal && isLegend ? 'pt-0' : '', // If not horizontal and not a legend, we add 'd-block' class to label
+            isHorizontal || isFieldset ? 'col-form-label' : '', // Emulate label padding top of `0` on legend when not horizontal
+            !isHorizontal && isFieldset ? 'pt-0' : '', // If not horizontal and not a legend, we add 'd-block' class to label
             // so that label-align works
-            !isHorizontal && !isLegend ? 'd-block' : '', labelSize ? "col-form-label-".concat(labelSize) : '', this.labelAlignClasses, this.labelClass]
+            !isHorizontal && !isFieldset ? 'd-block' : '', labelSize ? "col-form-label-".concat(labelSize) : '', this.labelAlignClasses, this.labelClass]
           }, [labelContent]);
         }
       }
 
       var $invalidFeedback = h();
-      var invalidFeedbackContent = normalizeSlot('invalid-feedback') || this.invalidFeedback;
-      var invalidFeedbackId = invalidFeedbackContent ? this.safeId('_BV_feedback_invalid_') : null;
+      var invalidFeedbackContent = normalizeSlot(SLOT_NAME_INVALID_FEEDBACK) || this.invalidFeedback;
+      var invalidFeedbackId = invalidFeedbackContent ? safeId('_BV_feedback_invalid_') : null;
 
       if (invalidFeedbackContent) {
         $invalidFeedback = h(BFormInvalidFeedback, {
           props: {
+            ariaLive: feedbackAriaLive,
             id: invalidFeedbackId,
+            role: feedbackAriaLive ? 'alert' : null,
             // If state is explicitly `false`, always show the feedback
             state: state,
-            tooltip: tooltip,
-            ariaLive: feedbackAriaLive,
-            role: feedbackAriaLive ? 'alert' : null
+            tooltip: tooltip
           },
           attrs: {
             tabindex: invalidFeedbackContent ? '-1' : null
@@ -15194,18 +13537,18 @@
       }
 
       var $validFeedback = h();
-      var validFeedbackContent = normalizeSlot('valid-feedback') || this.validFeedback;
-      var validFeedbackId = validFeedbackContent ? this.safeId('_BV_feedback_valid_') : null;
+      var validFeedbackContent = normalizeSlot(SLOT_NAME_VALID_FEEDBACK) || this.validFeedback;
+      var validFeedbackId = validFeedbackContent ? safeId('_BV_feedback_valid_') : null;
 
       if (validFeedbackContent) {
         $validFeedback = h(BFormValidFeedback, {
           props: {
+            ariaLive: feedbackAriaLive,
             id: validFeedbackId,
+            role: feedbackAriaLive ? 'alert' : null,
             // If state is explicitly `true`, always show the feedback
             state: state,
-            tooltip: tooltip,
-            ariaLive: feedbackAriaLive,
-            role: feedbackAriaLive ? 'alert' : null
+            tooltip: tooltip
           },
           attrs: {
             tabindex: validFeedbackContent ? '-1' : null
@@ -15215,49 +13558,48 @@
 
       var $description = h();
       var descriptionContent = normalizeSlot(SLOT_NAME_DESCRIPTION) || this.description;
-      var descriptionId = descriptionContent ? this.safeId('_BV_description_') : null;
+      var descriptionId = descriptionContent ? safeId('_BV_description_') : null;
 
       if (descriptionContent) {
         $description = h(BFormText, {
           attrs: {
             id: descriptionId,
-            tabindex: descriptionContent ? '-1' : null
+            tabindex: '-1'
           }
         }, [descriptionContent]);
-      }
-
-      var $content = h(isHorizontal ? BCol : 'div', {
-        ref: 'content',
-        // Hide focus ring
-        staticClass: 'bv-no-focus-ring',
-        attrs: {
-          tabindex: isFieldset ? '-1' : null,
-          role: isFieldset ? 'group' : null
-        }
-      }, [normalizeSlot() || h(), $invalidFeedback, $validFeedback, $description]); // Update the `aria-describedby` IDs
+      } // Update `ariaDescribedby`
       // Screen readers will read out any content linked to by `aria-describedby`
       // even if the content is hidden with `display: none;`, hence we only include
-      // feedback IDs if the form-group's state is explicitly valid or invalid
+      // feedback IDs if the form group's state is explicitly valid or invalid
 
-      this.describedByIds = [descriptionId, state === false ? invalidFeedbackId : null, state === true ? validFeedbackId : null].filter(Boolean).join(' '); // Return it wrapped in a form-group
+
+      var ariaDescribedby = this.ariaDescribedby = [descriptionId, state === false ? invalidFeedbackId : null, state === true ? validFeedbackId : null].filter(identity).join(' ') || null;
+      var $content = h(isHorizontal ? BCol : 'div', {
+        props: isHorizontal ? this.contentColProps : {},
+        ref: 'content'
+      }, [normalizeSlot(SLOT_NAME_DEFAULT, {
+        ariaDescribedby: ariaDescribedby,
+        descriptionId: descriptionId,
+        id: id,
+        labelId: labelId
+      }) || h(), $invalidFeedback, $validFeedback, $description]); // Return it wrapped in a form group
       // Note: Fieldsets do not support adding `row` or `form-row` directly
       // to them due to browser specific render issues, so we move the `form-row`
       // to an inner wrapper div when horizontal and using a fieldset
 
       return h(isFieldset ? 'fieldset' : isHorizontal ? BFormRow : 'div', {
         staticClass: 'form-group',
-        class: [this.validated ? 'was-validated' : null, this.stateClass],
+        class: [{
+          'was-validated': this.validated
+        }, this.stateClass],
         attrs: {
-          id: this.safeId(),
+          id: id,
           disabled: isFieldset ? this.disabled : null,
           role: isFieldset ? null : 'group',
-          'aria-invalid': state === false ? 'true' : null,
-          // Only apply aria-labelledby if we are a horizontal fieldset
+          'aria-invalid': this.computedAriaInvalid,
+          // Only apply `aria-labelledby` if we are a horizontal fieldset
           // as the legend is no longer a direct child of fieldset
-          'aria-labelledby': isFieldset && isHorizontal ? labelId : null,
-          // Only apply `aria-describedby` IDs if we are a fieldset
-          // as the input will have the IDs when not a fieldset
-          'aria-describedby': isFieldset ? this.describedByIds : null
+          'aria-labelledby': isFieldset && isHorizontal ? labelId : null
         }
       }, isHorizontal && isFieldset ? [h(BFormRow, [$label, $content])] : [$label, $content]);
     }
@@ -15270,8 +13612,7 @@
     }
   });
 
-  // @vue/component
-  var formSelectionMixin = {
+  var formSelectionMixin = Vue__default['default'].extend({
     computed: {
       selectionStart: {
         // Expose selectionStart for formatters, etc
@@ -15341,152 +13682,110 @@
         (_this$$refs$input3 = this.$refs.input).setRangeText.apply(_this$$refs$input3, arguments);
       }
     }
-  };
+  });
 
-  var formTextMixin = {
-    model: {
-      prop: 'value',
-      event: 'update'
-    },
-    props: {
-      value: {
-        type: [String, Number],
-        default: ''
-      },
-      ariaInvalid: {
-        type: [Boolean, String],
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      plaintext: {
-        type: Boolean,
-        default: false
-      },
-      autocomplete: {
-        type: String // default: null
+  var _makeModelMixin$8 = makeModelMixin('value', {
+    type: PROP_TYPE_NUMBER_STRING,
+    defaultValue: '',
+    event: EVENT_NAME_UPDATE
+  }),
+      modelMixin$8 = _makeModelMixin$8.mixin,
+      modelProps$8 = _makeModelMixin$8.props,
+      MODEL_PROP_NAME$8 = _makeModelMixin$8.prop,
+      MODEL_EVENT_NAME$8 = _makeModelMixin$8.event;
 
-      },
-      placeholder: {
-        type: String // default: null
+  var props$10 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, modelProps$8), {}, {
+    ariaInvalid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    autocomplete: makeProp(PROP_TYPE_STRING),
+    // Debounce timeout (in ms). Not applicable with `lazy` prop
+    debounce: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    formatter: makeProp(PROP_TYPE_FUNCTION),
+    // Only update the `v-model` on blur/change events
+    lazy: makeProp(PROP_TYPE_BOOLEAN, false),
+    lazyFormatter: makeProp(PROP_TYPE_BOOLEAN, false),
+    number: makeProp(PROP_TYPE_BOOLEAN, false),
+    placeholder: makeProp(PROP_TYPE_STRING),
+    plaintext: makeProp(PROP_TYPE_BOOLEAN, false),
+    readonly: makeProp(PROP_TYPE_BOOLEAN, false),
+    trim: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), 'formTextControls'); // --- Mixin ---
+  // @vue/component
 
-      },
-      formatter: {
-        type: Function // default: null
-
-      },
-      lazyFormatter: {
-        type: Boolean,
-        default: false
-      },
-      trim: {
-        type: Boolean,
-        default: false
-      },
-      number: {
-        type: Boolean,
-        default: false
-      },
-      lazy: {
-        // Only update the `v-model` on blur/change events
-        type: Boolean,
-        default: false
-      },
-      debounce: {
-        // Debounce timeout (in ms). Not applicable with `lazy` prop
-        type: [Number, String],
-        default: 0
-      }
-    },
+  var formTextMixin = Vue__default['default'].extend({
+    mixins: [modelMixin$8],
+    props: props$10,
     data: function data() {
+      var value = this[MODEL_PROP_NAME$8];
       return {
-        localValue: toString$1(this.value),
-        vModelValue: this.value
+        localValue: toString$1(value),
+        vModelValue: this.modifyValue(value)
       };
     },
     computed: {
       computedClass: function computedClass() {
+        var plaintext = this.plaintext,
+            type = this.type;
+        var isRange = type === 'range';
+        var isColor = type === 'color';
         return [{
           // Range input needs class `custom-range`
-          'custom-range': this.type === 'range',
+          'custom-range': isRange,
           // `plaintext` not supported by `type="range"` or `type="color"`
-          'form-control-plaintext': this.plaintext && this.type !== 'range' && this.type !== 'color',
+          'form-control-plaintext': plaintext && !isRange && !isColor,
           // `form-control` not used by `type="range"` or `plaintext`
           // Always used by `type="color"`
-          'form-control': !this.plaintext && this.type !== 'range' || this.type === 'color'
+          'form-control': isColor || !plaintext && !isRange
         }, this.sizeFormClass, this.stateClass];
-      },
-      computedAriaInvalid: function computedAriaInvalid() {
-        if (!this.ariaInvalid || this.ariaInvalid === 'false') {
-          // `this.ariaInvalid` is `null` or `false` or 'false'
-          return this.computedState === false ? 'true' : null;
-        }
-
-        if (this.ariaInvalid === true) {
-          // User wants explicit `:aria-invalid="true"`
-          return 'true';
-        } // Most likely a string value (which could be the string 'true')
-
-
-        return this.ariaInvalid;
       },
       computedDebounce: function computedDebounce() {
         // Ensure we have a positive number equal to or greater than 0
         return mathMax(toInteger(this.debounce, 0), 0);
       },
       hasFormatter: function hasFormatter() {
-        return isFunction(this.formatter);
+        return hasPropFunction(this.formatter);
       }
     },
-    watch: {
-      value: function value(newVal) {
-        var stringifyValue = toString$1(newVal);
+    watch: _defineProperty({}, MODEL_PROP_NAME$8, function (newValue) {
+      var stringifyValue = toString$1(newValue);
+      var modifiedValue = this.modifyValue(newValue);
 
-        if (stringifyValue !== this.localValue && newVal !== this.vModelValue) {
-          // Clear any pending debounce timeout, as we are overwriting the user input
-          this.clearDebounce(); // Update the local values
+      if (stringifyValue !== this.localValue || modifiedValue !== this.vModelValue) {
+        // Clear any pending debounce timeout, as we are overwriting the user input
+        this.clearDebounce(); // Update the local values
 
-          this.localValue = stringifyValue;
-          this.vModelValue = newVal;
-        }
+        this.localValue = stringifyValue;
+        this.vModelValue = modifiedValue;
       }
-    },
+    }),
     created: function created() {
       // Create private non-reactive props
       this.$_inputDebounceTimer = null;
     },
     mounted: function mounted() {
       // Set up destroy handler
-      this.$on('hook:beforeDestroy', this.clearDebounce); // Preset the internal state
-
-      var value = this.value;
-      var stringifyValue = toString$1(value);
-      /* istanbul ignore next */
-
-      if (stringifyValue !== this.localValue && value !== this.vModelValue) {
-        this.localValue = stringifyValue;
-        this.vModelValue = value;
-      }
+      this.$on(HOOK_EVENT_NAME_BEFORE_DESTROY, this.clearDebounce);
+    },
+    beforeDestroy: function beforeDestroy() {
+      this.clearDebounce();
     },
     methods: {
       clearDebounce: function clearDebounce() {
         clearTimeout(this.$_inputDebounceTimer);
         this.$_inputDebounceTimer = null;
       },
-      formatValue: function formatValue(value, evt) {
+      formatValue: function formatValue(value, event) {
         var force = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
         value = toString$1(value);
 
         if (this.hasFormatter && (!this.lazyFormatter || force)) {
-          value = this.formatter(value, evt);
+          value = this.formatter(value, event);
         }
 
         return value;
       },
       modifyValue: function modifyValue(value) {
-        // Emulate `.trim` modifier behaviour
+        value = toString$1(value); // Emulate `.trim` modifier behaviour
+
         if (this.trim) {
           value = value.trim();
         } // Emulate `.number` modifier behaviour
@@ -15519,7 +13818,7 @@
           if (value !== _this.vModelValue) {
             _this.vModelValue = value;
 
-            _this.$emit('update', value);
+            _this.$emit(MODEL_EVENT_NAME$8, value);
           } else if (_this.hasFormatter) {
             // When the `vModelValue` hasn't changed but the actual input value
             // is out of sync, make sure to change it to the given one
@@ -15549,24 +13848,24 @@
           doUpdate();
         }
       },
-      onInput: function onInput(evt) {
-        // `evt.target.composing` is set by Vue
+      onInput: function onInput(event) {
+        // `event.target.composing` is set by Vue
         // https://github.com/vuejs/vue/blob/dev/src/platforms/web/runtime/directives/model.js
         // TODO: Is this needed now with the latest Vue?
 
         /* istanbul ignore if: hard to test composition events */
-        if (evt.target.composing) {
+        if (event.target.composing) {
           return;
         }
 
-        var value = evt.target.value;
-        var formattedValue = this.formatValue(value, evt); // Exit when the `formatter` function strictly returned `false`
+        var value = event.target.value;
+        var formattedValue = this.formatValue(value, event); // Exit when the `formatter` function strictly returned `false`
         // or prevented the input event
 
         /* istanbul ignore next */
 
-        if (formattedValue === false || evt.defaultPrevented) {
-          stopEvent(evt, {
+        if (formattedValue === false || event.defaultPrevented) {
+          stopEvent(event, {
             propagation: false
           });
           return;
@@ -15574,17 +13873,17 @@
 
         this.localValue = formattedValue;
         this.updateValue(formattedValue);
-        this.$emit('input', formattedValue);
+        this.$emit(EVENT_NAME_INPUT, formattedValue);
       },
-      onChange: function onChange(evt) {
-        var value = evt.target.value;
-        var formattedValue = this.formatValue(value, evt); // Exit when the `formatter` function strictly returned `false`
+      onChange: function onChange(event) {
+        var value = event.target.value;
+        var formattedValue = this.formatValue(value, event); // Exit when the `formatter` function strictly returned `false`
         // or prevented the input event
 
         /* istanbul ignore next */
 
-        if (formattedValue === false || evt.defaultPrevented) {
-          stopEvent(evt, {
+        if (formattedValue === false || event.defaultPrevented) {
+          stopEvent(event, {
             propagation: false
           });
           return;
@@ -15592,13 +13891,13 @@
 
         this.localValue = formattedValue;
         this.updateValue(formattedValue, true);
-        this.$emit('change', formattedValue);
+        this.$emit(EVENT_NAME_CHANGE, formattedValue);
       },
-      onBlur: function onBlur(evt) {
+      onBlur: function onBlur(event) {
         // Apply the `localValue` on blur to prevent cursor jumps
         // on mobile browsers (e.g. caused by autocomplete)
-        var value = evt.target.value;
-        var formattedValue = this.formatValue(value, evt, true);
+        var value = event.target.value;
+        var formattedValue = this.formatValue(value, event, true);
 
         if (formattedValue !== false) {
           // We need to use the modified value here to apply the
@@ -15610,7 +13909,7 @@
         } // Emit native blur event
 
 
-        this.$emit('blur', evt);
+        this.$emit(EVENT_NAME_BLUR, event);
       },
       focus: function focus() {
         // For external handler that may want a focus method
@@ -15625,10 +13924,9 @@
         }
       }
     }
-  };
+  });
 
-  // @vue/component
-  var formValidityMixin = {
+  var formValidityMixin = Vue__default['default'].extend({
     computed: {
       validity: {
         // Expose validity property
@@ -15683,53 +13981,40 @@
         return (_this$$refs$input3 = this.$refs.input).reportValidity.apply(_this$$refs$input3, arguments);
       }
     }
-  };
+  });
 
-  var TYPES = ['text', 'password', 'email', 'number', 'url', 'tel', 'search', 'range', 'color', 'date', 'time', 'datetime', 'datetime-local', 'month', 'week']; // @vue/component
+  // Valid supported input types
+
+  var TYPES$1 = ['text', 'password', 'email', 'number', 'url', 'tel', 'search', 'range', 'color', 'date', 'time', 'datetime', 'datetime-local', 'month', 'week']; // --- Props ---
+
+  var props$11 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$Q), props$S), props$T), props$10), {}, {
+    list: makeProp(PROP_TYPE_STRING),
+    max: makeProp(PROP_TYPE_NUMBER_STRING),
+    min: makeProp(PROP_TYPE_NUMBER_STRING),
+    // Disable mousewheel to prevent wheel from changing values (i.e. number/date)
+    noWheel: makeProp(PROP_TYPE_BOOLEAN, false),
+    step: makeProp(PROP_TYPE_NUMBER_STRING),
+    type: makeProp(PROP_TYPE_STRING, 'text', function (type) {
+      return arrayIncludes(TYPES$1, type);
+    })
+  })), NAME_FORM_INPUT); // --- Main component ---
+  // @vue/component
 
   var BFormInput = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_INPUT,
     // Mixin order is important!
-    mixins: [listenersMixin, idMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
-    props: {
-      // `value` prop is defined in form-text mixin
-      type: {
-        type: String,
-        default: 'text',
-        validator: function validator(type) {
-          return arrayIncludes(TYPES, type);
-        }
-      },
-      noWheel: {
-        // Disable mousewheel to prevent wheel from
-        // changing values (i.e. number/date)
-        type: Boolean,
-        default: false
-      },
-      min: {
-        type: [String, Number] // default: null
-
-      },
-      max: {
-        type: [String, Number] // default: null
-
-      },
-      step: {
-        type: [String, Number] // default: null
-
-      },
-      list: {
-        type: String // default: null
-
-      }
-    },
+    mixins: [listenersMixin, idMixin, formControlMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
+    props: props$11,
     computed: {
       localType: function localType() {
         // We only allow certain types
-        return arrayIncludes(TYPES, this.type) ? this.type : 'text';
+        var type = this.type;
+        return arrayIncludes(TYPES$1, type) ? type : 'text';
       },
       computedAttrs: function computedAttrs() {
         var type = this.localType,
+            name = this.name,
+            form = this.form,
             disabled = this.disabled,
             placeholder = this.placeholder,
             required = this.required,
@@ -15738,8 +14023,8 @@
             step = this.step;
         return {
           id: this.safeId(),
-          name: this.name || null,
-          form: this.form || null,
+          name: name,
+          form: form,
           type: type,
           disabled: disabled,
           placeholder: placeholder,
@@ -15763,8 +14048,8 @@
       }
     },
     watch: {
-      noWheel: function noWheel(newVal) {
-        this.setWheelStopper(newVal);
+      noWheel: function noWheel(newValue) {
+        this.setWheelStopper(newValue);
       }
     },
     mounted: function mounted() {
@@ -15807,8 +14092,8 @@
       onWheelBlur: function onWheelBlur() {
         eventOff(document, 'wheel', this.stopWheel);
       },
-      stopWheel: function stopWheel(evt) {
-        stopEvent(evt, {
+      stopWheel: function stopWheel(event) {
+        stopEvent(event, {
           propagation: false
         });
         attemptBlur(this.$el);
@@ -15816,13 +14101,13 @@
     },
     render: function render(h) {
       return h('input', {
-        ref: 'input',
         class: this.computedClass,
         attrs: this.computedAttrs,
         domProps: {
           value: this.localValue
         },
-        on: this.computedListeners
+        on: this.computedListeners,
+        ref: 'input'
       });
     }
   });
@@ -15834,28 +14119,18 @@
     }
   });
 
-  var props$y = {
-    checked: {
-      // type: [String, Number, Boolean, Object],
-      default: null
-    }
-  }; // @vue/component
+  var props$12 = makePropsConfigurable(props$X, NAME_FORM_RADIO_GROUP); // --- Main component ---
+  // @vue/component
 
   var BFormRadioGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_RADIO_GROUP,
-    mixins: [idMixin, formMixin, formRadioCheckGroupMixin, // Includes render function
-    formOptionsMixin, formSizeMixin, formStateMixin],
+    mixins: [formRadioCheckGroupMixin],
     provide: function provide() {
       return {
         bvRadioGroup: this
       };
     },
-    props: props$y,
-    data: function data() {
-      return {
-        localChecked: this.checked
-      };
-    },
+    props: props$12,
     computed: {
       isRadioGroup: function isRadioGroup() {
         return true;
@@ -15872,51 +14147,50 @@
     }
   });
 
+  var _watch$9;
+
+  var _makeModelMixin$9 = makeModelMixin('value', {
+    type: PROP_TYPE_NUMBER_STRING,
+    event: EVENT_NAME_CHANGE
+  }),
+      modelMixin$9 = _makeModelMixin$9.mixin,
+      modelProps$9 = _makeModelMixin$9.props,
+      MODEL_PROP_NAME$9 = _makeModelMixin$9.prop,
+      MODEL_EVENT_NAME$9 = _makeModelMixin$9.event;
+
   var MIN_STARS = 3;
-  var DEFAULT_STARS = 5; // --- Private helper component ---
+  var DEFAULT_STARS = 5; // --- Helper methods ---
+
+  var computeStars = function computeStars(stars) {
+    return mathMax(MIN_STARS, toInteger(stars, DEFAULT_STARS));
+  };
+
+  var clampValue = function clampValue(value, min, max) {
+    return mathMax(mathMin(value, max), min);
+  }; // --- Helper components ---
   // @vue/component
+
 
   var BVFormRatingStar = Vue__default['default'].extend({
     name: NAME_FORM_RATING_STAR,
     mixins: [normalizeSlotMixin],
     props: {
-      rating: {
-        type: Number,
-        default: 0
-      },
-      star: {
-        type: Number,
-        default: 0
-      },
-      focused: {
-        // If parent is focused
-        type: Boolean,
-        default: false
-      },
-      variant: {
-        type: String // default: null
-
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      hasClear: {
-        type: Boolean,
-        default: false
-      }
+      disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+      // If parent is focused
+      focused: makeProp(PROP_TYPE_BOOLEAN, false),
+      hasClear: makeProp(PROP_TYPE_BOOLEAN, false),
+      rating: makeProp(PROP_TYPE_NUMBER, 0),
+      readonly: makeProp(PROP_TYPE_BOOLEAN, false),
+      star: makeProp(PROP_TYPE_NUMBER, 0),
+      variant: makeProp(PROP_TYPE_STRING)
     },
     methods: {
-      onClick: function onClick(evt) {
+      onClick: function onClick(event) {
         if (!this.disabled && !this.readonly) {
-          stopEvent(evt, {
+          stopEvent(event, {
             propagation: false
           });
-          this.$emit('selected', this.star);
+          this.$emit(EVENT_NAME_SELECTED, this.star);
         }
       }
     },
@@ -15955,17 +14229,31 @@
         staticClass: 'b-rating-icon'
       }, [this.normalizeSlot(type, slotScope)])]);
     }
-  }); // --- Utility methods ---
+  }); // --- Props ---
 
-  var computeStars = function computeStars(stars) {
-    return mathMax(MIN_STARS, toInteger(stars, DEFAULT_STARS));
-  };
-
-  var clampValue = function clampValue(value, min, max) {
-    return mathMax(mathMin(value, max), min);
-  }; // --- BFormRating ---
+  var props$13 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$9), omit(props$Q, ['required', 'autofocus'])), props$S), {}, {
+    // CSS color string (overrides variant)
+    color: makeProp(PROP_TYPE_STRING),
+    iconClear: makeProp(PROP_TYPE_STRING, 'x'),
+    iconEmpty: makeProp(PROP_TYPE_STRING, 'star'),
+    iconFull: makeProp(PROP_TYPE_STRING, 'star-fill'),
+    iconHalf: makeProp(PROP_TYPE_STRING, 'star-half'),
+    inline: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Locale for the formatted value (if shown)
+    // Defaults to the browser locale. Falls back to `en`
+    locale: makeProp(PROP_TYPE_ARRAY_STRING),
+    noBorder: makeProp(PROP_TYPE_BOOLEAN, false),
+    precision: makeProp(PROP_TYPE_NUMBER_STRING),
+    readonly: makeProp(PROP_TYPE_BOOLEAN, false),
+    showClear: makeProp(PROP_TYPE_BOOLEAN, false),
+    showValue: makeProp(PROP_TYPE_BOOLEAN, false),
+    showValueMax: makeProp(PROP_TYPE_BOOLEAN, false),
+    stars: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_STARS, function (value) {
+      return toInteger(value) >= MIN_STARS;
+    }),
+    variant: makeProp(PROP_TYPE_STRING)
+  })), NAME_FORM_RATING); // --- Main component ---
   // @vue/component
-
 
   var BFormRating = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_RATING,
@@ -15975,105 +14263,10 @@
       BIconStarFill: BIconStarFill,
       BIconX: BIconX
     },
-    mixins: [idMixin],
-    model: {
-      prop: 'value',
-      event: 'change'
-    },
-    props: {
-      value: {
-        type: [Number, String],
-        default: null
-      },
-      stars: {
-        type: [Number, String],
-        default: DEFAULT_STARS,
-        validator: function validator(val) {
-          return toInteger(val) >= MIN_STARS;
-        }
-      },
-      variant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_RATING, 'variant');
-        }
-      },
-      color: {
-        // CSS color string (overrides variant)
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_RATING, 'color');
-        }
-      },
-      showValue: {
-        type: Boolean,
-        default: false
-      },
-      showValueMax: {
-        type: Boolean,
-        default: false
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      size: {
-        type: String // default: null
-
-      },
-      name: {
-        type: String // default: null
-
-      },
-      form: {
-        type: String // default: null
-
-      },
-      noBorder: {
-        type: Boolean,
-        default: false
-      },
-      inline: {
-        type: Boolean,
-        default: false
-      },
-      precision: {
-        type: [Number, String],
-        default: null
-      },
-      iconEmpty: {
-        type: String,
-        default: 'star'
-      },
-      iconHalf: {
-        type: String,
-        default: 'star-half'
-      },
-      iconFull: {
-        type: String,
-        default: 'star-fill'
-      },
-      iconClear: {
-        type: String,
-        default: 'x'
-      },
-      locale: {
-        // Locale for the formatted value (if shown)
-        // Defaults to the browser locale. Falls back to `en`
-        type: [String, Array] // default: undefined
-
-      },
-      showClear: {
-        type: Boolean,
-        default: false
-      }
-    },
+    mixins: [idMixin, modelMixin$9, formSizeMixin],
+    props: props$13,
     data: function data() {
-      var value = toFloat(this.value, null);
+      var value = toFloat(this[MODEL_PROP_NAME$9], null);
       var stars = computeStars(this.stars);
       return {
         localValue: isNull(value) ? null : clampValue(value, 0, stars),
@@ -16116,25 +14309,21 @@
         return showValueMax ? "".concat(value, "/").concat(stars) : value;
       }
     },
-    watch: {
-      value: function value(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          var value = toFloat(newVal, null);
-          this.localValue = isNull(value) ? null : clampValue(value, 0, this.computedStars);
-        }
-      },
-      localValue: function localValue(newVal, oldVal) {
-        if (newVal !== oldVal && newVal !== (this.value || 0)) {
-          this.$emit('change', newVal || null);
-        }
-      },
-      disabled: function disabled(newVal) {
-        if (newVal) {
-          this.hasFocus = false;
-          this.blur();
-        }
+    watch: (_watch$9 = {}, _defineProperty(_watch$9, MODEL_PROP_NAME$9, function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        var value = toFloat(newValue, null);
+        this.localValue = isNull(value) ? null : clampValue(value, 0, this.computedStars);
       }
-    },
+    }), _defineProperty(_watch$9, "localValue", function localValue(newValue, oldValue) {
+      if (newValue !== oldValue && newValue !== (this.value || 0)) {
+        this.$emit(MODEL_EVENT_NAME$9, newValue || null);
+      }
+    }), _defineProperty(_watch$9, "disabled", function disabled(newValue) {
+      if (newValue) {
+        this.hasFocus = false;
+        this.blur();
+      }
+    }), _watch$9),
     methods: {
       // --- Public methods ---
       focus: function focus() {
@@ -16148,11 +14337,11 @@
         }
       },
       // --- Private methods ---
-      onKeydown: function onKeydown(evt) {
-        var keyCode = evt.keyCode;
+      onKeydown: function onKeydown(event) {
+        var keyCode = event.keyCode;
 
         if (this.isInteractive && arrayIncludes([CODE_LEFT, CODE_DOWN, CODE_RIGHT, CODE_UP], keyCode)) {
-          stopEvent(evt, {
+          stopEvent(event, {
             propagation: false
           });
           var value = toInteger(this.localValue, 0);
@@ -16177,8 +14366,8 @@
           this.localValue = value;
         }
       },
-      onFocus: function onFocus(evt) {
-        this.hasFocus = !this.isInteractive ? false : evt.type === 'focus';
+      onFocus: function onFocus(event) {
+        this.hasFocus = !this.isInteractive ? false : event.type === 'focus';
       },
       // --- Render methods ---
       renderIcon: function renderIcon(icon) {
@@ -16207,12 +14396,10 @@
       }
     },
     render: function render(h) {
-      var _this = this,
-          _class;
+      var _this = this;
 
       var disabled = this.disabled,
           readonly = this.readonly,
-          size = this.size,
           name = this.name,
           form = this.form,
           inline = this.inline,
@@ -16232,7 +14419,7 @@
       if (showClear && !disabled && !readonly) {
         var $icon = h('span', {
           staticClass: 'b-rating-icon'
-        }, [($scopedSlots['icon-clear'] || this.iconClearFn)()]);
+        }, [($scopedSlots[SLOT_NAME_ICON_CLEAR] || this.iconClearFn)()]);
         $content.push(h('span', {
           staticClass: 'b-rating-star b-rating-star-clear flex-grow-1',
           class: {
@@ -16270,9 +14457,9 @@
             selected: this.onSelected
           },
           scopedSlots: {
-            empty: $scopedSlots['icon-empty'] || this.iconEmptyFn,
-            half: $scopedSlots['icon-half'] || this.iconHalfFn,
-            full: $scopedSlots['icon-full'] || this.iconFullFn
+            empty: $scopedSlots[SLOT_NAME_ICON_EMPTY] || this.iconEmptyFn,
+            half: $scopedSlots[SLOT_NAME_ICON_HALF] || this.iconHalfFn,
+            full: $scopedSlots[SLOT_NAME_ICON_FULL] || this.iconFullFn
           },
           key: index
         }));
@@ -16302,7 +14489,13 @@
 
       return h('output', {
         staticClass: 'b-rating form-control align-items-center',
-        class: (_class = {}, _defineProperty(_class, "form-control-".concat(size), !!size), _defineProperty(_class, 'd-inline-flex', inline), _defineProperty(_class, 'd-flex', !inline), _defineProperty(_class, 'border-0', noBorder), _defineProperty(_class, "disabled", disabled), _defineProperty(_class, "readonly", !disabled && readonly), _class),
+        class: [{
+          'd-inline-flex': inline,
+          'd-flex': !inline,
+          'border-0': noBorder,
+          disabled: disabled,
+          readonly: !disabled && readonly
+        }, this.sizeFormClass],
         attrs: {
           id: this.safeId(),
           dir: isRTL ? 'rtl' : 'ltr',
@@ -16332,18 +14525,21 @@
     }
   });
 
-  var optionsMixin = {
+  var _makeModelMixin$a = makeModelMixin('value'),
+      mixin = _makeModelMixin$a.mixin,
+      props$14 = _makeModelMixin$a.props,
+      prop = _makeModelMixin$a.prop,
+      event = _makeModelMixin$a.event;
+
+  var props$15 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$K), {}, {
+    labelField: makeProp(PROP_TYPE_STRING, 'label'),
+    optionsField: makeProp(PROP_TYPE_STRING, 'options')
+  })), 'formOptions'); // --- Mixin ---
+  // @vue/component
+
+  var optionsMixin = Vue__default['default'].extend({
     mixins: [formOptionsMixin],
-    props: {
-      labelField: {
-        type: String,
-        default: 'label'
-      },
-      optionsField: {
-        type: String,
-        default: 'options'
-      }
-    },
+    props: props$15,
     methods: {
       normalizeOption: function normalizeOption(option) {
         var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -16378,23 +14574,19 @@
         };
       }
     }
-  };
+  });
 
-  var props$z = {
-    value: {
-      // type: [String, Number, Boolean, Object],
-      required: true
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  }; // @vue/component
+  var props$16 = makePropsConfigurable({
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    value: makeProp(PROP_TYPE_ANY, undefined, true) // Required
+
+  }, NAME_FORM_SELECT_OPTION); // --- Main component ---
+  // @vue/component
 
   var BFormSelectOption = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_SELECT_OPTION,
     functional: true,
-    props: props$z,
+    props: props$16,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -16412,16 +14604,18 @@
     }
   });
 
+  var props$17 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$K), {}, {
+    label: makeProp(PROP_TYPE_STRING, undefined, true) // Required
+
+  })), NAME_FORM_SELECT_OPTION_GROUP); // --- Main component ---
+  // @vue/component
+
   var BFormSelectOptionGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_SELECT_OPTION_GROUP,
     mixins: [normalizeSlotMixin, formOptionsMixin],
-    props: {
-      label: {
-        type: String,
-        required: true
-      }
-    },
+    props: props$17,
     render: function render(h) {
+      var label = this.label;
       var $options = this.formOptions.map(function (option, index) {
         var value = option.value,
             text = option.text,
@@ -16438,41 +14632,28 @@
       });
       return h('optgroup', {
         attrs: {
-          label: this.label
+          label: label
         }
       }, [this.normalizeSlot(SLOT_NAME_FIRST), $options, this.normalizeSlot()]);
     }
   });
 
+  var props$18 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$14), props$Q), props$R), props$S), props$T), {}, {
+    ariaInvalid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    multiple: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Browsers default size to `0`, which shows 4 rows in most browsers in multiple mode
+    // Size of `1` can bork out Firefox
+    selectSize: makeProp(PROP_TYPE_NUMBER, 0)
+  })), NAME_FORM_SELECT); // --- Main component ---
+  // @vue/component
+
   var BFormSelect = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_SELECT,
-    mixins: [idMixin, normalizeSlotMixin, formMixin, formSizeMixin, formStateMixin, formCustomMixin, optionsMixin],
-    model: {
-      prop: 'value',
-      event: 'input'
-    },
-    props: {
-      value: {// type: [Object, Array, String, Number, Boolean],
-        // default: undefined
-      },
-      multiple: {
-        type: Boolean,
-        default: false
-      },
-      selectSize: {
-        // Browsers default size to 0, which shows 4 rows in most browsers in multiple mode
-        // Size of 1 can bork out Firefox
-        type: Number,
-        default: 0
-      },
-      ariaInvalid: {
-        type: [Boolean, String],
-        default: false
-      }
-    },
+    mixins: [idMixin, mixin, formControlMixin, formSizeMixin, formStateMixin, formCustomMixin, optionsMixin, normalizeSlotMixin],
+    props: props$18,
     data: function data() {
       return {
-        localValue: this.value
+        localValue: this[prop]
       };
     },
     computed: {
@@ -16483,21 +14664,14 @@
       },
       inputClass: function inputClass() {
         return [this.plain ? 'form-control' : 'custom-select', this.size && this.plain ? "form-control-".concat(this.size) : null, this.size && !this.plain ? "custom-select-".concat(this.size) : null, this.stateClass];
-      },
-      computedAriaInvalid: function computedAriaInvalid() {
-        if (this.ariaInvalid === true || this.ariaInvalid === 'true') {
-          return 'true';
-        }
-
-        return this.stateClass === 'is-invalid' ? 'true' : null;
       }
     },
     watch: {
-      value: function value(newVal) {
-        this.localValue = newVal;
+      value: function value(newValue) {
+        this.localValue = newValue;
       },
       localValue: function localValue() {
-        this.$emit('input', this.localValue);
+        this.$emit(event, this.localValue);
       }
     },
     methods: {
@@ -16507,18 +14681,18 @@
       blur: function blur() {
         attemptBlur(this.$refs.input);
       },
-      onChange: function onChange(evt) {
+      onChange: function onChange(event) {
         var _this = this;
 
-        var target = evt.target;
-        var selectedVal = from(target.options).filter(function (o) {
+        var target = event.target;
+        var selectedValue = from(target.options).filter(function (o) {
           return o.selected;
         }).map(function (o) {
           return '_value' in o ? o._value : o.value;
         });
-        this.localValue = target.multiple ? selectedVal : selectedVal[0];
+        this.localValue = target.multiple ? selectedValue : selectedValue[0];
         this.$nextTick(function () {
-          _this.$emit('change', _this.localValue);
+          _this.$emit(EVENT_NAME_CHANGE, _this.localValue);
         });
       }
     },
@@ -16585,7 +14759,17 @@
     }
   });
 
-  // Default for spin button range and step
+  var _watch$a;
+
+  var _makeModelMixin$b = makeModelMixin('value', {
+    // Should this really be String, to match native number inputs?
+    type: PROP_TYPE_BOOLEAN_NUMBER
+  }),
+      modelMixin$a = _makeModelMixin$b.mixin,
+      modelProps$a = _makeModelMixin$b.props,
+      MODEL_PROP_NAME$a = _makeModelMixin$b.prop,
+      MODEL_EVENT_NAME$a = _makeModelMixin$b.event; // Default for spin button range and step
+
 
   var DEFAULT_MIN = 1;
   var DEFAULT_MAX = 100;
@@ -16598,126 +14782,39 @@
   var DEFAULT_REPEAT_THRESHOLD = 10; // Repeat speed multiplier (step multiplier, must be an integer)
 
   var DEFAULT_REPEAT_MULTIPLIER = 4;
-  var KEY_CODES = [CODE_UP, CODE_DOWN, CODE_HOME, CODE_END, CODE_PAGEUP, CODE_PAGEDOWN]; // --- BFormSpinbutton ---
+  var KEY_CODES = [CODE_UP, CODE_DOWN, CODE_HOME, CODE_END, CODE_PAGEUP, CODE_PAGEDOWN]; // --- Props ---
+
+  var props$19 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$a), omit(props$Q, ['required', 'autofocus'])), props$S), props$T), {}, {
+    ariaControls: makeProp(PROP_TYPE_STRING),
+    ariaLabel: makeProp(PROP_TYPE_STRING),
+    formatterFn: makeProp(PROP_TYPE_FUNCTION),
+    inline: makeProp(PROP_TYPE_BOOLEAN, false),
+    labelDecrement: makeProp(PROP_TYPE_STRING, 'Decrement'),
+    labelIncrement: makeProp(PROP_TYPE_STRING, 'Increment'),
+    locale: makeProp(PROP_TYPE_ARRAY_STRING),
+    max: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_MAX),
+    min: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_MIN),
+    placeholder: makeProp(PROP_TYPE_STRING),
+    readonly: makeProp(PROP_TYPE_BOOLEAN, false),
+    repeatDelay: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_REPEAT_DELAY),
+    repeatInterval: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_REPEAT_INTERVAL),
+    repeatStepMultiplier: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_REPEAT_MULTIPLIER),
+    repeatThreshold: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_REPEAT_THRESHOLD),
+    step: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_STEP),
+    vertical: makeProp(PROP_TYPE_BOOLEAN, false),
+    wrap: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_FORM_SPINBUTTON); // --- Main Component ---
   // @vue/component
 
   var BFormSpinbutton = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_SPINBUTTON,
     // Mixin order is important!
-    mixins: [attrsMixin, idMixin, normalizeSlotMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$a, formSizeMixin, formStateMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    props: {
-      value: {
-        // Should this really be String, to match native number inputs?
-        type: Number,
-        default: null
-      },
-      min: {
-        type: [Number, String],
-        default: DEFAULT_MIN
-      },
-      max: {
-        type: [Number, String],
-        default: DEFAULT_MAX
-      },
-      step: {
-        type: [Number, String],
-        default: DEFAULT_STEP
-      },
-      wrap: {
-        type: Boolean,
-        default: false
-      },
-      formatterFn: {
-        type: Function // default: null
-
-      },
-      size: {
-        type: String // default: null
-
-      },
-      placeholder: {
-        type: String // default: null
-
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      required: {
-        // Only affects the `aria-invalid` attribute
-        type: Boolean,
-        default: false
-      },
-      name: {
-        type: String // default: null
-
-      },
-      form: {
-        type: String // default: null
-
-      },
-      state: {
-        // Tri-state prop: `true`, `false`, or `null`
-        type: Boolean,
-        default: null
-      },
-      inline: {
-        type: Boolean,
-        default: false
-      },
-      vertical: {
-        type: Boolean,
-        default: false
-      },
-      ariaLabel: {
-        type: String // default: null
-
-      },
-      ariaControls: {
-        type: String // default: null
-
-      },
-      labelDecrement: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_SPINBUTTON, 'labelDecrement');
-        }
-      },
-      labelIncrement: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_SPINBUTTON, 'labelIncrement');
-        }
-      },
-      locale: {
-        type: [String, Array] // default: null
-
-      },
-      repeatDelay: {
-        type: [Number, String],
-        default: DEFAULT_REPEAT_DELAY
-      },
-      repeatInterval: {
-        type: [Number, String],
-        default: DEFAULT_REPEAT_INTERVAL
-      },
-      repeatThreshold: {
-        type: [Number, String],
-        default: DEFAULT_REPEAT_THRESHOLD
-      },
-      repeatStepMultiplier: {
-        type: [Number, String],
-        default: DEFAULT_REPEAT_MULTIPLIER
-      }
-    },
+    props: props$19,
     data: function data() {
       return {
-        localValue: toFloat(this.value, null),
+        localValue: toFloat(this[MODEL_PROP_NAME$a], null),
         hasFocus: false
       };
     },
@@ -16796,7 +14893,8 @@
         return nf.format;
       },
       computedFormatter: function computedFormatter() {
-        return isFunction(this.formatterFn) ? this.formatterFn : this.defaultFormatter;
+        var formatterFn = this.formatterFn;
+        return hasPropFunction(formatterFn) ? formatterFn : this.defaultFormatter;
       },
       computedAttrs: function computedAttrs() {
         return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
@@ -16836,24 +14934,19 @@
         });
       }
     },
-    watch: {
-      value: function value(_value) {
-        this.localValue = toFloat(_value, null);
-      },
-      localValue: function localValue(value) {
-        this.$emit('input', value);
-      },
-      disabled: function disabled(_disabled) {
-        if (_disabled) {
-          this.clearRepeat();
-        }
-      },
-      readonly: function readonly(_readonly) {
-        if (_readonly) {
-          this.clearRepeat();
-        }
+    watch: (_watch$a = {}, _defineProperty(_watch$a, MODEL_PROP_NAME$a, function (value) {
+      this.localValue = toFloat(value, null);
+    }), _defineProperty(_watch$a, "localValue", function localValue(value) {
+      this.$emit(MODEL_EVENT_NAME$a, value);
+    }), _defineProperty(_watch$a, "disabled", function disabled(_disabled) {
+      if (_disabled) {
+        this.clearRepeat();
       }
-    },
+    }), _defineProperty(_watch$a, "readonly", function readonly(_readonly) {
+      if (_readonly) {
+        this.clearRepeat();
+      }
+    }), _watch$a),
     created: function created() {
       // Create non reactive properties
       this.$_autoDelayTimer = null;
@@ -16865,9 +14958,7 @@
     },
 
     /* istanbul ignore next */
-    deactivated: function deactivated()
-    /* istanbul ignore next */
-    {
+    deactivated: function deactivated() {
       this.clearRepeat();
     },
     methods: {
@@ -16884,7 +14975,7 @@
       },
       // --- Private methods ---
       emitChange: function emitChange() {
-        this.$emit('change', this.localValue);
+        this.$emit(EVENT_NAME_CHANGE, this.localValue);
       },
       stepValue: function stepValue(direction) {
         // Sets a new incremented or decremented value, supporting optional wrapping
@@ -16905,9 +14996,9 @@
           this.localValue = value > max ? wrap ? min : max : value < min ? wrap ? max : min : value;
         }
       },
-      onFocusBlur: function onFocusBlur(evt) {
+      onFocusBlur: function onFocusBlur(event) {
         if (!this.disabled) {
-          this.hasFocus = evt.type === 'focus';
+          this.hasFocus = event.type === 'focus';
         } else {
           this.hasFocus = false;
         }
@@ -16932,11 +15023,11 @@
           this.stepValue(-1 * multiplier);
         }
       },
-      onKeydown: function onKeydown(evt) {
-        var keyCode = evt.keyCode,
-            altKey = evt.altKey,
-            ctrlKey = evt.ctrlKey,
-            metaKey = evt.metaKey;
+      onKeydown: function onKeydown(event) {
+        var keyCode = event.keyCode,
+            altKey = event.altKey,
+            ctrlKey = event.ctrlKey,
+            metaKey = event.metaKey;
         /* istanbul ignore if */
 
         if (this.disabled || this.readonly || altKey || ctrlKey || metaKey) {
@@ -16945,7 +15036,7 @@
 
         if (arrayIncludes(KEY_CODES, keyCode)) {
           // https://w3c.github.io/aria-practices/#spinbutton
-          stopEvent(evt, {
+          stopEvent(event, {
             propagation: false
           });
           /* istanbul ignore if */
@@ -16962,9 +15053,9 @@
             this.$_keyIsDown = true;
 
             if (keyCode === CODE_UP) {
-              this.handleStepRepeat(evt, this.stepUp);
+              this.handleStepRepeat(event, this.stepUp);
             } else if (keyCode === CODE_DOWN) {
-              this.handleStepRepeat(evt, this.stepDown);
+              this.handleStepRepeat(event, this.stepDown);
             }
           } else {
             // These use native OS key repeating
@@ -16980,12 +15071,12 @@
           }
         }
       },
-      onKeyup: function onKeyup(evt) {
+      onKeyup: function onKeyup(event) {
         // Emit a change event when the keyup happens
-        var keyCode = evt.keyCode,
-            altKey = evt.altKey,
-            ctrlKey = evt.ctrlKey,
-            metaKey = evt.metaKey;
+        var keyCode = event.keyCode,
+            altKey = event.altKey,
+            ctrlKey = event.ctrlKey,
+            metaKey = event.metaKey;
         /* istanbul ignore if */
 
         if (this.disabled || this.readonly || altKey || ctrlKey || metaKey) {
@@ -16993,7 +15084,7 @@
         }
 
         if (arrayIncludes(KEY_CODES, keyCode)) {
-          stopEvent(evt, {
+          stopEvent(event, {
             propagation: false
           });
           this.resetTimers();
@@ -17001,10 +15092,10 @@
           this.emitChange();
         }
       },
-      handleStepRepeat: function handleStepRepeat(evt, stepper) {
+      handleStepRepeat: function handleStepRepeat(event, stepper) {
         var _this = this;
 
-        var _ref = evt || {},
+        var _ref = event || {},
             type = _ref.type,
             button = _ref.button;
 
@@ -17036,9 +15127,9 @@
           }, delay);
         }
       },
-      onMouseup: function onMouseup(evt) {
+      onMouseup: function onMouseup(event) {
         // `<body>` listener, only enabled when mousedown starts
-        var _ref2 = evt || {},
+        var _ref2 = event || {},
             type = _ref2.type,
             button = _ref2.button;
         /* istanbul ignore if */
@@ -17049,7 +15140,7 @@
           return;
         }
 
-        stopEvent(evt, {
+        stopEvent(event, {
           propagation: false
         });
         this.resetTimers();
@@ -17078,8 +15169,7 @@
       }
     },
     render: function render(h) {
-      var _this2 = this,
-          _class;
+      var _this2 = this;
 
       var spinId = this.spinId,
           value = this.localValue,
@@ -17087,8 +15177,6 @@
           readonly = this.computedReadonly,
           vertical = this.vertical,
           disabled = this.disabled,
-          state = this.state,
-          size = this.size,
           computedFormatter = this.computedFormatter;
       var hasValue = !isNull(value);
 
@@ -17105,24 +15193,22 @@
           hasFocus: _this2.hasFocus
         };
 
-        var handler = function handler(evt) {
+        var handler = function handler(event) {
           if (!disabled && !readonly) {
-            stopEvent(evt, {
+            stopEvent(event, {
               propagation: false
             });
 
             _this2.setMouseup(true); // Since we `preventDefault()`, we must manually focus the button
 
 
-            attemptFocus(evt.currentTarget);
+            attemptFocus(event.currentTarget);
 
-            _this2.handleStepRepeat(evt, stepper);
+            _this2.handleStepRepeat(event, stepper);
           }
         };
 
         return h('button', {
-          key: keyRef || null,
-          ref: keyRef,
           staticClass: 'btn btn-sm border-0 rounded-0',
           class: {
             'py-0': !vertical
@@ -17139,32 +15225,32 @@
           on: {
             mousedown: handler,
             touchstart: handler
-          }
-        }, [h('div', [_this2.normalizeSlot(slotName, scope) || $icon])]);
+          },
+          key: keyRef || null,
+          ref: keyRef
+        }, [_this2.normalizeSlot(slotName, scope) || $icon]);
       }; // TODO: Add button disabled state when `wrap` is `false` and at value max/min
 
 
-      var $increment = makeButton(this.stepUp, this.labelIncrement, BIconPlus, 'inc', 'ArrowUp', false, 'increment');
-      var $decrement = makeButton(this.stepDown, this.labelDecrement, BIconDash, 'dec', 'ArrowDown', false, 'decrement');
+      var $increment = makeButton(this.stepUp, this.labelIncrement, BIconPlus, 'inc', 'ArrowUp', false, SLOT_NAME_INCREMENT);
+      var $decrement = makeButton(this.stepDown, this.labelDecrement, BIconDash, 'dec', 'ArrowDown', false, SLOT_NAME_DECREMENT);
       var $hidden = h();
 
       if (this.name && !disabled) {
         $hidden = h('input', {
-          key: 'hidden',
           attrs: {
             type: 'hidden',
             name: this.name,
             form: this.form || null,
             // TODO: Should this be set to '' if value is out of range?
             value: this.valueAsFixed
-          }
+          },
+          key: 'hidden'
         });
       }
 
       var $spin = h( // We use 'output' element to make this accept a `<label for="id">` (Except IE)
       'output', {
-        ref: 'spinner',
-        key: 'output',
         staticClass: 'flex-grow-1',
         class: {
           'd-flex': vertical,
@@ -17175,15 +15261,21 @@
           'border-left': !vertical,
           'border-right': !vertical
         },
-        attrs: this.computedSpinAttrs
+        attrs: this.computedSpinAttrs,
+        key: 'output',
+        ref: 'spinner'
       }, [h('bdi', hasValue ? computedFormatter(value) : this.placeholder || '')]);
       return h('div', {
         staticClass: 'b-form-spinbutton form-control',
-        class: (_class = {
+        class: [{
           disabled: disabled,
           readonly: readonly,
-          focus: this.hasFocus
-        }, _defineProperty(_class, "form-control-".concat(size), !!size), _defineProperty(_class, 'd-inline-flex', inline || vertical), _defineProperty(_class, 'd-flex', !inline && !vertical), _defineProperty(_class, 'align-items-stretch', !vertical), _defineProperty(_class, 'flex-column', vertical), _defineProperty(_class, 'is-valid', state === true), _defineProperty(_class, 'is-invalid', state === false), _class),
+          focus: this.hasFocus,
+          'd-inline-flex': inline || vertical,
+          'd-flex': !inline && !vertical,
+          'align-items-stretch': !vertical,
+          'flex-column': vertical
+        }, this.sizeFormClass, this.stateClass],
         attrs: this.computedAttrs,
         on: {
           keydown: this.onKeydown,
@@ -17203,55 +15295,42 @@
     }
   });
 
+  var props$1a = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$g), {}, {
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    noRemove: makeProp(PROP_TYPE_BOOLEAN, false),
+    pill: makeProp(PROP_TYPE_BOOLEAN, false),
+    removeLabel: makeProp(PROP_TYPE_STRING, 'Remove tag'),
+    tag: makeProp(PROP_TYPE_STRING, 'span'),
+    title: makeProp(PROP_TYPE_STRING),
+    variant: makeProp(PROP_TYPE_STRING, 'secondary')
+  })), NAME_FORM_TAG); // --- Main component ---
+  // @vue/component
+
   var BFormTag = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TAG,
     mixins: [idMixin, normalizeSlotMixin],
-    props: {
-      variant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAG, 'variant');
-        }
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      title: {
-        type: String // default: null
-
-      },
-      pill: {
-        type: Boolean,
-        default: false
-      },
-      removeLabel: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAG, 'removeLabel');
-        }
-      },
-      tag: {
-        type: String,
-        default: 'span'
-      }
-    },
+    props: props$1a,
     methods: {
-      onDelete: function onDelete(evt) {
-        var type = evt.type,
-            keyCode = evt.keyCode;
+      onRemove: function onRemove(event) {
+        var type = event.type,
+            keyCode = event.keyCode;
 
         if (!this.disabled && (type === 'click' || type === 'keydown' && keyCode === CODE_DELETE)) {
-          this.$emit('remove');
+          this.$emit(EVENT_NAME_REMOVE);
         }
       }
     },
     render: function render(h) {
+      var title = this.title,
+          tag = this.tag,
+          variant = this.variant,
+          pill = this.pill,
+          disabled = this.disabled;
       var tagId = this.safeId();
       var tagLabelId = this.safeId('_taglabel_');
       var $remove = h();
 
-      if (!this.disabled) {
+      if (!this.noRemove && !disabled) {
         $remove = h(BButtonClose, {
           staticClass: 'b-form-tag-remove',
           props: {
@@ -17263,8 +15342,8 @@
             'aria-keyshortcuts': 'Delete'
           },
           on: {
-            click: this.onDelete,
-            keydown: this.onDelete
+            click: this.onRemove,
+            keydown: this.onRemove
           }
         });
       }
@@ -17274,29 +15353,41 @@
         attrs: {
           id: tagLabelId
         }
-      }, this.normalizeSlot() || this.title || [h()]);
+      }, this.normalizeSlot() || title);
       return h(BBadge, {
         staticClass: 'b-form-tag d-inline-flex align-items-baseline mw-100',
         class: {
-          disabled: this.disabled
+          disabled: disabled
+        },
+        props: {
+          tag: tag,
+          variant: variant,
+          pill: pill
         },
         attrs: {
           id: tagId,
-          title: this.title || null,
+          title: title || null,
           'aria-labelledby': tagLabelId
-        },
-        props: {
-          tag: this.tag,
-          variant: this.variant,
-          pill: this.pill
         }
       }, [$tag, $remove]);
     }
   });
 
-  // Supported input types (for built in input)
+  var _watch$b;
 
-  var TYPES$1 = ['text', 'email', 'tel', 'url', 'number']; // --- Utility methods ---
+  var _makeModelMixin$c = makeModelMixin('value', {
+    type: PROP_TYPE_ARRAY,
+    defaultValue: []
+  }),
+      modelMixin$b = _makeModelMixin$c.mixin,
+      modelProps$b = _makeModelMixin$c.props,
+      MODEL_PROP_NAME$b = _makeModelMixin$c.prop,
+      MODEL_EVENT_NAME$b = _makeModelMixin$c.event; // Supported input types (for built in input)
+
+
+  var TYPES$2 = ['text', 'email', 'tel', 'url', 'number']; // Default ignore input focus selector
+
+  var DEFAULT_INPUT_FOCUS_SELECTOR = ['.b-form-tag', 'button', 'input', 'select'].join(' '); // --- Helper methods ---
   // Escape special chars in string and replace
   // contiguous spaces with a whitespace match
 
@@ -17314,8 +15405,8 @@
   }; // Processes an input/change event, normalizing string or event argument
 
 
-  var processEventValue = function processEventValue(evt) {
-    return isString(evt) ? evt : isEvent(evt) ? evt.target.value || '' : '';
+  var processEventValue = function processEventValue(event) {
+    return isString(event) ? event : isEvent(event) ? event.target.value || '' : '';
   }; // Returns a fresh empty `tagsState` object
 
 
@@ -17326,179 +15417,53 @@
       invalid: [],
       duplicate: []
     };
-  }; // @vue/component
+  }; // --- Props ---
 
+
+  var props$1b = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$b), props$Q), props$S), props$T), {}, {
+    addButtonText: makeProp(PROP_TYPE_STRING, 'Add'),
+    addButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-secondary'),
+    // Enable change event triggering tag addition
+    // Handy if using <select> as the input
+    addOnChange: makeProp(PROP_TYPE_BOOLEAN, false),
+    duplicateTagText: makeProp(PROP_TYPE_STRING, 'Duplicate tag(s)'),
+    // Disable the input focus behavior when clicking
+    // on element matching the selector (or selectors)
+    ignoreInputFocusSelector: makeProp(PROP_TYPE_ARRAY_STRING, DEFAULT_INPUT_FOCUS_SELECTOR),
+    // Additional attributes to add to the input element
+    inputAttrs: makeProp(PROP_TYPE_OBJECT, {}),
+    inputClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    inputId: makeProp(PROP_TYPE_STRING),
+    inputType: makeProp(PROP_TYPE_STRING, 'text', function (value) {
+      return arrayIncludes(TYPES$2, value);
+    }),
+    invalidTagText: makeProp(PROP_TYPE_STRING, 'Invalid tag(s)'),
+    limit: makeProp(PROP_TYPE_NUMBER),
+    limitTagsText: makeProp(PROP_TYPE_STRING, 'Tag limit reached'),
+    // Disable ENTER key from triggering tag addition
+    noAddOnEnter: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Disable the focus ring on the root element
+    noOuterFocus: makeProp(PROP_TYPE_BOOLEAN, false),
+    noTagRemove: makeProp(PROP_TYPE_BOOLEAN, false),
+    placeholder: makeProp(PROP_TYPE_STRING, 'Add tag...'),
+    // Enable deleting last tag in list when CODE_BACKSPACE is
+    // pressed and input is empty
+    removeOnDelete: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Character (or characters) that trigger adding tags
+    separator: makeProp(PROP_TYPE_ARRAY_STRING),
+    tagClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    tagPills: makeProp(PROP_TYPE_BOOLEAN, false),
+    tagRemoveLabel: makeProp(PROP_TYPE_STRING, 'Remove tag'),
+    tagRemovedLabel: makeProp(PROP_TYPE_STRING, 'Tag removed'),
+    tagValidator: makeProp(PROP_TYPE_FUNCTION),
+    tagVariant: makeProp(PROP_TYPE_STRING, 'secondary')
+  })), NAME_FORM_TAGS); // --- Main component ---
+  // @vue/component
 
   var BFormTags = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TAGS,
-    mixins: [idMixin, normalizeSlotMixin],
-    model: {
-      // Even though this is the default that Vue assumes, we need
-      // to add it for the docs to reflect that this is the model
-      prop: 'value',
-      event: 'input'
-    },
-    props: {
-      inputId: {
-        type: String // default: null
-
-      },
-      placeholder: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'placeholder');
-        }
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      name: {
-        type: String // default: null
-
-      },
-      form: {
-        type: String // default: null
-
-      },
-      autofocus: {
-        type: Boolean,
-        default: false
-      },
-      state: {
-        // Tri-state: `true`, `false`, `null`
-        type: Boolean,
-        default: null
-      },
-      size: {
-        type: String // default: null
-
-      },
-      inputType: {
-        type: String,
-        default: 'text',
-        validator: function validator(type) {
-          return arrayIncludes(TYPES$1, type);
-        }
-      },
-      inputClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      inputAttrs: {
-        // Additional attributes to add to the input element
-        type: Object,
-        default: function _default() {
-          return {};
-        }
-      },
-      addButtonText: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'addButtonText');
-        }
-      },
-      addButtonVariant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'addButtonVariant');
-        }
-      },
-      tagVariant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'tagVariant');
-        }
-      },
-      tagClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      tagPills: {
-        type: Boolean,
-        default: false
-      },
-      tagRemoveLabel: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'tagRemoveLabel');
-        }
-      },
-      tagRemovedLabel: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'tagRemovedLabel');
-        }
-      },
-      tagValidator: {
-        type: Function // default: null
-
-      },
-      duplicateTagText: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'duplicateTagText');
-        }
-      },
-      invalidTagText: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'invalidTagText');
-        }
-      },
-      limitTagsText: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TAGS, 'limitTagsText');
-        }
-      },
-      limit: {
-        type: Number // default: null
-
-      },
-      separator: {
-        // Character (or characters) that trigger adding tags
-        type: [String, Array] // default: null
-
-      },
-      removeOnDelete: {
-        // Enable deleting last tag in list when CODE_BACKSPACE is
-        // pressed and input is empty
-        type: Boolean,
-        default: false
-      },
-      addOnChange: {
-        // Enable change event triggering tag addition
-        // Handy if using <select> as the input
-        type: Boolean,
-        default: false
-      },
-      noAddOnEnter: {
-        // Disable ENTER key from triggering tag addition
-        type: Boolean,
-        default: false
-      },
-      noOuterFocus: {
-        // Disable the focus ring on the root element
-        type: Boolean,
-        default: false
-      },
-      ignoreInputFocusSelector: {
-        // Disable the input focus behavior when clicking
-        // on element matching the selector (or selectors)
-        type: [Array, String],
-        default: function _default() {
-          return ['.b-form-tag', 'button', 'input', 'select'];
-        }
-      },
-      value: {
-        // The v-model prop
-        type: Array,
-        default: function _default() {
-          return [];
-        }
-      }
-    },
+    mixins: [idMixin, modelMixin$b, formControlMixin, formSizeMixin, formStateMixin, normalizeSlotMixin],
+    props: props$1b,
     data: function data() {
       return {
         hasFocus: false,
@@ -17516,22 +15481,25 @@
       },
       computedInputType: function computedInputType() {
         // We only allow certain types
-        return arrayIncludes(TYPES$1, this.inputType) ? this.inputType : 'text';
+        return arrayIncludes(TYPES$2, this.inputType) ? this.inputType : 'text';
       },
       computedInputAttrs: function computedInputAttrs() {
+        var disabled = this.disabled,
+            form = this.form;
         return _objectSpread2(_objectSpread2({}, this.inputAttrs), {}, {
           // Must have attributes
           id: this.computedInputId,
           value: this.newTag,
-          disabled: this.disabled || null,
-          form: this.form || null
+          disabled: disabled,
+          form: form
         });
       },
       computedInputHandlers: function computedInputHandlers() {
         return {
           input: this.onInputInput,
           change: this.onInputChange,
-          keydown: this.onInputKeydown
+          keydown: this.onInputKeydown,
+          reset: this.reset
         };
       },
       computedSeparator: function computedSeparator() {
@@ -17587,45 +15555,44 @@
         return isNumber(limit) && limit >= 0 && this.tags.length >= limit;
       }
     },
-    watch: {
-      value: function value(newVal) {
-        this.tags = cleanTags(newVal);
-      },
-      tags: function tags(newVal, oldVal) {
-        // Update the `v-model` (if it differs from the value prop)
-        if (!looseEqual(newVal, this.value)) {
-          this.$emit('input', newVal);
-        }
-
-        if (!looseEqual(newVal, oldVal)) {
-          newVal = concat(newVal).filter(identity);
-          oldVal = concat(oldVal).filter(identity);
-          this.removedTags = oldVal.filter(function (old) {
-            return !arrayIncludes(newVal, old);
-          });
-        }
-      },
-      tagsState: function tagsState(newVal, oldVal) {
-        // Emit a tag-state event when the `tagsState` object changes
-        if (!looseEqual(newVal, oldVal)) {
-          this.$emit('tag-state', newVal.valid, newVal.invalid, newVal.duplicate);
-        }
+    watch: (_watch$b = {}, _defineProperty(_watch$b, MODEL_PROP_NAME$b, function (newValue) {
+      this.tags = cleanTags(newValue);
+    }), _defineProperty(_watch$b, "tags", function tags(newValue, oldValue) {
+      // Update the `v-model` (if it differs from the value prop)
+      if (!looseEqual(newValue, this[MODEL_PROP_NAME$b])) {
+        this.$emit(MODEL_EVENT_NAME$b, newValue);
       }
-    },
+
+      if (!looseEqual(newValue, oldValue)) {
+        newValue = concat(newValue).filter(identity);
+        oldValue = concat(oldValue).filter(identity);
+        this.removedTags = oldValue.filter(function (old) {
+          return !arrayIncludes(newValue, old);
+        });
+      }
+    }), _defineProperty(_watch$b, "tagsState", function tagsState(newValue, oldValue) {
+      // Emit a tag-state event when the `tagsState` object changes
+      if (!looseEqual(newValue, oldValue)) {
+        this.$emit(EVENT_NAME_TAG_STATE, newValue.valid, newValue.invalid, newValue.duplicate);
+      }
+    }), _watch$b),
     created: function created() {
       // We do this in created to make sure an input event emits
       // if the cleaned tags are not equal to the value prop
-      this.tags = cleanTags(this.value);
+      this.tags = cleanTags(this[MODEL_PROP_NAME$b]);
     },
     mounted: function mounted() {
-      this.handleAutofocus();
-    },
+      var _this2 = this;
 
-    /* istanbul ignore next */
-    activated: function activated()
-    /* istanbul ignore next */
-    {
-      this.handleAutofocus();
+      // Listen for form reset events, to reset the tags input
+      var $form = closest('form', this.$el);
+
+      if ($form) {
+        eventOn($form, 'reset', this.reset, EVENT_OPTIONS_PASSIVE);
+        this.$on(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
+          eventOff($form, 'reset', _this2.reset, EVENT_OPTIONS_PASSIVE);
+        });
+      }
     },
     methods: {
       addTag: function addTag(newTag) {
@@ -17670,7 +15637,7 @@
         this.focus();
       },
       removeTag: function removeTag(tag) {
-        var _this2 = this;
+        var _this3 = this;
 
         /* istanbul ignore next */
         if (this.disabled) {
@@ -17686,19 +15653,29 @@
         }); // Return focus to the input (if possible)
 
         this.$nextTick(function () {
-          _this2.focus();
+          _this3.focus();
+        });
+      },
+      reset: function reset() {
+        var _this4 = this;
+
+        this.newTag = '';
+        this.tags = [];
+        this.$nextTick(function () {
+          _this4.removedTags = [];
+          _this4.tagsState = cleanTagsState();
         });
       },
       // --- Input element event handlers ---
-      onInputInput: function onInputInput(evt) {
+      onInputInput: function onInputInput(event) {
         /* istanbul ignore next: hard to test composition events */
-        if (this.disabled || isEvent(evt) && evt.target.composing) {
-          // `evt.target.composing` is set by Vue (`v-model` directive)
+        if (this.disabled || isEvent(event) && event.target.composing) {
+          // `event.target.composing` is set by Vue (`v-model` directive)
           // https://github.com/vuejs/vue/blob/dev/src/platforms/web/runtime/directives/model.js
           return;
         }
 
-        var newTag = processEventValue(evt);
+        var newTag = processEventValue(event);
         var separatorRe = this.computedSeparatorRegExp;
 
         if (this.newTag !== newTag) {
@@ -17717,11 +15694,11 @@
           this.tagsState = newTag === '' ? cleanTagsState() : this.parseTags(newTag);
         }
       },
-      onInputChange: function onInputChange(evt) {
+      onInputChange: function onInputChange(event) {
         // Change is triggered on `<input>` blur, or `<select>` selected
         // This event is opt-in
         if (!this.disabled && this.addOnChange) {
-          var newTag = processEventValue(evt);
+          var newTag = processEventValue(event);
           /* istanbul ignore next */
 
           if (this.newTag !== newTag) {
@@ -17731,42 +15708,42 @@
           this.addTag();
         }
       },
-      onInputKeydown: function onInputKeydown(evt) {
+      onInputKeydown: function onInputKeydown(event) {
         // Early exit
 
         /* istanbul ignore next */
-        if (this.disabled || !isEvent(evt)) {
+        if (this.disabled || !isEvent(event)) {
           return;
         }
 
-        var keyCode = evt.keyCode;
-        var value = evt.target.value || '';
+        var keyCode = event.keyCode;
+        var value = event.target.value || '';
         /* istanbul ignore else: testing to be added later */
 
         if (!this.noAddOnEnter && keyCode === CODE_ENTER) {
           // Attempt to add the tag when user presses enter
-          stopEvent(evt, {
+          stopEvent(event, {
             propagation: false
           });
           this.addTag();
         } else if (this.removeOnDelete && (keyCode === CODE_BACKSPACE || keyCode === CODE_DELETE) && value === '') {
           // Remove the last tag if the user pressed backspace/delete and the input is empty
-          stopEvent(evt, {
+          stopEvent(event, {
             propagation: false
           });
           this.tags = this.tags.slice(0, -1);
         }
       },
       // --- Wrapper event handlers ---
-      onClick: function onClick(evt) {
-        var _this3 = this;
+      onClick: function onClick(event) {
+        var _this5 = this;
 
         var ignoreFocusSelector = this.computeIgnoreInputFocusSelector;
-        var target = evt.target;
+        var target = event.target;
 
         if (!this.disabled && !isActiveElement(target) && (!ignoreFocusSelector || !closest(ignoreFocusSelector, target, true))) {
           this.$nextTick(function () {
-            _this3.focus();
+            _this5.focus();
           });
         }
       },
@@ -17777,12 +15754,12 @@
         this.hasFocus = false;
       },
       handleAutofocus: function handleAutofocus() {
-        var _this4 = this;
+        var _this6 = this;
 
         this.$nextTick(function () {
           requestAF(function () {
-            if (_this4.autofocus && !_this4.disabled) {
-              _this4.focus();
+            if (_this6.autofocus && !_this6.disabled) {
+              _this6.focus();
             }
           });
         });
@@ -17809,7 +15786,7 @@
         return (separatorRe ? newTag.split(separatorRe) : [newTag]).map(trim).filter(identity);
       },
       parseTags: function parseTags(newTag) {
-        var _this5 = this;
+        var _this7 = this;
 
         // Takes `newTag` value and parses it into `validTags`,
         // `invalidTags`, and duplicate tags as an object
@@ -17824,12 +15801,12 @@
         }; // Parse the unique tags
 
         tags.forEach(function (tag) {
-          if (arrayIncludes(_this5.tags, tag) || arrayIncludes(parsed.valid, tag)) {
+          if (arrayIncludes(_this7.tags, tag) || arrayIncludes(parsed.valid, tag)) {
             // Unique duplicate tags
             if (!arrayIncludes(parsed.duplicate, tag)) {
               parsed.duplicate.push(tag);
             }
-          } else if (_this5.validateTag(tag)) {
+          } else if (_this7.validateTag(tag)) {
             // We only add unique/valid tags
             parsed.valid.push(tag);
           } else {
@@ -17842,9 +15819,8 @@
         return parsed;
       },
       validateTag: function validateTag(tag) {
-        // Call the user supplied tag validator
-        var validator = this.tagValidator;
-        return isFunction(validator) ? validator(tag) : true;
+        var tagValidator = this.tagValidator;
+        return hasPropFunction(tagValidator) ? tagValidator(tag) : true;
       },
       getInput: function getInput() {
         // Returns the input element reference (or null if not found)
@@ -17853,43 +15829,45 @@
       },
       // Default User Interface render
       defaultRender: function defaultRender(_ref) {
-        var tags = _ref.tags,
-            inputAttrs = _ref.inputAttrs,
-            inputType = _ref.inputType,
-            inputHandlers = _ref.inputHandlers,
-            removeTag = _ref.removeTag,
+        var addButtonText = _ref.addButtonText,
+            addButtonVariant = _ref.addButtonVariant,
             addTag = _ref.addTag,
-            isInvalid = _ref.isInvalid,
-            isDuplicate = _ref.isDuplicate,
-            isLimitReached = _ref.isLimitReached,
             disableAddButton = _ref.disableAddButton,
             disabled = _ref.disabled,
-            placeholder = _ref.placeholder,
+            duplicateTagText = _ref.duplicateTagText,
+            inputAttrs = _ref.inputAttrs,
             inputClass = _ref.inputClass,
+            inputHandlers = _ref.inputHandlers,
+            inputType = _ref.inputType,
+            invalidTagText = _ref.invalidTagText,
+            isDuplicate = _ref.isDuplicate,
+            isInvalid = _ref.isInvalid,
+            isLimitReached = _ref.isLimitReached,
+            limitTagsText = _ref.limitTagsText,
+            noTagRemove = _ref.noTagRemove,
+            placeholder = _ref.placeholder,
+            removeTag = _ref.removeTag,
+            tagClass = _ref.tagClass,
+            tagPills = _ref.tagPills,
             tagRemoveLabel = _ref.tagRemoveLabel,
             tagVariant = _ref.tagVariant,
-            tagPills = _ref.tagPills,
-            tagClass = _ref.tagClass,
-            addButtonText = _ref.addButtonText,
-            addButtonVariant = _ref.addButtonVariant,
-            invalidTagText = _ref.invalidTagText,
-            duplicateTagText = _ref.duplicateTagText,
-            limitTagsText = _ref.limitTagsText;
+            tags = _ref.tags;
         var h = this.$createElement; // Make the list of tags
 
         var $tags = tags.map(function (tag) {
           tag = toString$1(tag);
           return h(BFormTag, {
             class: tagClass,
+            // `BFormTag` will auto generate an ID
+            // so we do not need to set the ID prop
             props: {
-              // `BFormTag` will auto generate an ID
-              // so we do not need to set the ID prop
+              disabled: disabled,
+              noRemove: noTagRemove,
+              pill: tagPills,
+              removeLabel: tagRemoveLabel,
               tag: 'li',
               title: tag,
-              disabled: disabled,
-              variant: tagVariant,
-              pill: tagPills,
-              removeLabel: tagRemoveLabel
+              variant: tagVariant
             },
             on: {
               remove: function remove() {
@@ -17907,12 +15885,6 @@
         var ariaDescribedby = [inputAttrs['aria-describedby'], invalidFeedbackId, duplicateFeedbackId, limitFeedbackId].filter(identity).join(' '); // Input
 
         var $input = h('input', {
-          ref: 'input',
-          // Directive needed to get `evt.target.composing` set (if needed)
-          directives: [{
-            name: 'model',
-            value: inputAttrs.value
-          }],
           staticClass: 'b-form-tags-input w-100 flex-grow-1 p-0 m-0 bg-transparent border-0',
           class: inputClass,
           style: {
@@ -17927,11 +15899,16 @@
           domProps: {
             value: inputAttrs.value
           },
-          on: inputHandlers
+          on: inputHandlers,
+          // Directive needed to get `event.target.composing` set (if needed)
+          directives: [{
+            name: 'model',
+            value: inputAttrs.value
+          }],
+          ref: 'input'
         }); // Add button
 
         var $button = h(BButton, {
-          ref: 'button',
           staticClass: 'b-form-tags-button py-0',
           class: {
             // Only show the button if the tag can be added
@@ -17944,15 +15921,16 @@
             fontSize: '90%'
           },
           props: {
-            variant: addButtonVariant,
-            disabled: disableAddButton || isLimitReached
+            disabled: disableAddButton || isLimitReached,
+            variant: addButtonVariant
           },
           on: {
             click: function click() {
               return addTag();
             }
-          }
-        }, [this.normalizeSlot('add-button-text') || addButtonText]); // ID of the tags + input `<ul>` list
+          },
+          ref: 'button'
+        }, [this.normalizeSlot(SLOT_NAME_ADD_BUTTON_TEXT) || addButtonText]); // ID of the tags + input `<ul>` list
         // Note we could concatenate `inputAttrs.id` with '__tag_list__'
         // but `inputId` may be `null` until after mount
         // `safeId()` returns `null`, if no user provided ID,
@@ -18039,12 +16017,18 @@
       }
     },
     render: function render(h) {
-      var _this6 = this;
+      var name = this.name,
+          disabled = this.disabled,
+          required = this.required,
+          form = this.form,
+          tags = this.tags,
+          computedInputId = this.computedInputId,
+          hasFocus = this.hasFocus,
+          noOuterFocus = this.noOuterFocus; // Scoped slot properties
 
-      // Scoped slot properties
-      var scope = {
+      var scope = _objectSpread2({
         // Array of tags (shallow copy to prevent mutations)
-        tags: this.tags.slice(),
+        tags: tags.slice(),
         // <input> v-bind:inputAttrs
         inputAttrs: this.computedInputAttrs,
         // We don't include this in the attrs, as users may want to override this
@@ -18054,8 +16038,9 @@
         // Methods
         removeTag: this.removeTag,
         addTag: this.addTag,
+        reset: this.reset,
         // <input> :id="inputId"
-        inputId: this.computedInputId,
+        inputId: computedInputId,
         // Invalid/Duplicate state information
         isInvalid: this.hasInvalidTags,
         invalidTags: this.invalidTags.slice(),
@@ -18063,25 +16048,9 @@
         duplicateTags: this.duplicateTags.slice(),
         isLimitReached: this.isLimitReached,
         // If the 'Add' button should be disabled
-        disableAddButton: this.disableAddButton,
-        // Pass-though values
-        disabled: this.disabled,
-        state: this.state,
-        size: this.size,
-        limit: this.limit,
-        separator: this.separator,
-        placeholder: this.placeholder,
-        inputClass: this.inputClass,
-        tagRemoveLabel: this.tagRemoveLabel,
-        tagVariant: this.tagVariant,
-        tagPills: this.tagPills,
-        tagClass: this.tagClass,
-        addButtonText: this.addButtonText,
-        addButtonVariant: this.addButtonVariant,
-        invalidTagText: this.invalidTagText,
-        duplicateTagText: this.duplicateTagText,
-        limitTagsText: this.limitTagsText
-      }; // Generate the user interface
+        disableAddButton: this.disableAddButton
+      }, pick(this.$props, ['addButtonText', 'addButtonVariant', 'disabled', 'duplicateTagText', 'form', 'inputClass', 'invalidTagText', 'limit', 'limitTagsText', 'noTagRemove', 'placeholder', 'required', 'separator', 'size', 'state', 'tagClass', 'tagPills', 'tagRemoveLabel', 'tagVariant'])); // Generate the user interface
+
 
       var $content = this.normalizeSlot(SLOT_NAME_DEFAULT, scope) || this.defaultRender(scope); // Generate the `aria-live` region for the current value(s)
 
@@ -18090,8 +16059,8 @@
         attrs: {
           id: this.safeId('__selected_tags__'),
           role: 'status',
-          for: this.computedInputId,
-          'aria-live': this.hasFocus ? 'polite' : 'off',
+          for: computedInputId,
+          'aria-live': hasFocus ? 'polite' : 'off',
           'aria-atomic': 'true',
           'aria-relevant': 'additions text'
         }
@@ -18102,23 +16071,29 @@
         attrs: {
           id: this.safeId('__removed_tags__'),
           role: 'status',
-          'aria-live': this.hasFocus ? 'assertive' : 'off',
+          'aria-live': hasFocus ? 'assertive' : 'off',
           'aria-atomic': 'true'
         }
       }, this.removedTags.length > 0 ? "(".concat(this.tagRemovedLabel, ") ").concat(this.removedTags.join(', ')) : ''); // Add hidden inputs for form submission
 
       var $hidden = h();
 
-      if (this.name && !this.disabled) {
+      if (name && !disabled) {
         // We add hidden inputs for each tag if a name is provided
-        // for native submission of forms
-        $hidden = this.tags.map(function (tag) {
+        // When there are currently no tags, a visually hidden input
+        // with empty value is rendered for proper required handling
+        var hasTags = tags.length > 0;
+        $hidden = (hasTags ? tags : ['']).map(function (tag) {
           return h('input', {
+            class: {
+              'sr-only': !hasTags
+            },
             attrs: {
-              type: 'hidden',
+              type: hasTags ? 'hidden' : 'text',
               value: tag,
-              name: _this6.name,
-              form: _this6.form || null
+              required: required,
+              name: name,
+              form: form
             },
             key: "tag_input_".concat(tag)
           });
@@ -18128,16 +16103,14 @@
 
       return h('div', {
         staticClass: 'b-form-tags form-control h-auto',
-        class: _defineProperty({
-          focus: this.hasFocus && !this.noOuterFocus && !this.disabled,
-          disabled: this.disabled,
-          'is-valid': this.state === true,
-          'is-invalid': this.state === false
-        }, "form-control-".concat(this.size), this.size),
+        class: [{
+          focus: hasFocus && !noOuterFocus && !disabled,
+          disabled: disabled
+        }, this.sizeFormClass, this.stateClass],
         attrs: {
           id: this.safeId(),
           role: 'group',
-          tabindex: this.disabled || this.noOuterFocus ? null : '-1',
+          tabindex: disabled || noOuterFocus ? null : '-1',
           'aria-describedby': this.safeId('__selected_tags__')
         },
         on: {
@@ -18158,38 +16131,27 @@
     }
   });
 
+  var props$1c = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$Q), props$S), props$T), props$10), {}, {
+    maxRows: makeProp(PROP_TYPE_NUMBER_STRING),
+    // When in auto resize mode, disable shrinking to content height
+    noAutoShrink: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Disable the resize handle of textarea
+    noResize: makeProp(PROP_TYPE_BOOLEAN, false),
+    rows: makeProp(PROP_TYPE_NUMBER_STRING, 2),
+    // 'soft', 'hard' or 'off'
+    // Browser default is 'soft'
+    wrap: makeProp(PROP_TYPE_STRING, 'soft')
+  })), NAME_FORM_TEXTAREA); // --- Main component ---
+  // @vue/component
+
   var BFormTextarea = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TEXTAREA,
     directives: {
       'b-visible': VBVisible
     },
     // Mixin order is important!
-    mixins: [listenersMixin, idMixin, listenOnRootMixin, formMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
-    props: {
-      rows: {
-        type: [Number, String],
-        default: 2
-      },
-      maxRows: {
-        type: [Number, String] // default: null
-
-      },
-      wrap: {
-        // 'soft', 'hard' or 'off'. Browser default is 'soft'
-        type: String,
-        default: 'soft'
-      },
-      noResize: {
-        // Disable the resize handle of textarea
-        type: Boolean,
-        default: false
-      },
-      noAutoShrink: {
-        // When in auto resize mode, disable shrinking to content height
-        type: Boolean,
-        default: false
-      }
-    },
+    mixins: [listenersMixin, idMixin, listenOnRootMixin, formControlMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
+    props: props$1c,
     data: function data() {
       return {
         heightInPx: null
@@ -18264,9 +16226,9 @@
     },
     methods: {
       // Called by intersection observer directive
-      visibleCallback: function visibleCallback(visible)
+
       /* istanbul ignore next */
-      {
+      visibleCallback: function visibleCallback(visible) {
         if (visible) {
           // We use a `$nextTick()` here just to make sure any
           // transitions or portalling have completed
@@ -18282,9 +16244,9 @@
           });
         });
       },
-      computeHeight: function computeHeight()
+
       /* istanbul ignore next: can't test getComputedStyle in JSDOM */
-      {
+      computeHeight: function computeHeight() {
         if (this.$isServer || !isNull(this.computedRows)) {
           return null;
         }
@@ -18333,7 +16295,6 @@
     },
     render: function render(h) {
       return h('textarea', {
-        ref: 'input',
         class: this.computedClass,
         style: this.computedStyle,
         directives: [{
@@ -18348,7 +16309,8 @@
         domProps: {
           value: this.localValue
         },
-        on: this.computedListeners
+        on: this.computedListeners,
+        ref: 'input'
       });
     }
   });
@@ -18360,34 +16322,40 @@
     }
   });
 
-  var NUMERIC = 'numeric'; // --- Helpers ---
-  // Fallback to BFormSpinbutton prop if no value found
+  var _watch$c;
 
-  var getConfigFallback$1 = function getConfigFallback(prop) {
-    return getComponentConfig(NAME_TIME, prop) || getComponentConfig(NAME_FORM_SPINBUTTON, prop);
+  var _makeModelMixin$d = makeModelMixin('value', {
+    type: PROP_TYPE_STRING,
+    defaultValue: ''
+  }),
+      modelMixin$c = _makeModelMixin$d.mixin,
+      modelProps$c = _makeModelMixin$d.props,
+      MODEL_PROP_NAME$c = _makeModelMixin$d.prop,
+      MODEL_EVENT_NAME$c = _makeModelMixin$d.event;
+
+  var NUMERIC = 'numeric'; // --- Helper methods ---
+
+  var padLeftZeros = function padLeftZeros(value) {
+    return "00".concat(value || '').slice(-2);
   };
 
-  var padLeftZeros = function padLeftZeros(num) {
-    return "00".concat(num || '').slice(-2);
-  };
-
-  var parseHMS = function parseHMS(hms) {
-    hms = toString$1(hms);
+  var parseHMS = function parseHMS(value) {
+    value = toString$1(value);
     var hh = null,
         mm = null,
         ss = null;
 
-    if (RX_TIME.test(hms)) {
+    if (RX_TIME.test(value)) {
 
-      var _hms$split$map = hms.split(':').map(function (v) {
+      var _value$split$map = value.split(':').map(function (v) {
         return toInteger(v, null);
       });
 
-      var _hms$split$map2 = _slicedToArray(_hms$split$map, 3);
+      var _value$split$map2 = _slicedToArray(_value$split$map, 3);
 
-      hh = _hms$split$map2[0];
-      mm = _hms$split$map2[1];
-      ss = _hms$split$map2[2];
+      hh = _value$split$map2[0];
+      mm = _value$split$map2[1];
+      ss = _value$split$map2[2];
     }
 
     return {
@@ -18410,132 +16378,42 @@
 
     var hms = [hours, minutes, requireSeconds ? seconds : 0];
     return hms.map(padLeftZeros).join(':');
-  }; // @vue/component
+  }; // --- Props ---
 
+
+  var props$1d = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$c), pick(props$19, ['labelIncrement', 'labelDecrement'])), {}, {
+    // ID of label element
+    ariaLabelledby: makeProp(PROP_TYPE_STRING),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    hidden: makeProp(PROP_TYPE_BOOLEAN, false),
+    hideHeader: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Explicitly force 12 or 24 hour time
+    // Default is to use resolved locale for 12/24 hour display
+    // Tri-state: `true` = 12, `false` = 24, `null` = auto
+    hour12: makeProp(PROP_TYPE_BOOLEAN, null),
+    labelAm: makeProp(PROP_TYPE_STRING, 'AM'),
+    labelAmpm: makeProp(PROP_TYPE_STRING, 'AM/PM'),
+    labelHours: makeProp(PROP_TYPE_STRING, 'Hours'),
+    labelMinutes: makeProp(PROP_TYPE_STRING, 'Minutes'),
+    labelNoTimeSelected: makeProp(PROP_TYPE_STRING, 'No time selected'),
+    labelPm: makeProp(PROP_TYPE_STRING, 'PM'),
+    labelSeconds: makeProp(PROP_TYPE_STRING, 'Seconds'),
+    labelSelected: makeProp(PROP_TYPE_STRING, 'Selected time'),
+    locale: makeProp(PROP_TYPE_ARRAY_STRING),
+    minutesStep: makeProp(PROP_TYPE_NUMBER_STRING, 1),
+    readonly: makeProp(PROP_TYPE_BOOLEAN, false),
+    secondsStep: makeProp(PROP_TYPE_NUMBER_STRING, 1),
+    // If `true`, show the second spinbutton
+    showSeconds: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_TIME); // --- Main component ---
+  // @vue/component
 
   var BTime = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TIME,
-    mixins: [idMixin, normalizeSlotMixin],
-    model: {
-      prop: 'value',
-      event: 'input'
-    },
-    props: {
-      value: {
-        type: String,
-        default: ''
-      },
-      showSeconds: {
-        // If true, show the second spinbutton
-        type: Boolean,
-        default: false
-      },
-      hour12: {
-        // Explicitly force 12 or 24 hour time
-        // Default is to use resolved locale for 12/24 hour display
-        // Tri-state: `true` = 12, `false` = 24, `null` = auto
-        type: Boolean,
-        default: null
-      },
-      locale: {
-        type: [String, Array] // default: null
-
-      },
-      ariaLabelledby: {
-        // ID of label element
-        type: String // default: null
-
-      },
-      secondsStep: {
-        type: [Number, String],
-        default: 1
-      },
-      minutesStep: {
-        type: [Number, String],
-        default: 1
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      hideHeader: {
-        type: Boolean,
-        default: false
-      },
-      labelNoTimeSelected: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TIME, 'labelNoTimeSelected');
-        }
-      },
-      labelSelected: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TIME, 'labelSelected');
-        }
-      },
-      labelHours: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TIME, 'labelHours');
-        }
-      },
-      labelMinutes: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TIME, 'labelMinutes');
-        }
-      },
-      labelSeconds: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TIME, 'labelSeconds');
-        }
-      },
-      labelAmpm: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TIME, 'labelAmpm');
-        }
-      },
-      labelAm: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TIME, 'labelAm');
-        }
-      },
-      labelPm: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TIME, 'labelPm');
-        }
-      },
-      // Passed to the spin buttons
-      labelIncrement: {
-        type: String,
-        // Falls back to BFormSpinbutton label
-        default: function _default() {
-          return getConfigFallback$1('labelIncrement');
-        }
-      },
-      labelDecrement: {
-        type: String,
-        // Falls back to BFormSpinbutton label
-        default: function _default() {
-          return getConfigFallback$1('labelDecrement');
-        }
-      },
-      hidden: {
-        type: Boolean,
-        default: false
-      }
-    },
+    mixins: [idMixin, modelMixin$c, normalizeSlotMixin],
+    props: props$1d,
     data: function data() {
-      var parsed = parseHMS(this.value || '');
+      var parsed = parseHMS(this[MODEL_PROP_NAME$c] || '');
       return {
         // Spin button models
         modelHours: parsed.hours,
@@ -18694,58 +16572,52 @@
         };
       }
     },
-    watch: {
-      value: function value(newVal, oldVal) {
-        if (newVal !== oldVal && !looseEqual(parseHMS(newVal), parseHMS(this.computedHMS))) {
-          var _parseHMS = parseHMS(newVal),
-              hours = _parseHMS.hours,
-              minutes = _parseHMS.minutes,
-              seconds = _parseHMS.seconds,
-              ampm = _parseHMS.ampm;
+    watch: (_watch$c = {}, _defineProperty(_watch$c, MODEL_PROP_NAME$c, function (newValue, oldValue) {
+      if (newValue !== oldValue && !looseEqual(parseHMS(newValue), parseHMS(this.computedHMS))) {
+        var _parseHMS = parseHMS(newValue),
+            hours = _parseHMS.hours,
+            minutes = _parseHMS.minutes,
+            seconds = _parseHMS.seconds,
+            ampm = _parseHMS.ampm;
 
-          this.modelHours = hours;
-          this.modelMinutes = minutes;
-          this.modelSeconds = seconds;
-          this.modelAmpm = ampm;
-        }
-      },
-      computedHMS: function computedHMS(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.$emit('input', newVal);
-        }
-      },
-      context: function context(newVal, oldVal) {
-        if (!looseEqual(newVal, oldVal)) {
-          this.$emit('context', newVal);
-        }
-      },
-      modelAmpm: function modelAmpm(newVal, oldVal) {
-        var _this = this;
-
-        if (newVal !== oldVal) {
-          var hours = isNull(this.modelHours) ? 0 : this.modelHours;
-          this.$nextTick(function () {
-            if (newVal === 0 && hours > 11) {
-              // Switched to AM
-              _this.modelHours = hours - 12;
-            } else if (newVal === 1 && hours < 12) {
-              // Switched to PM
-              _this.modelHours = hours + 12;
-            }
-          });
-        }
-      },
-      modelHours: function modelHours(newHours, oldHours) {
-        if (newHours !== oldHours) {
-          this.modelAmpm = newHours > 11 ? 1 : 0;
-        }
+        this.modelHours = hours;
+        this.modelMinutes = minutes;
+        this.modelSeconds = seconds;
+        this.modelAmpm = ampm;
       }
-    },
+    }), _defineProperty(_watch$c, "computedHMS", function computedHMS(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.$emit(MODEL_EVENT_NAME$c, newValue);
+      }
+    }), _defineProperty(_watch$c, "context", function context(newValue, oldValue) {
+      if (!looseEqual(newValue, oldValue)) {
+        this.$emit(EVENT_NAME_CONTEXT, newValue);
+      }
+    }), _defineProperty(_watch$c, "modelAmpm", function modelAmpm(newValue, oldValue) {
+      var _this = this;
+
+      if (newValue !== oldValue) {
+        var hours = isNull(this.modelHours) ? 0 : this.modelHours;
+        this.$nextTick(function () {
+          if (newValue === 0 && hours > 11) {
+            // Switched to AM
+            _this.modelHours = hours - 12;
+          } else if (newValue === 1 && hours < 12) {
+            // Switched to PM
+            _this.modelHours = hours + 12;
+          }
+        });
+      }
+    }), _defineProperty(_watch$c, "modelHours", function modelHours(newHours, oldHours) {
+      if (newHours !== oldHours) {
+        this.modelAmpm = newHours > 11 ? 1 : 0;
+      }
+    }), _watch$c),
     created: function created() {
       var _this2 = this;
 
       this.$nextTick(function () {
-        _this2.$emit('context', _this2.context);
+        _this2.$emit(EVENT_NAME_CONTEXT, _this2.context);
       });
     },
     mounted: function mounted() {
@@ -18753,16 +16625,12 @@
     },
 
     /* istanbul ignore next */
-    activated: function activated()
-    /* istanbul ignore next */
-    {
+    activated: function activated() {
       this.setLive(true);
     },
 
     /* istanbul ignore next */
-    deactivated: function deactivated()
-    /* istanbul ignore next */
-    {
+    deactivated: function deactivated() {
       this.setLive(false);
     },
     beforeDestroy: function beforeDestroy() {
@@ -18823,12 +16691,12 @@
         this.modelAmpm = value;
       },
       onSpinLeftRight: function onSpinLeftRight() {
-        var evt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var type = evt.type,
-            keyCode = evt.keyCode;
+        var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var type = event.type,
+            keyCode = event.keyCode;
 
         if (!this.disabled && type === 'keydown' && (keyCode === CODE_LEFT || keyCode === CODE_RIGHT)) {
-          stopEvent(evt);
+          stopEvent(event);
           var spinners = this.$refs.spinners || [];
           var index = spinners.map(function (cmp) {
             return !!cmp.hasFocus;
@@ -18870,9 +16738,6 @@
         var id = _this4.safeId("_spinbutton_".concat(key, "_")) || null;
         spinIds.push(id);
         return h(BFormSpinbutton, {
-          key: key,
-          ref: 'spinners',
-          refInFor: true,
           class: classes,
           props: _objectSpread2({
             id: id,
@@ -18895,7 +16760,10 @@
             // and we don't want the formatted time to be announced
             // on each value input if repeat is happening
             change: handler
-          }
+          },
+          key: key,
+          ref: 'spinners',
+          refInFor: true
         });
       }; // Helper method to return a "colon" separator
 
@@ -18981,12 +16849,10 @@
         },
         on: {
           keydown: this.onSpinLeftRight,
-          click
+          click:
           /* istanbul ignore next */
-          : function click(evt)
-          /* istanbul ignore next */
-          {
-            if (evt.target === evt.currentTarget) {
+          function click(event) {
+            if (event.target === event.currentTarget) {
               _this4.focus();
             }
           }
@@ -19038,217 +16904,42 @@
     }
   });
 
-  var getConfigFallback$2 = function getConfigFallback(prop) {
-    return getComponentConfig(NAME_FORM_TIMEPICKER, prop) || getComponentConfig(NAME_TIME, prop) || getComponentConfig(NAME_FORM_SPINBUTTON, prop);
-  }; // We create our props as a mixin so that we can control
-  // where they appear in the props listing reference section
+  var _watch$d;
+
+  var _makeModelMixin$e = makeModelMixin('value', {
+    type: PROP_TYPE_STRING,
+    defaultValue: ''
+  }),
+      modelMixin$d = _makeModelMixin$e.mixin,
+      modelProps$d = _makeModelMixin$e.props,
+      MODEL_PROP_NAME$d = _makeModelMixin$e.prop,
+      MODEL_EVENT_NAME$d = _makeModelMixin$e.event; // --- Props ---
 
 
-  var propsMixin$1 = {
-    props: _objectSpread2({
-      value: {
-        type: String,
-        default: ''
-      },
-      resetValue: {
-        type: String,
-        default: ''
-      },
-      placeholder: {
-        type: String // Defaults to `labelNoTime` from BTime context
-        // default: null
-
-      },
-      size: {
-        type: String // default: null
-
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      readonly: {
-        type: Boolean,
-        default: false
-      },
-      required: {
-        // If true adds the `aria-required` attribute
-        type: Boolean,
-        default: false
-      },
-      name: {
-        type: String // default: null
-
-      },
-      form: {
-        type: String // default: null
-
-      },
-      state: {
-        // Tri-state prop: `true`, `false` or `null`
-        type: Boolean,
-        default: null
-      },
-      hour12: {
-        // Tri-state prop: `true` => 12 hour, `false` => 24 hour, `null` => auto
-        type: Boolean,
-        default: null
-      },
-      locale: {
-        type: [String, Array] // default: null
-
-      },
-      showSeconds: {
-        type: Boolean,
-        default: false
-      },
-      hideHeader: {
-        type: Boolean,
-        default: false
-      },
-      secondsStep: {
-        type: [Number, String],
-        default: 1
-      },
-      minutesStep: {
-        type: [Number, String],
-        default: 1
-      },
-      buttonOnly: {
-        type: Boolean,
-        default: false
-      },
-      buttonVariant: {
-        // Applicable in button only mode
-        type: String,
-        default: 'secondary'
-      },
-      nowButton: {
-        type: Boolean,
-        default: false
-      },
-      labelNowButton: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TIMEPICKER, 'labelNowButton');
-        }
-      },
-      nowButtonVariant: {
-        type: String,
-        default: 'outline-primary'
-      },
-      resetButton: {
-        type: Boolean,
-        default: false
-      },
-      labelResetButton: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TIMEPICKER, 'labelResetButton');
-        }
-      },
-      resetButtonVariant: {
-        type: String,
-        default: 'outline-danger'
-      },
-      noCloseButton: {
-        type: Boolean,
-        default: false
-      },
-      labelCloseButton: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_FORM_TIMEPICKER, 'labelCloseButton');
-        }
-      },
-      closeButtonVariant: {
-        type: String,
-        default: 'outline-secondary'
-      },
-      // Labels
-      // These fallback to BTime values
-      labelSelected: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelSelected');
-        }
-      },
-      labelNoTimeSelected: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelNoTimeSelected');
-        }
-      },
-      labelHours: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelHours');
-        }
-      },
-      labelMinutes: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelMinutes');
-        }
-      },
-      labelSeconds: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelSeconds');
-        }
-      },
-      labelAmpm: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelAmpm');
-        }
-      },
-      labelAm: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelAm');
-        }
-      },
-      labelPm: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelPm');
-        }
-      },
-      // These pick BTime or BFormSpinbutton global config if no BFormTimepicker global config
-      labelIncrement: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelIncrement');
-        }
-      },
-      labelDecrement: {
-        type: String,
-        default: function _default() {
-          return getConfigFallback$2('labelDecrement');
-        }
-      },
-      // extra dropdown stuff
-      menuClass: {
-        type: [String, Array, Object] // default: null
-
-      }
-    }, dropdownProps)
-  }; // --- BFormDate component ---
+  var timeProps = omit(props$1d, ['hidden', 'id', 'value']);
+  var formBtnLabelControlProps$1 = omit(props$Z, ['formattedValue', 'id', 'lang', 'rtl', 'value']);
+  var props$1e = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$d), timeProps), formBtnLabelControlProps$1), {}, {
+    closeButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-secondary'),
+    labelCloseButton: makeProp(PROP_TYPE_STRING, 'Close'),
+    labelNowButton: makeProp(PROP_TYPE_STRING, 'Select now'),
+    labelResetButton: makeProp(PROP_TYPE_STRING, 'Reset'),
+    noCloseButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    nowButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    nowButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-primary'),
+    resetButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    resetButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-danger'),
+    resetValue: makeProp(PROP_TYPE_DATE_STRING)
+  })), NAME_FORM_TIMEPICKER); // --- Main component ---
   // @vue/component
 
   var BFormTimepicker = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TIMEPICKER,
-    // The mixins order determines the order of appearance in the props reference section
-    mixins: [idMixin, propsMixin$1],
-    model: {
-      prop: 'value',
-      event: 'input'
-    },
+    mixins: [idMixin, modelMixin$d],
+    props: props$1e,
     data: function data() {
       return {
         // We always use `HH:mm:ss` value internally
-        localHMS: this.value || '',
+        localHMS: this[MODEL_PROP_NAME$d] || '',
         // Context data from BTime
         localLocale: null,
         isRTL: false,
@@ -19260,50 +16951,18 @@
     computed: {
       computedLang: function computedLang() {
         return (this.localLocale || '').replace(/-u-.*$/i, '') || null;
-      },
-      timeProps: function timeProps() {
-        // Props we pass to BTime
-        // Use self for better minification, as `this` won't
-        // minimize and we reference it many times below
-        var self = this;
-        return {
-          hidden: !self.isVisible,
-          value: self.localHMS,
-          // Passthrough props
-          readonly: self.readonly,
-          disabled: self.disabled,
-          locale: self.locale,
-          hour12: self.hour12,
-          hideHeader: self.hideHeader,
-          showSeconds: self.showSeconds,
-          secondsStep: self.secondsStep,
-          minutesStep: self.minutesStep,
-          labelNoTimeSelected: self.labelNoTimeSelected,
-          labelSelected: self.labelSelected,
-          labelHours: self.labelHours,
-          labelMinutes: self.labelMinutes,
-          labelSeconds: self.labelSeconds,
-          labelAmpm: self.labelAmpm,
-          labelAm: self.labelAm,
-          labelPm: self.labelPm,
-          labelIncrement: self.labelIncrement,
-          labelDecrement: self.labelDecrement
-        };
       }
     },
-    watch: {
-      value: function value(newVal) {
-        this.localHMS = newVal || '';
-      },
-      localHMS: function localHMS(newVal) {
-        // We only update the v-model value when the timepicker
-        // is open, to prevent cursor jumps when bound to a
-        // text input in button only mode
-        if (this.isVisible) {
-          this.$emit('input', newVal || '');
-        }
+    watch: (_watch$d = {}, _defineProperty(_watch$d, MODEL_PROP_NAME$d, function (newValue) {
+      this.localHMS = newValue || '';
+    }), _defineProperty(_watch$d, "localHMS", function localHMS(newValue) {
+      // We only update the v-model value when the timepicker
+      // is open, to prevent cursor jumps when bound to a
+      // text input in button only mode
+      if (this.isVisible) {
+        this.$emit(MODEL_EVENT_NAME$d, newValue || '');
       }
-    },
+    }), _watch$d),
     methods: {
       // Public methods
       focus: function focus() {
@@ -19340,7 +16999,7 @@
         this.formattedValue = formatted;
         this.localHMS = value || ''; // Re-emit the context event
 
-        this.$emit('context', ctx);
+        this.$emit(EVENT_NAME_CONTEXT, ctx);
       },
       onNowButton: function onNowButton() {
         var now = new Date();
@@ -19367,12 +17026,12 @@
         this.$nextTick(function () {
           attemptFocus(_this2.$refs.time);
 
-          _this2.$emit('shown');
+          _this2.$emit(EVENT_NAME_SHOWN);
         });
       },
       onHidden: function onHidden() {
         this.isVisible = false;
-        this.$emit('hidden');
+        this.$emit(EVENT_NAME_HIDDEN);
       },
       // Render function helpers
       defaultButtonFn: function defaultButtonFn(_ref) {
@@ -19388,7 +17047,8 @@
     render: function render(h) {
       var localHMS = this.localHMS,
           disabled = this.disabled,
-          readonly = this.readonly;
+          readonly = this.readonly,
+          $props = this.$props;
       var placeholder = isUndefinedOrNull(this.placeholder) ? this.labelNoTimeSelected : this.placeholder; // Footer buttons
 
       var $footer = [];
@@ -19396,7 +17056,6 @@
       if (this.nowButton) {
         var label = this.labelNowButton;
         $footer.push(h(BButton, {
-          key: 'now-btn',
           props: {
             size: 'sm',
             disabled: disabled || readonly,
@@ -19407,7 +17066,8 @@
           },
           on: {
             click: this.onNowButton
-          }
+          },
+          key: 'now-btn'
         }, label));
       }
 
@@ -19419,7 +17079,6 @@
 
         var _label = this.labelResetButton;
         $footer.push(h(BButton, {
-          key: 'reset-btn',
           props: {
             size: 'sm',
             disabled: disabled || readonly,
@@ -19430,19 +17089,19 @@
           },
           on: {
             click: this.onResetButton
-          }
+          },
+          key: 'reset-btn'
         }, _label));
       }
 
       if (!this.noCloseButton) {
+        // Add a "spacer" between buttons ('&nbsp;')
         if ($footer.length > 0) {
-          // Add a "spacer" between buttons ('&nbsp;')
           $footer.push(h('span', "\xA0"));
         }
 
         var _label2 = this.labelCloseButton;
         $footer.push(h(BButton, {
-          key: 'close-btn',
           props: {
             size: 'sm',
             disabled: disabled,
@@ -19453,7 +17112,8 @@
           },
           on: {
             click: this.onCloseButton
-          }
+          },
+          key: 'close-btn'
         }, _label2));
       }
 
@@ -19468,34 +17128,34 @@
       }
 
       var $time = h(BTime, {
-        ref: 'time',
         staticClass: 'b-form-time-control',
-        props: this.timeProps,
+        props: _objectSpread2(_objectSpread2({}, pluckProps(timeProps, $props)), {}, {
+          value: localHMS,
+          hidden: !this.isVisible
+        }),
         on: {
           input: this.onInput,
           context: this.onContext
-        }
+        },
+        ref: 'time'
       }, $footer);
       return h(BVFormBtnLabelControl, {
-        ref: 'control',
         staticClass: 'b-form-timepicker',
-        props: _objectSpread2(_objectSpread2({}, this.$props), {}, {
-          // Overridden / computed props
+        props: _objectSpread2(_objectSpread2({}, pluckProps(formBtnLabelControlProps$1, $props)), {}, {
           id: this.safeId(),
-          rtl: this.isRTL,
-          lang: this.computedLang,
-          value: localHMS || '',
+          value: localHMS,
           formattedValue: localHMS ? this.formattedValue : '',
-          placeholder: placeholder || ''
+          placeholder: placeholder,
+          rtl: this.isRTL,
+          lang: this.computedLang
         }),
         on: {
           show: this.onShow,
           shown: this.onShown,
           hidden: this.onHidden
         },
-        scopedSlots: {
-          'button-content': this.$scopedSlots['button-content'] || this.defaultButtonFn
-        }
+        scopedSlots: _defineProperty({}, SLOT_NAME_BUTTON_CONTENT, this.$scopedSlots[SLOT_NAME_BUTTON_CONTENT] || this.defaultButtonFn),
+        ref: 'control'
       }, [$time]);
     }
   });
@@ -19514,17 +17174,15 @@
     }
   });
 
-  var props$A = {
-    tag: {
-      type: String,
-      default: 'div'
-    }
-  }; // @vue/component
+  var props$1f = makePropsConfigurable({
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_INPUT_GROUP_TEXT); // --- Main component ---
+  // @vue/component
 
   var BInputGroupText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP_TEXT,
     functional: true,
-    props: props$A,
+    props: props$1f,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19535,38 +17193,27 @@
     }
   });
 
-  var commonProps$1 = {
-    id: {
-      type: String,
-      default: null
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    isText: {
-      type: Boolean,
-      default: false
-    }
-  }; // @vue/component
+  var props$1g = makePropsConfigurable({
+    append: makeProp(PROP_TYPE_BOOLEAN, false),
+    id: makeProp(PROP_TYPE_STRING),
+    isText: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_INPUT_GROUP_ADDON); // --- Main component ---
+  // @vue/component
 
   var BInputGroupAddon = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP_ADDON,
     functional: true,
-    props: _objectSpread2(_objectSpread2({}, commonProps$1), {}, {
-      append: {
-        type: Boolean,
-        default: false
-      }
-    }),
+    props: props$1g,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var append = props.append;
       return h(props.tag, a(data, {
         class: {
-          'input-group-append': props.append,
-          'input-group-prepend': !props.append
+          'input-group-append': append,
+          'input-group-prepend': !append
         },
         attrs: {
           id: props.id
@@ -19575,10 +17222,13 @@
     }
   });
 
+  var props$1h = makePropsConfigurable(omit(props$1g, ['append']), NAME_INPUT_GROUP_APPEND); // --- Main component ---
+  // @vue/component
+
   var BInputGroupAppend = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP_APPEND,
     functional: true,
-    props: commonProps$1,
+    props: props$1h,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19592,15 +17242,18 @@
     }
   });
 
+  var props$1i = makePropsConfigurable(omit(props$1g, ['append']), NAME_INPUT_GROUP_PREPEND); // --- Main component ---
+  // @vue/component
+
   var BInputGroupPrepend = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP_PREPEND,
     functional: true,
-    props: commonProps$1,
+    props: props$1i,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      // pass all our props/attrs down to child, and set`append` to false
+      // Pass all our data down to child, and set `append` to `true`
       return h(BInputGroupAddon, a(data, {
         props: _objectSpread2(_objectSpread2({}, props), {}, {
           append: false
@@ -19609,39 +17262,21 @@
     }
   });
 
-  var props$B = {
-    id: {
-      type: String
-    },
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_INPUT_GROUP, 'size');
-      }
-    },
-    prepend: {
-      type: String
-    },
-    prependHtml: {
-      type: String
-    },
-    append: {
-      type: String
-    },
-    appendHtml: {
-      type: String
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    }
-  }; // --- Main component ---
+  var props$1j = makePropsConfigurable({
+    append: makeProp(PROP_TYPE_STRING),
+    appendHtml: makeProp(PROP_TYPE_STRING),
+    id: makeProp(PROP_TYPE_STRING),
+    prepend: makeProp(PROP_TYPE_STRING),
+    prependHtml: makeProp(PROP_TYPE_STRING),
+    size: makeProp(PROP_TYPE_STRING),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_INPUT_GROUP); // --- Main component ---
   // @vue/component
 
   var BInputGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP,
     functional: true,
-    props: props$B,
+    props: props$1j,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19694,101 +17329,52 @@
     }
   });
 
-  var props$C = {
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    fluid: {
-      // String breakpoint name new in Bootstrap v4.4.x
-      type: [Boolean, String],
-      default: false
-    }
-  }; // @vue/component
+  var props$1k = makePropsConfigurable({
+    // String breakpoint name new in Bootstrap v4.4.x
+    fluid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_CONTAINER); // --- Main component ---
+  // @vue/component
 
   var BContainer = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CONTAINER,
     functional: true,
-    props: props$C,
+    props: props$1k,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var fluid = props.fluid;
       return h(props.tag, a(data, {
         class: _defineProperty({
-          container: !(props.fluid || props.fluid === ''),
-          'container-fluid': props.fluid === true || props.fluid === ''
-        }, "container-".concat(props.fluid), props.fluid && props.fluid !== true)
+          container: !(fluid || fluid === ''),
+          'container-fluid': fluid === true || fluid === ''
+        }, "container-".concat(fluid), fluid && fluid !== true)
       }), children);
     }
   });
 
-  var props$D = {
-    fluid: {
-      type: Boolean,
-      default: false
-    },
-    containerFluid: {
-      type: [Boolean, String],
-      default: false
-    },
-    header: {
-      type: String // default: null
-
-    },
-    headerHtml: {
-      type: String // default: null
-
-    },
-    headerTag: {
-      type: String,
-      default: 'h1'
-    },
-    headerLevel: {
-      type: [Number, String],
-      default: '3'
-    },
-    lead: {
-      type: String // default: null
-
-    },
-    leadHtml: {
-      type: String // default: null
-
-    },
-    leadTag: {
-      type: String,
-      default: 'p'
-    },
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    bgVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_JUMBOTRON, 'bgVariant');
-      }
-    },
-    borderVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_JUMBOTRON, 'borderVariant');
-      }
-    },
-    textVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_JUMBOTRON, 'textVariant');
-      }
-    }
-  }; // --- Main component ---
+  var props$1l = makePropsConfigurable({
+    bgVariant: makeProp(PROP_TYPE_STRING),
+    borderVariant: makeProp(PROP_TYPE_STRING),
+    containerFluid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    fluid: makeProp(PROP_TYPE_BOOLEAN, false),
+    header: makeProp(PROP_TYPE_STRING),
+    headerHtml: makeProp(PROP_TYPE_STRING),
+    headerLevel: makeProp(PROP_TYPE_NUMBER_STRING, 3),
+    headerTag: makeProp(PROP_TYPE_STRING, 'h1'),
+    lead: makeProp(PROP_TYPE_STRING),
+    leadHtml: makeProp(PROP_TYPE_STRING),
+    leadTag: makeProp(PROP_TYPE_STRING, 'p'),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    textVariant: makeProp(PROP_TYPE_STRING)
+  }, NAME_JUMBOTRON); // --- Main component ---
   // @vue/component
 
   var BJumbotron = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_JUMBOTRON,
     functional: true,
-    props: props$D,
+    props: props$1l,
     render: function render(h, _ref) {
       var _class2;
 
@@ -19852,16 +17438,9 @@
     }
   });
 
-  var COMMON_ALIGNMENT = ['start', 'end', 'center']; // Generates a prop object with a type of `[String, Number]`
-
-  var strNum$1 = function strNum() {
-    return {
-      type: [String, Number],
-      default: null
-    };
-  }; // Compute a `row-cols-{breakpoint}-{cols}` class name
+  var COMMON_ALIGNMENT = ['start', 'end', 'center']; // --- Helper methods ---
+  // Compute a `row-cols-{breakpoint}-{cols}` class name
   // Memoized function for better performance on generating class names
-
 
   var computeRowColsClass = memoize(function (breakpoint, cols) {
     cols = trim(toString$1(cols));
@@ -19874,55 +17453,35 @@
   }); // Cached copy of the `row-cols` breakpoint prop names
   // Will be populated when the props are generated
 
-  var rowColsPropList = []; // Lazy evaled props factory for <b-row> (called only once,
-  // the first time the component is used)
+  var rowColsPropList = []; // --- Props ---
+  // Prop generator for lazy generation of props
 
   var generateProps$2 = function generateProps() {
-    // Grab the breakpoints from the cached config (including the '' (xs) breakpoint)
-    var breakpoints = getBreakpointsUpCached(); // Supports classes like: `row-cols-2`, `row-cols-md-4`, `row-cols-xl-6`
-
-    var rowColsProps = breakpoints.reduce(function (props, breakpoint) {
-      props[suffixPropName(breakpoint, 'cols')] = strNum$1();
+    // i.e. 'row-cols-2', 'row-cols-md-4', 'row-cols-xl-6', ...
+    var rowColsProps = getBreakpointsUpCached().reduce(function (props, breakpoint) {
+      props[suffixPropName(breakpoint, 'cols')] = makeProp(PROP_TYPE_NUMBER_STRING);
       return props;
     }, create(null)); // Cache the row-cols prop names
 
     rowColsPropList = keys(rowColsProps); // Return the generated props
 
-    return _objectSpread2({
-      tag: {
-        type: String,
-        default: 'div'
-      },
-      noGutters: {
-        type: Boolean,
-        default: false
-      },
-      alignV: {
-        type: String,
-        default: null,
-        validator: function validator(str) {
-          return arrayIncludes(concat(COMMON_ALIGNMENT, 'baseline', 'stretch'), str);
-        }
-      },
-      alignH: {
-        type: String,
-        default: null,
-        validator: function validator(str) {
-          return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around'), str);
-        }
-      },
-      alignContent: {
-        type: String,
-        default: null,
-        validator: function validator(str) {
-          return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around', 'stretch'), str);
-        }
-      }
-    }, rowColsProps);
-  }; // We do not use `Vue.extend()` here as that would evaluate the props
+    return makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, rowColsProps), {}, {
+      alignContent: makeProp(PROP_TYPE_STRING, null, function (value) {
+        return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around', 'stretch'), value);
+      }),
+      alignH: makeProp(PROP_TYPE_STRING, null, function (value) {
+        return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around'), value);
+      }),
+      alignV: makeProp(PROP_TYPE_STRING, null, function (value) {
+        return arrayIncludes(concat(COMMON_ALIGNMENT, 'baseline', 'stretch'), value);
+      }),
+      noGutters: makeProp(PROP_TYPE_BOOLEAN, false),
+      tag: makeProp(PROP_TYPE_STRING, 'div')
+    })), NAME_ROW);
+  }; // --- Main component ---
+  // We do not use `Vue.extend()` here as that would evaluate the props
   // immediately, which we do not want to happen
   // @vue/component
-
 
   var BRow = {
     name: NAME_ROW,
@@ -19943,8 +17502,11 @@
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
-      var classList = []; // Loop through row-cols breakpoint props and generate the classes
+      var alignV = props.alignV,
+          alignH = props.alignH,
+          alignContent = props.alignContent; // Loop through row-cols breakpoint props and generate the classes
 
+      var classList = [];
       rowColsPropList.forEach(function (prop) {
         var c = computeRowColsClass(computeRowColsBreakpoint(prop), props[prop]); // If a class is returned, push it onto the array
 
@@ -19954,7 +17516,7 @@
       });
       classList.push((_classList$push = {
         'no-gutters': props.noGutters
-      }, _defineProperty(_classList$push, "align-items-".concat(props.alignV), props.alignV), _defineProperty(_classList$push, "justify-content-".concat(props.alignH), props.alignH), _defineProperty(_classList$push, "align-content-".concat(props.alignContent), props.alignContent), _classList$push));
+      }, _defineProperty(_classList$push, "align-items-".concat(alignV), alignV), _defineProperty(_classList$push, "justify-content-".concat(alignH), alignH), _defineProperty(_classList$push, "align-content-".concat(alignContent), alignContent), _classList$push));
       return h(props.tag, a(data, {
         staticClass: 'row',
         class: classList
@@ -19977,25 +17539,17 @@
     }
   });
 
-  var props$E = {
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    flush: {
-      type: Boolean,
-      default: false
-    },
-    horizontal: {
-      type: [Boolean, String],
-      default: false
-    }
-  }; // @vue/component
+  var props$1m = makePropsConfigurable({
+    flush: makeProp(PROP_TYPE_BOOLEAN, false),
+    horizontal: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_LIST_GROUP); // --- Main component ---
+  // @vue/component
 
   var BListGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_LIST_GROUP,
     functional: true,
-    props: props$E,
+    props: props$1m,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -20015,35 +17569,21 @@
 
   var actionTags = ['a', 'router-link', 'button', 'b-link']; // --- Props ---
 
-  var linkProps$3 = omit(props$1, ['event', 'routerTag']);
-  delete linkProps$3.href.default;
-  delete linkProps$3.to.default;
-  var props$F = _objectSpread2(_objectSpread2({}, linkProps$3), {}, {
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    action: {
-      type: Boolean,
-      default: null
-    },
-    button: {
-      type: Boolean,
-      default: null
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_LIST_GROUP_ITEM, 'variant');
-      }
-    }
-  }); // --- Main component ---
+  var linkProps$4 = omit(props$6, ['event', 'routerTag']);
+  delete linkProps$4.href.default;
+  delete linkProps$4.to.default;
+  var props$1n = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$4), {}, {
+    action: makeProp(PROP_TYPE_BOOLEAN, false),
+    button: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    variant: makeProp(PROP_TYPE_STRING)
+  })), NAME_LIST_GROUP_ITEM); // --- Main component ---
   // @vue/component
 
   var BListGroupItem = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_LIST_GROUP_ITEM,
     functional: true,
-    props: props$F,
+    props: props$1n,
     render: function render(h, _ref) {
       var _class;
 
@@ -20071,7 +17611,7 @@
           attrs.disabled = true;
         }
       } else {
-        itemProps = pluckProps(linkProps$3, props);
+        itemProps = pluckProps(linkProps$4, props);
       }
 
       return h(tag, a(data, {
@@ -20090,17 +17630,43 @@
     }
   });
 
-  var props$G = {
-    tag: {
-      type: String,
-      default: 'div'
+  var props$1o = makePropsConfigurable({
+    right: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    verticalAlign: makeProp(PROP_TYPE_STRING, 'top')
+  }, NAME_MEDIA_ASIDE); // --- Main component ---
+  // @vue/component
+
+  var BMediaAside = /*#__PURE__*/Vue__default['default'].extend({
+    name: NAME_MEDIA_ASIDE,
+    functional: true,
+    props: props$1o,
+    render: function render(h, _ref) {
+      var props = _ref.props,
+          data = _ref.data,
+          children = _ref.children;
+      var verticalAlign = props.verticalAlign;
+      var align = verticalAlign === 'top' ? 'start' : verticalAlign === 'bottom' ? 'end' :
+      /* istanbul ignore next */
+      verticalAlign;
+      return h(props.tag, a(data, {
+        staticClass: 'media-aside',
+        class: _defineProperty({
+          'media-aside-right': props.right
+        }, "align-self-".concat(align), align)
+      }), children);
     }
-  }; // @vue/component
+  });
+
+  var props$1p = makePropsConfigurable({
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }, NAME_MEDIA_BODY); // --- Main component ---
+  // @vue/component
 
   var BMediaBody = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_MEDIA_BODY,
     functional: true,
-    props: props$G,
+    props: props$1p,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -20111,88 +17677,41 @@
     }
   });
 
-  var props$H = {
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    verticalAlign: {
-      type: String,
-      default: 'top'
-    }
-  }; // @vue/component
-
-  var BMediaAside = /*#__PURE__*/Vue__default['default'].extend({
-    name: NAME_MEDIA_ASIDE,
-    functional: true,
-    props: props$H,
-    render: function render(h, _ref) {
-      var props = _ref.props,
-          data = _ref.data,
-          children = _ref.children;
-      var align = props.verticalAlign === 'top' ? 'start' : props.verticalAlign === 'bottom' ? 'end' :
-      /* istanbul ignore next */
-      props.verticalAlign;
-      return h(props.tag, a(data, {
-        staticClass: 'd-flex',
-        class: _defineProperty({}, "align-self-".concat(align), align)
-      }), children);
-    }
-  });
-
-  var props$I = {
-    tag: {
-      type: String,
-      default: 'div'
-    },
-    rightAlign: {
-      type: Boolean,
-      default: false
-    },
-    verticalAlign: {
-      type: String,
-      default: 'top'
-    },
-    noBody: {
-      type: Boolean,
-      default: false
-    }
-  }; // @vue/component
+  var props$1q = makePropsConfigurable({
+    noBody: makeProp(PROP_TYPE_BOOLEAN, false),
+    rightAlign: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    verticalAlign: makeProp(PROP_TYPE_STRING, 'top')
+  }, NAME_MEDIA); // --- Main component ---
+  // @vue/component
 
   var BMedia = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_MEDIA,
     functional: true,
-    props: props$I,
+    props: props$1q,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           slots = _ref.slots,
           scopedSlots = _ref.scopedSlots,
           children = _ref.children;
-      var childNodes = props.noBody ? children : [];
+      var noBody = props.noBody,
+          rightAlign = props.rightAlign,
+          verticalAlign = props.verticalAlign;
+      var $children = noBody ? children : [];
 
-      if (!props.noBody) {
+      if (!noBody) {
+        var slotScope = {};
         var $slots = slots();
         var $scopedSlots = scopedSlots || {};
-        var $aside = normalizeSlot('aside', {}, $scopedSlots, $slots);
-        var $default = normalizeSlot(SLOT_NAME_DEFAULT, {}, $scopedSlots, $slots);
+        $children.push(h(BMediaBody, normalizeSlot(SLOT_NAME_DEFAULT, slotScope, $scopedSlots, $slots)));
+        var $aside = normalizeSlot(SLOT_NAME_ASIDE, slotScope, $scopedSlots, $slots);
 
-        if ($aside && !props.rightAlign) {
-          childNodes.push(h(BMediaAside, {
-            staticClass: 'mr-3',
+        if ($aside) {
+          $children[rightAlign ? 'push' : 'unshift'](h(BMediaAside, {
             props: {
-              verticalAlign: props.verticalAlign
-            }
-          }, $aside));
-        }
-
-        childNodes.push(h(BMediaBody, $default));
-
-        if ($aside && props.rightAlign) {
-          childNodes.push(h(BMediaAside, {
-            staticClass: 'ml-3',
-            props: {
-              verticalAlign: props.verticalAlign
+              right: rightAlign,
+              verticalAlign: verticalAlign
             }
           }, $aside));
         }
@@ -20200,7 +17719,7 @@
 
       return h(props.tag, a(data, {
         staticClass: 'media'
-      }), childNodes);
+      }), $children);
     }
   });
 
@@ -20212,6 +17731,133 @@
     }
   });
 
+  var PROP$1 = '$_bv_documentHandlers_'; // --- Mixin ---
+  // @vue/component
+
+  var listenOnDocumentMixin = Vue__default['default'].extend({
+    created: function created() {
+      var _this = this;
+
+      /* istanbul ignore next */
+      if (!IS_BROWSER) {
+        return;
+      } // Declare non-reactive property
+      // Object of arrays, keyed by event name,
+      // where value is an array of handlers
+      // Prop will be defined on client only
+
+
+      this[PROP$1] = {}; // Set up our beforeDestroy handler (client only)
+
+      this.$once(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
+        var items = _this[PROP$1] || {}; // Immediately delete this[PROP] to prevent the
+        // listenOn/Off methods from running (which may occur
+        // due to requestAnimationFrame/transition delays)
+
+        delete _this[PROP$1]; // Remove all registered event handlers
+
+        keys(items).forEach(function (eventName) {
+          var handlers = items[eventName] || [];
+          handlers.forEach(function (handler) {
+            return eventOff(document, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
+          });
+        });
+      });
+    },
+    methods: {
+      listenDocument: function listenDocument(on, eventName, handler) {
+        on ? this.listenOnDocument(eventName, handler) : this.listenOffDocument(eventName, handler);
+      },
+      listenOnDocument: function listenOnDocument(eventName, handler) {
+        if (this[PROP$1] && isString(eventName) && isFunction(handler)) {
+          this[PROP$1][eventName] = this[PROP$1][eventName] || [];
+
+          if (!arrayIncludes(this[PROP$1][eventName], handler)) {
+            this[PROP$1][eventName].push(handler);
+            eventOn(document, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
+          }
+        }
+      },
+      listenOffDocument: function listenOffDocument(eventName, handler) {
+        if (this[PROP$1] && isString(eventName) && isFunction(handler)) {
+          eventOff(document, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
+          this[PROP$1][eventName] = (this[PROP$1][eventName] || []).filter(function (h) {
+            return h !== handler;
+          });
+        }
+      }
+    }
+  });
+
+  var PROP$2 = '$_bv_windowHandlers_'; // --- Mixin ---
+  // @vue/component
+
+  var listenOnWindowMixin = Vue__default['default'].extend({
+    beforeCreate: function beforeCreate() {
+      // Declare non-reactive property
+      // Object of arrays, keyed by event name,
+      // where value is an array of handlers
+      this[PROP$2] = {};
+    },
+    beforeDestroy: function beforeDestroy() {
+      if (IS_BROWSER) {
+        var items = this[PROP$2]; // Immediately delete this[PROP] to prevent the
+        // listenOn/Off methods from running (which may occur
+        // due to requestAnimationFrame delays)
+
+        delete this[PROP$2]; // Remove all registered event handlers
+
+        keys(items).forEach(function (eventName) {
+          var handlers = items[eventName] || [];
+          handlers.forEach(function (handler) {
+            return eventOff(window, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
+          });
+        });
+      }
+    },
+    methods: {
+      listenWindow: function listenWindow(on, eventName, handler) {
+        on ? this.listenOnWindow(eventName, handler) : this.listenOffWindow(eventName, handler);
+      },
+      listenOnWindow: function listenOnWindow(eventName, handler) {
+        if (IS_BROWSER && this[PROP$2] && isString(eventName) && isFunction(handler)) {
+          this[PROP$2][eventName] = this[PROP$2][eventName] || [];
+
+          if (!arrayIncludes(this[PROP$2][eventName], handler)) {
+            this[PROP$2][eventName].push(handler);
+            eventOn(window, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
+          }
+        }
+      },
+      listenOffWindow: function listenOffWindow(eventName, handler) {
+        if (IS_BROWSER && this[PROP$2] && isString(eventName) && isFunction(handler)) {
+          eventOff(window, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
+          this[PROP$2][eventName] = (this[PROP$2][eventName] || []).filter(function (h) {
+            return h !== handler;
+          });
+        }
+      }
+    }
+  });
+
+  // This method returns a component's scoped style attribute name: `data-v-xxxxxxx`
+  // The `_scopeId` options property is added by vue-loader when using scoped styles
+  // and will be `undefined` if no scoped styles are in use
+  var getScopeId = function getScopeId(vm) {
+    var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    return vm ? vm.$options._scopeId || defaultValue : defaultValue;
+  };
+
+  var scopedStyleMixin = Vue__default['default'].extend({
+    computed: {
+      scopedStyleAttrs: function scopedStyleAttrs() {
+        var scopeId = getScopeId(this.$parent);
+        return scopeId ? _defineProperty({}, scopeId, '') : {};
+      }
+    }
+  });
+
+  // BVTransporter/BVTransporterTarget:
   //
   // Single root node portaling of content, which retains parent/child hierarchy
   // Unlike Portal-Vue where portaled content is no longer a descendent of its
@@ -20221,23 +17867,20 @@
   //
   // Based on vue-simple-portal
   // https://github.com/LinusBorg/vue-simple-portal
-  // Transporter target used by BTransporterSingle
+  // Transporter target used by BVTransporter
   // Supports only a single root element
   // @vue/component
 
-  var BTransporterTargetSingle = /*#__PURE__*/Vue__default['default'].extend({
+  var BVTransporterTarget = /*#__PURE__*/Vue__default['default'].extend({
     // As an abstract component, it doesn't appear in the $parent chain of
     // components, which means the next parent of any component rendered inside
     // of this one will be the parent from which is was portal'd
     abstract: true,
-    name: NAME_TRANSPORTER_TARGET_SINGLE,
+    name: NAME_TRANSPORTER_TARGET,
     props: {
-      nodes: {
-        // Even though we only support a single root element,
-        // VNodes are always passed as an array
-        type: [Array, Function] // default: undefined
-
-      }
+      // Even though we only support a single root element,
+      // VNodes are always passed as an array
+      nodes: makeProp(PROP_TYPE_ARRAY_FUNCTION)
     },
     data: function data(vm) {
       return {
@@ -20248,41 +17891,35 @@
       removeNode(this.$el);
     },
     render: function render(h) {
-      var nodes = isFunction(this.updatedNodes) ? this.updatedNodes({}) : this.updatedNodes;
-      nodes = concat(nodes).filter(Boolean);
-      /* istanbul ignore else */
+      var updatedNodes = this.updatedNodes;
+      var $nodes = isFunction(updatedNodes) ? updatedNodes({}) : updatedNodes;
+      $nodes = concat($nodes).filter(identity);
 
-      if (nodes && nodes.length > 0 && !nodes[0].text) {
-        return nodes[0];
-      } else {
-        /* istanbul ignore next */
-        return h();
+      if ($nodes && $nodes.length > 0 && !$nodes[0].text) {
+        return $nodes[0];
       }
+      /* istanbul ignore next */
+
+
+      return h();
     }
-  }); // This component has no root element, so only a single VNode is allowed
+  }); // --- Props ---
+
+  var props$1r = {
+    // String: CSS selector,
+    // HTMLElement: Element reference
+    // Mainly needed for tooltips/popovers inside modals
+    container: makeProp([HTMLElement, PROP_TYPE_STRING], 'body'),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    // This should be set to match the root element type
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  }; // --- Main component ---
   // @vue/component
 
-  var BTransporterSingle = /*#__PURE__*/Vue__default['default'].extend({
-    name: NAME_TRANSPORTER_SINGLE,
+  var BVTransporter = /*#__PURE__*/Vue__default['default'].extend({
+    name: NAME_TRANSPORTER,
     mixins: [normalizeSlotMixin],
-    props: {
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      container: {
-        // String: CSS selector,
-        // HTMLElement: Element reference
-        // Mainly needed for tooltips/popovers inside modals
-        type: [String, HTMLElement],
-        default: 'body'
-      },
-      tag: {
-        // This should be set to match the root element type
-        type: String,
-        default: 'div'
-      }
-    },
+    props: props$1r,
     watch: {
       disabled: {
         immediate: true,
@@ -20316,7 +17953,7 @@
       // Get the element which the target should be appended to
       getContainer: function getContainer() {
         /* istanbul ignore else */
-        if (isBrowser) {
+        if (IS_BROWSER) {
           var container = this.container;
           return isString(container) ? select(container) : container;
         } else {
@@ -20326,13 +17963,13 @@
       // Mount the target
       mountTarget: function mountTarget() {
         if (!this.$_target) {
-          var container = this.getContainer();
+          var $container = this.getContainer();
 
-          if (container) {
-            var el = document.createElement('div');
-            container.appendChild(el);
-            this.$_target = new BTransporterTargetSingle({
-              el: el,
+          if ($container) {
+            var $el = document.createElement('div');
+            $container.appendChild($el);
+            this.$_target = new BVTransporterTarget({
+              el: $el,
               parent: this,
               propsData: {
                 // Initial nodes to be rendered
@@ -20344,7 +17981,7 @@
       },
       // Update the content of the target
       updateTarget: function updateTarget() {
-        if (isBrowser && this.$_target) {
+        if (IS_BROWSER && this.$_target) {
           var defaultFn = this.$scopedSlots.default;
 
           if (!this.disabled) {
@@ -20371,11 +18008,12 @@
       }
     },
     render: function render(h) {
+      // This component has no root element, so only a single VNode is allowed
       if (this.disabled) {
-        var nodes = concat(this.normalizeSlot()).filter(identity);
+        var $nodes = concat(this.normalizeSlot()).filter(identity);
 
-        if (nodes.length > 0 && !nodes[0].text) {
-          return nodes[0];
+        if ($nodes.length > 0 && !$nodes[0].text) {
+          return $nodes[0];
         }
       }
 
@@ -20383,129 +18021,37 @@
     }
   });
 
-  var PROP$1 = '$_bv_documentHandlers_'; // @vue/component
+  var BvModalEvent = /*#__PURE__*/function (_BvEvent) {
+    _inherits(BvModalEvent, _BvEvent);
 
-  var listenOnDocumentMixin = {
-    created: function created() {
-      var _this = this;
+    var _super = _createSuper(BvModalEvent);
 
-      /* istanbul ignore next */
-      if (!isBrowser) {
-        return;
-      } // Declare non-reactive property
-      // Object of arrays, keyed by event name,
-      // where value is an array of handlers
-      // Prop will be defined on client only
+    function BvModalEvent(type) {
+      var _this;
 
+      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      this[PROP$1] = {}; // Set up our beforeDestroy handler (client only)
+      _classCallCheck(this, BvModalEvent);
 
-      this.$once('hook:beforeDestroy', function () {
-        var items = _this[PROP$1] || {}; // Immediately delete this[PROP] to prevent the
-        // listenOn/Off methods from running (which may occur
-        // due to requestAnimationFrame/transition delays)
+      _this = _super.call(this, type, eventInit); // Freeze our new props as readonly, but leave them enumerable
 
-        delete _this[PROP$1]; // Remove all registered event handlers
-
-        keys(items).forEach(function (evtName) {
-          var handlers = items[evtName] || [];
-          handlers.forEach(function (handler) {
-            return eventOff(document, evtName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          });
-        });
+      defineProperties(_assertThisInitialized(_this), {
+        trigger: readonlyDescriptor()
       });
-    },
-    methods: {
-      listenDocument: function listenDocument(on, evtName, handler) {
-        on ? this.listenOnDocument(evtName, handler) : this.listenOffDocument(evtName, handler);
-      },
-      listenOnDocument: function listenOnDocument(evtName, handler) {
-        if (this[PROP$1] && isString(evtName) && isFunction(handler)) {
-          this[PROP$1][evtName] = this[PROP$1][evtName] || [];
-
-          if (!arrayIncludes(this[PROP$1][evtName], handler)) {
-            this[PROP$1][evtName].push(handler);
-            eventOn(document, evtName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          }
-        }
-      },
-      listenOffDocument: function listenOffDocument(evtName, handler) {
-        if (this[PROP$1] && isString(evtName) && isFunction(handler)) {
-          eventOff(document, evtName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          this[PROP$1][evtName] = (this[PROP$1][evtName] || []).filter(function (h) {
-            return h !== handler;
-          });
-        }
-      }
+      return _this;
     }
-  };
 
-  var PROP$2 = '$_bv_windowHandlers_'; // @vue/component
-
-  var listenOnWindowMixin = {
-    beforeCreate: function beforeCreate() {
-      // Declare non-reactive property
-      // Object of arrays, keyed by event name,
-      // where value is an array of handlers
-      this[PROP$2] = {};
-    },
-    beforeDestroy: function beforeDestroy() {
-      if (isBrowser) {
-        var items = this[PROP$2]; // Immediately delete this[PROP] to prevent the
-        // listenOn/Off methods from running (which may occur
-        // due to requestAnimationFrame delays)
-
-        delete this[PROP$2]; // Remove all registered event handlers
-
-        keys(items).forEach(function (evtName) {
-          var handlers = items[evtName] || [];
-          handlers.forEach(function (handler) {
-            return eventOff(window, evtName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          });
+    _createClass(BvModalEvent, null, [{
+      key: "Defaults",
+      get: function get() {
+        return _objectSpread2(_objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this)), {}, {
+          trigger: null
         });
       }
-    },
-    methods: {
-      listenWindow: function listenWindow(on, evtName, handler) {
-        on ? this.listenOnWindow(evtName, handler) : this.listenOffWindow(evtName, handler);
-      },
-      listenOnWindow: function listenOnWindow(evtName, handler) {
-        if (isBrowser && this[PROP$2] && isString(evtName) && isFunction(handler)) {
-          this[PROP$2][evtName] = this[PROP$2][evtName] || [];
+    }]);
 
-          if (!arrayIncludes(this[PROP$2][evtName], handler)) {
-            this[PROP$2][evtName].push(handler);
-            eventOn(window, evtName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          }
-        }
-      },
-      listenOffWindow: function listenOffWindow(evtName, handler) {
-        if (isBrowser && this[PROP$2] && isString(evtName) && isFunction(handler)) {
-          eventOff(window, evtName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          this[PROP$2][evtName] = (this[PROP$2][evtName] || []).filter(function (h) {
-            return h !== handler;
-          });
-        }
-      }
-    }
-  };
-
-  // This method returns a component's scoped style attribute name: `data-v-xxxxxxx`
-  // The `_scopeId` options property is added by vue-loader when using scoped styles
-  // and will be `undefined` if no scoped styles are in use
-  var getScopeId = function getScopeId(vm) {
-    var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    return vm ? vm.$options._scopeId || defaultValue : defaultValue;
-  };
-
-  var scopedStyleAttrsMixin = {
-    computed: {
-      scopedStyleAttrs: function scopedStyleAttrs() {
-        var scopeId = getScopeId(this.$parent);
-        return scopeId ? _defineProperty({}, scopeId, '') : {};
-      }
-    }
-  };
+    return BvModalEvent;
+  }(BvEvent); // Named exports
 
   /**
    * Private ModalManager helper
@@ -20515,11 +18061,10 @@
 
   var DEFAULT_ZINDEX = 1040; // Selectors for padding/margin adjustments
 
-  var Selector = {
-    FIXED_CONTENT: '.fixed-top, .fixed-bottom, .is-fixed, .sticky-top',
-    STICKY_CONTENT: '.sticky-top',
-    NAVBAR_TOGGLER: '.navbar-toggler'
-  }; // @vue/component
+  var SELECTOR_FIXED_CONTENT = '.fixed-top, .fixed-bottom, .is-fixed, .sticky-top';
+  var SELECTOR_STICKY_CONTENT = '.sticky-top';
+  var SELECTOR_NAVBAR_TOGGLER = '.navbar-toggler'; // --- Main component ---
+  // @vue/component
 
   var ModalManager = /*#__PURE__*/Vue__default['default'].extend({
     data: function data() {
@@ -20540,7 +18085,7 @@
     },
     watch: {
       modalCount: function modalCount(newCount, oldCount) {
-        if (isBrowser) {
+        if (IS_BROWSER) {
           this.getScrollbarWidth();
 
           if (newCount > 0 && oldCount === 0) {
@@ -20557,12 +18102,12 @@
           setAttr(document.body, 'data-modal-open-count', String(newCount));
         }
       },
-      modals: function modals(newVal) {
+      modals: function modals(newValue) {
         var _this = this;
 
         this.checkScrollbar();
         requestAF(function () {
-          _this.updateModals(newVal || []);
+          _this.updateModals(newValue || []);
         });
       }
     },
@@ -20575,7 +18120,7 @@
         if (modal && this.modals.indexOf(modal) === -1) {
           // Add modal to modals array
           this.modals.push(modal);
-          modal.$once('hook:beforeDestroy', function () {
+          modal.$once(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
             _this2.unregisterModal(modal);
           });
         }
@@ -20593,7 +18138,7 @@
         }
       },
       getBaseZIndex: function getBaseZIndex() {
-        if (isNull(this.baseZIndex) && isBrowser) {
+        if (isNull(this.baseZIndex) && IS_BROWSER) {
           // Create a temporary `div.modal-backdrop` to get computed z-index
           var div = document.createElement('div');
           addClass(div, 'modal-backdrop');
@@ -20607,7 +18152,7 @@
         return this.baseZIndex || DEFAULT_ZINDEX;
       },
       getScrollbarWidth: function getScrollbarWidth() {
-        if (isNull(this.scrollbarWidth) && isBrowser) {
+        if (isNull(this.scrollbarWidth) && IS_BROWSER) {
           // Create a temporary `div.measure-scrollbar` to get computed z-index
           var div = document.createElement('div');
           addClass(div, 'modal-scrollbar-measure');
@@ -20660,7 +18205,7 @@
 
           /* istanbul ignore next: difficult to test in JSDOM */
 
-          selectAll(Selector.FIXED_CONTENT).forEach(function (el) {
+          selectAll(SELECTOR_FIXED_CONTENT).forEach(function (el) {
             var actualPadding = getStyle(el, 'paddingRight') || '';
             setAttr(el, 'data-padding-right', actualPadding);
             setStyle(el, 'paddingRight', "".concat(toFloat(getCS(el).paddingRight, 0) + scrollbarWidth, "px"));
@@ -20670,7 +18215,7 @@
 
           /* istanbul ignore next: difficult to test in JSDOM */
 
-          selectAll(Selector.STICKY_CONTENT).forEach(function (el)
+          selectAll(SELECTOR_STICKY_CONTENT).forEach(function (el)
           /* istanbul ignore next */
           {
             var actualMargin = getStyle(el, 'marginRight') || '';
@@ -20682,7 +18227,7 @@
 
           /* istanbul ignore next: difficult to test in JSDOM */
 
-          selectAll(Selector.NAVBAR_TOGGLER).forEach(function (el)
+          selectAll(SELECTOR_NAVBAR_TOGGLER).forEach(function (el)
           /* istanbul ignore next */
           {
             var actualMargin = getStyle(el, 'marginRight') || '';
@@ -20735,39 +18280,25 @@
 
   var modalManager = new ModalManager();
 
-  var BvModalEvent = /*#__PURE__*/function (_BvEvent) {
-    _inherits(BvModalEvent, _BvEvent);
+  var _makeModelMixin$f = makeModelMixin('visible', {
+    type: PROP_TYPE_BOOLEAN,
+    defaultValue: false,
+    event: EVENT_NAME_CHANGE
+  }),
+      modelMixin$e = _makeModelMixin$f.mixin,
+      modelProps$e = _makeModelMixin$f.props,
+      MODEL_PROP_NAME$e = _makeModelMixin$f.prop,
+      MODEL_EVENT_NAME$e = _makeModelMixin$f.event;
 
-    var _super = _createSuper(BvModalEvent);
+  var TRIGGER_BACKDROP = 'backdrop';
+  var TRIGGER_ESC = 'esc';
+  var TRIGGER_FORCE = 'FORCE';
+  var TRIGGER_TOGGLE = 'toggle';
+  var BUTTON_CANCEL = 'cancel'; // TODO: This should be renamed to 'close'
 
-    function BvModalEvent(type) {
-      var _this;
-
-      var eventInit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      _classCallCheck(this, BvModalEvent);
-
-      _this = _super.call(this, type, eventInit); // Freeze our new props as readonly, but leave them enumerable
-
-      defineProperties(_assertThisInitialized(_this), {
-        trigger: readonlyDescriptor()
-      });
-      return _this;
-    }
-
-    _createClass(BvModalEvent, null, [{
-      key: "Defaults",
-      get: function get() {
-        return _objectSpread2(_objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this)), {}, {
-          trigger: null
-        });
-      }
-    }]);
-
-    return BvModalEvent;
-  }(BvEvent); // Named exports
-
-  // ObserveDom config to detect changes in modal content
+  var BUTTON_CLOSE = 'headerclose';
+  var BUTTON_OK = 'ok';
+  var BUTTONS = [BUTTON_CANCEL, BUTTON_CLOSE, BUTTON_OK]; // `ObserveDom` config to detect changes in modal content
   // so that we can adjust the modal padding if needed
 
   var OBSERVER_CONFIG = {
@@ -20778,268 +18309,75 @@
     attributeFilter: ['style', 'class']
   }; // --- Props ---
 
-  var props$J = {
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'size');
-      }
-    },
-    centered: {
-      type: Boolean,
-      default: false
-    },
-    scrollable: {
-      type: Boolean,
-      default: false
-    },
-    buttonSize: {
-      type: String // default: ''
-
-    },
-    noStacking: {
-      type: Boolean,
-      default: false
-    },
-    noFade: {
-      type: Boolean,
-      default: false
-    },
-    noCloseOnBackdrop: {
-      type: Boolean,
-      default: false
-    },
-    noCloseOnEsc: {
-      type: Boolean,
-      default: false
-    },
-    noEnforceFocus: {
-      type: Boolean,
-      default: false
-    },
-    ignoreEnforceFocusSelector: {
-      type: [Array, String],
-      default: ''
-    },
-    title: {
-      type: String,
-      default: ''
-    },
-    titleHtml: {
-      type: String
-    },
-    titleTag: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'titleTag');
-      }
-    },
-    titleClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    titleSrOnly: {
-      type: Boolean,
-      default: false
-    },
-    ariaLabel: {
-      type: String // default: null
-
-    },
-    headerBgVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'headerBgVariant');
-      }
-    },
-    headerBorderVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'headerBorderVariant');
-      }
-    },
-    headerTextVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'headerTextVariant');
-      }
-    },
-    headerCloseVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'headerCloseVariant');
-      }
-    },
-    headerClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    bodyBgVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'bodyBgVariant');
-      }
-    },
-    bodyTextVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'bodyTextVariant');
-      }
-    },
-    modalClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    dialogClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    contentClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    bodyClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    footerBgVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'footerBgVariant');
-      }
-    },
-    footerBorderVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'footerBorderVariant');
-      }
-    },
-    footerTextVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'footerTextVariant');
-      }
-    },
-    footerClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    // TODO: Rename to `noHeader` and deprecate `hideHeader`
-    hideHeader: {
-      type: Boolean,
-      default: false
-    },
-    // TODO: Rename to `noFooter` and deprecate `hideFooter`
-    hideFooter: {
-      type: Boolean,
-      default: false
-    },
-    // TODO: Rename to `noHeaderClose` and deprecate `hideHeaderClose`
-    hideHeaderClose: {
-      type: Boolean,
-      default: false
-    },
+  var props$1s = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$e), {}, {
+    ariaLabel: makeProp(PROP_TYPE_STRING),
+    autoFocusButton: makeProp(PROP_TYPE_STRING, null,
+    /* istanbul ignore next */
+    function (value) {
+      return isUndefinedOrNull(value) || arrayIncludes(BUTTONS, value);
+    }),
+    bodyBgVariant: makeProp(PROP_TYPE_STRING),
+    bodyClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    bodyTextVariant: makeProp(PROP_TYPE_STRING),
+    busy: makeProp(PROP_TYPE_BOOLEAN, false),
+    buttonSize: makeProp(PROP_TYPE_STRING),
+    cancelDisabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    cancelTitle: makeProp(PROP_TYPE_STRING, 'Cancel'),
+    cancelTitleHtml: makeProp(PROP_TYPE_STRING),
+    cancelVariant: makeProp(PROP_TYPE_STRING, 'secondary'),
+    centered: makeProp(PROP_TYPE_BOOLEAN, false),
+    contentClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    dialogClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    footerBgVariant: makeProp(PROP_TYPE_STRING),
+    footerBorderVariant: makeProp(PROP_TYPE_STRING),
+    footerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    footerTextVariant: makeProp(PROP_TYPE_STRING),
+    headerBgVariant: makeProp(PROP_TYPE_STRING),
+    headerBorderVariant: makeProp(PROP_TYPE_STRING),
+    headerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    headerCloseContent: makeProp(PROP_TYPE_STRING, '&times;'),
+    headerCloseLabel: makeProp(PROP_TYPE_STRING, 'Close'),
+    headerCloseVariant: makeProp(PROP_TYPE_STRING),
+    headerTextVariant: makeProp(PROP_TYPE_STRING),
     // TODO: Rename to `noBackdrop` and deprecate `hideBackdrop`
-    hideBackdrop: {
-      type: Boolean,
-      default: false
-    },
-    okOnly: {
-      type: Boolean,
-      default: false
-    },
-    okDisabled: {
-      type: Boolean,
-      default: false
-    },
-    cancelDisabled: {
-      type: Boolean,
-      default: false
-    },
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    returnFocus: {
-      // HTML Element, CSS selector string or Vue component instance
-      type: [HTMLElement, String, Object],
-      default: null
-    },
-    headerCloseContent: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'headerCloseContent');
-      }
-    },
-    headerCloseLabel: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'headerCloseLabel');
-      }
-    },
-    cancelTitle: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'cancelTitle');
-      }
-    },
-    cancelTitleHtml: {
-      type: String
-    },
-    okTitle: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'okTitle');
-      }
-    },
-    okTitleHtml: {
-      type: String
-    },
-    cancelVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'cancelVariant');
-      }
-    },
-    okVariant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_MODAL, 'okVariant');
-      }
-    },
-    lazy: {
-      type: Boolean,
-      default: false
-    },
-    busy: {
-      type: Boolean,
-      default: false
-    },
-    static: {
-      type: Boolean,
-      default: false
-    },
-    autoFocusButton: {
-      type: String,
-      default: null,
-      validator
-      /* istanbul ignore next */
-      : function validator(val) {
-        /* istanbul ignore next */
-        return isUndefinedOrNull(val) || arrayIncludes(['ok', 'cancel', 'close'], val);
-      }
-    }
-  }; // @vue/component
+    hideBackdrop: makeProp(PROP_TYPE_BOOLEAN, false),
+    // TODO: Rename to `noFooter` and deprecate `hideFooter`
+    hideFooter: makeProp(PROP_TYPE_BOOLEAN, false),
+    // TODO: Rename to `noHeader` and deprecate `hideHeader`
+    hideHeader: makeProp(PROP_TYPE_BOOLEAN, false),
+    // TODO: Rename to `noHeaderClose` and deprecate `hideHeaderClose`
+    hideHeaderClose: makeProp(PROP_TYPE_BOOLEAN, false),
+    ignoreEnforceFocusSelector: makeProp(PROP_TYPE_ARRAY_STRING),
+    lazy: makeProp(PROP_TYPE_BOOLEAN, false),
+    modalClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    noCloseOnBackdrop: makeProp(PROP_TYPE_BOOLEAN, false),
+    noCloseOnEsc: makeProp(PROP_TYPE_BOOLEAN, false),
+    noEnforceFocus: makeProp(PROP_TYPE_BOOLEAN, false),
+    noFade: makeProp(PROP_TYPE_BOOLEAN, false),
+    noStacking: makeProp(PROP_TYPE_BOOLEAN, false),
+    okDisabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    okOnly: makeProp(PROP_TYPE_BOOLEAN, false),
+    okTitle: makeProp(PROP_TYPE_STRING, 'OK'),
+    okTitleHtml: makeProp(PROP_TYPE_STRING),
+    okVariant: makeProp(PROP_TYPE_STRING, 'primary'),
+    // HTML Element, CSS selector string or Vue component instance
+    returnFocus: makeProp([HTMLElement, PROP_TYPE_OBJECT, PROP_TYPE_STRING]),
+    scrollable: makeProp(PROP_TYPE_BOOLEAN, false),
+    size: makeProp(PROP_TYPE_STRING, 'md'),
+    static: makeProp(PROP_TYPE_BOOLEAN, false),
+    title: makeProp(PROP_TYPE_STRING),
+    titleClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    titleHtml: makeProp(PROP_TYPE_STRING),
+    titleSrOnly: makeProp(PROP_TYPE_BOOLEAN, false),
+    titleTag: makeProp(PROP_TYPE_STRING, 'h5')
+  })), NAME_MODAL); // --- Main component ---
+  // @vue/component
 
   var BModal = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_MODAL,
-    mixins: [attrsMixin, idMixin, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$e, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleMixin],
     inheritAttrs: false,
-    model: {
-      prop: 'visible',
-      event: 'change'
-    },
-    props: props$J,
+    props: props$1s,
     data: function data() {
       return {
         isHidden: true,
@@ -21059,7 +18397,6 @@
         ignoreBackdropClick: false,
         // Used to signify if click out listener should ignore the click
         isModalOverflowing: false,
-        return_focus: this.returnFocus || null,
         // The following items are controlled by the modalManager instance
         scrollbarWidth: 0,
         zIndex: modalManager.getBaseZIndex(),
@@ -21142,10 +18479,10 @@
       },
       slotScope: function slotScope() {
         return {
-          ok: this.onOk,
           cancel: this.onCancel,
           close: this.onClose,
           hide: this.hide,
+          ok: this.onOk,
           visible: this.isVisible
         };
       },
@@ -21171,35 +18508,34 @@
           'aria-modal': isVisible ? 'true' : null,
           'aria-label': ariaLabel,
           'aria-labelledby': this.hideHeader || ariaLabel || // TODO: Rename slot to `title` and deprecate `modal-title`
-          !(this.hasNormalizedSlot('modal-title') || this.titleHtml || this.title) ? null : this.modalTitleId,
+          !(this.hasNormalizedSlot(SLOT_NAME_MODAL_TITLE) || this.titleHtml || this.title) ? null : this.modalTitleId,
           'aria-describedby': this.modalBodyId
         };
       }
     },
-    watch: {
-      visible: function visible(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this[newVal ? 'show' : 'hide']();
-        }
+    watch: _defineProperty({}, MODEL_PROP_NAME$e, function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this[newValue ? 'show' : 'hide']();
       }
-    },
+    }),
     created: function created() {
       // Define non-reactive properties
       this.$_observer = null;
+      this.$_returnFocus = this.returnFocus || null;
     },
     mounted: function mounted() {
       // Set initial z-index as queried from the DOM
       this.zIndex = modalManager.getBaseZIndex(); // Listen for events from others to either open or close ourselves
       // and listen to all modals to enable/disable enforce focus
 
-      this.listenOnRoot('bv::show::modal', this.showHandler);
-      this.listenOnRoot('bv::hide::modal', this.hideHandler);
-      this.listenOnRoot('bv::toggle::modal', this.toggleHandler); // Listen for `bv:modal::show events`, and close ourselves if the
+      this.listenOnRoot(getRootActionEventName(NAME_MODAL, EVENT_NAME_SHOW), this.showHandler);
+      this.listenOnRoot(getRootActionEventName(NAME_MODAL, EVENT_NAME_HIDE), this.hideHandler);
+      this.listenOnRoot(getRootActionEventName(NAME_MODAL, EVENT_NAME_TOGGLE), this.toggleHandler); // Listen for `bv:modal::show events`, and close ourselves if the
       // opening modal not us
 
-      this.listenOnRoot('bv::modal::show', this.modalListener); // Initially show modal?
+      this.listenOnRoot(getRootEventName(NAME_MODAL, EVENT_NAME_SHOW), this.modalListener); // Initially show modal?
 
-      if (this.visible === true) {
+      if (this[MODEL_PROP_NAME$e] === true) {
         this.$nextTick(this.show);
       }
     },
@@ -21224,9 +18560,9 @@
         }
       },
       // Private method to update the v-model
-      updateModel: function updateModel(val) {
-        if (val !== this.visible) {
-          this.$emit('change', val);
+      updateModel: function updateModel(value) {
+        if (value !== this[MODEL_PROP_NAME$e]) {
+          this.$emit(MODEL_EVENT_NAME$e, value);
         }
       },
       // Private method to create a BvModalEvent object
@@ -21259,7 +18595,7 @@
           // If we are in the process of closing, wait until hidden before re-opening
 
           /* istanbul ignore next */
-          this.$once('hidden', this.show);
+          this.$once(EVENT_NAME_HIDDEN, this.show);
           /* istanbul ignore next */
 
           return;
@@ -21267,8 +18603,8 @@
 
         this.isOpening = true; // Set the element to return focus to when closed
 
-        this.return_focus = this.return_focus || this.getActiveElement();
-        var showEvt = this.buildEvent('show', {
+        this.$_returnFocus = this.$_returnFocus || this.getActiveElement();
+        var showEvt = this.buildEvent(EVENT_NAME_SHOW, {
           cancelable: true
         });
         this.emitEvent(showEvt); // Don't show if canceled
@@ -21293,17 +18629,17 @@
         }
 
         this.isClosing = true;
-        var hideEvt = this.buildEvent('hide', {
-          cancelable: trigger !== 'FORCE',
+        var hideEvt = this.buildEvent(EVENT_NAME_HIDE, {
+          cancelable: trigger !== TRIGGER_FORCE,
           trigger: trigger || null
         }); // We emit specific event for one of the three built-in buttons
 
-        if (trigger === 'ok') {
-          this.$emit('ok', hideEvt);
-        } else if (trigger === 'cancel') {
-          this.$emit('cancel', hideEvt);
-        } else if (trigger === 'headerclose') {
-          this.$emit('close', hideEvt);
+        if (trigger === BUTTON_OK) {
+          this.$emit(EVENT_NAME_OK, hideEvt);
+        } else if (trigger === BUTTON_CANCEL) {
+          this.$emit(EVENT_NAME_CANCEL, hideEvt);
+        } else if (trigger === BUTTON_CLOSE) {
+          this.$emit(EVENT_NAME_CLOSE, hideEvt);
         }
 
         this.emitEvent(hideEvt); // Hide if not canceled
@@ -21325,11 +18661,11 @@
       // Public method to toggle modal visibility
       toggle: function toggle(triggerEl) {
         if (triggerEl) {
-          this.return_focus = triggerEl;
+          this.$_returnFocus = triggerEl;
         }
 
         if (this.isVisible) {
-          this.hide('toggle');
+          this.hide(TRIGGER_TOGGLE);
         } else {
           this.show();
         }
@@ -21338,7 +18674,7 @@
       getActiveElement: function getActiveElement$1() {
         // Returning focus to `document.body` may cause unwanted scrolls,
         // so we exclude setting focus on body
-        var activeElement = getActiveElement(isBrowser ? [document.body] : []); // Preset the fallback return focus value if it is not set
+        var activeElement = getActiveElement(IS_BROWSER ? [document.body] : []); // Preset the fallback return focus value if it is not set
         // `document.activeElement` should be the trigger element that was clicked or
         // in the case of using the v-model, which ever element has current focus
         // Will be overridden by some commands such as toggle, etc.
@@ -21356,7 +18692,7 @@
         /* istanbul ignore next: commenting out for now until we can test stacking */
         if (modalManager.modalsAreOpen && this.noStacking) {
           // If another modal(s) is already open, wait for it(them) to close
-          this.listenOnRootOnce('bv::modal::hidden', this.doShow);
+          this.listenOnRootOnce(getRootEventName(NAME_MODAL, EVENT_NAME_HIDDEN), this.doShow);
           return;
         }
 
@@ -21406,7 +18742,7 @@
         // when trying to pre-focus an element
 
         requestAF(function () {
-          _this3.emitEvent(_this3.buildEvent('shown'));
+          _this3.emitEvent(_this3.buildEvent(EVENT_NAME_SHOWN));
 
           _this3.setEnforceFocus(true);
 
@@ -21441,16 +18777,15 @@
           //       to the `hidden` event, not just only the `hide` event
 
 
-          _this4.emitEvent(_this4.buildEvent('hidden'));
+          _this4.emitEvent(_this4.buildEvent(EVENT_NAME_HIDDEN));
         });
       },
-      // Event emitter
-      emitEvent: function emitEvent(bvModalEvt) {
-        var type = bvModalEvt.type; // We emit on root first incase a global listener wants to cancel
+      emitEvent: function emitEvent(bvEvent) {
+        var type = bvEvent.type; // We emit on `$root` first in case a global listener wants to cancel
         // the event first before the instance emits its event
 
-        this.emitOnRoot("bv::modal::".concat(type), bvModalEvt, bvModalEvt.componentId);
-        this.$emit(type, bvModalEvt);
+        this.emitOnRoot(getRootEventName(NAME_MODAL, type), bvEvent, bvEvent.componentId);
+        this.$emit(type, bvEvent);
       },
       // UI event handlers
       onDialogMousedown: function onDialogMousedown() {
@@ -21460,17 +18795,17 @@
         // And if it does, cancel the clickOut handler
         var modal = this.$refs.modal;
 
-        var onceModalMouseup = function onceModalMouseup(evt) {
+        var onceModalMouseup = function onceModalMouseup(event) {
           eventOff(modal, 'mouseup', onceModalMouseup, EVENT_OPTIONS_NO_CAPTURE);
 
-          if (evt.target === modal) {
+          if (event.target === modal) {
             _this5.ignoreBackdropClick = true;
           }
         };
 
         eventOn(modal, 'mouseup', onceModalMouseup, EVENT_OPTIONS_NO_CAPTURE);
       },
-      onClickOut: function onClickOut(evt) {
+      onClickOut: function onClickOut(event) {
         if (this.ignoreBackdropClick) {
           // Click was initiated inside the modal content, but finished outside.
           // Set by the above onDialogMousedown handler
@@ -21480,44 +18815,43 @@
         // that generated click event is no longer in document body
 
 
-        if (!this.isVisible || this.noCloseOnBackdrop || !contains(document.body, evt.target)) {
+        if (!this.isVisible || this.noCloseOnBackdrop || !contains(document.body, event.target)) {
           return;
         } // If backdrop clicked, hide modal
 
 
-        if (!contains(this.$refs.content, evt.target)) {
-          this.hide('backdrop');
+        if (!contains(this.$refs.content, event.target)) {
+          this.hide(TRIGGER_BACKDROP);
         }
       },
       onOk: function onOk() {
-        this.hide('ok');
+        this.hide(BUTTON_OK);
       },
       onCancel: function onCancel() {
-        this.hide('cancel');
+        this.hide(BUTTON_CANCEL);
       },
       onClose: function onClose() {
-        this.hide('headerclose');
+        this.hide(BUTTON_CLOSE);
       },
-      onEsc: function onEsc(evt) {
+      onEsc: function onEsc(event) {
         // If ESC pressed, hide modal
-        if (evt.keyCode === CODE_ESC && this.isVisible && !this.noCloseOnEsc) {
-          this.hide('esc');
+        if (event.keyCode === CODE_ESC && this.isVisible && !this.noCloseOnEsc) {
+          this.hide(TRIGGER_ESC);
         }
       },
       // Document focusin listener
-      focusHandler: function focusHandler(evt) {
+      focusHandler: function focusHandler(event) {
         // If focus leaves modal content, bring it back
         var content = this.$refs.content;
-        var target = evt.target;
+        var target = event.target;
 
         if (this.noEnforceFocus || !this.isTop || !this.isVisible || !content || document === target || contains(content, target) || this.computeIgnoreEnforceFocusSelector && closest(this.computeIgnoreEnforceFocusSelector, target, true)) {
           return;
         }
 
         var tabables = getTabables(this.$refs.content);
-        var _this$$refs = this.$refs,
-            bottomTrap = _this$$refs.bottomTrap,
-            topTrap = _this$$refs.topTrap;
+        var bottomTrap = this.$refs['bottom-trap'];
+        var topTrap = this.$refs['top-trap'];
 
         if (bottomTrap && target === bottomTrap) {
           // If user pressed TAB out of modal into our bottom trab trap element
@@ -21552,7 +18886,7 @@
       // Root listener handlers
       showHandler: function showHandler(id, triggerEl) {
         if (id === this.modalId) {
-          this.return_focus = triggerEl || this.getActiveElement();
+          this.$_returnFocus = triggerEl || this.getActiveElement();
           this.show();
         }
       },
@@ -21566,9 +18900,9 @@
           this.toggle(triggerEl);
         }
       },
-      modalListener: function modalListener(bvEvt) {
+      modalListener: function modalListener(bvEvent) {
         // If another modal opens, close this one if stacking not permitted
-        if (this.noStacking && bvEvt.vueTarget !== this) {
+        if (this.noStacking && bvEvent.vueTarget !== this) {
           this.hide();
         }
       },
@@ -21577,7 +18911,7 @@
         var _this6 = this;
 
         // Don't try and focus if we are SSR
-        if (isBrowser) {
+        if (IS_BROWSER) {
           requestAF(function () {
             var modal = _this6.$refs.modal;
             var content = _this6.$refs.content;
@@ -21593,7 +18927,7 @@
               var autoFocus = _this6.autoFocusButton;
               /* istanbul ignore next */
 
-              var el = autoFocus === 'ok' && ok ? ok.$el || ok : autoFocus === 'cancel' && cancel ? cancel.$el || cancel : autoFocus === 'close' && close ? close.$el || close : content; // Focus the element
+              var el = autoFocus === BUTTON_OK && ok ? ok.$el || ok : autoFocus === BUTTON_CANCEL && cancel ? cancel.$el || cancel : autoFocus === BUTTON_CLOSE && close ? close.$el || close : content; // Focus the element
 
               attemptFocus(el);
 
@@ -21610,8 +18944,8 @@
       returnFocusTo: function returnFocusTo() {
         // Prefer `returnFocus` prop over event specified
         // `return_focus` value
-        var el = this.returnFocus || this.return_focus || null;
-        this.return_focus = null;
+        var el = this.returnFocus || this.$_returnFocus || null;
+        this.$_returnFocus = null;
         this.$nextTick(function () {
           // Is el a string CSS selector?
           el = isString(el) ? select(el) : el;
@@ -21635,7 +18969,7 @@
 
         if (!this.hideHeader) {
           // TODO: Rename slot to `header` and deprecate `modal-header`
-          var $modalHeader = this.normalizeSlot('modal-header', this.slotScope);
+          var $modalHeader = this.normalizeSlot(SLOT_NAME_MODAL_HEADER, this.slotScope);
 
           if (!$modalHeader) {
             var $closeButton = h();
@@ -21653,7 +18987,7 @@
                 },
                 ref: 'close-button'
               }, // TODO: Rename slot to `header-close` and deprecate `modal-header-close`
-              [this.normalizeSlot('modal-header-close')]);
+              [this.normalizeSlot(SLOT_NAME_MODAL_HEADER_CLOSE)]);
             }
 
             $modalHeader = [h(this.titleTag, {
@@ -21663,9 +18997,9 @@
                 id: this.modalTitleId
               },
               // TODO: Rename slot to `title` and deprecate `modal-title`
-              domProps: this.hasNormalizedSlot('modal-title') ? {} : htmlOrText(this.titleHtml, this.title)
+              domProps: this.hasNormalizedSlot(SLOT_NAME_MODAL_TITLE) ? {} : htmlOrText(this.titleHtml, this.title)
             }, // TODO: Rename slot to `title` and deprecate `modal-title`
-            this.normalizeSlot('modal-title', this.slotScope)), $closeButton];
+            this.normalizeSlot(SLOT_NAME_MODAL_TITLE, this.slotScope)), $closeButton];
           }
 
           $header = h('header', {
@@ -21692,7 +19026,7 @@
 
         if (!this.hideFooter) {
           // TODO: Rename slot to `footer` and deprecate `modal-footer`
-          var $modalFooter = this.normalizeSlot('modal-footer', this.slotScope);
+          var $modalFooter = this.normalizeSlot(SLOT_NAME_MODAL_FOOTER, this.slotScope);
 
           if (!$modalFooter) {
             var $cancelButton = h();
@@ -21705,13 +19039,13 @@
                   disabled: this.cancelDisabled || this.busy || this.isTransitioning
                 },
                 // TODO: Rename slot to `cancel-button` and deprecate `modal-cancel`
-                domProps: this.hasNormalizedSlot('modal-cancel') ? {} : htmlOrText(this.cancelTitleHtml, this.cancelTitle),
+                domProps: this.hasNormalizedSlot(SLOT_NAME_MODAL_CANCEL) ? {} : htmlOrText(this.cancelTitleHtml, this.cancelTitle),
                 on: {
                   click: this.onCancel
                 },
                 ref: 'cancel-button'
               }, // TODO: Rename slot to `cancel-button` and deprecate `modal-cancel`
-              this.normalizeSlot('modal-cancel'));
+              this.normalizeSlot(SLOT_NAME_MODAL_CANCEL));
             }
 
             var $okButton = h(BButton, {
@@ -21721,13 +19055,13 @@
                 disabled: this.okDisabled || this.busy || this.isTransitioning
               },
               // TODO: Rename slot to `ok-button` and deprecate `modal-ok`
-              domProps: this.hasNormalizedSlot('modal-ok') ? {} : htmlOrText(this.okTitleHtml, this.okTitle),
+              domProps: this.hasNormalizedSlot(SLOT_NAME_MODAL_OK) ? {} : htmlOrText(this.okTitleHtml, this.okTitle),
               on: {
                 click: this.onOk
               },
               ref: 'ok-button'
             }, // TODO: Rename slot to `ok-button` and deprecate `modal-ok`
-            this.normalizeSlot('modal-ok'));
+            this.normalizeSlot(SLOT_NAME_MODAL_OK));
             $modalFooter = [$cancelButton, $okButton];
           }
 
@@ -21758,16 +19092,16 @@
 
         if (this.isVisible && !this.noEnforceFocus) {
           $tabTrapTop = h('span', {
-            ref: 'topTrap',
             attrs: {
               tabindex: '0'
-            }
+            },
+            ref: 'top-trap'
           });
           $tabTrapBottom = h('span', {
-            ref: 'bottomTrap',
             attrs: {
               tabindex: '0'
-            }
+            },
+            ref: 'bottom-trap'
           });
         } // Modal dialog wrapper
 
@@ -21828,7 +19162,7 @@
               id: this.modalBackdropId
             }
           }, // TODO: Rename slot to `backdrop` and deprecate `modal-backdrop`
-          this.normalizeSlot('modal-backdrop'));
+          this.normalizeSlot(SLOT_NAME_MODAL_BACKDROP));
         }
 
         $backdrop = h(BVTransition, {
@@ -21840,7 +19174,7 @@
         return h('div', {
           style: this.modalOuterStyle,
           attrs: this.computedAttrs,
-          key: "modal-outer-".concat(this._uid)
+          key: "modal-outer-".concat(this[COMPONENT_UID_KEY])
         }, [$modal, $backdrop]);
       }
     },
@@ -21848,12 +19182,12 @@
       if (this.static) {
         return this.lazy && this.isHidden ? h() : this.makeModal(h);
       } else {
-        return this.isHidden ? h() : h(BTransporterSingle, [this.makeModal(h)]);
+        return this.isHidden ? h() : h(BVTransporter, [this.makeModal(h)]);
       }
     }
   });
 
-  var EVENT_SHOW = 'bv::show::modal'; // Prop name we use to store info on root element
+  var ROOT_ACTION_EVENT_NAME_SHOW = getRootActionEventName(NAME_MODAL, EVENT_NAME_SHOW); // Prop name we use to store info on root element
 
   var PROPERTY = '__bv_modal_directive__';
 
@@ -21892,16 +19226,16 @@
     var trigger = getTriggerElement(el);
 
     if (target && trigger) {
-      var handler = function handler(evt) {
+      var handler = function handler(event) {
         // `currentTarget` is the element with the listener on it
-        var currentTarget = evt.currentTarget;
+        var currentTarget = event.currentTarget;
 
         if (!isDisabled(currentTarget)) {
-          var type = evt.type;
-          var key = evt.keyCode; // Open modal only if trigger is not disabled
+          var type = event.type;
+          var key = event.keyCode; // Open modal only if trigger is not disabled
 
           if (type === 'click' || type === 'keydown' && (key === CODE_ENTER || key === CODE_SPACE)) {
-            vnode.context.$root.$emit(EVENT_SHOW, target, currentTarget);
+            vnode.context.$root.$emit(ROOT_ACTION_EVENT_NAME_SHOW, target, currentTarget);
           }
         }
       };
@@ -21968,13 +19302,13 @@
     unbind: unbind$1
   };
 
-  var PROP_NAME$2 = '$bvModal';
+  var PROP_NAME$1 = '$bvModal';
   var PROP_NAME_PRIV = '_bv__modal'; // Base modal props that are allowed
   // Some may be ignored or overridden on some message boxes
   // Prop ID is allowed, but really only should be used for testing
   // We need to add it in explicitly as it comes from the `idMixin`
 
-  var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$J, ['busy', 'lazy', 'noStacking', "static", 'visible'])))); // Fallback event resolver (returns undefined)
+  var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$1s, ['busy', 'lazy', 'noStacking', 'static', 'visible'])))); // Fallback event resolver (returns undefined)
 
   var defaultResolver = function defaultResolver() {}; // Map prop names to modal slot names
 
@@ -21984,7 +19318,7 @@
     title: 'modal-title',
     okTitle: 'modal-ok',
     cancelTitle: 'modal-cancel'
-  }; // --- Utility methods ---
+  }; // --- Helper methods ---
   // Method to filter only recognized props that are not undefined
 
   var filterOptions = function filterOptions(options) {
@@ -22025,9 +19359,9 @@
         }; // Self destruct if parent destroyed
 
 
-        this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+        this.$parent.$once(HOOK_EVENT_NAME_DESTROYED, handleDestroy); // Self destruct after hidden
 
-        this.$once('hidden', handleDestroy); // Self destruct on route change
+        this.$once(EVENT_NAME_HIDDEN, handleDestroy); // Self destruct on route change
 
         /* istanbul ignore if */
 
@@ -22035,7 +19369,7 @@
           // Destroy ourselves if route changes
 
           /* istanbul ignore next */
-          this.$once('hook:beforeDestroy', this.$watch('$router', handleDestroy));
+          this.$once(HOOK_EVENT_NAME_BEFORE_DESTROY, this.$watch('$router', handleDestroy));
         } // Show the `BMsgBox`
 
 
@@ -22047,7 +19381,7 @@
     var asyncMsgBox = function asyncMsgBox($parent, props) {
       var resolver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : defaultResolver;
 
-      if (warnNotClient(PROP_NAME$2) || warnNoPromiseSupport(PROP_NAME$2)) {
+      if (warnNotClient(PROP_NAME$1) || warnNoPromiseSupport(PROP_NAME$1)) {
         /* istanbul ignore next */
         return;
       } // Create an instance of `BMsgBox` component
@@ -22059,7 +19393,7 @@
         // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
         parent: $parent,
         // Preset the prop values
-        propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions(getComponentConfig(NAME_MODAL) || {})), {}, {
+        propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions(getComponentConfig(NAME_MODAL))), {}, {
           // Defaults that user can override
           hideHeaderClose: true,
           hideHeader: !(props.title || props.titleHtml)
@@ -22083,13 +19417,13 @@
 
       return new Promise(function (resolve, reject) {
         var resolved = false;
-        msgBox.$once('hook:destroyed', function () {
+        msgBox.$once(HOOK_EVENT_NAME_DESTROYED, function () {
           if (!resolved) {
             /* istanbul ignore next */
             reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
           }
         });
-        msgBox.$on('hide', function (bvModalEvt) {
+        msgBox.$on(EVENT_NAME_HIDE, function (bvModalEvt) {
           if (!bvModalEvt.defaultPrevented) {
             var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
 
@@ -22110,9 +19444,9 @@
 
     var makeMsgBox = function makeMsgBox($parent, content) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-      var resolver = arguments.length > 3 ? arguments[3] : undefined;
+      var resolver = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-      if (!content || warnNoPromiseSupport(PROP_NAME$2) || warnNotClient(PROP_NAME$2) || !isFunction(resolver)) {
+      if (!content || warnNoPromiseSupport(PROP_NAME$1) || warnNotClient(PROP_NAME$1) || !isFunction(resolver)) {
         /* istanbul ignore next */
         return;
       }
@@ -22151,7 +19485,7 @@
               args[_key - 1] = arguments[_key];
             }
 
-            (_this$_root = this._root).$emit.apply(_this$_root, ['bv::show::modal', id].concat(args));
+            (_this$_root = this._root).$emit.apply(_this$_root, [getRootActionEventName(NAME_MODAL, 'show'), id].concat(args));
           }
         } // Hide modal with the specified ID args are for future use
 
@@ -22165,7 +19499,7 @@
               args[_key2 - 1] = arguments[_key2];
             }
 
-            (_this$_root2 = this._root).$emit.apply(_this$_root2, ['bv::hide::modal', id].concat(args));
+            (_this$_root2 = this._root).$emit.apply(_this$_root2, [getRootActionEventName(NAME_MODAL, 'hide'), id].concat(args));
           }
         } // The following methods require Promise support!
         // IE 11 and others do not support Promise natively, so users
@@ -22227,12 +19561,12 @@
     }); // Define our read-only `$bvModal` instance property
     // Placed in an if just in case in HMR mode
 
-    if (!hasOwnProperty(Vue.prototype, PROP_NAME$2)) {
-      defineProperty(Vue.prototype, PROP_NAME$2, {
+    if (!hasOwnProperty(Vue.prototype, PROP_NAME$1)) {
+      defineProperty(Vue.prototype, PROP_NAME$1, {
         get: function get() {
           /* istanbul ignore next */
           if (!this || !this[PROP_NAME_PRIV]) {
-            warn("\"".concat(PROP_NAME$2, "\" must be accessed from a Vue instance \"this\" context."), NAME_MODAL);
+            warn("\"".concat(PROP_NAME$1, "\" must be accessed from a Vue instance \"this\" context."), NAME_MODAL);
           }
 
           return this[PROP_NAME_PRIV];
@@ -22260,119 +19594,91 @@
     }
   });
 
-  var props$K = {
-    tag: {
-      type: String,
-      default: 'ul'
-    },
-    fill: {
-      type: Boolean,
-      default: false
-    },
-    justified: {
-      type: Boolean,
-      default: false
-    },
-    align: {
-      type: String // default: null
-
-    },
-    tabs: {
-      type: Boolean,
-      default: false
-    },
-    pills: {
-      type: Boolean,
-      default: false
-    },
-    vertical: {
-      type: Boolean,
-      default: false
-    },
-    small: {
-      type: Boolean,
-      default: false
-    },
-    cardHeader: {
-      // Set to true if placing in a card header
-      type: Boolean,
-      default: false
-    }
-  }; // -- Utils --
-
   var computeJustifyContent = function computeJustifyContent(value) {
-    // Normalize value
     value = value === 'left' ? 'start' : value === 'right' ? 'end' : value;
     return "justify-content-".concat(value);
-  }; // @vue/component
+  }; // --- Props ---
 
+
+  var props$1t = makePropsConfigurable({
+    align: makeProp(PROP_TYPE_STRING),
+    // Set to `true` if placing in a card header
+    cardHeader: makeProp(PROP_TYPE_BOOLEAN, false),
+    fill: makeProp(PROP_TYPE_BOOLEAN, false),
+    justified: makeProp(PROP_TYPE_BOOLEAN, false),
+    pills: makeProp(PROP_TYPE_BOOLEAN, false),
+    small: makeProp(PROP_TYPE_BOOLEAN, false),
+    tabs: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'ul'),
+    vertical: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, NAME_NAV); // --- Main component ---
+  // @vue/component
 
   var BNav = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV,
     functional: true,
-    props: props$K,
+    props: props$1t,
     render: function render(h, _ref) {
       var _class;
 
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var tabs = props.tabs,
+          pills = props.pills,
+          vertical = props.vertical,
+          align = props.align,
+          cardHeader = props.cardHeader;
       return h(props.tag, a(data, {
         staticClass: 'nav',
         class: (_class = {
-          'nav-tabs': props.tabs,
-          'nav-pills': props.pills && !props.tabs,
-          'card-header-tabs': !props.vertical && props.cardHeader && props.tabs,
-          'card-header-pills': !props.vertical && props.cardHeader && props.pills && !props.tabs,
-          'flex-column': props.vertical,
-          'nav-fill': !props.vertical && props.fill,
-          'nav-justified': !props.vertical && props.justified
-        }, _defineProperty(_class, computeJustifyContent(props.align), !props.vertical && props.align), _defineProperty(_class, "small", props.small), _class)
+          'nav-tabs': tabs,
+          'nav-pills': pills && !tabs,
+          'card-header-tabs': !vertical && cardHeader && tabs,
+          'card-header-pills': !vertical && cardHeader && pills && !tabs,
+          'flex-column': vertical,
+          'nav-fill': !vertical && props.fill,
+          'nav-justified': !vertical && props.justified
+        }, _defineProperty(_class, computeJustifyContent(align), !vertical && align), _defineProperty(_class, "small", props.small), _class)
       }), children);
     }
   });
 
-  var props$L = omit(props$1, ['event', 'routerTag']); // --- Main component ---
+  var linkProps$5 = omit(props$6, ['event', 'routerTag']);
+  var props$1u = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$5), {}, {
+    linkAttrs: makeProp(PROP_TYPE_OBJECT, {}),
+    linkClasses: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
+  })), NAME_NAV_ITEM); // --- Main component ---
   // @vue/component
 
   var BNavItem = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV_ITEM,
     functional: true,
-    props: _objectSpread2(_objectSpread2({}, props$L), {}, {
-      linkAttrs: {
-        type: Object,
-        default: function _default() {}
-      },
-      linkClasses: {
-        type: [String, Object, Array],
-        default: null
-      }
-    }),
+    props: props$1u,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           listeners = _ref.listeners,
           children = _ref.children;
-      // We transfer the listeners to the link
-      delete data.on;
-      return h('li', a(data, {
+      return h('li', a(omit(data, ['on']), {
         staticClass: 'nav-item'
       }), [h(BLink, {
         staticClass: 'nav-link',
         class: props.linkClasses,
         attrs: props.linkAttrs,
-        props: props,
+        props: pluckProps(linkProps$5, props),
         on: listeners
       }, children)]);
     }
   });
 
-  var props$M = {}; // @vue/component
+  var props$1v = {}; // --- Main component ---
+  // @vue/component
 
   var BNavText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV_TEXT,
     functional: true,
-    props: props$M,
+    props: props$1v,
     render: function render(h, _ref) {
       var data = _ref.data,
           children = _ref.children;
@@ -22382,49 +19688,42 @@
     }
   });
 
-  var props$N = _objectSpread2(_objectSpread2({}, omit(props$q, ['inline'])), {}, {
-    formClass: {
-      type: [String, Array, Object] // default: null
-
-    }
-  }); // @vue/component
+  var formProps = omit(props$F, ['inline']);
+  var props$1w = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, formProps), {}, {
+    formClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
+  })), NAME_NAV_FORM); // --- Main component ---
+  // @vue/component
 
   var BNavForm = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV_FORM,
     functional: true,
-    props: props$N,
+    props: props$1w,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children,
-          _ref$listeners = _ref.listeners,
-          listeners = _ref$listeners === void 0 ? {} : _ref$listeners;
-      var attrs = data.attrs; // The following data properties are cleared out
-      // as they will be passed to BForm directly
-
-      data.attrs = {};
-      data.on = {};
+          listeners = _ref.listeners;
       var $form = h(BForm, {
         class: props.formClass,
-        props: _objectSpread2(_objectSpread2({}, props), {}, {
+        props: _objectSpread2(_objectSpread2({}, pluckProps(formProps, props)), {}, {
           inline: true
         }),
-        attrs: attrs,
+        attrs: data.attrs,
         on: listeners
       }, children);
-      return h('li', a(data, {
+      return h('li', a(omit(data, ['attrs', 'on']), {
         staticClass: 'form-inline'
       }), [$form]);
     }
   });
 
-  var props$O = pluckProps(['text', 'html', 'menuClass', 'toggleClass', 'noCaret', 'role', 'lazy'], props$l); // --- Main component ---
+  var props$1x = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$g), pick(props$A, [].concat(_toConsumableArray(keys(props$z)), ['html', 'lazy', 'menuClass', 'noCaret', 'role', 'text', 'toggleClass'])))), NAME_NAV_ITEM_DROPDOWN); // --- Main component ---
   // @vue/component
 
   var BNavItemDropdown = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV_ITEM_DROPDOWN,
     mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
-    props: props$O,
+    props: props$1x,
     computed: {
       toggleId: function toggleId() {
         return this.safeId('_BV_toggle_');
@@ -22448,7 +19747,8 @@
     },
     render: function render(h) {
       var toggleId = this.toggleId,
-          visible = this.visible;
+          visible = this.visible,
+          hide = this.hide;
       var $toggle = h(BLink, {
         staticClass: 'nav-link dropdown-toggle',
         class: this.toggleClasses,
@@ -22486,7 +19786,7 @@
         },
         ref: 'menu'
       }, !this.lazy || visible ? this.normalizeSlot(SLOT_NAME_DEFAULT, {
-        hide: this.hide
+        hide: hide
       }) : [h()]);
       return h('li', {
         staticClass: 'nav-item b-nav-dropdown dropdown',
@@ -22514,37 +19814,15 @@
     }
   });
 
-  var props$P = {
-    tag: {
-      type: String,
-      default: 'nav'
-    },
-    type: {
-      type: String,
-      default: 'light'
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_NAVBAR, 'variant');
-      }
-    },
-    toggleable: {
-      type: [Boolean, String],
-      default: false
-    },
-    fixed: {
-      type: String
-    },
-    sticky: {
-      type: Boolean,
-      default: false
-    },
-    print: {
-      type: Boolean,
-      default: false
-    }
-  }; // --- Main component ---
+  var props$1y = makePropsConfigurable({
+    fixed: makeProp(PROP_TYPE_STRING),
+    print: makeProp(PROP_TYPE_BOOLEAN, false),
+    sticky: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'nav'),
+    toggleable: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    type: makeProp(PROP_TYPE_STRING, 'light'),
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_NAVBAR); // --- Main component ---
   // @vue/component
 
   var BNavbar = /*#__PURE__*/Vue__default['default'].extend({
@@ -22555,12 +19833,12 @@
         bvNavbar: this
       };
     },
-    props: props$P,
+    props: props$1y,
     computed: {
       breakpointClass: function breakpointClass() {
-        var breakpoint = null;
-        var xs = getBreakpoints()[0];
         var toggleable = this.toggleable;
+        var xs = getBreakpoints()[0];
+        var breakpoint = null;
 
         if (toggleable && isString(toggleable) && toggleable !== xs) {
           breakpoint = "navbar-expand-".concat(toggleable);
@@ -22574,63 +19852,65 @@
     render: function render(h) {
       var _ref;
 
-      return h(this.tag, {
+      var tag = this.tag,
+          type = this.type,
+          variant = this.variant,
+          fixed = this.fixed;
+      return h(tag, {
         staticClass: 'navbar',
         class: [(_ref = {
           'd-print': this.print,
           'sticky-top': this.sticky
-        }, _defineProperty(_ref, "navbar-".concat(this.type), this.type), _defineProperty(_ref, "bg-".concat(this.variant), this.variant), _defineProperty(_ref, "fixed-".concat(this.fixed), this.fixed), _ref), this.breakpointClass],
+        }, _defineProperty(_ref, "navbar-".concat(type), type), _defineProperty(_ref, "bg-".concat(variant), variant), _defineProperty(_ref, "fixed-".concat(fixed), fixed), _ref), this.breakpointClass],
         attrs: {
-          role: isTag(this.tag, 'nav') ? null : 'navigation'
+          role: isTag(tag, 'nav') ? null : 'navigation'
         }
       }, [this.normalizeSlot()]);
     }
   });
 
-  var props$Q = pluckProps(['tag', 'fill', 'justified', 'align', 'small'], props$K); // -- Utils --
-
   var computeJustifyContent$1 = function computeJustifyContent(value) {
-    // Normalize value
     value = value === 'left' ? 'start' : value === 'right' ? 'end' : value;
     return "justify-content-".concat(value);
-  }; // @vue/component
+  }; // --- Props ---
 
+
+  var props$1z = makePropsConfigurable(pick(props$1t, ['tag', 'fill', 'justified', 'align', 'small']), NAME_NAVBAR_NAV); // --- Main component ---
+  // @vue/component
 
   var BNavbarNav = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAVBAR_NAV,
     functional: true,
-    props: props$Q,
+    props: props$1z,
     render: function render(h, _ref) {
       var _class;
 
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
+      var align = props.align;
       return h(props.tag, a(data, {
         staticClass: 'navbar-nav',
         class: (_class = {
           'nav-fill': props.fill,
           'nav-justified': props.justified
-        }, _defineProperty(_class, computeJustifyContent$1(props.align), props.align), _defineProperty(_class, "small", props.small), _class)
+        }, _defineProperty(_class, computeJustifyContent$1(align), align), _defineProperty(_class, "small", props.small), _class)
       }), children);
     }
   });
 
-  var linkProps$4 = omit(props$1, ['event', 'routerTag']);
-  linkProps$4.href.default = undefined;
-  linkProps$4.to.default = undefined;
-  var props$R = _objectSpread2({
-    tag: {
-      type: String,
-      default: 'div'
-    }
-  }, linkProps$4); // --- Main component ---
+  var linkProps$6 = omit(props$6, ['event', 'routerTag']);
+  linkProps$6.href.default = undefined;
+  linkProps$6.to.default = undefined;
+  var props$1A = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$6), {}, {
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  })), NAME_NAVBAR_BRAND); // --- Main component ---
   // @vue/component
 
   var BNavbarBrand = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAVBAR_BRAND,
     functional: true,
-    props: props$R,
+    props: props$1A,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -22639,12 +19919,21 @@
       var tag = isLink ? BLink : props.tag;
       return h(tag, a(data, {
         staticClass: 'navbar-brand',
-        props: isLink ? pluckProps(linkProps$4, props) : {}
+        props: isLink ? pluckProps(linkProps$6, props) : {}
       }), children);
     }
   });
 
-  var CLASS_NAME$2 = 'navbar-toggler'; // --- Main component ---
+  var CLASS_NAME$2 = 'navbar-toggler';
+  var ROOT_EVENT_NAME_STATE$2 = getRootEventName(NAME_COLLAPSE, 'state');
+  var ROOT_EVENT_NAME_SYNC_STATE$2 = getRootEventName(NAME_COLLAPSE, 'sync-state'); // --- Props ---
+
+  var props$1B = makePropsConfigurable({
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    label: makeProp(PROP_TYPE_STRING, 'Toggle navigation'),
+    target: makeProp(PROP_TYPE_ARRAY_STRING, undefined, true) // Required
+
+  }, NAME_NAVBAR_TOGGLE); // --- Main component ---
   // @vue/component
 
   var BNavbarToggle = /*#__PURE__*/Vue__default['default'].extend({
@@ -22653,36 +19942,21 @@
       VBToggle: VBToggle
     },
     mixins: [listenOnRootMixin, normalizeSlotMixin],
-    props: {
-      label: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_NAVBAR_TOGGLE, 'label');
-        }
-      },
-      target: {
-        type: [Array, String],
-        required: true
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      }
-    },
+    props: props$1B,
     data: function data() {
       return {
         toggleState: false
       };
     },
     created: function created() {
-      this.listenOnRoot(EVENT_STATE, this.handleStateEvt);
-      this.listenOnRoot(EVENT_STATE_SYNC, this.handleStateEvt);
+      this.listenOnRoot(ROOT_EVENT_NAME_STATE$2, this.handleStateEvt);
+      this.listenOnRoot(ROOT_EVENT_NAME_SYNC_STATE$2, this.handleStateEvt);
     },
     methods: {
-      onClick: function onClick(evt) {
+      onClick: function onClick(event) {
         if (!this.disabled) {
           // Emit courtesy `click` event
-          this.$emit('click', evt);
+          this.$emit(EVENT_NAME_CLICK, event);
         }
       },
       handleStateEvt: function handleStateEvt(id, state) {
@@ -22735,38 +20009,20 @@
     }
   });
 
+  var props$1C = makePropsConfigurable({
+    label: makeProp(PROP_TYPE_STRING),
+    role: makeProp(PROP_TYPE_STRING, 'status'),
+    small: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'span'),
+    type: makeProp(PROP_TYPE_STRING, 'border'),
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_SPINNER); // --- Main component ---
+  // @vue/component
+
   var BSpinner = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SPINNER,
     functional: true,
-    props: {
-      type: {
-        type: String,
-        default: 'border' // SCSS currently supports 'border' or 'grow'
-
-      },
-      label: {
-        type: String // default: null
-
-      },
-      variant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_SPINNER, 'variant');
-        }
-      },
-      small: {
-        type: Boolean,
-        default: false
-      },
-      role: {
-        type: String,
-        default: 'status'
-      },
-      tag: {
-        type: String,
-        default: 'span'
-      }
-    },
+    props: props$1C,
     render: function render(h, _ref) {
       var _class;
 
@@ -22776,116 +20032,72 @@
           scopedSlots = _ref.scopedSlots;
       var $slots = slots();
       var $scopedSlots = scopedSlots || {};
-      var label = normalizeSlot(SLOT_NAME_LABEL, {}, $scopedSlots, $slots) || props.label;
+      var $label = normalizeSlot(SLOT_NAME_LABEL, {}, $scopedSlots, $slots) || props.label;
 
-      if (label) {
-        label = h('span', {
+      if ($label) {
+        $label = h('span', {
           staticClass: 'sr-only'
-        }, label);
+        }, $label);
       }
 
       return h(props.tag, a(data, {
         attrs: {
-          role: label ? props.role || 'status' : null,
-          'aria-hidden': label ? null : 'true'
+          role: $label ? props.role || 'status' : null,
+          'aria-hidden': $label ? null : 'true'
         },
         class: (_class = {}, _defineProperty(_class, "spinner-".concat(props.type), props.type), _defineProperty(_class, "spinner-".concat(props.type, "-sm"), props.small), _defineProperty(_class, "text-".concat(props.variant), props.variant), _class)
-      }), [label || h()]);
+      }), [$label || h()]);
     }
   });
 
-  var positionCover = {
+  var POSITION_COVER = {
     top: 0,
     left: 0,
     bottom: 0,
     right: 0
-  };
+  }; // --- Props ---
+
+  var props$1D = makePropsConfigurable({
+    // Alternative to variant, allowing a specific
+    // CSS color to be applied to the overlay
+    bgColor: makeProp(PROP_TYPE_STRING),
+    blur: makeProp(PROP_TYPE_STRING, '2px'),
+    fixed: makeProp(PROP_TYPE_BOOLEAN, false),
+    noCenter: makeProp(PROP_TYPE_BOOLEAN, false),
+    noFade: makeProp(PROP_TYPE_BOOLEAN, false),
+    // If `true, does not render the default slot
+    // and switches to absolute positioning
+    noWrap: makeProp(PROP_TYPE_BOOLEAN, false),
+    opacity: makeProp(PROP_TYPE_NUMBER_STRING, 0.85, function (value) {
+      var number = toFloat(value, 0);
+      return number >= 0 && number <= 1;
+    }),
+    overlayTag: makeProp(PROP_TYPE_STRING, 'div'),
+    rounded: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    show: makeProp(PROP_TYPE_BOOLEAN, false),
+    spinnerSmall: makeProp(PROP_TYPE_BOOLEAN, false),
+    spinnerType: makeProp(PROP_TYPE_STRING, 'border'),
+    spinnerVariant: makeProp(PROP_TYPE_STRING),
+    variant: makeProp(PROP_TYPE_STRING, 'light'),
+    wrapTag: makeProp(PROP_TYPE_STRING, 'div'),
+    zIndex: makeProp(PROP_TYPE_NUMBER_STRING, 10)
+  }, NAME_OVERLAY); // --- Main component ---
+  // @vue/component
+
   var BOverlay = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_OVERLAY,
     mixins: [normalizeSlotMixin],
-    props: {
-      show: {
-        type: Boolean,
-        default: false
-      },
-      variant: {
-        type: String,
-        default: 'light'
-      },
-      bgColor: {
-        // Alternative to variant, allowing a specific
-        // CSS color to be applied to the overlay
-        type: String // default: null
-
-      },
-      opacity: {
-        type: [Number, String],
-        default: 0.85,
-        validator: function validator(value) {
-          var number = toFloat(value, 0);
-          return number >= 0 && number <= 1;
-        }
-      },
-      blur: {
-        type: String,
-        default: '2px'
-      },
-      rounded: {
-        type: [Boolean, String],
-        default: false
-      },
-      noCenter: {
-        type: Boolean,
-        default: false
-      },
-      noFade: {
-        type: Boolean,
-        default: false
-      },
-      spinnerType: {
-        type: String,
-        default: 'border'
-      },
-      spinnerVariant: {
-        type: String // default: null
-
-      },
-      spinnerSmall: {
-        type: Boolean,
-        default: false
-      },
-      overlayTag: {
-        type: String,
-        default: 'div'
-      },
-      wrapTag: {
-        type: String,
-        default: 'div'
-      },
-      noWrap: {
-        // If set, does not render the default slot
-        // and switches to absolute positioning
-        type: Boolean,
-        default: false
-      },
-      fixed: {
-        type: Boolean,
-        default: false
-      },
-      zIndex: {
-        type: [Number, String],
-        default: 10
-      }
-    },
+    props: props$1D,
     computed: {
       computedRounded: function computedRounded() {
         var rounded = this.rounded;
         return rounded === true || rounded === '' ? 'rounded' : !rounded ? '' : "rounded-".concat(rounded);
       },
       computedVariant: function computedVariant() {
-        return this.variant && !this.bgColor ? "bg-".concat(this.variant) : '';
+        var variant = this.variant;
+        return variant && !this.bgColor ? "bg-".concat(variant) : '';
       },
-      overlayScope: function overlayScope() {
+      slotScope: function slotScope() {
         return {
           spinnerType: this.spinnerType || null,
           spinnerVariant: this.spinnerVariant || null,
@@ -22910,76 +20122,77 @@
     render: function render(h) {
       var _this = this;
 
+      var show = this.show,
+          fixed = this.fixed,
+          noFade = this.noFade,
+          noWrap = this.noWrap,
+          slotScope = this.slotScope;
       var $overlay = h();
 
-      if (this.show) {
-        var scope = this.overlayScope; // Overlay backdrop
-
+      if (show) {
         var $background = h('div', {
           staticClass: 'position-absolute',
           class: [this.computedVariant, this.computedRounded],
-          style: _objectSpread2(_objectSpread2({}, positionCover), {}, {
+          style: _objectSpread2(_objectSpread2({}, POSITION_COVER), {}, {
             opacity: this.opacity,
             backgroundColor: this.bgColor || null,
             backdropFilter: this.blur ? "blur(".concat(this.blur, ")") : null
           })
-        }); // Overlay content
-
+        });
         var $content = h('div', {
           staticClass: 'position-absolute',
           style: this.noCenter ?
           /* istanbul ignore next */
-          _objectSpread2({}, positionCover) : {
+          _objectSpread2({}, POSITION_COVER) : {
             top: '50%',
             left: '50%',
             transform: 'translateX(-50%) translateY(-50%)'
           }
-        }, [this.normalizeSlot('overlay', scope) || this.defaultOverlayFn(scope)]); // Overlay positioning
-
+        }, [this.normalizeSlot(SLOT_NAME_OVERLAY, slotScope) || this.defaultOverlayFn(slotScope)]);
         $overlay = h(this.overlayTag, {
-          key: 'overlay',
           staticClass: 'b-overlay',
           class: {
-            'position-absolute': !this.noWrap || this.noWrap && !this.fixed,
-            'position-fixed': this.noWrap && this.fixed
+            'position-absolute': !noWrap || noWrap && !fixed,
+            'position-fixed': noWrap && fixed
           },
-          style: _objectSpread2(_objectSpread2({}, positionCover), {}, {
+          style: _objectSpread2(_objectSpread2({}, POSITION_COVER), {}, {
             zIndex: this.zIndex || 10
           }),
           on: {
-            click: function click(evt) {
-              return _this.$emit('click', evt);
+            click: function click(event) {
+              return _this.$emit(EVENT_NAME_CLICK, event);
             }
-          }
+          },
+          key: 'overlay'
         }, [$background, $content]);
       } // Wrap in a fade transition
 
 
       $overlay = h(BVTransition, {
         props: {
-          noFade: this.noFade,
+          noFade: noFade,
           appear: true
         },
         on: {
           'after-enter': function afterEnter() {
-            return _this.$emit('shown');
+            return _this.$emit(EVENT_NAME_SHOWN);
           },
           'after-leave': function afterLeave() {
-            return _this.$emit('hidden');
+            return _this.$emit(EVENT_NAME_HIDDEN);
           }
         }
       }, [$overlay]);
 
-      if (this.noWrap) {
+      if (noWrap) {
         return $overlay;
       }
 
       return h(this.wrapTag, {
         staticClass: 'b-overlay-wrap position-relative',
         attrs: {
-          'aria-busy': this.show ? 'true' : null
+          'aria-busy': show ? 'true' : null
         }
-      }, this.noWrap ? [$overlay] : [this.normalizeSlot(), $overlay]);
+      }, noWrap ? [$overlay] : [this.normalizeSlot(), $overlay]);
     }
   });
 
@@ -22989,19 +20202,28 @@
     }
   });
 
-  /**
-   * @param {number} length
-   * @return {Array}
-   */
-  var range = function range(length) {
-    return Array.apply(null, {
-      length: length
-    });
-  };
-
+  var _watch$e;
   // for `<b-pagination>` and `<b-pagination-nav>`
   // --- Constants ---
-  // Threshold of limit size when we start/stop showing ellipsis
+
+  var _makeModelMixin$g = makeModelMixin('value', {
+    type: PROP_TYPE_BOOLEAN_NUMBER_STRING,
+    defaultValue: null,
+
+    /* istanbul ignore next */
+    validator: function validator(value) {
+      if (!isNull(value) && toInteger(value, 0) < 1) {
+        warn('"v-model" value must be a number greater than "0"', NAME_PAGINATION);
+        return false;
+      }
+
+      return true;
+    }
+  }),
+      modelMixin$f = _makeModelMixin$g.mixin,
+      modelProps$f = _makeModelMixin$g.props,
+      MODEL_PROP_NAME$f = _makeModelMixin$g.prop,
+      MODEL_EVENT_NAME$f = _makeModelMixin$g.event;
 
   var ELLIPSIS_THRESHOLD = 3; // Default # of buttons limit
 
@@ -23009,7 +20231,7 @@
   // Make an array of N to N+X
 
   var makePageArray = function makePageArray(startNumber, numberOfPages) {
-    return range(numberOfPages).map(function (val, i) {
+    return createArray(numberOfPages, function (_, i) {
       return {
         number: startNumber + i,
         classes: null
@@ -23018,8 +20240,8 @@
   }; // Sanitize the provided limit value (converting to a number)
 
 
-  var sanitizeLimit = function sanitizeLimit(val) {
-    var limit = toInteger(val) || 1;
+  var sanitizeLimit = function sanitizeLimit(value) {
+    var limit = toInteger(value) || 1;
     return limit < 1 ? DEFAULT_LIMIT : limit;
   }; // Sanitize the provided current page number (converting to a number)
 
@@ -23031,161 +20253,69 @@
   // functionality via this handler
 
 
-  var onSpaceKey = function onSpaceKey(evt) {
-    if (evt.keyCode === CODE_SPACE) {
+  var onSpaceKey = function onSpaceKey(event) {
+    if (event.keyCode === CODE_SPACE) {
       // Stop page from scrolling
-      stopEvent(evt, {
+      stopEvent(event, {
         immediatePropagation: true
       }); // Trigger the click event on the link
 
-      evt.currentTarget.click();
+      event.currentTarget.click();
       return false;
     }
   }; // --- Props ---
 
 
-  var props$S = {
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    value: {
-      type: [Number, String],
-      default: null,
-      validator: function validator(value)
-      /* istanbul ignore next */
-      {
-        if (!isNull(value) && toInteger(value, 0) < 1) {
-          warn('"v-model" value must be a number greater than "0"', NAME_PAGINATION);
-          return false;
-        }
-
-        return true;
+  var props$1E = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, modelProps$f), {}, {
+    align: makeProp(PROP_TYPE_STRING, 'left'),
+    ariaLabel: makeProp(PROP_TYPE_STRING, 'Pagination'),
+    disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    ellipsisClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    ellipsisText: makeProp(PROP_TYPE_STRING, "\u2026"),
+    // '…'
+    firstClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    firstNumber: makeProp(PROP_TYPE_BOOLEAN, false),
+    firstText: makeProp(PROP_TYPE_STRING, "\xAB"),
+    // '«'
+    hideEllipsis: makeProp(PROP_TYPE_BOOLEAN, false),
+    hideGotoEndButtons: makeProp(PROP_TYPE_BOOLEAN, false),
+    labelFirstPage: makeProp(PROP_TYPE_STRING, 'Go to first page'),
+    labelLastPage: makeProp(PROP_TYPE_STRING, 'Go to last page'),
+    labelNextPage: makeProp(PROP_TYPE_STRING, 'Go to next page'),
+    labelPage: makeProp(PROP_TYPE_FUNCTION_STRING, 'Go to page'),
+    labelPrevPage: makeProp(PROP_TYPE_STRING, 'Go to previous page'),
+    lastClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    lastNumber: makeProp(PROP_TYPE_BOOLEAN, false),
+    lastText: makeProp(PROP_TYPE_STRING, "\xBB"),
+    // '»'
+    limit: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_LIMIT,
+    /* istanbul ignore next */
+    function (value) {
+      if (toInteger(value, 0) < 1) {
+        warn('Prop "limit" must be a number greater than "0"', NAME_PAGINATION);
+        return false;
       }
-    },
-    limit: {
-      type: [Number, String],
-      default: DEFAULT_LIMIT,
-      validator: function validator(value)
-      /* istanbul ignore next */
-      {
-        if (toInteger(value, 0) < 1) {
-          warn('Prop "limit" must be a number greater than "0"', NAME_PAGINATION);
-          return false;
-        }
 
-        return true;
-      }
-    },
-    align: {
-      type: String,
-      default: 'left'
-    },
-    pills: {
-      type: Boolean,
-      default: false
-    },
-    hideGotoEndButtons: {
-      type: Boolean,
-      default: false
-    },
-    ariaLabel: {
-      type: String,
-      default: 'Pagination'
-    },
-    labelFirstPage: {
-      type: String,
-      default: 'Go to first page'
-    },
-    firstText: {
-      type: String,
-      default: "\xAB" // '«'
+      return true;
+    }),
+    nextClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    nextText: makeProp(PROP_TYPE_STRING, "\u203A"),
+    // '›'
+    pageClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    pills: makeProp(PROP_TYPE_BOOLEAN, false),
+    prevClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    prevText: makeProp(PROP_TYPE_STRING, "\u2039"),
+    // '‹'
+    size: makeProp(PROP_TYPE_STRING)
+  })), 'pagination'); // --- Mixin ---
+  // @vue/component
 
-    },
-    firstNumber: {
-      type: Boolean,
-      default: false
-    },
-    firstClass: {
-      type: [String, Array, Object],
-      default: null
-    },
-    labelPrevPage: {
-      type: String,
-      default: 'Go to previous page'
-    },
-    prevText: {
-      type: String,
-      default: "\u2039" // '‹'
-
-    },
-    prevClass: {
-      type: [String, Array, Object],
-      default: null
-    },
-    labelNextPage: {
-      type: String,
-      default: 'Go to next page'
-    },
-    nextText: {
-      type: String,
-      default: "\u203A" // '›'
-
-    },
-    nextClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    labelLastPage: {
-      type: String,
-      default: 'Go to last page'
-    },
-    lastText: {
-      type: String,
-      default: "\xBB" // '»'
-
-    },
-    lastNumber: {
-      type: Boolean,
-      default: false
-    },
-    lastClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    labelPage: {
-      type: [String, Function],
-      default: 'Go to page'
-    },
-    pageClass: {
-      type: [String, Array, Object] // default: null
-
-    },
-    hideEllipsis: {
-      type: Boolean,
-      default: false
-    },
-    ellipsisText: {
-      type: String,
-      default: "\u2026" // '…'
-
-    },
-    ellipsisClass: {
-      type: [String, Array, Object] // default: null
-
-    }
-  }; // @vue/component
-
-  var paginationMixin = {
-    mixins: [normalizeSlotMixin],
-    model: {
-      prop: 'value',
-      event: 'input'
-    },
-    props: props$S,
+  var paginationMixin = Vue__default['default'].extend({
+    mixins: [modelMixin$f, normalizeSlotMixin],
+    props: props$1E,
     data: function data() {
       // `-1` signifies no page initially selected
-      var currentPage = toInteger(this.value, 0);
+      var currentPage = toInteger(this[MODEL_PROP_NAME$f], 0);
       currentPage = currentPage > 0 ? currentPage : -1;
       return {
         currentPage: currentPage,
@@ -23195,7 +20325,8 @@
     },
     computed: {
       btnSize: function btnSize() {
-        return this.size ? "pagination-".concat(this.size) : '';
+        var size = this.size;
+        return size ? "pagination-".concat(size) : '';
       },
       alignment: function alignment() {
         var align = this.align;
@@ -23345,24 +20476,20 @@
         return pages;
       }
     },
-    watch: {
-      value: function value(newValue, oldValue) {
-        if (newValue !== oldValue) {
-          this.currentPage = sanitizeCurrentPage(newValue, this.localNumberOfPages);
-        }
-      },
-      currentPage: function currentPage(newValue, oldValue) {
-        if (newValue !== oldValue) {
-          // Emit `null` if no page selected
-          this.$emit('input', newValue > 0 ? newValue : null);
-        }
-      },
-      limit: function limit(newValue, oldValue) {
-        if (newValue !== oldValue) {
-          this.localLimit = sanitizeLimit(newValue);
-        }
+    watch: (_watch$e = {}, _defineProperty(_watch$e, MODEL_PROP_NAME$f, function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.currentPage = sanitizeCurrentPage(newValue, this.localNumberOfPages);
       }
-    },
+    }), _defineProperty(_watch$e, "currentPage", function currentPage(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        // Emit `null` if no page selected
+        this.$emit(MODEL_EVENT_NAME$f, newValue > 0 ? newValue : null);
+      }
+    }), _defineProperty(_watch$e, "limit", function limit(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.localLimit = sanitizeLimit(newValue);
+      }
+    }), _watch$e),
     created: function created() {
       var _this = this;
 
@@ -23374,9 +20501,9 @@
       });
     },
     methods: {
-      handleKeyNav: function handleKeyNav(evt) {
-        var keyCode = evt.keyCode,
-            shiftKey = evt.shiftKey;
+      handleKeyNav: function handleKeyNav(event) {
+        var keyCode = event.keyCode,
+            shiftKey = event.shiftKey;
         /* istanbul ignore if */
 
         if (this.isNav) {
@@ -23385,12 +20512,12 @@
         }
 
         if (keyCode === CODE_LEFT || keyCode === CODE_UP) {
-          stopEvent(evt, {
+          stopEvent(event, {
             propagation: false
           });
           shiftKey ? this.focusFirst() : this.focusPrev();
         } else if (keyCode === CODE_RIGHT || keyCode === CODE_DOWN) {
-          stopEvent(evt, {
+          stopEvent(event, {
             propagation: false
           });
           shiftKey ? this.focusLast() : this.focusNext();
@@ -23473,19 +20600,20 @@
     render: function render(h) {
       var _this7 = this;
 
-      var buttons = [];
-      var numberOfPages = this.localNumberOfPages;
+      var disabled = this.disabled,
+          labelPage = this.labelPage,
+          ariaLabel = this.ariaLabel,
+          isNav = this.isNav,
+          numberOfPages = this.localNumberOfPages,
+          currentPage = this.computedCurrentPage;
       var pageNumbers = this.pageList.map(function (p) {
         return p.number;
       });
-      var disabled = this.disabled;
       var _this$paginationParam2 = this.paginationParams,
           showFirstDots = _this$paginationParam2.showFirstDots,
           showLastDots = _this$paginationParam2.showLastDots;
-      var currentPage = this.computedCurrentPage;
-      var fill = this.align === 'fill'; // Used to control what type of aria attributes are rendered and wrapper
-
-      var isNav = this.isNav; // Helper function and flag
+      var fill = this.align === 'fill';
+      var $buttons = []; // Helper function and flag
 
       var isActivePage = function isActivePage(pageNumber) {
         return pageNumber === currentPage;
@@ -23517,8 +20645,8 @@
             'aria-disabled': isDisabled ? 'true' : null
           },
           on: isDisabled ? {} : {
-            '!click': function click(evt) {
-              _this7.onClick(evt, linkTo);
+            '!click': function click(event) {
+              _this7.onClick(event, linkTo);
             },
             keydown: onSpaceKey
           }
@@ -23541,20 +20669,21 @@
 
       var makeEllipsis = function makeEllipsis(isLast) {
         return h('li', {
-          key: "ellipsis-".concat(isLast ? 'last' : 'first'),
           staticClass: 'page-item',
           class: ['disabled', 'bv-d-xs-down-none', fill ? 'flex-fill' : '', _this7.ellipsisClass],
           attrs: {
             role: 'separator'
-          }
+          },
+          key: "ellipsis-".concat(isLast ? 'last' : 'first')
         }, [h('span', {
           staticClass: 'page-link'
-        }, [_this7.normalizeSlot('ellipsis-text') || toString$1(_this7.ellipsisText) || h()])]);
+        }, [_this7.normalizeSlot(SLOT_NAME_ELLIPSIS_TEXT) || toString$1(_this7.ellipsisText) || h()])]);
       }; // Page button factory
 
 
       var makePageButton = function makePageButton(page, idx) {
-        var active = isActivePage(page.number) && !noCurrentPage; // Active page will have tabindex of 0, or if no current page and first page button
+        var pageNumber = page.number;
+        var active = isActivePage(pageNumber) && !noCurrentPage; // Active page will have tabindex of 0, or if no current page and first page button
 
         var tabIndex = disabled ? null : active || noCurrentPage && idx === 0 ? '0' : '-1';
         var attrs = {
@@ -23562,40 +20691,39 @@
           type: isNav || disabled ? null : 'button',
           'aria-disabled': disabled ? 'true' : null,
           'aria-controls': _this7.ariaControls || null,
-          'aria-label': isFunction(_this7.labelPage) ?
+          'aria-label': hasPropFunction(labelPage) ?
           /* istanbul ignore next */
-          _this7.labelPage(page.number) : "".concat(_this7.labelPage, " ").concat(page.number),
+          labelPage(pageNumber) : "".concat(isFunction(labelPage) ? labelPage() : labelPage, " ").concat(pageNumber),
           'aria-checked': isNav ? null : active ? 'true' : 'false',
           'aria-current': isNav && active ? 'page' : null,
-          'aria-posinset': isNav ? null : page.number,
+          'aria-posinset': isNav ? null : pageNumber,
           'aria-setsize': isNav ? null : numberOfPages,
           // ARIA "roving tabindex" method (except in `isNav` mode)
           tabindex: isNav ? null : tabIndex
         };
-        var btnContent = toString$1(_this7.makePage(page.number));
+        var btnContent = toString$1(_this7.makePage(pageNumber));
         var scope = {
-          page: page.number,
-          index: page.number - 1,
+          page: pageNumber,
+          index: pageNumber - 1,
           content: btnContent,
           active: active,
           disabled: disabled
         };
         var $inner = h(disabled ? 'span' : isNav ? BLink : 'button', {
-          props: disabled || !isNav ? {} : _this7.linkProps(page.number),
+          props: disabled || !isNav ? {} : _this7.linkProps(pageNumber),
           staticClass: 'page-link',
           class: {
             'flex-grow-1': !isNav && !disabled && fill
           },
           attrs: attrs,
           on: disabled ? {} : {
-            '!click': function click(evt) {
-              _this7.onClick(evt, page.number);
+            '!click': function click(event) {
+              _this7.onClick(event, pageNumber);
             },
             keydown: onSpaceKey
           }
-        }, [_this7.normalizeSlot('page', scope) || btnContent]);
+        }, [_this7.normalizeSlot(SLOT_NAME_PAGE, scope) || btnContent]);
         return h('li', {
-          key: "page-".concat(page.number),
           staticClass: 'page-item',
           class: [{
             disabled: disabled,
@@ -23605,7 +20733,8 @@
           }, page.classes, _this7.pageClass],
           attrs: {
             role: isNav ? null : 'presentation'
-          }
+          },
+          key: "page-".concat(pageNumber)
         }, [$inner]);
       }; // Goto first page button
       // Don't render button when `hideGotoEndButtons` or `firstNumber` is set
@@ -23614,116 +20743,103 @@
       var $firstPageBtn = h();
 
       if (!this.firstNumber && !this.hideGotoEndButtons) {
-        $firstPageBtn = makeEndBtn(1, this.labelFirstPage, 'first-text', this.firstText, this.firstClass, 1, 'pagination-goto-first');
+        $firstPageBtn = makeEndBtn(1, this.labelFirstPage, SLOT_NAME_FIRST_TEXT, this.firstText, this.firstClass, 1, 'pagination-goto-first');
       }
 
-      buttons.push($firstPageBtn); // Goto previous page button
+      $buttons.push($firstPageBtn); // Goto previous page button
 
-      buttons.push(makeEndBtn(currentPage - 1, this.labelPrevPage, 'prev-text', this.prevText, this.prevClass, 1, 'pagination-goto-prev')); // Show first (1) button?
+      $buttons.push(makeEndBtn(currentPage - 1, this.labelPrevPage, SLOT_NAME_PREV_TEXT, this.prevText, this.prevClass, 1, 'pagination-goto-prev')); // Show first (1) button?
 
-      buttons.push(this.firstNumber && pageNumbers[0] !== 1 ? makePageButton({
+      $buttons.push(this.firstNumber && pageNumbers[0] !== 1 ? makePageButton({
         number: 1
       }, 0) : h()); // First ellipsis
 
-      buttons.push(showFirstDots ? makeEllipsis(false) : h()); // Individual page links
+      $buttons.push(showFirstDots ? makeEllipsis(false) : h()); // Individual page links
 
       this.pageList.forEach(function (page, idx) {
         var offset = showFirstDots && _this7.firstNumber && pageNumbers[0] !== 1 ? 1 : 0;
-        buttons.push(makePageButton(page, idx + offset));
+        $buttons.push(makePageButton(page, idx + offset));
       }); // Last ellipsis
 
-      buttons.push(showLastDots ? makeEllipsis(true) : h()); // Show last page button?
+      $buttons.push(showLastDots ? makeEllipsis(true) : h()); // Show last page button?
 
-      buttons.push(this.lastNumber && pageNumbers[pageNumbers.length - 1] !== numberOfPages ? makePageButton({
+      $buttons.push(this.lastNumber && pageNumbers[pageNumbers.length - 1] !== numberOfPages ? makePageButton({
         number: numberOfPages
       }, -1) : h()); // Goto next page button
 
-      buttons.push(makeEndBtn(currentPage + 1, this.labelNextPage, 'next-text', this.nextText, this.nextClass, numberOfPages, 'pagination-goto-next')); // Goto last page button
+      $buttons.push(makeEndBtn(currentPage + 1, this.labelNextPage, SLOT_NAME_NEXT_TEXT, this.nextText, this.nextClass, numberOfPages, 'pagination-goto-next')); // Goto last page button
       // Don't render button when `hideGotoEndButtons` or `lastNumber` is set
 
       var $lastPageBtn = h();
 
       if (!this.lastNumber && !this.hideGotoEndButtons) {
-        $lastPageBtn = makeEndBtn(numberOfPages, this.labelLastPage, 'last-text', this.lastText, this.lastClass, numberOfPages, 'pagination-goto-last');
+        $lastPageBtn = makeEndBtn(numberOfPages, this.labelLastPage, SLOT_NAME_LAST_TEXT, this.lastText, this.lastClass, numberOfPages, 'pagination-goto-last');
       }
 
-      buttons.push($lastPageBtn); // Assemble the pagination buttons
+      $buttons.push($lastPageBtn); // Assemble the pagination buttons
 
       var $pagination = h('ul', {
-        ref: 'ul',
         staticClass: 'pagination',
         class: ['b-pagination', this.btnSize, this.alignment, this.styleClass],
         attrs: {
           role: isNav ? null : 'menubar',
           'aria-disabled': disabled ? 'true' : 'false',
-          'aria-label': isNav ? null : this.ariaLabel || null
+          'aria-label': isNav ? null : ariaLabel || null
         },
         // We disable keyboard left/right nav when `<b-pagination-nav>`
         on: isNav ? {} : {
           keydown: this.handleKeyNav
-        }
-      }, buttons); // If we are `<b-pagination-nav>`, wrap in `<nav>` wrapper
+        },
+        ref: 'ul'
+      }, $buttons); // If we are `<b-pagination-nav>`, wrap in `<nav>` wrapper
 
       if (isNav) {
         return h('nav', {
           attrs: {
             'aria-disabled': disabled ? 'true' : null,
             'aria-hidden': disabled ? 'true' : 'false',
-            'aria-label': isNav ? this.ariaLabel || null : null
+            'aria-label': isNav ? ariaLabel || null : null
           }
         }, [$pagination]);
       }
 
       return $pagination;
     }
-  };
+  });
 
   var DEFAULT_PER_PAGE = 20;
-  var DEFAULT_TOTAL_ROWS = 0;
-  var props$T = {
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_PAGINATION, 'size');
-      }
-    },
-    perPage: {
-      type: [Number, String],
-      default: DEFAULT_PER_PAGE
-    },
-    totalRows: {
-      type: [Number, String],
-      default: DEFAULT_TOTAL_ROWS
-    },
-    ariaControls: {
-      type: String // default: null
-
-    }
-  }; // --- Helper methods ---
+  var DEFAULT_TOTAL_ROWS = 0; // --- Helper methods ---
   // Sanitize the provided per page number (converting to a number)
 
-  var sanitizePerPage = function sanitizePerPage(val) {
-    return mathMax(toInteger(val) || DEFAULT_PER_PAGE, 1);
+  var sanitizePerPage = function sanitizePerPage(value) {
+    return mathMax(toInteger(value) || DEFAULT_PER_PAGE, 1);
   }; // Sanitize the provided total rows number (converting to a number)
 
 
-  var sanitizeTotalRows = function sanitizeTotalRows(val) {
-    return mathMax(toInteger(val) || DEFAULT_TOTAL_ROWS, 0);
-  }; // The render function is brought in via the `paginationMixin`
-  // @vue/component
+  var sanitizeTotalRows = function sanitizeTotalRows(value) {
+    return mathMax(toInteger(value) || DEFAULT_TOTAL_ROWS, 0);
+  }; // --- Props ---
 
+
+  var props$1F = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$1E), {}, {
+    ariaControls: makeProp(PROP_TYPE_STRING),
+    perPage: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_PER_PAGE),
+    totalRows: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_TOTAL_ROWS)
+  })), NAME_PAGINATION); // --- Main component ---
+  // @vue/component
 
   var BPagination = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_PAGINATION,
+    // The render function is brought in via the `paginationMixin`
     mixins: [paginationMixin],
-    props: props$T,
+    props: props$1F,
     computed: {
       numberOfPages: function numberOfPages() {
         var result = mathCeil(sanitizeTotalRows(this.totalRows) / sanitizePerPage(this.perPage));
         return result < 1 ? 1 : result;
       },
+      // Used for watching changes to `perPage` and `numberOfPages`
       pageSizeNumberOfPages: function pageSizeNumberOfPages() {
-        // Used for watching changes to `perPage` and `numberOfPages`
         return {
           perPage: sanitizePerPage(this.perPage),
           totalRows: sanitizeTotalRows(this.totalRows),
@@ -23732,19 +20848,19 @@
       }
     },
     watch: {
-      pageSizeNumberOfPages: function pageSizeNumberOfPages(newVal, oldVal) {
-        if (!isUndefinedOrNull(oldVal)) {
-          if (newVal.perPage !== oldVal.perPage && newVal.totalRows === oldVal.totalRows) {
+      pageSizeNumberOfPages: function pageSizeNumberOfPages(newValue, oldValue) {
+        if (!isUndefinedOrNull(oldValue)) {
+          if (newValue.perPage !== oldValue.perPage && newValue.totalRows === oldValue.totalRows) {
             // If the page size changes, reset to page 1
             this.currentPage = 1;
-          } else if (newVal.numberOfPages !== oldVal.numberOfPages && this.currentPage > newVal.numberOfPages) {
+          } else if (newValue.numberOfPages !== oldValue.numberOfPages && this.currentPage > newValue.numberOfPages) {
             // If `numberOfPages` changes and is less than
             // the `currentPage` number, reset to page 1
             this.currentPage = 1;
           }
         }
 
-        this.localNumberOfPages = newVal.numberOfPages;
+        this.localNumberOfPages = newValue.numberOfPages;
       }
     },
     created: function created() {
@@ -23753,7 +20869,7 @@
       // Set the initial page count
       this.localNumberOfPages = this.numberOfPages; // Set the initial page value
 
-      var currentPage = toInteger(this.value, 0);
+      var currentPage = toInteger(this[MODEL_PROP_NAME$f], 0);
 
       if (currentPage > 0) {
         this.currentPage = currentPage;
@@ -23765,13 +20881,9 @@
         });
       }
     },
-    mounted: function mounted() {
-      // Set the initial page count
-      this.localNumberOfPages = this.numberOfPages;
-    },
     methods: {
       // These methods are used by the render function
-      onClick: function onClick(evt, pageNumber) {
+      onClick: function onClick(event, pageNumber) {
         var _this2 = this;
 
         // Dont do anything if clicking the current active page
@@ -23779,9 +20891,9 @@
           return;
         }
 
-        var target = evt.target; // Emit a user-cancelable `page-click` event
+        var target = event.target; // Emit a user-cancelable `page-click` event
 
-        var clickEvt = new BvEvent('page-click', {
+        var clickEvt = new BvEvent(EVENT_NAME_PAGE_CLICK, {
           cancelable: true,
           vueTarget: this,
           target: target
@@ -23795,7 +20907,7 @@
 
         this.currentPage = pageNumber; // Emit event triggered by user interaction
 
-        this.$emit('change', this.currentPage); // Keep the current button focused if possible
+        this.$emit(EVENT_NAME_CHANGE, this.currentPage); // Keep the current button focused if possible
 
         this.$nextTick(function () {
           if (isVisible(target) && _this2.$el.contains(target)) {
@@ -23812,8 +20924,6 @@
       /* istanbul ignore next */
       linkProps: function linkProps() {
         // No props, since we render a plain button
-
-        /* istanbul ignore next */
         return {};
       }
     }
@@ -23825,71 +20935,43 @@
     }
   });
 
-  var _linkProps = omit(props$1, ['event', 'routerTag']);
-
-  var props$U = _objectSpread2({
-    size: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_PAGINATION_NAV, 'size');
-      }
-    },
-    numberOfPages: {
-      type: [Number, String],
-      default: 1,
-      validator: function validator(value)
-      /* istanbul ignore next */
-      {
-        var number = toInteger(value, 0);
-
-        if (number < 1) {
-          warn('Prop "number-of-pages" must be a number greater than "0"', NAME_PAGINATION_NAV);
-          return false;
-        }
-
-        return true;
-      }
-    },
-    baseUrl: {
-      type: String,
-      default: '/'
-    },
-    useRouter: {
-      type: Boolean,
-      default: false
-    },
-    linkGen: {
-      type: Function // default: null
-
-    },
-    pageGen: {
-      type: Function // default: null
-
-    },
-    pages: {
-      // Optional array of page links
-      type: Array // default: null
-
-    },
-    noPageDetect: {
-      // Disable auto page number detection if true
-      type: Boolean,
-      default: false
-    }
-  }, _linkProps); // --- Utility methods ---
   // Sanitize the provided number of pages (converting to a number)
-
 
   var sanitizeNumberOfPages = function sanitizeNumberOfPages(value) {
     return mathMax(toInteger(value, 0), 1);
-  }; // --- Main component ---
-  // The render function is brought in via the pagination mixin
+  }; // --- Props ---
+
+  var _linkProps = omit(props$6, ['event', 'routerTag']);
+
+  var props$1G = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$1E), _linkProps), {}, {
+    baseUrl: makeProp(PROP_TYPE_STRING, '/'),
+    linkGen: makeProp(PROP_TYPE_FUNCTION),
+    // Disable auto page number detection if `true`
+    noPageDetect: makeProp(PROP_TYPE_BOOLEAN, false),
+    numberOfPages: makeProp(PROP_TYPE_NUMBER_STRING, 1,
+    /* istanbul ignore next */
+    function (value) {
+      var number = toInteger(value, 0);
+
+      if (number < 1) {
+        warn('Prop "number-of-pages" must be a number greater than "0"', NAME_PAGINATION_NAV);
+        return false;
+      }
+
+      return true;
+    }),
+    pageGen: makeProp(PROP_TYPE_FUNCTION),
+    // Optional array of page links
+    pages: makeProp(PROP_TYPE_ARRAY),
+    useRouter: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_PAGINATION_NAV); // --- Main component ---
   // @vue/component
 
   var BPaginationNav = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_PAGINATION_NAV,
+    // The render function is brought in via the pagination mixin
     mixins: [paginationMixin],
-    props: props$U,
+    props: props$1G,
     computed: {
       // Used by render function to trigger wrapping in '<nav>' element
       isNav: function isNav() {
@@ -23948,7 +21030,7 @@
           _this4.guessCurrentPage();
         });
       },
-      onClick: function onClick(evt, pageNumber) {
+      onClick: function onClick(event, pageNumber) {
         var _this5 = this;
 
         // Dont do anything if clicking the current active page
@@ -23956,9 +21038,9 @@
           return;
         }
 
-        var target = evt.currentTarget || evt.target; // Emit a user-cancelable `page-click` event
+        var target = event.currentTarget || event.target; // Emit a user-cancelable `page-click` event
 
-        var clickEvt = new BvEvent('page-click', {
+        var clickEvt = new BvEvent(EVENT_NAME_PAGE_CLICK, {
           cancelable: true,
           vueTarget: this,
           target: target
@@ -23975,7 +21057,7 @@
         requestAF(function () {
           _this5.currentPage = pageNumber;
 
-          _this5.$emit('change', pageNumber);
+          _this5.$emit(EVENT_NAME_CHANGE, pageNumber);
         }); // Emulate native link click page reloading behaviour by blurring the
         // paginator and returning focus to the document
         // Done in a `nextTick()` to ensure rendering complete
@@ -23984,18 +21066,18 @@
           attemptBlur(target);
         });
       },
-      getPageInfo: function getPageInfo(pageNum) {
-        if (!isArray(this.pages) || this.pages.length === 0 || isUndefined(this.pages[pageNum - 1])) {
-          var link = "".concat(this.baseUrl).concat(pageNum);
+      getPageInfo: function getPageInfo(pageNumber) {
+        if (!isArray(this.pages) || this.pages.length === 0 || isUndefined(this.pages[pageNumber - 1])) {
+          var link = "".concat(this.baseUrl).concat(pageNumber);
           return {
             link: this.useRouter ? {
               path: link
             } : link,
-            text: toString$1(pageNum)
+            text: toString$1(pageNumber)
           };
         }
 
-        var info = this.pages[pageNum - 1];
+        var info = this.pages[pageNumber - 1];
 
         if (isObject(info)) {
           var _link = info.link;
@@ -24005,36 +21087,38 @@
               path: _link
             } : _link,
             // Make sure text has a value
-            text: toString$1(info.text || pageNum)
+            text: toString$1(info.text || pageNumber)
           };
         } else {
           return {
             link: toString$1(info),
-            text: toString$1(pageNum)
+            text: toString$1(pageNumber)
           };
         }
       },
-      makePage: function makePage(pageNum) {
-        var info = this.getPageInfo(pageNum);
+      makePage: function makePage(pageNumber) {
+        var pageGen = this.pageGen;
+        var info = this.getPageInfo(pageNumber);
 
-        if (this.pageGen && isFunction(this.pageGen)) {
-          return this.pageGen(pageNum, info);
+        if (hasPropFunction(pageGen)) {
+          return pageGen(pageNumber, info);
         }
 
         return info.text;
       },
-      makeLink: function makeLink(pageNum) {
-        var info = this.getPageInfo(pageNum);
+      makeLink: function makeLink(pageNumber) {
+        var linkGen = this.linkGen;
+        var info = this.getPageInfo(pageNumber);
 
-        if (this.linkGen && isFunction(this.linkGen)) {
-          return this.linkGen(pageNum, info);
+        if (hasPropFunction(linkGen)) {
+          return linkGen(pageNumber, info);
         }
 
         return info.link;
       },
-      linkProps: function linkProps(pageNum) {
+      linkProps: function linkProps(pageNumber) {
         var props = pluckProps(_linkProps, this);
-        var link = this.makeLink(pageNum);
+        var link = this.makeLink(pageNumber);
 
         if (this.useRouter || isObject(link)) {
           props.to = link;
@@ -24047,7 +21131,7 @@
       resolveLink: function resolveLink() {
         var to = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         // Given a to (or href string), convert to normalized route-like structure
-        // Works only client side!!
+        // Works only client side!
         var link;
 
         try {
@@ -24087,7 +21171,7 @@
         var to = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
         // Given a to (or href string), convert to normalized route location structure
-        // works only when router available!!
+        // Works only when router available!
         try {
           var route = this.$router.resolve(to, this.$route).route;
           return {
@@ -24101,22 +21185,21 @@
         }
       },
       guessCurrentPage: function guessCurrentPage() {
-        var guess = this.computedValue;
-        var $router = this.$router;
-        var $route = this.$route; // This section only occurs if we are client side, or server-side with $router
+        var $router = this.$router,
+            $route = this.$route;
+        var guess = this.computedValue; // This section only occurs if we are client side, or server-side with `$router`
 
-        /* istanbul ignore else */
-
-        if (!this.noPageDetect && !guess && (isBrowser || !isBrowser && $router)) {
+        if (!this.noPageDetect && !guess && (IS_BROWSER || !IS_BROWSER && $router)) {
           // Current route (if router available)
-          var currRoute = $router && $route ? {
+          var currentRoute = $router && $route ? {
             path: $route.path,
             hash: $route.hash,
             query: $route.query
-          } : {}; // Current page full HREF (if client side). Can't be done as a computed prop!
+          } : {}; // Current page full HREF (if client side)
+          // Can't be done as a computed prop!
 
-          var loc = isBrowser ? window.location || document.location : null;
-          var currLink = loc ? {
+          var loc = IS_BROWSER ? window.location || document.location : null;
+          var currentLink = loc ? {
             path: loc.pathname,
             hash: loc.hash,
             query: parseQuery(loc.search)
@@ -24124,27 +21207,27 @@
           /* istanbul ignore next */
           {}; // Loop through the possible pages looking for a match until found
 
-          for (var page = 1; !guess && page <= this.localNumberOfPages; page++) {
-            var to = this.makeLink(page);
+          for (var pageNumber = 1; !guess && pageNumber <= this.localNumberOfPages; pageNumber++) {
+            var to = this.makeLink(pageNumber);
 
             if ($router && (isObject(to) || this.useRouter)) {
-              // Resolve the page via the $router
-              guess = looseEqual(this.resolveRoute(to), currRoute) ? page : null;
-            } else if (isBrowser) {
-              // If no $router available (or !this.useRouter when `to` is a string)
+              // Resolve the page via the `$router`
+              guess = looseEqual(this.resolveRoute(to), currentRoute) ? pageNumber : null;
+            } else if (IS_BROWSER) {
+              // If no `$router` available (or `!this.useRouter` when `to` is a string)
               // we compare using parsed URIs
-              guess = looseEqual(this.resolveLink(to), currLink) ? page : null;
+              guess = looseEqual(this.resolveLink(to), currentLink) ? pageNumber : null;
             } else {
-              // probably SSR, but no $router so we can't guess, so lets break out of
-              // the loop early
+              // Probably SSR, but no `$router` so we can't guess,
+              // so lets break out of the loop early
 
               /* istanbul ignore next */
               guess = -1;
             }
           }
-        } // We set currentPage to 0 to trigger an $emit('input', null)
-        // As the default for this.currentPage is -1 when no value is specified
-        // And valid page numbers are greater than 0
+        } // We set `currentPage` to `0` to trigger an `$emit('input', null)`
+        // As the default for `currentPage` is `-1` when no value is specified
+        // Valid page numbers are greater than `0`
 
 
         this.currentPage = guess > 0 ? guess : 0;
@@ -24159,6 +21242,7 @@
   });
 
   // Base on-demand component for tooltip / popover templates
+
   var AttachmentMap = {
     AUTO: 'auto',
     TOP: 'top',
@@ -24188,46 +21272,28 @@
     LEFTTOP: -1,
     LEFT: 0,
     LEFTBOTTOM: +1
-  }; // @vue/component
+  }; // --- Props ---
+
+  var props$1H = {
+    // The minimum distance (in `px`) from the edge of the
+    // tooltip/popover that the arrow can be positioned
+    arrowPadding: makeProp(PROP_TYPE_NUMBER_STRING, 6),
+    // 'scrollParent', 'viewport', 'window', or `Element`
+    boundary: makeProp([HTMLElement, PROP_TYPE_STRING], 'scrollParent'),
+    // Tooltip/popover will try and stay away from
+    // boundary edge by this many pixels
+    boundaryPadding: makeProp(PROP_TYPE_NUMBER_STRING, 5),
+    fallbackPlacement: makeProp(PROP_TYPE_ARRAY_STRING, 'flip'),
+    offset: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    placement: makeProp(PROP_TYPE_STRING, 'top'),
+    // Element that the tooltip/popover is positioned relative to
+    target: makeProp([HTMLElement, SVGElement])
+  }; // --- Main component ---
+  // @vue/component
 
   var BVPopper = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_POPPER,
-    props: {
-      target: {
-        // Element that the tooltip/popover is positioned relative to
-        type: [HTMLElement, SVGElement] // default: null
-
-      },
-      placement: {
-        type: String,
-        default: 'top'
-      },
-      fallbackPlacement: {
-        type: [String, Array],
-        default: 'flip'
-      },
-      offset: {
-        type: Number,
-        default: 0
-      },
-      boundary: {
-        // 'scrollParent', 'viewport', 'window', or Element
-        type: [String, HTMLElement],
-        default: 'scrollParent'
-      },
-      boundaryPadding: {
-        // Tooltip/popover will try and stay away from
-        // boundary edge by this many pixels
-        type: Number,
-        default: 5
-      },
-      arrowPadding: {
-        // The minimum distance (in `px`) from the edge of the
-        // tooltip/popover that the arrow can be positioned
-        type: Number,
-        default: 6
-      }
-    },
+    props: props$1H,
     data: function data() {
       return {
         // reactive props set by parent
@@ -24289,7 +21355,7 @@
 
       this.localShow = true; // Create popper instance before shown
 
-      this.$on('show', function (el) {
+      this.$on(EVENT_NAME_SHOW, function (el) {
         _this2.popperCreate(el);
       }); // Self destruct handler
 
@@ -24303,9 +21369,9 @@
       }; // Self destruct if parent destroyed
 
 
-      this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+      this.$parent.$once(HOOK_EVENT_NAME_DESTROYED, handleDestroy); // Self destruct after hidden
 
-      this.$once('hidden', handleDestroy);
+      this.$once(EVENT_NAME_HIDDEN, handleDestroy);
     },
     beforeMount: function beforeMount() {
       // Ensure that the attachment position is correct before mounting
@@ -24380,9 +21446,7 @@
       },
 
       /* istanbul ignore next */
-      renderTemplate: function renderTemplate(h)
-      /* istanbul ignore next */
-      {
+      renderTemplate: function renderTemplate(h) {
         // Will be overridden by templates
         return h('div');
       }
@@ -24390,48 +21454,46 @@
     render: function render(h) {
       var _this3 = this;
 
-      // Note: `show` and 'fade' classes are only appled during transition
+      var noFade = this.noFade; // Note: 'show' and 'fade' classes are only appled during transition
+
       return h(BVTransition, {
         // Transitions as soon as mounted
         props: {
           appear: true,
-          noFade: this.noFade
+          noFade: noFade
         },
         on: {
           // Events used by parent component/instance
           beforeEnter: function beforeEnter(el) {
-            return _this3.$emit('show', el);
+            return _this3.$emit(EVENT_NAME_SHOW, el);
           },
           afterEnter: function afterEnter(el) {
-            return _this3.$emit('shown', el);
+            return _this3.$emit(EVENT_NAME_SHOWN, el);
           },
           beforeLeave: function beforeLeave(el) {
-            return _this3.$emit('hide', el);
+            return _this3.$emit(EVENT_NAME_HIDE, el);
           },
           afterLeave: function afterLeave(el) {
-            return _this3.$emit('hidden', el);
+            return _this3.$emit(EVENT_NAME_HIDDEN, el);
           }
         }
       }, [this.localShow ? this.renderTemplate(h) : h()]);
     }
   });
 
+  var props$1I = {
+    // Used only by the directive versions
+    html: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Other non-reactive (while open) props are pulled in from BVPopper
+    id: makeProp(PROP_TYPE_STRING)
+  }; // --- Main component ---
+  // @vue/component
+
   var BVTooltipTemplate = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TOOLTIP_TEMPLATE,
     extends: BVPopper,
-    mixins: [scopedStyleAttrsMixin],
-    props: {
-      // Other non-reactive (while open) props are pulled in from BVPopper
-      id: {
-        type: String // default: null
-
-      },
-      html: {
-        // Used only by the directive versions
-        type: Boolean // default: false
-
-      }
-    },
+    mixins: [scopedStyleMixin],
+    props: props$1I,
     data: function data() {
       // We use data, rather than props to ensure reactivity
       // Parent component will directly set this data
@@ -24450,15 +21512,19 @@
       templateClasses: function templateClasses() {
         var _ref;
 
+        var variant = this.variant,
+            attachment = this.attachment,
+            templateType = this.templateType;
         return [(_ref = {
           // Disables pointer events to hide the tooltip when the user
           // hovers over its content
           noninteractive: !this.interactive
-        }, _defineProperty(_ref, "b-".concat(this.templateType, "-").concat(this.variant), this.variant), _defineProperty(_ref, "bs-".concat(this.templateType, "-").concat(this.attachment), this.attachment), _ref), this.customClass];
+        }, _defineProperty(_ref, "b-".concat(templateType, "-").concat(variant), variant), _defineProperty(_ref, "bs-".concat(templateType, "-").concat(attachment), attachment), _ref), this.customClass];
       },
       templateAttributes: function templateAttributes() {
+        var id = this.id;
         return _objectSpread2(_objectSpread2({}, this.$parent.$parent.$attrs), {}, {
-          id: this.id,
+          id: id,
           role: 'tooltip',
           tabindex: '-1'
         }, this.scopedStyleAttrs);
@@ -24468,42 +21534,37 @@
 
         // Used for hover/focus trigger listeners
         return {
-          mouseenter
+          mouseenter:
           /* istanbul ignore next */
-          : function mouseenter(evt) {
-            /* istanbul ignore next: difficult to test in JSDOM */
-            _this.$emit('mouseenter', evt);
+          function mouseenter(event) {
+            _this.$emit(EVENT_NAME_MOUSEENTER, event);
           },
-          mouseleave
+          mouseleave:
           /* istanbul ignore next */
-          : function mouseleave(evt) {
-            /* istanbul ignore next: difficult to test in JSDOM */
-            _this.$emit('mouseleave', evt);
+          function mouseleave(event) {
+            _this.$emit(EVENT_NAME_MOUSELEAVE, event);
           },
-          focusin
+          focusin:
           /* istanbul ignore next */
-          : function focusin(evt) {
-            /* istanbul ignore next: difficult to test in JSDOM */
-            _this.$emit('focusin', evt);
+          function focusin(event) {
+            _this.$emit(EVENT_NAME_FOCUSIN, event);
           },
-          focusout
+          focusout:
           /* istanbul ignore next */
-          : function focusout(evt) {
-            /* istanbul ignore next: difficult to test in JSDOM */
-            _this.$emit('focusout', evt);
+          function focusout(event) {
+            _this.$emit(EVENT_NAME_FOCUSOUT, event);
           }
         };
       }
     },
     methods: {
       renderTemplate: function renderTemplate(h) {
-        // Title can be a scoped slot function
-        var $title = isFunction(this.title) ? this.title({}) : isUndefinedOrNull(this.title) ?
-        /* istanbul ignore next */
-        h() : this.title; // Directive versions only
+        var title = this.title; // Title can be a scoped slot function
 
-        var domProps = this.html && !isFunction(this.title) ? {
-          innerHTML: this.title
+        var $title = isFunction(title) ? title({}) : title; // Directive versions only
+
+        var domProps = this.html && !isFunction(title) ? {
+          innerHTML: title
         } : {};
         return h('div', {
           staticClass: 'tooltip b-tooltip',
@@ -24511,8 +21572,8 @@
           attrs: this.templateAttributes,
           on: this.templateListeners
         }, [h('div', {
-          ref: 'arrow',
-          staticClass: 'arrow'
+          staticClass: 'arrow',
+          ref: 'arrow'
         }), h('div', {
           staticClass: 'tooltip-inner',
           domProps: domProps
@@ -24521,9 +21582,11 @@
     }
   });
 
+  // Modal container selector for appending tooltip/popover
+
   var MODAL_SELECTOR = '.modal-content'; // Modal `$root` hidden event
 
-  var MODAL_CLOSE_EVENT = 'bv::modal::hidden'; // Sidebar container selector for appending tooltip/popover
+  var ROOT_EVENT_NAME_MODAL_HIDDEN = getRootEventName(NAME_MODAL, EVENT_NAME_HIDDEN); // Sidebar container selector for appending tooltip/popover
 
   var SIDEBAR_SELECTOR = '.b-sidebar'; // For finding the container to append to
 
@@ -24579,10 +21642,12 @@
     id: null,
     // Flag used by directives only, for HTML content
     html: false
-  }; // @vue/component
+  }; // --- Main component ---
+  // @vue/component
 
   var BVTooltip = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TOOLTIP_HELPER,
+    mixins: [listenOnRootMixin],
     data: function data() {
       return _objectSpread2(_objectSpread2({}, templateData), {}, {
         // State management data
@@ -24601,7 +21666,7 @@
         return 'tooltip';
       },
       computedId: function computedId() {
-        return this.id || "__bv_".concat(this.templateType, "_").concat(this._uid, "__");
+        return this.id || "__bv_".concat(this.templateType, "_").concat(this[COMPONENT_UID_KEY], "__");
       },
       computedDelay: function computedDelay() {
         // Normalizes delay into object form
@@ -24622,7 +21687,7 @@
       computedTriggers: function computedTriggers() {
         // Returns the triggers in sorted array form
         // TODO: Switch this to object form for easier lookup
-        return concat(this.triggers).filter(Boolean).join(' ').trim().toLowerCase().split(/\s+/).sort();
+        return concat(this.triggers).filter(identity).join(' ').trim().toLowerCase().split(/\s+/).sort();
       },
       isWithActiveTrigger: function isWithActiveTrigger() {
         for (var trigger in this.activeTrigger) {
@@ -24634,13 +21699,19 @@
         return false;
       },
       computedTemplateData: function computedTemplateData() {
+        var title = this.title,
+            content = this.content,
+            variant = this.variant,
+            customClass = this.customClass,
+            noFade = this.noFade,
+            interactive = this.interactive;
         return {
-          title: this.title,
-          content: this.content,
-          variant: this.variant,
-          customClass: this.customClass,
-          noFade: this.noFade,
-          interactive: this.interactive
+          title: title,
+          content: content,
+          variant: variant,
+          customClass: customClass,
+          noFade: noFade,
+          interactive: interactive
         };
       }
     },
@@ -24700,7 +21771,7 @@
       this.$_noop = noop.bind(this); // Destroy ourselves when the parent is destroyed
 
       if (this.$parent) {
-        this.$parent.$once('hook:beforeDestroy', function () {
+        this.$parent.$once(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
           _this2.$nextTick(function () {
             // In a `requestAF()` to release control back to application
             requestAF(function () {
@@ -24726,17 +21797,13 @@
     },
 
     /* istanbul ignore next */
-    updated: function updated()
-    /* istanbul ignore next */
-    {
+    updated: function updated() {
       // Usually called when the slots/data changes
       this.$nextTick(this.handleTemplateUpdate);
     },
 
     /* istanbul ignore next */
-    deactivated: function deactivated()
-    /* istanbul ignore next */
-    {
+    deactivated: function deactivated() {
       // In a keepalive that has been deactivated, so hide
       // the tooltip/popover if it is showing
       this.forceHide();
@@ -24807,22 +21874,22 @@
         this.handleTemplateUpdate(); // Template transition phase events (handled once only)
         // When the template has mounted, but not visibly shown yet
 
-        $tip.$once('show', this.onTemplateShow); // When the template has completed showing
+        $tip.$once(EVENT_NAME_SHOW, this.onTemplateShow); // When the template has completed showing
 
-        $tip.$once('shown', this.onTemplateShown); // When the template has started to hide
+        $tip.$once(EVENT_NAME_SHOWN, this.onTemplateShown); // When the template has started to hide
 
-        $tip.$once('hide', this.onTemplateHide); // When the template has completed hiding
+        $tip.$once(EVENT_NAME_HIDE, this.onTemplateHide); // When the template has completed hiding
 
-        $tip.$once('hidden', this.onTemplateHidden); // When the template gets destroyed for any reason
+        $tip.$once(EVENT_NAME_HIDDEN, this.onTemplateHidden); // When the template gets destroyed for any reason
 
-        $tip.$once('hook:destroyed', this.destroyTemplate); // Convenience events from template
+        $tip.$once(HOOK_EVENT_NAME_DESTROYED, this.destroyTemplate); // Convenience events from template
         // To save us from manually adding/removing DOM
         // listeners to tip element when it is open
 
-        $tip.$on('focusin', this.handleEvent);
-        $tip.$on('focusout', this.handleEvent);
-        $tip.$on('mouseenter', this.handleEvent);
-        $tip.$on('mouseleave', this.handleEvent); // Mount (which triggers the `show`)
+        $tip.$on(EVENT_NAME_FOCUSIN, this.handleEvent);
+        $tip.$on(EVENT_NAME_FOCUSOUT, this.handleEvent);
+        $tip.$on(EVENT_NAME_MOUSEENTER, this.handleEvent);
+        $tip.$on(EVENT_NAME_MOUSELEAVE, this.handleEvent); // Mount (which triggers the `show`)
 
         $tip.$mount(container.appendChild(document.createElement('div'))); // Template will automatically remove its markup from DOM when hidden
       },
@@ -24895,7 +21962,7 @@
 
         this.localShow = true; // Create a cancelable BvEvent
 
-        var showEvt = this.buildEvent('show', {
+        var showEvt = this.buildEvent(EVENT_NAME_SHOW, {
           cancelable: true
         });
         this.emitEvent(showEvt); // Don't show if event cancelled
@@ -24928,7 +21995,7 @@
         // We disable cancelling if `force` is true
 
 
-        var hideEvt = this.buildEvent('hide', {
+        var hideEvt = this.buildEvent(EVENT_NAME_HIDE, {
           cancelable: !force
         });
         this.emitEvent(hideEvt);
@@ -24950,7 +22017,7 @@
           /* istanbul ignore next */
           return;
         } // Disable while open listeners/watchers
-        // This is also done in the template `hide` evt handler
+        // This is also done in the template `hide` event handler
 
 
         this.setWhileOpenListeners(false); // Clear any hover enter/leave event
@@ -24969,12 +22036,12 @@
       enable: function enable() {
         this.$_enabled = true; // Create a non-cancelable BvEvent
 
-        this.emitEvent(this.buildEvent('enabled'));
+        this.emitEvent(this.buildEvent(EVENT_NAME_ENABLED));
       },
       disable: function disable() {
         this.$_enabled = false; // Create a non-cancelable BvEvent
 
-        this.emitEvent(this.buildEvent('disabled'));
+        this.emitEvent(this.buildEvent(EVENT_NAME_DISABLED));
       },
       // --- Handlers for template events ---
       // When template is inserted into DOM, but not yet shown
@@ -24993,7 +22060,7 @@
         } // Emit a non-cancelable BvEvent 'shown'
 
 
-        this.emitEvent(this.buildEvent('shown'));
+        this.emitEvent(this.buildEvent(EVENT_NAME_SHOWN));
       },
       // When template is starting to hide
       onTemplateHide: function onTemplateHide() {
@@ -25005,9 +22072,9 @@
         // Destroy the template
         this.destroyTemplate(); // Emit a non-cancelable BvEvent 'shown'
 
-        this.emitEvent(this.buildEvent('hidden'));
+        this.emitEvent(this.buildEvent(EVENT_NAME_HIDDEN));
       },
-      // --- Utility methods ---
+      // --- Helper methods ---
       getTarget: function getTarget() {
         var target = this.target;
 
@@ -25153,17 +22220,10 @@
           vueTarget: this
         }, options));
       },
-      emitEvent: function emitEvent(bvEvt) {
-        // Emits a BvEvent on $root and this instance
-        var evtName = bvEvt.type;
-        var $root = this.$root;
-
-        if ($root && $root.$emit) {
-          // Emit an event on $root
-          $root.$emit("bv::".concat(this.templateType, "::").concat(evtName), bvEvt);
-        }
-
-        this.$emit(evtName, bvEvt);
+      emitEvent: function emitEvent(bvEvent) {
+        var type = bvEvent.type;
+        this.emitOnRoot(getRootEventName(this.templateType, type), bvEvent);
+        this.$emit(type, bvEvent);
       },
       // --- Event handler setup methods ---
       listen: function listen() {
@@ -25197,9 +22257,9 @@
           }
         }, this);
       },
-      unListen: function unListen()
+
       /* istanbul ignore next */
-      {
+      unListen: function unListen() {
         var _this7 = this;
 
         // Remove trigger event handlers
@@ -25208,8 +22268,8 @@
 
         this.setRootListener(false); // Clear out any active target listeners
 
-        events.forEach(function (evt) {
-          target && eventOff(target, evt, _this7.handleEvent, EVENT_OPTIONS_NO_CAPTURE);
+        events.forEach(function (event) {
+          target && eventOff(target, event, _this7.handleEvent, EVENT_OPTIONS_NO_CAPTURE);
         }, this);
       },
       setRootListener: function setRootListener(on) {
@@ -25219,10 +22279,10 @@
         if ($root) {
           var method = on ? '$on' : '$off';
           var type = this.templateType;
-          $root[method]("bv::hide::".concat(type), this.doHide);
-          $root[method]("bv::show::".concat(type), this.doShow);
-          $root[method]("bv::disable::".concat(type), this.doDisable);
-          $root[method]("bv::enable::".concat(type), this.doEnable);
+          $root[method](getRootActionEventName(type, EVENT_NAME_HIDE), this.doHide);
+          $root[method](getRootActionEventName(type, EVENT_NAME_SHOW), this.doShow);
+          $root[method](getRootActionEventName(type, EVENT_NAME_DISABLE), this.doDisable);
+          $root[method](getRootActionEventName(type, EVENT_NAME_ENABLE), this.doEnable);
         }
       },
       setWhileOpenListeners: function setWhileOpenListeners(on) {
@@ -25258,12 +22318,12 @@
         // Handle case where tooltip/target is in a modal
         if (this.isInModal()) {
           // We can listen for modal hidden events on `$root`
-          this.$root[on ? '$on' : '$off'](MODAL_CLOSE_EVENT, this.forceHide);
+          this.$root[on ? '$on' : '$off'](ROOT_EVENT_NAME_MODAL_HIDDEN, this.forceHide);
         }
       },
-      setOnTouchStartListener: function setOnTouchStartListener(on)
+
       /* istanbul ignore next: JSDOM doesn't support `ontouchstart` */
-      {
+      setOnTouchStartListener: function setOnTouchStartListener(on) {
         var _this9 = this;
 
         // If this is a touch-enabled device we add extra empty
@@ -25291,11 +22351,11 @@
 
 
         if (target.__vue__) {
-          target.__vue__[on ? '$on' : '$off']('shown', this.forceHide);
+          target.__vue__[on ? '$on' : '$off'](EVENT_NAME_SHOWN, this.forceHide);
         }
       },
       // --- Event handlers ---
-      handleEvent: function handleEvent(evt) {
+      handleEvent: function handleEvent(event) {
         // General trigger event handler
         // target is the trigger element
         var target = this.getTarget();
@@ -25307,40 +22367,40 @@
           return;
         }
 
-        var type = evt.type;
+        var type = event.type;
         var triggers = this.computedTriggers;
 
         if (type === 'click' && arrayIncludes(triggers, 'click')) {
-          this.click(evt);
+          this.click(event);
         } else if (type === 'mouseenter' && arrayIncludes(triggers, 'hover')) {
           // `mouseenter` is a non-bubbling event
-          this.enter(evt);
+          this.enter(event);
         } else if (type === 'focusin' && arrayIncludes(triggers, 'focus')) {
           // `focusin` is a bubbling event
-          // `evt` includes `relatedTarget` (element losing focus)
-          this.enter(evt);
+          // `event` includes `relatedTarget` (element losing focus)
+          this.enter(event);
         } else if (type === 'focusout' && (arrayIncludes(triggers, 'focus') || arrayIncludes(triggers, 'blur')) || type === 'mouseleave' && arrayIncludes(triggers, 'hover')) {
           // `focusout` is a bubbling event
           // `mouseleave` is a non-bubbling event
           // `tip` is the template (will be null if not open)
-          var tip = this.getTemplateElement(); // `evtTarget` is the element which is losing focus/hover and
+          var tip = this.getTemplateElement(); // `eventTarget` is the element which is losing focus/hover and
 
-          var evtTarget = evt.target; // `relatedTarget` is the element gaining focus/hover
+          var eventTarget = event.target; // `relatedTarget` is the element gaining focus/hover
 
-          var relatedTarget = evt.relatedTarget;
+          var relatedTarget = event.relatedTarget;
           /* istanbul ignore next */
 
           if ( // From tip to target
-          tip && contains(tip, evtTarget) && contains(target, relatedTarget) || // From target to tip
-          tip && contains(target, evtTarget) && contains(tip, relatedTarget) || // Within tip
-          tip && contains(tip, evtTarget) && contains(tip, relatedTarget) || // Within target
-          contains(target, evtTarget) && contains(target, relatedTarget)) {
+          tip && contains(tip, eventTarget) && contains(target, relatedTarget) || // From target to tip
+          tip && contains(target, eventTarget) && contains(tip, relatedTarget) || // Within tip
+          tip && contains(tip, eventTarget) && contains(tip, relatedTarget) || // Within target
+          contains(target, eventTarget) && contains(target, relatedTarget)) {
             // If focus/hover moves within `tip` and `target`, don't trigger a leave
             return;
           } // Otherwise trigger a leave
 
 
-          this.leave(evt);
+          this.leave(event);
         }
       },
       doHide: function doHide(id) {
@@ -25379,7 +22439,7 @@
           this.enable();
         }
       },
-      click: function click(evt) {
+      click: function click(event) {
         if (!this.$_enabled || this.dropdownOpen()) {
           /* istanbul ignore next */
           return;
@@ -25391,7 +22451,7 @@
         // element, not the inner content
 
 
-        attemptFocus(evt.currentTarget);
+        attemptFocus(event.currentTarget);
         this.activeTrigger.click = !this.activeTrigger.click;
 
         if (this.isWithActiveTrigger) {
@@ -25403,9 +22463,7 @@
       },
 
       /* istanbul ignore next */
-      toggle: function toggle()
-      /* istanbul ignore next */
-      {
+      toggle: function toggle() {
         // Manual toggle handler
         if (!this.$_enabled || this.dropdownOpen()) {
           /* istanbul ignore next */
@@ -25423,12 +22481,12 @@
       enter: function enter() {
         var _this10 = this;
 
-        var evt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
         // Opening trigger handler
-        // Note: Click events are sent with evt === null
-        if (evt) {
-          this.activeTrigger[evt.type === 'focusin' ? 'focus' : 'hover'] = true;
+        // Note: Click events are sent with event === null
+        if (event) {
+          this.activeTrigger[event.type === 'focusin' ? 'focus' : 'hover'] = true;
         }
         /* istanbul ignore next */
 
@@ -25459,15 +22517,15 @@
       leave: function leave() {
         var _this11 = this;
 
-        var evt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
         // Closing trigger handler
-        // Note: Click events are sent with evt === null
-        if (evt) {
-          this.activeTrigger[evt.type === 'focusout' ? 'focus' : 'hover'] = false;
+        // Note: Click events are sent with event === null
+        if (event) {
+          this.activeTrigger[event.type === 'focusout' ? 'focus' : 'hover'] = false;
           /* istanbul ignore next */
 
-          if (evt.type === 'focusout' && arrayIncludes(this.computedTriggers, 'blur')) {
+          if (event.type === 'focusout' && arrayIncludes(this.computedTriggers, 'blur')) {
             // Special case for `blur`: we clear out the other triggers
             this.activeTrigger.click = false;
             this.activeTrigger.hover = false;
@@ -25496,185 +22554,88 @@
     }
   });
 
+  var _makePropsConfigurabl, _watch$f;
+
+  var MODEL_PROP_NAME_ENABLED = 'disabled';
+  var MODEL_EVENT_NAME_ENABLED = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_ENABLED;
+  var MODEL_PROP_NAME_SHOW$1 = 'show';
+  var MODEL_EVENT_NAME_SHOW$1 = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SHOW$1; // --- Props ---
+
+  var props$1J = makePropsConfigurable((_makePropsConfigurabl = {
+    // String: scrollParent, window, or viewport
+    // Element: element reference
+    // Object: Vue component
+    boundary: makeProp([HTMLElement, PROP_TYPE_OBJECT, PROP_TYPE_STRING], 'scrollParent'),
+    boundaryPadding: makeProp(PROP_TYPE_NUMBER_STRING, 50),
+    // String: HTML ID of container, if null body is used (default)
+    // HTMLElement: element reference reference
+    // Object: Vue Component
+    container: makeProp([HTMLElement, PROP_TYPE_OBJECT, PROP_TYPE_STRING]),
+    customClass: makeProp(PROP_TYPE_STRING),
+    delay: makeProp(PROP_TYPE_NUMBER_OBJECT_STRING, 50)
+  }, _defineProperty(_makePropsConfigurabl, MODEL_PROP_NAME_ENABLED, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "fallbackPlacement", makeProp(PROP_TYPE_ARRAY_STRING, 'flip')), _defineProperty(_makePropsConfigurabl, "id", makeProp(PROP_TYPE_STRING)), _defineProperty(_makePropsConfigurabl, "noFade", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "noninteractive", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "offset", makeProp(PROP_TYPE_NUMBER_STRING, 0)), _defineProperty(_makePropsConfigurabl, "placement", makeProp(PROP_TYPE_STRING, 'top')), _defineProperty(_makePropsConfigurabl, MODEL_PROP_NAME_SHOW$1, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "target", makeProp([HTMLElement, SVGElement, PROP_TYPE_FUNCTION, PROP_TYPE_OBJECT, PROP_TYPE_STRING], undefined, true)), _defineProperty(_makePropsConfigurabl, "title", makeProp(PROP_TYPE_STRING)), _defineProperty(_makePropsConfigurabl, "triggers", makeProp(PROP_TYPE_ARRAY_STRING, 'hover focus')), _defineProperty(_makePropsConfigurabl, "variant", makeProp(PROP_TYPE_STRING)), _makePropsConfigurabl), NAME_TOOLTIP); // --- Main component ---
+  // @vue/component
+
   var BTooltip = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TOOLTIP,
+    mixins: [normalizeSlotMixin],
     inheritAttrs: false,
-    props: {
-      title: {
-        type: String // default: undefined
-
-      },
-      // Added in by BPopover
-      // content: {
-      //   type: String,
-      //   default: undefined
-      // },
-      target: {
-        // String ID of element, or element/component reference
-        // Or function that returns one of the above
-        type: [String, HTMLElement, SVGElement, Function, Object],
-        required: true
-      },
-      triggers: {
-        type: [String, Array],
-        default: 'hover focus'
-      },
-      placement: {
-        type: String,
-        default: 'top'
-      },
-      fallbackPlacement: {
-        type: [String, Array],
-        default: 'flip',
-        validator: function validator(value) {
-          return isArray(value) && value.every(function (v) {
-            return isString(v);
-          }) || arrayIncludes(['flip', 'clockwise', 'counterclockwise'], value);
-        }
-      },
-      variant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TOOLTIP, 'variant');
-        }
-      },
-      customClass: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TOOLTIP, 'customClass');
-        }
-      },
-      delay: {
-        type: [Number, Object, String],
-        default: function _default() {
-          return getComponentConfig(NAME_TOOLTIP, 'delay');
-        }
-      },
-      boundary: {
-        // String: scrollParent, window, or viewport
-        // Element: element reference
-        // Object: Vue component
-        type: [String, HTMLElement, Object],
-        default: function _default() {
-          return getComponentConfig(NAME_TOOLTIP, 'boundary');
-        }
-      },
-      boundaryPadding: {
-        type: [Number, String],
-        default: function _default() {
-          return getComponentConfig(NAME_TOOLTIP, 'boundaryPadding');
-        }
-      },
-      offset: {
-        type: [Number, String],
-        default: 0
-      },
-      noFade: {
-        type: Boolean,
-        default: false
-      },
-      container: {
-        // String: HTML ID of container, if null body is used (default)
-        // HTMLElement: element reference reference
-        // Object: Vue Component
-        type: [String, HTMLElement, Object] // default: undefined
-
-      },
-      show: {
-        type: Boolean,
-        default: false
-      },
-      noninteractive: {
-        type: Boolean,
-        default: false
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      id: {
-        // ID to use for tooltip element
-        // If not provided on will automatically be generated
-        type: String // default: null
-
-      }
-    },
+    props: props$1J,
     data: function data() {
       return {
-        localShow: this.show,
+        localShow: this[MODEL_PROP_NAME_SHOW$1],
         localTitle: '',
         localContent: ''
       };
     },
     computed: {
+      // Data that will be passed to the template and popper
       templateData: function templateData() {
-        // Data that will be passed to the template and popper
-        return {
-          // We use massaged versions of the title and content props/slots
+        return _objectSpread2({
           title: this.localTitle,
           content: this.localContent,
-          // Pass these props as is
-          target: this.target,
-          triggers: this.triggers,
-          placement: this.placement,
-          fallbackPlacement: this.fallbackPlacement,
-          variant: this.variant,
-          customClass: this.customClass,
-          container: this.container,
-          boundary: this.boundary,
-          boundaryPadding: this.boundaryPadding,
-          delay: this.delay,
-          offset: this.offset,
-          noFade: this.noFade,
-          interactive: !this.noninteractive,
-          disabled: this.disabled,
-          id: this.id
-        };
+          interactive: !this.noninteractive
+        }, pick(this.$props, ['boundary', 'boundaryPadding', 'container', 'customClass', 'delay', 'fallbackPlacement', 'id', 'noFade', 'offset', 'placement', 'target', 'target', 'triggers', 'variant', MODEL_PROP_NAME_ENABLED]));
       },
+      // Used to watch for changes to the title and content props
       templateTitleContent: function templateTitleContent() {
-        // Used to watch for changes to the title and content props
+        var title = this.title,
+            content = this.content;
         return {
-          title: this.title,
-          content: this.content
+          title: title,
+          content: content
         };
       }
     },
-    watch: {
-      show: function show(_show, oldVal) {
-        if (_show !== oldVal && _show !== this.localShow && this.$_toolpop) {
-          if (_show) {
-            this.$_toolpop.show();
-          } else {
-            // We use `forceHide()` to override any active triggers
-            this.$_toolpop.forceHide();
-          }
-        }
-      },
-      disabled: function disabled(newVal) {
-        if (newVal) {
-          this.doDisable();
+    watch: (_watch$f = {}, _defineProperty(_watch$f, MODEL_PROP_NAME_SHOW$1, function (newValue, oldValue) {
+      if (newValue !== oldValue && newValue !== this.localShow && this.$_toolpop) {
+        if (newValue) {
+          this.$_toolpop.show();
         } else {
-          this.doEnable();
+          // We use `forceHide()` to override any active triggers
+          this.$_toolpop.forceHide();
         }
-      },
-      localShow: function localShow(newVal) {
-        // TODO: May need to be done in a `$nextTick()`
-        this.$emit('update:show', newVal);
-      },
-      templateData: function templateData() {
-        var _this = this;
-
-        this.$nextTick(function () {
-          if (_this.$_toolpop) {
-            _this.$_toolpop.updateData(_this.templateData);
-          }
-        });
-      },
-      // Watchers for title/content props (prop changes do not trigger the `updated()` hook)
-      templateTitleContent: function templateTitleContent() {
-        this.$nextTick(this.updateContent);
       }
-    },
+    }), _defineProperty(_watch$f, MODEL_PROP_NAME_ENABLED, function (newValue) {
+      if (newValue) {
+        this.doDisable();
+      } else {
+        this.doEnable();
+      }
+    }), _defineProperty(_watch$f, "localShow", function localShow(newValue) {
+      // TODO: May need to be done in a `$nextTick()`
+      this.$emit(MODEL_EVENT_NAME_SHOW$1, newValue);
+    }), _defineProperty(_watch$f, "templateData", function templateData() {
+      var _this = this;
+
+      this.$nextTick(function () {
+        if (_this.$_toolpop) {
+          _this.$_toolpop.updateData(_this.templateData);
+        }
+      });
+    }), _defineProperty(_watch$f, "templateTitleContent", function templateTitleContent() {
+      this.$nextTick(this.updateContent);
+    }), _watch$f),
     created: function created() {
       // Create private non-reactive props
       this.$_toolpop = null;
@@ -25686,10 +22647,10 @@
     },
     beforeDestroy: function beforeDestroy() {
       // Shutdown our local event listeners
-      this.$off('open', this.doOpen);
-      this.$off('close', this.doClose);
-      this.$off('disable', this.doDisable);
-      this.$off('enable', this.doEnable); // Destroy the tip instance
+      this.$off(EVENT_NAME_OPEN, this.doOpen);
+      this.$off(EVENT_NAME_CLOSE, this.doClose);
+      this.$off(EVENT_NAME_DISABLE, this.doDisable);
+      this.$off(EVENT_NAME_ENABLE, this.doEnable); // Destroy the tip instance
 
       if (this.$_toolpop) {
         this.$_toolpop.$destroy();
@@ -25720,29 +22681,29 @@
 
         $toolpop.updateData(_this2.templateData); // Set listeners
 
-        $toolpop.$on('show', _this2.onShow);
-        $toolpop.$on('shown', _this2.onShown);
-        $toolpop.$on('hide', _this2.onHide);
-        $toolpop.$on('hidden', _this2.onHidden);
-        $toolpop.$on('disabled', _this2.onDisabled);
-        $toolpop.$on('enabled', _this2.onEnabled); // Initially disabled?
+        $toolpop.$on(EVENT_NAME_SHOW, _this2.onShow);
+        $toolpop.$on(EVENT_NAME_SHOWN, _this2.onShown);
+        $toolpop.$on(EVENT_NAME_HIDE, _this2.onHide);
+        $toolpop.$on(EVENT_NAME_HIDDEN, _this2.onHidden);
+        $toolpop.$on(EVENT_NAME_DISABLED, _this2.onDisabled);
+        $toolpop.$on(EVENT_NAME_ENABLED, _this2.onEnabled); // Initially disabled?
 
-        if (_this2.disabled) {
+        if (_this2[MODEL_PROP_NAME_ENABLED]) {
           // Initially disabled
           _this2.doDisable();
         } // Listen to open signals from others
 
 
-        _this2.$on('open', _this2.doOpen); // Listen to close signals from others
+        _this2.$on(EVENT_NAME_OPEN, _this2.doOpen); // Listen to close signals from others
 
 
-        _this2.$on('close', _this2.doClose); // Listen to disable signals from others
+        _this2.$on(EVENT_NAME_CLOSE, _this2.doClose); // Listen to disable signals from others
 
 
-        _this2.$on('disable', _this2.doDisable); // Listen to enable signals from others
+        _this2.$on(EVENT_NAME_DISABLE, _this2.doDisable); // Listen to enable signals from others
 
 
-        _this2.$on('enable', _this2.doEnable); // Initially show tooltip?
+        _this2.$on(EVENT_NAME_ENABLE, _this2.doEnable); // Initially show tooltip?
 
 
         if (_this2.localShow) {
@@ -25761,59 +22722,59 @@
         // Popover: Default slot is `content`, `title` slot is title
         // We pass a scoped slot function reference by default (Vue v2.6x)
         // And pass the title prop as a fallback
-        this.setTitle(this.$scopedSlots.default || this.title);
+        this.setTitle(this.normalizeSlot() || this.title);
       },
       // Helper methods for `updateContent()`
-      setTitle: function setTitle(val) {
-        val = isUndefinedOrNull(val) ? '' : val; // We only update the value if it has changed
+      setTitle: function setTitle(value) {
+        value = isUndefinedOrNull(value) ? '' : value; // We only update the value if it has changed
 
-        if (this.localTitle !== val) {
-          this.localTitle = val;
+        if (this.localTitle !== value) {
+          this.localTitle = value;
         }
       },
-      setContent: function setContent(val) {
-        val = isUndefinedOrNull(val) ? '' : val; // We only update the value if it has changed
+      setContent: function setContent(value) {
+        value = isUndefinedOrNull(value) ? '' : value; // We only update the value if it has changed
 
-        if (this.localContent !== val) {
-          this.localContent = val;
+        if (this.localContent !== value) {
+          this.localContent = value;
         }
       },
       // --- Template event handlers ---
-      onShow: function onShow(bvEvt) {
+      onShow: function onShow(bvEvent) {
         // Placeholder
-        this.$emit('show', bvEvt);
+        this.$emit(EVENT_NAME_SHOW, bvEvent);
 
-        if (bvEvt) {
-          this.localShow = !bvEvt.defaultPrevented;
+        if (bvEvent) {
+          this.localShow = !bvEvent.defaultPrevented;
         }
       },
-      onShown: function onShown(bvEvt) {
+      onShown: function onShown(bvEvent) {
         // Tip is now showing
         this.localShow = true;
-        this.$emit('shown', bvEvt);
+        this.$emit(EVENT_NAME_SHOWN, bvEvent);
       },
-      onHide: function onHide(bvEvt) {
-        this.$emit('hide', bvEvt);
+      onHide: function onHide(bvEvent) {
+        this.$emit(EVENT_NAME_HIDE, bvEvent);
       },
-      onHidden: function onHidden(bvEvt) {
+      onHidden: function onHidden(bvEvent) {
         // Tip is no longer showing
-        this.$emit('hidden', bvEvt);
+        this.$emit(EVENT_NAME_HIDDEN, bvEvent);
         this.localShow = false;
       },
-      onDisabled: function onDisabled(bvEvt) {
+      onDisabled: function onDisabled(bvEvent) {
         // Prevent possible endless loop if user mistakenly
         // fires `disabled` instead of `disable`
-        if (bvEvt && bvEvt.type === 'disabled') {
-          this.$emit('update:disabled', true);
-          this.$emit('disabled', bvEvt);
+        if (bvEvent && bvEvent.type === EVENT_NAME_DISABLED) {
+          this.$emit(MODEL_EVENT_NAME_ENABLED, true);
+          this.$emit(EVENT_NAME_DISABLED, bvEvent);
         }
       },
-      onEnabled: function onEnabled(bvEvt) {
+      onEnabled: function onEnabled(bvEvent) {
         // Prevent possible endless loop if user mistakenly
         // fires `enabled` instead of `enable`
-        if (bvEvt && bvEvt.type === 'enabled') {
-          this.$emit('update:disabled', false);
-          this.$emit('enabled', bvEvt);
+        if (bvEvent && bvEvent.type === EVENT_NAME_ENABLED) {
+          this.$emit(MODEL_EVENT_NAME_ENABLED, false);
+          this.$emit(EVENT_NAME_ENABLED, bvEvent);
         }
       },
       // --- Local event listeners ---
@@ -25849,15 +22810,17 @@
     },
     methods: {
       renderTemplate: function renderTemplate(h) {
-        // Title and content could be a scoped slot function
-        var $title = isFunction(this.title) ? this.title({}) : this.title;
-        var $content = isFunction(this.content) ? this.content({}) : this.content; // Directive usage only
+        var title = this.title,
+            content = this.content; // Title and content could be a scoped slot function
 
-        var titleDomProps = this.html && !isFunction(this.title) ? {
-          innerHTML: this.title
+        var $title = isFunction(title) ? title({}) : title;
+        var $content = isFunction(content) ? content({}) : content; // Directive usage only
+
+        var titleDomProps = this.html && !isFunction(title) ? {
+          innerHTML: title
         } : {};
-        var contentDomProps = this.html && !isFunction(this.content) ? {
-          innerHTML: this.content
+        var contentDomProps = this.html && !isFunction(content) ? {
+          innerHTML: content
         } : {};
         return h('div', {
           staticClass: 'popover b-popover',
@@ -25865,8 +22828,8 @@
           attrs: this.templateAttributes,
           on: this.templateListeners
         }, [h('div', {
-          ref: 'arrow',
-          staticClass: 'arrow'
+          staticClass: 'arrow',
+          ref: 'arrow'
         }), isUndefinedOrNull($title) || $title === '' ?
         /* istanbul ignore next */
         h() : h('h3', {
@@ -25901,61 +22864,18 @@
     }
   });
 
+  var props$1K = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$1J), {}, {
+    content: makeProp(PROP_TYPE_STRING),
+    placement: makeProp(PROP_TYPE_STRING, 'right'),
+    triggers: makeProp(PROP_TYPE_ARRAY_STRING, EVENT_NAME_CLICK)
+  })), NAME_POPOVER); // --- Main component ---
+  // @vue/component
+
   var BPopover = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_POPOVER,
     extends: BTooltip,
     inheritAttrs: false,
-    props: {
-      title: {
-        type: String // default: undefined
-
-      },
-      content: {
-        type: String // default: undefined
-
-      },
-      triggers: {
-        type: [String, Array],
-        default: 'click'
-      },
-      placement: {
-        type: String,
-        default: 'right'
-      },
-      variant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_POPOVER, 'variant');
-        }
-      },
-      customClass: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_POPOVER, 'customClass');
-        }
-      },
-      delay: {
-        type: [Number, Object, String],
-        default: function _default() {
-          return getComponentConfig(NAME_POPOVER, 'delay');
-        }
-      },
-      boundary: {
-        // String: scrollParent, window, or viewport
-        // Element: element reference
-        // Object: Vue component
-        type: [String, HTMLElement, Object],
-        default: function _default() {
-          return getComponentConfig(NAME_POPOVER, 'boundary');
-        }
-      },
-      boundaryPadding: {
-        type: [Number, String],
-        default: function _default() {
-          return getComponentConfig(NAME_POPOVER, 'boundaryPadding');
-        }
-      }
-    },
+    props: props$1K,
     methods: {
       getComponent: function getComponent() {
         // Overridden by BPopover
@@ -25966,8 +22886,8 @@
         // Popover: Default slot is `content`, `title` slot is title
         // We pass a scoped slot function references by default (Vue v2.6x)
         // And pass the title prop as a fallback
-        this.setContent(this.$scopedSlots.default || this.content);
-        this.setTitle(this.$scopedSlots.title || this.title);
+        this.setContent(this.normalizeSlot() || this.content);
+        this.setTitle(this.normalizeSlot(SLOT_NAME_TITLE) || this.title);
       }
     } // Render function provided by BTooltip
 
@@ -26015,9 +22935,9 @@
       disabled: false,
       id: null,
       html: false,
-      delay: getComponentConfig(NAME_POPOVER, 'delay'),
-      boundary: String(getComponentConfig(NAME_POPOVER, 'boundary')),
-      boundaryPadding: toInteger(getComponentConfig(NAME_POPOVER, 'boundaryPadding'), 0),
+      delay: getComponentConfig(NAME_POPOVER, 'delay', 50),
+      boundary: String(getComponentConfig(NAME_POPOVER, 'boundary', 'scrollParent')),
+      boundaryPadding: toInteger(getComponentConfig(NAME_POPOVER, 'boundaryPadding', 5), 0),
       variant: getComponentConfig(NAME_POPOVER, 'variant'),
       customClass: getComponentConfig(NAME_POPOVER, 'customClass')
     }; // Process `bindings.value`
@@ -26125,7 +23045,7 @@
 
 
   var applyPopover = function applyPopover(el, bindings, vnode) {
-    if (!isBrowser) {
+    if (!IS_BROWSER) {
       /* istanbul ignore next */
       return;
     }
@@ -26140,7 +23060,7 @@
         _scopeId: getScopeId($parent, undefined)
       });
       el[BV_POPOVER].__bv_prev_data__ = {};
-      el[BV_POPOVER].$on('show', function ()
+      el[BV_POPOVER].$on(EVENT_NAME_SHOW, function ()
       /* istanbul ignore next: for now */
       {
         // Before showing the popover, we update the title
@@ -26242,66 +23162,38 @@
     }
   });
 
+  var props$1L = makePropsConfigurable({
+    animated: makeProp(PROP_TYPE_BOOLEAN, null),
+    label: makeProp(PROP_TYPE_STRING),
+    labelHtml: makeProp(PROP_TYPE_STRING),
+    max: makeProp(PROP_TYPE_NUMBER_STRING, null),
+    precision: makeProp(PROP_TYPE_NUMBER_STRING, null),
+    showProgress: makeProp(PROP_TYPE_BOOLEAN, null),
+    showValue: makeProp(PROP_TYPE_BOOLEAN, null),
+    striped: makeProp(PROP_TYPE_BOOLEAN, null),
+    value: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_PROGRESS_BAR); // --- Main component ---
+  // @vue/component
+
   var BProgressBar = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_PROGRESS_BAR,
     mixins: [normalizeSlotMixin],
     inject: {
       bvProgress: {
-        default: function _default()
+        default:
         /* istanbul ignore next */
-        {
+        function _default() {
           return {};
         }
       }
     },
-    props: {
-      value: {
-        type: [Number, String],
-        default: 0
-      },
-      label: {
-        type: String // default: null
-
-      },
-      labelHtml: {
-        type: String
-      },
-      // $parent (this.bvProgress) prop values may take precedence over the following props
-      // Which is why they are defaulted to null
-      max: {
-        type: [Number, String],
-        default: null
-      },
-      precision: {
-        type: [Number, String],
-        default: null
-      },
-      variant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_PROGRESS_BAR, 'variant');
-        }
-      },
-      striped: {
-        type: Boolean,
-        default: null
-      },
-      animated: {
-        type: Boolean,
-        default: null
-      },
-      showProgress: {
-        type: Boolean,
-        default: null
-      },
-      showValue: {
-        type: Boolean,
-        default: null
-      }
-    },
+    props: props$1L,
     computed: {
       progressBarClasses: function progressBarClasses() {
-        return [this.computedVariant ? "bg-".concat(this.computedVariant) : '', this.computedStriped || this.computedAnimated ? 'progress-bar-striped' : '', this.computedAnimated ? 'progress-bar-animated' : ''];
+        var computedAnimated = this.computedAnimated,
+            computedVariant = this.computedVariant;
+        return [computedVariant ? "bg-".concat(computedVariant) : '', this.computedStriped || computedAnimated ? 'progress-bar-striped' : '', computedAnimated ? 'progress-bar-animated' : ''];
       },
       progressBarStyles: function progressBarStyles() {
         return {
@@ -26381,6 +23273,18 @@
     }
   });
 
+  var progressBarProps = omit(props$1L, ['label', 'labelHtml']);
+  var props$1M = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, progressBarProps), {}, {
+    animated: makeProp(PROP_TYPE_BOOLEAN, false),
+    height: makeProp(PROP_TYPE_STRING),
+    max: makeProp(PROP_TYPE_NUMBER_STRING, 100),
+    precision: makeProp(PROP_TYPE_NUMBER_STRING, 0),
+    showProgress: makeProp(PROP_TYPE_BOOLEAN, false),
+    showValue: makeProp(PROP_TYPE_BOOLEAN, false),
+    striped: makeProp(PROP_TYPE_BOOLEAN, false)
+  })), NAME_PROGRESS); // --- Main component ---
+  // @vue/component
+
   var BProgress = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_PROGRESS,
     mixins: [normalizeSlotMixin],
@@ -26389,48 +23293,7 @@
         bvProgress: this
       };
     },
-    props: {
-      // These props can be inherited via the child b-progress-bar(s)
-      variant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_PROGRESS, 'variant');
-        }
-      },
-      striped: {
-        type: Boolean,
-        default: false
-      },
-      animated: {
-        type: Boolean,
-        default: false
-      },
-      height: {
-        type: String // default: null
-
-      },
-      precision: {
-        type: [Number, String],
-        default: 0
-      },
-      showProgress: {
-        type: Boolean,
-        default: false
-      },
-      showValue: {
-        type: Boolean,
-        default: false
-      },
-      max: {
-        type: [Number, String],
-        default: 100
-      },
-      // This prop is not inherited by child b-progress-bar(s)
-      value: {
-        type: [Number, String],
-        default: 0
-      }
-    },
+    props: props$1M,
     computed: {
       progressHeight: function progressHeight() {
         return {
@@ -26439,27 +23302,18 @@
       }
     },
     render: function render(h) {
-      var childNodes = this.normalizeSlot();
+      var $childNodes = this.normalizeSlot();
 
-      if (!childNodes) {
-        childNodes = h(BProgressBar, {
-          props: {
-            value: this.value,
-            max: this.max,
-            precision: this.precision,
-            variant: this.variant,
-            animated: this.animated,
-            striped: this.striped,
-            showProgress: this.showProgress,
-            showValue: this.showValue
-          }
+      if (!$childNodes) {
+        $childNodes = h(BProgressBar, {
+          props: pluckProps(progressBarProps, this.$props)
         });
       }
 
       return h('div', {
-        class: ['progress'],
+        staticClass: 'progress',
         style: this.progressHeight
-      }, [childNodes]);
+      }, [$childNodes]);
     }
   });
 
@@ -26470,11 +23324,58 @@
     }
   });
 
-  var CLASS_NAME$3 = 'b-sidebar'; // --- Render methods ---
+  var _watch$g;
+
+  var CLASS_NAME$3 = 'b-sidebar';
+  var ROOT_ACTION_EVENT_NAME_REQUEST_STATE$2 = getRootActionEventName(NAME_COLLAPSE, 'request-state');
+  var ROOT_ACTION_EVENT_NAME_TOGGLE$2 = getRootActionEventName(NAME_COLLAPSE, 'toggle');
+  var ROOT_EVENT_NAME_STATE$3 = getRootEventName(NAME_COLLAPSE, 'state');
+  var ROOT_EVENT_NAME_SYNC_STATE$3 = getRootEventName(NAME_COLLAPSE, 'sync-state');
+
+  var _makeModelMixin$h = makeModelMixin('visible', {
+    type: PROP_TYPE_BOOLEAN,
+    defaultValue: false,
+    event: EVENT_NAME_CHANGE
+  }),
+      modelMixin$g = _makeModelMixin$h.mixin,
+      modelProps$g = _makeModelMixin$h.props,
+      MODEL_PROP_NAME$g = _makeModelMixin$h.prop,
+      MODEL_EVENT_NAME$g = _makeModelMixin$h.event; // --- Props ---
+
+
+  var props$1N = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$g), {}, {
+    ariaLabel: makeProp(PROP_TYPE_STRING),
+    ariaLabelledby: makeProp(PROP_TYPE_STRING),
+    // If `true`, shows a basic backdrop
+    backdrop: makeProp(PROP_TYPE_BOOLEAN, false),
+    backdropVariant: makeProp(PROP_TYPE_STRING, 'dark'),
+    bgVariant: makeProp(PROP_TYPE_STRING, 'light'),
+    bodyClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    // `aria-label` for close button
+    closeLabel: makeProp(PROP_TYPE_STRING),
+    footerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    headerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    lazy: makeProp(PROP_TYPE_BOOLEAN, false),
+    noCloseOnBackdrop: makeProp(PROP_TYPE_BOOLEAN, false),
+    noCloseOnEsc: makeProp(PROP_TYPE_BOOLEAN, false),
+    noCloseOnRouteChange: makeProp(PROP_TYPE_BOOLEAN, false),
+    noEnforceFocus: makeProp(PROP_TYPE_BOOLEAN, false),
+    noHeader: makeProp(PROP_TYPE_BOOLEAN, false),
+    noHeaderClose: makeProp(PROP_TYPE_BOOLEAN, false),
+    noSlide: makeProp(PROP_TYPE_BOOLEAN, false),
+    right: makeProp(PROP_TYPE_BOOLEAN, false),
+    shadow: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    sidebarClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    tag: makeProp(PROP_TYPE_STRING, 'div'),
+    textVariant: makeProp(PROP_TYPE_STRING, 'dark'),
+    title: makeProp(PROP_TYPE_STRING),
+    width: makeProp(PROP_TYPE_STRING),
+    zIndex: makeProp(PROP_TYPE_NUMBER_STRING)
+  })), NAME_SIDEBAR); // --- Render methods ---
 
   var renderHeaderTitle = function renderHeaderTitle(h, ctx) {
     // Render a empty `<span>` when to title was provided
-    var title = ctx.computedTile;
+    var title = ctx.normalizeSlot(SLOT_NAME_TITLE, ctx.slotScope) || ctx.title;
 
     if (!title) {
       return h('span');
@@ -26496,15 +23397,15 @@
         textVariant = ctx.textVariant,
         hide = ctx.hide;
     return h(BButtonClose, {
-      ref: 'close-button',
       props: {
         ariaLabel: closeLabel,
         textVariant: textVariant
       },
       on: {
         click: hide
-      }
-    }, [ctx.normalizeSlot('header-close') || h(BIconX)]);
+      },
+      ref: 'close-button'
+    }, [ctx.normalizeSlot(SLOT_NAME_HEADER_CLOSE) || h(BIconX)]);
   };
 
   var renderHeader = function renderHeader(h, ctx) {
@@ -26512,20 +23413,26 @@
       return h();
     }
 
-    var $title = renderHeaderTitle(h, ctx);
-    var $close = renderHeaderClose(h, ctx);
+    var $content = ctx.normalizeSlot(SLOT_NAME_HEADER, ctx.slotScope);
+
+    if (!$content) {
+      var $title = renderHeaderTitle(h, ctx);
+      var $close = renderHeaderClose(h, ctx);
+      $content = ctx.right ? [$close, $title] : [$title, $close];
+    }
+
     return h('header', {
-      key: 'header',
       staticClass: "".concat(CLASS_NAME$3, "-header"),
-      class: ctx.headerClass
-    }, ctx.right ? [$close, $title] : [$title, $close]);
+      class: ctx.headerClass,
+      key: 'header'
+    }, $content);
   };
 
   var renderBody = function renderBody(h, ctx) {
     return h('div', {
-      key: 'body',
       staticClass: "".concat(CLASS_NAME$3, "-body"),
-      class: ctx.bodyClass
+      class: ctx.bodyClass,
+      key: 'body'
     }, [ctx.normalizeSlot(SLOT_NAME_DEFAULT, ctx.slotScope)]);
   };
 
@@ -26537,9 +23444,9 @@
     }
 
     return h('footer', {
-      key: 'footer',
       staticClass: "".concat(CLASS_NAME$3, "-footer"),
-      class: ctx.footerClass
+      class: ctx.footerClass,
+      key: 'footer'
     }, [$footer]);
   };
 
@@ -26567,7 +23474,7 @@
         value: ctx.localShow
       }],
       staticClass: 'b-sidebar-backdrop',
-      class: _defineProperty({}, "bg-".concat(backdropVariant), !!backdropVariant),
+      class: _defineProperty({}, "bg-".concat(backdropVariant), backdropVariant),
       on: {
         click: ctx.onBackdropClick
       }
@@ -26578,140 +23485,16 @@
 
   var BSidebar = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SIDEBAR,
-    // Mixin order is important!
-    mixins: [attrsMixin, idMixin, listenOnRootMixin, normalizeSlotMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$g, listenOnRootMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    model: {
-      prop: 'visible',
-      event: 'change'
-    },
-    props: {
-      title: {
-        type: String // default: null
-
-      },
-      right: {
-        type: Boolean,
-        default: false
-      },
-      bgVariant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_SIDEBAR, 'bgVariant');
-        }
-      },
-      textVariant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_SIDEBAR, 'textVariant');
-        }
-      },
-      shadow: {
-        type: [Boolean, String],
-        default: function _default() {
-          return getComponentConfig(NAME_SIDEBAR, 'shadow');
-        }
-      },
-      width: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_SIDEBAR, 'width');
-        }
-      },
-      zIndex: {
-        type: [Number, String] // default: null
-
-      },
-      ariaLabel: {
-        type: String // default: null
-
-      },
-      ariaLabelledby: {
-        type: String // default: null
-
-      },
-      closeLabel: {
-        // `aria-label` for close button
-        // Defaults to 'Close'
-        type: String // default: undefined
-
-      },
-      tag: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_SIDEBAR, 'tag');
-        }
-      },
-      sidebarClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      headerClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      bodyClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      footerClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      backdrop: {
-        // If `true`, shows a basic backdrop
-        type: Boolean,
-        default: false
-      },
-      backdropVariant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_SIDEBAR, 'backdropVariant');
-        }
-      },
-      noSlide: {
-        type: Boolean,
-        default: false
-      },
-      noHeader: {
-        type: Boolean,
-        default: false
-      },
-      noHeaderClose: {
-        type: Boolean,
-        default: false
-      },
-      noCloseOnEsc: {
-        type: Boolean,
-        default: false
-      },
-      noCloseOnBackdrop: {
-        type: Boolean,
-        default: false
-      },
-      noCloseOnRouteChange: {
-        type: Boolean,
-        default: false
-      },
-      noEnforceFocus: {
-        type: Boolean,
-        default: false
-      },
-      lazy: {
-        type: Boolean,
-        default: false
-      },
-      visible: {
-        type: Boolean,
-        default: false
-      }
-    },
+    props: props$1N,
     data: function data() {
+      var visible = !!this[MODEL_PROP_NAME$g];
       return {
         // Internal `v-model` state
-        localShow: !!this.visible,
+        localShow: visible,
         // For lazy render triggering
-        isOpen: !!this.visible
+        isOpen: visible
       };
     },
     computed: {
@@ -26731,17 +23514,22 @@
         };
       },
       slotScope: function slotScope() {
+        var hide = this.hide,
+            right = this.right,
+            visible = this.localShow;
         return {
-          visible: this.localShow,
-          right: this.right,
-          hide: this.hide
+          hide: hide,
+          right: right,
+          visible: visible
         };
       },
-      computedTile: function computedTile() {
-        return this.normalizeSlot(SLOT_NAME_TITLE, this.slotScope) || toString$1(this.title) || null;
+      hasTitle: function hasTitle() {
+        var $scopedSlots = this.$scopedSlots,
+            $slots = this.$slots;
+        return !this.noHeader && !this.hasNormalizedSlot(SLOT_NAME_HEADER) && !!(this.normalizeSlot(SLOT_NAME_TITLE, this.slotScope, $scopedSlots, $slots) || this.title);
       },
       titleId: function titleId() {
-        return this.computedTile ? this.safeId('__title__') : null;
+        return this.hasTitle ? this.safeId('__title__') : null;
       },
       computedAttrs: function computedAttrs() {
         return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
@@ -26755,31 +23543,23 @@
         });
       }
     },
-    watch: {
-      visible: function visible(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.localShow = newVal;
-        }
-      },
-      localShow: function localShow(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.emitState(newVal);
-          this.$emit('change', newVal);
-        }
-      },
-
-      /* istanbul ignore next */
-      $route: function $route()
-      /* istanbul ignore next: pain to mock */
-      {
-        var newVal = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var oldVal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        if (!this.noCloseOnRouteChange && newVal.fullPath !== oldVal.fullPath) {
-          this.hide();
-        }
+    watch: (_watch$g = {}, _defineProperty(_watch$g, MODEL_PROP_NAME$g, function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.localShow = newValue;
       }
-    },
+    }), _defineProperty(_watch$g, "localShow", function localShow(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.emitState(newValue);
+        this.$emit(MODEL_EVENT_NAME$g, newValue);
+      }
+    }), _defineProperty(_watch$g, "$route", function $route() {
+      var newValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var oldValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (!this.noCloseOnRouteChange && newValue.fullPath !== oldValue.fullPath) {
+        this.hide();
+      }
+    }), _watch$g),
     created: function created() {
       // Define non-reactive properties
       this.$_returnFocusEl = null;
@@ -26788,8 +23568,8 @@
       var _this = this;
 
       // Add `$root` listeners
-      this.listenOnRoot(EVENT_TOGGLE, this.handleToggle);
-      this.listenOnRoot(EVENT_STATE_REQUEST, this.handleSync); // Send out a gratuitous state event to ensure toggle button is synced
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_TOGGLE$2, this.handleToggle);
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_REQUEST_STATE$2, this.handleSync); // Send out a gratuitous state event to ensure toggle button is synced
 
       this.$nextTick(function () {
         _this.emitState(_this.localShow);
@@ -26797,9 +23577,7 @@
     },
 
     /* istanbul ignore next */
-    activated: function activated()
-    /* istanbul ignore next */
-    {
+    activated: function activated() {
       this.emitSync();
     },
     beforeDestroy: function beforeDestroy() {
@@ -26812,11 +23590,11 @@
       },
       emitState: function emitState() {
         var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.localShow;
-        this.emitOnRoot(EVENT_STATE, this.safeId(), state);
+        this.emitOnRoot(ROOT_EVENT_NAME_STATE$3, this.safeId(), state);
       },
       emitSync: function emitSync() {
         var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.localShow;
-        this.emitOnRoot(EVENT_STATE_SYNC, this.safeId(), state);
+        this.emitOnRoot(ROOT_EVENT_NAME_SYNC_STATE$3, this.safeId(), state);
       },
       handleToggle: function handleToggle(id) {
         // Note `safeId()` can be null until after mount
@@ -26834,8 +23612,8 @@
           });
         }
       },
-      onKeydown: function onKeydown(evt) {
-        var keyCode = evt.keyCode;
+      onKeydown: function onKeydown(event) {
+        var keyCode = event.keyCode;
 
         if (!this.noCloseOnEsc && keyCode === CODE_ESC && this.localShow) {
           this.hide();
@@ -26848,24 +23626,20 @@
       },
 
       /* istanbul ignore next */
-      onTopTrapFocus: function onTopTrapFocus()
-      /* istanbul ignore next */
-      {
+      onTopTrapFocus: function onTopTrapFocus() {
         var tabables = getTabables(this.$refs.content);
         this.enforceFocus(tabables.reverse()[0]);
       },
 
       /* istanbul ignore next */
-      onBottomTrapFocus: function onBottomTrapFocus()
-      /* istanbul ignore next */
-      {
+      onBottomTrapFocus: function onBottomTrapFocus() {
         var tabables = getTabables(this.$refs.content);
         this.enforceFocus(tabables[0]);
       },
       onBeforeEnter: function onBeforeEnter() {
         // Returning focus to `document.body` may cause unwanted scrolls,
         // so we exclude setting focus on body
-        this.$_returnFocusEl = getActiveElement(isBrowser ? [document.body] : []); // Trigger lazy render
+        this.$_returnFocusEl = getActiveElement(IS_BROWSER ? [document.body] : []); // Trigger lazy render
 
         this.isOpen = true;
       },
@@ -26874,14 +23648,14 @@
           this.enforceFocus(el);
         }
 
-        this.$emit('shown');
+        this.$emit(EVENT_NAME_SHOWN);
       },
       onAfterLeave: function onAfterLeave() {
         this.enforceFocus(this.$_returnFocusEl);
         this.$_returnFocusEl = null; // Trigger lazy render
 
         this.isOpen = false;
-        this.$emit('hidden');
+        this.$emit(EVENT_NAME_HIDDEN);
       },
       enforceFocus: function enforceFocus(el) {
         if (!this.noEnforceFocus) {
@@ -26892,22 +23666,25 @@
     render: function render(h) {
       var _ref;
 
-      var localShow = this.localShow;
+      var bgVariant = this.bgVariant,
+          width = this.width,
+          textVariant = this.textVariant,
+          localShow = this.localShow;
       var shadow = this.shadow === '' ? true : this.shadow;
       var $sidebar = h(this.tag, {
-        ref: 'content',
+        staticClass: CLASS_NAME$3,
+        class: [(_ref = {
+          shadow: shadow === true
+        }, _defineProperty(_ref, "shadow-".concat(shadow), shadow && shadow !== true), _defineProperty(_ref, "".concat(CLASS_NAME$3, "-right"), this.right), _defineProperty(_ref, "bg-".concat(bgVariant), bgVariant), _defineProperty(_ref, "text-".concat(textVariant), textVariant), _ref), this.sidebarClass],
+        style: {
+          width: width
+        },
+        attrs: this.computedAttrs,
         directives: [{
           name: 'show',
           value: localShow
         }],
-        staticClass: CLASS_NAME$3,
-        class: [(_ref = {
-          shadow: shadow === true
-        }, _defineProperty(_ref, "shadow-".concat(shadow), shadow && shadow !== true), _defineProperty(_ref, "".concat(CLASS_NAME$3, "-right"), this.right), _defineProperty(_ref, "bg-".concat(this.bgVariant), !!this.bgVariant), _defineProperty(_ref, "text-".concat(this.textVariant), !!this.textVariant), _ref), this.sidebarClass],
-        attrs: this.computedAttrs,
-        style: {
-          width: this.width
-        }
+        ref: 'content'
       }, [renderContent(h, this)]);
       $sidebar = h('transition', {
         props: this.transitionProps,
@@ -26925,7 +23702,7 @@
       var $tabTrapTop = h();
       var $tabTrapBottom = h();
 
-      if (this.backdrop && this.localShow) {
+      if (this.backdrop && localShow) {
         $tabTrapTop = h('div', {
           attrs: {
             tabindex: '0'
@@ -26968,33 +23745,20 @@
     }
   });
 
+  var props$1O = makePropsConfigurable({
+    animation: makeProp(PROP_TYPE_STRING, 'wave'),
+    height: makeProp(PROP_TYPE_STRING),
+    size: makeProp(PROP_TYPE_STRING),
+    type: makeProp(PROP_TYPE_STRING, 'text'),
+    variant: makeProp(PROP_TYPE_STRING),
+    width: makeProp(PROP_TYPE_STRING)
+  }, NAME_SKELETON); // --- Main component ---
+  // @vue/component
+
   var BSkeleton = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON,
     functional: true,
-    props: {
-      animation: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_SKELETON, 'animation');
-        }
-      },
-      type: {
-        type: String,
-        default: 'text'
-      },
-      width: {
-        type: String
-      },
-      height: {
-        type: String
-      },
-      size: {
-        type: String
-      },
-      variant: {
-        type: String
-      }
-    },
+    props: props$1O,
     render: function render(h, _ref) {
       var _class;
 
@@ -27014,50 +23778,28 @@
     }
   });
 
-  var BIconstack = /*#__PURE__*/Vue__default['default'].extend({
-    name: NAME_ICONSTACK,
-    functional: true,
-    props: _objectSpread2({}, commonIconProps),
-    render: function render(h, _ref) {
-      var data = _ref.data,
-          props = _ref.props,
-          children = _ref.children;
-      return h(BVIconBase, a(data, {
-        staticClass: 'b-iconstack',
-        props: _objectSpread2(_objectSpread2({}, props), {}, {
-          stacked: false
-        })
-      }), children);
-    }
-  });
+  var props$1P = makePropsConfigurable(omit(props$4, ['content', 'stacked']), NAME_ICONSTACK); // --- Main component ---
+
+  var props$1Q = makePropsConfigurable({
+    animation: makeProp(PROP_TYPE_STRING, 'wave'),
+    icon: makeProp(PROP_TYPE_STRING),
+    iconProps: makeProp(PROP_TYPE_OBJECT, {})
+  }, NAME_SKELETON_ICON); // --- Main component ---
+  // @vue/component
 
   var BSkeletonIcon = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON_ICON,
     functional: true,
-    props: {
-      animation: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_SKELETON_ICON, 'animation');
-        }
-      },
-      icon: {
-        type: String
-      },
-      iconProps: {
-        type: Object,
-        default: function _default() {}
-      }
-    },
+    props: props$1Q,
     render: function render(h, _ref) {
       var props = _ref.props;
       var icon = props.icon,
           animation = props.animation;
       var $icon = h(BIcon, {
-        props: _objectSpread2({
+        staticClass: 'b-skeleton-icon',
+        props: _objectSpread2(_objectSpread2({}, props.iconProps), {}, {
           icon: icon
-        }, props.iconProps),
-        staticClass: 'b-skeleton-icon'
+        })
       });
       return h('div', {
         staticClass: 'b-skeleton-icon-wrapper position-relative d-inline-block overflow-hidden',
@@ -27066,34 +23808,21 @@
     }
   });
 
+  var props$1R = makePropsConfigurable({
+    animation: makeProp(PROP_TYPE_STRING),
+    aspect: makeProp(PROP_TYPE_STRING, '16:9'),
+    cardImg: makeProp(PROP_TYPE_STRING),
+    height: makeProp(PROP_TYPE_STRING),
+    noAspect: makeProp(PROP_TYPE_BOOLEAN, false),
+    variant: makeProp(PROP_TYPE_STRING),
+    width: makeProp(PROP_TYPE_STRING)
+  }, NAME_SKELETON_IMG); // --- Main component ---
+  // @vue/component
+
   var BSkeletonImg = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON_IMG,
     functional: true,
-    props: {
-      animation: {
-        type: String
-      },
-      aspect: {
-        type: String,
-        default: '16:9'
-      },
-      noAspect: {
-        type: Boolean,
-        default: false
-      },
-      height: {
-        type: String
-      },
-      width: {
-        type: String
-      },
-      variant: {
-        type: String
-      },
-      cardImg: {
-        type: String
-      }
-    },
+    props: props$1R,
     render: function render(h, _ref) {
       var props = _ref.props;
       var aspect = props.aspect,
@@ -27122,7 +23851,7 @@
 
   // Mixin to determine if an event listener has been registered
 
-  var hasListenerMixin = {
+  var hasListenerMixin = Vue__default['default'].extend({
     methods: {
       hasListener: function hasListener(name) {
         // Only includes listeners registered via `v-on:name`
@@ -27136,23 +23865,21 @@
         return !isUndefined($listeners[name]) || isArray($events[name]) && $events[name].length > 0;
       }
     }
-  };
+  });
 
-  var props$V = {
-    variant: {
-      type: String,
-      default: null
-    }
-  };
   var LIGHT = 'light';
-  var DARK = 'dark'; // TODO:
+  var DARK = 'dark'; // --- Props ---
+
+  var props$1S = makePropsConfigurable({
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_TR); // --- Main component ---
+  // TODO:
   //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
   //   to the child elements, so this can be converted to a functional component
   // @vue/component
 
   var BTr = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TR,
-    // Mixin order is important!
     mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     provide: function provide() {
       return {
@@ -27161,62 +23888,61 @@
     },
     inject: {
       bvTableRowGroup: {
+        default:
         /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
+        function _default() {
           return {};
         }
       }
     },
     inheritAttrs: false,
-    props: props$V,
+    props: props$1S,
     computed: {
+      // Sniffed by `<b-td>` / `<b-th>`
       inTbody: function inTbody() {
-        // Sniffed by <b-td> / <b-th>
         return this.bvTableRowGroup.isTbody;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
       inThead: function inThead() {
-        // Sniffed by <b-td> / <b-th>
         return this.bvTableRowGroup.isThead;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
       inTfoot: function inTfoot() {
-        // Sniffed by <b-td> / <b-th>
         return this.bvTableRowGroup.isTfoot;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
       isDark: function isDark() {
-        // Sniffed by <b-td> / <b-th>
         return this.bvTableRowGroup.isDark;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
       isStacked: function isStacked() {
-        // Sniffed by <b-td> / <b-th>
         return this.bvTableRowGroup.isStacked;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
       isResponsive: function isResponsive() {
-        // Sniffed by <b-td> / <b-th>
         return this.bvTableRowGroup.isResponsive;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
+      // Sticky headers are only supported in thead
       isStickyHeader: function isStickyHeader() {
-        // Sniffed by <b-td> / <b-th>
-        // Sticky headers are only supported in thead
         return this.bvTableRowGroup.isStickyHeader;
       },
+      // Sniffed by <b-tr> / `<b-td>` / `<b-th>`
+      // Needed to handle header background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
       hasStickyHeader: function hasStickyHeader() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-        // Needed to handle header background classes, due to lack of
-        // background color inheritance with Bootstrap v4 table CSS
         return !this.isStacked && this.bvTableRowGroup.hasStickyHeader;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
       tableVariant: function tableVariant() {
-        // Sniffed by <b-td> / <b-th>
         return this.bvTableRowGroup.tableVariant;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
       headVariant: function headVariant() {
-        // Sniffed by <b-td> / <b-th>
         return this.inThead ? this.bvTableRowGroup.headVariant : null;
       },
+      // Sniffed by `<b-td>` / `<b-th>`
       footVariant: function footVariant() {
-        // Sniffed by <b-td> / <b-th>
         return this.inTfoot ? this.bvTableRowGroup.footVariant : null;
       },
       isRowDark: function isRowDark() {
@@ -27227,7 +23953,8 @@
         true : this.isDark;
       },
       trClasses: function trClasses() {
-        return [this.variant ? "".concat(this.isRowDark ? 'bg' : 'table', "-").concat(this.variant) : null];
+        var variant = this.variant;
+        return [variant ? "".concat(this.isRowDark ? 'bg' : 'table', "-").concat(variant) : null];
       },
       trAttrs: function trAttrs() {
         return _objectSpread2({
@@ -27245,34 +23972,40 @@
     }
   });
 
-  var slotName = 'bottom-row';
-  var bottomRowMixin = {
+  var props$1T = {}; // --- Mixin ---
+  // @vue/component
+
+  var bottomRowMixin = Vue__default['default'].extend({
+    props: props$1T,
     methods: {
       renderBottomRow: function renderBottomRow() {
+        var fields = this.computedFields,
+            stacked = this.stacked,
+            tbodyTrClass = this.tbodyTrClass,
+            tbodyTrAttr = this.tbodyTrAttr;
         var h = this.$createElement; // Static bottom row slot (hidden in visibly stacked mode as we can't control the data-label)
         // If in *always* stacked mode, we don't bother rendering the row
 
-        if (!this.hasNormalizedSlot(slotName) || this.stacked === true || this.stacked === '') {
+        if (!this.hasNormalizedSlot(SLOT_NAME_BOTTOM_ROW) || stacked === true || stacked === '') {
           return h();
         }
 
-        var fields = this.computedFields;
         return h(BTr, {
-          key: 'b-bottom-row',
           staticClass: 'b-table-bottom-row',
-          class: [isFunction(this.tbodyTrClass) ?
+          class: [isFunction(tbodyTrClass) ?
           /* istanbul ignore next */
-          this.tbodyTrClass(null, 'row-bottom') : this.tbodyTrClass],
-          attrs: isFunction(this.tbodyTrAttr) ?
+          tbodyTrClass(null, 'row-bottom') : tbodyTrClass],
+          attrs: isFunction(tbodyTrAttr) ?
           /* istanbul ignore next */
-          this.tbodyTrAttr(null, 'row-bottom') : this.tbodyTrAttr
-        }, this.normalizeSlot(slotName, {
+          tbodyTrAttr(null, 'row-bottom') : tbodyTrAttr,
+          key: 'b-bottom-row'
+        }, this.normalizeSlot(SLOT_NAME_BOTTOM_ROW, {
           columns: fields.length,
           fields: fields
         }));
       }
     }
-  };
+  });
 
   // Parse a rowspan or colspan into a digit (or `null` if < `1` )
 
@@ -27283,35 +24016,18 @@
   /* istanbul ignore next */
 
 
-  var spanValidator = function spanValidator(val) {
-    return isUndefinedOrNull(val) || parseSpan(val) > 0;
+  var spanValidator = function spanValidator(value) {
+    return isUndefinedOrNull(value) || parseSpan(value) > 0;
   }; // --- Props ---
 
 
-  var props$W = {
-    variant: {
-      type: String,
-      default: null
-    },
-    colspan: {
-      type: [Number, String],
-      default: null,
-      validator: spanValidator
-    },
-    rowspan: {
-      type: [Number, String],
-      default: null,
-      validator: spanValidator
-    },
-    stackedHeading: {
-      type: String,
-      default: null
-    },
-    stickyColumn: {
-      type: Boolean,
-      default: false
-    }
-  }; // --- Main component ---
+  var props$1U = makePropsConfigurable({
+    colspan: makeProp(PROP_TYPE_NUMBER_STRING, null, spanValidator),
+    rowspan: makeProp(PROP_TYPE_NUMBER_STRING, null, spanValidator),
+    stackedHeading: makeProp(PROP_TYPE_STRING),
+    stickyColumn: makeProp(PROP_TYPE_BOOLEAN, false),
+    variant: makeProp(PROP_TYPE_STRING)
+  }, NAME_TABLE_CELL); // --- Main component ---
   // TODO:
   //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
   //   to the child elements, so this can be converted to a functional component
@@ -27323,19 +24039,18 @@
     mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     inject: {
       bvTableTr: {
+        default:
         /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
+        function _default() {
           return {};
         }
       }
     },
     inheritAttrs: false,
-    props: props$W,
+    props: props$1U,
     computed: {
+      // Overridden by `<b-th>`
       tag: function tag() {
-        // Overridden by <b-th>
         return 'td';
       },
       inTbody: function inTbody() {
@@ -27353,30 +24068,30 @@
       isStacked: function isStacked() {
         return this.bvTableTr.isStacked;
       },
+      // We only support stacked-heading in tbody in stacked mode
       isStackedCell: function isStackedCell() {
-        // We only support stacked-heading in tbody in stacked mode
         return this.inTbody && this.isStacked;
       },
       isResponsive: function isResponsive() {
         return this.bvTableTr.isResponsive;
       },
+      // Needed to handle header background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
+      // Sticky headers only apply to cells in table `thead`
       isStickyHeader: function isStickyHeader() {
-        // Needed to handle header background classes, due to lack of
-        // background color inheritance with Bootstrap v4 table CSS
-        // Sticky headers only apply to cells in table `thead`
         return this.bvTableTr.isStickyHeader;
       },
+      // Needed to handle header background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
       hasStickyHeader: function hasStickyHeader() {
-        // Needed to handle header background classes, due to lack of
-        // background color inheritance with Bootstrap v4 table CSS
         return this.bvTableTr.hasStickyHeader;
       },
+      // Needed to handle background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
+      // Sticky column cells are only available in responsive
+      // mode (horizontal scrolling) or when sticky header mode
+      // Applies to cells in `thead`, `tbody` and `tfoot`
       isStickyColumn: function isStickyColumn() {
-        // Needed to handle background classes, due to lack of
-        // background color inheritance with Bootstrap v4 table CSS
-        // Sticky column cells are only available in responsive
-        // mode (horizontal scrolling) or when sticky header mode
-        // Applies to cells in `thead`, `tbody` and `tfoot`
         return !this.isStacked && (this.isResponsive || this.hasStickyHeader) && this.stickyColumn;
       },
       rowVariant: function rowVariant() {
@@ -27397,22 +24112,25 @@
       computedRowspan: function computedRowspan() {
         return parseSpan(this.rowspan);
       },
+      // We use computed props here for improved performance by caching
+      // the results of the string interpolation
       cellClasses: function cellClasses() {
-        // We use computed props here for improved performance by caching
-        // the results of the string interpolation
-        var variant = this.variant;
+        var variant = this.variant,
+            headVariant = this.headVariant,
+            isStickyColumn = this.isStickyColumn;
 
-        if (!variant && this.isStickyHeader && !this.headVariant || !variant && this.isStickyColumn && this.inTfoot && !this.footVariant || !variant && this.isStickyColumn && this.inThead && !this.headVariant || !variant && this.isStickyColumn && this.inTbody) {
+        if (!variant && this.isStickyHeader && !headVariant || !variant && isStickyColumn && this.inTfoot && !this.footVariant || !variant && isStickyColumn && this.inThead && !headVariant || !variant && isStickyColumn && this.inTbody) {
           // Needed for sticky-header mode as Bootstrap v4 table cells do
-          // not inherit parent's background-color. Boo!
+          // not inherit parent's `background-color`
           variant = this.rowVariant || this.tableVariant || 'b-table-default';
         }
 
-        return [variant ? "".concat(this.isDark ? 'bg' : 'table', "-").concat(variant) : null, this.isStickyColumn ? 'b-table-sticky-column' : null];
+        return [variant ? "".concat(this.isDark ? 'bg' : 'table', "-").concat(variant) : null, isStickyColumn ? 'b-table-sticky-column' : null];
       },
       cellAttrs: function cellAttrs() {
-        // We use computed props here for improved performance by caching
+        var stackedHeading = this.stackedHeading; // We use computed props here for improved performance by caching
         // the results of the object spread (Object.assign)
+
         var headOrFoot = this.inThead || this.inTfoot; // Make sure col/rowspan's are > 0 or null
 
         var colspan = this.computedColspan;
@@ -27440,31 +24158,31 @@
         }, this.bvAttrs), {}, {
           // Add in the stacked cell label data-attribute if in
           // stacked mode (if a stacked heading label is provided)
-          'data-label': this.isStackedCell && !isUndefinedOrNull(this.stackedHeading) ?
+          'data-label': this.isStackedCell && !isUndefinedOrNull(stackedHeading) ?
           /* istanbul ignore next */
-          toString$1(this.stackedHeading) : null
+          toString$1(stackedHeading) : null
         });
       }
     },
     render: function render(h) {
-      var content = [this.normalizeSlot()];
+      var $content = [this.normalizeSlot()];
       return h(this.tag, {
         class: this.cellClasses,
         attrs: this.cellAttrs,
         // Transfer any native listeners
         on: this.bvListeners
-      }, [this.isStackedCell ? h('div', [content]) : content]);
+      }, [this.isStackedCell ? h('div', [$content]) : $content]);
     }
   });
 
-  var busySlotName = 'table-busy';
-  var busyMixin = {
-    props: {
-      busy: {
-        type: Boolean,
-        default: false
-      }
-    },
+  var MODEL_PROP_NAME_BUSY = 'busy';
+  var MODEL_EVENT_NAME_BUSY = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_BUSY; // --- Props ---
+
+  var props$1V = _defineProperty({}, MODEL_PROP_NAME_BUSY, makeProp(PROP_TYPE_BOOLEAN, false)); // --- Mixin ---
+  // @vue/component
+
+  var busyMixin = Vue__default['default'].extend({
+    props: props$1V,
     data: function data() {
       return {
         localBusy: false
@@ -27472,22 +24190,22 @@
     },
     computed: {
       computedBusy: function computedBusy() {
-        return this.busy || this.localBusy;
+        return this[MODEL_PROP_NAME_BUSY] || this.localBusy;
       }
     },
     watch: {
-      localBusy: function localBusy(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.$emit('update:busy', newVal);
+      localBusy: function localBusy(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.$emit(MODEL_EVENT_NAME_BUSY, newValue);
         }
       }
     },
     methods: {
       // Event handler helper
-      stopIfBusy: function stopIfBusy(evt) {
+      stopIfBusy: function stopIfBusy(event) {
+        // If table is busy (via provider) then don't propagate
         if (this.computedBusy) {
-          // If table is busy (via provider) then don't propagate
-          stopEvent(evt);
+          stopEvent(event);
           return true;
         }
 
@@ -27495,52 +24213,46 @@
       },
       // Render the busy indicator or return `null` if not busy
       renderBusy: function renderBusy() {
+        var tbodyTrClass = this.tbodyTrClass,
+            tbodyTrAttr = this.tbodyTrAttr;
         var h = this.$createElement; // Return a busy indicator row, or `null` if not busy
 
-        if (this.computedBusy && this.hasNormalizedSlot(busySlotName)) {
-          // Show the busy slot
+        if (this.computedBusy && this.hasNormalizedSlot(SLOT_NAME_TABLE_BUSY)) {
           return h(BTr, {
-            key: 'table-busy-slot',
             staticClass: 'b-table-busy-slot',
-            class: [isFunction(this.tbodyTrClass) ?
+            class: [isFunction(tbodyTrClass) ?
             /* istanbul ignore next */
-            this.tbodyTrClass(null, busySlotName) : this.tbodyTrClass],
-            attrs: isFunction(this.tbodyTrAttr) ?
+            tbodyTrClass(null, SLOT_NAME_TABLE_BUSY) : tbodyTrClass],
+            attrs: isFunction(tbodyTrAttr) ?
             /* istanbul ignore next */
-            this.tbodyTrAttr(null, busySlotName) : this.tbodyTrAttr
+            tbodyTrAttr(null, SLOT_NAME_TABLE_BUSY) : tbodyTrAttr,
+            key: 'table-busy-slot'
           }, [h(BTd, {
             props: {
               colspan: this.computedFields.length || null
             }
-          }, [this.normalizeSlot(busySlotName)])]);
-        } else {
-          // We return `null` here so that we can determine if we need to
-          // render the table items rows or not
-          return null;
-        }
+          }, [this.normalizeSlot(SLOT_NAME_TABLE_BUSY)])]);
+        } // We return `null` here so that we can determine if we need to
+        // render the table items rows or not
+
+
+        return null;
       }
     }
-  };
+  });
 
-  var captionMixin = {
-    props: {
-      // `caption-top` is part of table-render mixin (styling)
-      // captionTop: {
-      //   type: Boolean,
-      //   default: false
-      // },
-      caption: {
-        type: String // default: null
+  var props$1W = {
+    caption: makeProp(PROP_TYPE_STRING),
+    captionHtml: makeProp(PROP_TYPE_STRING) // `caption-top` is part of table-render mixin (styling)
+    // captionTop: makeProp(PROP_TYPE_BOOLEAN, false)
 
-      },
-      captionHtml: {
-        type: String
-      }
-    },
+  }; // --- Mixin ---
+  // @vue/component
+
+  var captionMixin = Vue__default['default'].extend({
+    props: props$1W,
     computed: {
       captionId: function captionId() {
-        // Even though `this.safeId` looks like a method, it is a computed prop
-        // that returns a new function if the underlying ID changes
         return this.isStacked ? this.safeId('_caption_') : null;
       }
     },
@@ -27550,34 +24262,38 @@
             captionHtml = this.captionHtml;
         var h = this.$createElement;
         var $caption = h();
-        var hasCaptionSlot = this.hasNormalizedSlot('table-caption');
+        var hasCaptionSlot = this.hasNormalizedSlot(SLOT_NAME_TABLE_CAPTION);
 
         if (hasCaptionSlot || caption || captionHtml) {
           $caption = h('caption', {
-            key: 'caption',
             attrs: {
               id: this.captionId
             },
-            domProps: hasCaptionSlot ? {} : htmlOrText(captionHtml, caption)
-          }, this.normalizeSlot('table-caption'));
+            domProps: hasCaptionSlot ? {} : htmlOrText(captionHtml, caption),
+            key: 'caption',
+            ref: 'caption'
+          }, this.normalizeSlot(SLOT_NAME_TABLE_CAPTION));
         }
 
         return $caption;
       }
     }
-  };
+  });
 
-  var colgroupMixin = {
+  var props$1X = {}; // --- Mixin ---
+  // @vue/component
+
+  var colgroupMixin = Vue__default['default'].extend({
     methods: {
       renderColgroup: function renderColgroup() {
-        var h = this.$createElement;
         var fields = this.computedFields;
+        var h = this.$createElement;
         var $colgroup = h();
 
-        if (this.hasNormalizedSlot('table-colgroup')) {
+        if (this.hasNormalizedSlot(SLOT_NAME_TABLE_COLGROUP)) {
           $colgroup = h('colgroup', {
             key: 'colgroup'
-          }, [this.normalizeSlot('table-colgroup', {
+          }, [this.normalizeSlot(SLOT_NAME_TABLE_COLGROUP, {
             columns: fields.length,
             fields: fields
           })]);
@@ -27586,52 +24302,42 @@
         return $colgroup;
       }
     }
-  };
+  });
 
-  var emptyMixin = {
-    props: {
-      showEmpty: {
-        type: Boolean,
-        default: false
-      },
-      emptyText: {
-        type: String,
-        default: 'There are no records to show'
-      },
-      emptyHtml: {
-        type: String
-      },
-      emptyFilteredText: {
-        type: String,
-        default: 'There are no records matching your request'
-      },
-      emptyFilteredHtml: {
-        type: String
-      }
-    },
+  var props$1Y = {
+    emptyFilteredHtml: makeProp(PROP_TYPE_STRING),
+    emptyFilteredText: makeProp(PROP_TYPE_STRING, 'There are no records matching your request'),
+    emptyHtml: makeProp(PROP_TYPE_STRING),
+    emptyText: makeProp(PROP_TYPE_STRING, 'There are no records to show'),
+    showEmpty: makeProp(PROP_TYPE_BOOLEAN, false)
+  }; // --- Mixin ---
+  // @vue/component
+
+  var emptyMixin = Vue__default['default'].extend({
+    props: props$1Y,
     methods: {
       renderEmpty: function renderEmpty() {
-        var h = this.$createElement;
         var items = this.computedItems;
+        var h = this.$createElement;
         var $empty = h();
 
-        if (this.showEmpty && (!items || items.length === 0) && !(this.computedBusy && this.hasNormalizedSlot('table-busy'))) {
-          var isFiltered = this.isFiltered,
+        if (this.showEmpty && (!items || items.length === 0) && !(this.computedBusy && this.hasNormalizedSlot(SLOT_NAME_TABLE_BUSY))) {
+          var fields = this.computedFields,
+              isFiltered = this.isFiltered,
               emptyText = this.emptyText,
               emptyHtml = this.emptyHtml,
               emptyFilteredText = this.emptyFilteredText,
               emptyFilteredHtml = this.emptyFilteredHtml,
-              computedFields = this.computedFields,
               tbodyTrClass = this.tbodyTrClass,
               tbodyTrAttr = this.tbodyTrAttr;
-          $empty = this.normalizeSlot(this.isFiltered ? 'emptyfiltered' : 'empty', {
+          $empty = this.normalizeSlot(isFiltered ? SLOT_NAME_EMPTYFILTERED : SLOT_NAME_EMPTY, {
             emptyFilteredHtml: emptyFilteredHtml,
             emptyFilteredText: emptyFilteredText,
             emptyHtml: emptyHtml,
             emptyText: emptyText,
-            fields: computedFields,
+            fields: fields,
             // Not sure why this is included, as it will always be an empty array
-            items: this.computedItems
+            items: items
           });
 
           if (!$empty) {
@@ -27643,7 +24349,7 @@
 
           $empty = h(BTd, {
             props: {
-              colspan: computedFields.length || null
+              colspan: fields.length || null
             }
           }, [h('div', {
             attrs: {
@@ -27655,10 +24361,10 @@
             staticClass: 'b-table-empty-row',
             class: [isFunction(tbodyTrClass) ?
             /* istanbul ignore next */
-            this.tbodyTrClass(null, 'row-empty') : tbodyTrClass],
+            tbodyTrClass(null, 'row-empty') : tbodyTrClass],
             attrs: isFunction(tbodyTrAttr) ?
             /* istanbul ignore next */
-            this.tbodyTrAttr(null, 'row-empty') : tbodyTrAttr,
+            tbodyTrAttr(null, 'row-empty') : tbodyTrAttr,
             key: isFiltered ? 'b-empty-filtered-row' : 'b-empty-row'
           }, [$empty]);
         }
@@ -27666,16 +24372,49 @@
         return $empty;
       }
     }
+  });
+
+  // SSR safe deterministic way (keys are sorted before stringification)
+  //
+  //   ex:
+  //     { b: 3, c: { z: 'zzz', d: null, e: 2 }, d: [10, 12, 11], a: 'one' }
+  //   becomes
+  //     'one 3 2 zzz 10 12 11'
+  //
+  // Strings are returned as-is
+  // Numbers get converted to string
+  // `null` and `undefined` values are filtered out
+  // Dates are converted to their native string format
+
+  var stringifyObjectValues = function stringifyObjectValues(value) {
+    if (isUndefinedOrNull(value)) {
+      return '';
+    } // Arrays are also object, and keys just returns the array indexes
+    // Date objects we convert to strings
+
+
+    if (isObject(value) && !isDate(value)) {
+      return keys(value).sort() // Sort to prevent SSR issues on pre-rendered sorted tables
+      .map(function (k) {
+        return stringifyObjectValues(value[k]);
+      }).filter(function (v) {
+        return !!v;
+      }) // Ignore empty strings
+      .join(' ');
+    }
+
+    return toString$1(value);
   };
 
   // Constants used by table helpers
-  // Object of item keys that should be ignored for headers and
+  var FIELD_KEY_CELL_VARIANT = '_cellVariants';
+  var FIELD_KEY_ROW_VARIANT = '_rowVariant';
+  var FIELD_KEY_SHOW_DETAILS = '_showDetails'; // Object of item keys that should be ignored for headers and
   // stringification and filter events
-  var IGNORED_FIELD_KEYS = {
-    _rowVariant: true,
-    _cellVariants: true,
-    _showDetails: true
-  }; // Filter CSS selector for click/dblclick/etc. events
+
+  var IGNORED_FIELD_KEYS = [FIELD_KEY_CELL_VARIANT, FIELD_KEY_ROW_VARIANT, FIELD_KEY_SHOW_DETAILS].reduce(function (result, key) {
+    return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, true));
+  }, {}); // Filter CSS selector for click/dblclick/etc. events
   // If any of these selectors match the clicked element, we ignore the event
 
   var EVENT_FILTER = ['a', 'a *', // Include content inside links
@@ -27712,38 +24451,6 @@
     return pick(formattedRow, allowedKeys);
   };
 
-  // SSR safe deterministic way (keys are sorted before stringification)
-  //
-  //   ex:
-  //     { b: 3, c: { z: 'zzz', d: null, e: 2 }, d: [10, 12, 11], a: 'one' }
-  //   becomes
-  //     'one 3 2 zzz 10 12 11'
-  //
-  // Primitives (numbers/strings) are returned as-is
-  // Null and undefined values are filtered out
-  // Dates are converted to their native string format
-
-  var stringifyObjectValues = function stringifyObjectValues(val) {
-    if (isUndefinedOrNull(val)) {
-      /* istanbul ignore next */
-      return '';
-    } // Arrays are also object, and keys just returns the array indexes
-    // Date objects we convert to strings
-
-
-    if (isObject(val) && !isDate(val)) {
-      return keys(val).sort() // Sort to prevent SSR issues on pre-rendered sorted tables
-      .filter(function (v) {
-        return !isUndefinedOrNull(v);
-      }) // Ignore undefined/null values
-      .map(function (k) {
-        return stringifyObjectValues(val[k]);
-      }).join(' ');
-    }
-
-    return toString$1(val);
-  };
-
   // TODO: Add option to stringify `scopedSlot` items
 
   var stringifyRecordValues = function stringifyRecordValues(row, ignoreFields, includeFields, fieldsObj) {
@@ -27752,34 +24459,21 @@
     '';
   };
 
-  var DEBOUNCE_DEPRECATED_MSG = 'Prop "filter-debounce" is deprecated. Use the debounce feature of "<b-form-input>" instead.';
-  var filteringMixin = {
-    props: {
-      filter: {
-        type: [String, RegExp, Object, Array],
-        default: null
-      },
-      filterFunction: {
-        type: Function // default: null
+  var DEBOUNCE_DEPRECATED_MSG = 'Prop "filter-debounce" is deprecated. Use the debounce feature of "<b-form-input>" instead.'; // --- Props ---
 
-      },
-      filterIgnoredFields: {
-        type: Array // default: undefined
+  var props$1Z = {
+    filter: makeProp([].concat(_toConsumableArray(PROP_TYPE_ARRAY_OBJECT_STRING), [PROP_TYPE_REG_EXP])),
+    filterDebounce: makeProp(PROP_TYPE_NUMBER_STRING, 0, function (value) {
+      return RX_DIGITS.test(String(value));
+    }),
+    filterFunction: makeProp(PROP_TYPE_FUNCTION),
+    filterIgnoredFields: makeProp(PROP_TYPE_ARRAY, []),
+    filterIncludedFields: makeProp(PROP_TYPE_ARRAY, [])
+  }; // --- Mixin ---
+  // @vue/component
 
-      },
-      filterIncludedFields: {
-        type: Array // default: undefined
-
-      },
-      filterDebounce: {
-        type: [Number, String],
-        deprecated: DEBOUNCE_DEPRECATED_MSG,
-        default: 0,
-        validator: function validator(val) {
-          return /^\d+/.test(String(val));
-        }
-      }
-    },
+  var filteringMixin = Vue__default['default'].extend({
+    props: props$1Z,
     data: function data() {
       return {
         // Flag for displaying which empty slot to show and some event triggering
@@ -27811,23 +24505,27 @@
       },
       // For watching changes to `filteredItems` vs `localItems`
       filteredCheck: function filteredCheck() {
+        var filteredItems = this.filteredItems,
+            localItems = this.localItems,
+            localFilter = this.localFilter;
         return {
-          filteredItems: this.filteredItems,
-          localItems: this.localItems,
-          localFilter: this.localFilter
+          filteredItems: filteredItems,
+          localItems: localItems,
+          localFilter: localFilter
         };
       },
       // Sanitized/normalize filter-function prop
       localFilterFn: function localFilterFn() {
         // Return `null` to signal to use internal filter function
-        return isFunction(this.filterFunction) ? this.filterFunction : null;
+        var filterFunction = this.filterFunction;
+        return hasPropFunction(filterFunction) ? filterFunction : null;
       },
       // Returns the records in `localItems` that match the filter criteria
       // Returns the original `localItems` array if not sorting
       filteredItems: function filteredItems() {
-        var items = this.localItems || []; // Note the criteria is debounced and sanitized
-
-        var criteria = this.localFilter; // Resolve the filtering function, when requested
+        // Note the criteria is debounced and sanitized
+        var items = this.localItems,
+            criteria = this.localFilter; // Resolve the filtering function, when requested
         // We prefer the provided filtering function and fallback to the internal one
         // When no filtering criteria is specified the filtering factories will return `null`
 
@@ -27838,8 +24536,8 @@
     },
     watch: {
       // Watch for debounce being set to 0
-      computedFilterDebounce: function computedFilterDebounce(newVal) {
-        if (!newVal && this.$_filterTimer) {
+      computedFilterDebounce: function computedFilterDebounce(newValue) {
+        if (!newValue && this.$_filterTimer) {
           this.clearFilterTimer();
           this.localFilter = this.filterSanitize(this.filter);
         }
@@ -27886,16 +24584,17 @@
         }
 
         if (isFiltered) {
-          this.$emit('filtered', filteredItems, filteredItems.length);
+          this.$emit(EVENT_NAME_FILTERED, filteredItems, filteredItems.length);
         }
 
         this.isFiltered = isFiltered;
       },
-      isFiltered: function isFiltered(newVal, oldVal) {
-        if (newVal === false && oldVal === true) {
-          // We need to emit a filtered event if isFiltered transitions from true to
-          // false so that users can update their pagination controls.
-          this.$emit('filtered', this.localItems, this.localItems.length);
+      isFiltered: function isFiltered(newValue, oldValue) {
+        if (newValue === false && oldValue === true) {
+          // We need to emit a filtered event if `isFiltered` transitions from `true` to
+          // `false` so that users can update their pagination controls
+          var localItems = this.localItems;
+          this.$emit(EVENT_NAME_FILTERED, localItems, localItems.length);
         }
       }
     },
@@ -27913,9 +24612,7 @@
         _this2.isFiltered = Boolean(_this2.localFilter);
       });
     },
-    beforeDestroy: function beforeDestroy()
-    /* istanbul ignore next */
-    {
+    beforeDestroy: function beforeDestroy() {
       this.clearFilterTimer();
     },
     methods: {
@@ -28003,7 +24700,7 @@
         return fn;
       }
     }
-  };
+  });
 
   var processField = function processField(key, value) {
     var field = null;
@@ -28089,42 +24786,34 @@
     });
   };
 
-  var itemsMixin = {
-    props: {
-      items: {
-        // Provider mixin adds in `Function` type
-        type: Array,
+  var _makeModelMixin$i = makeModelMixin('value', {
+    type: PROP_TYPE_ARRAY,
+    defaultValue: []
+  }),
+      modelMixin$h = _makeModelMixin$i.mixin,
+      modelProps$h = _makeModelMixin$i.props,
+      MODEL_PROP_NAME$h = _makeModelMixin$i.prop,
+      MODEL_EVENT_NAME$h = _makeModelMixin$i.event;
 
-        /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
-          return [];
-        }
-      },
-      fields: {
-        type: Array,
-        default: null
-      },
-      primaryKey: {
-        // Primary key for record
-        // If provided the value in each row must be unique!
-        type: String // default: null
+  var props$1_ = sortKeys(_objectSpread2(_objectSpread2({}, modelProps$h), {}, _defineProperty({
+    fields: makeProp(PROP_TYPE_ARRAY, null),
+    // Provider mixin adds in `Function` type
+    items: makeProp(PROP_TYPE_ARRAY, []),
+    // Primary key for record
+    // If provided the value in each row must be unique!
+    primaryKey: makeProp(PROP_TYPE_STRING)
+  }, MODEL_PROP_NAME$h, makeProp(PROP_TYPE_ARRAY, [])))); // --- Mixin ---
+  // @vue/component
 
-      },
-      value: {
-        // `v-model` for retrieving the current displayed rows
-        type: Array,
-        default: function _default() {
-          return [];
-        }
-      }
-    },
+  var itemsMixin = Vue__default['default'].extend({
+    mixins: [modelMixin$h],
+    props: props$1_,
     data: function data() {
+      var items = this.items;
       return {
         // Our local copy of the items
         // Must be an array
-        localItems: isArray(this.items) ? this.items.slice() : []
+        localItems: isArray(items) ? items.slice() : []
       };
     },
     computed: {
@@ -28138,7 +24827,7 @@
         // Mainly for formatter lookup and use in `scopedSlots` for convenience
         // If the field has a formatter, it normalizes formatter to a
         // function ref or `undefined` if no formatter
-        var parent = this.$parent;
+        var $parent = this.$parent;
         return this.computedFields.reduce(function (obj, f) {
           // We use object spread here so we don't mutate the original field object
           obj[f.key] = clone(f);
@@ -28147,8 +24836,8 @@
             // Normalize formatter to a function ref or `undefined`
             var formatter = f.formatter;
 
-            if (isString(formatter) && isFunction(parent[formatter])) {
-              formatter = parent[formatter];
+            if (isString(formatter) && isFunction($parent[formatter])) {
+              formatter = $parent[formatter];
             } else if (!isFunction(formatter)) {
               /* istanbul ignore next */
               formatter = undefined;
@@ -28180,33 +24869,27 @@
       }
     },
     watch: {
-      items: function items(newItems) {
-        /* istanbul ignore else */
-        if (isArray(newItems)) {
-          // Set `localItems`/`filteredItems` to a copy of the provided array
-          this.localItems = newItems.slice();
-        } else if (isUndefinedOrNull(newItems)) {
-          /* istanbul ignore next */
-          this.localItems = [];
-        }
+      items: function items(newValue) {
+        // Set `localItems`/`filteredItems` to a copy of the provided array
+        this.localItems = isArray(newValue) ? newValue.slice() : [];
       },
       // Watch for changes on `computedItems` and update the `v-model`
-      computedItems: function computedItems(newVal, oldVal) {
-        if (!looseEqual(newVal, oldVal)) {
-          this.$emit('input', newVal);
+      computedItems: function computedItems(newValue, oldValue) {
+        if (!looseEqual(newValue, oldValue)) {
+          this.$emit(MODEL_EVENT_NAME$h, newValue);
         }
       },
       // Watch for context changes
-      context: function context(newVal, oldVal) {
+      context: function context(newValue, oldValue) {
         // Emit context information for external paging/filtering/sorting handling
-        if (!looseEqual(newVal, oldVal)) {
-          this.$emit('context-changed', newVal);
+        if (!looseEqual(newValue, oldValue)) {
+          this.$emit(EVENT_NAME_CONTEXT_CHANGED, newValue);
         }
       }
     },
     mounted: function mounted() {
       // Initially update the `v-model` of displayed items
-      this.$emit('input', this.computedItems);
+      this.$emit(MODEL_EVENT_NAME$h, this.computedItems);
     },
     methods: {
       // Method to get the formatter method for a given field key
@@ -28217,19 +24900,16 @@
         return field ? field.formatter : undefined;
       }
     }
-  };
+  });
 
-  var paginationMixin$1 = {
-    props: {
-      perPage: {
-        type: [Number, String],
-        default: 0
-      },
-      currentPage: {
-        type: [Number, String],
-        default: 1
-      }
-    },
+  var props$1$ = {
+    currentPage: makeProp(PROP_TYPE_NUMBER_STRING, 1),
+    perPage: makeProp(PROP_TYPE_NUMBER_STRING, 0)
+  }; // --- Mixin ---
+  // @vue/component
+
+  var paginationMixin$1 = Vue__default['default'].extend({
+    props: props$1$,
     computed: {
       localPaging: function localPaging() {
         return this.hasProvider ? !!this.noProviderPaging : true;
@@ -28239,7 +24919,7 @@
         var currentPage = mathMax(toInteger(this.currentPage, 1), 1);
         var perPage = mathMax(toInteger(this.perPage, 0), 0); // Apply local pagination
 
-        if (this.localPaging && !!perPage) {
+        if (this.localPaging && perPage) {
           // Grab the current page of data (which may be past filtered items limit)
           items = items.slice((currentPage - 1) * perPage, currentPage * perPage);
         } // Return the items to display in the table
@@ -28248,42 +24928,26 @@
         return items;
       }
     }
-  };
+  });
 
-  var providerMixin = {
+  var ROOT_EVENT_NAME_REFRESHED = getRootEventName(NAME_TABLE, EVENT_NAME_REFRESHED);
+  var ROOT_ACTION_EVENT_NAME_REFRESH = getRootActionEventName(NAME_TABLE, EVENT_NAME_REFRESH); // --- Props ---
+
+  var props$20 = {
+    // Passed to the context object
+    // Not used by `<b-table>` directly
+    apiUrl: makeProp(PROP_TYPE_STRING),
+    // Adds in 'Function' support
+    items: makeProp(PROP_TYPE_ARRAY_FUNCTION, []),
+    noProviderFiltering: makeProp(PROP_TYPE_BOOLEAN, false),
+    noProviderPaging: makeProp(PROP_TYPE_BOOLEAN, false),
+    noProviderSorting: makeProp(PROP_TYPE_BOOLEAN, false)
+  }; // --- Mixin ---
+  // @vue/component
+
+  var providerMixin = Vue__default['default'].extend({
     mixins: [listenOnRootMixin],
-    props: {
-      // Prop override(s)
-      items: {
-        // Adds in 'Function' support
-        type: [Array, Function],
-
-        /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
-          return [];
-        }
-      },
-      // Additional props
-      noProviderPaging: {
-        type: Boolean,
-        default: false
-      },
-      noProviderSorting: {
-        type: Boolean,
-        default: false
-      },
-      noProviderFiltering: {
-        type: Boolean,
-        default: false
-      },
-      apiUrl: {
-        // Passthrough prop. Passed to the context object. Not used by b-table directly
-        type: String,
-        default: ''
-      }
-    },
+    props: props$20,
     computed: {
       hasProvider: function hasProvider() {
         return isFunction(this.items);
@@ -28322,15 +24986,15 @@
     },
     watch: {
       // Provider update triggering
-      items: function items(newVal) {
+      items: function items(newValue) {
         // If a new provider has been specified, trigger an update
-        if (this.hasProvider || isFunction(newVal)) {
+        if (this.hasProvider || isFunction(newValue)) {
           this.$nextTick(this._providerUpdate);
         }
       },
-      providerTriggerContext: function providerTriggerContext(newVal, oldVal) {
+      providerTriggerContext: function providerTriggerContext(newValue, oldValue) {
         // Trigger the provider to update as the relevant context values have changed.
-        if (!looseEqual(newVal, oldVal)) {
+        if (!looseEqual(newValue, oldValue)) {
           this.$nextTick(this._providerUpdate);
         }
       }
@@ -28345,7 +25009,7 @@
       } // Listen for global messages to tell us to force refresh the table
 
 
-      this.listenOnRoot('bv::refresh::table', function (id) {
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_REFRESH, function (id) {
         if (id === _this.id || id === _this) {
           _this.refresh();
         }
@@ -28353,14 +25017,16 @@
     },
     methods: {
       refresh: function refresh() {
-        // Public Method: Force a refresh of the provider function
-        this.$off('refreshed', this.refresh);
+        var items = this.items,
+            refresh = this.refresh; // Public Method: Force a refresh of the provider function
+
+        this.$off(EVENT_NAME_REFRESHED, refresh);
 
         if (this.computedBusy) {
           // Can't force an update when forced busy by user (busy prop === true)
           if (this.localBusy && this.hasProvider) {
             // But if provider running (localBusy), re-schedule refresh once `refreshed` emitted
-            this.$on('refreshed', this.refresh);
+            this.$on(EVENT_NAME_REFRESHED, refresh);
           }
         } else {
           this.clearSelected();
@@ -28369,7 +25035,7 @@
             this.$nextTick(this._providerUpdate);
           } else {
             /* istanbul ignore next */
-            this.localItems = isArray(this.items) ? this.items.slice() : [];
+            this.localItems = isArray(items) ? items.slice() : [];
           }
         }
       },
@@ -28377,10 +25043,10 @@
       _providerSetLocal: function _providerSetLocal(items) {
         this.localItems = isArray(items) ? items.slice() : [];
         this.localBusy = false;
-        this.$emit('refreshed'); // New root emit
+        this.$emit(EVENT_NAME_REFRESHED); // New root emit
 
         if (this.id) {
-          this.emitOnRoot('bv::table::refreshed', this.id);
+          this.emitOnRoot(ROOT_EVENT_NAME_REFRESHED, this.id);
         }
       },
       _providerUpdate: function _providerUpdate() {
@@ -28436,38 +25102,28 @@
             warn("Provider function error [".concat(e.name, "] ").concat(e.message, "."), NAME_TABLE);
             _this2.localBusy = false;
 
-            _this2.$off('refreshed', _this2.refresh);
+            _this2.$off(EVENT_NAME_REFRESHED, _this2.refresh);
           }
         });
       }
     }
-  };
+  });
 
-  var selectableMixin = {
-    props: {
-      selectable: {
-        type: Boolean,
-        default: false
-      },
-      selectMode: {
-        type: String,
-        default: 'multi',
-        validator: function validator(val) {
-          return arrayIncludes(['range', 'multi', 'single'], val);
-        }
-      },
-      selectedVariant: {
-        type: String,
-        default: function _default() {
-          return getComponentConfig(NAME_TABLE, 'selectedVariant');
-        }
-      },
-      noSelectOnClick: {
-        // Disable use of click handlers for row selection
-        type: Boolean,
-        default: false
-      }
-    },
+  var SELECT_MODES = ['range', 'multi', 'single']; // --- Props ---
+
+  var props$21 = {
+    // Disable use of click handlers for row selection
+    noSelectOnClick: makeProp(PROP_TYPE_BOOLEAN, false),
+    selectMode: makeProp(PROP_TYPE_STRING, 'multi', function (value) {
+      return arrayIncludes(SELECT_MODES, value);
+    }),
+    selectable: makeProp(PROP_TYPE_BOOLEAN, false),
+    selectedVariant: makeProp(PROP_TYPE_STRING, 'active')
+  }; // --- Mixin ---
+  // @vue/component
+
+  var selectableMixin = Vue__default['default'].extend({
+    props: props$21,
     data: function data() {
       return {
         selectedRows: [],
@@ -28485,7 +25141,8 @@
         return true;
       },
       selectableHasSelection: function selectableHasSelection() {
-        return this.isSelectable && this.selectedRows && this.selectedRows.length > 0 && this.selectedRows.some(identity);
+        var selectedRows = this.selectedRows;
+        return this.isSelectable && selectedRows && selectedRows.length > 0 && selectedRows.some(identity);
       },
       selectableIsMultiSelect: function selectableIsMultiSelect() {
         return this.isSelectable && arrayIncludes(['range', 'multi'], this.selectMode);
@@ -28493,9 +25150,10 @@
       selectableTableClasses: function selectableTableClasses() {
         var _ref;
 
+        var isSelectable = this.isSelectable;
         return _ref = {
-          'b-table-selectable': this.isSelectable
-        }, _defineProperty(_ref, "b-table-select-".concat(this.selectMode), this.isSelectable), _defineProperty(_ref, 'b-table-selecting', this.selectableHasSelection), _defineProperty(_ref, 'b-table-selectable-no-click', this.isSelectable && !this.hasSelectableRowClick), _ref;
+          'b-table-selectable': isSelectable
+        }, _defineProperty(_ref, "b-table-select-".concat(this.selectMode), isSelectable), _defineProperty(_ref, 'b-table-selecting', this.selectableHasSelection), _defineProperty(_ref, 'b-table-selectable-no-click', isSelectable && !this.hasSelectableRowClick), _ref;
       },
       selectableTableAttrs: function selectableTableAttrs() {
         return {
@@ -28507,17 +25165,17 @@
       }
     },
     watch: {
-      computedItems: function computedItems(newVal, oldVal) {
+      computedItems: function computedItems(newValue, oldValue) {
         // Reset for selectable
         var equal = false;
 
         if (this.isSelectable && this.selectedRows.length > 0) {
           // Quick check against array length
-          equal = isArray(newVal) && isArray(oldVal) && newVal.length === oldVal.length;
+          equal = isArray(newValue) && isArray(oldValue) && newValue.length === oldValue.length;
 
-          for (var i = 0; equal && i < newVal.length; i++) {
+          for (var i = 0; equal && i < newValue.length; i++) {
             // Look for the first non-loosely equal row, after ignoring reserved fields
-            equal = looseEqual(sanitizeRow(newVal[i]), sanitizeRow(oldVal[i]));
+            equal = looseEqual(sanitizeRow(newValue[i]), sanitizeRow(oldValue[i]));
           }
         }
 
@@ -28525,21 +25183,21 @@
           this.clearSelected();
         }
       },
-      selectable: function selectable(newVal) {
+      selectable: function selectable(newValue) {
         this.clearSelected();
-        this.setSelectionHandlers(newVal);
+        this.setSelectionHandlers(newValue);
       },
       selectMode: function selectMode() {
         this.clearSelected();
       },
-      hasSelectableRowClick: function hasSelectableRowClick(newVal) {
+      hasSelectableRowClick: function hasSelectableRowClick(newValue) {
         this.clearSelected();
-        this.setSelectionHandlers(!newVal);
+        this.setSelectionHandlers(!newValue);
       },
-      selectedRows: function selectedRows(_selectedRows, oldVal) {
+      selectedRows: function selectedRows(_selectedRows, oldValue) {
         var _this = this;
 
-        if (this.isSelectable && !looseEqual(_selectedRows, oldVal)) {
+        if (this.isSelectable && !looseEqual(_selectedRows, oldValue)) {
           var items = []; // `.forEach()` skips over non-existent indices (on sparse arrays)
 
           _selectedRows.forEach(function (v, idx) {
@@ -28548,7 +25206,7 @@
             }
           });
 
-          this.$emit('row-selected', items);
+          this.$emit(EVENT_NAME_ROW_SELECTED, items);
         }
       }
     },
@@ -28583,9 +25241,7 @@
 
         if (this.isSelectable && length > 0) {
           this.selectedLastClicked = -1;
-          this.selectedRows = this.selectableIsMultiSelect ? range(length).map(function () {
-            return true;
-          }) : [true];
+          this.selectedRows = this.selectableIsMultiSelect ? createArray(length, true) : [true];
         }
       },
       isRowSelected: function isRowSelected(index) {
@@ -28604,9 +25260,9 @@
           return _defineProperty({
             'b-table-row-selected': true
           }, "".concat(this.dark ? 'bg' : 'table', "-").concat(variant), variant);
-        } else {
-          return {};
         }
+
+        return {};
       },
       selectableRowAttrs: function selectableRowAttrs(index) {
         return {
@@ -28616,12 +25272,12 @@
       setSelectionHandlers: function setSelectionHandlers(on) {
         var method = on && !this.noSelectOnClick ? '$on' : '$off'; // Handle row-clicked event
 
-        this[method]('row-clicked', this.selectionHandler); // Clear selection on filter, pagination, and sort changes
+        this[method](EVENT_NAME_ROW_CLICKED, this.selectionHandler); // Clear selection on filter, pagination, and sort changes
 
-        this[method]('filtered', this.clearSelected);
-        this[method]('context-changed', this.clearSelected);
+        this[method](EVENT_NAME_FILTERED, this.clearSelected);
+        this[method](EVENT_NAME_CONTEXT_CHANGED, this.clearSelected);
       },
-      selectionHandler: function selectionHandler(item, index, evt) {
+      selectionHandler: function selectionHandler(item, index, event) {
         /* istanbul ignore if: should never happen */
         if (!this.isSelectable || this.noSelectOnClick) {
           // Don't do anything if table is not in selectable mode
@@ -28629,22 +25285,23 @@
           return;
         }
 
-        var selectMode = this.selectMode;
+        var selectMode = this.selectMode,
+            selectedLastRow = this.selectedLastRow;
         var selectedRows = this.selectedRows.slice();
         var selected = !selectedRows[index]; // Note 'multi' mode needs no special event handling
 
         if (selectMode === 'single') {
           selectedRows = [];
         } else if (selectMode === 'range') {
-          if (this.selectedLastRow > -1 && evt.shiftKey) {
+          if (selectedLastRow > -1 && event.shiftKey) {
             // range
-            for (var idx = mathMin(this.selectedLastRow, index); idx <= mathMax(this.selectedLastRow, index); idx++) {
+            for (var idx = mathMin(selectedLastRow, index); idx <= mathMax(selectedLastRow, index); idx++) {
               selectedRows[idx] = true;
             }
 
             selected = true;
           } else {
-            if (!(evt.ctrlKey || evt.metaKey)) {
+            if (!(event.ctrlKey || event.metaKey)) {
               // Clear range selection if any
               selectedRows = [];
               selected = true;
@@ -28658,7 +25315,7 @@
         this.selectedRows = selectedRows;
       }
     }
-  };
+  });
 
   /*
    * Consistent and stable sort function across JavaScript platforms
@@ -28691,126 +25348,106 @@
     });
   };
 
-  //
-  // TODO: Add option to sort by multiple columns (tri-state per column,
-  //       plus order of columns in sort)  where sortBy could be an array
-  //       of objects `[ {key: 'foo', sortDir: 'asc'}, {key:'bar', sortDir: 'desc'} ...]`
-  //       or an array of arrays `[ ['foo','asc'], ['bar','desc'] ]`
-  //       Multisort will most likely be handled in mixin-sort.js by
-  //       calling this method for each sortBy
+  var normalizeValue = function normalizeValue(value) {
+    if (isUndefinedOrNull(value)) {
+      return '';
+    }
 
-  var defaultSortCompare = function defaultSortCompare(a, b, sortBy, sortDesc, formatter, localeOpts, locale, nullLast) {
+    if (isNumeric(value)) {
+      return toFloat(value, value);
+    }
+
+    return value;
+  }; // Default sort compare routine
+  //
+  // TODO:
+  //   Add option to sort by multiple columns (tri-state per column,
+  //   plus order of columns in sort) where `sortBy` could be an array
+  //   of objects `[ {key: 'foo', sortDir: 'asc'}, {key:'bar', sortDir: 'desc'} ...]`
+  //   or an array of arrays `[ ['foo','asc'], ['bar','desc'] ]`
+  //   Multisort will most likely be handled in `mixin-sort.js` by
+  //   calling this method for each sortBy
+
+
+  var defaultSortCompare = function defaultSortCompare(a, b) {
+    var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        _ref$sortBy = _ref.sortBy,
+        sortBy = _ref$sortBy === void 0 ? null : _ref$sortBy,
+        _ref$formatter = _ref.formatter,
+        formatter = _ref$formatter === void 0 ? null : _ref$formatter,
+        _ref$locale = _ref.locale,
+        locale = _ref$locale === void 0 ? undefined : _ref$locale,
+        _ref$localeOptions = _ref.localeOptions,
+        localeOptions = _ref$localeOptions === void 0 ? {} : _ref$localeOptions,
+        _ref$nullLast = _ref.nullLast,
+        nullLast = _ref$nullLast === void 0 ? false : _ref$nullLast;
+
+    // Get the value by `sortBy`
     var aa = get(a, sortBy, null);
-    var bb = get(b, sortBy, null);
+    var bb = get(b, sortBy, null); // Apply user-provided formatter
 
     if (isFunction(formatter)) {
       aa = formatter(aa, sortBy, a);
       bb = formatter(bb, sortBy, b);
-    }
+    } // Internally normalize value
+    // `null` / `undefined` => ''
+    // `'0'` => `0`
 
-    aa = isUndefinedOrNull(aa) ? '' : aa;
-    bb = isUndefinedOrNull(bb) ? '' : bb;
+
+    aa = normalizeValue(aa);
+    bb = normalizeValue(bb);
 
     if (isDate(aa) && isDate(bb) || isNumber(aa) && isNumber(bb)) {
       // Special case for comparing dates and numbers
       // Internally dates are compared via their epoch number values
       return aa < bb ? -1 : aa > bb ? 1 : 0;
     } else if (nullLast && aa === '' && bb !== '') {
-      // Special case when sorting null/undefined/empty string last
+      // Special case when sorting `null` / `undefined` / '' last
       return 1;
     } else if (nullLast && aa !== '' && bb === '') {
-      // Special case when sorting null/undefined/empty string last
+      // Special case when sorting `null` / `undefined` / '' last
       return -1;
     } // Do localized string comparison
 
 
-    return stringifyObjectValues(aa).localeCompare(stringifyObjectValues(bb), locale, localeOpts);
+    return stringifyObjectValues(aa).localeCompare(stringifyObjectValues(bb), locale, localeOptions);
   };
 
-  var sortingMixin = {
-    props: {
-      sortBy: {
-        type: String,
-        default: ''
-      },
-      sortDesc: {
-        // TODO: Make this tri-state: true, false, null
-        type: Boolean,
-        default: false
-      },
-      sortDirection: {
-        // This prop is named incorrectly
-        // It should be `initialSortDirection` as it is a bit misleading
-        // (not to mention it screws up the ARIA label on the headers)
-        type: String,
-        default: 'asc',
-        validator: function validator(direction) {
-          return arrayIncludes(['asc', 'desc', 'last'], direction);
-        }
-      },
-      sortCompare: {
-        type: Function // default: null
+  var _props, _watch$h;
 
-      },
-      sortCompareOptions: {
-        // Supported localCompare options, see `options` section of:
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
-        type: Object,
-        default: function _default() {
-          return {
-            numeric: true
-          };
-        }
-      },
-      sortCompareLocale: {
-        // String: locale code
-        // Array: array of Locale strings
-        type: [String, Array] // default: undefined
+  var MODEL_PROP_NAME_SORT_BY = 'sortBy';
+  var MODEL_EVENT_NAME_SORT_BY = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SORT_BY;
+  var MODEL_PROP_NAME_SORT_DESC = 'sortDesc';
+  var MODEL_EVENT_NAME_SORT_DESC = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SORT_DESC;
+  var SORT_DIRECTION_ASC = 'asc';
+  var SORT_DIRECTION_DESC = 'desc';
+  var SORT_DIRECTION_LAST = 'last';
+  var SORT_DIRECTIONS = [SORT_DIRECTION_ASC, SORT_DIRECTION_DESC, SORT_DIRECTION_LAST]; // --- Props ---
 
-      },
-      sortNullLast: {
-        // Sort null and undefined to appear last
-        type: Boolean,
-        default: false
-      },
-      noSortReset: {
-        // Another prop that should have had a better name.
-        // It should be noSortClear (on non-sortable headers).
-        // We will need to make sure the documentation is clear on what
-        // this prop does (as well as in the code for future reference)
-        type: Boolean,
-        default: false
-      },
-      labelSortAsc: {
-        type: String,
-        default: 'Click to sort Ascending'
-      },
-      labelSortDesc: {
-        type: String,
-        default: 'Click to sort Descending'
-      },
-      labelSortClear: {
-        type: String,
-        default: 'Click to clear sorting'
-      },
-      noLocalSorting: {
-        type: Boolean,
-        default: false
-      },
-      noFooterSorting: {
-        type: Boolean,
-        default: false
-      },
-      sortIconLeft: {
-        // Place the sorting icon on the left of the header cells
-        type: Boolean,
-        default: false
-      }
-    },
+  var props$22 = (_props = {
+    labelSortAsc: makeProp(PROP_TYPE_STRING, 'Click to sort Ascending'),
+    labelSortClear: makeProp(PROP_TYPE_STRING, 'Click to clear sorting'),
+    labelSortDesc: makeProp(PROP_TYPE_STRING, 'Click to sort Descending'),
+    noFooterSorting: makeProp(PROP_TYPE_BOOLEAN, false),
+    noLocalSorting: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Another prop that should have had a better name
+    // It should be `noSortClear` (on non-sortable headers)
+    // We will need to make sure the documentation is clear on what
+    // this prop does (as well as in the code for future reference)
+    noSortReset: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, _defineProperty(_props, MODEL_PROP_NAME_SORT_BY, makeProp(PROP_TYPE_STRING)), _defineProperty(_props, "sortCompare", makeProp(PROP_TYPE_FUNCTION)), _defineProperty(_props, "sortCompareLocale", makeProp(PROP_TYPE_ARRAY_STRING)), _defineProperty(_props, "sortCompareOptions", makeProp(PROP_TYPE_OBJECT, {
+    numeric: true
+  })), _defineProperty(_props, MODEL_PROP_NAME_SORT_DESC, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_props, "sortDirection", makeProp(PROP_TYPE_STRING, SORT_DIRECTION_ASC, function (value) {
+    return arrayIncludes(SORT_DIRECTIONS, value);
+  })), _defineProperty(_props, "sortIconLeft", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_props, "sortNullLast", makeProp(PROP_TYPE_BOOLEAN, false)), _props); // --- Mixin ---
+  // @vue/component
+
+  var sortingMixin = Vue__default['default'].extend({
+    props: props$22,
     data: function data() {
       return {
-        localSortBy: this.sortBy || '',
-        localSortDesc: this.sortDesc || false
+        localSortBy: this[MODEL_PROP_NAME_SORT_BY] || '',
+        localSortDesc: this[MODEL_PROP_NAME_SORT_DESC] || false
       };
     },
     computed: {
@@ -28822,21 +25459,20 @@
           return f.sortable;
         });
       },
+      // Sorts the filtered items and returns a new array of the sorted items
+      // When not sorted, the original items array will be returned
       sortedItems: function sortedItems() {
-        // Sorts the filtered items and returns a new array of the sorted items
-        // or the original items array if not sorted.
+        var sortBy = this.localSortBy,
+            sortDesc = this.localSortDesc,
+            locale = this.sortCompareLocale,
+            nullLast = this.sortNullLast,
+            sortCompare = this.sortCompare,
+            localSorting = this.localSorting;
         var items = (this.filteredItems || this.localItems || []).slice();
-        var sortBy = this.localSortBy;
-        var sortDesc = this.localSortDesc;
-        var sortCompare = this.sortCompare;
-        var localSorting = this.localSorting;
 
-        var sortOptions = _objectSpread2(_objectSpread2({}, this.sortCompareOptions), {}, {
+        var localeOptions = _objectSpread2(_objectSpread2({}, this.sortCompareOptions), {}, {
           usage: 'sort'
         });
-
-        var sortLocale = this.sortCompareLocale || undefined;
-        var nullLast = this.sortNullLast;
 
         if (sortBy && localSorting) {
           var field = this.computedFieldsObj[sortBy] || {};
@@ -28846,17 +25482,25 @@
           sortByFormatted : sortByFormatted ? this.getFieldFormatter(sortBy) : undefined; // `stableSort` returns a new array, and leaves the original array intact
 
           return stableSort(items, function (a, b) {
-            var result = null;
+            var result = null; // Call user provided `sortCompare` routine first
 
             if (isFunction(sortCompare)) {
-              // Call user provided sortCompare routine
-              result = sortCompare(a, b, sortBy, sortDesc, formatter, sortOptions, sortLocale);
-            }
+              // TODO:
+              //   Change the `sortCompare` signature to the one of `defaultSortCompare`
+              //   with the next major version bump
+              result = sortCompare(a, b, sortBy, sortDesc, formatter, localeOptions, locale);
+            } // Fallback to built-in `defaultSortCompare` if `sortCompare`
+            // is not defined or returns `null`/`false`
+
 
             if (isUndefinedOrNull(result) || result === false) {
-              // Fallback to built-in defaultSortCompare if sortCompare
-              // is not defined or returns null/false
-              result = defaultSortCompare(a, b, sortBy, sortDesc, formatter, sortOptions, sortLocale, nullLast);
+              result = defaultSortCompare(a, b, {
+                sortBy: sortBy,
+                formatter: formatter,
+                locale: locale,
+                localeOptions: localeOptions,
+                nullLast: nullLast
+              });
             } // Negate result if sorting in descending order
 
 
@@ -28867,57 +25511,50 @@
         return items;
       }
     },
-    watch: {
+    watch: (_watch$h = {
       /* istanbul ignore next: pain in the butt to test */
-      isSortable: function isSortable(newVal)
-      /* istanbul ignore next: pain in the butt to test */
-      {
-        if (newVal) {
+      isSortable: function isSortable(newValue) {
+        if (newValue) {
           if (this.isSortable) {
-            this.$on('head-clicked', this.handleSort);
+            this.$on(EVENT_NAME_HEAD_CLICKED, this.handleSort);
           }
         } else {
-          this.$off('head-clicked', this.handleSort);
-        }
-      },
-      sortDesc: function sortDesc(newVal) {
-        if (newVal === this.localSortDesc) {
-          /* istanbul ignore next */
-          return;
-        }
-
-        this.localSortDesc = newVal || false;
-      },
-      sortBy: function sortBy(newVal) {
-        if (newVal === this.localSortBy) {
-          /* istanbul ignore next */
-          return;
-        }
-
-        this.localSortBy = newVal || '';
-      },
-      // Update .sync props
-      localSortDesc: function localSortDesc(newVal, oldVal) {
-        // Emit update to sort-desc.sync
-        if (newVal !== oldVal) {
-          this.$emit('update:sortDesc', newVal);
-        }
-      },
-      localSortBy: function localSortBy(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          this.$emit('update:sortBy', newVal);
+          this.$off(EVENT_NAME_HEAD_CLICKED, this.handleSort);
         }
       }
-    },
+    }, _defineProperty(_watch$h, MODEL_PROP_NAME_SORT_DESC, function (newValue) {
+      /* istanbul ignore next */
+      if (newValue === this.localSortDesc) {
+        return;
+      }
+
+      this.localSortDesc = newValue || false;
+    }), _defineProperty(_watch$h, MODEL_PROP_NAME_SORT_BY, function (newValue) {
+      /* istanbul ignore next */
+      if (newValue === this.localSortBy) {
+        return;
+      }
+
+      this.localSortBy = newValue || '';
+    }), _defineProperty(_watch$h, "localSortDesc", function localSortDesc(newValue, oldValue) {
+      // Emit update to sort-desc.sync
+      if (newValue !== oldValue) {
+        this.$emit(MODEL_EVENT_NAME_SORT_DESC, newValue);
+      }
+    }), _defineProperty(_watch$h, "localSortBy", function localSortBy(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.$emit(MODEL_EVENT_NAME_SORT_BY, newValue);
+      }
+    }), _watch$h),
     created: function created() {
       if (this.isSortable) {
-        this.$on('head-clicked', this.handleSort);
+        this.$on(EVENT_NAME_HEAD_CLICKED, this.handleSort);
       }
     },
     methods: {
       // Handlers
       // Need to move from thead-mixin
-      handleSort: function handleSort(key, field, evt, isFoot) {
+      handleSort: function handleSort(key, field, event, isFoot) {
         var _this = this;
 
         if (!this.isSortable) {
@@ -28936,9 +25573,9 @@
         var toggleLocalSortDesc = function toggleLocalSortDesc() {
           var sortDirection = field.sortDirection || _this.sortDirection;
 
-          if (sortDirection === 'asc') {
+          if (sortDirection === SORT_DIRECTION_ASC) {
             _this.localSortDesc = false;
-          } else if (sortDirection === 'desc') {
+          } else if (sortDirection === SORT_DIRECTION_DESC) {
             _this.localSortDesc = true;
           } else ;
         };
@@ -28965,7 +25602,7 @@
 
         if (sortChanged) {
           // Sorting parameters changed
-          this.$emit('sort-changed', this.context);
+          this.$emit(EVENT_NAME_SORT_CHANGED, this.context);
         }
       },
       // methods to compute classes and attrs for thead>th cells
@@ -29012,9 +25649,9 @@
 
             var sortDirection = this.sortDirection || field.sortDirection;
 
-            if (sortDirection === 'asc') {
+            if (sortDirection === SORT_DIRECTION_ASC) {
               labelSorting = this.labelSortAsc;
-            } else if (sortDirection === 'desc') {
+            } else if (sortDirection === SORT_DIRECTION_DESC) {
               labelSorting = this.labelSortDesc;
             }
           }
@@ -29027,124 +25664,91 @@
         return trim(labelSorting) || null;
       }
     }
-  };
+  });
 
-  // Mixin for providing stacked tables
-  var stackedMixin = {
-    props: {
-      stacked: {
-        type: [Boolean, String],
-        default: false
-      }
-    },
+  var props$23 = {
+    stacked: makeProp(PROP_TYPE_BOOLEAN_STRING, false)
+  }; // --- Mixin ---
+  // @vue/component
+
+  var stackedMixin = Vue__default['default'].extend({
+    props: props$23,
     computed: {
       isStacked: function isStacked() {
-        // `true` when always stacked, or returns breakpoint specified
-        return this.stacked === '' ? true : this.stacked;
+        var stacked = this.stacked; // `true` when always stacked, or returns breakpoint specified
+
+        return stacked === '' ? true : stacked;
       },
       isStackedAlways: function isStackedAlways() {
         return this.isStacked === true;
       },
       stackedTableClasses: function stackedTableClasses() {
+        var isStackedAlways = this.isStackedAlways;
         return _defineProperty({
-          'b-table-stacked': this.isStackedAlways
-        }, "b-table-stacked-".concat(this.stacked), !this.isStackedAlways && this.isStacked);
+          'b-table-stacked': isStackedAlways
+        }, "b-table-stacked-".concat(this.stacked), !isStackedAlways && this.isStacked);
       }
     }
-  };
+  });
 
   // Includes all main table styling options
+  // --- Props ---
 
-  var tableRendererMixin = {
-    // Don't place attributes on root element automatically,
-    // as table could be wrapped in responsive `<div>`
-    inheritAttrs: false,
-    // Mixin order is important!
+  var props$24 = {
+    bordered: makeProp(PROP_TYPE_BOOLEAN, false),
+    borderless: makeProp(PROP_TYPE_BOOLEAN, false),
+    captionTop: makeProp(PROP_TYPE_BOOLEAN, false),
+    dark: makeProp(PROP_TYPE_BOOLEAN, false),
+    fixed: makeProp(PROP_TYPE_BOOLEAN, false),
+    hover: makeProp(PROP_TYPE_BOOLEAN, false),
+    noBorderCollapse: makeProp(PROP_TYPE_BOOLEAN, false),
+    outlined: makeProp(PROP_TYPE_BOOLEAN, false),
+    responsive: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    small: makeProp(PROP_TYPE_BOOLEAN, false),
+    // If a string, it is assumed to be the table `max-height` value
+    stickyHeader: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
+    striped: makeProp(PROP_TYPE_BOOLEAN, false),
+    tableClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    tableVariant: makeProp(PROP_TYPE_STRING)
+  }; // --- Mixin ---
+  // @vue/component
+
+  var tableRendererMixin = Vue__default['default'].extend({
     mixins: [attrsMixin],
     provide: function provide() {
       return {
         bvTable: this
       };
     },
-    props: {
-      striped: {
-        type: Boolean,
-        default: false
-      },
-      bordered: {
-        type: Boolean,
-        default: false
-      },
-      borderless: {
-        type: Boolean,
-        default: false
-      },
-      outlined: {
-        type: Boolean,
-        default: false
-      },
-      dark: {
-        type: Boolean,
-        default: false
-      },
-      hover: {
-        type: Boolean,
-        default: false
-      },
-      small: {
-        type: Boolean,
-        default: false
-      },
-      fixed: {
-        type: Boolean,
-        default: false
-      },
-      responsive: {
-        type: [Boolean, String],
-        default: false
-      },
-      stickyHeader: {
-        // If a string, it is assumed to be the table `max-height` value
-        type: [Boolean, String],
-        default: false
-      },
-      noBorderCollapse: {
-        type: Boolean,
-        default: false
-      },
-      captionTop: {
-        type: Boolean,
-        default: false
-      },
-      tableVariant: {
-        type: String // default: null
-
-      },
-      tableClass: {
-        type: [String, Array, Object] // default: null
-
-      }
-    },
+    // Don't place attributes on root element automatically,
+    // as table could be wrapped in responsive `<div>`
+    inheritAttrs: false,
+    props: props$24,
     computed: {
       // Layout related computed props
       isResponsive: function isResponsive() {
-        var responsive = this.responsive === '' ? true : this.responsive;
-        return this.isStacked ? false : responsive;
+        var responsive = this.responsive;
+        return responsive === '' ? true : responsive;
       },
       isStickyHeader: function isStickyHeader() {
-        var stickyHeader = this.stickyHeader === '' ? true : this.stickyHeader;
+        var stickyHeader = this.stickyHeader;
+        stickyHeader = stickyHeader === '' ? true : stickyHeader;
         return this.isStacked ? false : stickyHeader;
       },
       wrapperClasses: function wrapperClasses() {
-        return [this.isStickyHeader ? 'b-table-sticky-header' : '', this.isResponsive === true ? 'table-responsive' : this.isResponsive ? "table-responsive-".concat(this.responsive) : ''].filter(identity);
+        var isResponsive = this.isResponsive;
+        return [this.isStickyHeader ? 'b-table-sticky-header' : '', isResponsive === true ? 'table-responsive' : isResponsive ? "table-responsive-".concat(this.responsive) : ''].filter(identity);
       },
       wrapperStyles: function wrapperStyles() {
-        return this.isStickyHeader && !isBoolean(this.isStickyHeader) ? {
-          maxHeight: this.isStickyHeader
+        var isStickyHeader = this.isStickyHeader;
+        return isStickyHeader && !isBoolean(isStickyHeader) ? {
+          maxHeight: isStickyHeader
         } : {};
       },
       tableClasses: function tableClasses() {
-        var hover = this.isTableSimple ? this.hover : this.hover && this.computedItems.length > 0 && !this.computedBusy;
+        var hover = this.hover,
+            tableVariant = this.tableVariant;
+        hover = this.isTableSimple ? hover : hover && this.computedItems.length > 0 && !this.computedBusy;
         return [// User supplied classes
         this.tableClass, // Styling classes
         {
@@ -29159,21 +25763,20 @@
           'b-table-fixed': this.fixed,
           'b-table-caption-top': this.captionTop,
           'b-table-no-border-collapse': this.noBorderCollapse
-        }, this.tableVariant ? "".concat(this.dark ? 'bg' : 'table', "-").concat(this.tableVariant) : '', // Stacked table classes
+        }, tableVariant ? "".concat(this.dark ? 'bg' : 'table', "-").concat(tableVariant) : '', // Stacked table classes
         this.stackedTableClasses, // Selectable classes
         this.selectableTableClasses];
       },
       tableAttrs: function tableAttrs() {
-        // Preserve user supplied aria-describedby, if provided in `$attrs`
-        var adb = [(this.bvAttrs || {})['aria-describedby'], this.captionId].filter(identity).join(' ') || null;
-        var items = this.computedItems;
-        var filteredItems = this.filteredItems;
-        var fields = this.computedFields;
-        var selectableAttrs = this.selectableTableAttrs || {};
+        var items = this.computedItems,
+            filteredItems = this.filteredItems,
+            fields = this.computedFields,
+            selectableTableAttrs = this.selectableTableAttrs;
         var ariaAttrs = this.isTableSimple ? {} : {
           'aria-busy': this.computedBusy ? 'true' : 'false',
           'aria-colcount': toString$1(fields.length),
-          'aria-describedby': adb
+          // Preserve user supplied `aria-describedby`, if provided
+          'aria-describedby': this.bvAttrs['aria-describedby'] || this.$refs.caption ? this.captionId : null
         };
         var rowCount = items && filteredItems && filteredItems.length > items.length ? toString$1(filteredItems.length) : null;
         return _objectSpread2(_objectSpread2(_objectSpread2({
@@ -29184,60 +25787,60 @@
           // Now we can override any `$attrs` here
           id: this.safeId(),
           role: 'table'
-        }, ariaAttrs), selectableAttrs);
+        }, ariaAttrs), selectableTableAttrs);
       }
     },
     render: function render(h) {
+      var wrapperClasses = this.wrapperClasses,
+          renderCaption = this.renderCaption,
+          renderColgroup = this.renderColgroup,
+          renderThead = this.renderThead,
+          renderTbody = this.renderTbody,
+          renderTfoot = this.renderTfoot;
       var $content = [];
 
       if (this.isTableSimple) {
         $content.push(this.normalizeSlot());
       } else {
         // Build the `<caption>` (from caption mixin)
-        $content.push(this.renderCaption ? this.renderCaption() : null); // Build the `<colgroup>`
+        $content.push(renderCaption ? renderCaption() : null); // Build the `<colgroup>`
 
-        $content.push(this.renderColgroup ? this.renderColgroup() : null); // Build the `<thead>`
+        $content.push(renderColgroup ? renderColgroup() : null); // Build the `<thead>`
 
-        $content.push(this.renderThead ? this.renderThead() : null); // Build the `<tbody>`
+        $content.push(renderThead ? renderThead() : null); // Build the `<tbody>`
 
-        $content.push(this.renderTbody ? this.renderTbody() : null); // Build the `<tfoot>`
+        $content.push(renderTbody ? renderTbody() : null); // Build the `<tfoot>`
 
-        $content.push(this.renderTfoot ? this.renderTfoot() : null);
+        $content.push(renderTfoot ? renderTfoot() : null);
       } // Assemble `<table>`
 
 
       var $table = h('table', {
-        key: 'b-table',
         staticClass: 'table b-table',
         class: this.tableClasses,
-        attrs: this.tableAttrs
+        attrs: this.tableAttrs,
+        key: 'b-table'
       }, $content.filter(identity)); // Add responsive/sticky wrapper if needed and return table
 
-      return this.wrapperClasses.length > 0 ? h('div', {
-        key: 'wrap',
-        class: this.wrapperClasses,
-        style: this.wrapperStyles
+      return wrapperClasses.length > 0 ? h('div', {
+        class: wrapperClasses,
+        style: this.wrapperStyles,
+        key: 'wrap'
       }, [$table]) : $table;
     }
-  };
+  });
 
-  var props$X = {
-    tbodyTransitionProps: {
-      type: Object // default: undefined
-
-    },
-    tbodyTransitionHandlers: {
-      type: Object // default: undefined
-
-    }
-  }; // TODO:
+  var props$25 = makePropsConfigurable({
+    tbodyTransitionHandlers: makeProp(PROP_TYPE_OBJECT),
+    tbodyTransitionProps: makeProp(PROP_TYPE_OBJECT)
+  }, NAME_TBODY); // --- Main component ---
+  // TODO:
   //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
   //   to the child elements, so this can be converted to a functional component
   // @vue/component
 
   var BTbody = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TBODY,
-    // Mixin order is important!
     mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     provide: function provide() {
       return {
@@ -29245,49 +25848,47 @@
       };
     },
     inject: {
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       bvTable: {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-
+        default:
         /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
+        function _default() {
           return {};
         }
       }
     },
     inheritAttrs: false,
-    props: props$X,
+    props: props$25,
     computed: {
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isTbody: function isTbody() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return true;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isDark: function isDark() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.dark;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isStacked: function isStacked() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.isStacked;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isResponsive: function isResponsive() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.isResponsive;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
+      // Sticky headers are only supported in thead
       isStickyHeader: function isStickyHeader() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-        // Sticky headers are only supported in thead
         return false;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
+      // Needed to handle header background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
       hasStickyHeader: function hasStickyHeader() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-        // Needed to handle header background classes, due to lack of
-        // background color inheritance with Bootstrap v4 table CSS
         return !this.isStacked && this.bvTable.stickyHeader;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       tableVariant: function tableVariant() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.tableVariant;
       },
       isTransitionGroup: function isTransitionGroup() {
@@ -29299,7 +25900,8 @@
         }, this.bvAttrs);
       },
       tbodyProps: function tbodyProps() {
-        return this.tbodyTransitionProps ? _objectSpread2(_objectSpread2({}, this.tbodyTransitionProps), {}, {
+        var tbodyTransitionProps = this.tbodyTransitionProps;
+        return tbodyTransitionProps ? _objectSpread2(_objectSpread2({}, tbodyTransitionProps), {}, {
           tag: 'tbody'
         }) : {};
       }
@@ -29326,14 +25928,14 @@
   var TABLE_TAG_NAMES = ['TD', 'TH', 'TR']; // Returns `true` if we should ignore the click/double-click/keypress event
   // Avoids having the user need to use `@click.stop` on the form control
 
-  var filterEvent = function filterEvent(evt) {
+  var filterEvent = function filterEvent(event) {
     // Exit early when we don't have a target element
-    if (!evt || !evt.target) {
+    if (!event || !event.target) {
       /* istanbul ignore next */
       return false;
     }
 
-    var el = evt.target; // Exit early when element is disabled or a table element
+    var el = event.target; // Exit early when element is disabled or a table element
 
     if (el.disabled || TABLE_TAG_NAMES.indexOf(el.tagName) !== -1) {
       return false;
@@ -29376,6 +25978,8 @@
     sel.containsNode(el, true) : false;
   };
 
+  var props$26 = makePropsConfigurable(props$1U, NAME_TH); // --- Main component ---
+  // TODO:
   //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
   //   to the child elements, so this can be converted to a functional component
   // @vue/component
@@ -29383,6 +25987,7 @@
   var BTh = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TH,
     extends: BTd,
+    props: props$26,
     computed: {
       tag: function tag() {
         return 'th';
@@ -29390,57 +25995,50 @@
     }
   });
 
-  var detailsSlotName = 'row-details';
-  var tbodyRowMixin = {
-    props: {
-      tbodyTrClass: {
-        type: [String, Array, Object, Function] // default: null
+  var props$27 = {
+    detailsTdClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    tbodyTrAttr: makeProp(PROP_TYPE_OBJECT_FUNCTION),
+    tbodyTrClass: makeProp([].concat(_toConsumableArray(PROP_TYPE_ARRAY_OBJECT_STRING), [PROP_TYPE_FUNCTION]))
+  }; // --- Mixin ---
+  // @vue/component
 
-      },
-      tbodyTrAttr: {
-        type: [Object, Function] // default: null
-
-      },
-      detailsTdClass: {
-        type: [String, Array, Object] // default: null
-
-      }
-    },
+  var tbodyRowMixin = Vue__default['default'].extend({
+    props: props$27,
     methods: {
       // Methods for computing classes, attributes and styles for table cells
-      getTdValues: function getTdValues(item, key, tdValue, defValue) {
-        var parent = this.$parent;
+      getTdValues: function getTdValues(item, key, tdValue, defaultValue) {
+        var $parent = this.$parent;
 
         if (tdValue) {
           var value = get(item, key, '');
 
           if (isFunction(tdValue)) {
             return tdValue(value, key, item);
-          } else if (isString(tdValue) && isFunction(parent[tdValue])) {
-            return parent[tdValue](value, key, item);
+          } else if (isString(tdValue) && isFunction($parent[tdValue])) {
+            return $parent[tdValue](value, key, item);
           }
 
           return tdValue;
         }
 
-        return defValue;
+        return defaultValue;
       },
-      getThValues: function getThValues(item, key, thValue, type, defValue) {
-        var parent = this.$parent;
+      getThValues: function getThValues(item, key, thValue, type, defaultValue) {
+        var $parent = this.$parent;
 
         if (thValue) {
           var value = get(item, key, '');
 
           if (isFunction(thValue)) {
             return thValue(value, key, item, type);
-          } else if (isString(thValue) && isFunction(parent[thValue])) {
-            return parent[thValue](value, key, item, type);
+          } else if (isString(thValue) && isFunction($parent[thValue])) {
+            return $parent[thValue](value, key, item, type);
           }
 
           return thValue;
         }
 
-        return defValue;
+        return defaultValue;
       },
       // Method to get the value for a field
       getFormattedValue: function getFormattedValue(item, field) {
@@ -29461,68 +26059,70 @@
         // Returns a function to toggle a row's details slot
         return function () {
           if (hasDetailsSlot) {
-            _this.$set(item, '_showDetails', !item._showDetails);
+            _this.$set(item, FIELD_KEY_SHOW_DETAILS, !item[FIELD_KEY_SHOW_DETAILS]);
           }
         };
       },
       // Row event handlers
-      rowHovered: function rowHovered(evt) {
+      rowHovered: function rowHovered(event) {
         // `mouseenter` handler (non-bubbling)
         // `this.tbodyRowEvtStopped` from tbody mixin
-        if (!this.tbodyRowEvtStopped(evt)) {
+        if (!this.tbodyRowEvtStopped(event)) {
           // `this.emitTbodyRowEvent` from tbody mixin
-          this.emitTbodyRowEvent('row-hovered', evt);
+          this.emitTbodyRowEvent(EVENT_NAME_ROW_HOVERED, event);
         }
       },
-      rowUnhovered: function rowUnhovered(evt) {
+      rowUnhovered: function rowUnhovered(event) {
         // `mouseleave` handler (non-bubbling)
         // `this.tbodyRowEvtStopped` from tbody mixin
-        if (!this.tbodyRowEvtStopped(evt)) {
+        if (!this.tbodyRowEvtStopped(event)) {
           // `this.emitTbodyRowEvent` from tbody mixin
-          this.emitTbodyRowEvent('row-unhovered', evt);
+          this.emitTbodyRowEvent(EVENT_NAME_ROW_UNHOVERED, event);
         }
       },
-      // Render helpers
+      // Renders a TD or TH for a row's field
       renderTbodyRowCell: function renderTbodyRowCell(field, colIndex, item, rowIndex) {
         var _this2 = this;
 
-        // Renders a TD or TH for a row's field
+        var isStacked = this.isStacked;
+        var key = field.key,
+            label = field.label,
+            isRowHeader = field.isRowHeader;
         var h = this.$createElement;
-        var hasDetailsSlot = this.hasNormalizedSlot(detailsSlotName);
+        var hasDetailsSlot = this.hasNormalizedSlot(SLOT_NAME_ROW_DETAILS);
         var formatted = this.getFormattedValue(item, field);
-        var key = field.key;
-        var stickyColumn = !this.isStacked && (this.isResponsive || this.stickyHeader) && field.stickyColumn; // We only uses the helper components for sticky columns to
+        var stickyColumn = !isStacked && (this.isResponsive || this.stickyHeader) && field.stickyColumn; // We only uses the helper components for sticky columns to
         // improve performance of BTable/BTableLite by reducing the
         // total number of vue instances created during render
 
-        var cellTag = stickyColumn ? field.isRowHeader ? BTh : BTd : field.isRowHeader ? 'th' : 'td';
-        var cellVariant = item._cellVariants && item._cellVariants[key] ? item._cellVariants[key] : field.variant || null;
+        var cellTag = stickyColumn ? isRowHeader ? BTh : BTd : isRowHeader ? 'th' : 'td';
+        var cellVariant = item[FIELD_KEY_CELL_VARIANT] && item[FIELD_KEY_CELL_VARIANT][key] ? item[FIELD_KEY_CELL_VARIANT][key] : field.variant || null;
         var data = {
           // For the Vue key, we concatenate the column index and
           // field key (as field keys could be duplicated)
           // TODO: Although we do prevent duplicate field keys...
           //   So we could change this to: `row-${rowIndex}-cell-${key}`
-          key: "row-".concat(rowIndex, "-cell-").concat(colIndex, "-").concat(key),
           class: [field.class ? field.class : '', this.getTdValues(item, key, field.tdClass, '')],
           props: {},
           attrs: _objectSpread2({
             'aria-colindex': String(colIndex + 1)
-          }, field.isRowHeader ? this.getThValues(item, key, field.thAttr, 'row', {}) : this.getTdValues(item, key, field.tdAttr, {}))
+          }, isRowHeader ? this.getThValues(item, key, field.thAttr, 'row', {}) : this.getTdValues(item, key, field.tdAttr, {})),
+          key: "row-".concat(rowIndex, "-cell-").concat(colIndex, "-").concat(key)
         };
 
         if (stickyColumn) {
           // We are using the helper BTd or BTh
           data.props = {
-            stackedHeading: this.isStacked ? field.label : null,
+            stackedHeading: isStacked ? label : null,
             stickyColumn: true,
             variant: cellVariant
           };
         } else {
           // Using native TD or TH element, so we need to
           // add in the attributes and variant class
-          data.attrs['data-label'] = this.isStacked && !isUndefinedOrNull(field.label) ? toString$1(field.label) : null;
-          data.attrs.role = field.isRowHeader ? 'rowheader' : 'cell';
-          data.attrs.scope = field.isRowHeader ? 'row' : null; // Add in the variant class
+          data.attrs['data-label'] = isStacked && !isUndefinedOrNull(label) ? toString$1(label) : null;
+          data.attrs.role = isRowHeader ? 'rowheader' : 'cell';
+          data.attrs.scope = isRowHeader ? 'row' : null; // Add in the variant class
 
           if (cellVariant) {
             data.class.push("".concat(this.dark ? 'bg' : 'table', "-").concat(cellVariant));
@@ -29536,7 +26136,7 @@
           unformatted: get(item, key, ''),
           value: formatted,
           toggleDetails: this.toggleDetailsFactory(hasDetailsSlot, item),
-          detailsShowing: Boolean(item._showDetails)
+          detailsShowing: Boolean(item[FIELD_KEY_SHOW_DETAILS])
         }; // If table supports selectable mode, then add in the following scope
         // this.supportsSelectableRows will be undefined if mixin isn't loaded
 
@@ -29571,16 +26171,21 @@
 
         return h(cellTag, data, [$childNodes]);
       },
+      // Renders an item's row (or rows if details supported)
       renderTbodyRow: function renderTbodyRow(item, rowIndex) {
         var _this3 = this;
 
-        // Renders an item's row (or rows if details supported)
+        var fields = this.computedFields,
+            striped = this.striped,
+            primaryKey = this.primaryKey,
+            currentPage = this.currentPage,
+            perPage = this.perPage,
+            tbodyTrClass = this.tbodyTrClass,
+            tbodyTrAttr = this.tbodyTrAttr;
         var h = this.$createElement;
-        var fields = this.computedFields;
-        var tableStriped = this.striped;
-        var hasDetailsSlot = this.hasNormalizedSlot(detailsSlotName);
-        var rowShowDetails = item._showDetails && hasDetailsSlot;
-        var hasRowClickHandler = this.$listeners['row-clicked'] || this.hasSelectableRowClick; // We can return more than one TR if rowDetails enabled
+        var hasDetailsSlot = this.hasNormalizedSlot(SLOT_NAME_ROW_DETAILS);
+        var rowShowDetails = item[FIELD_KEY_SHOW_DETAILS] && hasDetailsSlot;
+        var hasRowClickHandler = this.$listeners[EVENT_NAME_ROW_CLICKED] || this.hasSelectableRowClick; // We can return more than one TR if rowDetails enabled
 
         var $rows = []; // Details ID needed for `aria-details` when details showing
         // We set it to `null` when not showing so that attribute
@@ -29594,15 +26199,14 @@
 
         var ariaRowIndex = null;
 
-        if (this.currentPage && this.perPage && this.perPage > 0) {
-          ariaRowIndex = String((this.currentPage - 1) * this.perPage + rowIndex + 1);
+        if (currentPage && perPage && perPage > 0) {
+          ariaRowIndex = String((currentPage - 1) * perPage + rowIndex + 1);
         } // Create a unique :key to help ensure that sub components are re-rendered rather than
         // re-used, which can cause issues. If a primary key is not provided we use the rendered
         // rows index within the tbody.
         // See: https://github.com/bootstrap-vue/bootstrap-vue/issues/2410
 
 
-        var primaryKey = this.primaryKey;
         var primaryKeyValue = toString$1(get(item, primaryKey)) || null;
         var rowKey = primaryKeyValue || toString$1(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
         // In the format of '{tableId}__row_{primaryKeyValue}'
@@ -29612,18 +26216,15 @@
         var selectableClasses = this.selectableRowClasses ? this.selectableRowClasses(rowIndex) : {};
         var selectableAttrs = this.selectableRowAttrs ? this.selectableRowAttrs(rowIndex) : {}; // Additional classes and attributes
 
-        var userTrClasses = isFunction(this.tbodyTrClass) ? this.tbodyTrClass(item, 'row') : this.tbodyTrClass;
-        var userTrAttrs = isFunction(this.tbodyTrAttr) ?
+        var userTrClasses = isFunction(tbodyTrClass) ? tbodyTrClass(item, 'row') : tbodyTrClass;
+        var userTrAttrs = isFunction(tbodyTrAttr) ?
         /* istanbul ignore next */
-        this.tbodyTrAttr(item, 'row') : this.tbodyTrAttr; // Add the item row
+        tbodyTrAttr(item, 'row') : tbodyTrAttr; // Add the item row
 
         $rows.push(h(BTr, {
-          key: "__b-table-row-".concat(rowKey, "__"),
-          ref: 'itemRows',
-          refInFor: true,
           class: [userTrClasses, selectableClasses, rowShowDetails ? 'b-table-has-details' : ''],
           props: {
-            variant: item._rowVariant || null
+            variant: item[FIELD_KEY_ROW_VARIANT] || null
           },
           attrs: _objectSpread2(_objectSpread2({
             id: rowId
@@ -29639,7 +26240,10 @@
             // Note: These events are not A11Y friendly!
             mouseenter: this.rowHovered,
             mouseleave: this.rowUnhovered
-          }
+          },
+          key: "__b-table-row-".concat(rowKey, "__"),
+          ref: 'item-rows',
+          refInFor: true
         }, $tds)); // Row Details slot
 
         if (rowShowDetails) {
@@ -29669,46 +26273,46 @@
               colspan: fields.length
             },
             class: this.detailsTdClass
-          }, [this.normalizeSlot(detailsSlotName, detailsScope)]); // Add a hidden row to keep table row striping consistent when details showing
+          }, [this.normalizeSlot(SLOT_NAME_ROW_DETAILS, detailsScope)]); // Add a hidden row to keep table row striping consistent when details showing
           // Only added if the table is striped
 
-          if (tableStriped) {
+          if (striped) {
             $rows.push( // We don't use `BTr` here as we don't need the extra functionality
             h('tr', {
-              key: "__b-table-details-stripe__".concat(rowKey),
               staticClass: 'd-none',
               attrs: {
                 'aria-hidden': 'true',
                 role: 'presentation'
-              }
+              },
+              key: "__b-table-details-stripe__".concat(rowKey)
             }));
           } // Add the actual details row
 
 
           var userDetailsTrClasses = isFunction(this.tbodyTrClass) ?
           /* istanbul ignore next */
-          this.tbodyTrClass(item, detailsSlotName) : this.tbodyTrClass;
+          this.tbodyTrClass(item, SLOT_NAME_ROW_DETAILS) : this.tbodyTrClass;
           var userDetailsTrAttrs = isFunction(this.tbodyTrAttr) ?
           /* istanbul ignore next */
-          this.tbodyTrAttr(item, detailsSlotName) : this.tbodyTrAttr;
+          this.tbodyTrAttr(item, SLOT_NAME_ROW_DETAILS) : this.tbodyTrAttr;
           $rows.push(h(BTr, {
-            key: "__b-table-details__".concat(rowKey),
             staticClass: 'b-table-details',
             class: [userDetailsTrClasses],
             props: {
-              variant: item._rowVariant || null
+              variant: item[FIELD_KEY_ROW_VARIANT] || null
             },
             attrs: _objectSpread2(_objectSpread2({}, userDetailsTrAttrs), {}, {
               // Users cannot override the following attributes
               id: detailsId,
               tabindex: '-1'
-            })
+            }),
+            key: "__b-table-details__".concat(rowKey)
           }, [$details]));
         } else if (hasDetailsSlot) {
           // Only add the placeholder if a the table has a row-details slot defined (but not shown)
           $rows.push(h());
 
-          if (tableStriped) {
+          if (striped) {
             // Add extra placeholder if table is striped
             $rows.push(h());
           }
@@ -29718,31 +26322,33 @@
         return $rows;
       }
     }
-  };
-
-  var props$Y = _objectSpread2(_objectSpread2({}, props$X), {}, {
-    tbodyClass: {
-      type: [String, Array, Object] // default: undefined
-
-    }
   });
 
-  var tbodyMixin = {
+  var getCellSlotName = function getCellSlotName(value) {
+    return "cell(".concat(value || '', ")");
+  }; // --- Props ---
+
+
+  var props$28 = sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$25), props$27), {}, {
+    tbodyClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
+  })); // --- Mixin ---
+  // @vue/component
+
+  var tbodyMixin = Vue__default['default'].extend({
     mixins: [tbodyRowMixin],
-    props: props$Y,
+    props: props$28,
     beforeDestroy: function beforeDestroy() {
       this.$_bodyFieldSlotNameCache = null;
     },
     methods: {
-      // Helper methods
+      // Returns all the item TR elements (excludes detail and spacer rows)
+      // `this.$refs['item-rows']` is an array of item TR components/elements
+      // Rows should all be `<b-tr>` components, but we map to TR elements
+      // Also note that `this.$refs['item-rows']` may not always be in document order
       getTbodyTrs: function getTbodyTrs() {
-        // Returns all the item TR elements (excludes detail and spacer rows)
-        // `this.$refs.itemRows` is an array of item TR components/elements
-        // Rows should all be B-TR components, but we map to TR elements
-        // Also note that `this.$refs.itemRows` may not always be in document order
-        var refs = this.$refs || {};
-        var tbody = refs.tbody ? refs.tbody.$el || refs.tbody : null;
-        var trs = (refs.itemRows || []).map(function (tr) {
+        var $refs = this.$refs;
+        var tbody = $refs.tbody ? $refs.tbody.$el || $refs.tbody : null;
+        var trs = ($refs['item-rows'] || []).map(function (tr) {
           return tr.$el || tr;
         });
         return tbody && tbody.children && tbody.children.length > 0 && trs && trs.length > 0 ? from(tbody.children).filter(function (tr) {
@@ -29751,10 +26357,9 @@
         /* istanbul ignore next */
         [];
       },
+      // Returns index of a particular TBODY item TR
+      // We set `true` on closest to include self in result
       getTbodyTrIndex: function getTbodyTrIndex(el) {
-        // Returns index of a particular TBODY item TR
-        // We set `true` on closest to include self in result
-
         /* istanbul ignore next: should not normally happen */
         if (!isElement(el)) {
           return -1;
@@ -29763,45 +26368,44 @@
         var tr = el.tagName === 'TR' ? el : closest('tr', el, true);
         return tr ? this.getTbodyTrs().indexOf(tr) : -1;
       },
-      emitTbodyRowEvent: function emitTbodyRowEvent(type, evt) {
-        // Emits a row event, with the item object, row index and original event
-        if (type && this.hasListener(type) && evt && evt.target) {
-          var rowIndex = this.getTbodyTrIndex(evt.target);
+      // Emits a row event, with the item object, row index and original event
+      emitTbodyRowEvent: function emitTbodyRowEvent(type, event) {
+        if (type && this.hasListener(type) && event && event.target) {
+          var rowIndex = this.getTbodyTrIndex(event.target);
 
           if (rowIndex > -1) {
             // The array of TRs correlate to the `computedItems` array
             var item = this.computedItems[rowIndex];
-            this.$emit(type, item, rowIndex, evt);
+            this.$emit(type, item, rowIndex, event);
           }
         }
       },
-      tbodyRowEvtStopped: function tbodyRowEvtStopped(evt) {
-        return this.stopIfBusy && this.stopIfBusy(evt);
+      tbodyRowEvtStopped: function tbodyRowEvtStopped(event) {
+        return this.stopIfBusy && this.stopIfBusy(event);
       },
       // Delegated row event handlers
-      onTbodyRowKeydown: function onTbodyRowKeydown(evt) {
+      onTbodyRowKeydown: function onTbodyRowKeydown(event) {
         // Keyboard navigation and row click emulation
-        var target = evt.target;
+        var target = event.target,
+            keyCode = event.keyCode;
 
-        if (this.tbodyRowEvtStopped(evt) || target.tagName !== 'TR' || !isActiveElement(target) || target.tabIndex !== 0) {
+        if (this.tbodyRowEvtStopped(event) || target.tagName !== 'TR' || !isActiveElement(target) || target.tabIndex !== 0) {
           // Early exit if not an item row TR
           return;
         }
 
-        var keyCode = evt.keyCode;
-
         if (arrayIncludes([CODE_ENTER, CODE_SPACE], keyCode)) {
           // Emulated click for keyboard users, transfer to click handler
-          stopEvent(evt);
-          this.onTBodyRowClicked(evt);
+          stopEvent(event);
+          this.onTBodyRowClicked(event);
         } else if (arrayIncludes([CODE_UP, CODE_DOWN, CODE_HOME, CODE_END], keyCode)) {
           // Keyboard navigation
           var rowIndex = this.getTbodyTrIndex(target);
 
           if (rowIndex > -1) {
-            stopEvent(evt);
+            stopEvent(event);
             var trs = this.getTbodyTrs();
-            var shift = evt.shiftKey;
+            var shift = event.shiftKey;
 
             if (keyCode === CODE_HOME || shift && keyCode === CODE_UP) {
               // Focus first row
@@ -29819,49 +26423,48 @@
           }
         }
       },
-      onTBodyRowClicked: function onTBodyRowClicked(evt) {
-        if (this.tbodyRowEvtStopped(evt)) {
-          // If table is busy, then don't propagate
-          return;
-        } else if (filterEvent(evt) || textSelectionActive(this.$el)) {
-          // Clicked on a non-disabled control so ignore
-          // Or user is selecting text, so ignore
+      onTBodyRowClicked: function onTBodyRowClicked(event) {
+        // Don't emit event when the table is busy, the user clicked
+        // on a non-disabled control or is selecting text
+        if (this.tbodyRowEvtStopped(event) || filterEvent(event) || textSelectionActive(this.$el)) {
           return;
         }
 
-        this.emitTbodyRowEvent('row-clicked', evt);
+        this.emitTbodyRowEvent(EVENT_NAME_ROW_CLICKED, event);
       },
-      onTbodyRowMiddleMouseRowClicked: function onTbodyRowMiddleMouseRowClicked(evt) {
-        if (!this.tbodyRowEvtStopped(evt) && evt.which === 2) {
-          this.emitTbodyRowEvent('row-middle-clicked', evt);
+      onTbodyRowMiddleMouseRowClicked: function onTbodyRowMiddleMouseRowClicked(event) {
+        if (!this.tbodyRowEvtStopped(event) && event.which === 2) {
+          this.emitTbodyRowEvent(EVENT_NAME_ROW_MIDDLE_CLICKED, event);
         }
       },
-      onTbodyRowContextmenu: function onTbodyRowContextmenu(evt) {
-        if (!this.tbodyRowEvtStopped(evt)) {
-          this.emitTbodyRowEvent('row-contextmenu', evt);
+      onTbodyRowContextmenu: function onTbodyRowContextmenu(event) {
+        if (!this.tbodyRowEvtStopped(event)) {
+          this.emitTbodyRowEvent(EVENT_NAME_ROW_CONTEXTMENU, event);
         }
       },
-      onTbodyRowDblClicked: function onTbodyRowDblClicked(evt) {
-        if (!this.tbodyRowEvtStopped(evt) && !filterEvent(evt)) {
-          this.emitTbodyRowEvent('row-dblclicked', evt);
+      onTbodyRowDblClicked: function onTbodyRowDblClicked(event) {
+        if (!this.tbodyRowEvtStopped(event) && !filterEvent(event)) {
+          this.emitTbodyRowEvent(EVENT_NAME_ROW_DBLCLICKED, event);
         }
       },
-      // Note: Row hover handlers are handled by the tbody-row mixin
-      // As mouseenter/mouseleave events do not bubble
-      //
-      // Render Helper
+      // Render the tbody element and children
+      // Note:
+      //   Row hover handlers are handled by the tbody-row mixin
+      //   As mouseenter/mouseleave events do not bubble
       renderTbody: function renderTbody() {
         var _this = this;
 
-        // Render the tbody element and children
-        var items = this.computedItems; // Shortcut to `createElement` (could use `this._c()` instead)
-
+        var items = this.computedItems,
+            renderBusy = this.renderBusy,
+            renderTopRow = this.renderTopRow,
+            renderEmpty = this.renderEmpty,
+            renderBottomRow = this.renderBottomRow;
         var h = this.$createElement;
-        var hasRowClickHandler = this.hasListener('row-clicked') || this.hasSelectableRowClick; // Prepare the tbody rows
+        var hasRowClickHandler = this.hasListener(EVENT_NAME_ROW_CLICKED) || this.hasSelectableRowClick; // Prepare the tbody rows
 
         var $rows = []; // Add the item data rows or the busy slot
 
-        var $busy = this.renderBusy ? this.renderBusy() : null;
+        var $busy = renderBusy ? renderBusy() : null;
 
         if ($busy) {
           // If table is busy and a busy slot, then return only the busy "row" indicator
@@ -29873,31 +26476,32 @@
           // Slots could be dynamic (i.e. `v-if`), so we must compute on each render
           // Used by tbody-row mixin render helper
           var cache = {};
-          var defaultSlotName = this.hasNormalizedSlot('cell()') ? 'cell()' : null;
+          var defaultSlotName = getCellSlotName();
+          defaultSlotName = this.hasNormalizedSlot(defaultSlotName) ? defaultSlotName : null;
           this.computedFields.forEach(function (field) {
             var key = field.key;
-            var fullName = "cell(".concat(key, ")");
-            var lowerName = "cell(".concat(key.toLowerCase(), ")");
-            cache[key] = _this.hasNormalizedSlot(fullName) ? fullName : _this.hasNormalizedSlot(lowerName) ?
+            var slotName = getCellSlotName(key);
+            var lowercaseSlotName = getCellSlotName(key.toLowerCase());
+            cache[key] = _this.hasNormalizedSlot(slotName) ? slotName : _this.hasNormalizedSlot(lowercaseSlotName) ?
             /* istanbul ignore next */
-            lowerName : defaultSlotName;
+            lowercaseSlotName : defaultSlotName;
           }); // Created as a non-reactive property so to not trigger component updates
           // Must be a fresh object each render
 
           this.$_bodyFieldSlotNameCache = cache; // Add static top row slot (hidden in visibly stacked mode
           // as we can't control `data-label` attr)
 
-          $rows.push(this.renderTopRow ? this.renderTopRow() : h()); // Render the rows
+          $rows.push(renderTopRow ? renderTopRow() : h()); // Render the rows
 
           items.forEach(function (item, rowIndex) {
             // Render the individual item row (rows if details slot)
             $rows.push(_this.renderTbodyRow(item, rowIndex));
           }); // Empty items / empty filtered row slot (only shows if `items.length < 1`)
 
-          $rows.push(this.renderEmpty ? this.renderEmpty() : h()); // Static bottom row slot (hidden in visibly stacked mode
+          $rows.push(renderEmpty ? renderEmpty() : h()); // Static bottom row slot (hidden in visibly stacked mode
           // as we can't control `data-label` attr)
 
-          $rows.push(this.renderBottomRow ? this.renderBottomRow() : h());
+          $rows.push(renderBottomRow ? renderBottomRow() : h());
         } // Note: these events will only emit if a listener is registered
 
 
@@ -29920,36 +26524,30 @@
 
 
         var $tbody = h(BTbody, {
-          ref: 'tbody',
           class: this.tbodyClass || null,
-          props: {
-            tbodyTransitionProps: this.tbodyTransitionProps,
-            tbodyTransitionHandlers: this.tbodyTransitionHandlers
-          },
+          props: pluckProps(props$25, this.$props),
           // BTbody transfers all native event listeners to the root element
           // TODO: Only set the handlers if the table is not busy
-          on: handlers
+          on: handlers,
+          ref: 'tbody'
         }, $rows); // Return the assembled tbody
 
         return $tbody;
       }
     }
-  };
+  });
 
-  var props$Z = {
-    footVariant: {
-      type: String,
-      // Supported values: 'lite', 'dark', or null
-      default: null
-    }
-  }; // TODO:
+  var props$29 = makePropsConfigurable({
+    // Supported values: 'lite', 'dark', or null
+    footVariant: makeProp(PROP_TYPE_STRING)
+  }, NAME_TFOOT); // --- Main component ---
+  // TODO:
   //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
   //   to the child elements, so this can be converted to a functional component
   // @vue/component
 
   var BTfoot = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TFOOT,
-    // Mixin order is important!
     mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     provide: function provide() {
       return {
@@ -29957,58 +26555,56 @@
       };
     },
     inject: {
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       bvTable: {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-
+        default:
         /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
+        function _default() {
           return {};
         }
       }
     },
     inheritAttrs: false,
-    props: props$Z,
+    props: props$29,
     computed: {
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isTfoot: function isTfoot() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return true;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isDark: function isDark() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.dark;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isStacked: function isStacked() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.isStacked;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isResponsive: function isResponsive() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.isResponsive;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
+      // Sticky headers are only supported in thead
       isStickyHeader: function isStickyHeader() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-        // Sticky headers are only supported in thead
         return false;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
+      // Needed to handle header background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
       hasStickyHeader: function hasStickyHeader() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-        // Needed to handle header background classes, due to lack of
-        // background color inheritance with Bootstrap v4 table CSS
         return !this.isStacked && this.bvTable.stickyHeader;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       tableVariant: function tableVariant() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.tableVariant;
       },
       tfootClasses: function tfootClasses() {
         return [this.footVariant ? "thead-".concat(this.footVariant) : null];
       },
       tfootAttrs: function tfootAttrs() {
-        return _objectSpread2({
+        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
           role: 'rowgroup'
-        }, this.bvAttrs);
+        });
       }
     },
     render: function render(h) {
@@ -30021,75 +26617,59 @@
     }
   });
 
-  var tfootMixin = {
-    props: {
-      footClone: {
-        type: Boolean,
-        default: false
-      },
-      footVariant: {
-        type: String,
-        // 'dark', 'light', or `null` (or custom)
-        default: function _default() {
-          return getComponentConfig(NAME_TABLE, 'footVariant');
-        }
-      },
-      footRowVariant: {
-        // Any Bootstrap theme variant (or custom). Falls back to `headRowVariant`
-        type: String // default: null
+  var props$2a = {
+    footClone: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Any Bootstrap theme variant (or custom)
+    // Falls back to `headRowVariant`
+    footRowVariant: makeProp(PROP_TYPE_STRING),
+    // 'dark', 'light', or `null` (or custom)
+    footVariant: makeProp(PROP_TYPE_STRING),
+    tfootClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    tfootTrClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
+  }; // --- Mixin ---
+  // @vue/component
 
-      },
-      tfootClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      tfootTrClass: {
-        type: [String, Array, Object] // default: null
-
-      }
-    },
+  var tfootMixin = Vue__default['default'].extend({
+    props: props$2a,
     methods: {
       renderTFootCustom: function renderTFootCustom() {
         var h = this.$createElement;
 
-        if (this.hasNormalizedSlot('custom-foot')) {
+        if (this.hasNormalizedSlot(SLOT_NAME_CUSTOM_FOOT)) {
           return h(BTfoot, {
-            key: 'bv-tfoot-custom',
             class: this.tfootClass || null,
             props: {
               footVariant: this.footVariant || this.headVariant || null
-            }
-          }, this.normalizeSlot('custom-foot', {
+            },
+            key: 'bv-tfoot-custom'
+          }, this.normalizeSlot(SLOT_NAME_CUSTOM_FOOT, {
             items: this.computedItems.slice(),
             fields: this.computedFields.slice(),
             columns: this.computedFields.length
           }));
-        } else {
-          return h();
         }
+
+        return h();
       },
       renderTfoot: function renderTfoot() {
         // Passing true to renderThead will make it render a tfoot
         return this.footClone ? this.renderThead(true) : this.renderTFootCustom();
       }
     }
-  };
+  });
 
-  var props$_ = {
-    headVariant: {
-      // Also sniffed by <b-tr> / <b-td> / <b-th>
-      type: String,
-      // Supported values: 'lite', 'dark', or null
-      default: null
-    }
-  }; // TODO:
+  var props$2b = makePropsConfigurable({
+    // Also sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
+    // Supported values: 'lite', 'dark', or `null`
+    headVariant: makeProp(PROP_TYPE_STRING)
+  }, NAME_THEAD); // --- Main component ---
+  // TODO:
   //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
   //   to the child elements, so this can be converted to a functional component
   // @vue/component
 
   var BThead = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_THEAD,
-    // Mixin order is important!
     mixins: [attrsMixin, listenersMixin, normalizeSlotMixin],
     provide: function provide() {
       return {
@@ -30097,51 +26677,49 @@
       };
     },
     inject: {
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       bvTable: {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-
+        default:
         /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
+        function _default() {
           return {};
         }
       }
     },
     inheritAttrs: false,
-    props: props$_,
+    props: props$2b,
     computed: {
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isThead: function isThead() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return true;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isDark: function isDark() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.dark;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isStacked: function isStacked() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.isStacked;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isResponsive: function isResponsive() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.isResponsive;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
+      // Needed to handle header background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
+      // Sticky headers only apply to cells in table `thead`
       isStickyHeader: function isStickyHeader() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-        // Needed to handle header background classes, due to lack of
-        // background color inheritance with Bootstrap v4 table CSS
-        // Sticky headers only apply to cells in table `thead`
         return !this.isStacked && this.bvTable.stickyHeader;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
+      // Needed to handle header background classes, due to lack of
+      // background color inheritance with Bootstrap v4 table CSS
       hasStickyHeader: function hasStickyHeader() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
-        // Needed to handle header background classes, due to lack of
-        // background color inheritance with Bootstrap v4 table CSS
         return !this.isStacked && this.bvTable.stickyHeader;
       },
+      // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       tableVariant: function tableVariant() {
-        // Sniffed by <b-tr> / <b-td> / <b-th>
         return this.bvTable.tableVariant;
       },
       theadClasses: function theadClasses() {
@@ -30163,39 +26741,37 @@
     }
   });
 
-  var theadMixin = {
-    props: {
-      headVariant: {
-        type: String,
-        // 'light', 'dark' or `null` (or custom)
-        default: function _default() {
-          return getComponentConfig(NAME_TABLE, 'headVariant');
-        }
-      },
-      headRowVariant: {
-        // Any Bootstrap theme variant (or custom)
-        type: String // default: null
+  var getHeadSlotName = function getHeadSlotName(value) {
+    return "head(".concat(value || '', ")");
+  };
 
-      },
-      theadClass: {
-        type: [String, Array, Object] // default: undefined
+  var getFootSlotName = function getFootSlotName(value) {
+    return "foot(".concat(value || '', ")");
+  }; // --- Props ---
 
-      },
-      theadTrClass: {
-        type: [String, Array, Object] // default: undefined
 
-      }
-    },
+  var props$2c = {
+    // Any Bootstrap theme variant (or custom)
+    headRowVariant: makeProp(PROP_TYPE_STRING),
+    // 'light', 'dark' or `null` (or custom)
+    headVariant: makeProp(PROP_TYPE_STRING),
+    theadClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    theadTrClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
+  }; // --- Mixin ---
+  // @vue/component
+
+  var theadMixin = Vue__default['default'].extend({
+    props: props$2c,
     methods: {
       fieldClasses: function fieldClasses(field) {
         // Header field (<th>) classes
         return [field.class ? field.class : '', field.thClass ? field.thClass : ''];
       },
-      headClicked: function headClicked(evt, field, isFoot) {
-        if (this.stopIfBusy && this.stopIfBusy(evt)) {
+      headClicked: function headClicked(event, field, isFoot) {
+        if (this.stopIfBusy && this.stopIfBusy(event)) {
           // If table is busy (via provider) then don't propagate
           return;
-        } else if (filterEvent(evt)) {
+        } else if (filterEvent(event)) {
           // Clicked on a non-disabled control so ignore
           return;
         } else if (textSelectionActive(this.$el)) {
@@ -30205,28 +26781,28 @@
           return;
         }
 
-        stopEvent(evt);
-        this.$emit('head-clicked', field.key, field, evt, isFoot);
+        stopEvent(event);
+        this.$emit(EVENT_NAME_HEAD_CLICKED, field.key, field, event, isFoot);
       },
       renderThead: function renderThead() {
         var _this = this;
 
         var isFoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-        var h = this.$createElement;
-        var fields = this.computedFields || []; // In always stacked mode, we don't bother rendering the head/foot
+        var fields = this.computedFields,
+            isSortable = this.isSortable,
+            isSelectable = this.isSelectable,
+            headVariant = this.headVariant,
+            footVariant = this.footVariant,
+            headRowVariant = this.headRowVariant,
+            footRowVariant = this.footRowVariant;
+        var h = this.$createElement; // In always stacked mode, we don't bother rendering the head/foot
         // Or if no field headings (empty table)
 
         if (this.isStackedAlways || fields.length === 0) {
           return h();
         }
 
-        var isSortable = this.isSortable,
-            isSelectable = this.isSelectable,
-            headVariant = this.headVariant,
-            footVariant = this.footVariant,
-            headRowVariant = this.headRowVariant,
-            footRowVariant = this.footRowVariant;
-        var hasHeadClickListener = isSortable || this.hasListener('head-clicked'); // Reference to `selectAllRows` and `clearSelected()`, if table is selectable
+        var hasHeadClickListener = isSortable || this.hasListener(EVENT_NAME_HEAD_CLICKED); // Reference to `selectAllRows` and `clearSelected()`, if table is selectable
 
         var selectAllRows = isSelectable ? this.selectAllRows : noop;
         var clearSelected = isSelectable ? this.clearSelected : noop; // Helper function to generate a field <th> cell
@@ -30250,15 +26826,15 @@
           var on = {};
 
           if (hasHeadClickListener) {
-            on.click = function (evt) {
-              _this.headClicked(evt, field, isFoot);
+            on.click = function (event) {
+              _this.headClicked(event, field, isFoot);
             };
 
-            on.keydown = function (evt) {
-              var keyCode = evt.keyCode;
+            on.keydown = function (event) {
+              var keyCode = event.keyCode;
 
               if (keyCode === CODE_ENTER || keyCode === CODE_SPACE) {
-                _this.headClicked(evt, field, isFoot);
+                _this.headClicked(event, field, isFoot);
               }
             };
           }
@@ -30274,8 +26850,9 @@
             },
             style: field.thStyle || {},
             attrs: _objectSpread2(_objectSpread2({
-              // We only add a tabindex of 0 if there is a head-clicked listener
-              tabindex: hasHeadClickListener ? '0' : null,
+              // We only add a `tabindex` of `0` if there is a head-clicked listener
+              // and the current field is sortable
+              tabindex: hasHeadClickListener && field.sortable ? '0' : null,
               abbr: field.headerAbbr || null,
               title: field.headerTitle || null,
               'aria-colindex': colIndex + 1,
@@ -30289,10 +26866,10 @@
           // We have replaced the square bracket syntax with round brackets
           // to prevent confusion with dynamic slot names
 
-          var slotNames = ["head(".concat(key, ")"), "head(".concat(key.toLowerCase(), ")"), 'head()']; // Footer will fallback to header slot names
+          var slotNames = [getHeadSlotName(key), getHeadSlotName(key.toLowerCase()), getHeadSlotName()]; // Footer will fallback to header slot names
 
           if (isFoot) {
-            slotNames = ["foot(".concat(key, ")"), "foot(".concat(key.toLowerCase(), ")"), 'foot()'].concat(_toConsumableArray(slotNames));
+            slotNames = [getFootSlotName(key), getFootSlotName(key.toLowerCase()), getFootSlotName()].concat(_toConsumableArray(slotNames));
           }
 
           var scope = {
@@ -30336,7 +26913,7 @@
             selectAllRows: selectAllRows,
             clearSelected: clearSelected
           };
-          $trs.push(this.normalizeSlot('thead-top', scope) || h());
+          $trs.push(this.normalizeSlot(SLOT_NAME_THEAD_TOP, scope) || h());
           $trs.push(h(BTr, {
             class: this.theadTrClass,
             props: {
@@ -30346,43 +26923,49 @@
         }
 
         return h(isFoot ? BTfoot : BThead, {
-          key: isFoot ? 'bv-tfoot' : 'bv-thead',
           class: (isFoot ? this.tfootClass : this.theadClass) || null,
           props: isFoot ? {
             footVariant: footVariant || headVariant || null
           } : {
             headVariant: headVariant || null
-          }
+          },
+          key: isFoot ? 'bv-tfoot' : 'bv-thead'
         }, $trs);
       }
     }
-  };
+  });
 
-  var slotName$1 = 'top-row';
-  var topRowMixin = {
+  var props$2d = {}; // --- Mixin ---
+  // @vue/component
+
+  var topRowMixin = Vue__default['default'].extend({
     methods: {
       renderTopRow: function renderTopRow() {
+        var fields = this.computedFields,
+            stacked = this.stacked,
+            tbodyTrClass = this.tbodyTrClass,
+            tbodyTrAttr = this.tbodyTrAttr;
         var h = this.$createElement; // Add static Top Row slot (hidden in visibly stacked mode as we can't control the data-label)
         // If in *always* stacked mode, we don't bother rendering the row
 
-        if (!this.hasNormalizedSlot(slotName$1) || this.stacked === true || this.stacked === '') {
+        if (!this.hasNormalizedSlot(SLOT_NAME_TOP_ROW) || stacked === true || stacked === '') {
           return h();
         }
 
-        var fields = this.computedFields;
         return h(BTr, {
-          key: 'b-top-row',
           staticClass: 'b-table-top-row',
-          class: [isFunction(this.tbodyTrClass) ? this.tbodyTrClass(null, 'row-top') : this.tbodyTrClass],
-          attrs: isFunction(this.tbodyTrAttr) ? this.tbodyTrAttr(null, 'row-top') : this.tbodyTrAttr
-        }, [this.normalizeSlot(slotName$1, {
+          class: [isFunction(tbodyTrClass) ? tbodyTrClass(null, 'row-top') : tbodyTrClass],
+          attrs: isFunction(tbodyTrAttr) ? tbodyTrAttr(null, 'row-top') : tbodyTrAttr,
+          key: 'b-top-row'
+        }, [this.normalizeSlot(SLOT_NAME_TOP_ROW, {
           columns: fields.length,
           fields: fields
         })]);
       }
     }
-  };
+  });
 
+  var props$2e = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$1T), props$1V), props$1W), props$1X), props$1Y), props$1Z), props$1_), props$1$), props$20), props$21), props$22), props$23), props$24), props$28), props$2a), props$2c), props$2d)), NAME_TABLE); // --- Main component ---
   // @vue/component
 
   var BTable = /*#__PURE__*/Vue__default['default'].extend({
@@ -30392,39 +26975,46 @@
     mixins: [// General mixins
     attrsMixin, hasListenerMixin, idMixin, normalizeSlotMixin, // Required table mixins
     itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Table features mixins
-    stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin] // Render function is provided by table-renderer mixin
+    stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin],
+    props: props$2e // Render function is provided by `tableRendererMixin`
 
   });
 
+  var props$2f = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$1W), props$1X), props$1_), props$23), props$24), props$28), props$2a), props$2c)), NAME_TABLE_LITE); // --- Main component ---
   // @vue/component
 
   var BTableLite = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TABLE_LITE,
     // Order of mixins is important!
-    // They are merged from first to last, followed by this component.
-    mixins: [// Required mixins
-    hasListenerMixin, idMixin, normalizeSlotMixin, itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Features Mixins
+    // They are merged from first to last, followed by this component
+    mixins: [// General mixins
+    attrsMixin, hasListenerMixin, idMixin, normalizeSlotMixin, // Required table mixins
+    itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Table features mixins
     // These are pretty lightweight, and are useful for lightweight tables
-    captionMixin, colgroupMixin] // render function provided by table-renderer mixin
+    captionMixin, colgroupMixin],
+    props: props$2f // Render function is provided by `tableRendererMixin`
 
   });
 
+  var props$2g = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$23), props$24)), NAME_TABLE_SIMPLE); // --- Main component ---
   // @vue/component
 
   var BTableSimple = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TABLE_SIMPLE,
     // Order of mixins is important!
-    // They are merged from first to last, followed by this component.
-    mixins: [// Required mixins
-    idMixin, normalizeSlotMixin, tableRendererMixin, // feature mixin
+    // They are merged from first to last, followed by this component
+    mixins: [// General mixins
+    attrsMixin, hasListenerMixin, idMixin, normalizeSlotMixin, // Required table mixins
+    tableRendererMixin, // Table features mixins
     // Stacked requires extra handling by users via
     // the table cell `stacked-heading` prop
     stackedMixin],
+    props: props$2g,
     computed: {
       isTableSimple: function isTableSimple() {
         return true;
       }
-    } // render function provided by table-renderer mixin
+    } // Render function is provided by `tableRendererMixin`
 
   });
 
@@ -30454,40 +27044,25 @@
     }
   });
 
+  var isPositiveNumber = function isPositiveNumber(value) {
+    return value > 0;
+  }; // --- Props ---
+
+
+  var props$2h = makePropsConfigurable({
+    animation: makeProp(PROP_TYPE_STRING),
+    columns: makeProp(PROP_TYPE_NUMBER, 5, isPositiveNumber),
+    hideHeader: makeProp(PROP_TYPE_BOOLEAN, false),
+    rows: makeProp(PROP_TYPE_NUMBER, 3, isPositiveNumber),
+    showFooter: makeProp(PROP_TYPE_BOOLEAN, false),
+    tableProps: makeProp(PROP_TYPE_OBJECT, {})
+  }, NAME_SKELETON_TABLE); // --- Main component ---
+  // @vue/component
+
   var BSkeletonTable = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON_TABLE,
     functional: true,
-    props: {
-      animation: {
-        type: String
-      },
-      rows: {
-        type: Number,
-        default: 3,
-        validator: function validator(value) {
-          return value > 0;
-        }
-      },
-      columns: {
-        type: Number,
-        default: 5,
-        validator: function validator(value) {
-          return value > 0;
-        }
-      },
-      hideHeader: {
-        type: Boolean,
-        default: false
-      },
-      showFooter: {
-        type: Boolean,
-        default: false
-      },
-      tableProps: {
-        type: Object,
-        default: function _default() {}
-      }
-    },
+    props: props$2h,
     render: function render(h, _ref) {
       var props = _ref.props;
       var animation = props.animation,
@@ -30497,15 +27072,15 @@
           animation: animation
         }
       })]);
-      var $thTr = h('tr', createAndFillArray(columns, $th));
+      var $thTr = h('tr', createArray(columns, $th));
       var $td = h('td', [h(BSkeleton, {
         props: {
           width: '75%',
           animation: animation
         }
       })]);
-      var $tdTr = h('tr', createAndFillArray(columns, $td));
-      var $tbody = h('tbody', createAndFillArray(props.rows, $tdTr));
+      var $tdTr = h('tr', createArray(columns, $td));
+      var $tbody = h('tbody', createArray(props.rows, $tdTr));
       var $thead = !props.hideHeader ? h('thead', [$thTr]) : h();
       var $tfoot = props.showFooter ? h('tfoot', [$thTr]) : h();
       return h(BTableSimple, {
@@ -30514,15 +27089,15 @@
     }
   });
 
+  var props$2i = makePropsConfigurable({
+    loading: makeProp(PROP_TYPE_BOOLEAN, false)
+  }, NAME_SKELETON_WRAPPER); // --- Main component ---
+  // @vue/component
+
   var BSkeletonWrapper = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON_WRAPPER,
     functional: true,
-    props: {
-      loading: {
-        type: Boolean,
-        default: false
-      }
-    },
+    props: props$2i,
     render: function render(h, _ref) {
       var data = _ref.data,
           props = _ref.props,
@@ -30541,10 +27116,10 @@
           },
           staticClass: 'b-skeleton-wrapper',
           key: 'loading'
-        }), [normalizeSlot('loading', slotScope, $scopedSlots, $slots) || h()]);
+        }), normalizeSlot(SLOT_NAME_LOADING, slotScope, $scopedSlots, $slots));
       }
 
-      return normalizeSlot(SLOT_NAME_DEFAULT, slotScope, $scopedSlots, $slots) || h();
+      return normalizeSlot(SLOT_NAME_DEFAULT, slotScope, $scopedSlots, $slots);
     }
   });
 
@@ -30564,8 +27139,17 @@
     }
   });
 
-  var navProps = omit(props$K, ['tabs', 'isNavBar', 'cardHeader']); // --- Helper methods ---
+  var _watch$i;
+
+  var _makeModelMixin$j = makeModelMixin('value', {
+    type: PROP_TYPE_NUMBER
+  }),
+      modelMixin$i = _makeModelMixin$j.mixin,
+      modelProps$i = _makeModelMixin$j.props,
+      MODEL_PROP_NAME$i = _makeModelMixin$j.prop,
+      MODEL_EVENT_NAME$i = _makeModelMixin$j.event; // --- Helper methods ---
   // Filter function to filter out disabled tabs
+
 
   var notDisabled = function notDisabled(tab) {
     return !tab.disabled;
@@ -30577,94 +27161,63 @@
     name: NAME_TAB_BUTTON_HELPER,
     inject: {
       bvTabs: {
+        default:
         /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
+        function _default() {
           return {};
         }
       }
     },
     props: {
+      controls: makeProp(PROP_TYPE_STRING),
+      id: makeProp(PROP_TYPE_STRING),
+      noKeyNav: makeProp(PROP_TYPE_BOOLEAN, false),
+      posInSet: makeProp(PROP_TYPE_NUMBER),
+      setSize: makeProp(PROP_TYPE_NUMBER),
       // Reference to the child <b-tab> instance
-      tab: {
-        default: null
-      },
-      tabs: {
-        type: Array,
-
-        /* istanbul ignore next */
-        default: function _default()
-        /* istanbul ignore next */
-        {
-          return [];
-        }
-      },
-      id: {
-        type: String,
-        default: null
-      },
-      controls: {
-        type: String,
-        default: null
-      },
-      tabIndex: {
-        type: Number,
-        default: null
-      },
-      posInSet: {
-        type: Number,
-        default: null
-      },
-      setSize: {
-        type: Number,
-        default: null
-      },
-      noKeyNav: {
-        type: Boolean,
-        default: false
-      }
+      tab: makeProp(),
+      tabIndex: makeProp(PROP_TYPE_NUMBER)
     },
     methods: {
       focus: function focus() {
         attemptFocus(this.$refs.link);
       },
-      handleEvt: function handleEvt(evt) {
+      handleEvt: function handleEvt(event) {
+        /* istanbul ignore next */
         if (this.tab.disabled) {
-          /* istanbul ignore next */
           return;
         }
 
-        var type = evt.type,
-            keyCode = evt.keyCode,
-            shiftKey = evt.shiftKey;
+        var type = event.type,
+            keyCode = event.keyCode,
+            shiftKey = event.shiftKey;
 
         if (type === 'click') {
-          stopEvent(evt);
-          this.$emit('click', evt);
+          stopEvent(event);
+          this.$emit(EVENT_NAME_CLICK, event);
         } else if (type === 'keydown' && keyCode === CODE_SPACE) {
           // For ARIA tabs the SPACE key will also trigger a click/select
           // Even with keyboard navigation disabled, SPACE should "click" the button
           // See: https://github.com/bootstrap-vue/bootstrap-vue/issues/4323
-          stopEvent(evt);
-          this.$emit('click', evt);
+          stopEvent(event);
+          this.$emit(EVENT_NAME_CLICK, event);
         } else if (type === 'keydown' && !this.noKeyNav) {
           // For keyboard navigation
           if ([CODE_UP, CODE_LEFT, CODE_HOME].indexOf(keyCode) !== -1) {
-            stopEvent(evt);
+            stopEvent(event);
 
             if (shiftKey || keyCode === CODE_HOME) {
-              this.$emit('first', evt);
+              this.$emit(EVENT_NAME_FIRST, event);
             } else {
-              this.$emit('prev', evt);
+              this.$emit(EVENT_NAME_PREV, event);
             }
           } else if ([CODE_DOWN, CODE_RIGHT, CODE_END].indexOf(keyCode) !== -1) {
-            stopEvent(evt);
+            stopEvent(event);
 
             if (shiftKey || keyCode === CODE_END) {
-              this.$emit('last', evt);
+              this.$emit(EVENT_NAME_LAST, event);
             } else {
-              this.$emit('next', evt);
+              this.$emit(EVENT_NAME_NEXT, event);
             }
           }
         }
@@ -30685,7 +27238,6 @@
           titleLinkClass = _this$tab.titleLinkClass,
           titleLinkAttributes = _this$tab.titleLinkAttributes;
       var $link = h(BLink, {
-        ref: 'link',
         staticClass: 'nav-link',
         class: [{
           active: localActive && !disabled,
@@ -30696,8 +27248,8 @@
           disabled: disabled
         },
         attrs: _objectSpread2(_objectSpread2({}, titleLinkAttributes), {}, {
-          role: 'tab',
           id: id,
+          role: 'tab',
           // Roving tab index when keynav enabled
           tabindex: tabIndex,
           'aria-selected': localActive && !disabled ? 'true' : 'false',
@@ -30708,7 +27260,8 @@
         on: {
           click: handleEvt,
           keydown: handleEvt
-        }
+        },
+        ref: 'link'
       }, [this.tab.normalizeSlot(SLOT_NAME_TITLE) || title]);
       return h('li', {
         staticClass: 'nav-item',
@@ -30718,90 +27271,47 @@
         }
       }, [$link]);
     }
-  }); // @vue/component
+  }); // --- Props ---
+
+  var navProps = omit(props$1t, ['tabs', 'isNavBar', 'cardHeader']);
+  var props$2j = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$i), navProps), {}, {
+    // Only applied to the currently active `<b-nav-item>`
+    activeNavItemClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    // Only applied to the currently active `<b-tab>`
+    // This prop is sniffed by the `<b-tab>` child
+    activeTabClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    card: makeProp(PROP_TYPE_BOOLEAN, false),
+    contentClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    // Synonym for 'bottom'
+    end: makeProp(PROP_TYPE_BOOLEAN, false),
+    // This prop is sniffed by the `<b-tab>` child
+    lazy: makeProp(PROP_TYPE_BOOLEAN, false),
+    navClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    navWrapperClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    noFade: makeProp(PROP_TYPE_BOOLEAN, false),
+    noKeyNav: makeProp(PROP_TYPE_BOOLEAN, false),
+    noNavStyle: makeProp(PROP_TYPE_BOOLEAN, false),
+    tag: makeProp(PROP_TYPE_STRING, 'div')
+  })), NAME_TABS); // --- Main component ---
+  // @vue/component
 
   var BTabs = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TABS,
-    mixins: [idMixin, normalizeSlotMixin],
+    mixins: [idMixin, modelMixin$i, normalizeSlotMixin],
     provide: function provide() {
       return {
         bvTabs: this
       };
     },
-    model: {
-      prop: 'value',
-      event: 'input'
-    },
-    props: _objectSpread2(_objectSpread2({}, navProps), {}, {
-      tag: {
-        type: String,
-        default: 'div'
-      },
-      card: {
-        type: Boolean,
-        default: false
-      },
-      end: {
-        // Synonym for 'bottom'
-        type: Boolean,
-        default: false
-      },
-      noFade: {
-        type: Boolean,
-        default: false
-      },
-      noNavStyle: {
-        type: Boolean,
-        default: false
-      },
-      noKeyNav: {
-        type: Boolean,
-        default: false
-      },
-      lazy: {
-        // This prop is sniffed by the <b-tab> child
-        type: Boolean,
-        default: false
-      },
-      contentClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      navClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      navWrapperClass: {
-        type: [String, Array, Object] // default: null
-
-      },
-      activeNavItemClass: {
-        // Only applied to the currently active <b-nav-item>
-        type: [String, Array, Object] // default: null
-
-      },
-      activeTabClass: {
-        // Only applied to the currently active <b-tab>
-        // This prop is sniffed by the <b-tab> child
-        type: [String, Array, Object] // default: null
-
-      },
-      value: {
-        // v-model
-        type: Number,
-        default: null
-      }
-    }),
+    props: props$2j,
     data: function data() {
       return {
         // Index of current tab
-        currentTab: toInteger(this.value, -1),
-        // Array of direct child <b-tab> instances, in DOM order
+        currentTab: toInteger(this[MODEL_PROP_NAME$i], -1),
+        // Array of direct child `<b-tab>` instances, in DOM order
         tabs: [],
         // Array of child instances registered (for triggering reactive updates)
-        registeredTabs: [],
-        // Flag to know if we are mounted or not
-        isMounted: false
+        registeredTabs: []
       };
     },
     computed: {
@@ -30819,174 +27329,99 @@
         return [].concat(classes, [this.navClass]);
       }
     },
-    watch: {
-      currentTab: function currentTab(newVal) {
-        var index = -1; // Ensure only one tab is active at most
+    watch: (_watch$i = {}, _defineProperty(_watch$i, MODEL_PROP_NAME$i, function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        newValue = toInteger(newValue, -1);
+        oldValue = toInteger(oldValue, 0);
+        var $tab = this.tabs[newValue];
 
-        this.tabs.forEach(function (tab, idx) {
-          if (newVal === idx && !tab.disabled) {
-            tab.localActive = true;
-            index = idx;
+        if ($tab && !$tab.disabled) {
+          this.activateTab($tab);
+        } else {
+          // Try next or prev tabs
+          if (newValue < oldValue) {
+            this.previousTab();
           } else {
-            tab.localActive = false;
-          }
-        }); // Update the v-model
-
-        this.$emit('input', index);
-      },
-      value: function value(newVal, oldVal) {
-        if (newVal !== oldVal) {
-          newVal = toInteger(newVal, -1);
-          oldVal = toInteger(oldVal, 0);
-          var tabs = this.tabs;
-
-          if (tabs[newVal] && !tabs[newVal].disabled) {
-            this.activateTab(tabs[newVal]);
-          } else {
-            // Try next or prev tabs
-            if (newVal < oldVal) {
-              this.previousTab();
-            } else {
-              this.nextTab();
-            }
+            this.nextTab();
           }
         }
-      },
-      registeredTabs: function registeredTabs() {
-        var _this = this;
-
-        // Each b-tab will register/unregister itself.
-        // We use this to detect when tabs are added/removed
-        // to trigger the update of the tabs.
-        this.$nextTick(function () {
-          requestAF(function () {
-            _this.updateTabs();
-          });
-        });
-      },
-      tabs: function tabs(newVal, oldVal) {
-        var _this2 = this;
-
-        // If tabs added, removed, or re-ordered, we emit a `changed` event.
-        // We use `tab._uid` instead of `tab.safeId()`, as the later is changed
-        // in a nextTick if no explicit ID is provided, causing duplicate emits.
-        if (!looseEqual(newVal.map(function (t) {
-          return t._uid;
-        }), oldVal.map(function (t) {
-          return t._uid;
-        }))) {
-          // In a nextTick to ensure currentTab has been set first.
-          this.$nextTick(function () {
-            // We emit shallow copies of the new and old arrays of tabs, to
-            // prevent users from potentially mutating the internal arrays.
-            _this2.$emit('changed', newVal.slice(), oldVal.slice());
-          });
-        }
-      },
-      isMounted: function isMounted(newVal) {
-        var _this3 = this;
-
-        // Trigger an update after mounted.  Needed for tabs inside lazy modals.
-        if (newVal) {
-          requestAF(function () {
-            _this3.updateTabs();
-          });
-        } // Enable or disable the observer
-
-
-        this.setObserver(newVal);
       }
-    },
-    created: function created() {
-      var _this4 = this;
+    }), _defineProperty(_watch$i, "currentTab", function currentTab(newValue) {
+      var index = -1; // Ensure only one tab is active at most
 
+      this.tabs.forEach(function ($tab, i) {
+        if (i === newValue && !$tab.disabled) {
+          $tab.localActive = true;
+          index = i;
+        } else {
+          $tab.localActive = false;
+        }
+      }); // Update the v-model
+
+      this.$emit(MODEL_EVENT_NAME$i, index);
+    }), _defineProperty(_watch$i, "tabs", function tabs(newValue, oldValue) {
+      var _this = this;
+
+      // We use `_uid` instead of `safeId()`, as the later is changed in a `$nextTick()`
+      // if no explicit ID is provided, causing duplicate emits
+      if (!looseEqual(newValue.map(function ($tab) {
+        return $tab[COMPONENT_UID_KEY];
+      }), oldValue.map(function ($tab) {
+        return $tab[COMPONENT_UID_KEY];
+      }))) {
+        // In a `$nextTick()` to ensure `currentTab` has been set first
+        this.$nextTick(function () {
+          // We emit shallow copies of the new and old arrays of tabs,
+          // to prevent users from potentially mutating the internal arrays
+          _this.$emit(EVENT_NAME_CHANGED, newValue.slice(), oldValue.slice());
+        });
+      }
+    }), _defineProperty(_watch$i, "registeredTabs", function registeredTabs() {
+      this.updateTabs();
+    }), _watch$i),
+    created: function created() {
       // Create private non-reactive props
       this.$_observer = null;
-      this.currentTab = toInteger(this.value, -1); // For SSR and to make sure only a single tab is shown on mount
-      // We wrap this in a `$nextTick()` to ensure the child tabs have been created
-
-      this.$nextTick(function () {
-        _this4.updateTabs();
-      });
     },
     mounted: function mounted() {
-      var _this5 = this;
-
-      // Call `updateTabs()` just in case...
-      this.updateTabs();
-      this.$nextTick(function () {
-        // Flag we are now mounted and to switch to DOM for tab probing.
-        // As this.$slots.default appears to lie about component instances
-        // after b-tabs is destroyed and re-instantiated.
-        // And this.$children does not respect DOM order.
-        _this5.isMounted = true;
-      });
-    },
-
-    /* istanbul ignore next */
-    deactivated: function deactivated()
-    /* istanbul ignore next */
-    {
-      this.isMounted = false;
-    },
-
-    /* istanbul ignore next */
-    activated: function activated()
-    /* istanbul ignore next */
-    {
-      var _this6 = this;
-
-      this.currentTab = toInteger(this.value, -1);
-      this.$nextTick(function () {
-        _this6.updateTabs();
-
-        _this6.isMounted = true;
-      });
+      this.setObserver(true);
     },
     beforeDestroy: function beforeDestroy() {
-      this.isMounted = false;
-    },
-    destroyed: function destroyed() {
-      // Ensure no references to child instances exist
+      this.setObserver(false); // Ensure no references to child instances exist
+
       this.tabs = [];
     },
     methods: {
-      registerTab: function registerTab(tab) {
-        var _this7 = this;
-
-        if (!arrayIncludes(this.registeredTabs, tab)) {
-          this.registeredTabs.push(tab);
-          tab.$once('hook:destroyed', function () {
-            _this7.unregisterTab(tab);
-          });
+      registerTab: function registerTab($tab) {
+        if (!arrayIncludes(this.registeredTabs, $tab)) {
+          this.registeredTabs.push($tab);
         }
       },
-      unregisterTab: function unregisterTab(tab) {
-        this.registeredTabs = this.registeredTabs.slice().filter(function (t) {
-          return t !== tab;
+      unregisterTab: function unregisterTab($tab) {
+        this.registeredTabs = this.registeredTabs.slice().filter(function ($t) {
+          return $t !== $tab;
         });
       },
       // DOM observer is needed to detect changes in order of tabs
-      setObserver: function setObserver(on) {
+      setObserver: function setObserver() {
+        var _this2 = this;
+
+        var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
         this.$_observer && this.$_observer.disconnect();
         this.$_observer = null;
 
         if (on) {
-          var self = this;
           /* istanbul ignore next: difficult to test mutation observer in JSDOM */
-
           var handler = function handler() {
-            // We delay the update to ensure that `tab.safeId()` has
-            // updated with the final ID value.
-            self.$nextTick(function () {
+            _this2.$nextTick(function () {
               requestAF(function () {
-                self.updateTabs();
+                _this2.updateTabs();
               });
             });
-          }; // Watch for changes to <b-tab> sub components
+          }; // Watch for changes to `<b-tab>` sub components
 
 
-          this.$_observer = observeDom(this.$refs.tabsContainer, handler, {
+          this.$_observer = observeDom(this.$refs.content, handler, {
             childList: true,
             subtree: false,
             attributes: true,
@@ -30995,134 +27430,123 @@
         }
       },
       getTabs: function getTabs() {
-        // We use `registeredTabs` as the source of truth for child tab components
-        // We also filter out any `<b-tab>` components that are extended
-        // `<b-tab>` with a root child `<b-tab>`
-        // See: https://github.com/bootstrap-vue/bootstrap-vue/issues/3260
-        var tabs = this.registeredTabs.filter(function (tab) {
-          return tab.$children.filter(function (t) {
-            return t._isTab;
+        var $tabs = this.registeredTabs.filter(function ($tab) {
+          return $tab.$children.filter(function ($t) {
+            return $t._isTab;
           }).length === 0;
         }); // DOM Order of Tabs
 
         var order = [];
+        /* istanbul ignore next: too difficult to test */
 
-        if (this.isMounted && tabs.length > 0) {
-          // We rely on the DOM when mounted to get the 'true' order of the `<b-tab>` children
+        if (IS_BROWSER && $tabs.length > 0) {
+          // We rely on the DOM when mounted to get the "true" order of the `<b-tab>` children
           // `querySelectorAll()` always returns elements in document order, regardless of
           // order specified in the selector
-          var selector = tabs.map(function (tab) {
-            return "#".concat(tab.safeId());
+          var selector = $tabs.map(function ($tab) {
+            return "#".concat($tab.safeId());
           }).join(', ');
-          order = selectAll(selector, this.$el).map(function (el) {
-            return el.id;
+          order = selectAll(selector, this.$el).map(function ($el) {
+            return $el.id;
           }).filter(identity);
         } // Stable sort keeps the original order if not found in the `order` array,
         // which will be an empty array before mount
 
 
-        return stableSort(tabs, function (a, b) {
+        return stableSort($tabs, function (a, b) {
           return order.indexOf(a.safeId()) - order.indexOf(b.safeId());
         });
       },
-      // Update list of `<b-tab>` children
       updateTabs: function updateTabs() {
-        // Probe tabs
-        var tabs = this.getTabs(); // Find *last* active non-disabled tab in current tabs
+        var $tabs = this.getTabs(); // Find last active non-disabled tab in current tabs
         // We trust tab state over `currentTab`, in case tabs were added/removed/re-ordered
 
-        var tabIndex = tabs.indexOf(tabs.slice().reverse().find(function (tab) {
-          return tab.localActive && !tab.disabled;
+        var tabIndex = $tabs.indexOf($tabs.slice().reverse().find(function ($tab) {
+          return $tab.localActive && !$tab.disabled;
         })); // Else try setting to `currentTab`
 
         if (tabIndex < 0) {
           var currentTab = this.currentTab;
 
-          if (currentTab >= tabs.length) {
+          if (currentTab >= $tabs.length) {
             // Handle last tab being removed, so find the last non-disabled tab
-            tabIndex = tabs.indexOf(tabs.slice().reverse().find(notDisabled));
-          } else if (tabs[currentTab] && !tabs[currentTab].disabled) {
+            tabIndex = $tabs.indexOf($tabs.slice().reverse().find(notDisabled));
+          } else if ($tabs[currentTab] && !$tabs[currentTab].disabled) {
             // Current tab is not disabled
             tabIndex = currentTab;
           }
-        } // Else find *first* non-disabled tab in current tabs
+        } // Else find first non-disabled tab in current tabs
 
 
         if (tabIndex < 0) {
-          tabIndex = tabs.indexOf(tabs.find(notDisabled));
-        } // Set the current tab state to active
+          tabIndex = $tabs.indexOf($tabs.find(notDisabled));
+        } // Ensure only one tab is active at a time
 
 
-        tabs.forEach(function (tab) {
-          // tab.localActive = idx === tabIndex && !tab.disabled
-          tab.localActive = false;
+        $tabs.forEach(function ($tab, index) {
+          $tab.localActive = index === tabIndex;
         });
-
-        if (tabs[tabIndex]) {
-          tabs[tabIndex].localActive = true;
-        } // Update the array of tab children
-
-
-        this.tabs = tabs; // Set the currentTab index (can be -1 if no non-disabled tabs)
-
+        this.tabs = $tabs;
         this.currentTab = tabIndex;
       },
       // Find a button that controls a tab, given the tab reference
       // Returns the button vm instance
-      getButtonForTab: function getButtonForTab(tab) {
-        return (this.$refs.buttons || []).find(function (btn) {
-          return btn.tab === tab;
+      getButtonForTab: function getButtonForTab($tab) {
+        return (this.$refs.buttons || []).find(function ($btn) {
+          return $btn.tab === $tab;
         });
       },
-      // Force a button to re-render its content, given a <b-tab> instance
-      // Called by <b-tab> on `update()`
-      updateButton: function updateButton(tab) {
-        var button = this.getButtonForTab(tab);
+      // Force a button to re-render its content, given a `<b-tab>` instance
+      // Called by `<b-tab>` on `update()`
+      updateButton: function updateButton($tab) {
+        var $button = this.getButtonForTab($tab);
 
-        if (button && button.$forceUpdate) {
-          button.$forceUpdate();
+        if ($button && $button.$forceUpdate) {
+          $button.$forceUpdate();
         }
       },
       // Activate a tab given a `<b-tab>` instance
       // Also accessed by `<b-tab>`
-      activateTab: function activateTab(tab) {
+      activateTab: function activateTab($tab) {
+        var currentTab = this.currentTab,
+            $tabs = this.tabs;
         var result = false;
 
-        if (tab) {
-          var index = this.tabs.indexOf(tab);
+        if ($tab) {
+          var index = $tabs.indexOf($tab);
 
-          if (!tab.disabled && index > -1 && index !== this.currentTab) {
-            var tabEvt = new BvEvent('activate-tab', {
+          if (index !== currentTab && index > -1 && !$tab.disabled) {
+            var tabEvent = new BvEvent(EVENT_NAME_ACTIVATE_TAB, {
               cancelable: true,
               vueTarget: this,
               componentId: this.safeId()
             });
-            this.$emit(tabEvt.type, index, this.currentTab, tabEvt);
+            this.$emit(tabEvent.type, index, currentTab, tabEvent);
 
-            if (!tabEvt.defaultPrevented) {
-              result = true;
+            if (!tabEvent.defaultPrevented) {
               this.currentTab = index;
+              result = true;
             }
           }
-        } // Couldn't set tab, so ensure v-model is set to `this.currentTab`
+        } // Couldn't set tab, so ensure v-model is up to date
 
         /* istanbul ignore next: should rarely happen */
 
 
-        if (!result && this.currentTab !== this.value) {
-          this.$emit('input', this.currentTab);
+        if (!result && this[MODEL_PROP_NAME$i] !== currentTab) {
+          this.$emit(MODEL_EVENT_NAME$i, currentTab);
         }
 
         return result;
       },
-      // Deactivate a tab given a <b-tab> instance
-      // Accessed by <b-tab>
-      deactivateTab: function deactivateTab(tab) {
-        if (tab) {
+      // Deactivate a tab given a `<b-tab>` instance
+      // Accessed by `<b-tab>`
+      deactivateTab: function deactivateTab($tab) {
+        if ($tab) {
           // Find first non-disabled tab that isn't the one being deactivated
           // If no tabs are available, then don't deactivate current tab
-          return this.activateTab(this.tabs.filter(function (t) {
-            return t !== tab;
+          return this.activateTab(this.tabs.filter(function ($t) {
+            return $t !== $tab;
           }).find(notDisabled));
         }
         /* istanbul ignore next: should never/rarely happen */
@@ -31130,185 +27554,198 @@
 
         return false;
       },
-      // Focus a tab button given its <b-tab> instance
-      focusButton: function focusButton(tab) {
-        var _this8 = this;
+      // Focus a tab button given its `<b-tab>` instance
+      focusButton: function focusButton($tab) {
+        var _this3 = this;
 
-        // Wrap in `$nextTick()` to ensure DOM has completed rendering/updating before focusing
+        // Wrap in `$nextTick()` to ensure DOM has completed rendering
         this.$nextTick(function () {
-          attemptFocus(_this8.getButtonForTab(tab));
+          attemptFocus(_this3.getButtonForTab($tab));
         });
       },
-      // Emit a click event on a specified <b-tab> component instance
-      emitTabClick: function emitTabClick(tab, evt) {
-        if (isEvent(evt) && tab && tab.$emit && !tab.disabled) {
-          tab.$emit('click', evt);
+      // Emit a click event on a specified `<b-tab>` component instance
+      emitTabClick: function emitTabClick(tab, event) {
+        if (isEvent(event) && tab && tab.$emit && !tab.disabled) {
+          tab.$emit(EVENT_NAME_CLICK, event);
         }
       },
       // Click handler
-      clickTab: function clickTab(tab, evt) {
-        this.activateTab(tab);
-        this.emitTabClick(tab, evt);
+      clickTab: function clickTab($tab, event) {
+        this.activateTab($tab);
+        this.emitTabClick($tab, event);
       },
       // Move to first non-disabled tab
       firstTab: function firstTab(focus) {
-        var tab = this.tabs.find(notDisabled);
+        var $tab = this.tabs.find(notDisabled);
 
-        if (this.activateTab(tab) && focus) {
-          this.focusButton(tab);
-          this.emitTabClick(tab, focus);
+        if (this.activateTab($tab) && focus) {
+          this.focusButton($tab);
+          this.emitTabClick($tab, focus);
         }
       },
       // Move to previous non-disabled tab
       previousTab: function previousTab(focus) {
         var currentIndex = mathMax(this.currentTab, 0);
-        var tab = this.tabs.slice(0, currentIndex).reverse().find(notDisabled);
+        var $tab = this.tabs.slice(0, currentIndex).reverse().find(notDisabled);
 
-        if (this.activateTab(tab) && focus) {
-          this.focusButton(tab);
-          this.emitTabClick(tab, focus);
+        if (this.activateTab($tab) && focus) {
+          this.focusButton($tab);
+          this.emitTabClick($tab, focus);
         }
       },
       // Move to next non-disabled tab
       nextTab: function nextTab(focus) {
         var currentIndex = mathMax(this.currentTab, -1);
-        var tab = this.tabs.slice(currentIndex + 1).find(notDisabled);
+        var $tab = this.tabs.slice(currentIndex + 1).find(notDisabled);
 
-        if (this.activateTab(tab) && focus) {
-          this.focusButton(tab);
-          this.emitTabClick(tab, focus);
+        if (this.activateTab($tab) && focus) {
+          this.focusButton($tab);
+          this.emitTabClick($tab, focus);
         }
       },
       // Move to last non-disabled tab
       lastTab: function lastTab(focus) {
-        var tab = this.tabs.slice().reverse().find(notDisabled);
+        var $tab = this.tabs.slice().reverse().find(notDisabled);
 
-        if (this.activateTab(tab) && focus) {
-          this.focusButton(tab);
-          this.emitTabClick(tab, focus);
+        if (this.activateTab($tab) && focus) {
+          this.focusButton($tab);
+          this.emitTabClick($tab, focus);
         }
       }
     },
     render: function render(h) {
-      var _this9 = this;
+      var _this4 = this;
 
-      var tabs = this.tabs,
-          noKeyNav = this.noKeyNav,
+      var align = this.align,
+          card = this.card,
+          end = this.end,
+          fill = this.fill,
           firstTab = this.firstTab,
-          previousTab = this.previousTab,
+          justified = this.justified,
+          lastTab = this.lastTab,
           nextTab = this.nextTab,
-          lastTab = this.lastTab; // Currently active tab
+          noKeyNav = this.noKeyNav,
+          noNavStyle = this.noNavStyle,
+          pills = this.pills,
+          previousTab = this.previousTab,
+          small = this.small,
+          $tabs = this.tabs,
+          vertical = this.vertical; // Currently active tab
 
-      var activeTab = tabs.find(function (tab) {
-        return tab.localActive && !tab.disabled;
+      var $activeTab = $tabs.find(function ($tab) {
+        return $tab.localActive && !$tab.disabled;
       }); // Tab button to allow focusing when no active tab found (keynav only)
 
-      var fallbackTab = tabs.find(function (tab) {
-        return !tab.disabled;
+      var $fallbackTab = $tabs.find(function ($tab) {
+        return !$tab.disabled;
       }); // For each `<b-tab>` found create the tab buttons
 
-      var buttons = tabs.map(function (tab, index) {
-        var tabIndex = null; // Ensure at least one tab button is focusable when keynav enabled (if possible)
+      var $buttons = $tabs.map(function ($tab, index) {
+        var _on;
+
+        var safeId = $tab.safeId; // Ensure at least one tab button is focusable when keynav enabled (if possible)
+
+        var tabIndex = null;
 
         if (!noKeyNav) {
           // Buttons are not in tab index unless active, or a fallback tab
           tabIndex = -1;
 
-          if (activeTab === tab || !activeTab && fallbackTab === tab) {
+          if ($tab === $activeTab || !$activeTab && $tab === $fallbackTab) {
             // Place tab button in tab sequence
             tabIndex = null;
           }
         }
 
         return h(BVTabButton, {
-          key: tab._uid || index,
+          props: {
+            controls: safeId ? safeId() : null,
+            id: $tab.controlledBy || (safeId ? safeId("_BV_tab_button_") : null),
+            noKeyNav: noKeyNav,
+            posInSet: index + 1,
+            setSize: $tabs.length,
+            tab: $tab,
+            tabIndex: tabIndex
+          },
+          on: (_on = {}, _defineProperty(_on, EVENT_NAME_CLICK, function (event) {
+            _this4.clickTab($tab, event);
+          }), _defineProperty(_on, EVENT_NAME_FIRST, firstTab), _defineProperty(_on, EVENT_NAME_PREV, previousTab), _defineProperty(_on, EVENT_NAME_NEXT, nextTab), _defineProperty(_on, EVENT_NAME_LAST, lastTab), _on),
+          key: $tab[COMPONENT_UID_KEY] || index,
           ref: 'buttons',
           // Needed to make `this.$refs.buttons` an array
-          refInFor: true,
-          props: {
-            tab: tab,
-            tabs: tabs,
-            id: tab.controlledBy || (tab.safeId ? tab.safeId("_BV_tab_button_") : null),
-            controls: tab.safeId ? tab.safeId() : null,
-            tabIndex: tabIndex,
-            setSize: tabs.length,
-            posInSet: index + 1,
-            noKeyNav: noKeyNav
-          },
-          on: {
-            click: function click(evt) {
-              _this9.clickTab(tab, evt);
-            },
-            first: firstTab,
-            prev: previousTab,
-            next: nextTab,
-            last: lastTab
-          }
+          refInFor: true
         });
-      }); // Nav
-
-      var nav = h(BNav, {
-        ref: 'nav',
+      });
+      var $nav = h(BNav, {
         class: this.localNavClass,
         attrs: {
           role: 'tablist',
           id: this.safeId('_BV_tab_controls_')
         },
         props: {
-          fill: this.fill,
-          justified: this.justified,
-          align: this.align,
-          tabs: !this.noNavStyle && !this.pills,
-          pills: !this.noNavStyle && this.pills,
-          vertical: this.vertical,
-          small: this.small,
-          cardHeader: this.card && !this.vertical
-        }
-      }, [this.normalizeSlot('tabs-start') || h(), buttons, this.normalizeSlot('tabs-end') || h()]);
-      nav = h('div', {
-        key: 'bv-tabs-nav',
+          fill: fill,
+          justified: justified,
+          align: align,
+          tabs: !noNavStyle && !pills,
+          pills: !noNavStyle && pills,
+          vertical: vertical,
+          small: small,
+          cardHeader: card && !vertical
+        },
+        ref: 'nav'
+      }, [this.normalizeSlot(SLOT_NAME_TABS_START) || h(), $buttons, this.normalizeSlot(SLOT_NAME_TABS_END) || h()]);
+      $nav = h('div', {
         class: [{
-          'card-header': this.card && !this.vertical && !this.end,
-          'card-footer': this.card && !this.vertical && this.end,
-          'col-auto': this.vertical
-        }, this.navWrapperClass]
-      }, [nav]);
-      var empty = h();
+          'card-header': card && !vertical && !end,
+          'card-footer': card && !vertical && end,
+          'col-auto': vertical
+        }, this.navWrapperClass],
+        key: 'bv-tabs-nav'
+      }, [$nav]);
+      var $children = this.normalizeSlot() || [];
+      var $empty = h();
 
-      if (!tabs || tabs.length === 0) {
-        empty = h('div', {
-          key: 'bv-empty-tab',
+      if ($children.length === 0) {
+        $empty = h('div', {
           class: ['tab-pane', 'active', {
-            'card-body': this.card
-          }]
-        }, this.normalizeSlot('empty'));
-      } // Main content section
+            'card-body': card
+          }],
+          key: 'bv-empty-tab'
+        }, this.normalizeSlot(SLOT_NAME_EMPTY));
+      }
 
-
-      var content = h('div', {
-        ref: 'tabsContainer',
-        key: 'bv-tabs-container',
+      var $content = h('div', {
         staticClass: 'tab-content',
         class: [{
-          col: this.vertical
+          col: vertical
         }, this.contentClass],
         attrs: {
           id: this.safeId('_BV_tab_container_')
-        }
-      }, concat(this.normalizeSlot(), empty)); // Render final output
+        },
+        key: 'bv-content',
+        ref: 'content'
+      }, [$children, $empty]); // Render final output
 
       return h(this.tag, {
         staticClass: 'tabs',
         class: {
-          row: this.vertical,
-          'no-gutters': this.vertical && this.card
+          row: vertical,
+          'no-gutters': vertical && card
         },
         attrs: {
           id: this.safeId()
         }
-      }, [this.end ? content : h(), [nav], this.end ? h() : content]);
+      }, [end ? $content : h(), $nav, end ? h() : $content]);
     }
   });
+
+  var _objectSpread2$3, _watch$j;
+
+  var MODEL_PROP_NAME_ACTIVE = 'active';
+  var MODEL_EVENT_NAME_ACTIVE = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_ACTIVE; // --- Props ---
+
+  var props$2k = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$g), {}, (_objectSpread2$3 = {}, _defineProperty(_objectSpread2$3, MODEL_PROP_NAME_ACTIVE, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$3, "buttonId", makeProp(PROP_TYPE_STRING)), _defineProperty(_objectSpread2$3, "disabled", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$3, "lazy", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$3, "noBody", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$3, "tag", makeProp(PROP_TYPE_STRING, 'div')), _defineProperty(_objectSpread2$3, "title", makeProp(PROP_TYPE_STRING)), _defineProperty(_objectSpread2$3, "titleItemClass", makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)), _defineProperty(_objectSpread2$3, "titleLinkAttributes", makeProp(PROP_TYPE_OBJECT)), _defineProperty(_objectSpread2$3, "titleLinkClass", makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)), _objectSpread2$3))), NAME_TAB); // --- Main component ---
+  // @vue/component
 
   var BTab = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TAB,
@@ -31320,64 +27757,26 @@
         }
       }
     },
-    props: {
-      active: {
-        type: Boolean,
-        default: false
-      },
-      tag: {
-        type: String,
-        default: 'div'
-      },
-      buttonId: {
-        type: String // default: ''
-
-      },
-      title: {
-        type: String,
-        default: ''
-      },
-      titleItemClass: {
-        // Sniffed by `<b-tabs>` and added to nav `li.nav-item`
-        type: [String, Array, Object] // default: null
-
-      },
-      titleLinkClass: {
-        // Sniffed by `<b-tabs>` and added to nav `a.nav-link`
-        type: [String, Array, Object] // default: null
-
-      },
-      titleLinkAttributes: {
-        type: Object // default: null
-
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      },
-      noBody: {
-        type: Boolean,
-        default: false
-      },
-      lazy: {
-        type: Boolean,
-        default: false
-      }
-    },
+    props: props$2k,
     data: function data() {
       return {
-        localActive: this.active && !this.disabled,
-        show: false
+        localActive: this[MODEL_PROP_NAME_ACTIVE] && !this.disabled
       };
     },
     computed: {
+      // For parent sniffing of child
+      _isTab: function _isTab() {
+        return true;
+      },
       tabClasses: function tabClasses() {
+        var active = this.localActive,
+            disabled = this.disabled;
         return [{
-          active: this.localActive,
-          disabled: this.disabled,
+          active: active,
+          disabled: disabled,
           'card-body': this.bvTabs.card && !this.noBody
         }, // Apply <b-tabs> `activeTabClass` styles when this tab is active
-        this.localActive ? this.bvTabs.activeTabClass : null];
+        active ? this.bvTabs.activeTabClass : null];
       },
       controlledBy: function controlledBy() {
         return this.buttonId || this.safeId('__BV_tab_button__');
@@ -31387,48 +27786,38 @@
       },
       computedLazy: function computedLazy() {
         return this.bvTabs.lazy || this.lazy;
-      },
-      // For parent sniffing of child
-      _isTab: function _isTab() {
-        return true;
       }
     },
-    watch: {
-      localActive: function localActive(newValue) {
-        // Make `active` prop work with `.sync` modifier
-        this.$emit('update:active', newValue);
-      },
-      active: function active(newValue, oldValue) {
-        if (newValue !== oldValue) {
-          if (newValue) {
-            // If activated post mount
-            this.activate();
-          } else {
-            /* istanbul ignore next */
-            if (!this.deactivate()) {
-              // Tab couldn't be deactivated, so we reset the synced active prop
-              // Deactivation will fail if no other tabs to activate
-              this.$emit('update:active', this.localActive);
-            }
+    watch: (_watch$j = {}, _defineProperty(_watch$j, MODEL_PROP_NAME_ACTIVE, function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        if (newValue) {
+          // If activated post mount
+          this.activate();
+        } else {
+          /* istanbul ignore next */
+          if (!this.deactivate()) {
+            // Tab couldn't be deactivated, so we reset the synced active prop
+            // Deactivation will fail if no other tabs to activate
+            this.$emit(MODEL_EVENT_NAME_ACTIVE, this.localActive);
           }
         }
-      },
-      disabled: function disabled(newValue, oldValue) {
-        if (newValue !== oldValue) {
-          var firstTab = this.bvTabs.firstTab;
+      }
+    }), _defineProperty(_watch$j, "disabled", function disabled(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        var firstTab = this.bvTabs.firstTab;
 
-          if (newValue && this.localActive && firstTab) {
-            this.localActive = false;
-            firstTab();
-          }
+        if (newValue && this.localActive && firstTab) {
+          this.localActive = false;
+          firstTab();
         }
       }
-    },
+    }), _defineProperty(_watch$j, "localActive", function localActive(newValue) {
+      // Make `active` prop work with `.sync` modifier
+      this.$emit(MODEL_EVENT_NAME_ACTIVE, newValue);
+    }), _watch$j),
     mounted: function mounted() {
-      // Inform b-tabs of our presence
-      this.registerTab(); // Initially show on mount if active and not disabled
-
-      this.show = this.localActive;
+      // Inform `<b-tabs>` of our presence
+      this.registerTab();
     },
     updated: function updated() {
       // Force the tab button content to update (since slots are not reactive)
@@ -31439,8 +27828,8 @@
         updateButton(this);
       }
     },
-    destroyed: function destroyed() {
-      // inform b-tabs of our departure
+    beforeDestroy: function beforeDestroy() {
+      // Inform `<b-tabs>` of our departure
       this.unregisterTab();
     },
     methods: {
@@ -31476,21 +27865,19 @@
     render: function render(h) {
       var localActive = this.localActive;
       var $content = h(this.tag, {
-        ref: 'panel',
         staticClass: 'tab-pane',
         class: this.tabClasses,
         directives: [{
           name: 'show',
-          rawName: 'v-show',
-          value: localActive,
-          expression: 'localActive'
+          value: localActive
         }],
         attrs: {
           role: 'tabpanel',
           id: this.safeId(),
           'aria-hidden': localActive ? 'false' : 'true',
           'aria-labelledby': this.controlledBy || null
-        }
+        },
+        ref: 'panel'
       }, // Render content lazily if requested
       [localActive || !this.computedLazy ? this.normalizeSlot() : h()]);
       return h(BVTransition, {
@@ -31550,7 +27937,7 @@
   }
 
   var inBrowser = typeof window !== 'undefined';
-  function freeze$1(item) {
+  function freeze(item) {
     if (Array.isArray(item) || _typeof$1(item) === 'object') {
       return Object.freeze(item);
     }
@@ -31608,7 +27995,7 @@
         var newTransport = {
           to: to,
           from: from,
-          passengers: freeze$1(passengers),
+          passengers: freeze(passengers),
           order: order
         };
         var keys = Object.keys(this.transports);
@@ -32094,41 +28481,10 @@
     }
   });
 
-  var props$$ = {
-    name: {
-      type: String,
-      required: true
-    },
-    ariaLive: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_TOASTER, 'ariaLive');
-      }
-    },
-    ariaAtomic: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_TOASTER, 'ariaAtomic');
-      } // Allowed: 'true' or 'false' or null
-
-    },
-    role: {
-      // Aria role
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_TOASTER, 'role');
-      }
-    }
-    /*
-    transition: {
-      type: [Boolean, String, Object],
-      default: false
-    }
-    */
-
-  }; // @vue/component
+  // @vue/component
 
   var DefaultTransition = /*#__PURE__*/Vue__default['default'].extend({
+    mixins: [normalizeSlotMixin],
     data: function data() {
       return {
         // Transition classes base name
@@ -32158,13 +28514,25 @@
         on: {
           afterEnter: this.onAfterEnter
         }
-      }, this.$slots.default);
+      }, this.normalizeSlot());
     }
-  }); // @vue/component
+  }); // --- Props ---
+
+  var props$2l = makePropsConfigurable({
+    // Allowed: 'true' or 'false' or `null`
+    ariaAtomic: makeProp(PROP_TYPE_STRING),
+    ariaLive: makeProp(PROP_TYPE_STRING),
+    name: makeProp(PROP_TYPE_STRING, undefined, true),
+    // Required
+    // Aria role
+    role: makeProp(PROP_TYPE_STRING)
+  }, NAME_TOASTER); // --- Main component ---
+  // @vue/component
 
   var BToaster = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TOASTER,
-    props: props$$,
+    mixins: [listenOnRootMixin],
+    props: props$2l,
     data: function data() {
       return {
         // We don't render on SSR or if a an existing target found
@@ -32177,27 +28545,29 @@
     beforeMount: function beforeMount() {
       var _this2 = this;
 
-      this.staticName = this.name;
+      var name = this.name;
+      this.staticName = name;
       /* istanbul ignore if */
 
-      if (wormhole.hasTarget(this.staticName)) {
-        warn("A \"<portal-target>\" with name \"".concat(this.name, "\" already exists in the document."), NAME_TOASTER);
+      if (wormhole.hasTarget(name)) {
+        warn("A \"<portal-target>\" with name \"".concat(name, "\" already exists in the document."), NAME_TOASTER);
         this.dead = true;
       } else {
         this.doRender = true;
-        this.$once('hook:beforeDestroy', function () {
+        this.$once(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
           // Let toasts made with `this.$bvToast.toast()` know that this toaster
           // is being destroyed and should should also destroy/hide themselves
-          _this2.$root.$emit('bv::toaster::destroyed', _this2.staticName);
+          _this2.emitOnRoot(getRootEventName(NAME_TOASTER, EVENT_NAME_DESTROYED), name);
         });
       }
     },
     destroyed: function destroyed() {
       // Remove from DOM if needed
-
+      var $el = this.$el;
       /* istanbul ignore next: difficult to test */
-      if (this.$el && this.$el.parentNode) {
-        this.$el.parentNode.removeChild(this.$el);
+
+      if ($el && $el.parentNode) {
+        $el.parentNode.removeChild($el);
       }
     },
     render: function render(h) {
@@ -32224,8 +28594,8 @@
           class: [this.staticName],
           attrs: {
             id: this.staticName,
-            role: this.role || null,
             // Fallback to null to make sure attribute doesn't exist
+            role: this.role || null,
             'aria-live': this.ariaLive,
             'aria-atomic': this.ariaAtomic
           }
@@ -32236,105 +28606,47 @@
     }
   });
 
+  var _watch$k;
+
+  var _makeModelMixin$k = makeModelMixin('visible', {
+    type: PROP_TYPE_BOOLEAN,
+    defaultValue: false,
+    event: EVENT_NAME_CHANGE
+  }),
+      modelMixin$j = _makeModelMixin$k.mixin,
+      modelProps$j = _makeModelMixin$k.props,
+      MODEL_PROP_NAME$j = _makeModelMixin$k.prop,
+      MODEL_EVENT_NAME$j = _makeModelMixin$k.event;
+
   var MIN_DURATION = 1000; // --- Props ---
 
-  var linkProps$5 = pick(props$1, ['href', 'to']);
-  var props$10 = _objectSpread2({
-    id: {
-      // Even though the ID prop is provided by idMixin, we
-      // add it here for $bvToast props filtering
-      type: String // default: null
-
-    },
-    title: {
-      type: String // default: null
-
-    },
-    toaster: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_TOAST, 'toaster');
-      }
-    },
-    visible: {
-      type: Boolean,
-      default: false
-    },
-    variant: {
-      type: String,
-      default: function _default() {
-        return getComponentConfig(NAME_TOAST, 'variant');
-      }
-    },
-    isStatus: {
-      // Switches role to 'status' and aria-live to 'polite'
-      type: Boolean,
-      default: false
-    },
-    appendToast: {
-      type: Boolean,
-      default: false
-    },
-    noAutoHide: {
-      type: Boolean,
-      default: false
-    },
-    autoHideDelay: {
-      type: [Number, String],
-      default: function _default() {
-        return getComponentConfig(NAME_TOAST, 'autoHideDelay');
-      }
-    },
-    noCloseButton: {
-      type: Boolean,
-      default: false
-    },
-    noFade: {
-      type: Boolean,
-      default: false
-    },
-    noHoverPause: {
-      type: Boolean,
-      default: false
-    },
-    solid: {
-      type: Boolean,
-      default: false
-    },
-    toastClass: {
-      type: [String, Object, Array],
-      default: function _default() {
-        return getComponentConfig(NAME_TOAST, 'toastClass');
-      }
-    },
-    headerClass: {
-      type: [String, Object, Array],
-      default: function _default() {
-        return getComponentConfig(NAME_TOAST, 'headerClass');
-      }
-    },
-    bodyClass: {
-      type: [String, Object, Array],
-      default: function _default() {
-        return getComponentConfig(NAME_TOAST, 'bodyClass');
-      }
-    },
-    static: {
-      // Render the toast in place, rather than in a portal-target
-      type: Boolean,
-      default: false
-    }
-  }, linkProps$5); // @vue/component
+  var linkProps$7 = pick(props$6, ['href', 'to']);
+  var props$2m = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$j), linkProps$7), {}, {
+    appendToast: makeProp(PROP_TYPE_BOOLEAN, false),
+    autoHideDelay: makeProp(PROP_TYPE_NUMBER_STRING, 5000),
+    bodyClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    headerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    // Switches role to 'status' and aria-live to 'polite'
+    isStatus: makeProp(PROP_TYPE_BOOLEAN, false),
+    noAutoHide: makeProp(PROP_TYPE_BOOLEAN, false),
+    noCloseButton: makeProp(PROP_TYPE_BOOLEAN, false),
+    noFade: makeProp(PROP_TYPE_BOOLEAN, false),
+    noHoverPause: makeProp(PROP_TYPE_BOOLEAN, false),
+    solid: makeProp(PROP_TYPE_BOOLEAN, false),
+    // Render the toast in place, rather than in a portal-target
+    static: makeProp(PROP_TYPE_BOOLEAN, false),
+    title: makeProp(PROP_TYPE_STRING),
+    toastClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    toaster: makeProp(PROP_TYPE_STRING, 'b-toaster-top-right'),
+    variant: makeProp(PROP_TYPE_STRING)
+  })), NAME_TOAST); // --- Main component ---
+  // @vue/component
 
   var BToast = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TOAST,
-    mixins: [attrsMixin, idMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleAttrsMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$j, listenOnRootMixin, normalizeSlotMixin, scopedStyleMixin],
     inheritAttrs: false,
-    model: {
-      prop: 'visible',
-      event: 'change'
-    },
-    props: props$10,
+    props: props$2m,
     data: function data() {
       return {
         isMounted: false,
@@ -32343,22 +28655,24 @@
         isTransitioning: false,
         isHiding: false,
         order: 0,
-        timer: null,
         dismissStarted: 0,
         resumeDismiss: 0
       };
     },
     computed: {
-      bToastClasses: function bToastClasses() {
+      toastClasses: function toastClasses() {
+        var appendToast = this.appendToast,
+            variant = this.variant;
         return _defineProperty({
           'b-toast-solid': this.solid,
-          'b-toast-append': this.appendToast,
-          'b-toast-prepend': !this.appendToast
-        }, "b-toast-".concat(this.variant), this.variant);
+          'b-toast-append': appendToast,
+          'b-toast-prepend': !appendToast
+        }, "b-toast-".concat(variant), variant);
       },
       slotScope: function slotScope() {
+        var hide = this.hide;
         return {
-          hide: this.hide
+          hide: hide
         };
       },
       computedDuration: function computedDuration() {
@@ -32383,54 +28697,45 @@
         });
       }
     },
-    watch: {
-      visible: function visible(newVal) {
-        newVal ? this.show() : this.hide();
-      },
-      localShow: function localShow(newVal) {
-        if (newVal !== this.visible) {
-          this.$emit('change', newVal);
-        }
-      },
-
-      /* istanbul ignore next */
-      toaster: function toaster()
-      /* istanbul ignore next */
-      {
-        // If toaster target changed, make sure toaster exists
-        this.$nextTick(this.ensureToaster);
-      },
-
-      /* istanbul ignore next */
-      static: function _static(newVal)
-      /* istanbul ignore next */
-      {
-        // If static changes to true, and the toast is showing,
-        // ensure the toaster target exists
-        if (newVal && this.localShow) {
-          this.ensureToaster();
-        }
+    watch: (_watch$k = {}, _defineProperty(_watch$k, MODEL_PROP_NAME$j, function (newValue) {
+      this[newValue ? 'show' : 'hide']();
+    }), _defineProperty(_watch$k, "localShow", function localShow(newValue) {
+      if (newValue !== this[MODEL_PROP_NAME$j]) {
+        this.$emit(MODEL_EVENT_NAME$j, newValue);
       }
+    }), _defineProperty(_watch$k, "toaster", function toaster() {
+      // If toaster target changed, make sure toaster exists
+      this.$nextTick(this.ensureToaster);
+    }), _defineProperty(_watch$k, "static", function _static(newValue) {
+      // If static changes to true, and the toast is showing,
+      // ensure the toaster target exists
+      if (newValue && this.localShow) {
+        this.ensureToaster();
+      }
+    }), _watch$k),
+    created: function created() {
+      // Create private non-reactive props
+      this.$_dismissTimer = null;
     },
     mounted: function mounted() {
       var _this = this;
 
       this.isMounted = true;
       this.$nextTick(function () {
-        if (_this.visible) {
+        if (_this[MODEL_PROP_NAME$j]) {
           requestAF(function () {
             _this.show();
           });
         }
       }); // Listen for global $root show events
 
-      this.listenOnRoot('bv::show::toast', function (id) {
+      this.listenOnRoot(getRootActionEventName(NAME_TOAST, EVENT_NAME_SHOW), function (id) {
         if (id === _this.safeId()) {
           _this.show();
         }
       }); // Listen for global $root hide events
 
-      this.listenOnRoot('bv::hide::toast', function (id) {
+      this.listenOnRoot(getRootActionEventName(NAME_TOAST, EVENT_NAME_HIDE), function (id) {
         if (!id || id === _this.safeId()) {
           _this.hide();
         }
@@ -32438,10 +28743,9 @@
 
       /* istanbul ignore next: difficult to test */
 
-      this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
+      this.listenOnRoot(getRootEventName(NAME_TOASTER, EVENT_NAME_DESTROYED), function (toaster) {
         /* istanbul ignore next */
         if (toaster === _this.computedToaster) {
-          /* istanbul ignore next */
           _this.hide();
         }
       });
@@ -32455,7 +28759,7 @@
 
         if (!this.localShow) {
           this.ensureToaster();
-          var showEvt = this.buildEvent('show');
+          var showEvt = this.buildEvent(EVENT_NAME_SHOW);
           this.emitEvent(showEvt);
           this.dismissStarted = this.resumeDismiss = 0;
           this.order = Date.now() * (this.appendToast ? 1 : -1);
@@ -32474,7 +28778,7 @@
         var _this3 = this;
 
         if (this.localShow) {
-          var hideEvt = this.buildEvent('hide');
+          var hideEvt = this.buildEvent(EVENT_NAME_HIDE);
           this.emitEvent(hideEvt);
           this.setHoverHandler(false);
           this.dismissStarted = this.resumeDismiss = 0;
@@ -32496,23 +28800,25 @@
           componentId: this.safeId()
         }));
       },
-      emitEvent: function emitEvent(bvEvt) {
-        var type = bvEvt.type;
-        this.emitOnRoot("bv::toast:".concat(type), bvEvt);
-        this.$emit(type, bvEvt);
+      emitEvent: function emitEvent(bvEvent) {
+        var type = bvEvent.type;
+        this.emitOnRoot(getRootEventName(NAME_TOAST, type), bvEvent);
+        this.$emit(type, bvEvent);
       },
       ensureToaster: function ensureToaster() {
         if (this.static) {
           return;
         }
 
-        if (!wormhole.hasTarget(this.computedToaster)) {
+        var computedToaster = this.computedToaster;
+
+        if (!wormhole.hasTarget(computedToaster)) {
           var div = document.createElement('div');
           document.body.appendChild(div);
           var toaster = new BToaster({
             parent: this.$root,
             propsData: {
-              name: this.computedToaster
+              name: computedToaster
             }
           });
           toaster.$mount(div);
@@ -32522,14 +28828,14 @@
         this.clearDismissTimer();
 
         if (!this.noAutoHide) {
-          this.timer = setTimeout(this.hide, this.resumeDismiss || this.computedDuration);
+          this.$_dismissTimer = setTimeout(this.hide, this.resumeDismiss || this.computedDuration);
           this.dismissStarted = Date.now();
           this.resumeDismiss = 0;
         }
       },
       clearDismissTimer: function clearDismissTimer() {
-        clearTimeout(this.timer);
-        this.timer = null;
+        clearTimeout(this.$_dismissTimer);
+        this.$_dismissTimer = null;
       },
       setHoverHandler: function setHoverHandler(on) {
         var el = this.$refs['b-toast'];
@@ -32538,7 +28844,7 @@
       },
       onPause: function onPause() {
         // Determine time remaining, and then pause timer
-        if (this.noAutoHide || this.noHoverPause || !this.timer || this.resumeDismiss) {
+        if (this.noAutoHide || this.noHoverPause || !this.$_dismissTimer || this.resumeDismiss) {
           return;
         }
 
@@ -32574,7 +28880,7 @@
       },
       onAfterEnter: function onAfterEnter() {
         this.isTransitioning = false;
-        var hiddenEvt = this.buildEvent('shown');
+        var hiddenEvt = this.buildEvent(EVENT_NAME_SHOWN);
         this.emitEvent(hiddenEvt);
         this.startDismissTimer();
         this.setHoverHandler(true);
@@ -32586,24 +28892,26 @@
         this.isTransitioning = false;
         this.order = 0;
         this.resumeDismiss = this.dismissStarted = 0;
-        var hiddenEvt = this.buildEvent('hidden');
+        var hiddenEvt = this.buildEvent(EVENT_NAME_HIDDEN);
         this.emitEvent(hiddenEvt);
         this.doRender = false;
       },
+      // Render helper for generating the toast
       makeToast: function makeToast(h) {
         var _this5 = this;
 
-        // Render helper for generating the toast
-        // Assemble the header content
+        var title = this.title,
+            slotScope = this.slotScope;
+        var link = isLink(this);
         var $headerContent = [];
-        var $title = this.normalizeSlot('toast-title', this.slotScope);
+        var $title = this.normalizeSlot(SLOT_NAME_TOAST_TITLE, slotScope);
 
         if ($title) {
           $headerContent.push($title);
-        } else if (this.title) {
+        } else if (title) {
           $headerContent.push(h('strong', {
             staticClass: 'mr-2'
-          }, this.title));
+          }, title));
         }
 
         if (!this.noCloseButton) {
@@ -32615,8 +28923,7 @@
               }
             }
           }));
-        } // Assemble the header (if needed)
-
+        }
 
         var $header = h();
 
@@ -32625,27 +28932,23 @@
             staticClass: 'toast-header',
             class: this.headerClass
           }, $headerContent);
-        } // Toast body
+        }
 
-
-        var link = isLink(this);
         var $body = h(link ? BLink : 'div', {
           staticClass: 'toast-body',
           class: this.bodyClass,
-          props: link ? pluckProps(linkProps$5, this) : {},
+          props: link ? pluckProps(linkProps$7, this) : {},
           on: link ? {
             click: this.onLinkClick
           } : {}
-        }, [this.normalizeSlot(SLOT_NAME_DEFAULT, this.slotScope) || h()]); // Build the toast
-
-        var $toast = h('div', {
-          key: "toast-".concat(this._uid),
-          ref: 'toast',
+        }, this.normalizeSlot(SLOT_NAME_DEFAULT, slotScope));
+        return h('div', {
           staticClass: 'toast',
           class: this.toastClass,
-          attrs: this.computedAttrs
+          attrs: this.computedAttrs,
+          key: "toast-".concat(this[COMPONENT_UID_KEY]),
+          ref: 'toast'
         }, [$header, $body]);
-        return $toast;
       }
     },
     render: function render(h) {
@@ -32653,50 +28956,52 @@
         return h();
       }
 
-      var name = "b-toast-".concat(this._uid); // If scoped styles are applied and the toast is not static,
-      // make sure the scoped style data attribute is applied
-
-      var scopedStyleAttrs = !this.static ? this.scopedStyleAttrs : {};
-      return h(Portal, {
-        props: {
-          name: name,
-          to: this.computedToaster,
-          order: this.order,
-          slim: true,
-          disabled: this.static
-        }
-      }, [h('div', {
-        key: name,
-        ref: 'b-toast',
+      var order = this.order,
+          isStatic = this.static,
+          isHiding = this.isHiding,
+          isStatus = this.isStatus;
+      var name = "b-toast-".concat(this[COMPONENT_UID_KEY]);
+      var $toast = h('div', {
         staticClass: 'b-toast',
-        class: this.bToastClasses,
-        attrs: _objectSpread2(_objectSpread2({}, scopedStyleAttrs), {}, {
+        class: this.toastClasses,
+        attrs: _objectSpread2(_objectSpread2({}, isStatic ? {} : this.scopedStyleAttrs), {}, {
           id: this.safeId('_toast_outer'),
-          role: this.isHiding ? null : this.isStatus ? 'status' : 'alert',
-          'aria-live': this.isHiding ? null : this.isStatus ? 'polite' : 'assertive',
-          'aria-atomic': this.isHiding ? null : 'true'
-        })
+          role: isHiding ? null : isStatus ? 'status' : 'alert',
+          'aria-live': isHiding ? null : isStatus ? 'polite' : 'assertive',
+          'aria-atomic': isHiding ? null : 'true'
+        }),
+        key: name,
+        ref: 'b-toast'
       }, [h(BVTransition, {
         props: {
           noFade: this.noFade
         },
         on: this.transitionHandlers
-      }, [this.localShow ? this.makeToast(h) : h()])])]);
+      }, [this.localShow ? this.makeToast(h) : h()])]);
+      return h(Portal, {
+        props: {
+          name: name,
+          to: this.computedToaster,
+          order: order,
+          slim: true,
+          disabled: isStatic
+        }
+      }, [$toast]);
     }
   });
 
-  var PROP_NAME$3 = '$bvToast';
+  var PROP_NAME$2 = '$bvToast';
   var PROP_NAME_PRIV$1 = '_bv__toast'; // Base toast props that are allowed
   // Some may be ignored or overridden on some message boxes
   // Prop ID is allowed, but really only should be used for testing
   // We need to add it in explicitly as it comes from the `idMixin`
 
-  var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$10, ['static', 'visible'])))); // Map prop names to toast slot names
+  var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$2m, ['static', 'visible'])))); // Map prop names to toast slot names
 
   var propsToSlots$1 = {
     toastContent: 'default',
     title: 'toast-title'
-  }; // --- Utility methods ---
+  }; // --- Helper methods ---
   // Method to filter only recognized props that are not undefined
 
   var filterOptions$1 = function filterOptions(options) {
@@ -32719,8 +29024,10 @@
       extends: BToast,
       destroyed: function destroyed() {
         // Make sure we not in document any more
-        if (this.$el && this.$el.parentNode) {
-          this.$el.parentNode.removeChild(this.$el);
+        var $el = this.$el;
+
+        if ($el && $el.parentNode) {
+          $el.parentNode.removeChild($el);
         }
       },
       mounted: function mounted() {
@@ -32744,11 +29051,11 @@
         }; // Self destruct if parent destroyed
 
 
-        this.$parent.$once('hook:destroyed', handleDestroy); // Self destruct after hidden
+        this.$parent.$once(HOOK_EVENT_NAME_DESTROYED, handleDestroy); // Self destruct after hidden
 
-        this.$once('hidden', handleDestroy); // Self destruct when toaster is destroyed
+        this.$once(EVENT_NAME_HIDDEN, handleDestroy); // Self destruct when toaster is destroyed
 
-        this.listenOnRoot('bv::toaster::destroyed', function (toaster) {
+        this.listenOnRoot(getRootEventName(NAME_TOASTER, EVENT_NAME_DESTROYED), function (toaster) {
           /* istanbul ignore next: hard to test */
           if (toaster === _this.toaster) {
             handleDestroy();
@@ -32758,7 +29065,7 @@
     }); // Private method to generate the on-demand toast
 
     var makeToast = function makeToast(props, $parent) {
-      if (warnNotClient(PROP_NAME$3)) {
+      if (warnNotClient(PROP_NAME$2)) {
         /* istanbul ignore next */
         return;
       } // Create an instance of `BVToastPop` component
@@ -32768,7 +29075,7 @@
         // We set parent as the local VM so these toasts can emit events on the
         // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
         parent: $parent,
-        propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions$1(getComponentConfig(NAME_TOAST) || {})), omit(props, keys(propsToSlots$1))), {}, {
+        propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions$1(getComponentConfig(NAME_TOAST))), omit(props, keys(propsToSlots$1))), {}, {
           // Props that can't be overridden
           static: false,
           visible: true
@@ -32820,7 +29127,7 @@
         value: function toast(content) {
           var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-          if (!content || warnNotClient(PROP_NAME$3)) {
+          if (!content || warnNotClient(PROP_NAME$2)) {
             /* istanbul ignore next */
             return;
           }
@@ -32834,7 +29141,7 @@
         key: "show",
         value: function show(id) {
           if (id) {
-            this._root.$emit('bv::show::toast', id);
+            this._root.$emit(getRootActionEventName(NAME_TOAST, EVENT_NAME_SHOW), id);
           }
         } // Hide a toast with specified ID, or if not ID all toasts
 
@@ -32843,7 +29150,7 @@
         value: function hide() {
           var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-          this._root.$emit('bv::hide::toast', id);
+          this._root.$emit(getRootActionEventName(NAME_TOAST, EVENT_NAME_HIDE), id);
         }
       }]);
 
@@ -32860,12 +29167,12 @@
     }); // Define our read-only `$bvToast` instance property
     // Placed in an if just in case in HMR mode
 
-    if (!hasOwnProperty(Vue.prototype, PROP_NAME$3)) {
-      defineProperty(Vue.prototype, PROP_NAME$3, {
+    if (!hasOwnProperty(Vue.prototype, PROP_NAME$2)) {
+      defineProperty(Vue.prototype, PROP_NAME$2, {
         get: function get() {
           /* istanbul ignore next */
           if (!this || !this[PROP_NAME_PRIV$1]) {
-            warn("\"".concat(PROP_NAME$3, "\" must be accessed from a Vue instance \"this\" context."), NAME_TOAST);
+            warn("\"".concat(PROP_NAME$2, "\" must be accessed from a Vue instance \"this\" context."), NAME_TOAST);
           }
 
           return this[PROP_NAME_PRIV$1];
@@ -32934,9 +29241,9 @@
       html: false,
       interactive: true,
       disabled: false,
-      delay: getComponentConfig(NAME_TOOLTIP, 'delay'),
-      boundary: String(getComponentConfig(NAME_TOOLTIP, 'boundary')),
-      boundaryPadding: toInteger(getComponentConfig(NAME_TOOLTIP, 'boundaryPadding'), 0),
+      delay: getComponentConfig(NAME_TOOLTIP, 'delay', 50),
+      boundary: String(getComponentConfig(NAME_TOOLTIP, 'boundary', 'scrollParent')),
+      boundaryPadding: toInteger(getComponentConfig(NAME_TOOLTIP, 'boundaryPadding', 5), 0),
       variant: getComponentConfig(NAME_TOOLTIP, 'variant'),
       customClass: getComponentConfig(NAME_TOOLTIP, 'customClass')
     }; // Process `bindings.value`
@@ -33048,7 +29355,7 @@
 
 
   var applyTooltip = function applyTooltip(el, bindings, vnode) {
-    if (!isBrowser) {
+    if (!IS_BROWSER) {
       /* istanbul ignore next */
       return;
     }
@@ -33063,7 +29370,7 @@
         _scopeId: getScopeId($parent, undefined)
       });
       el[BV_TOOLTIP].__bv_prev_data__ = {};
-      el[BV_TOOLTIP].$on('show', function ()
+      el[BV_TOOLTIP].$on(EVENT_NAME_SHOW, function ()
       /* istanbul ignore next: for now */
       {
         // Before showing the tooltip, we update the title if it is a function
@@ -33226,7 +29533,6 @@
    */
 
   var NAME$1 = 'v-b-scrollspy';
-  var ACTIVATE_EVENT = 'bv::scrollspy::activate';
   var CLASS_NAME_DROPDOWN_ITEM = 'dropdown-item';
   var CLASS_NAME_ACTIVE = 'active';
   var SELECTOR_NAV_LIST_GROUP = '.nav, .list-group';
@@ -33236,6 +29542,7 @@
   var SELECTOR_DROPDOWN = '.dropdown, .dropup';
   var SELECTOR_DROPDOWN_ITEMS = '.dropdown-item';
   var SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle';
+  var ROOT_EVENT_NAME_ACTIVATE = getRootEventName('BVScrollspy', 'activate');
   var METHOD_OFFSET = 'offset';
   var METHOD_POSITION = 'position';
   var Default = {
@@ -33293,11 +29600,11 @@
   /* istanbul ignore next: not easy to test */
 
 
-  var ScrollSpy
+  var BVScrollSpy
   /* istanbul ignore next: not easy to test */
   = /*#__PURE__*/function () {
-    function ScrollSpy(element, config, $root) {
-      _classCallCheck(this, ScrollSpy);
+    function BVScrollSpy(element, config, $root) {
+      _classCallCheck(this, BVScrollSpy);
 
       // The element we activate links in
       this.$el = element;
@@ -33315,7 +29622,7 @@
       this.updateConfig(config);
     }
 
-    _createClass(ScrollSpy, [{
+    _createClass(BVScrollSpy, [{
       key: "updateConfig",
       value: function updateConfig(config, $root) {
         if (this.$scroller) {
@@ -33371,8 +29678,8 @@
         eventOn(window, 'scroll', this, EVENT_OPTIONS_NO_CAPTURE);
         eventOn(window, 'resize', this, EVENT_OPTIONS_NO_CAPTURE);
         eventOn(window, 'orientationchange', this, EVENT_OPTIONS_NO_CAPTURE);
-        TransitionEndEvents$1.forEach(function (evtName) {
-          eventOn(window, evtName, _this, EVENT_OPTIONS_NO_CAPTURE);
+        TransitionEndEvents$1.forEach(function (eventName) {
+          eventOn(window, eventName, _this, EVENT_OPTIONS_NO_CAPTURE);
         });
         this.setObservers(true); // Schedule a refresh
 
@@ -33393,8 +29700,8 @@
         eventOff(window, 'scroll', this, EVENT_OPTIONS_NO_CAPTURE);
         eventOff(window, 'resize', this, EVENT_OPTIONS_NO_CAPTURE);
         eventOff(window, 'orientationchange', this, EVENT_OPTIONS_NO_CAPTURE);
-        TransitionEndEvents$1.forEach(function (evtName) {
-          eventOff(window, evtName, _this2, EVENT_OPTIONS_NO_CAPTURE);
+        TransitionEndEvents$1.forEach(function (eventName) {
+          eventOff(window, eventName, _this2, EVENT_OPTIONS_NO_CAPTURE);
         });
       }
     }, {
@@ -33431,8 +29738,8 @@
 
     }, {
       key: "handleEvent",
-      value: function handleEvent(evt) {
-        var type = isString(evt) ? evt : evt.type;
+      value: function handleEvent(event) {
+        var type = isString(event) ? event : event.type;
         var self = this;
 
         var resizeThrottle = function resizeThrottle() {
@@ -33504,7 +29811,7 @@
           }
 
           return null;
-        }).filter(Boolean) // Sort them by their offsets (smallest first)
+        }).filter(identity) // Sort them by their offsets (smallest first)
         .sort(function (a, b) {
           return a.offset - b.offset;
         }) // record only unique targets/offsets
@@ -33657,7 +29964,7 @@
         }); // Signal event to via $root, passing ID of activated target and reference to array of links
 
         if (links && links.length > 0 && this.$root) {
-          this.$root.$emit(ACTIVATE_EVENT, target, links);
+          this.$root.$emit(ROOT_EVENT_NAME_ACTIVATE, target, links);
         }
       }
     }, {
@@ -33701,7 +30008,7 @@
       }
     }]);
 
-    return ScrollSpy;
+    return BVScrollSpy;
   }();
 
   var BV_SCROLLSPY = '__BV_ScrollSpy__'; // Pre-compiled regular expressions
@@ -33744,7 +30051,7 @@
       // Value is config object
       // Filter the object based on our supported config options
       keys(bindings.value).filter(function (k) {
-        return !!ScrollSpy.DefaultType[k];
+        return !!BVScrollSpy.DefaultType[k];
       }).forEach(function (k) {
         config[k] = bindings.value[k];
       });
@@ -33757,7 +30064,7 @@
   var applyScrollspy = function applyScrollspy(el, bindings, vnode)
   /* istanbul ignore next: not easy to test */
   {
-    if (!isBrowser) {
+    if (!IS_BROWSER) {
       /* istanbul ignore next */
       return;
     }
@@ -33767,7 +30074,7 @@
     if (el[BV_SCROLLSPY]) {
       el[BV_SCROLLSPY].updateConfig(config, vnode.context.$root);
     } else {
-      el[BV_SCROLLSPY] = new ScrollSpy(el, config, vnode.context.$root);
+      el[BV_SCROLLSPY] = new BVScrollSpy(el, config, vnode.context.$root);
     }
   }; // Remove ScrollSpy on our element
 
@@ -33790,41 +30097,31 @@
 
   var VBScrollspy = {
     /* istanbul ignore next: not easy to test */
-    bind: function bind(el, bindings, vnode)
-    /* istanbul ignore next: not easy to test */
-    {
+    bind: function bind(el, bindings, vnode) {
       applyScrollspy(el, bindings, vnode);
     },
 
     /* istanbul ignore next: not easy to test */
-    inserted: function inserted(el, bindings, vnode)
-    /* istanbul ignore next: not easy to test */
-    {
+    inserted: function inserted(el, bindings, vnode) {
       applyScrollspy(el, bindings, vnode);
     },
 
     /* istanbul ignore next: not easy to test */
-    update: function update(el, bindings, vnode)
-    /* istanbul ignore next: not easy to test */
-    {
+    update: function update(el, bindings, vnode) {
       if (bindings.value !== bindings.oldValue) {
         applyScrollspy(el, bindings, vnode);
       }
     },
 
     /* istanbul ignore next: not easy to test */
-    componentUpdated: function componentUpdated(el, bindings, vnode)
-    /* istanbul ignore next: not easy to test */
-    {
+    componentUpdated: function componentUpdated(el, bindings, vnode) {
       if (bindings.value !== bindings.oldValue) {
         applyScrollspy(el, bindings, vnode);
       }
     },
 
     /* istanbul ignore next: not easy to test */
-    unbind: function unbind(el)
-    /* istanbul ignore next: not easy to test */
-    {
+    unbind: function unbind(el) {
       removeScrollspy(el);
     }
   };
