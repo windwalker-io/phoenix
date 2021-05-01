@@ -17,17 +17,14 @@
       typeof Reflect !== 'undefined' &&
       isNative(Reflect.ownKeys);
   var noopFn = function (_) { return _; };
-  var sharedPropertyDefinition = {
-      enumerable: true,
-      configurable: true,
-      get: noopFn,
-      set: noopFn,
-  };
   function proxy(target, key, _a) {
       var get = _a.get, set = _a.set;
-      sharedPropertyDefinition.get = get || noopFn;
-      sharedPropertyDefinition.set = set || noopFn;
-      Object.defineProperty(target, key, sharedPropertyDefinition);
+      Object.defineProperty(target, key, {
+          enumerable: true,
+          configurable: true,
+          get: get || noopFn,
+          set: set || noopFn,
+      });
   }
   function def(obj, key, val, enumerable) {
       Object.defineProperty(obj, key, {
@@ -41,8 +38,9 @@
       return Object.hasOwnProperty.call(obj, key);
   }
   function assert(condition, msg) {
-      if (!condition)
+      if (!condition) {
           throw new Error("[vue-composition-api] " + msg);
+      }
   }
   function isPrimitive(value) {
       return (typeof value === 'string' ||
@@ -70,12 +68,12 @@
   function isUndef(v) {
       return v === undefined || v === null;
   }
-  function warn(msg, vm) {
+  function warn$1(msg, vm) {
       Vue__default['default'].util.warn(msg, vm);
   }
   function logError(err, vm, info) {
       {
-          warn("Error in " + info + ": \"" + err.toString() + "\"", vm);
+          warn$1("Error in " + info + ": \"" + err.toString() + "\"", vm);
       }
       if (typeof window !== 'undefined' && typeof console !== 'undefined') {
           console.error(err);
@@ -125,8 +123,8 @@
   }
   function setVueConstructor(Vue) {
       // @ts-ignore
-      if ( vueConstructor && Vue.__proto__ !== vueConstructor.__proto__) {
-          warn('Another instance of vue installed');
+      if (vueConstructor && Vue.__proto__ !== vueConstructor.__proto__) {
+          warn$1('[vue-composition-api] another instance of Vue installed');
       }
       vueConstructor = Vue;
       Object.defineProperty(Vue, PluginInstalledFlag, {
@@ -214,8 +212,8 @@
 
   function currentVMInFn(hook) {
       var vm = getCurrentInstance();
-      if ( !vm) {
-          warn(hook + " is called when there is no active component instance to be " +
+      if (!vm) {
+          warn$1(hook + " is called when there is no active component instance to be " +
               "associated with. " +
               "Lifecycle injection APIs can only be used during execution of setup().");
       }
@@ -240,7 +238,7 @@
               args[_i] = arguments[_i];
           }
           if (!vm.$scopedSlots[slotName]) {
-              return warn("slots." + slotName + "() got called outside of the \"render()\" scope", vm);
+              return warn$1("slots." + slotName + "() got called outside of the \"render()\" scope", vm);
           }
           return vm.$scopedSlots[slotName].apply(vm, args);
       };
@@ -348,10 +346,10 @@
       return ar;
   }
 
-  function __spread() {
-      for (var ar = [], i = 0; i < arguments.length; i++)
-          ar = ar.concat(__read(arguments[i]));
-      return ar;
+  function __spreadArray(to, from) {
+      for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+          to[j] = from[i];
+      return to;
   }
 
   function createSymbol(name) {
@@ -403,8 +401,8 @@
       return isRef(ref) ? ref.value : ref;
   }
   function toRefs(obj) {
-      if ( !isReactive(obj)) {
-          warn("toRefs() expects a reactive object but received a plain one.");
+      if (!isReactive(obj)) {
+          warn$1("toRefs() expects a reactive object but received a plain one.");
       }
       if (!isPlainObject(obj))
           return obj;
@@ -602,8 +600,8 @@
   }
   function shallowReactive(obj) {
       var e_1, _a;
-      if ( !obj) {
-          warn('"shallowReactive()" is called without provide an "object".');
+      if (!obj) {
+          warn$1('"shallowReactive()" is called without provide an "object".');
           return;
       }
       if (!(isPlainObject(obj) || isArray(obj)) ||
@@ -668,10 +666,11 @@
    * Make obj reactivity
    */
   function reactive(obj) {
-      if ( !obj) {
-          warn('"reactive()" is called without provide an "object".');
-          // @ts-ignore
-          return;
+      if (!isObject(obj)) {
+          {
+              warn$1('"reactive()" is called without provide an "object".');
+          }
+          return obj;
       }
       if (!(isPlainObject(obj) || isArray(obj)) ||
           isRaw(obj) ||
@@ -745,7 +744,7 @@
               },
               set: function (v) {
                   {
-                      warn("Set operation on key \"" + key + "\" failed: target is readonly.");
+                      warn$1("Set operation on key \"" + key + "\" failed: target is readonly.");
                   }
               },
           });
@@ -772,10 +771,10 @@
    * notification and intercept it's subsequent access if the property doesn't
    * already exist.
    */
-  function set(target, key, val) {
+  function set$1(target, key, val) {
       var Vue = getVueConstructor();
       var _a = Vue.util, warn = _a.warn, defineReactive = _a.defineReactive;
-      if ( (isUndef(target) || isPrimitive(target))) {
+      if ((isUndef(target) || isPrimitive(target))) {
           warn("Cannot set reactive property on undefined, null, or primitive value: " + target);
       }
       if (isArray(target) && isValidArrayIndex(key)) {
@@ -789,8 +788,7 @@
       }
       var ob = target.__ob__;
       if (target._isVue || (ob && ob.vmCount)) {
-          
-              warn('Avoid adding reactive properties to a Vue instance or its root $data ' +
+          warn('Avoid adding reactive properties to a Vue instance or its root $data ' +
                   'at runtime - declare it upfront in the data option.');
           return val;
       }
@@ -811,7 +809,7 @@
   function del(target, key) {
       var Vue = getVueConstructor();
       var warn = Vue.util.warn;
-      if ( (isUndef(target) || isPrimitive(target))) {
+      if ((isUndef(target) || isPrimitive(target))) {
           warn("Cannot delete reactive property on undefined, null, or primitive value: " + target);
       }
       if (Array.isArray(target) && isValidArrayIndex(key)) {
@@ -820,8 +818,7 @@
       }
       var ob = target.__ob__;
       if (target._isVue || (ob && ob.vmCount)) {
-          
-              warn('Avoid deleting properties on a Vue instance or its root $data ' +
+          warn('Avoid deleting properties on a Vue instance or its root $data ' +
                   '- just set it to null.');
           return;
       }
@@ -859,7 +856,7 @@
           var preVm = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
           setCurrentInstance(vm);
           try {
-              return fn.apply(void 0, __spread(args));
+              return fn.apply(void 0, __spreadArray([], __read(args)));
           }
           finally {
               setCurrentInstance(preVm);
@@ -1014,7 +1011,7 @@
                   args[_i] = arguments[_i];
               }
               return queueFlushJob(vm, function () {
-                  fn.apply(void 0, __spread(args));
+                  fn.apply(void 0, __spreadArray([], __read(args)));
               }, flushMode);
           });
       };
@@ -1066,7 +1063,7 @@
       }
       else {
           getter = noopFn;
-          warn("Invalid watch source: " + JSON.stringify(source) + ".\n      A watch source can only be a getter/effect function, a ref, a reactive object, or an array of these types.", vm);
+          warn$1("Invalid watch source: " + JSON.stringify(source) + ".\n      A watch source can only be a getter/effect function, a ref, a reactive object, or an array of these types.", vm);
       }
       var applyCb = function (n, o) {
           // cleanup before running cb again
@@ -1125,7 +1122,7 @@
       else {
           // effect watch
           {
-              warn("`watch(fn, options?)` signature has been moved to a separate API. " +
+              warn$1("`watch(fn, options?)` signature has been moved to a separate API. " +
                   "Use `watchEffect(fn, options?)` instead. `watch` now only " +
                   "supports `watch(source, cb, options?) signature.");
           }
@@ -1138,16 +1135,17 @@
   }
 
   // implement
-  function computed(options) {
+  function computed(getterOrOptions) {
       var _a;
       var vm = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
-      var get, set;
-      if (typeof options === 'function') {
-          get = options;
+      var getter;
+      var setter;
+      if (typeof getterOrOptions === 'function') {
+          getter = getterOrOptions;
       }
       else {
-          get = options.get;
-          set = options.set;
+          getter = getterOrOptions.get;
+          setter = getterOrOptions.set;
       }
       var computedSetter;
       var computedGetter;
@@ -1156,7 +1154,7 @@
           var watcher_1;
           computedGetter = function () {
               if (!watcher_1) {
-                  watcher_1 = new Watcher_1(vm, get, noopFn, { lazy: true });
+                  watcher_1 = new Watcher_1(vm, getter, noopFn, { lazy: true });
               }
               if (watcher_1.dirty) {
                   watcher_1.evaluate();
@@ -1167,12 +1165,12 @@
               return watcher_1.value;
           };
           computedSetter = function (v) {
-              if ( !set) {
-                  warn('Write operation failed: computed value is readonly.', vm);
+              if (!setter) {
+                  warn$1('Write operation failed: computed value is readonly.', vm);
                   return;
               }
-              if (set) {
-                  set(v);
+              if (setter) {
+                  setter(v);
               }
           };
       }
@@ -1181,16 +1179,16 @@
           var computedHost_1 = defineComponentInstance(getVueConstructor(), {
               computed: {
                   $$state: {
-                      get: get,
-                      set: set,
+                      get: getter,
+                      set: setter,
                   },
               },
           });
           vm && vm.$on('hook:destroyed', function () { return computedHost_1.$destroy(); });
           computedGetter = function () { return computedHost_1.$$state; };
           computedSetter = function (v) {
-              if ( !set) {
-                  warn('Write operation failed: computed value is readonly.', vm);
+              if (!setter) {
+                  warn$1('Write operation failed: computed value is readonly.', vm);
                   return;
               }
               computedHost_1.$$state = v;
@@ -1236,7 +1234,7 @@
       }
       var vm = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
       if (!vm) {
-          warn("inject() can only be used inside setup() or functional components.");
+          warn$1("inject() can only be used inside setup() or functional components.");
           return;
       }
       var val = resolveInject(key, vm);
@@ -1244,27 +1242,26 @@
           return val;
       }
       if (defaultValue === undefined && true) {
-          warn("Injection \"" + String(key) + "\" not found", vm);
+          warn$1("Injection \"" + String(key) + "\" not found", vm);
       }
       return treatDefaultAsFactory && isFunction(defaultValue)
           ? defaultValue()
           : defaultValue;
   }
 
-  var EMPTY_OBJ =  Object.freeze({})
+  var EMPTY_OBJ = Object.freeze({})
       ;
   var useCssModule = function (name) {
       var _a;
       if (name === void 0) { name = '$style'; }
       var instance = getCurrentInstance();
       if (!instance) {
-           warn("useCssModule must be called inside setup()");
+          warn$1("useCssModule must be called inside setup()");
           return EMPTY_OBJ;
       }
       var mod = (_a = instance.proxy) === null || _a === void 0 ? void 0 : _a[name];
       if (!mod) {
-          
-              warn("Current instance does not have CSS module named \"" + name + "\".");
+          warn$1("Current instance does not have CSS module named \"" + name + "\".");
           return EMPTY_OBJ;
       }
       return mod;
@@ -1292,7 +1289,7 @@
               }
               else {
                   {
-                      warn("App has already been mounted.\n" +
+                      warn$1("App has already been mounted.\n" +
                           "If you want to remount the same app, move your app creation logic " +
                           "into a factory function and create fresh app instances for each " +
                           "mount - e.g. `const createMyApp = () => createApp(App)`");
@@ -1306,7 +1303,7 @@
                   mountedVM = undefined;
               }
               else {
-                  warn("Cannot unmount an app that is not mounted.");
+                  warn$1("Cannot unmount an app that is not mounted.");
               }
           },
       };
@@ -1330,7 +1327,7 @@
       }
       var instance = (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy;
       if (!instance) {
-          warn('`createElement()` has been called outside of render function.');
+          warn$1('`createElement()` has been called outside of render function.');
           if (!fallbackCreateElement) {
               fallbackCreateElement = defineComponentInstance(getVueConstructor())
                   .$createElement;
@@ -1346,12 +1343,12 @@
    *
    * @param message warning message to be displayed
    */
-  function warn$1(message) {
+  function warn(message) {
       var _a;
-      warn(message, (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy);
+      warn$1(message, (_a = getCurrentInstance()) === null || _a === void 0 ? void 0 : _a.proxy);
   }
 
-  function set$1(vm, key, value) {
+  function set(vm, key, value) {
       var state = (vm.__composition_api_state__ =
           vm.__composition_api_state__ || {});
       state[key] = value;
@@ -1360,7 +1357,7 @@
       return (vm.__composition_api_state__ || {})[key];
   }
   var vmStateManager = {
-      set: set$1,
+      set: set,
       get: get,
   };
 
@@ -1399,10 +1396,10 @@
       }
       else {
           if (props && hasOwn(props, propName)) {
-              warn("The setup binding property \"" + propName + "\" is already declared as a prop.", vm);
+              warn$1("The setup binding property \"" + propName + "\" is already declared as a prop.", vm);
           }
           else {
-              warn("The setup binding property \"" + propName + "\" is already declared.", vm);
+              warn$1("The setup binding property \"" + propName + "\" is already declared.", vm);
           }
       }
   }
@@ -1506,7 +1503,7 @@
           }
           if (typeof setup !== 'function') {
               {
-                  warn('The "setup" option should be a function that returns a object in component definitions.', vm);
+                  warn$1('The "setup" option should be a function that returns a object in component definitions.', vm);
               }
               return;
           }
@@ -1633,7 +1630,7 @@
               proxy(ctx, key, {
                   get: function () { return vm[srcKey]; },
                   set: function () {
-                      warn("Cannot assign to '" + key + "' because it is a read-only property", vm);
+                      warn$1("Cannot assign to '" + key + "' because it is a read-only property", vm);
                   },
               });
           });
@@ -1668,7 +1665,7 @@
                       return data;
                   },
                   set: function () {
-                      warn("Cannot assign to '" + key + "' because it is a read-only property", vm);
+                      warn$1("Cannot assign to '" + key + "' because it is a read-only property", vm);
                   },
               });
           });
@@ -1726,18 +1723,18 @@
   function install(Vue) {
       if (isVueRegistered(Vue)) {
           {
-              assert(false, 'already installed. Vue.use(VueCompositionAPI) should be called only once.');
+              warn$1('[vue-composition-api] already installed. Vue.use(VueCompositionAPI) should be called only once.');
           }
           return;
       }
       {
           if (Vue.version) {
               if (Vue.version[0] !== '2' || Vue.version[1] !== '.') {
-                  assert(false, "only works with Vue 2, v" + Vue.version + " found.");
+                  warn$1("[vue-composition-api] only works with Vue 2, v" + Vue.version + " found.");
               }
           }
           else {
-              warn('Vue version not found');
+              warn$1('[vue-composition-api] no Vue version found');
           }
       }
       Vue.config.optionMergeStrategies.setup = function (parent, child) {
@@ -1757,7 +1754,73 @@
       return options;
   }
 
-  var version = "1.0.0-beta.25";
+  function defineAsyncComponent(source) {
+      if (isFunction(source)) {
+          source = { loader: source };
+      }
+      var loader = source.loader, loadingComponent = source.loadingComponent, errorComponent = source.errorComponent, _a = source.delay, delay = _a === void 0 ? 200 : _a, timeout = source.timeout, // undefined = never times out
+      _b = source.suspensible, // undefined = never times out
+      suspensible = _b === void 0 ? false : _b, // in Vue 3 default is true
+      userOnError = source.onError;
+      if (suspensible) {
+          warn$1("The suspensiblbe option for async components is not supported in Vue2. It is ignored.");
+      }
+      var pendingRequest = null;
+      var retries = 0;
+      var retry = function () {
+          retries++;
+          pendingRequest = null;
+          return load();
+      };
+      var load = function () {
+          var thisRequest;
+          return (pendingRequest ||
+              (thisRequest = pendingRequest = loader()
+                  .catch(function (err) {
+                  err = err instanceof Error ? err : new Error(String(err));
+                  if (userOnError) {
+                      return new Promise(function (resolve, reject) {
+                          var userRetry = function () { return resolve(retry()); };
+                          var userFail = function () { return reject(err); };
+                          userOnError(err, userRetry, userFail, retries + 1);
+                      });
+                  }
+                  else {
+                      throw err;
+                  }
+              })
+                  .then(function (comp) {
+                  if (thisRequest !== pendingRequest && pendingRequest) {
+                      return pendingRequest;
+                  }
+                  if (!comp) {
+                      warn$1("Async component loader resolved to undefined. " +
+                          "If you are using retry(), make sure to return its return value.");
+                  }
+                  // interop module default
+                  if (comp &&
+                      (comp.__esModule || comp[Symbol.toStringTag] === 'Module')) {
+                      comp = comp.default;
+                  }
+                  if (comp && !isObject(comp) && !isFunction(comp)) {
+                      throw new Error("Invalid async component load result: " + comp);
+                  }
+                  return comp;
+              })));
+      };
+      return function () {
+          var component = load();
+          return {
+              component: component,
+              delay: delay,
+              timeout: timeout,
+              error: errorComponent,
+              loading: loadingComponent,
+          };
+      };
+  }
+
+  var version = "1.0.0-rc.8";
   // auto install when using CDN
   if (typeof window !== 'undefined' && window.Vue) {
       window.Vue.use(Plugin);
@@ -1765,8 +1828,10 @@
 
   exports.computed = computed;
   exports.createApp = createApp;
+  exports.createRef = createRef;
   exports.customRef = customRef;
   exports.default = Plugin;
+  exports.defineAsyncComponent = defineAsyncComponent;
   exports.defineComponent = defineComponent;
   exports.del = del;
   exports.getCurrentInstance = getCurrentInstance;
@@ -1793,7 +1858,7 @@
   exports.reactive = reactive;
   exports.readonly = readonly;
   exports.ref = ref;
-  exports.set = set;
+  exports.set = set$1;
   exports.shallowReactive = shallowReactive;
   exports.shallowReadonly = shallowReadonly;
   exports.shallowRef = shallowRef;
@@ -1805,7 +1870,7 @@
   exports.useCSSModule = useCSSModule;
   exports.useCssModule = useCssModule;
   exports.version = version;
-  exports.warn = warn$1;
+  exports.warn = warn;
   exports.watch = watch;
   exports.watchEffect = watchEffect;
 
