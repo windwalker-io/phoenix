@@ -14,11 +14,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -90,20 +90,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
   }(PhoenixJQueryPlugin);
 
   var PhoenixValidationV1Element = /*#__PURE__*/function () {
-    _createClass(PhoenixValidationV1Element, null, [{
-      key: "defaultOptions",
-      get: function get() {
-        return {
-          events: ['change'],
-          scroll: {
-            enabled: true,
-            offset: -100,
-            duration: 1000
-          }
-        };
-      }
-    }]);
-
     function PhoenixValidationV1Element(element, options, phoenix) {
       _classCallCheck(this, PhoenixValidationV1Element);
 
@@ -241,9 +227,9 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
             }
           } // Handle all fields and checkbox
           else if (!$input.val() || Array.isArray($input.val()) && $input.val().length === 0) {
-              this.showResponse(this.STATE_EMPTY, $input);
-              return false;
-            }
+            this.showResponse(this.STATE_EMPTY, $input);
+            return false;
+          }
         } // Is value exists, validate this type.
 
 
@@ -384,6 +370,18 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
             this.addValidator(name, handlers[name]);
           }
         }
+      }
+    }], [{
+      key: "defaultOptions",
+      get: function get() {
+        return {
+          events: ['change'],
+          scroll: {
+            enabled: true,
+            offset: -100,
+            duration: 1000
+          }
+        };
       }
     }]);
 

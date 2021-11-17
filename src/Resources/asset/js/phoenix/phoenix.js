@@ -10,13 +10,13 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+function _get() { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(arguments.length < 3 ? target : receiver); } return desc.value; }; } return _get.apply(this, arguments); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
@@ -26,11 +26,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -382,17 +382,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   'use strict';
 
   window.PhoenixEventMixin = Mixin(function (superclass) {
-    var _temp;
+    return /*#__PURE__*/function (_superclass) {
+      _inherits(_class3, _superclass);
 
-    return _temp = /*#__PURE__*/function (_superclass) {
-      _inherits(_temp, _superclass);
+      var _super = _createSuper(_class3);
 
-      var _super = _createSuper(_temp);
-
-      function _temp() {
+      function _class3() {
         var _this;
 
-        _classCallCheck(this, _temp);
+        _classCallCheck(this, _class3);
 
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
@@ -405,7 +403,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         return _this;
       }
 
-      _createClass(_temp, [{
+      _createClass(_class3, [{
         key: "on",
         value: function on(event, handler) {
           var _this2 = this;
@@ -491,8 +489,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         }
       }]);
 
-      return _temp;
-    }(superclass), _temp;
+      return _class3;
+    }(superclass);
   });
 
   window.PhoenixEvent = /*#__PURE__*/function (_PhoenixEventMixin) {
@@ -508,11 +506,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     return PhoenixEvent;
   }(PhoenixEventMixin( /*#__PURE__*/function () {
-    function _class3() {
-      _classCallCheck(this, _class3);
+    function _class4() {
+      _classCallCheck(this, _class4);
     }
 
-    return _class3;
+    return _class4;
   }()));
 })();
 /**
@@ -528,18 +526,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _inherits(PhoenixCore, _mix$with);
 
     var _super3 = _createSuper(PhoenixCore);
-
-    _createClass(PhoenixCore, null, [{
-      key: "defaultOptions",
-
-      /**
-       * Default options.
-       * @returns {Object}
-       */
-      get: function get() {
-        return {};
-      }
-    }]);
 
     function PhoenixCore() {
       var _this5;
@@ -702,15 +688,25 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         return this;
       }
+    }], [{
+      key: "defaultOptions",
+      get:
+      /**
+       * Default options.
+       * @returns {Object}
+       */
+      function get() {
+        return {};
+      }
     }]);
 
     return PhoenixCore;
   }(mix( /*#__PURE__*/function () {
-    function _class4() {
-      _classCallCheck(this, _class4);
+    function _class5() {
+      _classCallCheck(this, _class5);
     }
 
-    return _class4;
+    return _class5;
   }())["with"](PhoenixEventMixin));
 
   window.PhoenixCore = PhoenixCore;
@@ -725,47 +721,17 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 (function ($) {
   var PhoenixPlugin = /*#__PURE__*/function () {
-    _createClass(PhoenixPlugin, [{
-      key: "options",
-      get: function get() {
-        return this.phoenix.options[this.constructor.is.toLowerCase()];
-      }
-    }], [{
-      key: "install",
-      value: function install(phoenix) {
-        var self = new this();
-        this.createProxies(phoenix, self);
-        return self;
-      }
-    }, {
-      key: "uninstall",
-      value: function uninstall(phoenix) {
-        var self = new this(phoenix);
-        this.resetProxies(phoenix, self);
-      }
-    }, {
-      key: "is",
-      get: function get() {
-        throw new Error("Please add \"is\" property to Phoenix Plugin: ".concat(this.name));
-      }
-    }, {
-      key: "proxies",
-      get: function get() {
-        return {};
-      }
-    }, {
-      key: "defaultOptions",
-      get: function get() {
-        return {};
-      }
-    }]);
-
     function PhoenixPlugin() {//
 
       _classCallCheck(this, PhoenixPlugin);
     }
 
     _createClass(PhoenixPlugin, [{
+      key: "options",
+      get: function get() {
+        return this.phoenix.options[this.constructor.is.toLowerCase()];
+      }
+    }, {
       key: "boot",
       value: function boot(phoenix) {
         var _this8 = this;
@@ -796,6 +762,34 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       value: function loaded() {//
       }
     }], [{
+      key: "is",
+      get: function get() {
+        throw new Error("Please add \"is\" property to Phoenix Plugin: ".concat(this.name));
+      }
+    }, {
+      key: "proxies",
+      get: function get() {
+        return {};
+      }
+    }, {
+      key: "defaultOptions",
+      get: function get() {
+        return {};
+      }
+    }, {
+      key: "install",
+      value: function install(phoenix) {
+        var self = new this();
+        this.createProxies(phoenix, self);
+        return self;
+      }
+    }, {
+      key: "uninstall",
+      value: function uninstall(phoenix) {
+        var self = new this(phoenix);
+        this.resetProxies(phoenix, self);
+      }
+    }, {
       key: "createProxies",
       value: function createProxies(phoenix, plugin) {
         if (plugin.constructor.proxies === undefined) {
@@ -895,27 +889,27 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         return (_$ = $(selector))[this.constructor.pluginName].apply(_$, [options, this.phoenix].concat(args));
       }
     }], [{
-      key: "install",
-      value: function install(phoenix) {
-        var instance = _get(_getPrototypeOf(PhoenixJQueryPlugin), "install", this).call(this, phoenix);
-
-        phoenix.plugin(this.pluginName, this.pluginClass);
-        return instance;
-      }
-    }, {
       key: "pluginName",
-
+      get:
       /**
        * Plugin name.
        * @returns {string|null}
        */
-      get: function get() {
+      function get() {
         throw new Error('Please provide a plugin name.');
       }
     }, {
       key: "pluginClass",
       get: function get() {
         throw new Error('Please provide a class as plugin instance.');
+      }
+    }, {
+      key: "install",
+      value: function install(phoenix) {
+        var instance = _get(_getPrototypeOf(PhoenixJQueryPlugin), "install", this).call(this, phoenix);
+
+        phoenix.plugin(this.pluginName, this.pluginClass);
+        return instance;
       }
     }]);
 
@@ -938,37 +932,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _inherits(PhoenixHelper, _PhoenixPlugin2);
 
     var _super5 = _createSuper(PhoenixHelper);
-
-    _createClass(PhoenixHelper, null, [{
-      key: "is",
-      get: function get() {
-        return 'Helper';
-      }
-    }, {
-      key: "proxies",
-      get: function get() {
-        return {
-          $get: 'get',
-          $set: 'set',
-          isDebug: 'isDebug',
-          confirm: 'confirm',
-          keepAlive: 'keepAlive',
-          stopKeepAlive: 'stopKeepAlive',
-          isNullDate: 'isNullDate',
-          getNullDate: 'getNullDate',
-          loadScript: 'loadScript',
-          notify: 'notify',
-          numberFormat: 'numberFormat',
-          sprintf: 'sprintf',
-          vsprintf: 'vsprintf'
-        };
-      }
-    }, {
-      key: "defaultOptions",
-      get: function get() {
-        return {};
-      }
-    }]);
 
     function PhoenixHelper() {
       var _this9;
@@ -1215,6 +1178,35 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         }
 
         return (number < 0 ? '-' : '') + numbersString + formattedNumber + (decimalsString ? decPoint + decimalsString : '');
+      }
+    }], [{
+      key: "is",
+      get: function get() {
+        return 'Helper';
+      }
+    }, {
+      key: "proxies",
+      get: function get() {
+        return {
+          $get: 'get',
+          $set: 'set',
+          isDebug: 'isDebug',
+          confirm: 'confirm',
+          keepAlive: 'keepAlive',
+          stopKeepAlive: 'stopKeepAlive',
+          isNullDate: 'isNullDate',
+          getNullDate: 'getNullDate',
+          loadScript: 'loadScript',
+          notify: 'notify',
+          numberFormat: 'numberFormat',
+          sprintf: 'sprintf',
+          vsprintf: 'vsprintf'
+        };
+      }
+    }, {
+      key: "defaultOptions",
+      get: function get() {
+        return {};
       }
     }]);
 
@@ -1469,27 +1461,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     var _super6 = _createSuper(PhoenixUI);
 
-    _createClass(PhoenixUI, null, [{
-      key: "is",
-      get: function get() {
-        return 'UI';
-      }
-    }, {
-      key: "defaultOptions",
-      get: function get() {
-        return {
-          messageSelector: '.message-wrap'
-        };
-      }
-    }, {
-      key: "proxies",
-      get: function get() {
-        return {
-          addMessage: 'renderMessage'
-        };
-      }
-    }]);
-
     function PhoenixUI() {
       var _this11;
 
@@ -1632,7 +1603,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var confirmed = confirm(message);
         callback(confirmed);
         return confirmed;
-      })
+      }
       /**
        * Keep alive.
        *
@@ -1641,7 +1612,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
        *
        * @return {number}
        */
-
+      )
     }, {
       key: "keepAlive",
       value: function keepAlive(url, time) {
@@ -1653,6 +1624,25 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       key: "stopKeepAlive",
       value: function stopKeepAlive() {
         clearInterval(this.aliveHandle);
+      }
+    }], [{
+      key: "is",
+      get: function get() {
+        return 'UI';
+      }
+    }, {
+      key: "defaultOptions",
+      get: function get() {
+        return {
+          messageSelector: '.message-wrap'
+        };
+      }
+    }, {
+      key: "proxies",
+      get: function get() {
+        return {
+          addMessage: 'renderMessage'
+        };
       }
     }]);
 
@@ -1832,23 +1822,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _inherits(PhoenixAjax, _PhoenixPlugin5);
 
     var _super8 = _createSuper(PhoenixAjax);
-
-    _createClass(PhoenixAjax, null, [{
-      key: "is",
-      get: function get() {
-        return 'Ajax';
-      }
-    }, {
-      key: "proxies",
-      get: function get() {
-        return {};
-      }
-    }, {
-      key: "defaultOptions",
-      get: function get() {
-        return {};
-      }
-    }]);
 
     function PhoenixAjax() {
       var _this14;
@@ -2101,6 +2074,21 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         clone.config.customMethod = true;
         return clone;
       }
+    }], [{
+      key: "is",
+      get: function get() {
+        return 'Ajax';
+      }
+    }, {
+      key: "proxies",
+      get: function get() {
+        return {};
+      }
+    }, {
+      key: "defaultOptions",
+      get: function get() {
+        return {};
+      }
     }]);
 
     return PhoenixAjax;
@@ -2138,7 +2126,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     _createClass(PhoenixCrypto, [{
       key: "base64Encode",
-
+      value:
       /**
        * Base64 encode.
        *
@@ -2146,7 +2134,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
        *
        * @returns {string}
        */
-      value: function base64Encode(string) {
+      function base64Encode(string) {
         return btoa(string);
       }
       /**
@@ -2629,22 +2617,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
     var _super10 = _createSuper(PhoenixTranslator);
 
-    _createClass(PhoenixTranslator, null, [{
-      key: "is",
-      get: function get() {
-        return 'Translator';
-      }
-    }, {
-      key: "proxies",
-      get: function get() {
-        return {
-          trans: 'translate',
-          __: 'translate',
-          addLanguage: 'addKey'
-        };
-      }
-    }]);
-
     function PhoenixTranslator() {
       var _this17;
 
@@ -2766,6 +2738,20 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         return text;
       }
+    }], [{
+      key: "is",
+      get: function get() {
+        return 'Translator';
+      }
+    }, {
+      key: "proxies",
+      get: function get() {
+        return {
+          trans: 'translate',
+          __: 'translate',
+          addLanguage: 'addKey'
+        };
+      }
     }]);
 
     return PhoenixTranslator;
@@ -2792,20 +2778,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _inherits(PhoenixStack, _PhoenixPlugin8);
 
     var _super11 = _createSuper(PhoenixStack);
-
-    _createClass(PhoenixStack, null, [{
-      key: "is",
-      get: function get() {
-        return 'Stack';
-      }
-    }, {
-      key: "proxies",
-      get: function get() {
-        return {
-          stack: 'get'
-        };
-      }
-    }]);
 
     function PhoenixStack() {
       var _this18;
@@ -2866,6 +2838,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       value: function all() {
         return this.stacks;
       }
+    }], [{
+      key: "is",
+      get: function get() {
+        return 'Stack';
+      }
+    }, {
+      key: "proxies",
+      get: function get() {
+        return {
+          stack: 'get'
+        };
+      }
     }]);
 
     return PhoenixStack;
@@ -2915,6 +2899,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         return this.store.length === 0;
       }
     }, {
+      key: "length",
+      get: function get() {
+        return this.store.length;
+      }
+    }, {
       key: "peek",
       value: function peek() {
         return this.store;
@@ -2957,11 +2946,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           return observer !== callback;
         });
         return this;
-      }
-    }, {
-      key: "length",
-      get: function get() {
-        return this.store.length;
       }
     }]);
 
@@ -3038,14 +3022,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         _get(_getPrototypeOf(PhoenixLegacy.prototype), "ready", this).call(this);
       }
     }], [{
-      key: "warn",
-      value: function warn(obj, method) {
-        console.warn("Calling ".concat(obj, ".").concat(method, "() is deprecated."));
-      }
-    }, {
       key: "is",
       get: function get() {
         return 'Legacy';
+      }
+    }, {
+      key: "warn",
+      value: function warn(obj, method) {
+        console.warn("Calling ".concat(obj, ".").concat(method, "() is deprecated."));
       }
     }]);
 

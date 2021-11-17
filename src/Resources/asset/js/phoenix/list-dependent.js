@@ -32,34 +32,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
   var ListDependent = /*#__PURE__*/function () {
-    _createClass(ListDependent, null, [{
-      key: "pluginName",
-      get: function get() {
-        return 'listDependent';
-      }
-    }, {
-      key: "defaultOptions",
-      get: function get() {
-        return {
-          ajax: {
-            url: null,
-            value_field: 'value'
-          },
-          source: null,
-          text_field: 'title',
-          value_field: 'id',
-          first_option: null,
-          default_value: null,
-          initial_load: true,
-          empty_mark: '__EMPTY__',
-          hooks: {
-            before_request: nope,
-            after_request: nope
-          }
-        };
-      }
-    }]);
-
     function ListDependent($element, dependent, options) {
       _classCallCheck(this, ListDependent);
 
@@ -281,6 +253,32 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       value: function afterHook(value, element, dependent) {
         var after = this.options.hooks.after_request;
         return after.call(this, value, element, dependent);
+      }
+    }], [{
+      key: "pluginName",
+      get: function get() {
+        return 'listDependent';
+      }
+    }, {
+      key: "defaultOptions",
+      get: function get() {
+        return {
+          ajax: {
+            url: null,
+            value_field: 'value'
+          },
+          source: null,
+          text_field: 'title',
+          value_field: 'id',
+          first_option: null,
+          default_value: null,
+          initial_load: true,
+          empty_mark: '__EMPTY__',
+          hooks: {
+            before_request: nope,
+            after_request: nope
+          }
+        };
       }
     }]);
 

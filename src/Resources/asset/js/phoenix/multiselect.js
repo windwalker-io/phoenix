@@ -28,21 +28,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
    * @constructor
    */
   var PhoenixMultiSelect = /*#__PURE__*/function () {
-    _createClass(PhoenixMultiSelect, null, [{
-      key: "pluginName",
-      get: function get() {
-        return 'multiselect';
-      }
-    }, {
-      key: "defaultOptions",
-      get: function get() {
-        return {
-          duration: 100,
-          inputSelector: 'input.grid-checkbox[type=checkbox]'
-        };
-      }
-    }]);
-
     function PhoenixMultiSelect($element, options) {
       _classCallCheck(this, PhoenixMultiSelect);
 
@@ -89,6 +74,19 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         }
 
         this.last = element;
+      }
+    }], [{
+      key: "pluginName",
+      get: function get() {
+        return 'multiselect';
+      }
+    }, {
+      key: "defaultOptions",
+      get: function get() {
+        return {
+          duration: 100,
+          inputSelector: 'input.grid-checkbox[type=checkbox]'
+        };
       }
     }]);
 
