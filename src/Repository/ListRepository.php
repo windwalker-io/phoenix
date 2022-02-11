@@ -154,6 +154,7 @@ class ListRepository extends DatabaseRepository implements ListRepositoryInterfa
      *
      * @since  1.8.13
      */
+    #[\ReturnTypeWillChange]
     public function getIterator(): \Generator
     {
         // Make sure we change state values before cache detected.

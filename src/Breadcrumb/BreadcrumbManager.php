@@ -183,6 +183,7 @@ class BreadcrumbManager implements \IteratorAggregate
      *
      * @return Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return $this->items;
