@@ -80,7 +80,7 @@ class InlineField extends TextField
 
         $group = $this->get('as_group') ? $this->getGroup() . '.' . $this->getName() : $this->getGroup();
 
-        $this->inlineForm->wrap('inline-' . $this->getName(true), trim($group, '.'), $handler);
+        $this->inlineForm->wrap('inline-' . $this->getName(true), trim((string) $group, '.'), $handler);
     }
 
     /**
