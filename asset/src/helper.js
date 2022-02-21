@@ -218,20 +218,18 @@
      * @returns {string}
      */
     numberFormat(number, decimals = 0, decPoint = '.', thousandsSep = ',') {
-      decimals = decimals || 0;
-      number = parseFloat(number);
+      number = Number(number);
 
-      let roundedNumber = Math.round(Math.abs(number) * ('1e' + decimals)) + '';
-      let numbersString = decimals ? roundedNumber.slice(0, decimals * -1) : roundedNumber;
-      let decimalsString = decimals ? roundedNumber.slice(decimals * -1) : '';
-      let formattedNumber = "";
+      const str = number.toFixed(decimals ? decimals : 0).toString().split('.');
+      const parts = [];
 
-      while (numbersString.length > 3) {
-        formattedNumber += thousandsSep + numbersString.slice(-3);
-        numbersString = numbersString.slice(0, -3);
+      for (var i = str[0].length; i > 0; i -= 3) {
+        parts.unshift(str[0].substring(Math.max(0, i - 3), i));
       }
 
-      return (number < 0 ? '-' : '') + numbersString + formattedNumber + (decimalsString ? (decPoint + decimalsString) : '');
+      str[0] = parts.join(thousandsSep ? thousandsSep : ',');
+
+      return str.join(decPoint ? decPoint : '.');
     }
   }
 

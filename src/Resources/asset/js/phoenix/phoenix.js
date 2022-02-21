@@ -1165,19 +1165,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         var decimals = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
         var decPoint = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '.';
         var thousandsSep = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : ',';
-        decimals = decimals || 0;
-        number = parseFloat(number);
-        var roundedNumber = Math.round(Math.abs(number) * ('1e' + decimals)) + '';
-        var numbersString = decimals ? roundedNumber.slice(0, decimals * -1) : roundedNumber;
-        var decimalsString = decimals ? roundedNumber.slice(decimals * -1) : '';
-        var formattedNumber = "";
+        number = Number(number);
+        var str = number.toFixed(decimals ? decimals : 0).toString().split('.');
+        var parts = [];
 
-        while (numbersString.length > 3) {
-          formattedNumber += thousandsSep + numbersString.slice(-3);
-          numbersString = numbersString.slice(0, -3);
+        for (var i = str[0].length; i > 0; i -= 3) {
+          parts.unshift(str[0].substring(Math.max(0, i - 3), i));
         }
 
-        return (number < 0 ? '-' : '') + numbersString + formattedNumber + (decimalsString ? decPoint + decimalsString : '');
+        str[0] = parts.join(thousandsSep ? thousandsSep : ',');
+        return str.join(decPoint ? decPoint : '.');
       }
     }], [{
       key: "is",
