@@ -1,9 +1,9 @@
 /*!
- * BootstrapVue 2.21.2
+ * BootstrapVue 2.22.0
  *
  * @link https://bootstrap-vue.org
  * @source https://github.com/bootstrap-vue/bootstrap-vue
- * @copyright (c) 2016-2021 BootstrapVue
+ * @copyright (c) 2016-2022 BootstrapVue
  * @license MIT
  * https://github.com/bootstrap-vue/bootstrap-vue/blob/master/LICENSE
  */
@@ -18,20 +18,40 @@
 
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
 
-  function _typeof(obj) {
-    "@babel/helpers - typeof";
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
 
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function (obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof = function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
     }
 
-    return _typeof(obj);
+    return keys;
+  }
+
+  function _objectSpread2$3(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = null != arguments[i] ? arguments[i] : {};
+      i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+
+    return target;
+  }
+
+  function _typeof$1(obj) {
+    "@babel/helpers - typeof";
+
+    return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+      return typeof obj;
+    } : function (obj) {
+      return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    }, _typeof$1(obj);
   }
 
   function _classCallCheck(instance, Constructor) {
@@ -53,6 +73,9 @@
   function _createClass(Constructor, protoProps, staticProps) {
     if (protoProps) _defineProperties(Constructor.prototype, protoProps);
     if (staticProps) _defineProperties(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
     return Constructor;
   }
 
@@ -71,51 +94,20 @@
     return obj;
   }
 
-  function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-
-    if (Object.getOwnPropertySymbols) {
-      var symbols = Object.getOwnPropertySymbols(object);
-      if (enumerableOnly) symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      });
-      keys.push.apply(keys, symbols);
-    }
-
-    return keys;
-  }
-
-  function _objectSpread2(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i] != null ? arguments[i] : {};
-
-      if (i % 2) {
-        ownKeys(Object(source), true).forEach(function (key) {
-          _defineProperty(target, key, source[key]);
-        });
-      } else if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-      } else {
-        ownKeys(Object(source)).forEach(function (key) {
-          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-      }
-    }
-
-    return target;
-  }
-
   function _inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
     }
 
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        writable: true,
-        configurable: true
-      }
+    Object.defineProperty(subClass, "prototype", {
+      value: Object.create(superClass && superClass.prototype, {
+        constructor: {
+          value: subClass,
+          writable: true,
+          configurable: true
+        }
+      }),
+      writable: false
     });
     if (superClass) _setPrototypeOf(subClass, superClass);
   }
@@ -142,7 +134,7 @@
     if (typeof Proxy === "function") return true;
 
     try {
-      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
       return true;
     } catch (e) {
       return false;
@@ -215,6 +207,8 @@
   function _possibleConstructorReturn(self, call) {
     if (call && (typeof call === "object" || typeof call === "function")) {
       return call;
+    } else if (call !== void 0) {
+      throw new TypeError("Derived constructors may only return object or undefined");
     }
 
     return _assertThisInitialized(self);
@@ -248,7 +242,7 @@
     return object;
   }
 
-  function _get(target, property, receiver) {
+  function _get() {
     if (typeof Reflect !== "undefined" && Reflect.get) {
       _get = Reflect.get;
     } else {
@@ -259,25 +253,25 @@
         var desc = Object.getOwnPropertyDescriptor(base, property);
 
         if (desc.get) {
-          return desc.get.call(receiver);
+          return desc.get.call(arguments.length < 3 ? target : receiver);
         }
 
         return desc.value;
       };
     }
 
-    return _get(target, property, receiver || target);
+    return _get.apply(this, arguments);
   }
 
   function _slicedToArray(arr, i) {
     return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
   }
 
-  function _toConsumableArray(arr) {
-    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+  function _toConsumableArray$1(arr) {
+    return _arrayWithoutHoles$1(arr) || _iterableToArray$1(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread$1();
   }
 
-  function _arrayWithoutHoles(arr) {
+  function _arrayWithoutHoles$1(arr) {
     if (Array.isArray(arr)) return _arrayLikeToArray(arr);
   }
 
@@ -285,19 +279,22 @@
     if (Array.isArray(arr)) return arr;
   }
 
-  function _iterableToArray(iter) {
-    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+  function _iterableToArray$1(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
   }
 
   function _iterableToArrayLimit(arr, i) {
-    if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
+    var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"];
+
+    if (_i == null) return;
     var _arr = [];
     var _n = true;
     var _d = false;
-    var _e = undefined;
+
+    var _s, _e;
 
     try {
-      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
         _arr.push(_s.value);
 
         if (i && _arr.length === i) break;
@@ -333,7 +330,7 @@
     return arr2;
   }
 
-  function _nonIterableSpread() {
+  function _nonIterableSpread$1() {
     throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
@@ -358,7 +355,7 @@
   var NAVIGATOR = HAS_NAVIGATOR_SUPPORT ? navigator : {};
   var USER_AGENT = (NAVIGATOR.userAgent || '').toLowerCase();
   var IS_JSDOM = USER_AGENT.indexOf('jsdom') > 0;
-  var IS_IE = /msie|trident/.test(USER_AGENT); // Determine if the browser supports the option passive for events
+  /msie|trident/.test(USER_AGENT); // Determine if the browser supports the option passive for events
 
   var HAS_PASSIVE_EVENT_SUPPORT = function () {
     var passiveEventSupported = false;
@@ -393,8 +390,8 @@
   // 'isIntersecting' in window.IntersectionObserverEntry.prototype &&
   'intersectionRatio' in WINDOW.IntersectionObserverEntry.prototype;
 
-  var NAME = 'BvConfig';
-  var PROP_NAME = '$bvConfig';
+  var NAME$2 = 'BvConfig';
+  var PROP_NAME$2 = '$bvConfig';
   var DEFAULT_BREAKPOINT = ['xs', 'sm', 'md', 'lg', 'xl'];
 
   // --- General ---
@@ -502,8 +499,8 @@
     return File;
   }( /*#__PURE__*/_wrapNativeSuper(Object));
 
-  var toType = function toType(value) {
-    return _typeof(value);
+  var toType$1 = function toType(value) {
+    return _typeof$1(value);
   };
   var toRawType = function toRawType(value) {
     return Object.prototype.toString.call(value).slice(8, -1);
@@ -517,19 +514,19 @@
   var isUndefinedOrNull = function isUndefinedOrNull(value) {
     return isUndefined(value) || isNull(value);
   };
-  var isFunction = function isFunction(value) {
-    return toType(value) === 'function';
+  var isFunction$1 = function isFunction(value) {
+    return toType$1(value) === 'function';
   };
   var isBoolean = function isBoolean(value) {
-    return toType(value) === 'boolean';
+    return toType$1(value) === 'boolean';
   };
   var isString = function isString(value) {
-    return toType(value) === 'string';
+    return toType$1(value) === 'string';
   };
   var isNumber = function isNumber(value) {
-    return toType(value) === 'number';
+    return toType$1(value) === 'number';
   };
-  var isNumeric = function isNumeric(value) {
+  var isNumeric$1 = function isNumeric(value) {
     return RX_NUMBER.test(String(value));
   };
   var isArray = function isArray(value) {
@@ -540,7 +537,7 @@
   // Note object could be a complex type like array, Date, etc.
 
   var isObject = function isObject(obj) {
-    return obj !== null && _typeof(obj) === 'object';
+    return obj !== null && _typeof$1(obj) === 'object';
   }; // Strict object type check
   // Only returns true for plain JavaScript objects
 
@@ -560,7 +557,7 @@
     return toRawType(value) === 'RegExp';
   };
   var isPromise = function isPromise(value) {
-    return !isUndefinedOrNull(value) && isFunction(value.then) && isFunction(value.catch);
+    return !isUndefinedOrNull(value) && isFunction$1(value.then) && isFunction$1(value.catch);
   };
 
   var assign = function assign() {
@@ -572,7 +569,7 @@
   var defineProperties = function defineProperties(obj, props) {
     return Object.defineProperties(obj, props);
   };
-  var defineProperty = function defineProperty(obj, prop, descriptor) {
+  var defineProperty$1 = function defineProperty(obj, prop, descriptor) {
     return Object.defineProperty(obj, prop, descriptor);
   };
   var getOwnPropertyNames = function getOwnPropertyNames(obj) {
@@ -585,21 +582,21 @@
   var hasOwnProperty = function hasOwnProperty(obj, prop) {
     return Object.prototype.hasOwnProperty.call(obj, prop);
   };
-  var toString = function toString(obj) {
+  var toString$1 = function toString(obj) {
     return Object.prototype.toString.call(obj);
   }; // --- Utilities ---
   // Shallow copy an object
 
   var clone = function clone(obj) {
-    return _objectSpread2({}, obj);
+    return _objectSpread2$3({}, obj);
   }; // Return a shallow copy of object with the specified properties only
   // See: https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
 
-  var pick = function pick(obj, props) {
+  var pick$1 = function pick(obj, props) {
     return keys(obj).filter(function (key) {
       return props.indexOf(key) !== -1;
     }).reduce(function (result, key) {
-      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
+      return _objectSpread2$3(_objectSpread2$3({}, result), {}, _defineProperty({}, key, obj[key]));
     }, {});
   }; // Return a shallow copy of object with the specified properties omitted
   // See: https://gist.github.com/bisubus/2da8af7e801ffd813fab7ac221aa7afc
@@ -608,7 +605,7 @@
     return keys(obj).filter(function (key) {
       return props.indexOf(key) === -1;
     }).reduce(function (result, key) {
-      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
+      return _objectSpread2$3(_objectSpread2$3({}, result), {}, _defineProperty({}, key, obj[key]));
     }, {});
   }; // Merges two object deeply together
   // See: https://gist.github.com/Salakar/1d7137de9cb8b704e48a
@@ -633,7 +630,7 @@
 
   var sortKeys = function sortKeys(obj) {
     return keys(obj).sort().reduce(function (result, key) {
-      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, obj[key]));
+      return _objectSpread2$3(_objectSpread2$3({}, result), {}, _defineProperty({}, key, obj[key]));
     }, {});
   }; // Convenience method to create a read-only descriptor
 
@@ -650,13 +647,13 @@
 
     if (isArray(obj)) {
       return obj.reduce(function (result, val) {
-        return [].concat(_toConsumableArray(result), [cloneDeep(val, val)]);
+        return [].concat(_toConsumableArray$1(result), [cloneDeep(val, val)]);
       }, []);
     }
 
     if (isPlainObject(obj)) {
       return keys(obj).reduce(function (result, key) {
-        return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
+        return _objectSpread2$3(_objectSpread2$3({}, result), {}, _defineProperty({}, key, cloneDeep(obj[key], obj[key])));
       }, {});
     }
 
@@ -834,7 +831,7 @@
             if (!isArray(subConfig) || subConfig.length < 2 || subConfig.some(function (b) {
               return !isString(b) || b.length === 0;
             })) {
-              warn('"breakpoints" must be an array of at least 2 breakpoint names', NAME);
+              warn('"breakpoints" must be an array of at least 2 breakpoint names', NAME$2);
             } else {
               _this.$_config[key] = cloneDeep(subConfig);
             }
@@ -880,9 +877,9 @@
     var Vue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Vue__default['default'];
     // Ensure we have a `$bvConfig` Object on the Vue prototype
     // We set on Vue and OurVue just in case consumer has not set an alias of `vue`
-    Vue.prototype[PROP_NAME] = Vue__default['default'].prototype[PROP_NAME] = Vue.prototype[PROP_NAME] || Vue__default['default'].prototype[PROP_NAME] || new BvConfig(); // Apply the config values
+    Vue.prototype[PROP_NAME$2] = Vue__default['default'].prototype[PROP_NAME$2] = Vue.prototype[PROP_NAME$2] || Vue__default['default'].prototype[PROP_NAME$2] || new BvConfig(); // Apply the config values
 
-    Vue.prototype[PROP_NAME].setConfig(config);
+    Vue.prototype[PROP_NAME$2].setConfig(config);
   }; // Method for resetting the user config
 
   /**
@@ -942,7 +939,7 @@
   var pluginFactory = function pluginFactory() {
     var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var extend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    return _objectSpread2(_objectSpread2({}, extend), {}, {
+    return _objectSpread2$3(_objectSpread2$3({}, extend), {}, {
       install: installFactory(options)
     });
   };
@@ -1182,6 +1179,7 @@
   var EVENT_NAME_ENABLED = 'enabled';
   var EVENT_NAME_FILTERED = 'filtered';
   var EVENT_NAME_FIRST = 'first';
+  var EVENT_NAME_FOCUS = 'focus';
   var EVENT_NAME_FOCUSIN = 'focusin';
   var EVENT_NAME_FOCUSOUT = 'focusout';
   var EVENT_NAME_HEAD_CLICKED = 'head-clicked';
@@ -1337,7 +1335,7 @@
   }; // --- Utilities ---
 
   var createArray = function createArray(length, fillFn) {
-    var mapFn = isFunction(fillFn) ? fillFn : function () {
+    var mapFn = isFunction$1(fillFn) ? fillFn : function () {
       return fillFn;
     };
     return Array.apply(null, {
@@ -1416,21 +1414,21 @@
   // `undefined`/`null` will be converted to `''`
   // Plain objects and arrays will be JSON stringified
 
-  var toString$1 = function toString(val) {
+  var toString = function toString(val) {
     var spaces = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
     return isUndefinedOrNull(val) ? '' : isArray(val) || isPlainObject(val) && val.toString === Object.prototype.toString ? JSON.stringify(val, null, spaces) : String(val);
   }; // Remove leading white space from a string
 
   var trimLeft = function trimLeft(str) {
-    return toString$1(str).replace(RX_TRIM_LEFT, '');
+    return toString(str).replace(RX_TRIM_LEFT, '');
   }; // Remove Trailing white space from a string
 
   var trim = function trim(str) {
-    return toString$1(str).trim();
+    return toString(str).trim();
   }; // Lower case a string
 
   var lowerCase = function lowerCase(str) {
-    return toString$1(str).toLowerCase();
+    return toString(str).toLowerCase();
   }; // Upper case a string
 
   var ELEMENT_PROTO = Element.prototype;
@@ -1462,13 +1460,13 @@
 
   /* istanbul ignore next: JSDOM always returns the first option */
 
-  var requestAF = WINDOW.requestAnimationFrame || WINDOW.webkitRequestAnimationFrame || WINDOW.mozRequestAnimationFrame || WINDOW.msRequestAnimationFrame || WINDOW.oRequestAnimationFrame || // Fallback, but not a true polyfill
+  var requestAF = (WINDOW.requestAnimationFrame || WINDOW.webkitRequestAnimationFrame || WINDOW.mozRequestAnimationFrame || WINDOW.msRequestAnimationFrame || WINDOW.oRequestAnimationFrame || // Fallback, but not a true polyfill
   // Only needed for Opera Mini
 
   /* istanbul ignore next */
   function (cb) {
     return setTimeout(cb, 16);
-  };
+  }).bind(WINDOW);
   var MutationObs = WINDOW.MutationObserver || WINDOW.WebKitMutationObserver || WINDOW.MozMutationObserver || null; // --- Utils ---
   // Remove a node from DOM
 
@@ -1489,7 +1487,7 @@
   }; // Returns `true` if a tag's name equals `name`
 
   var isTag = function isTag(tag, name) {
-    return toString$1(tag).toLowerCase() === toString$1(name).toLowerCase();
+    return toString(tag).toLowerCase() === toString(name).toLowerCase();
   }; // Determine if an HTML element is the currently active element
 
   var isActiveElement = function isActiveElement(el) {
@@ -1555,7 +1553,7 @@
   }; // Returns true if the parent element contains the child element
 
   var contains = function contains(parent, child) {
-    return parent && isFunction(parent.contains) ? parent.contains(child) : false;
+    return parent && isFunction$1(parent.contains) ? parent.contains(child) : false;
   }; // Get an element given an ID
 
   var getById = function getById(id) {
@@ -1653,7 +1651,7 @@
   }; // Return an element's offset with respect to document element
   // https://j11y.io/jquery/#v=git&fn=jQuery.fn.offset
 
-  var offset = function offset(el)
+  var offset$1 = function offset(el)
   /* istanbul ignore next: getBoundingClientRect(), getClientRects() doesn't work in JSDOM */
   {
     var _offset = {
@@ -1698,7 +1696,7 @@
     if (elStyles.position === 'fixed') {
       _offset = getBCR(el) || _offset;
     } else {
-      _offset = offset(el);
+      _offset = offset$1(el);
       var doc = el.ownerDocument;
       var offsetParent = el.offsetParent || doc.documentElement;
 
@@ -1707,7 +1705,7 @@
       }
 
       if (offsetParent && offsetParent !== el && offsetParent.nodeType === Node.ELEMENT_NODE) {
-        parentOffset = offset(offsetParent);
+        parentOffset = offset$1(offsetParent);
         var offsetParentStyles = getCS(offsetParent);
         parentOffset.top += toFloat(offsetParentStyles.borderTopWidth, 0);
         parentOffset.left += toFloat(offsetParentStyles.borderLeftWidth, 0);
@@ -1762,7 +1760,7 @@
 
   var getConfigValue = function getConfigValue(key) {
     var defaultValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
-    var bvConfig = VueProto[PROP_NAME];
+    var bvConfig = VueProto[PROP_NAME$2];
     return bvConfig ? bvConfig.getConfigValue(key, defaultValue) : cloneDeep(defaultValue);
   }; // Method to grab a config value for a particular component
 
@@ -1815,7 +1813,7 @@
     var validator = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : undefined;
     var required = requiredOrValidator === true;
     validator = required ? validator : requiredOrValidator;
-    return _objectSpread2(_objectSpread2(_objectSpread2({}, type ? {
+    return _objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, type ? {
       type: type
     } : {}), required ? {
       required: required
@@ -1865,10 +1863,10 @@
   // call that falls back to the current default value of the prop
 
   var makePropConfigurable = function makePropConfigurable(prop, key, componentKey) {
-    return _objectSpread2(_objectSpread2({}, cloneDeep(prop)), {}, {
+    return _objectSpread2$3(_objectSpread2$3({}, cloneDeep(prop)), {}, {
       default: function bvConfigurablePropDefault() {
         var value = getComponentConfig(componentKey, key, prop.default);
-        return isFunction(value) ? value() : value;
+        return isFunction$1(value) ? value() : value;
       }
     });
   }; // Make a props object configurable by global configuration
@@ -1877,7 +1875,7 @@
 
   var makePropsConfigurable = function makePropsConfigurable(props, componentKey) {
     return keys(props).reduce(function (result, key) {
-      return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, makePropConfigurable(props[key], key, componentKey)));
+      return _objectSpread2$3(_objectSpread2$3({}, result), {}, _defineProperty({}, key, makePropConfigurable(props[key], key, componentKey)));
     }, {});
   }; // Get function name we use in `makePropConfigurable()`
   // for the prop default value override to compare
@@ -1887,7 +1885,7 @@
   // and isn't the props default function
 
   var hasPropFunction = function hasPropFunction(fn) {
-    return isFunction(fn) && fn.name !== configurablePropDefaultFnName;
+    return isFunction$1(fn) && fn.name && fn.name !== configurablePropDefaultFnName;
   };
 
   var makeModelMixin = function makeModelMixin(prop) {
@@ -1966,7 +1964,7 @@
     } // Note: in Vue 2.6.x, all named slots are also scoped slots
 
 
-    return isFunction(slot) ? slot(scope) : slot;
+    return isFunction$1(slot) ? slot(scope) : slot;
   };
 
   var normalizeSlotMixin = Vue__default['default'].extend({
@@ -2071,7 +2069,7 @@
     return [ROOT_EVENT_NAME_PREFIX, actionName, getBaseEventName(name)].join(ROOT_EVENT_NAME_SEPARATOR);
   };
 
-  var props = makePropsConfigurable({
+  var props$2l = makePropsConfigurable({
     ariaLabel: makeProp(PROP_TYPE_STRING, 'Close'),
     content: makeProp(PROP_TYPE_STRING, '&times;'),
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -2082,7 +2080,7 @@
   var BButtonClose = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BUTTON_CLOSE,
     functional: true,
-    props: props,
+    props: props$2l,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -2130,13 +2128,13 @@
     leaveToClass: ''
   };
 
-  var FADE_PROPS = _objectSpread2(_objectSpread2({}, NO_FADE_PROPS), {}, {
+  var FADE_PROPS = _objectSpread2$3(_objectSpread2$3({}, NO_FADE_PROPS), {}, {
     enterActiveClass: 'fade',
     leaveActiveClass: 'fade'
   }); // --- Props ---
 
 
-  var props$1 = {
+  var props$2k = {
     // Has no effect if `trans-props` provided
     appear: makeProp(PROP_TYPE_BOOLEAN, false),
     // Can be overridden by user supplied `trans-props`
@@ -2152,7 +2150,7 @@
   var BVTransition = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TRANSITION,
     functional: true,
-    props: props$1,
+    props: props$2k,
     render: function render(h, _ref) {
       var children = _ref.children,
           data = _ref.data,
@@ -2164,7 +2162,7 @@
 
         if (props.appear) {
           // Default the appear classes to equal the enter classes
-          transProps = _objectSpread2(_objectSpread2({}, transProps), {}, {
+          transProps = _objectSpread2$3(_objectSpread2$3({}, transProps), {}, {
             appear: true,
             appearClass: transProps.enterClass,
             appearActiveClass: transProps.enterActiveClass,
@@ -2173,7 +2171,7 @@
         }
       }
 
-      transProps = _objectSpread2(_objectSpread2({
+      transProps = _objectSpread2$3(_objectSpread2$3({
         mode: props.mode
       }, transProps), {}, {
         // We always need `css` true
@@ -2186,16 +2184,16 @@
     }
   });
 
-  var _watch;
+  var _watch$k;
 
-  var _makeModelMixin = makeModelMixin('show', {
+  var _makeModelMixin$k = makeModelMixin('show', {
     type: PROP_TYPE_BOOLEAN_NUMBER_STRING,
     defaultValue: false
   }),
-      modelMixin = _makeModelMixin.mixin,
-      modelProps = _makeModelMixin.props,
-      MODEL_PROP_NAME = _makeModelMixin.prop,
-      MODEL_EVENT_NAME = _makeModelMixin.event; // --- Helper methods ---
+      modelMixin$j = _makeModelMixin$k.mixin,
+      modelProps$j = _makeModelMixin$k.props,
+      MODEL_PROP_NAME$j = _makeModelMixin$k.prop,
+      MODEL_EVENT_NAME$j = _makeModelMixin$k.event; // --- Helper methods ---
   // Convert `show` value to a number
 
 
@@ -2223,7 +2221,7 @@
   }; // --- Props ---
 
 
-  var props$2 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, modelProps), {}, {
+  var props$2j = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, modelProps$j), {}, {
     dismissLabel: makeProp(PROP_TYPE_STRING, 'Close'),
     dismissible: makeProp(PROP_TYPE_BOOLEAN, false),
     fade: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -2233,29 +2231,29 @@
 
   var BAlert = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_ALERT,
-    mixins: [modelMixin, normalizeSlotMixin],
-    props: props$2,
+    mixins: [modelMixin$j, normalizeSlotMixin],
+    props: props$2j,
     data: function data() {
       return {
         countDown: 0,
         // If initially shown, we need to set these for SSR
-        localShow: parseShow(this[MODEL_PROP_NAME])
+        localShow: parseShow(this[MODEL_PROP_NAME$j])
       };
     },
-    watch: (_watch = {}, _defineProperty(_watch, MODEL_PROP_NAME, function (newValue) {
+    watch: (_watch$k = {}, _defineProperty(_watch$k, MODEL_PROP_NAME$j, function (newValue) {
       this.countDown = parseCountDown(newValue);
       this.localShow = parseShow(newValue);
-    }), _defineProperty(_watch, "countDown", function countDown(newValue) {
+    }), _defineProperty(_watch$k, "countDown", function countDown(newValue) {
       var _this = this;
 
       this.clearCountDownInterval();
-      var show = this[MODEL_PROP_NAME]; // Ignore if `show` transitions to a boolean value
+      var show = this[MODEL_PROP_NAME$j]; // Ignore if `show` transitions to a boolean value
 
-      if (isNumeric(show)) {
+      if (isNumeric$1(show)) {
         this.$emit(EVENT_NAME_DISMISS_COUNT_DOWN, newValue); // Update the v-model if needed
 
         if (show !== newValue) {
-          this.$emit(MODEL_EVENT_NAME, newValue);
+          this.$emit(MODEL_EVENT_NAME$j, newValue);
         }
 
         if (newValue > 0) {
@@ -2272,22 +2270,22 @@
           });
         }
       }
-    }), _defineProperty(_watch, "localShow", function localShow(newValue) {
-      var show = this[MODEL_PROP_NAME]; // Only emit dismissed events for dismissible or auto-dismissing alerts
+    }), _defineProperty(_watch$k, "localShow", function localShow(newValue) {
+      var show = this[MODEL_PROP_NAME$j]; // Only emit dismissed events for dismissible or auto-dismissing alerts
 
-      if (!newValue && (this.dismissible || isNumeric(show))) {
+      if (!newValue && (this.dismissible || isNumeric$1(show))) {
         this.$emit(EVENT_NAME_DISMISSED);
       } // Only emit booleans if we weren't passed a number via v-model
 
 
-      if (!isNumeric(show) && show !== newValue) {
-        this.$emit(MODEL_EVENT_NAME, newValue);
+      if (!isNumeric$1(show) && show !== newValue) {
+        this.$emit(MODEL_EVENT_NAME$j, newValue);
       }
-    }), _watch),
+    }), _watch$k),
     created: function created() {
       // Create private non-reactive props
       this.$_filterTimer = null;
-      var show = this[MODEL_PROP_NAME];
+      var show = this[MODEL_PROP_NAME$j];
       this.countDown = parseCountDown(show);
       this.localShow = parseShow(show);
     },
@@ -2362,9 +2360,9 @@
   var mathPow = Math.pow;
   var mathRound = Math.round;
 
-  var CLASS_NAME = 'b-aspect'; // --- Props ---
+  var CLASS_NAME$3 = 'b-aspect'; // --- Props ---
 
-  var props$3 = makePropsConfigurable({
+  var props$2i = makePropsConfigurable({
     // Accepts a number (i.e. `16 / 9`, `1`, `4 / 3`)
     // Or a string (i.e. '16/9', '16:9', '4:3' '1:1')
     aspect: makeProp(PROP_TYPE_NUMBER_STRING, '1:1'),
@@ -2375,7 +2373,7 @@
   var BAspect = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_ASPECT,
     mixins: [normalizeSlotMixin],
-    props: props$3,
+    props: props$2i,
     computed: {
       padding: function padding() {
         var aspect = this.aspect;
@@ -2401,20 +2399,20 @@
     },
     render: function render(h) {
       var $sizer = h('div', {
-        staticClass: "".concat(CLASS_NAME, "-sizer flex-grow-1"),
+        staticClass: "".concat(CLASS_NAME$3, "-sizer flex-grow-1"),
         style: {
           paddingBottom: this.padding,
           height: 0
         }
       });
       var $content = h('div', {
-        staticClass: "".concat(CLASS_NAME, "-content flex-grow-1 w-100 mw-100"),
+        staticClass: "".concat(CLASS_NAME$3, "-content flex-grow-1 w-100 mw-100"),
         style: {
           marginLeft: '-100%'
         }
       }, this.normalizeSlot());
       return h(this.tag, {
-        staticClass: "".concat(CLASS_NAME, " d-flex")
+        staticClass: "".concat(CLASS_NAME$3, " d-flex")
       }, [$sizer, $content]);
     }
   });
@@ -2435,7 +2433,7 @@
 
 
   var encode = function encode(str) {
-    return encodeURIComponent(toString$1(str)).replace(RX_ENCODE_REVERSE, encodeReserveReplacer).replace(RX_ENCODED_COMMA, ',');
+    return encodeURIComponent(toString(str)).replace(RX_ENCODE_REVERSE, encodeReserveReplacer).replace(RX_ENCODED_COMMA, ',');
   };
 
   var decode = decodeURIComponent; // Stringifies an object of query parameters
@@ -2477,7 +2475,7 @@
   };
   var parseQuery = function parseQuery(query) {
     var parsed = {};
-    query = toString$1(query).trim().replace(RX_QUERY_START, '');
+    query = toString(query).trim().replace(RX_QUERY_START, '');
 
     if (!query) {
       return parsed;
@@ -2498,7 +2496,7 @@
     });
     return parsed;
   };
-  var isLink = function isLink(props) {
+  var isLink$1 = function isLink(props) {
     return !!(props.href || props.to);
   };
   var isRouterLink = function isRouterLink(tag) {
@@ -2559,9 +2557,9 @@
 
 
     if (isPlainObject(to) && (to.path || to.query || to.hash)) {
-      var path = toString$1(to.path);
+      var path = toString(to.path);
       var query = stringifyQueryObj(to.query);
-      var hash = toString$1(to.hash);
+      var hash = toString(to.hash);
       hash = !hash || hash.charAt(0) === '#' ? hash : "#".concat(hash);
       return "".concat(path).concat(query).concat(hash) || toFallback;
     } // If nothing is provided return the fallback
@@ -2589,7 +2587,7 @@
     'aria-label': null
   }; // --- Props ---
 
-  var props$4 = {
+  var props$2h = {
     animation: makeProp(PROP_TYPE_STRING),
     content: makeProp(PROP_TYPE_STRING),
     flipH: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -2609,7 +2607,7 @@
   var BVIconBase = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_ICON_BASE,
     functional: true,
-    props: props$4,
+    props: props$2h,
     render: function render(h, _ref) {
       var _class;
 
@@ -2684,6 +2682,7 @@
     }
   });
 
+  var iconProps$1 = omit(props$2h, ['content']);
   /**
    * Icon component generator function
    *
@@ -2703,7 +2702,7 @@
     return /*#__PURE__*/Vue__default['default'].extend({
       name: iconName,
       functional: true,
-      props: omit(props$4, ['content']),
+      props: iconProps$1,
       render: function render(h, _ref) {
         var data = _ref.data,
             props = _ref.props;
@@ -2719,7 +2718,7 @@
         data, // Required data
         {
           staticClass: iconNameClass,
-          props: _objectSpread2(_objectSpread2({}, props), {}, {
+          props: _objectSpread2$3(_objectSpread2$3({}, props), {}, {
             content: svgContent
           })
         }));
@@ -2742,25 +2741,25 @@
   var BIconDash=/*#__PURE__*/makeIcon('Dash','<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>');// eslint-disable-next-line
   var BIconPersonFill=/*#__PURE__*/makeIcon('PersonFill','<path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>');// eslint-disable-next-line
   var BIconPlus=/*#__PURE__*/makeIcon('Plus','<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>');// eslint-disable-next-line
-  var BIconStar=/*#__PURE__*/makeIcon('Star','<path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>');// eslint-disable-next-line
-  var BIconStarFill=/*#__PURE__*/makeIcon('StarFill','<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>');// eslint-disable-next-line
-  var BIconStarHalf=/*#__PURE__*/makeIcon('StarHalf','<path d="M5.354 5.119L7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.55.55 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.519.519 0 0 1-.146.05c-.341.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.171-.403.59.59 0 0 1 .084-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027c.08 0 .16.018.232.056l3.686 1.894-.694-3.957a.564.564 0 0 1 .163-.505l2.906-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.002 2.223 8 2.226v9.8z"/>');// eslint-disable-next-line
+  var BIconStar=/*#__PURE__*/makeIcon('Star','<path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>');// eslint-disable-next-line
+  var BIconStarFill=/*#__PURE__*/makeIcon('StarFill','<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>');// eslint-disable-next-line
+  var BIconStarHalf=/*#__PURE__*/makeIcon('StarHalf','<path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.505l2.907-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.001 2.223 8 2.226v9.8z"/>');// eslint-disable-next-line
   var BIconX=/*#__PURE__*/makeIcon('X','<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>');// eslint-disable-next-line
   // --- END AUTO-GENERATED FILE ---
 
   var findIconComponent = function findIconComponent(ctx, iconName) {
     if (!ctx) {
-      return null;
+      return Vue__default['default'].component(iconName);
     }
 
     var components = (ctx.$options || {}).components;
-    var iconComponent = components[iconName];
+    var iconComponent = components && components[iconName];
     return iconComponent || findIconComponent(ctx.$parent, iconName);
   }; // --- Props ---
 
 
-  var iconProps = omit(props$4, ['content']);
-  var props$5 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, iconProps), {}, {
+  var iconProps = omit(props$2h, ['content']);
+  var props$2g = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, iconProps), {}, {
     icon: makeProp(PROP_TYPE_STRING)
   })), NAME_ICON); // --- Main component ---
   // Helper BIcon component
@@ -2770,7 +2769,7 @@
   var BIcon = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_ICON,
     functional: true,
-    props: props$5,
+    props: props$2g,
     render: function render(h, _ref) {
       var data = _ref.data,
           props = _ref.props,
@@ -2908,41 +2907,74 @@
 
   var attrsMixin = makePropCacheMixin('$attrs', 'bvAttrs');
 
+  var PROP$3 = '$_rootListeners'; // --- Mixin ---
+  // @vue/component
+
   var listenOnRootMixin = Vue__default['default'].extend({
+    created: function created() {
+      // Define non-reactive property
+      // Object of arrays, keyed by event name,
+      // where value is an array of callbacks
+      this[PROP$3] = {};
+    },
+    beforeDestroy: function beforeDestroy() {
+      var _this = this;
+
+      // Unregister all registered listeners
+      keys(this[PROP$3] || {}).forEach(function (event) {
+        _this[PROP$3][event].forEach(function (callback) {
+          _this.listenOffRoot(event, callback);
+        });
+      });
+      this[PROP$3] = null;
+    },
     methods: {
+      registerRootListener: function registerRootListener(event, callback) {
+        if (this[PROP$3]) {
+          this[PROP$3][event] = this[PROP$3][event] || [];
+
+          if (!arrayIncludes(this[PROP$3][event], callback)) {
+            this[PROP$3][event].push(callback);
+          }
+        }
+      },
+      unregisterRootListener: function unregisterRootListener(event, callback) {
+        if (this[PROP$3] && this[PROP$3][event]) {
+          this[PROP$3][event] = this[PROP$3][event].filter(function (cb) {
+            return cb !== callback;
+          });
+        }
+      },
+
       /**
        * Safely register event listeners on the root Vue node
        * While Vue automatically removes listeners for individual components,
-       * when a component registers a listener on root and is destroyed,
-       * this orphans a callback because the node is gone,
-       * but the root does not clear the callback
+       * when a component registers a listener on `$root` and is destroyed,
+       * this orphans a callback because the node is gone, but the `$root`
+       * does not clear the callback
        *
-       * When registering a `$root` listener, it also registers a listener on
-       * the component's `beforeDestroy()` hook to automatically remove the
-       * event listener from the `$root` instance
+       * When registering a `$root` listener, it also registers the listener
+       * to be removed in the component's `beforeDestroy()` hook
        *
        * @param {string} event
        * @param {function} callback
        */
       listenOnRoot: function listenOnRoot(event, callback) {
-        var _this = this;
-
-        this.$root.$on(event, callback);
-        this.$on(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
-          _this.$root.$off(event, callback);
-        });
+        if (this.$root) {
+          this.$root.$on(event, callback);
+          this.registerRootListener(event, callback);
+        }
       },
 
       /**
        * Safely register a `$once()` event listener on the root Vue node
        * While Vue automatically removes listeners for individual components,
-       * when a component registers a listener on root and is destroyed,
-       * this orphans a callback because the node is gone,
-       * but the root does not clear the callback
+       * when a component registers a listener on `$root` and is destroyed,
+       * this orphans a callback because the node is gone, but the `$root`
+       * does not clear the callback
        *
-       * When registering a $root listener, it also registers a listener on
-       * the component's `beforeDestroy` hook to automatically remove the
-       * event listener from the $root instance.
+       * When registering a `$root` listener, it also registers the listener
+       * to be removed in the component's `beforeDestroy()` hook
        *
        * @param {string} event
        * @param {function} callback
@@ -2950,26 +2982,49 @@
       listenOnRootOnce: function listenOnRootOnce(event, callback) {
         var _this2 = this;
 
-        this.$root.$once(event, callback);
-        this.$on(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
-          _this2.$root.$off(event, callback);
-        });
+        if (this.$root) {
+          var _callback = function _callback() {
+            _this2.unregisterRootListener(_callback); // eslint-disable-next-line node/no-callback-literal
+
+
+            callback.apply(void 0, arguments);
+          };
+
+          this.$root.$once(event, _callback);
+          this.registerRootListener(event, _callback);
+        }
       },
 
       /**
-       * Convenience method for calling `vm.$emit()` on `vm.$root`
+       * Safely unregister event listeners from the root Vue node
+       *
+       * @param {string} event
+       * @param {function} callback
+       */
+      listenOffRoot: function listenOffRoot(event, callback) {
+        this.unregisterRootListener(event, callback);
+
+        if (this.$root) {
+          this.$root.$off(event, callback);
+        }
+      },
+
+      /**
+       * Convenience method for calling `vm.$emit()` on `$root`
        *
        * @param {string} event
        * @param {*} args
        */
       emitOnRoot: function emitOnRoot(event) {
-        var _this$$root;
+        if (this.$root) {
+          var _this$$root;
 
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
+          for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+          }
+
+          (_this$$root = this.$root).$emit.apply(_this$$root, [event].concat(args));
         }
-
-        (_this$$root = this.$root).$emit.apply(_this$$root, [event].concat(args));
       }
     }
   });
@@ -2982,11 +3037,13 @@
   var routerLinkProps = {
     activeClass: makeProp(PROP_TYPE_STRING),
     append: makeProp(PROP_TYPE_BOOLEAN, false),
-    event: makeProp(PROP_TYPE_ARRAY_STRING, EVENT_NAME_CLICK),
+    event: makeProp(PROP_TYPE_ARRAY_STRING),
     exact: makeProp(PROP_TYPE_BOOLEAN, false),
     exactActiveClass: makeProp(PROP_TYPE_STRING),
+    exactPath: makeProp(PROP_TYPE_BOOLEAN, false),
+    exactPathActiveClass: makeProp(PROP_TYPE_STRING),
     replace: makeProp(PROP_TYPE_BOOLEAN, false),
-    routerTag: makeProp(PROP_TYPE_STRING, 'a'),
+    routerTag: makeProp(PROP_TYPE_STRING),
     to: makeProp(PROP_TYPE_OBJECT_STRING)
   }; // `<nuxt-link>` specific props
 
@@ -3001,7 +3058,7 @@
     prefetch: makeProp(PROP_TYPE_BOOLEAN, null)
   }; // All `<b-link>` props
 
-  var props$6 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, nuxtLinkProps), routerLinkProps), {}, {
+  var props$2f = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, nuxtLinkProps), routerLinkProps), {}, {
     active: makeProp(PROP_TYPE_BOOLEAN, false),
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
     href: makeProp(PROP_TYPE_STRING),
@@ -3021,7 +3078,7 @@
     // Mixin order is important!
     mixins: [attrsMixin, listenersMixin, listenOnRootMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    props: props$6,
+    props: props$2f,
     computed: {
       computedTag: function computedTag() {
         // We don't pass `this` as the first arg as we need reactivity of the props
@@ -3056,13 +3113,16 @@
         }, this.computedTag);
       },
       computedProps: function computedProps() {
-        var prefetch = this.prefetch;
-        return this.isRouterLink ? _objectSpread2(_objectSpread2({}, pluckProps(_objectSpread2(_objectSpread2({}, routerLinkProps), nuxtLinkProps), this)), {}, {
-          // Coerce `prefetch` value `null` to be `undefined`
-          prefetch: isBoolean(prefetch) ? prefetch : undefined,
-          // Pass `router-tag` as `tag` prop
-          tag: this.routerTag
-        }) : {};
+        var event = this.event,
+            prefetch = this.prefetch,
+            routerTag = this.routerTag;
+        return this.isRouterLink ? _objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, pluckProps(omit(_objectSpread2$3(_objectSpread2$3({}, routerLinkProps), nuxtLinkProps), ['event', 'prefetch', 'routerTag']), this)), event ? {
+          event: event
+        } : {}), isBoolean(prefetch) ? {
+          prefetch: prefetch
+        } : {}), routerTag ? {
+          tag: routerTag
+        } : {}) : {};
       },
       computedAttrs: function computedAttrs() {
         var bvAttrs = this.bvAttrs,
@@ -3072,9 +3132,9 @@
             target = this.target,
             routerTag = this.routerTag,
             isRouterLink = this.isRouterLink;
-        return _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, bvAttrs), href ? {
+        return _objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, bvAttrs), href ? {
           href: href
-        } : {}), isRouterLink && !isTag(routerTag, 'a') ? {} : {
+        } : {}), isRouterLink && routerTag && !isTag(routerTag, 'a') ? {} : {
           rel: rel,
           target: target
         }), {}, {
@@ -3083,7 +3143,7 @@
         });
       },
       computedListeners: function computedListeners() {
-        return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvListeners), {}, {
           // We want to overwrite any click handler since our callback
           // will invoke the user supplied handler(s) if `!this.disabled`
           click: this.onClick
@@ -3105,18 +3165,19 @@
             immediatePropagation: true
           });
         } else {
+          // Router links do not emit instance `click` events, so we
+          // add in an `$emit('click', event)` on its Vue instance
+
           /* istanbul ignore next: difficult to test, but we know it works */
           if (isRouterLink && event.currentTarget.__vue__) {
-            // Router links do not emit instance `click` events, so we
-            // add in an `$emit('click', event)` on its Vue instance
             event.currentTarget.__vue__.$emit(EVENT_NAME_CLICK, event);
           } // Call the suppliedHandler(s), if any provided
 
 
           concat(suppliedHandler).filter(function (h) {
-            return isFunction(h);
+            return isFunction$1(h);
           }).forEach(function (handler) {
-            handler.apply(void 0, _toConsumableArray(_arguments));
+            handler.apply(void 0, _toConsumableArray$1(_arguments));
           }); // Emit the global `$root` click event
 
           this.emitOnRoot(ROOT_EVENT_NAME_CLICKED, event); // TODO: Remove deprecated 'clicked::link' event with next major release
@@ -3153,10 +3214,10 @@
     }
   });
 
-  var linkProps = omit(props$6, ['event', 'routerTag']);
-  delete linkProps.href.default;
-  delete linkProps.to.default;
-  var props$7 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps), {}, {
+  var linkProps$7 = omit(props$2f, ['event', 'routerTag']);
+  delete linkProps$7.href.default;
+  delete linkProps$7.to.default;
+  var props$2e = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, linkProps$7), {}, {
     block: makeProp(PROP_TYPE_BOOLEAN, false),
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
     pill: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -3182,8 +3243,8 @@
   // If tag prop is set to `a`, we use a <b-link> to get proper disabled handling
 
 
-  var isLink$1 = function isLink$1(props) {
-    return isLink(props) || isTag(props.tag, 'a');
+  var isLink = function isLink(props) {
+    return isLink$1(props) || isTag(props.tag, 'a');
   }; // Is the button to be a toggle button?
 
 
@@ -3193,12 +3254,12 @@
 
 
   var isButton = function isButton(props) {
-    return !(isLink$1(props) || props.tag && !isTag(props.tag, 'button'));
+    return !(isLink(props) || props.tag && !isTag(props.tag, 'button'));
   }; // Is the requested tag not a button or link?
 
 
-  var isNonStandardTag = function isNonStandardTag(props) {
-    return !isLink$1(props) && !isButton(props);
+  var isNonStandardTag$1 = function isNonStandardTag(props) {
+    return !isLink(props) && !isButton(props);
   }; // Compute required classes (non static classes)
 
 
@@ -3210,15 +3271,15 @@
 
 
   var computeLinkProps = function computeLinkProps(props) {
-    return isLink$1(props) ? pluckProps(linkProps, props) : {};
+    return isLink(props) ? pluckProps(linkProps$7, props) : {};
   }; // Compute the attributes for a button
 
 
   var computeAttrs = function computeAttrs(props, data) {
     var button = isButton(props);
-    var link = isLink$1(props);
+    var link = isLink(props);
     var toggle = isToggle(props);
-    var nonStandardTag = isNonStandardTag(props);
+    var nonStandardTag = isNonStandardTag$1(props);
     var hashLink = link && props.href === '#';
     var role = data.attrs && data.attrs.role ? data.attrs.role : null;
     var tabindex = data.attrs ? data.attrs.tabindex : null;
@@ -3256,15 +3317,15 @@
   var BButton = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BUTTON,
     functional: true,
-    props: props$7,
+    props: props$2e,
     render: function render(h, _ref2) {
       var props = _ref2.props,
           data = _ref2.data,
           listeners = _ref2.listeners,
           children = _ref2.children;
       var toggle = isToggle(props);
-      var link = isLink$1(props);
-      var nonStandardTag = isNonStandardTag(props);
+      var link = isLink(props);
+      var nonStandardTag = isNonStandardTag$1(props);
       var hashLink = link && props.href === '#';
       var on = {
         keydown: function keydown(event) {
@@ -3295,7 +3356,7 @@
             // `concat()` will normalize the value to an array without
             // double wrapping an array value in an array
             concat(listeners['update:pressed']).forEach(function (fn) {
-              if (isFunction(fn)) {
+              if (isFunction$1(fn)) {
                 fn(!props.pressed);
               }
             });
@@ -3319,20 +3380,20 @@
     }
   });
 
-  var CLASS_NAME$1 = 'b-avatar';
+  var CLASS_NAME$2 = 'b-avatar';
   var SIZES = ['sm', null, 'lg'];
   var FONT_SIZE_SCALE = 0.4;
   var BADGE_FONT_SIZE_SCALE = FONT_SIZE_SCALE * 0.7; // --- Helper methods ---
 
   var computeSize = function computeSize(value) {
     // Parse to number when value is a float-like string
-    value = isString(value) && isNumeric(value) ? toFloat(value, 0) : value; // Convert all numbers to pixel values
+    value = isString(value) && isNumeric$1(value) ? toFloat(value, 0) : value; // Convert all numbers to pixel values
 
     return isNumber(value) ? "".concat(value, "px") : value || null;
   }; // --- Props ---
 
-  var linkProps$1 = omit(props$6, ['active', 'event', 'routerTag']);
-  var props$8 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$1), {}, {
+  var linkProps$6 = omit(props$2f, ['active', 'event', 'routerTag']);
+  var props$2d = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, linkProps$6), {}, {
     alt: makeProp(PROP_TYPE_STRING, 'avatar'),
     ariaLabel: makeProp(PROP_TYPE_STRING),
     badge: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
@@ -3360,7 +3421,7 @@
         default: null
       }
     },
-    props: props$8,
+    props: props$2d,
     data: function data() {
       return {
         localSrc: this.src || null
@@ -3447,7 +3508,7 @@
           badge = this.badge,
           badgeVariant = this.badgeVariant,
           badgeStyle = this.badgeStyle;
-      var link = !button && isLink(this);
+      var link = !button && isLink$1(this);
       var tag = button ? BButton : link ? BLink : 'span';
       var alt = this.alt;
       var ariaLabel = this.ariaLabel || null;
@@ -3513,9 +3574,9 @@
       }
 
       var componentData = {
-        staticClass: CLASS_NAME$1,
-        class: (_class2 = {}, _defineProperty(_class2, "".concat(CLASS_NAME$1, "-").concat(size), size && SIZES.indexOf(size) !== -1), _defineProperty(_class2, "badge-".concat(variant), !button && variant), _defineProperty(_class2, "rounded", rounded === true), _defineProperty(_class2, "rounded-".concat(rounded), rounded && rounded !== true), _defineProperty(_class2, "disabled", disabled), _class2),
-        style: _objectSpread2(_objectSpread2({}, marginStyle), {}, {
+        staticClass: CLASS_NAME$2,
+        class: (_class2 = {}, _defineProperty(_class2, "".concat(CLASS_NAME$2, "-").concat(size), size && SIZES.indexOf(size) !== -1), _defineProperty(_class2, "badge-".concat(variant), !button && variant), _defineProperty(_class2, "rounded", rounded === true), _defineProperty(_class2, "rounded-".concat(rounded), rounded && rounded !== true), _defineProperty(_class2, "disabled", disabled), _class2),
+        style: _objectSpread2$3(_objectSpread2$3({}, marginStyle), {}, {
           width: size,
           height: size
         }),
@@ -3526,7 +3587,7 @@
           variant: variant,
           disabled: disabled,
           type: type
-        } : link ? pluckProps(linkProps$1, this) : {},
+        } : link ? pluckProps(linkProps$6, this) : {},
         on: button || link ? {
           click: this.onClick
         } : {}
@@ -3535,7 +3596,7 @@
     }
   });
 
-  var props$9 = makePropsConfigurable({
+  var props$2c = makePropsConfigurable({
     overlap: makeProp(PROP_TYPE_NUMBER_STRING, 0.3),
     // Child avatars will prefer this prop (if set) over their own
     rounded: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
@@ -3557,7 +3618,7 @@
         bvAvatarGroup: this
       };
     },
-    props: props$9,
+    props: props$2c,
     computed: {
       computedSize: function computedSize() {
         return computeSize(this.size);
@@ -3595,10 +3656,10 @@
     }
   });
 
-  var linkProps$2 = omit(props$6, ['event', 'routerTag']);
-  delete linkProps$2.href.default;
-  delete linkProps$2.to.default;
-  var props$a = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$2), {}, {
+  var linkProps$5 = omit(props$2f, ['event', 'routerTag']);
+  delete linkProps$5.href.default;
+  delete linkProps$5.to.default;
+  var props$2b = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, linkProps$5), {}, {
     pill: makeProp(PROP_TYPE_BOOLEAN, false),
     tag: makeProp(PROP_TYPE_STRING, 'span'),
     variant: makeProp(PROP_TYPE_STRING, 'secondary')
@@ -3608,14 +3669,14 @@
   var BBadge = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BADGE,
     functional: true,
-    props: props$a,
+    props: props$2b,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
       var active = props.active,
           disabled = props.disabled;
-      var link = isLink(props);
+      var link = isLink$1(props);
       var tag = link ? BLink : props.tag;
       var variant = props.variant || 'secondary';
       return h(tag, a(data, {
@@ -3625,7 +3686,7 @@
           active: active,
           disabled: disabled
         }],
-        props: link ? pluckProps(linkProps$2, props) : {}
+        props: link ? pluckProps(linkProps$5, props) : {}
       }), children);
     }
   });
@@ -3649,7 +3710,7 @@
     } : {};
   };
 
-  var props$b = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, omit(props$6, ['event', 'routerTag'])), {}, {
+  var props$2a = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, omit(props$2f, ['event', 'routerTag'])), {}, {
     ariaCurrent: makeProp(PROP_TYPE_STRING, 'location'),
     html: makeProp(PROP_TYPE_STRING),
     text: makeProp(PROP_TYPE_STRING)
@@ -3659,7 +3720,7 @@
   var BBreadcrumbLink = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BREADCRUMB_LINK,
     functional: true,
-    props: props$b,
+    props: props$2a,
     render: function render(h, _ref) {
       var suppliedProps = _ref.props,
           data = _ref.data,
@@ -3670,7 +3731,7 @@
         attrs: {
           'aria-current': active ? suppliedProps.ariaCurrent : null
         },
-        props: pluckProps(props$b, suppliedProps)
+        props: pluckProps(props$2a, suppliedProps)
       };
 
       if (!children) {
@@ -3681,13 +3742,13 @@
     }
   });
 
-  var props$c = makePropsConfigurable(props$b, NAME_BREADCRUMB_ITEM); // --- Main component ---
+  var props$29 = makePropsConfigurable(props$2a, NAME_BREADCRUMB_ITEM); // --- Main component ---
   // @vue/component
 
   var BBreadcrumbItem = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BREADCRUMB_ITEM,
     functional: true,
-    props: props$c,
+    props: props$29,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -3703,7 +3764,7 @@
     }
   });
 
-  var props$d = makePropsConfigurable({
+  var props$28 = makePropsConfigurable({
     items: makeProp(PROP_TYPE_ARRAY)
   }, NAME_BREADCRUMB); // --- Main component ---
   // @vue/component
@@ -3711,7 +3772,7 @@
   var BBreadcrumb = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BREADCRUMB,
     functional: true,
-    props: props$d,
+    props: props$28,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -3725,7 +3786,7 @@
         childNodes = items.map(function (item, idx) {
           if (!isObject(item)) {
             item = {
-              text: toString$1(item)
+              text: toString(item)
             };
           } // Copy the value here so we can normalize it
 
@@ -3743,7 +3804,7 @@
           }
 
           return h(BBreadcrumbItem, {
-            props: _objectSpread2(_objectSpread2({}, item), {}, {
+            props: _objectSpread2$3(_objectSpread2$3({}, item), {}, {
               active: active
             })
           });
@@ -3773,7 +3834,7 @@
     }
   });
 
-  var props$e = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, pick(props$7, ['size'])), {}, {
+  var props$27 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, pick$1(props$2e, ['size'])), {}, {
     ariaRole: makeProp(PROP_TYPE_STRING, 'group'),
     size: makeProp(PROP_TYPE_STRING),
     tag: makeProp(PROP_TYPE_STRING, 'div'),
@@ -3784,7 +3845,7 @@
   var BButtonGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BUTTON_GROUP,
     functional: true,
-    props: props$e,
+    props: props$27,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -3810,7 +3871,7 @@
 
   var ITEM_SELECTOR = ['.btn:not(.disabled):not([disabled]):not(.dropdown-item)', '.form-control:not(.disabled):not([disabled])', 'select:not(.disabled):not([disabled])', 'input[type="checkbox"]:not(.disabled)', 'input[type="radio"]:not(.disabled)'].join(','); // --- Props ---
 
-  var props$f = makePropsConfigurable({
+  var props$26 = makePropsConfigurable({
     justify: makeProp(PROP_TYPE_BOOLEAN, false),
     keyNav: makeProp(PROP_TYPE_BOOLEAN, false)
   }, NAME_BUTTON_TOOLBAR); // --- Main component ---
@@ -3819,7 +3880,7 @@
   var BButtonToolbar = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_BUTTON_TOOLBAR,
     mixins: [normalizeSlotMixin],
-    props: props$f,
+    props: props$26,
     mounted: function mounted() {
       // Pre-set the tabindexes if the markup does not include
       // `tabindex="-1"` on the toolbar items
@@ -4060,7 +4121,7 @@
 
   var isLocaleRTL = function isLocaleRTL(locale) {
     // Determines if the locale is RTL (only single locale supported)
-    var parts = toString$1(locale).toLowerCase().replace(RX_STRIP_LOCALE_MODS, '').split('-');
+    var parts = toString(locale).toLowerCase().replace(RX_STRIP_LOCALE_MODS, '').split('-');
     var locale1 = parts.slice(0, 2).join('-');
     var locale2 = parts[0];
     return arrayIncludes(RTL_LANGS, locale1) || arrayIncludes(RTL_LANGS, locale2);
@@ -4068,13 +4129,13 @@
 
   // SSR safe client-side ID attribute generation
 
-  var props$g = {
+  var props$25 = {
     id: makeProp(PROP_TYPE_STRING)
   }; // --- Mixin ---
   // @vue/component
 
   var idMixin = Vue__default['default'].extend({
-    props: props$g,
+    props: props$25,
     data: function data() {
       return {
         localId_: null
@@ -4112,18 +4173,18 @@
     }
   });
 
-  var _watch$1;
+  var _watch$j;
 
-  var _makeModelMixin$1 = makeModelMixin('value', {
+  var _makeModelMixin$j = makeModelMixin('value', {
     type: PROP_TYPE_DATE_STRING
   }),
-      modelMixin$1 = _makeModelMixin$1.mixin,
-      modelProps$1 = _makeModelMixin$1.props,
-      MODEL_PROP_NAME$1 = _makeModelMixin$1.prop,
-      MODEL_EVENT_NAME$1 = _makeModelMixin$1.event; // --- Props ---
+      modelMixin$i = _makeModelMixin$j.mixin,
+      modelProps$i = _makeModelMixin$j.props,
+      MODEL_PROP_NAME$i = _makeModelMixin$j.prop,
+      MODEL_EVENT_NAME$i = _makeModelMixin$j.event; // --- Props ---
 
 
-  var props$h = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$1), {}, {
+  var props$24 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$i), {}, {
     ariaControls: makeProp(PROP_TYPE_STRING),
     // Makes calendar the full width of its parent container
     block: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -4144,6 +4205,7 @@
     // 'ltr', 'rtl', or `null` (for auto detect)
     direction: makeProp(PROP_TYPE_STRING),
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    headerTag: makeProp(PROP_TYPE_STRING, 'header'),
     // When `true`, renders a comment node, but keeps the component instance active
     // Mainly for <b-form-date>, so that we can get the component's value and locale
     // But we might just use separate date formatters, using the resolved locale
@@ -4208,10 +4270,10 @@
   var BCalendar = Vue__default['default'].extend({
     name: NAME_CALENDAR,
     // Mixin order is important!
-    mixins: [attrsMixin, idMixin, modelMixin$1, normalizeSlotMixin],
-    props: props$h,
+    mixins: [attrsMixin, idMixin, modelMixin$i, normalizeSlotMixin],
+    props: props$24,
     data: function data() {
-      var selected = formatYMD(this[MODEL_PROP_NAME$1]) || '';
+      var selected = formatYMD(this[MODEL_PROP_NAME$i]) || '';
       return {
         // Selected date
         selectedYMD: selected,
@@ -4332,7 +4394,7 @@
       },
       isRTL: function isRTL() {
         // `true` if the language requested is RTL
-        var dir = toString$1(this.direction).toLowerCase();
+        var dir = toString(this.direction).toLowerCase();
 
         if (dir === 'rtl') {
           /* istanbul ignore next */
@@ -4400,7 +4462,7 @@
       // Computed props that return date formatter functions
       formatDateString: function formatDateString() {
         // Returns a date formatter function
-        return createDateFormatter(this.calendarLocale, _objectSpread2(_objectSpread2({
+        return createDateFormatter(this.calendarLocale, _objectSpread2$3(_objectSpread2$3({
           // Ensure we have year, month, day shown for screen readers/ARIA
           // If users really want to leave one of these out, they can
           // pass `undefined` for the property value
@@ -4515,7 +4577,7 @@
             /* istanbul ignore next */
             {
               class: dateInfo
-            } : isPlainObject(dateInfo) ? _objectSpread2({
+            } : isPlainObject(dateInfo) ? _objectSpread2$3({
               class: ''
             }, dateInfo) :
             /* istanbul ignore next */
@@ -4549,7 +4611,7 @@
         });
       }
     },
-    watch: (_watch$1 = {}, _defineProperty(_watch$1, MODEL_PROP_NAME$1, function (newValue, oldValue) {
+    watch: (_watch$j = {}, _defineProperty(_watch$j, MODEL_PROP_NAME$i, function (newValue, oldValue) {
       var selected = formatYMD(newValue) || '';
       var old = formatYMD(oldValue) || '';
 
@@ -4557,23 +4619,23 @@
         this.activeYMD = selected || this.activeYMD;
         this.selectedYMD = selected;
       }
-    }), _defineProperty(_watch$1, "selectedYMD", function selectedYMD(newYMD, oldYMD) {
+    }), _defineProperty(_watch$j, "selectedYMD", function selectedYMD(newYMD, oldYMD) {
       // TODO:
       //   Should we compare to `formatYMD(this.value)` and emit
       //   only if they are different?
       if (newYMD !== oldYMD) {
-        this.$emit(MODEL_EVENT_NAME$1, this.valueAsDate ? parseYMD(newYMD) || null : newYMD || '');
+        this.$emit(MODEL_EVENT_NAME$i, this.valueAsDate ? parseYMD(newYMD) || null : newYMD || '');
       }
-    }), _defineProperty(_watch$1, "context", function context(newValue, oldValue) {
+    }), _defineProperty(_watch$j, "context", function context(newValue, oldValue) {
       if (!looseEqual(newValue, oldValue)) {
         this.$emit(EVENT_NAME_CONTEXT, newValue);
       }
-    }), _defineProperty(_watch$1, "hidden", function hidden(newValue) {
+    }), _defineProperty(_watch$j, "hidden", function hidden(newValue) {
       // Reset the active focused day when hidden
-      this.activeYMD = this.selectedYMD || formatYMD(this[MODEL_PROP_NAME$1] || this.constrainDate(this.initialDate || this.getToday())); // Enable/disable the live regions
+      this.activeYMD = this.selectedYMD || formatYMD(this[MODEL_PROP_NAME$i] || this.constrainDate(this.initialDate || this.getToday())); // Enable/disable the live regions
 
       this.setLive(!newValue);
-    }), _watch$1),
+    }), _watch$j),
     created: function created() {
       var _this3 = this;
 
@@ -4826,7 +4888,7 @@
           tabindex: disabled ? null : '-1',
           // Mainly for testing purposes, as we do not know
           // the exact format `Intl` will format the date string
-          'data-selected': toString$1(selectedYMD),
+          'data-selected': toString(selectedYMD),
           // We wait until after mount to enable `aria-live`
           // to prevent initial announcement on page render
           'aria-live': isLive ? 'polite' : 'off',
@@ -4842,9 +4904,9 @@
       // Although IE 11 does not deal with <BDI> at all (equivalent to a span)
       h('bdi', {
         staticClass: 'sr-only'
-      }, " (".concat(toString$1(this.labelSelected), ") ")), h('bdi', this.formatDateString(this.selectedDate))] : this.labelNoDateSelected || "\xA0" // '&nbsp;'
+      }, " (".concat(toString(this.labelSelected), ") ")), h('bdi', this.formatDateString(this.selectedDate))] : this.labelNoDateSelected || "\xA0" // '&nbsp;'
       );
-      $header = h('header', {
+      $header = h(this.headerTag, {
         staticClass: 'b-calendar-header',
         class: {
           'sr-only': this.hideHeader
@@ -4861,11 +4923,11 @@
         shiftV: 0.5
       };
 
-      var navPrevProps = _objectSpread2(_objectSpread2({}, navProps), {}, {
+      var navPrevProps = _objectSpread2$3(_objectSpread2$3({}, navProps), {}, {
         flipH: isRTL
       });
 
-      var navNextProps = _objectSpread2(_objectSpread2({}, navProps), {}, {
+      var navNextProps = _objectSpread2$3(_objectSpread2$3({}, navProps), {}, {
         flipH: !isRTL
       });
 
@@ -4928,7 +4990,7 @@
         }
       }, [hideDecadeNav ? h() : makeNavBtn($prevDecadeIcon, this.labelPrevDecade, this.gotoPrevDecade, this.prevDecadeDisabled, 'Ctrl+Alt+PageDown'), makeNavBtn($prevYearIcon, this.labelPrevYear, this.gotoPrevYear, this.prevYearDisabled, 'Alt+PageDown'), makeNavBtn($prevMonthIcon, this.labelPrevMonth, this.gotoPrevMonth, this.prevMonthDisabled, 'PageDown'), makeNavBtn($thisMonthIcon, this.labelCurrentMonth, this.gotoCurrentMonth, this.thisMonthDisabled, 'Home'), makeNavBtn($nextMonthIcon, this.labelNextMonth, this.gotoNextMonth, this.nextMonthDisabled, 'PageUp'), makeNavBtn($nextYearIcon, this.labelNextYear, this.gotoNextYear, this.nextYearDisabled, 'Alt+PageUp'), hideDecadeNav ? h() : makeNavBtn($nextDecadeIcon, this.labelNextDecade, this.gotoNextDecade, this.nextDecadeDisabled, 'Ctrl+Alt+PageUp')]); // Caption for calendar grid
 
-      var $gridCaption = h('header', {
+      var $gridCaption = h('div', {
         staticClass: 'b-calendar-grid-caption text-center font-weight-bold',
         class: {
           'text-muted': disabled
@@ -5023,7 +5085,7 @@
         } : {} // key: this.activeYMD.slice(0, -3)
 
       }, $gridBody);
-      var $gridHelp = h('footer', {
+      var $gridHelp = h('div', {
         staticClass: 'b-calendar-grid-help border-top small text-muted text-center bg-light',
         attrs: {
           id: gridHelpId
@@ -5099,7 +5161,7 @@
     }
   });
 
-  var props$i = makePropsConfigurable({
+  var props$23 = makePropsConfigurable({
     bgVariant: makeProp(PROP_TYPE_STRING),
     borderVariant: makeProp(PROP_TYPE_STRING),
     tag: makeProp(PROP_TYPE_STRING, 'div'),
@@ -5107,11 +5169,11 @@
   }, NAME_CARD); // --- Mixin ---
   // @vue/component
 
-  var cardMixin = Vue__default['default'].extend({
-    props: props$i
+  Vue__default['default'].extend({
+    props: props$23
   });
 
-  var props$j = makePropsConfigurable({
+  var props$22 = makePropsConfigurable({
     title: makeProp(PROP_TYPE_STRING),
     titleTag: makeProp(PROP_TYPE_STRING, 'h4')
   }, NAME_CARD_TITLE); // --- Main component ---
@@ -5120,18 +5182,18 @@
   var BCardTitle = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_TITLE,
     functional: true,
-    props: props$j,
+    props: props$22,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
       return h(props.titleTag, a(data, {
         staticClass: 'card-title'
-      }), children || toString$1(props.title));
+      }), children || toString(props.title));
     }
   });
 
-  var props$k = makePropsConfigurable({
+  var props$21 = makePropsConfigurable({
     subTitle: makeProp(PROP_TYPE_STRING),
     subTitleTag: makeProp(PROP_TYPE_STRING, 'h6'),
     subTitleTextVariant: makeProp(PROP_TYPE_STRING, 'muted')
@@ -5141,7 +5203,7 @@
   var BCardSubTitle = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_SUB_TITLE,
     functional: true,
-    props: props$k,
+    props: props$21,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -5149,11 +5211,11 @@
       return h(props.subTitleTag, a(data, {
         staticClass: 'card-subtitle',
         class: [props.subTitleTextVariant ? "text-".concat(props.subTitleTextVariant) : null]
-      }), children || toString$1(props.subTitle));
+      }), children || toString(props.subTitle));
     }
   });
 
-  var props$l = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$j), props$k), copyProps(props$i, prefixPropName.bind(null, 'body'))), {}, {
+  var props$20 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$22), props$21), copyProps(props$23, prefixPropName.bind(null, 'body'))), {}, {
     bodyClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     overlay: makeProp(PROP_TYPE_BOOLEAN, false)
   })), NAME_CARD_BODY); // --- Main component ---
@@ -5162,7 +5224,7 @@
   var BCardBody = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_BODY,
     functional: true,
-    props: props$l,
+    props: props$20,
     render: function render(h, _ref) {
       var _ref2;
 
@@ -5176,7 +5238,7 @@
 
       if (props.title) {
         $title = h(BCardTitle, {
-          props: pluckProps(props$j, props)
+          props: pluckProps(props$22, props)
         });
       }
 
@@ -5184,7 +5246,7 @@
 
       if (props.subTitle) {
         $subTitle = h(BCardSubTitle, {
-          props: pluckProps(props$k, props),
+          props: pluckProps(props$21, props),
           class: ['mb-2']
         });
       }
@@ -5198,7 +5260,7 @@
     }
   });
 
-  var props$m = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, copyProps(props$i, prefixPropName.bind(null, 'header'))), {}, {
+  var props$1$ = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, copyProps(props$23, prefixPropName.bind(null, 'header'))), {}, {
     header: makeProp(PROP_TYPE_STRING),
     headerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     headerHtml: makeProp(PROP_TYPE_STRING)
@@ -5208,7 +5270,7 @@
   var BCardHeader = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_HEADER,
     functional: true,
-    props: props$m,
+    props: props$1$,
     render: function render(h, _ref) {
       var _ref2;
 
@@ -5226,7 +5288,7 @@
     }
   });
 
-  var props$n = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, copyProps(props$i, prefixPropName.bind(null, 'footer'))), {}, {
+  var props$1_ = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, copyProps(props$23, prefixPropName.bind(null, 'footer'))), {}, {
     footer: makeProp(PROP_TYPE_STRING),
     footerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     footerHtml: makeProp(PROP_TYPE_STRING)
@@ -5236,7 +5298,7 @@
   var BCardFooter = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_FOOTER,
     functional: true,
-    props: props$n,
+    props: props$1_,
     render: function render(h, _ref) {
       var _ref2;
 
@@ -5259,12 +5321,12 @@
   var BLANK_TEMPLATE = '<svg width="%{w}" height="%{h}" ' + 'xmlns="http://www.w3.org/2000/svg" ' + 'viewBox="0 0 %{w} %{h}" preserveAspectRatio="none">' + '<rect width="100%" height="100%" style="fill:%{f};"></rect>' + '</svg>'; // --- Helper methods ---
 
   var makeBlankImgSrc = function makeBlankImgSrc(width, height, color) {
-    var src = encodeURIComponent(BLANK_TEMPLATE.replace('%{w}', toString$1(width)).replace('%{h}', toString$1(height)).replace('%{f}', color));
+    var src = encodeURIComponent(BLANK_TEMPLATE.replace('%{w}', toString(width)).replace('%{h}', toString(height)).replace('%{f}', color));
     return "data:image/svg+xml;charset=UTF-8,".concat(src);
   }; // --- Props ---
 
 
-  var props$o = makePropsConfigurable({
+  var props$1Z = makePropsConfigurable({
     alt: makeProp(PROP_TYPE_STRING),
     blank: makeProp(PROP_TYPE_BOOLEAN, false),
     blankColor: makeProp(PROP_TYPE_STRING, 'transparent'),
@@ -5297,7 +5359,7 @@
   var BImg = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_IMG,
     functional: true,
-    props: props$o,
+    props: props$1Z,
     render: function render(h, _ref) {
       var _class;
 
@@ -5346,8 +5408,8 @@
         attrs: {
           src: src,
           alt: alt,
-          width: width ? toString$1(width) : null,
-          height: height ? toString$1(height) : null,
+          width: width ? toString(width) : null,
+          height: height ? toString(height) : null,
           srcset: srcset || null,
           sizes: sizes || null
         },
@@ -5361,7 +5423,7 @@
     }
   });
 
-  var props$p = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, pick(props$o, ['src', 'alt', 'width', 'height', 'left', 'right'])), {}, {
+  var props$1Y = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, pick$1(props$1Z, ['src', 'alt', 'width', 'height', 'left', 'right'])), {}, {
     bottom: makeProp(PROP_TYPE_BOOLEAN, false),
     end: makeProp(PROP_TYPE_BOOLEAN, false),
     start: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -5372,7 +5434,7 @@
   var BCardImg = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_IMG,
     functional: true,
-    props: props$p,
+    props: props$1Y,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
@@ -5404,9 +5466,9 @@
     }
   });
 
-  var cardImgProps = copyProps(props$p, prefixPropName.bind(null, 'img'));
+  var cardImgProps = copyProps(props$1Y, prefixPropName.bind(null, 'img'));
   cardImgProps.imgSrc.required = false;
-  var props$q = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$l), props$m), props$n), cardImgProps), props$i), {}, {
+  var props$1X = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$20), props$1$), props$1_), cardImgProps), props$23), {}, {
     align: makeProp(PROP_TYPE_STRING),
     noBody: makeProp(PROP_TYPE_BOOLEAN, false)
   })), NAME_CARD); // --- Main component ---
@@ -5415,7 +5477,7 @@
   var BCard = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD,
     functional: true,
-    props: props$q,
+    props: props$1X,
     render: function render(h, _ref) {
       var _class;
 
@@ -5460,7 +5522,7 @@
 
       if (hasHeaderSlot || header || headerHtml) {
         $header = h(BCardHeader, {
-          props: pluckProps(props$m, props),
+          props: pluckProps(props$1$, props),
           domProps: hasHeaderSlot ? {} : htmlOrText(headerHtml, header)
         }, normalizeSlot(SLOT_NAME_HEADER, slotScope, $scopedSlots, $slots));
       }
@@ -5469,7 +5531,7 @@
 
       if (!props.noBody) {
         $content = h(BCardBody, {
-          props: pluckProps(props$l, props)
+          props: pluckProps(props$20, props)
         }, $content); // When the `overlap` prop is set we need to wrap the `<b-card-img>` and `<b-card-body>`
         // into a relative positioned wrapper to don't distract a potential header or footer
 
@@ -5488,7 +5550,7 @@
 
       if (hasFooterSlot || footer || footerHtml) {
         $footer = h(BCardFooter, {
-          props: pluckProps(props$n, props),
+          props: pluckProps(props$1_, props),
           domProps: hasHeaderSlot ? {} : htmlOrText(footerHtml, footer)
         }, normalizeSlot(SLOT_NAME_FOOTER, slotScope, $scopedSlots, $slots));
       }
@@ -5532,7 +5594,7 @@
         } // Should only be called once and `callback` prop should be a function
 
 
-        if (this.doneOnce || !isFunction(this.callback)) {
+        if (this.doneOnce || !isFunction$1(this.callback)) {
           /* istanbul ignore next */
           return;
         } // Create the observer instance
@@ -5600,7 +5662,7 @@
     return VisibilityObserver;
   }();
 
-  var destroy = function destroy(el) {
+  var destroy$1 = function destroy(el) {
     var observer = el[OBSERVER_PROP_NAME];
 
     if (observer && observer.stop) {
@@ -5610,7 +5672,7 @@
     delete el[OBSERVER_PROP_NAME];
   };
 
-  var bind = function bind(el, _ref, vnode) {
+  var bind$1 = function bind(el, _ref, vnode) {
     var value = _ref.value,
         modifiers = _ref.modifiers;
     // `value` is the callback function
@@ -5629,7 +5691,7 @@
       }
     }); // Destroy any previous observer
 
-    destroy(el); // Create new observer
+    destroy$1(el); // Create new observer
 
     el[OBSERVER_PROP_NAME] = new VisibilityObserver(el, options, vnode); // Store the current modifiers on the object (cloned)
 
@@ -5637,7 +5699,7 @@
   }; // When the directive options may have been updated (or element)
 
 
-  var componentUpdated = function componentUpdated(el, _ref2, vnode) {
+  var componentUpdated$1 = function componentUpdated(el, _ref2, vnode) {
     var value = _ref2.value,
         oldValue = _ref2.oldValue,
         modifiers = _ref2.modifiers;
@@ -5650,7 +5712,7 @@
 
     if (el && (value !== oldValue || !el[OBSERVER_PROP_NAME] || !looseEqual(modifiers, el[OBSERVER_PROP_NAME]._prevModifiers))) {
       // Re-bind on element
-      bind(el, {
+      bind$1(el, {
         value: value,
         modifiers: modifiers
       }, vnode);
@@ -5658,26 +5720,25 @@
   }; // When directive un-binds from element
 
 
-  var unbind = function unbind(el) {
+  var unbind$1 = function unbind(el) {
     // Remove the observer
-    destroy(el);
+    destroy$1(el);
   }; // Export the directive
 
 
   var VBVisible = {
-    bind: bind,
-    componentUpdated: componentUpdated,
-    unbind: unbind
+    bind: bind$1,
+    componentUpdated: componentUpdated$1,
+    unbind: unbind$1
   };
 
-  var _watch$2;
+  var _watch$i;
 
-  var MODEL_PROP_NAME_SHOW = 'show';
-  var MODEL_EVENT_NAME_SHOW = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SHOW; // --- Props ---
+  var MODEL_PROP_NAME_SHOW$1 = 'show';
+  var MODEL_EVENT_NAME_SHOW$1 = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SHOW$1; // --- Props ---
 
-  var imgProps = omit(props$o, ['blank']);
-  var props$r = makePropsConfigurable(_objectSpread2(_objectSpread2({}, imgProps), {}, _defineProperty({
-    blankColor: makeProp(PROP_TYPE_STRING, 'transparent'),
+  var imgProps$1 = omit(props$1Z, ['blank']);
+  var props$1W = makePropsConfigurable(_objectSpread2$3(_objectSpread2$3({}, imgProps$1), {}, _defineProperty({
     blankHeight: makeProp(PROP_TYPE_NUMBER_STRING),
     // If `null`, a blank image is generated
     blankSrc: makeProp(PROP_TYPE_STRING, null),
@@ -5685,7 +5746,7 @@
     // Distance away from viewport (in pixels)
     // before being considered "visible"
     offset: makeProp(PROP_TYPE_NUMBER_STRING, 360)
-  }, MODEL_PROP_NAME_SHOW, makeProp(PROP_TYPE_BOOLEAN, false))), NAME_IMG_LAZY); // --- Main component ---
+  }, MODEL_PROP_NAME_SHOW$1, makeProp(PROP_TYPE_BOOLEAN, false))), NAME_IMG_LAZY); // --- Main component ---
   // @vue/component
 
   var BImgLazy = /*#__PURE__*/Vue__default['default'].extend({
@@ -5693,10 +5754,10 @@
     directives: {
       'b-visible': VBVisible
     },
-    props: props$r,
+    props: props$1W,
     data: function data() {
       return {
-        isShown: this[MODEL_PROP_NAME_SHOW]
+        isShown: this[MODEL_PROP_NAME_SHOW$1]
       };
     },
     computed: {
@@ -5717,42 +5778,48 @@
       },
       computedSrcset: function computedSrcset() {
         var srcset = concat(this.srcset).filter(identity).join(',');
-        return !this.blankSrc || this.isShown ? srcset : null;
+        return srcset && (!this.blankSrc || this.isShown) ? srcset : null;
       },
       computedSizes: function computedSizes() {
         var sizes = concat(this.sizes).filter(identity).join(',');
-        return !this.blankSrc || this.isShown ? sizes : null;
+        return sizes && (!this.blankSrc || this.isShown) ? sizes : null;
       }
     },
-    watch: (_watch$2 = {}, _defineProperty(_watch$2, MODEL_PROP_NAME_SHOW, function (newValue, oldValue) {
+    watch: (_watch$i = {}, _defineProperty(_watch$i, MODEL_PROP_NAME_SHOW$1, function (newValue, oldValue) {
       if (newValue !== oldValue) {
         // If `IntersectionObserver` support is not available, image is always shown
         var visible = HAS_INTERACTION_OBSERVER_SUPPORT ? newValue : true;
         this.isShown = visible; // Ensure the show prop is synced (when no `IntersectionObserver`)
 
-        if (visible !== newValue) {
+        if (newValue !== visible) {
           this.$nextTick(this.updateShowProp);
         }
       }
-    }), _defineProperty(_watch$2, "isShown", function isShown(newValue, oldValue) {
+    }), _defineProperty(_watch$i, "isShown", function isShown(newValue, oldValue) {
       // Update synched show prop
       if (newValue !== oldValue) {
         this.updateShowProp();
       }
-    }), _watch$2),
+    }), _watch$i),
     mounted: function mounted() {
       // If `IntersectionObserver` is not available, image is always shown
-      this.isShown = HAS_INTERACTION_OBSERVER_SUPPORT ? this[MODEL_PROP_NAME_SHOW] : true;
+      this.isShown = HAS_INTERACTION_OBSERVER_SUPPORT ? this[MODEL_PROP_NAME_SHOW$1] : true;
     },
     methods: {
       updateShowProp: function updateShowProp() {
-        this.$emit(MODEL_EVENT_NAME_SHOW, this.isShown);
+        this.$emit(MODEL_EVENT_NAME_SHOW$1, this.isShown);
       },
       doShow: function doShow(visible) {
+        var _this = this;
+
         // If IntersectionObserver is not supported, the callback
         // will be called with `null` rather than `true` or `false`
         if ((visible || visible === null) && !this.isShown) {
-          this.isShown = true;
+          // In a `requestAF()` to render the `blank` placeholder properly
+          // for fast loading images in some browsers (i.e. Firefox)
+          requestAF(function () {
+            _this.isShown = true;
+          });
         }
       }
     },
@@ -5765,7 +5832,7 @@
         // We only add the visible directive if we are not shown
         directives.push({
           // Visible directive will silently do nothing if
-          // IntersectionObserver is not supported
+          // `IntersectionObserver` is not supported
           name: 'b-visible',
           // Value expects a callback (passed one arg of `visible` = `true` or `false`)
           value: this.doShow,
@@ -5775,26 +5842,26 @@
 
       return h(BImg, {
         directives: directives,
-        props: _objectSpread2({
+        props: _objectSpread2$3(_objectSpread2$3({}, pluckProps(imgProps$1, this.$props)), {}, {
           // Computed value props
           src: this.computedSrc,
           blank: this.computedBlank,
           width: this.computedWidth,
           height: this.computedHeight,
-          srcset: this.computedSrcset || null,
-          sizes: this.computedSizes || null
-        }, pluckProps(imgProps, this.$props))
+          srcset: this.computedSrcset,
+          sizes: this.computedSizes
+        })
       });
     }
   });
 
-  var props$s = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, omit(props$r, keys(props$o))), omit(props$p, ['src', 'alt', 'width', 'height']))), NAME_CARD_IMG_LAZY); // --- Main component ---
+  var props$1V = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, omit(props$1W, keys(props$1Z))), omit(props$1Y, ['src', 'alt', 'width', 'height']))), NAME_CARD_IMG_LAZY); // --- Main component ---
   // @vue/component
 
   var BCardImgLazy = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_IMG_LAZY,
     functional: true,
-    props: props$s,
+    props: props$1V,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
@@ -5818,7 +5885,7 @@
     }
   });
 
-  var props$t = makePropsConfigurable({
+  var props$1U = makePropsConfigurable({
     textTag: makeProp(PROP_TYPE_STRING, 'p')
   }, NAME_CARD_TEXT); // --- Main component ---
   // @vue/component
@@ -5826,7 +5893,7 @@
   var BCardText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_TEXT,
     functional: true,
-    props: props$t,
+    props: props$1U,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -5837,7 +5904,7 @@
     }
   });
 
-  var props$u = makePropsConfigurable({
+  var props$1T = makePropsConfigurable({
     columns: makeProp(PROP_TYPE_BOOLEAN, false),
     deck: makeProp(PROP_TYPE_BOOLEAN, false),
     tag: makeProp(PROP_TYPE_STRING, 'div')
@@ -5847,7 +5914,7 @@
   var BCardGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CARD_GROUP,
     functional: true,
-    props: props$u,
+    props: props$1T,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -5935,7 +6002,7 @@
       }
     }); // Have the observer observe foo for changes in children, etc
 
-    obs.observe(el, _objectSpread2({
+    obs.observe(el, _objectSpread2$3({
       childList: true,
       subtree: true
     }, options)); // We return a reference to the observer so that `obs.disconnect()`
@@ -5945,16 +6012,16 @@
     return obs;
   };
 
-  var _watch$3;
+  var _watch$h;
 
-  var _makeModelMixin$2 = makeModelMixin('value', {
+  var _makeModelMixin$i = makeModelMixin('value', {
     type: PROP_TYPE_NUMBER,
     defaultValue: 0
   }),
-      modelMixin$2 = _makeModelMixin$2.mixin,
-      modelProps$2 = _makeModelMixin$2.props,
-      MODEL_PROP_NAME$2 = _makeModelMixin$2.prop,
-      MODEL_EVENT_NAME$2 = _makeModelMixin$2.event; // Slide directional classes
+      modelMixin$h = _makeModelMixin$i.mixin,
+      modelProps$h = _makeModelMixin$i.props,
+      MODEL_PROP_NAME$h = _makeModelMixin$i.prop,
+      MODEL_EVENT_NAME$h = _makeModelMixin$i.event; // Slide directional classes
 
 
   var DIRECTION = {
@@ -5979,7 +6046,7 @@
     PEN: 'pen'
   }; // Transition Event names
 
-  var TransitionEndEvents = {
+  var TransitionEndEvents$1 = {
     WebkitTransition: 'webkitTransitionEnd',
     MozTransition: 'transitionend',
     OTransition: 'otransitionend oTransitionEnd',
@@ -5988,9 +6055,9 @@
   // Return the browser specific transitionEnd event name
 
   var getTransitionEndEvent = function getTransitionEndEvent(el) {
-    for (var name in TransitionEndEvents) {
+    for (var name in TransitionEndEvents$1) {
       if (!isUndefined(el.style[name])) {
-        return TransitionEndEvents[name];
+        return TransitionEndEvents$1[name];
       }
     } // Fallback
 
@@ -6001,7 +6068,7 @@
   }; // --- Props ---
 
 
-  var props$v = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$2), {}, {
+  var props$1S = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$h), {}, {
     background: makeProp(PROP_TYPE_STRING),
     controls: makeProp(PROP_TYPE_BOOLEAN, false),
     // Enable cross-fade animation instead of slide animation
@@ -6029,16 +6096,16 @@
 
   var BCarousel = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CAROUSEL,
-    mixins: [idMixin, modelMixin$2, normalizeSlotMixin],
+    mixins: [idMixin, modelMixin$h, normalizeSlotMixin],
     provide: function provide() {
       return {
         bvCarousel: this
       };
     },
-    props: props$v,
+    props: props$1S,
     data: function data() {
       return {
-        index: this[MODEL_PROP_NAME$2] || 0,
+        index: this[MODEL_PROP_NAME$h] || 0,
         isSliding: false,
         transitionEndEvent: null,
         slides: [],
@@ -6054,11 +6121,11 @@
         return this.slides.length;
       }
     },
-    watch: (_watch$3 = {}, _defineProperty(_watch$3, MODEL_PROP_NAME$2, function (newValue, oldValue) {
+    watch: (_watch$h = {}, _defineProperty(_watch$h, MODEL_PROP_NAME$h, function (newValue, oldValue) {
       if (newValue !== oldValue) {
         this.setSlide(toInteger(newValue, 0));
       }
-    }), _defineProperty(_watch$3, "interval", function interval(newValue, oldValue) {
+    }), _defineProperty(_watch$h, "interval", function interval(newValue, oldValue) {
       /* istanbul ignore next */
       if (newValue === oldValue) {
         return;
@@ -6072,18 +6139,18 @@
         this.pause(true);
         this.start(false);
       }
-    }), _defineProperty(_watch$3, "isPaused", function isPaused(newValue, oldValue) {
+    }), _defineProperty(_watch$h, "isPaused", function isPaused(newValue, oldValue) {
       if (newValue !== oldValue) {
         this.$emit(newValue ? EVENT_NAME_PAUSED : EVENT_NAME_UNPAUSED);
       }
-    }), _defineProperty(_watch$3, "index", function index(to, from) {
+    }), _defineProperty(_watch$h, "index", function index(to, from) {
       /* istanbul ignore next */
       if (to === from || this.isSliding) {
         return;
       }
 
       this.doSlide(to, from);
-    }), _watch$3),
+    }), _watch$h),
     created: function created() {
       // Create private non-reactive props
       this.$_interval = null;
@@ -6184,8 +6251,8 @@
         this.index = slide >= numSlides ? noWrap ? numSlides - 1 : 0 : slide < 0 ? noWrap ? 0 : numSlides - 1 : slide; // Ensure the v-model is synched up if no-wrap is enabled
         // and user tried to slide pass either ends
 
-        if (noWrap && this.index !== slide && this.index !== this[MODEL_PROP_NAME$2]) {
-          this.$emit(MODEL_EVENT_NAME$2, this.index);
+        if (noWrap && this.index !== slide && this.index !== this[MODEL_PROP_NAME$h]) {
+          this.$emit(MODEL_EVENT_NAME$h, this.index);
         }
       },
       // Previous slide
@@ -6252,7 +6319,7 @@
 
         this.$emit(EVENT_NAME_SLIDING_START, to); // Update v-model
 
-        this.$emit(MODEL_EVENT_NAME$2, this.index);
+        this.$emit(MODEL_EVENT_NAME$h, this.index);
 
         if (this.noAnimation) {
           addClass(nextSlide, 'active');
@@ -6593,7 +6660,7 @@
     }
   });
 
-  var imgProps$1 = {
+  var imgProps = {
     imgAlt: makeProp(PROP_TYPE_STRING),
     imgBlank: makeProp(PROP_TYPE_BOOLEAN, false),
     imgBlankColor: makeProp(PROP_TYPE_STRING, 'transparent'),
@@ -6601,7 +6668,7 @@
     imgSrc: makeProp(PROP_TYPE_STRING),
     imgWidth: makeProp(PROP_TYPE_NUMBER_STRING)
   };
-  var props$w = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), imgProps$1), {}, {
+  var props$1R = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), imgProps), {}, {
     background: makeProp(PROP_TYPE_STRING),
     caption: makeProp(PROP_TYPE_STRING),
     captionHtml: makeProp(PROP_TYPE_STRING),
@@ -6627,7 +6694,7 @@
         }
       }
     },
-    props: props$w,
+    props: props$1R,
     computed: {
       contentClasses: function contentClasses() {
         return [this.contentVisibleUp ? 'd-none' : '', this.contentVisibleUp ? "d-".concat(this.contentVisibleUp, "-block") : ''];
@@ -6658,7 +6725,7 @@
         }
 
         $img = h(BImg, {
-          props: _objectSpread2(_objectSpread2({}, pluckProps(imgProps$1, this.$props, unprefixPropName.bind(null, 'img'))), {}, {
+          props: _objectSpread2$3(_objectSpread2$3({}, pluckProps(imgProps, this.$props, unprefixPropName.bind(null, 'img'))), {}, {
             width: this.computedWidth,
             height: this.computedHeight,
             fluidGrow: true,
@@ -6760,7 +6827,7 @@
     afterLeave: onAfterLeave
   }; // --- Main component ---
 
-  var props$x = {
+  var props$1Q = {
     // // If `true` (and `visible` is `true` on mount), animate initially visible
     appear: makeProp(PROP_TYPE_BOOLEAN, false)
   }; // --- Main component ---
@@ -6769,7 +6836,7 @@
   var BVCollapse = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_COLLAPSE_HELPER,
     functional: true,
-    props: props$x,
+    props: props$1Q,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -6785,25 +6852,25 @@
     }
   });
 
-  var _watch$4;
+  var _watch$g;
 
-  var ROOT_ACTION_EVENT_NAME_TOGGLE = getRootActionEventName(NAME_COLLAPSE, 'toggle');
-  var ROOT_ACTION_EVENT_NAME_REQUEST_STATE = getRootActionEventName(NAME_COLLAPSE, 'request-state');
+  var ROOT_ACTION_EVENT_NAME_TOGGLE$2 = getRootActionEventName(NAME_COLLAPSE, 'toggle');
+  var ROOT_ACTION_EVENT_NAME_REQUEST_STATE$2 = getRootActionEventName(NAME_COLLAPSE, 'request-state');
   var ROOT_EVENT_NAME_ACCORDION = getRootEventName(NAME_COLLAPSE, 'accordion');
-  var ROOT_EVENT_NAME_STATE = getRootEventName(NAME_COLLAPSE, 'state');
-  var ROOT_EVENT_NAME_SYNC_STATE = getRootEventName(NAME_COLLAPSE, 'sync-state');
+  var ROOT_EVENT_NAME_STATE$3 = getRootEventName(NAME_COLLAPSE, 'state');
+  var ROOT_EVENT_NAME_SYNC_STATE$3 = getRootEventName(NAME_COLLAPSE, 'sync-state');
 
-  var _makeModelMixin$3 = makeModelMixin('visible', {
+  var _makeModelMixin$h = makeModelMixin('visible', {
     type: PROP_TYPE_BOOLEAN,
     defaultValue: false
   }),
-      modelMixin$3 = _makeModelMixin$3.mixin,
-      modelProps$3 = _makeModelMixin$3.props,
-      MODEL_PROP_NAME$3 = _makeModelMixin$3.prop,
-      MODEL_EVENT_NAME$3 = _makeModelMixin$3.event; // --- Props ---
+      modelMixin$g = _makeModelMixin$h.mixin,
+      modelProps$g = _makeModelMixin$h.props,
+      MODEL_PROP_NAME$g = _makeModelMixin$h.prop,
+      MODEL_EVENT_NAME$g = _makeModelMixin$h.event; // --- Props ---
 
 
-  var props$y = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$3), {}, {
+  var props$1P = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$g), {}, {
     // If `true` (and `visible` is `true` on mount), animate initially visible
     accordion: makeProp(PROP_TYPE_STRING),
     appear: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -6814,11 +6881,11 @@
 
   var BCollapse = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_COLLAPSE,
-    mixins: [idMixin, modelMixin$3, normalizeSlotMixin, listenOnRootMixin],
-    props: props$y,
+    mixins: [idMixin, modelMixin$g, normalizeSlotMixin, listenOnRootMixin],
+    props: props$1P,
     data: function data() {
       return {
-        show: this[MODEL_PROP_NAME$3],
+        show: this[MODEL_PROP_NAME$g],
         transitioning: false
       };
     },
@@ -6842,26 +6909,26 @@
         };
       }
     },
-    watch: (_watch$4 = {}, _defineProperty(_watch$4, MODEL_PROP_NAME$3, function (newValue) {
+    watch: (_watch$g = {}, _defineProperty(_watch$g, MODEL_PROP_NAME$g, function (newValue) {
       if (newValue !== this.show) {
         this.show = newValue;
       }
-    }), _defineProperty(_watch$4, "show", function show(newValue, oldValue) {
+    }), _defineProperty(_watch$g, "show", function show(newValue, oldValue) {
       if (newValue !== oldValue) {
         this.emitState();
       }
-    }), _watch$4),
+    }), _watch$g),
     created: function created() {
-      this.show = this[MODEL_PROP_NAME$3];
+      this.show = this[MODEL_PROP_NAME$g];
     },
     mounted: function mounted() {
       var _this2 = this;
 
-      this.show = this[MODEL_PROP_NAME$3]; // Listen for toggle events to open/close us
+      this.show = this[MODEL_PROP_NAME$g]; // Listen for toggle events to open/close us
 
-      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_TOGGLE, this.handleToggleEvt); // Listen to other collapses for accordion events
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_TOGGLE$2, this.handleToggleEvent); // Listen to other collapses for accordion events
 
-      this.listenOnRoot(ROOT_EVENT_NAME_ACCORDION, this.handleAccordionEvt);
+      this.listenOnRoot(ROOT_EVENT_NAME_ACCORDION, this.handleAccordionEvent);
 
       if (this.isNav) {
         // Set up handlers
@@ -6873,7 +6940,7 @@
         _this2.emitState();
       }); // Listen for "Sync state" requests from `v-b-toggle`
 
-      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_REQUEST_STATE, function (id) {
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_REQUEST_STATE$2, function (id) {
         if (id === _this2.safeId()) {
           _this2.$nextTick(_this2.emitSync);
         }
@@ -6939,9 +7006,9 @@
         var show = this.show,
             accordion = this.accordion;
         var id = this.safeId();
-        this.$emit(MODEL_EVENT_NAME$3, show); // Let `v-b-toggle` know the state of this collapse
+        this.$emit(MODEL_EVENT_NAME$g, show); // Let `v-b-toggle` know the state of this collapse
 
-        this.emitOnRoot(ROOT_EVENT_NAME_STATE, id, show);
+        this.emitOnRoot(ROOT_EVENT_NAME_STATE$3, id, show);
 
         if (accordion && show) {
           // Tell the other collapses in this accordion to close
@@ -6952,7 +7019,7 @@
         // Emit a private event every time this component updates to ensure
         // the toggle button is in sync with the collapse's state
         // It is emitted regardless if the visible state changes
-        this.emitOnRoot(ROOT_EVENT_NAME_SYNC_STATE, this.safeId(), this.show);
+        this.emitOnRoot(ROOT_EVENT_NAME_SYNC_STATE$3, this.safeId(), this.show);
       },
       checkDisplayBlock: function checkDisplayBlock() {
         // Check to see if the collapse has `display: block !important` set
@@ -6983,12 +7050,12 @@
           this.show = false;
         }
       },
-      handleToggleEvt: function handleToggleEvt(id) {
+      handleToggleEvent: function handleToggleEvent(id) {
         if (id === this.safeId()) {
           this.toggle();
         }
       },
-      handleAccordionEvt: function handleAccordionEvt(openedId, openAccordion) {
+      handleAccordionEvent: function handleAccordionEvent(openedId, openAccordion) {
         var accordion = this.accordion,
             show = this.show;
 
@@ -7064,16 +7131,16 @@
 
   var ROOT_ACTION_EVENT_NAME_TOGGLE$1 = getRootActionEventName(NAME_COLLAPSE, 'toggle'); // Listen to event for toggle state update (emitted by collapse)
 
-  var ROOT_EVENT_NAME_STATE$1 = getRootEventName(NAME_COLLAPSE, 'state'); // Private event emitted on `$root` to ensure the toggle state is always synced
+  var ROOT_EVENT_NAME_STATE$2 = getRootEventName(NAME_COLLAPSE, 'state'); // Private event emitted on `$root` to ensure the toggle state is always synced
   // Gets emitted even if the state of b-collapse has not changed
   // This event is NOT to be documented as people should not be using it
 
-  var ROOT_EVENT_NAME_SYNC_STATE$1 = getRootEventName(NAME_COLLAPSE, 'sync-state'); // Private event we send to collapse to request state update sync event
+  var ROOT_EVENT_NAME_SYNC_STATE$2 = getRootEventName(NAME_COLLAPSE, 'sync-state'); // Private event we send to collapse to request state update sync event
 
   var ROOT_ACTION_EVENT_NAME_REQUEST_STATE$1 = getRootActionEventName(NAME_COLLAPSE, 'request-state');
   var KEYDOWN_KEY_CODES = [CODE_ENTER, CODE_SPACE]; // --- Helper methods ---
 
-  var isNonStandardTag$1 = function isNonStandardTag(el) {
+  var isNonStandardTag = function isNonStandardTag(el) {
     return !arrayIncludes(['button', 'a'], el.tagName.toLowerCase());
   };
 
@@ -7133,7 +7200,7 @@
       el[BV_TOGGLE_CLICK_HANDLER] = handler;
       eventOn(el, 'click', handler, EVENT_OPTIONS_PASSIVE);
 
-      if (isNonStandardTag$1(el)) {
+      if (isNonStandardTag(el)) {
         eventOn(el, 'keydown', handler, EVENT_OPTIONS_PASSIVE);
       }
     }
@@ -7141,7 +7208,7 @@
 
   var removeRootListeners = function removeRootListeners(el, vnode) {
     if (el[BV_TOGGLE_ROOT_HANDLER] && vnode.context) {
-      vnode.context.$root.$off([ROOT_EVENT_NAME_STATE$1, ROOT_EVENT_NAME_SYNC_STATE$1], el[BV_TOGGLE_ROOT_HANDLER]);
+      vnode.context.$root.$off([ROOT_EVENT_NAME_STATE$2, ROOT_EVENT_NAME_SYNC_STATE$2], el[BV_TOGGLE_ROOT_HANDLER]);
     }
 
     el[BV_TOGGLE_ROOT_HANDLER] = null;
@@ -7163,7 +7230,7 @@
 
       el[BV_TOGGLE_ROOT_HANDLER] = handler; // Listen for toggle state changes (public) and sync (private)
 
-      vnode.context.$root.$on([ROOT_EVENT_NAME_STATE$1, ROOT_EVENT_NAME_SYNC_STATE$1], handler);
+      vnode.context.$root.$on([ROOT_EVENT_NAME_STATE$2, ROOT_EVENT_NAME_SYNC_STATE$2], handler);
     }
   };
 
@@ -7195,7 +7262,7 @@
     // and `tabindex="0"` for accessibility reasons
 
 
-    if (isNonStandardTag$1(el)) {
+    if (isNonStandardTag(el)) {
       if (!hasAttr(el, ATTR_ROLE)) {
         setAttr(el, ATTR_ROLE, 'button');
       }
@@ -7378,7 +7445,7 @@
    * @argument {Any} functionToCheck - variable to check
    * @returns {Boolean} answer to: is a function?
    */
-  function isFunction$1(functionToCheck) {
+  function isFunction(functionToCheck) {
     var getType = {};
     return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
   }
@@ -7689,7 +7756,7 @@
 
 
 
-  var defineProperty$1 = function (obj, key, value) {
+  var defineProperty = function (obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
         value: value,
@@ -8187,7 +8254,7 @@
         console.warn('`modifier.function` is deprecated, use `modifier.fn`!');
       }
       var fn = modifier['function'] || modifier.fn; // eslint-disable-line dot-notation
-      if (modifier.enabled && isFunction$1(fn)) {
+      if (modifier.enabled && isFunction(fn)) {
         // Add properties to offsets to make them a complete clientRect object
         // we do this before each modifier to make sure the previous one doesn't
         // mess with these values
@@ -8294,7 +8361,7 @@
    * @method
    * @memberof Popper
    */
-  function destroy$1() {
+  function destroy() {
     this.state.isDestroyed = true;
 
     // touch DOM only if `applyStyle` modifier is enabled
@@ -8416,7 +8483,7 @@
    * @param {*} input to check
    * @return {Boolean}
    */
-  function isNumeric$1(n) {
+  function isNumeric(n) {
     return n !== '' && !isNaN(parseFloat(n)) && isFinite(n);
   }
 
@@ -8432,7 +8499,7 @@
     Object.keys(styles).forEach(function (prop) {
       var unit = '';
       // add unit if the value is numeric and is one of the following
-      if (['width', 'height', 'top', 'right', 'bottom', 'left'].indexOf(prop) !== -1 && isNumeric$1(styles[prop])) {
+      if (['width', 'height', 'top', 'right', 'bottom', 'left'].indexOf(prop) !== -1 && isNumeric(styles[prop])) {
         unit = 'px';
       }
       element.style[prop] = styles[prop] + unit;
@@ -8768,7 +8835,7 @@
     sideValue = Math.max(Math.min(popper[len] - arrowElementSize, sideValue), 0);
 
     data.arrowElement = arrowElement;
-    data.offsets.arrow = (_data$offsets$arrow = {}, defineProperty$1(_data$offsets$arrow, side, Math.round(sideValue)), defineProperty$1(_data$offsets$arrow, altSide, ''), _data$offsets$arrow);
+    data.offsets.arrow = (_data$offsets$arrow = {}, defineProperty(_data$offsets$arrow, side, Math.round(sideValue)), defineProperty(_data$offsets$arrow, altSide, ''), _data$offsets$arrow);
 
     return data;
   }
@@ -9098,7 +9165,7 @@
     // Loop trough the offsets arrays and execute the operations
     ops.forEach(function (op, index) {
       op.forEach(function (frag, index2) {
-        if (isNumeric$1(frag)) {
+        if (isNumeric(frag)) {
           offsets[index] += frag * (op[index2 - 1] === '-' ? -1 : 1);
         }
       });
@@ -9115,7 +9182,7 @@
    * The offset value as described in the modifier description
    * @returns {Object} The data object, properly modified
    */
-  function offset$1(data, _ref) {
+  function offset(data, _ref) {
     var offset = _ref.offset;
     var placement = data.placement,
         _data$offsets = data.offsets,
@@ -9125,7 +9192,7 @@
     var basePlacement = placement.split('-')[0];
 
     var offsets = void 0;
-    if (isNumeric$1(+offset)) {
+    if (isNumeric(+offset)) {
       offsets = [+offset, 0];
     } else {
       offsets = parseOffset(offset, popper, reference, basePlacement);
@@ -9198,7 +9265,7 @@
         if (popper[placement] < boundaries[placement] && !options.escapeWithReference) {
           value = Math.max(popper[placement], boundaries[placement]);
         }
-        return defineProperty$1({}, placement, value);
+        return defineProperty({}, placement, value);
       },
       secondary: function secondary(placement) {
         var mainSide = placement === 'right' ? 'left' : 'top';
@@ -9206,7 +9273,7 @@
         if (popper[placement] > boundaries[placement] && !options.escapeWithReference) {
           value = Math.min(popper[mainSide], boundaries[placement] - (placement === 'right' ? popper.width : popper.height));
         }
-        return defineProperty$1({}, mainSide, value);
+        return defineProperty({}, mainSide, value);
       }
     };
 
@@ -9243,8 +9310,8 @@
       var measurement = isVertical ? 'width' : 'height';
 
       var shiftOffsets = {
-        start: defineProperty$1({}, side, reference[side]),
-        end: defineProperty$1({}, side, reference[side] + reference[measurement] - popper[measurement])
+        start: defineProperty({}, side, reference[side]),
+        end: defineProperty({}, side, reference[side] + reference[measurement] - popper[measurement])
       };
 
       data.offsets.popper = _extends({}, popper, shiftOffsets[shiftvariation]);
@@ -9400,7 +9467,7 @@
       /** @prop {Boolean} enabled=true - Whether the modifier is enabled or not */
       enabled: true,
       /** @prop {ModifierFn} */
-      fn: offset$1,
+      fn: offset,
       /** @prop {Number|String} offset=0
        * The offset value as described in the modifier description
        */
@@ -9814,7 +9881,7 @@
       // they could add new properties to their options configuration
       // BE AWARE: don't add options to `options.modifiers.name` but to `modifierOptions`!
       this.modifiers.forEach(function (modifierOptions) {
-        if (modifierOptions.enabled && isFunction$1(modifierOptions.onLoad)) {
+        if (modifierOptions.enabled && isFunction(modifierOptions.onLoad)) {
           modifierOptions.onLoad(_this.reference, _this.popper, _this.options, modifierOptions, _this.state);
         }
       });
@@ -9843,7 +9910,7 @@
     }, {
       key: 'destroy',
       value: function destroy$$1() {
-        return destroy$1.call(this);
+        return destroy.call(this);
       }
     }, {
       key: 'enableEventListeners',
@@ -9954,7 +10021,7 @@
       // can only be altered by the preventDefault method
 
 
-      defineProperty(this, 'defaultPrevented', {
+      defineProperty$1(this, 'defaultPrevented', {
         enumerable: true,
         get: function get() {
           return defaultPrevented;
@@ -10086,7 +10153,7 @@
   }; // --- Props ---
 
 
-  var props$z = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$g), {}, {
+  var props$1O = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$25), {}, {
     // String: `scrollParent`, `window` or `viewport`
     // HTMLElement: HTML Element reference
     boundary: makeProp([HTMLElement, PROP_TYPE_STRING], 'scrollParent'),
@@ -10120,7 +10187,7 @@
         default: null
       }
     },
-    props: props$z,
+    props: props$1O,
     data: function data() {
       return {
         visible: false,
@@ -10151,6 +10218,9 @@
         // boundaries when boundary is anything other than `scrollParent`
         // See: https://github.com/twbs/bootstrap/issues/24251#issuecomment-341413786
         return this.boundary !== 'scrollParent' && !this.inNavbar ? 'position-static' : '';
+      },
+      hideDelay: function hideDelay() {
+        return this.inNavbar ? HAS_TOUCH_SUPPORT ? 300 : 50 : 0;
       }
     },
     watch: {
@@ -10450,7 +10520,7 @@
           this.clearHideTimeout();
           this.$_hideTimeout = setTimeout(function () {
             return _this3.hide();
-          }, this.inNavbar ? 300 : 0);
+          }, this.hideDelay);
         }
       },
       // Document click-out listener
@@ -10521,7 +10591,7 @@
     }
   });
 
-  var props$A = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$z), {}, {
+  var props$1N = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$1O), {}, {
     block: makeProp(PROP_TYPE_BOOLEAN, false),
     html: makeProp(PROP_TYPE_STRING),
     // If `true`, only render menu contents when open
@@ -10539,6 +10609,7 @@
     splitTo: makeProp(PROP_TYPE_OBJECT_STRING),
     splitVariant: makeProp(PROP_TYPE_STRING),
     text: makeProp(PROP_TYPE_STRING),
+    toggleAttrs: makeProp(PROP_TYPE_OBJECT, {}),
     toggleClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     toggleTag: makeProp(PROP_TYPE_STRING, 'button'),
     // TODO: This really should be `toggleLabel`
@@ -10550,7 +10621,7 @@
   var BDropdown = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN,
     mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
-    props: props$A,
+    props: props$1N,
     computed: {
       dropdownClasses: function dropdownClasses() {
         var block = this.block,
@@ -10605,7 +10676,7 @@
             splitHref = this.splitHref,
             splitButtonType = this.splitButtonType;
 
-        var btnProps = _objectSpread2(_objectSpread2({}, commonProps), {}, {
+        var btnProps = _objectSpread2$3(_objectSpread2$3({}, commonProps), {}, {
           variant: this.splitVariant || variant
         }); // We add these as needed due to <router-link> issues with
         // defined property with `undefined`/`null` values
@@ -10638,15 +10709,17 @@
         buttonContentDomProps = {};
       }
 
+      var ariaHasPopupRoles = ['menu', 'listbox', 'tree', 'grid', 'dialog'];
       var $toggle = h(BButton, {
         staticClass: 'dropdown-toggle',
         class: this.toggleClasses,
-        attrs: {
+        attrs: _objectSpread2$3(_objectSpread2$3({}, this.toggleAttrs), {}, {
+          // Must have attributes
           id: this.safeId('_BV_toggle_'),
-          'aria-haspopup': 'true',
-          'aria-expanded': toString$1(visible)
-        },
-        props: _objectSpread2(_objectSpread2({}, commonProps), {}, {
+          'aria-haspopup': ariaHasPopupRoles.includes(role) ? role : 'false',
+          'aria-expanded': toString(visible)
+        }),
+        props: _objectSpread2$3(_objectSpread2$3({}, commonProps), {}, {
           tag: this.toggleTag,
           block: block && !split
         }),
@@ -10685,8 +10758,8 @@
     }
   });
 
-  var linkProps$3 = omit(props$6, ['event', 'routerTag']);
-  var props$B = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$3), {}, {
+  var linkProps$4 = omit(props$2f, ['event', 'routerTag']);
+  var props$1M = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, linkProps$4), {}, {
     linkClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     variant: makeProp(PROP_TYPE_STRING)
   })), NAME_DROPDOWN_ITEM); // --- Main component ---
@@ -10701,10 +10774,10 @@
       }
     },
     inheritAttrs: false,
-    props: props$B,
+    props: props$1M,
     computed: {
       computedAttrs: function computedAttrs() {
-        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvAttrs), {}, {
           role: 'menuitem'
         });
       }
@@ -10741,7 +10814,7 @@
       }, [h(BLink, {
         staticClass: 'dropdown-item',
         class: [linkClass, _defineProperty({}, "text-".concat(variant), variant && !(active || disabled))],
-        props: pluckProps(linkProps$3, this.$props),
+        props: pluckProps(linkProps$4, this.$props),
         attrs: this.computedAttrs,
         on: {
           click: onClick
@@ -10751,7 +10824,7 @@
     }
   });
 
-  var props$C = makePropsConfigurable({
+  var props$1L = makePropsConfigurable({
     active: makeProp(PROP_TYPE_BOOLEAN, false),
     activeClass: makeProp(PROP_TYPE_STRING, 'active'),
     buttonClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
@@ -10769,10 +10842,10 @@
       }
     },
     inheritAttrs: false,
-    props: props$C,
+    props: props$1L,
     computed: {
       computedAttrs: function computedAttrs() {
-        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvAttrs), {}, {
           role: 'menuitem',
           type: 'button',
           disabled: this.disabled
@@ -10814,7 +10887,7 @@
     }
   });
 
-  var props$D = makePropsConfigurable({
+  var props$1K = makePropsConfigurable({
     id: makeProp(PROP_TYPE_STRING),
     tag: makeProp(PROP_TYPE_STRING, 'header'),
     variant: makeProp(PROP_TYPE_STRING)
@@ -10824,7 +10897,7 @@
   var BDropdownHeader = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_HEADER,
     functional: true,
-    props: props$D,
+    props: props$1K,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -10838,7 +10911,7 @@
       }), [h(tag, {
         staticClass: 'dropdown-header',
         class: _defineProperty({}, "text-".concat(variant), variant),
-        attrs: _objectSpread2(_objectSpread2({}, data.attrs || {}), {}, {
+        attrs: _objectSpread2$3(_objectSpread2$3({}, data.attrs || {}), {}, {
           id: props.id || null,
           role: isTag(tag, 'header') ? null : 'heading'
         }),
@@ -10847,7 +10920,7 @@
     }
   });
 
-  var props$E = makePropsConfigurable({
+  var props$1J = makePropsConfigurable({
     tag: makeProp(PROP_TYPE_STRING, 'hr')
   }, NAME_DROPDOWN_DIVIDER); // --- Main component ---
   // @vue/component
@@ -10855,7 +10928,7 @@
   var BDropdownDivider = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_DIVIDER,
     functional: true,
-    props: props$E,
+    props: props$1J,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data;
@@ -10865,7 +10938,7 @@
         }
       }), [h(props.tag, {
         staticClass: 'dropdown-divider',
-        attrs: _objectSpread2(_objectSpread2({}, data.attrs || {}), {}, {
+        attrs: _objectSpread2$3(_objectSpread2$3({}, data.attrs || {}), {}, {
           role: 'separator',
           'aria-orientation': 'horizontal'
         }),
@@ -10874,7 +10947,7 @@
     }
   });
 
-  var props$F = makePropsConfigurable({
+  var props$1I = makePropsConfigurable({
     id: makeProp(PROP_TYPE_STRING),
     inline: makeProp(PROP_TYPE_BOOLEAN, false),
     novalidate: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -10885,7 +10958,7 @@
   var BForm = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM,
     functional: true,
-    props: props$F,
+    props: props$1I,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -10903,7 +10976,7 @@
     }
   });
 
-  var props$G = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$F), {}, {
+  var props$1H = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$1I), {}, {
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
     formClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
   })), NAME_DROPDOWN_FORM); // --- Main component ---
@@ -10912,7 +10985,7 @@
   var BDropdownForm = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_FORM,
     functional: true,
-    props: props$G,
+    props: props$1H,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -10928,7 +11001,7 @@
           disabled: props.disabled
         }],
         props: props,
-        attrs: _objectSpread2(_objectSpread2({}, data.attrs || {}), {}, {
+        attrs: _objectSpread2$3(_objectSpread2$3({}, data.attrs || {}), {}, {
           disabled: props.disabled,
           // Tab index of -1 for keyboard navigation
           tabindex: props.disabled ? null : '-1'
@@ -10939,7 +11012,7 @@
     }
   });
 
-  var props$H = makePropsConfigurable({
+  var props$1G = makePropsConfigurable({
     tag: makeProp(PROP_TYPE_STRING, 'p'),
     textClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     variant: makeProp(PROP_TYPE_STRING)
@@ -10949,7 +11022,7 @@
   var BDropdownText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_TEXT,
     functional: true,
-    props: props$H,
+    props: props$1G,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -10971,7 +11044,7 @@
     }
   });
 
-  var props$I = makePropsConfigurable({
+  var props$1F = makePropsConfigurable({
     ariaDescribedby: makeProp(PROP_TYPE_STRING),
     header: makeProp(PROP_TYPE_STRING),
     headerClasses: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
@@ -10984,7 +11057,7 @@
   var BDropdownGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_DROPDOWN_GROUP,
     functional: true,
-    props: props$I,
+    props: props$1F,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11017,7 +11090,7 @@
         }
       }), [$header, h('ul', {
         staticClass: 'list-unstyled',
-        attrs: _objectSpread2(_objectSpread2({}, data.attrs || {}), {}, {
+        attrs: _objectSpread2$3(_objectSpread2$3({}, data.attrs || {}), {}, {
           id: id,
           role: 'group',
           'aria-describedby': [headerId, props.ariaDescribedBy].filter(identity).join(' ').trim() || null
@@ -11049,13 +11122,13 @@
     }
   });
 
-  var TYPES = ['iframe', 'embed', 'video', 'object', 'img', 'b-img', 'b-img-lazy']; // --- Props ---
+  var TYPES$2 = ['iframe', 'embed', 'video', 'object', 'img', 'b-img', 'b-img-lazy']; // --- Props ---
 
-  var props$J = makePropsConfigurable({
+  var props$1E = makePropsConfigurable({
     aspect: makeProp(PROP_TYPE_STRING, '16by9'),
     tag: makeProp(PROP_TYPE_STRING, 'div'),
     type: makeProp(PROP_TYPE_STRING, 'iframe', function (value) {
-      return arrayIncludes(TYPES, value);
+      return arrayIncludes(TYPES$2, value);
     })
   }, NAME_EMBED); // --- Main component ---
   // @vue/component
@@ -11063,7 +11136,7 @@
   var BEmbed = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_EMBED,
     functional: true,
-    props: props$J,
+    props: props$1E,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11087,7 +11160,7 @@
 
   var OPTIONS_OBJECT_DEPRECATED_MSG = 'Setting prop "options" to an object is deprecated. Use the array format instead.'; // --- Props ---
 
-  var props$K = makePropsConfigurable({
+  var props$1D = makePropsConfigurable({
     disabledField: makeProp(PROP_TYPE_STRING, 'disabled'),
     htmlField: makeProp(PROP_TYPE_STRING, 'html'),
     options: makeProp(PROP_TYPE_ARRAY_OBJECT, []),
@@ -11097,7 +11170,7 @@
   // @vue/component
 
   var formOptionsMixin = Vue__default['default'].extend({
-    props: props$K,
+    props: props$1D,
     computed: {
       formOptions: function formOptions() {
         return this.normalizeOptions(this.options);
@@ -11151,7 +11224,7 @@
     }
   });
 
-  var props$L = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$K), {}, {
+  var props$1C = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$1D), {}, {
     id: makeProp(PROP_TYPE_STRING, undefined, true) // Required
 
   })), NAME_FORM_DATALIST); // --- Main component ---
@@ -11160,7 +11233,7 @@
   var BFormDatalist = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_DATALIST,
     mixins: [formOptionsMixin, normalizeSlotMixin],
-    props: props$L,
+    props: props$1C,
     render: function render(h) {
       var id = this.id;
       var $options = this.formOptions.map(function (option, index) {
@@ -11185,7 +11258,7 @@
     }
   });
 
-  var props$M = makePropsConfigurable({
+  var props$1B = makePropsConfigurable({
     id: makeProp(PROP_TYPE_STRING),
     inline: makeProp(PROP_TYPE_BOOLEAN, false),
     tag: makeProp(PROP_TYPE_STRING, 'small'),
@@ -11196,7 +11269,7 @@
   var BFormText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TEXT,
     functional: true,
-    props: props$M,
+    props: props$1B,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11212,7 +11285,7 @@
     }
   });
 
-  var props$N = makePropsConfigurable({
+  var props$1A = makePropsConfigurable({
     ariaLive: makeProp(PROP_TYPE_STRING),
     forceShow: makeProp(PROP_TYPE_BOOLEAN, false),
     id: makeProp(PROP_TYPE_STRING),
@@ -11227,7 +11300,7 @@
   var BFormInvalidFeedback = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_INVALID_FEEDBACK,
     functional: true,
-    props: props$N,
+    props: props$1A,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11251,7 +11324,7 @@
     }
   });
 
-  var props$O = makePropsConfigurable({
+  var props$1z = makePropsConfigurable({
     ariaLive: makeProp(PROP_TYPE_STRING),
     forceShow: makeProp(PROP_TYPE_BOOLEAN, false),
     id: makeProp(PROP_TYPE_STRING),
@@ -11266,7 +11339,7 @@
   var BFormValidFeedback = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_VALID_FEEDBACK,
     functional: true,
-    props: props$O,
+    props: props$1z,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11290,7 +11363,7 @@
     }
   });
 
-  var props$P = makePropsConfigurable({
+  var props$1y = makePropsConfigurable({
     tag: makeProp(PROP_TYPE_STRING, 'div')
   }, NAME_FORM_ROW); // --- Main component ---
   // @vue/component
@@ -11298,7 +11371,7 @@
   var BFormRow = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_ROW,
     functional: true,
-    props: props$P,
+    props: props$1y,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -11335,7 +11408,7 @@
 
   var SELECTOR = 'input, textarea, select'; // --- Props ---
 
-  var props$Q = makePropsConfigurable({
+  var props$1x = makePropsConfigurable({
     autofocus: makeProp(PROP_TYPE_BOOLEAN, false),
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
     form: makeProp(PROP_TYPE_STRING),
@@ -11346,7 +11419,7 @@
   // @vue/component
 
   var formControlMixin = Vue__default['default'].extend({
-    props: props$Q,
+    props: props$1x,
     mounted: function mounted() {
       this.handleAutofocus();
     },
@@ -11376,13 +11449,13 @@
     }
   });
 
-  var props$R = makePropsConfigurable({
+  var props$1w = makePropsConfigurable({
     plain: makeProp(PROP_TYPE_BOOLEAN, false)
   }, 'formControls'); // --- Mixin ---
   // @vue/component
 
   var formCustomMixin = Vue__default['default'].extend({
-    props: props$R,
+    props: props$1w,
     computed: {
       custom: function custom() {
         return !this.plain;
@@ -11390,13 +11463,13 @@
     }
   });
 
-  var props$S = makePropsConfigurable({
+  var props$1v = makePropsConfigurable({
     size: makeProp(PROP_TYPE_STRING)
   }, 'formControls'); // --- Mixin ---
   // @vue/component
 
   var formSizeMixin = Vue__default['default'].extend({
-    props: props$S,
+    props: props$1v,
     computed: {
       sizeFormClass: function sizeFormClass() {
         return [this.size ? "form-control-".concat(this.size) : null];
@@ -11413,14 +11486,14 @@
    *  - null for no contextual state
    */
 
-  var props$T = makePropsConfigurable({
+  var props$1u = makePropsConfigurable({
     // Tri-state prop: true, false, null (or undefined)
     state: makeProp(PROP_TYPE_BOOLEAN, null)
   }, 'formState'); // --- Mixin ---
   // @vue/component
 
   var formStateMixin = Vue__default['default'].extend({
-    props: props$T,
+    props: props$1u,
     computed: {
       computedState: function computedState() {
         // If not a boolean, ensure that value is null
@@ -11442,17 +11515,17 @@
     }
   });
 
-  var _watch$5, _methods;
+  var _watch$f, _methods;
 
-  var _makeModelMixin$4 = makeModelMixin('checked', {
+  var _makeModelMixin$g = makeModelMixin('checked', {
     defaultValue: null
   }),
-      modelMixin$4 = _makeModelMixin$4.mixin,
-      modelProps$4 = _makeModelMixin$4.props,
-      MODEL_PROP_NAME$4 = _makeModelMixin$4.prop,
-      MODEL_EVENT_NAME$4 = _makeModelMixin$4.event;
+      modelMixin$f = _makeModelMixin$g.mixin,
+      modelProps$f = _makeModelMixin$g.props,
+      MODEL_PROP_NAME$f = _makeModelMixin$g.prop,
+      MODEL_EVENT_NAME$f = _makeModelMixin$g.event;
 
-  var props$U = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$4), props$Q), props$S), props$T), props$R), {}, {
+  var props$1t = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$f), props$1x), props$1v), props$1u), props$1w), {}, {
     ariaLabel: makeProp(PROP_TYPE_STRING),
     ariaLabelledby: makeProp(PROP_TYPE_STRING),
     // Only applicable in standalone mode (non group)
@@ -11465,12 +11538,12 @@
   // @vue/component
 
   var formRadioCheckMixin = Vue__default['default'].extend({
-    mixins: [attrsMixin, idMixin, modelMixin$4, normalizeSlotMixin, formControlMixin, formSizeMixin, formStateMixin, formCustomMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$f, normalizeSlotMixin, formControlMixin, formSizeMixin, formStateMixin, formCustomMixin],
     inheritAttrs: false,
-    props: props$U,
+    props: props$1t,
     data: function data() {
       return {
-        localChecked: this.isGroup ? this.bvGroup[MODEL_PROP_NAME$4] : this[MODEL_PROP_NAME$4],
+        localChecked: this.isGroup ? this.bvGroup[MODEL_PROP_NAME$f] : this[MODEL_PROP_NAME$f],
         hasFocus: false
       };
     },
@@ -11560,7 +11633,7 @@
       computedAttrs: function computedAttrs() {
         var disabled = this.isDisabled,
             required = this.isRequired;
-        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvAttrs), {}, {
           id: this.safeId(),
           type: this.isRadio ? 'radio' : 'checkbox',
           name: this.computedName,
@@ -11573,18 +11646,18 @@
         });
       }
     },
-    watch: (_watch$5 = {}, _defineProperty(_watch$5, MODEL_PROP_NAME$4, function () {
-      this["".concat(MODEL_PROP_NAME$4, "Watcher")].apply(this, arguments);
-    }), _defineProperty(_watch$5, "computedLocalChecked", function computedLocalChecked() {
+    watch: (_watch$f = {}, _defineProperty(_watch$f, MODEL_PROP_NAME$f, function () {
+      this["".concat(MODEL_PROP_NAME$f, "Watcher")].apply(this, arguments);
+    }), _defineProperty(_watch$f, "computedLocalChecked", function computedLocalChecked() {
       this.computedLocalCheckedWatcher.apply(this, arguments);
-    }), _watch$5),
-    methods: (_methods = {}, _defineProperty(_methods, "".concat(MODEL_PROP_NAME$4, "Watcher"), function Watcher(newValue) {
+    }), _watch$f),
+    methods: (_methods = {}, _defineProperty(_methods, "".concat(MODEL_PROP_NAME$f, "Watcher"), function Watcher(newValue) {
       if (!looseEqual(newValue, this.computedLocalChecked)) {
         this.computedLocalChecked = newValue;
       }
     }), _defineProperty(_methods, "computedLocalCheckedWatcher", function computedLocalCheckedWatcher(newValue, oldValue) {
       if (!looseEqual(newValue, oldValue)) {
-        this.$emit(MODEL_EVENT_NAME$4, newValue);
+        this.$emit(MODEL_EVENT_NAME$f, newValue);
       }
     }), _defineProperty(_methods, "handleChange", function handleChange(_ref2) {
       var _this = this;
@@ -11648,7 +11721,7 @@
           value: this.value,
           checked: this.isChecked
         },
-        on: _objectSpread2({
+        on: _objectSpread2$3({
           change: this.handleChange
         }, isBtnMode ? {
           focus: this.handleFocus,
@@ -11705,12 +11778,12 @@
     }
   });
 
-  var _objectSpread2$1;
+  var _objectSpread2$2;
 
   var MODEL_PROP_NAME_INDETERMINATE = 'indeterminate';
   var MODEL_EVENT_NAME_INDETERMINATE = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_INDETERMINATE; // --- Props ---
 
-  var props$V = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$U), {}, (_objectSpread2$1 = {}, _defineProperty(_objectSpread2$1, MODEL_PROP_NAME_INDETERMINATE, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$1, "switch", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$1, "uncheckedValue", makeProp(PROP_TYPE_ANY, false)), _defineProperty(_objectSpread2$1, "value", makeProp(PROP_TYPE_ANY, true)), _objectSpread2$1))), NAME_FORM_CHECKBOX); // --- Main component ---
+  var props$1s = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$1t), {}, (_objectSpread2$2 = {}, _defineProperty(_objectSpread2$2, MODEL_PROP_NAME_INDETERMINATE, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$2, "switch", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$2, "uncheckedValue", makeProp(PROP_TYPE_ANY, false)), _defineProperty(_objectSpread2$2, "value", makeProp(PROP_TYPE_ANY, true)), _objectSpread2$2))), NAME_FORM_CHECKBOX); // --- Main component ---
   // @vue/component
 
   var BFormCheckbox = /*#__PURE__*/Vue__default['default'].extend({
@@ -11722,7 +11795,7 @@
         default: null
       }
     },
-    props: props$V,
+    props: props$1s,
     computed: {
       isChecked: function isChecked() {
         var value = this.value,
@@ -11745,7 +11818,7 @@
     methods: {
       computedLocalCheckedWatcher: function computedLocalCheckedWatcher(newValue, oldValue) {
         if (!looseEqual(newValue, oldValue)) {
-          this.$emit(MODEL_EVENT_NAME$4, newValue);
+          this.$emit(MODEL_EVENT_NAME$f, newValue);
           var $input = this.$refs.input;
 
           if ($input) {
@@ -11809,41 +11882,40 @@
     }
   });
 
-  var props$W = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$Q), props$U), props$S), props$T)), NAME_FORM_RADIO); // --- Main component ---
+  var props$1r = makePropsConfigurable(props$1t, NAME_FORM_RADIO); // --- Main component ---
   // @vue/component
 
   var BFormRadio = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_RADIO,
-    mixins: [idMixin, formRadioCheckMixin, // Includes shared render function
-    formControlMixin, formSizeMixin, formStateMixin],
+    mixins: [formRadioCheckMixin],
     inject: {
       bvGroup: {
         from: 'bvRadioGroup',
         default: false
       }
     },
-    props: props$W,
+    props: props$1r,
     watch: {
       computedLocalChecked: function computedLocalChecked(newValue, oldValue) {
         if (!looseEqual(newValue, oldValue)) {
-          this.$emit(MODEL_EVENT_NAME$4, newValue);
+          this.$emit(MODEL_EVENT_NAME$f, newValue);
         }
       }
     }
   });
 
-  var _watch$6;
+  var _watch$e;
   // Attributes to pass down to checks/radios instead of applying them to the group
 
   var PASS_DOWN_ATTRS = ['aria-describedby', 'aria-labelledby'];
 
-  var _makeModelMixin$5 = makeModelMixin('checked'),
-      modelMixin$5 = _makeModelMixin$5.mixin,
-      modelProps$5 = _makeModelMixin$5.props,
-      MODEL_PROP_NAME$5 = _makeModelMixin$5.prop,
-      MODEL_EVENT_NAME$5 = _makeModelMixin$5.event;
+  var _makeModelMixin$f = makeModelMixin('checked'),
+      modelMixin$e = _makeModelMixin$f.mixin,
+      modelProps$e = _makeModelMixin$f.props,
+      MODEL_PROP_NAME$e = _makeModelMixin$f.prop,
+      MODEL_EVENT_NAME$e = _makeModelMixin$f.event;
 
-  var props$X = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$5), props$Q), props$K), props$S), props$T), props$R), {}, {
+  var props$1q = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$e), props$1x), props$1D), props$1v), props$1u), props$1w), {}, {
     ariaInvalid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
     // Only applicable when rendered with button style
     buttonVariant: makeProp(PROP_TYPE_STRING),
@@ -11855,12 +11927,12 @@
   // @vue/component
 
   var formRadioCheckGroupMixin = Vue__default['default'].extend({
-    mixins: [idMixin, modelMixin$5, normalizeSlotMixin, formControlMixin, formOptionsMixin, formSizeMixin, formStateMixin, formCustomMixin],
+    mixins: [idMixin, modelMixin$e, normalizeSlotMixin, formControlMixin, formOptionsMixin, formSizeMixin, formStateMixin, formCustomMixin],
     inheritAttrs: false,
-    props: props$X,
+    props: props$1q,
     data: function data() {
       return {
-        localChecked: this[MODEL_PROP_NAME$5]
+        localChecked: this[MODEL_PROP_NAME$e]
       };
     },
     computed: {
@@ -11890,20 +11962,20 @@
         return classes;
       }
     },
-    watch: (_watch$6 = {}, _defineProperty(_watch$6, MODEL_PROP_NAME$5, function (newValue) {
+    watch: (_watch$e = {}, _defineProperty(_watch$e, MODEL_PROP_NAME$e, function (newValue) {
       if (!looseEqual(newValue, this.localChecked)) {
         this.localChecked = newValue;
       }
-    }), _defineProperty(_watch$6, "localChecked", function localChecked(newValue, oldValue) {
+    }), _defineProperty(_watch$e, "localChecked", function localChecked(newValue, oldValue) {
       if (!looseEqual(newValue, oldValue)) {
-        this.$emit(MODEL_EVENT_NAME$5, newValue);
+        this.$emit(MODEL_EVENT_NAME$e, newValue);
       }
-    }), _watch$6),
+    }), _watch$e),
     render: function render(h) {
       var _this = this;
 
       var isRadioGroup = this.isRadioGroup;
-      var attrs = pick(this.$attrs, PASS_DOWN_ATTRS);
+      var attrs = pick$1(this.$attrs, PASS_DOWN_ATTRS);
       var optionComponent = isRadioGroup ? BFormRadio : BFormCheckbox;
       var $inputs = this.formOptions.map(function (option, index) {
         var key = "BV_option_".concat(index);
@@ -11915,7 +11987,8 @@
             value: option.value // We don't need to include these, since the input's will know they are inside here
             // form: this.form || null,
             // name: this.groupName,
-            // required: Boolean(this.name && this.required)
+            // required: Boolean(this.name && this.required),
+            // state: this.state
 
           },
           attrs: attrs,
@@ -11926,7 +11999,7 @@
       });
       return h('div', {
         class: [this.groupClasses, 'bv-no-focus-ring'],
-        attrs: _objectSpread2(_objectSpread2({}, omit(this.$attrs, PASS_DOWN_ATTRS)), {}, {
+        attrs: _objectSpread2$3(_objectSpread2$3({}, omit(this.$attrs, PASS_DOWN_ATTRS)), {}, {
           'aria-invalid': this.computedAriaInvalid,
           'aria-required': this.required ? 'true' : null,
           id: this.safeId(),
@@ -11938,9 +12011,9 @@
     }
   });
 
-  var _objectSpread2$2;
+  var _objectSpread2$1;
 
-  var props$Y = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$X), {}, (_objectSpread2$2 = {}, _defineProperty(_objectSpread2$2, MODEL_PROP_NAME$5, makeProp(PROP_TYPE_ARRAY, [])), _defineProperty(_objectSpread2$2, "switches", makeProp(PROP_TYPE_BOOLEAN, false)), _objectSpread2$2))), NAME_FORM_CHECKBOX_GROUP); // --- Main component ---
+  var props$1p = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$1q), {}, (_objectSpread2$1 = {}, _defineProperty(_objectSpread2$1, MODEL_PROP_NAME$e, makeProp(PROP_TYPE_ARRAY, [])), _defineProperty(_objectSpread2$1, "switches", makeProp(PROP_TYPE_BOOLEAN, false)), _objectSpread2$1))), NAME_FORM_CHECKBOX_GROUP); // --- Main component ---
   // @vue/component
 
   var BFormCheckboxGroup = /*#__PURE__*/Vue__default['default'].extend({
@@ -11952,7 +12025,7 @@
         bvCheckGroup: this
       };
     },
-    props: props$Y,
+    props: props$1p,
     computed: {
       isRadioGroup: function isRadioGroup() {
         return false;
@@ -11973,7 +12046,7 @@
 
   // v-b-hover directive
 
-  var PROP = '__BV_hover_handler__';
+  var PROP$2 = '__BV_hover_handler__';
   var MOUSEENTER = 'mouseenter';
   var MOUSELEAVE = 'mouseleave'; // --- Helper methods ---
 
@@ -11997,18 +12070,18 @@
         handler = _ref$value === void 0 ? null : _ref$value;
 
     if (IS_BROWSER) {
-      var listener = el[PROP];
-      var hasListener = isFunction(listener);
+      var listener = el[PROP$2];
+      var hasListener = isFunction$1(listener);
       var handlerChanged = !(hasListener && listener.fn === handler);
 
       if (hasListener && handlerChanged) {
         updateListeners(false, el, listener);
-        delete el[PROP];
+        delete el[PROP$2];
       }
 
-      if (isFunction(handler) && handlerChanged) {
-        el[PROP] = createListener(handler);
-        updateListeners(true, el, el[PROP]);
+      if (isFunction$1(handler) && handlerChanged) {
+        el[PROP$2] = createListener(handler);
+        updateListeners(true, el, el[PROP$2]);
       }
     }
   }; // VBHover directive
@@ -12024,7 +12097,7 @@
     }
   };
 
-  var props$Z = sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$S), props$T), omit(props$z, ['disabled'])), omit(props$Q, ['autofocus'])), {}, {
+  var props$1o = sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$1v), props$1u), omit(props$1O, ['disabled'])), omit(props$1x, ['autofocus'])), {}, {
     // When `true`, renders a `btn-group` wrapper and visually hides the label
     buttonOnly: makeProp(PROP_TYPE_BOOLEAN, false),
     // Applicable in button mode only
@@ -12052,7 +12125,7 @@
       'b-hover': VBHover
     },
     mixins: [idMixin, formSizeMixin, formStateMixin, dropdownMixin, normalizeSlotMixin],
-    props: props$Z,
+    props: props$1o,
     data: function data() {
       return {
         isHovered: false,
@@ -12113,7 +12186,7 @@
           labelSelected = this.labelSelected,
           buttonVariant = this.buttonVariant,
           buttonOnly = this.buttonOnly;
-      var value = toString$1(this.value) || '';
+      var value = toString(this.value) || '';
       var invalid = state === false || required && !value;
       var btnScope = {
         isHovered: isHovered,
@@ -12247,20 +12320,20 @@
     }
   });
 
-  var _watch$7;
+  var _watch$d;
 
-  var _makeModelMixin$6 = makeModelMixin('value', {
+  var _makeModelMixin$e = makeModelMixin('value', {
     type: PROP_TYPE_DATE_STRING
   }),
-      modelMixin$6 = _makeModelMixin$6.mixin,
-      modelProps$6 = _makeModelMixin$6.props,
-      MODEL_PROP_NAME$6 = _makeModelMixin$6.prop,
-      MODEL_EVENT_NAME$6 = _makeModelMixin$6.event; // --- Props ---
+      modelMixin$d = _makeModelMixin$e.mixin,
+      modelProps$d = _makeModelMixin$e.props,
+      MODEL_PROP_NAME$d = _makeModelMixin$e.prop,
+      MODEL_EVENT_NAME$d = _makeModelMixin$e.event; // --- Props ---
 
 
-  var calendarProps = omit(props$h, ['block', 'hidden', 'id', 'noKeyNav', 'roleDescription', 'value', 'width']);
-  var formBtnLabelControlProps = omit(props$Z, ['formattedValue', 'id', 'lang', 'rtl', 'value']);
-  var props$_ = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$6), calendarProps), formBtnLabelControlProps), {}, {
+  var calendarProps = omit(props$24, ['block', 'hidden', 'id', 'noKeyNav', 'roleDescription', 'value', 'width']);
+  var formBtnLabelControlProps$1 = omit(props$1o, ['formattedValue', 'id', 'lang', 'rtl', 'value']);
+  var props$1n = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$d), calendarProps), formBtnLabelControlProps$1), {}, {
     // Width of the calendar dropdown
     calendarWidth: makeProp(PROP_TYPE_STRING, '270px'),
     closeButton: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -12281,12 +12354,12 @@
 
   var BFormDatepicker = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_DATEPICKER,
-    mixins: [idMixin, modelMixin$6],
-    props: props$_,
+    mixins: [idMixin, modelMixin$d],
+    props: props$1n,
     data: function data() {
       return {
         // We always use `YYYY-MM-DD` value internally
-        localYMD: formatYMD(this[MODEL_PROP_NAME$6]) || '',
+        localYMD: formatYMD(this[MODEL_PROP_NAME$d]) || '',
         // If the popup is open
         isVisible: false,
         // Context data from BCalendar
@@ -12309,14 +12382,14 @@
         return formatYMD(constrainDate(this.resetValue)) || '';
       }
     },
-    watch: (_watch$7 = {}, _defineProperty(_watch$7, MODEL_PROP_NAME$6, function (newValue) {
+    watch: (_watch$d = {}, _defineProperty(_watch$d, MODEL_PROP_NAME$d, function (newValue) {
       this.localYMD = formatYMD(newValue) || '';
-    }), _defineProperty(_watch$7, "localYMD", function localYMD(newValue) {
+    }), _defineProperty(_watch$d, "localYMD", function localYMD(newValue) {
       // We only update the v-model when the datepicker is open
       if (this.isVisible) {
-        this.$emit(MODEL_EVENT_NAME$6, this.valueAsDate ? parseYMD(newValue) || null : newValue || '');
+        this.$emit(MODEL_EVENT_NAME$d, this.valueAsDate ? parseYMD(newValue) || null : newValue || '');
       }
-    }), _defineProperty(_watch$7, "calendarYM", function calendarYM(newValue, oldValue) {
+    }), _defineProperty(_watch$d, "calendarYM", function calendarYM(newValue, oldValue) {
       // Displayed calendar month has changed
       // So possibly the calendar height has changed...
       // We need to update popper computed position
@@ -12325,7 +12398,7 @@
           this.$refs.control.updatePopper();
         } catch (_unused) {}
       }
-    }), _watch$7),
+    }), _watch$d),
     methods: {
       // Public methods
       focus: function focus() {
@@ -12488,7 +12561,7 @@
 
       var $calendar = h(BCalendar, {
         staticClass: 'b-form-date-calendar w-100',
-        props: _objectSpread2(_objectSpread2({}, pluckProps(calendarProps, $props)), {}, {
+        props: _objectSpread2$3(_objectSpread2$3({}, pluckProps(calendarProps, $props)), {}, {
           hidden: !this.isVisible,
           value: localYMD,
           valueAsDate: false,
@@ -12499,13 +12572,13 @@
           input: this.onInput,
           context: this.onContext
         },
-        scopedSlots: pick($scopedSlots, ['nav-prev-decade', 'nav-prev-year', 'nav-prev-month', 'nav-this-month', 'nav-next-month', 'nav-next-year', 'nav-next-decade']),
+        scopedSlots: pick$1($scopedSlots, ['nav-prev-decade', 'nav-prev-year', 'nav-prev-month', 'nav-this-month', 'nav-next-month', 'nav-next-year', 'nav-next-decade']),
         key: 'calendar',
         ref: 'calendar'
       }, $footer);
       return h(BVFormBtnLabelControl, {
         staticClass: 'b-form-datepicker',
-        props: _objectSpread2(_objectSpread2({}, pluckProps(formBtnLabelControlProps, $props)), {}, {
+        props: _objectSpread2$3(_objectSpread2$3({}, pluckProps(formBtnLabelControlProps$1, $props)), {}, {
           formattedValue: localYMD ? this.formattedValue : '',
           id: this.safeId(),
           lang: this.computedLang,
@@ -12535,9 +12608,9 @@
     }
   });
 
-  var _watch$8;
+  var _watch$c;
 
-  var _makeModelMixin$7 = makeModelMixin('value', {
+  var _makeModelMixin$d = makeModelMixin('value', {
     type: [PROP_TYPE_ARRAY, File],
     defaultValue: null,
     validator: function validator(value) {
@@ -12550,10 +12623,10 @@
       return isUndefinedOrNull(value) || isValidValue(value);
     }
   }),
-      modelMixin$7 = _makeModelMixin$7.mixin,
-      modelProps$7 = _makeModelMixin$7.props,
-      MODEL_PROP_NAME$7 = _makeModelMixin$7.prop,
-      MODEL_EVENT_NAME$7 = _makeModelMixin$7.event;
+      modelMixin$c = _makeModelMixin$d.mixin,
+      modelProps$c = _makeModelMixin$d.props,
+      MODEL_PROP_NAME$c = _makeModelMixin$d.prop,
+      MODEL_EVENT_NAME$c = _makeModelMixin$d.event;
 
   var VALUE_EMPTY_DEPRECATED_MSG = 'Setting "value"/"v-model" to an empty string for reset is deprecated. Set to "null" instead.'; // --- Helper methods ---
 
@@ -12567,7 +12640,7 @@
 
 
   var getDataTransferItemEntry = function getDataTransferItemEntry(item) {
-    return isFunction(item.getAsEntry) ? item.getAsEntry() : isFunction(item.webkitGetAsEntry) ? item.webkitGetAsEntry() : null;
+    return isFunction$1(item.getAsEntry) ? item.getAsEntry() : isFunction$1(item.webkitGetAsEntry) ? item.webkitGetAsEntry() : null;
   }; // Drop handler function to get all files
 
   /* istanbul ignore next: not supported in JSDOM */
@@ -12638,7 +12711,7 @@
   }; // --- Props ---
 
 
-  var props$$ = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$7), props$Q), props$R), props$T), props$S), {}, {
+  var props$1m = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$c), props$1x), props$1w), props$1u), props$1v), {}, {
     accept: makeProp(PROP_TYPE_STRING, ''),
     browseText: makeProp(PROP_TYPE_STRING, 'Browse'),
     // Instruct input to capture from camera
@@ -12664,9 +12737,9 @@
 
   var BFormFile = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_FILE,
-    mixins: [attrsMixin, idMixin, modelMixin$7, normalizeSlotMixin, formControlMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$c, normalizeSlotMixin, formControlMixin, formStateMixin, formCustomMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    props: props$$,
+    props: props$1m,
     data: function data() {
       return {
         files: [],
@@ -12729,7 +12802,7 @@
             accept = this.accept,
             multiple = this.multiple,
             directory = this.directory;
-        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvAttrs), {}, {
           type: 'file',
           id: this.safeId(),
           name: name,
@@ -12794,18 +12867,18 @@
         return computedFileNameFormatter(flattenedFiles, clonedFiles, fileNames);
       }
     },
-    watch: (_watch$8 = {}, _defineProperty(_watch$8, MODEL_PROP_NAME$7, function (newValue) {
+    watch: (_watch$c = {}, _defineProperty(_watch$c, MODEL_PROP_NAME$c, function (newValue) {
       if (!newValue || isArray(newValue) && newValue.length === 0) {
         this.reset();
       }
-    }), _defineProperty(_watch$8, "files", function files(newValue, oldValue) {
+    }), _defineProperty(_watch$c, "files", function files(newValue, oldValue) {
       if (!looseEqual(newValue, oldValue)) {
         var multiple = this.multiple,
             noTraverse = this.noTraverse;
         var files = !multiple || noTraverse ? flattenDeep(newValue) : newValue;
-        this.$emit(MODEL_EVENT_NAME$7, multiple ? files : files[0] || null);
+        this.$emit(MODEL_EVENT_NAME$c, multiple ? files : files[0] || null);
       }
-    }), _watch$8),
+    }), _watch$c),
     created: function created() {
       // Create private non-reactive props
       this.$_form = null;
@@ -13099,7 +13172,7 @@
 
 
   var cssEscape = function cssEscape(value) {
-    value = toString$1(value);
+    value = toString(value);
     var length = value.length;
     var firstCharCode = value.charCodeAt(0);
     return value.split('').reduce(function (result, char, index) {
@@ -13180,7 +13253,7 @@
   var breakpointPropMap = create(null); // --- Props ---
   // Prop generator for lazy generation of props
 
-  var generateProps = function generateProps() {
+  var generateProps$2 = function generateProps() {
     // Grab the breakpoints from the cached config (exclude the '' (xs) breakpoint)
     var breakpoints = getBreakpointsUpCached().filter(identity); // i.e. 'col-sm', 'col-md-6', 'col-lg-auto', ...
 
@@ -13206,7 +13279,7 @@
       order: keys(breakpointOrder)
     }); // Return the generated props
 
-    return makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, breakpointCol), breakpointOffset), breakpointOrder), {}, {
+    return makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, breakpointCol), breakpointOffset), breakpointOrder), {}, {
       // Flex alignment
       alignSelf: makeProp(PROP_TYPE_STRING, null, function (value) {
         return arrayIncludes(ALIGN_SELF_VALUES, value);
@@ -13234,7 +13307,7 @@
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get#Smart_self-overwriting_lazy_getters
       delete this.props; // eslint-disable-next-line no-return-assign
 
-      return this.props = generateProps();
+      return this.props = generateProps$2();
     },
 
     render: function render(h, _ref) {
@@ -13286,7 +13359,7 @@
   // Prop generator for lazy generation of props
 
   var generateProps$1 = function generateProps() {
-    return makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$T), getBreakpointsUpCached().reduce(function (props, breakpoint) {
+    return makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$1u), getBreakpointsUpCached().reduce(function (props, breakpoint) {
       // i.e. 'content-cols', 'content-cols-sm', 'content-cols-md', ...
       props[suffixPropName(breakpoint, 'contentCols')] = makeProp(PROP_TYPE_BOOLEAN_NUMBER_STRING); // i.e. 'label-align', 'label-align-sm', 'label-align-md', ...
 
@@ -13493,7 +13566,7 @@
             on: isFieldset ? {
               click: this.onLegendClick
             } : {},
-            props: isHorizontal ? _objectSpread2(_objectSpread2({}, labelColProps), {}, {
+            props: isHorizontal ? _objectSpread2$3(_objectSpread2$3({}, labelColProps), {}, {
               tag: labelTag
             }) : {},
             attrs: {
@@ -13525,7 +13598,6 @@
           props: {
             ariaLive: feedbackAriaLive,
             id: invalidFeedbackId,
-            role: feedbackAriaLive ? 'alert' : null,
             // If state is explicitly `false`, always show the feedback
             state: state,
             tooltip: tooltip
@@ -13545,7 +13617,6 @@
           props: {
             ariaLive: feedbackAriaLive,
             id: validFeedbackId,
-            role: feedbackAriaLive ? 'alert' : null,
             // If state is explicitly `true`, always show the feedback
             state: state,
             tooltip: tooltip
@@ -13684,17 +13755,17 @@
     }
   });
 
-  var _makeModelMixin$8 = makeModelMixin('value', {
+  var _makeModelMixin$c = makeModelMixin('value', {
     type: PROP_TYPE_NUMBER_STRING,
     defaultValue: '',
     event: EVENT_NAME_UPDATE
   }),
-      modelMixin$8 = _makeModelMixin$8.mixin,
-      modelProps$8 = _makeModelMixin$8.props,
-      MODEL_PROP_NAME$8 = _makeModelMixin$8.prop,
-      MODEL_EVENT_NAME$8 = _makeModelMixin$8.event;
+      modelMixin$b = _makeModelMixin$c.mixin,
+      modelProps$b = _makeModelMixin$c.props,
+      MODEL_PROP_NAME$b = _makeModelMixin$c.prop,
+      MODEL_EVENT_NAME$b = _makeModelMixin$c.event;
 
-  var props$10 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, modelProps$8), {}, {
+  var props$1l = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, modelProps$b), {}, {
     ariaInvalid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
     autocomplete: makeProp(PROP_TYPE_STRING),
     // Debounce timeout (in ms). Not applicable with `lazy` prop
@@ -13712,12 +13783,12 @@
   // @vue/component
 
   var formTextMixin = Vue__default['default'].extend({
-    mixins: [modelMixin$8],
-    props: props$10,
+    mixins: [modelMixin$b],
+    props: props$1l,
     data: function data() {
-      var value = this[MODEL_PROP_NAME$8];
+      var value = this[MODEL_PROP_NAME$b];
       return {
-        localValue: toString$1(value),
+        localValue: toString(value),
         vModelValue: this.modifyValue(value)
       };
     },
@@ -13745,8 +13816,8 @@
         return hasPropFunction(this.formatter);
       }
     },
-    watch: _defineProperty({}, MODEL_PROP_NAME$8, function (newValue) {
-      var stringifyValue = toString$1(newValue);
+    watch: _defineProperty({}, MODEL_PROP_NAME$b, function (newValue) {
+      var stringifyValue = toString(newValue);
       var modifiedValue = this.modifyValue(newValue);
 
       if (stringifyValue !== this.localValue || modifiedValue !== this.vModelValue) {
@@ -13761,10 +13832,6 @@
       // Create private non-reactive props
       this.$_inputDebounceTimer = null;
     },
-    mounted: function mounted() {
-      // Set up destroy handler
-      this.$on(HOOK_EVENT_NAME_BEFORE_DESTROY, this.clearDebounce);
-    },
     beforeDestroy: function beforeDestroy() {
       this.clearDebounce();
     },
@@ -13775,7 +13842,7 @@
       },
       formatValue: function formatValue(value, event) {
         var force = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-        value = toString$1(value);
+        value = toString(value);
 
         if (this.hasFormatter && (!this.lazyFormatter || force)) {
           value = this.formatter(value, event);
@@ -13784,7 +13851,7 @@
         return value;
       },
       modifyValue: function modifyValue(value) {
-        value = toString$1(value); // Emulate `.trim` modifier behaviour
+        value = toString(value); // Emulate `.trim` modifier behaviour
 
         if (this.trim) {
           value = value.trim();
@@ -13818,7 +13885,7 @@
           if (value !== _this.vModelValue) {
             _this.vModelValue = value;
 
-            _this.$emit(MODEL_EVENT_NAME$8, value);
+            _this.$emit(MODEL_EVENT_NAME$b, value);
           } else if (_this.hasFormatter) {
             // When the `vModelValue` hasn't changed but the actual input value
             // is out of sync, make sure to change it to the given one
@@ -13902,7 +13969,7 @@
         if (formattedValue !== false) {
           // We need to use the modified value here to apply the
           // `.trim` and `.number` modifiers properly
-          this.localValue = toString$1(this.modifyValue(formattedValue)); // We pass the formatted value here since the `updateValue` method
+          this.localValue = toString(this.modifyValue(formattedValue)); // We pass the formatted value here since the `updateValue` method
           // handles the modifiers itself
 
           this.updateValue(formattedValue, true);
@@ -13987,7 +14054,7 @@
 
   var TYPES$1 = ['text', 'password', 'email', 'number', 'url', 'tel', 'search', 'range', 'color', 'date', 'time', 'datetime', 'datetime-local', 'month', 'week']; // --- Props ---
 
-  var props$11 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$Q), props$S), props$T), props$10), {}, {
+  var props$1k = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$1x), props$1v), props$1u), props$1l), {}, {
     list: makeProp(PROP_TYPE_STRING),
     max: makeProp(PROP_TYPE_NUMBER_STRING),
     min: makeProp(PROP_TYPE_NUMBER_STRING),
@@ -14004,7 +14071,7 @@
     name: NAME_FORM_INPUT,
     // Mixin order is important!
     mixins: [listenersMixin, idMixin, formControlMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
-    props: props$11,
+    props: props$1k,
     computed: {
       localType: function localType() {
         // We only allow certain types
@@ -14040,7 +14107,7 @@
         };
       },
       computedListeners: function computedListeners() {
-        return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvListeners), {}, {
           input: this.onInput,
           change: this.onChange,
           blur: this.onBlur
@@ -14119,7 +14186,7 @@
     }
   });
 
-  var props$12 = makePropsConfigurable(props$X, NAME_FORM_RADIO_GROUP); // --- Main component ---
+  var props$1j = makePropsConfigurable(props$1q, NAME_FORM_RADIO_GROUP); // --- Main component ---
   // @vue/component
 
   var BFormRadioGroup = /*#__PURE__*/Vue__default['default'].extend({
@@ -14130,7 +14197,7 @@
         bvRadioGroup: this
       };
     },
-    props: props$12,
+    props: props$1j,
     computed: {
       isRadioGroup: function isRadioGroup() {
         return true;
@@ -14147,16 +14214,16 @@
     }
   });
 
-  var _watch$9;
+  var _watch$b;
 
-  var _makeModelMixin$9 = makeModelMixin('value', {
+  var _makeModelMixin$b = makeModelMixin('value', {
     type: PROP_TYPE_NUMBER_STRING,
     event: EVENT_NAME_CHANGE
   }),
-      modelMixin$9 = _makeModelMixin$9.mixin,
-      modelProps$9 = _makeModelMixin$9.props,
-      MODEL_PROP_NAME$9 = _makeModelMixin$9.prop,
-      MODEL_EVENT_NAME$9 = _makeModelMixin$9.event;
+      modelMixin$a = _makeModelMixin$b.mixin,
+      modelProps$a = _makeModelMixin$b.props,
+      MODEL_PROP_NAME$a = _makeModelMixin$b.prop,
+      MODEL_EVENT_NAME$a = _makeModelMixin$b.event;
 
   var MIN_STARS = 3;
   var DEFAULT_STARS = 5; // --- Helper methods ---
@@ -14231,7 +14298,7 @@
     }
   }); // --- Props ---
 
-  var props$13 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$9), omit(props$Q, ['required', 'autofocus'])), props$S), {}, {
+  var props$1i = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$a), omit(props$1x, ['required', 'autofocus'])), props$1v), {}, {
     // CSS color string (overrides variant)
     color: makeProp(PROP_TYPE_STRING),
     iconClear: makeProp(PROP_TYPE_STRING, 'x'),
@@ -14263,10 +14330,10 @@
       BIconStarFill: BIconStarFill,
       BIconX: BIconX
     },
-    mixins: [idMixin, modelMixin$9, formSizeMixin],
-    props: props$13,
+    mixins: [idMixin, modelMixin$a, formSizeMixin],
+    props: props$1i,
     data: function data() {
-      var value = toFloat(this[MODEL_PROP_NAME$9], null);
+      var value = toFloat(this[MODEL_PROP_NAME$a], null);
       var stars = computeStars(this.stars);
       return {
         localValue: isNull(value) ? null : clampValue(value, 0, stars),
@@ -14309,21 +14376,21 @@
         return showValueMax ? "".concat(value, "/").concat(stars) : value;
       }
     },
-    watch: (_watch$9 = {}, _defineProperty(_watch$9, MODEL_PROP_NAME$9, function (newValue, oldValue) {
+    watch: (_watch$b = {}, _defineProperty(_watch$b, MODEL_PROP_NAME$a, function (newValue, oldValue) {
       if (newValue !== oldValue) {
         var value = toFloat(newValue, null);
         this.localValue = isNull(value) ? null : clampValue(value, 0, this.computedStars);
       }
-    }), _defineProperty(_watch$9, "localValue", function localValue(newValue, oldValue) {
+    }), _defineProperty(_watch$b, "localValue", function localValue(newValue, oldValue) {
       if (newValue !== oldValue && newValue !== (this.value || 0)) {
-        this.$emit(MODEL_EVENT_NAME$9, newValue || null);
+        this.$emit(MODEL_EVENT_NAME$a, newValue || null);
       }
-    }), _defineProperty(_watch$9, "disabled", function disabled(newValue) {
+    }), _defineProperty(_watch$b, "disabled", function disabled(newValue) {
       if (newValue) {
         this.hasFocus = false;
         this.blur();
       }
-    }), _watch$9),
+    }), _watch$b),
     methods: {
       // --- Public methods ---
       focus: function focus() {
@@ -14484,7 +14551,7 @@
             'aria-hidden': 'true'
           },
           key: 'value'
-        }, toString$1(formattedRating)));
+        }, toString(formattedRating)));
       }
 
       return h('output', {
@@ -14506,8 +14573,8 @@
           'aria-readonly': !disabled && readonly ? 'true' : null,
           'aria-live': 'off',
           'aria-valuemin': showClear ? '0' : '1',
-          'aria-valuemax': toString$1(computedStars),
-          'aria-valuenow': computedRating ? toString$1(computedRating) : null
+          'aria-valuemax': toString(computedStars),
+          'aria-valuenow': computedRating ? toString(computedRating) : null
         },
         on: {
           keydown: this.onKeydown,
@@ -14527,11 +14594,11 @@
 
   var _makeModelMixin$a = makeModelMixin('value'),
       mixin = _makeModelMixin$a.mixin,
-      props$14 = _makeModelMixin$a.props,
+      props$1h = _makeModelMixin$a.props,
       prop = _makeModelMixin$a.prop,
       event = _makeModelMixin$a.event;
 
-  var props$15 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$K), {}, {
+  var props$1g = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$1D), {}, {
     labelField: makeProp(PROP_TYPE_STRING, 'label'),
     optionsField: makeProp(PROP_TYPE_STRING, 'options')
   })), 'formOptions'); // --- Mixin ---
@@ -14539,7 +14606,7 @@
 
   var optionsMixin = Vue__default['default'].extend({
     mixins: [formOptionsMixin],
-    props: props$15,
+    props: props$1g,
     methods: {
       normalizeOption: function normalizeOption(option) {
         var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -14576,7 +14643,7 @@
     }
   });
 
-  var props$16 = makePropsConfigurable({
+  var props$1f = makePropsConfigurable({
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
     value: makeProp(PROP_TYPE_ANY, undefined, true) // Required
 
@@ -14586,7 +14653,7 @@
   var BFormSelectOption = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_SELECT_OPTION,
     functional: true,
-    props: props$16,
+    props: props$1f,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -14604,7 +14671,7 @@
     }
   });
 
-  var props$17 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$K), {}, {
+  var props$1e = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$1D), {}, {
     label: makeProp(PROP_TYPE_STRING, undefined, true) // Required
 
   })), NAME_FORM_SELECT_OPTION_GROUP); // --- Main component ---
@@ -14613,7 +14680,7 @@
   var BFormSelectOptionGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_SELECT_OPTION_GROUP,
     mixins: [normalizeSlotMixin, formOptionsMixin],
-    props: props$17,
+    props: props$1e,
     render: function render(h) {
       var label = this.label;
       var $options = this.formOptions.map(function (option, index) {
@@ -14638,7 +14705,7 @@
     }
   });
 
-  var props$18 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$14), props$Q), props$R), props$S), props$T), {}, {
+  var props$1d = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$1h), props$1x), props$1w), props$1v), props$1u), {}, {
     ariaInvalid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
     multiple: makeProp(PROP_TYPE_BOOLEAN, false),
     // Browsers default size to `0`, which shows 4 rows in most browsers in multiple mode
@@ -14650,7 +14717,7 @@
   var BFormSelect = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_SELECT,
     mixins: [idMixin, mixin, formControlMixin, formSizeMixin, formStateMixin, formCustomMixin, optionsMixin, normalizeSlotMixin],
-    props: props$18,
+    props: props$1d,
     data: function data() {
       return {
         localValue: this[prop]
@@ -14761,14 +14828,14 @@
 
   var _watch$a;
 
-  var _makeModelMixin$b = makeModelMixin('value', {
+  var _makeModelMixin$9 = makeModelMixin('value', {
     // Should this really be String, to match native number inputs?
     type: PROP_TYPE_BOOLEAN_NUMBER
   }),
-      modelMixin$a = _makeModelMixin$b.mixin,
-      modelProps$a = _makeModelMixin$b.props,
-      MODEL_PROP_NAME$a = _makeModelMixin$b.prop,
-      MODEL_EVENT_NAME$a = _makeModelMixin$b.event; // Default for spin button range and step
+      modelMixin$9 = _makeModelMixin$9.mixin,
+      modelProps$9 = _makeModelMixin$9.props,
+      MODEL_PROP_NAME$9 = _makeModelMixin$9.prop,
+      MODEL_EVENT_NAME$9 = _makeModelMixin$9.event; // Default for spin button range and step
 
 
   var DEFAULT_MIN = 1;
@@ -14784,7 +14851,7 @@
   var DEFAULT_REPEAT_MULTIPLIER = 4;
   var KEY_CODES = [CODE_UP, CODE_DOWN, CODE_HOME, CODE_END, CODE_PAGEUP, CODE_PAGEDOWN]; // --- Props ---
 
-  var props$19 = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$a), omit(props$Q, ['required', 'autofocus'])), props$S), props$T), {}, {
+  var props$1c = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$9), omit(props$1x, ['required', 'autofocus'])), props$1v), props$1u), {}, {
     ariaControls: makeProp(PROP_TYPE_STRING),
     ariaLabel: makeProp(PROP_TYPE_STRING),
     formatterFn: makeProp(PROP_TYPE_FUNCTION),
@@ -14809,12 +14876,12 @@
   var BFormSpinbutton = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_SPINBUTTON,
     // Mixin order is important!
-    mixins: [attrsMixin, idMixin, modelMixin$a, formSizeMixin, formStateMixin, normalizeSlotMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$9, formSizeMixin, formStateMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    props: props$19,
+    props: props$1c,
     data: function data() {
       return {
-        localValue: toFloat(this[MODEL_PROP_NAME$a], null),
+        localValue: toFloat(this[MODEL_PROP_NAME$9], null),
         hasFocus: false
       };
     },
@@ -14897,7 +14964,7 @@
         return hasPropFunction(formatterFn) ? formatterFn : this.defaultFormatter;
       },
       computedAttrs: function computedAttrs() {
-        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvAttrs), {}, {
           role: 'group',
           lang: this.computedLocale,
           tabindex: this.disabled ? null : '-1',
@@ -14912,7 +14979,7 @@
             state = this.state,
             computedFormatter = this.computedFormatter;
         var hasValue = !isNull(value);
-        return _objectSpread2(_objectSpread2({
+        return _objectSpread2$3(_objectSpread2$3({
           dir: this.computedRTL ? 'rtl' : 'ltr'
         }, this.bvAttrs), {}, {
           id: spinId,
@@ -14925,8 +14992,8 @@
           'aria-invalid': state === false || !hasValue && required ? 'true' : null,
           'aria-required': required ? 'true' : null,
           // These attrs are required for role spinbutton
-          'aria-valuemin': toString$1(this.computedMin),
-          'aria-valuemax': toString$1(this.computedMax),
+          'aria-valuemin': toString(this.computedMin),
+          'aria-valuemax': toString(this.computedMax),
           // These should be `null` if the value is out of range
           // They must also be non-existent attrs if the value is out of range or `null`
           'aria-valuenow': hasValue ? value : null,
@@ -14934,10 +15001,10 @@
         });
       }
     },
-    watch: (_watch$a = {}, _defineProperty(_watch$a, MODEL_PROP_NAME$a, function (value) {
+    watch: (_watch$a = {}, _defineProperty(_watch$a, MODEL_PROP_NAME$9, function (value) {
       this.localValue = toFloat(value, null);
     }), _defineProperty(_watch$a, "localValue", function localValue(value) {
-      this.$emit(MODEL_EVENT_NAME$a, value);
+      this.$emit(MODEL_EVENT_NAME$9, value);
     }), _defineProperty(_watch$a, "disabled", function disabled(_disabled) {
       if (_disabled) {
         this.clearRepeat();
@@ -14997,11 +15064,7 @@
         }
       },
       onFocusBlur: function onFocusBlur(event) {
-        if (!this.disabled) {
-          this.hasFocus = event.type === 'focus';
-        } else {
-          this.hasFocus = false;
-        }
+        this.hasFocus = this.disabled ? false : event.type === 'focus';
       },
       stepUp: function stepUp() {
         var multiplier = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
@@ -15295,7 +15358,7 @@
     }
   });
 
-  var props$1a = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$g), {}, {
+  var props$1b = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$25), {}, {
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
     noRemove: makeProp(PROP_TYPE_BOOLEAN, false),
     pill: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -15309,7 +15372,7 @@
   var BFormTag = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TAG,
     mixins: [idMixin, normalizeSlotMixin],
-    props: props$1a,
+    props: props$1b,
     methods: {
       onRemove: function onRemove(event) {
         var type = event.type,
@@ -15373,19 +15436,19 @@
     }
   });
 
-  var _watch$b;
+  var _watch$9;
 
-  var _makeModelMixin$c = makeModelMixin('value', {
+  var _makeModelMixin$8 = makeModelMixin('value', {
     type: PROP_TYPE_ARRAY,
     defaultValue: []
   }),
-      modelMixin$b = _makeModelMixin$c.mixin,
-      modelProps$b = _makeModelMixin$c.props,
-      MODEL_PROP_NAME$b = _makeModelMixin$c.prop,
-      MODEL_EVENT_NAME$b = _makeModelMixin$c.event; // Supported input types (for built in input)
+      modelMixin$8 = _makeModelMixin$8.mixin,
+      modelProps$8 = _makeModelMixin$8.props,
+      MODEL_PROP_NAME$8 = _makeModelMixin$8.prop,
+      MODEL_EVENT_NAME$8 = _makeModelMixin$8.event; // Supported input types (for built in input)
 
 
-  var TYPES$2 = ['text', 'email', 'tel', 'url', 'number']; // Default ignore input focus selector
+  var TYPES = ['text', 'email', 'tel', 'url', 'number']; // Default ignore input focus selector
 
   var DEFAULT_INPUT_FOCUS_SELECTOR = ['.b-form-tag', 'button', 'input', 'select'].join(' '); // --- Helper methods ---
   // Escape special chars in string and replace
@@ -15398,7 +15461,7 @@
 
   var cleanTags = function cleanTags(tags) {
     return concat(tags).map(function (tag) {
-      return trim(toString$1(tag));
+      return trim(toString(tag));
     }).filter(function (tag, index, arr) {
       return tag.length > 0 && arr.indexOf(tag) === index;
     });
@@ -15420,13 +15483,14 @@
   }; // --- Props ---
 
 
-  var props$1b = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$b), props$Q), props$S), props$T), {}, {
+  var props$1a = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$8), props$1x), props$1v), props$1u), {}, {
     addButtonText: makeProp(PROP_TYPE_STRING, 'Add'),
     addButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-secondary'),
     // Enable change event triggering tag addition
     // Handy if using <select> as the input
     addOnChange: makeProp(PROP_TYPE_BOOLEAN, false),
     duplicateTagText: makeProp(PROP_TYPE_STRING, 'Duplicate tag(s)'),
+    feedbackAriaLive: makeProp(PROP_TYPE_STRING, 'assertive'),
     // Disable the input focus behavior when clicking
     // on element matching the selector (or selectors)
     ignoreInputFocusSelector: makeProp(PROP_TYPE_ARRAY_STRING, DEFAULT_INPUT_FOCUS_SELECTOR),
@@ -15435,7 +15499,7 @@
     inputClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     inputId: makeProp(PROP_TYPE_STRING),
     inputType: makeProp(PROP_TYPE_STRING, 'text', function (value) {
-      return arrayIncludes(TYPES$2, value);
+      return arrayIncludes(TYPES, value);
     }),
     invalidTagText: makeProp(PROP_TYPE_STRING, 'Invalid tag(s)'),
     limit: makeProp(PROP_TYPE_NUMBER),
@@ -15462,8 +15526,8 @@
 
   var BFormTags = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TAGS,
-    mixins: [idMixin, modelMixin$b, formControlMixin, formSizeMixin, formStateMixin, normalizeSlotMixin],
-    props: props$1b,
+    mixins: [listenersMixin, idMixin, modelMixin$8, formControlMixin, formSizeMixin, formStateMixin, normalizeSlotMixin],
+    props: props$1a,
     data: function data() {
       return {
         hasFocus: false,
@@ -15472,7 +15536,8 @@
         // Tags that were removed
         removedTags: [],
         // Populated when tags are parsed
-        tagsState: cleanTagsState()
+        tagsState: cleanTagsState(),
+        focusState: null
       };
     },
     computed: {
@@ -15481,12 +15546,12 @@
       },
       computedInputType: function computedInputType() {
         // We only allow certain types
-        return arrayIncludes(TYPES$2, this.inputType) ? this.inputType : 'text';
+        return arrayIncludes(TYPES, this.inputType) ? this.inputType : 'text';
       },
       computedInputAttrs: function computedInputAttrs() {
         var disabled = this.disabled,
             form = this.form;
-        return _objectSpread2(_objectSpread2({}, this.inputAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.inputAttrs), {}, {
           // Must have attributes
           id: this.computedInputId,
           value: this.newTag,
@@ -15495,12 +15560,14 @@
         });
       },
       computedInputHandlers: function computedInputHandlers() {
-        return {
-          input: this.onInputInput,
+        return _objectSpread2$3(_objectSpread2$3({}, omit(this.bvListeners, [EVENT_NAME_FOCUSIN, EVENT_NAME_FOCUSOUT])), {}, {
+          blur: this.onInputBlur,
           change: this.onInputChange,
+          focus: this.onInputFocus,
+          input: this.onInputInput,
           keydown: this.onInputKeydown,
           reset: this.reset
-        };
+        });
       },
       computedSeparator: function computedSeparator() {
         // Merge the array into a string
@@ -15555,12 +15622,12 @@
         return isNumber(limit) && limit >= 0 && this.tags.length >= limit;
       }
     },
-    watch: (_watch$b = {}, _defineProperty(_watch$b, MODEL_PROP_NAME$b, function (newValue) {
+    watch: (_watch$9 = {}, _defineProperty(_watch$9, MODEL_PROP_NAME$8, function (newValue) {
       this.tags = cleanTags(newValue);
-    }), _defineProperty(_watch$b, "tags", function tags(newValue, oldValue) {
+    }), _defineProperty(_watch$9, "tags", function tags(newValue, oldValue) {
       // Update the `v-model` (if it differs from the value prop)
-      if (!looseEqual(newValue, this[MODEL_PROP_NAME$b])) {
-        this.$emit(MODEL_EVENT_NAME$b, newValue);
+      if (!looseEqual(newValue, this[MODEL_PROP_NAME$8])) {
+        this.$emit(MODEL_EVENT_NAME$8, newValue);
       }
 
       if (!looseEqual(newValue, oldValue)) {
@@ -15570,28 +15637,30 @@
           return !arrayIncludes(newValue, old);
         });
       }
-    }), _defineProperty(_watch$b, "tagsState", function tagsState(newValue, oldValue) {
+    }), _defineProperty(_watch$9, "tagsState", function tagsState(newValue, oldValue) {
       // Emit a tag-state event when the `tagsState` object changes
       if (!looseEqual(newValue, oldValue)) {
         this.$emit(EVENT_NAME_TAG_STATE, newValue.valid, newValue.invalid, newValue.duplicate);
       }
-    }), _watch$b),
+    }), _watch$9),
     created: function created() {
       // We do this in created to make sure an input event emits
       // if the cleaned tags are not equal to the value prop
-      this.tags = cleanTags(this[MODEL_PROP_NAME$b]);
+      this.tags = cleanTags(this[MODEL_PROP_NAME$8]);
     },
     mounted: function mounted() {
-      var _this2 = this;
-
       // Listen for form reset events, to reset the tags input
       var $form = closest('form', this.$el);
 
       if ($form) {
         eventOn($form, 'reset', this.reset, EVENT_OPTIONS_PASSIVE);
-        this.$on(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
-          eventOff($form, 'reset', _this2.reset, EVENT_OPTIONS_PASSIVE);
-        });
+      }
+    },
+    beforeDestroy: function beforeDestroy() {
+      var $form = closest('form', this.$el);
+
+      if ($form) {
+        eventOff($form, 'reset', this.reset, EVENT_OPTIONS_PASSIVE);
       }
     },
     methods: {
@@ -15616,7 +15685,7 @@
             // work with `<select>` elements
             this.newTag = '';
           } else {
-            var invalidAndDuplicates = [].concat(_toConsumableArray(parsed.invalid), _toConsumableArray(parsed.duplicate));
+            var invalidAndDuplicates = [].concat(_toConsumableArray$1(parsed.invalid), _toConsumableArray$1(parsed.duplicate));
             this.newTag = parsed.all.filter(function (tag) {
               return arrayIncludes(invalidAndDuplicates, tag);
             }).join(this.computedJoiner).concat(invalidAndDuplicates.length > 0 ? this.computedJoiner.charAt(0) : '');
@@ -15637,8 +15706,6 @@
         this.focus();
       },
       removeTag: function removeTag(tag) {
-        var _this3 = this;
-
         /* istanbul ignore next */
         if (this.disabled) {
           return;
@@ -15650,20 +15717,16 @@
 
         this.tags = this.tags.filter(function (t) {
           return t !== tag;
-        }); // Return focus to the input (if possible)
-
-        this.$nextTick(function () {
-          _this3.focus();
         });
       },
       reset: function reset() {
-        var _this4 = this;
+        var _this2 = this;
 
         this.newTag = '';
         this.tags = [];
         this.$nextTick(function () {
-          _this4.removedTags = [];
-          _this4.tagsState = cleanTagsState();
+          _this2.removedTags = [];
+          _this2.tagsState = cleanTagsState();
         });
       },
       // --- Input element event handlers ---
@@ -15736,29 +15799,62 @@
       },
       // --- Wrapper event handlers ---
       onClick: function onClick(event) {
-        var _this5 = this;
+        var _this3 = this;
 
         var ignoreFocusSelector = this.computeIgnoreInputFocusSelector;
-        var target = event.target;
 
-        if (!this.disabled && !isActiveElement(target) && (!ignoreFocusSelector || !closest(ignoreFocusSelector, target, true))) {
+        if (!ignoreFocusSelector || !closest(ignoreFocusSelector, event.target, true)) {
           this.$nextTick(function () {
-            _this5.focus();
+            _this3.focus();
           });
         }
       },
-      onFocusin: function onFocusin() {
-        this.hasFocus = true;
+      onInputFocus: function onInputFocus(event) {
+        var _this4 = this;
+
+        if (this.focusState !== 'out') {
+          this.focusState = 'in';
+          this.$nextTick(function () {
+            requestAF(function () {
+              if (_this4.hasFocus) {
+                _this4.$emit(EVENT_NAME_FOCUS, event);
+
+                _this4.focusState = null;
+              }
+            });
+          });
+        }
       },
-      onFocusout: function onFocusout() {
+      onInputBlur: function onInputBlur(event) {
+        var _this5 = this;
+
+        if (this.focusState !== 'in') {
+          this.focusState = 'out';
+          this.$nextTick(function () {
+            requestAF(function () {
+              if (!_this5.hasFocus) {
+                _this5.$emit(EVENT_NAME_BLUR, event);
+
+                _this5.focusState = null;
+              }
+            });
+          });
+        }
+      },
+      onFocusin: function onFocusin(event) {
+        this.hasFocus = true;
+        this.$emit(EVENT_NAME_FOCUSIN, event);
+      },
+      onFocusout: function onFocusout(event) {
         this.hasFocus = false;
+        this.$emit(EVENT_NAME_FOCUSOUT, event);
       },
       handleAutofocus: function handleAutofocus() {
         var _this6 = this;
 
         this.$nextTick(function () {
           requestAF(function () {
-            if (_this6.autofocus && !_this6.disabled) {
+            if (_this6.autofocus) {
               _this6.focus();
             }
           });
@@ -15778,7 +15874,7 @@
       // --- Private methods ---
       splitTags: function splitTags(newTag) {
         // Split the input into an array of raw tags
-        newTag = toString$1(newTag);
+        newTag = toString(newTag);
         var separatorRe = this.computedSeparatorRegExp; // Split the tag(s) via the optional separator
         // Normally only a single tag is provided, but copy/paste
         // can enter multiple tags in a single operation
@@ -15855,7 +15951,7 @@
         var h = this.$createElement; // Make the list of tags
 
         var $tags = tags.map(function (tag) {
-          tag = toString$1(tag);
+          tag = toString(tag);
           return h(BFormTag, {
             class: tagClass,
             // `BFormTag` will auto generate an ID
@@ -15891,7 +15987,7 @@
             outline: 0,
             minWidth: '5rem'
           },
-          attrs: _objectSpread2(_objectSpread2({}, inputAttrs), {}, {
+          attrs: _objectSpread2$3(_objectSpread2$3({}, inputAttrs), {}, {
             'aria-describedby': ariaDescribedby || null,
             type: inputType,
             placeholder: placeholder || null
@@ -15938,7 +16034,7 @@
 
         var tagListId = this.safeId('__tag_list__');
         var $field = h('li', {
-          staticClass: 'b-from-tags-field flex-grow-1',
+          staticClass: 'b-form-tags-field flex-grow-1',
           attrs: {
             role: 'none',
             'aria-live': 'off',
@@ -15965,7 +16061,8 @@
         if (invalidTagText || duplicateTagText || limitTagsText) {
           // Add an aria live region for the invalid/duplicate tag
           // messages if the user has not disabled the messages
-          var joiner = this.computedJoiner; // Invalid tag feedback if needed (error)
+          var ariaLive = this.feedbackAriaLive,
+              joiner = this.computedJoiner; // Invalid tag feedback if needed (error)
 
           var $invalid = h();
 
@@ -15973,6 +16070,7 @@
             $invalid = h(BFormInvalidFeedback, {
               props: {
                 id: invalidFeedbackId,
+                ariaLive: ariaLive,
                 forceShow: true
               },
               key: 'tags_invalid_feedback'
@@ -15985,7 +16083,8 @@
           if (duplicateFeedbackId) {
             $duplicate = h(BFormText, {
               props: {
-                id: duplicateFeedbackId
+                id: duplicateFeedbackId,
+                ariaLive: ariaLive
               },
               key: 'tags_duplicate_feedback'
             }, [this.duplicateTagText, ': ', this.duplicateTags.join(joiner)]);
@@ -15997,7 +16096,8 @@
           if (limitFeedbackId) {
             $limit = h(BFormText, {
               props: {
-                id: limitFeedbackId
+                id: limitFeedbackId,
+                ariaLive: ariaLive
               },
               key: 'tags_limit_feedback'
             }, [limitTagsText]);
@@ -16026,7 +16126,7 @@
           hasFocus = this.hasFocus,
           noOuterFocus = this.noOuterFocus; // Scoped slot properties
 
-      var scope = _objectSpread2({
+      var scope = _objectSpread2$3({
         // Array of tags (shallow copy to prevent mutations)
         tags: tags.slice(),
         // <input> v-bind:inputAttrs
@@ -16049,7 +16149,7 @@
         isLimitReached: this.isLimitReached,
         // If the 'Add' button should be disabled
         disableAddButton: this.disableAddButton
-      }, pick(this.$props, ['addButtonText', 'addButtonVariant', 'disabled', 'duplicateTagText', 'form', 'inputClass', 'invalidTagText', 'limit', 'limitTagsText', 'noTagRemove', 'placeholder', 'required', 'separator', 'size', 'state', 'tagClass', 'tagPills', 'tagRemoveLabel', 'tagVariant'])); // Generate the user interface
+      }, pick$1(this.$props, ['addButtonText', 'addButtonVariant', 'disabled', 'duplicateTagText', 'form', 'inputClass', 'invalidTagText', 'limit', 'limitTagsText', 'noTagRemove', 'placeholder', 'required', 'separator', 'size', 'state', 'tagClass', 'tagPills', 'tagRemoveLabel', 'tagVariant'])); // Generate the user interface
 
 
       var $content = this.normalizeSlot(SLOT_NAME_DEFAULT, scope) || this.defaultRender(scope); // Generate the `aria-live` region for the current value(s)
@@ -16131,7 +16231,7 @@
     }
   });
 
-  var props$1c = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$Q), props$S), props$T), props$10), {}, {
+  var props$19 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$1x), props$1v), props$1u), props$1l), {}, {
     maxRows: makeProp(PROP_TYPE_NUMBER_STRING),
     // When in auto resize mode, disable shrinking to content height
     noAutoShrink: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -16151,7 +16251,7 @@
     },
     // Mixin order is important!
     mixins: [listenersMixin, idMixin, listenOnRootMixin, formControlMixin, formSizeMixin, formStateMixin, formTextMixin, formSelectionMixin, formValidityMixin],
-    props: props$1c,
+    props: props$19,
     data: function data() {
       return {
         heightInPx: null
@@ -16209,7 +16309,7 @@
         };
       },
       computedListeners: function computedListeners() {
-        return _objectSpread2(_objectSpread2({}, this.bvListeners), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvListeners), {}, {
           input: this.onInput,
           change: this.onChange,
           blur: this.onBlur
@@ -16322,16 +16422,16 @@
     }
   });
 
-  var _watch$c;
+  var _watch$8;
 
-  var _makeModelMixin$d = makeModelMixin('value', {
+  var _makeModelMixin$7 = makeModelMixin('value', {
     type: PROP_TYPE_STRING,
     defaultValue: ''
   }),
-      modelMixin$c = _makeModelMixin$d.mixin,
-      modelProps$c = _makeModelMixin$d.props,
-      MODEL_PROP_NAME$c = _makeModelMixin$d.prop,
-      MODEL_EVENT_NAME$c = _makeModelMixin$d.event;
+      modelMixin$7 = _makeModelMixin$7.mixin,
+      modelProps$7 = _makeModelMixin$7.props,
+      MODEL_PROP_NAME$7 = _makeModelMixin$7.prop,
+      MODEL_EVENT_NAME$7 = _makeModelMixin$7.event;
 
   var NUMERIC = 'numeric'; // --- Helper methods ---
 
@@ -16340,7 +16440,7 @@
   };
 
   var parseHMS = function parseHMS(value) {
-    value = toString$1(value);
+    value = toString(value);
     var hh = null,
         mm = null,
         ss = null;
@@ -16381,10 +16481,12 @@
   }; // --- Props ---
 
 
-  var props$1d = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$c), pick(props$19, ['labelIncrement', 'labelDecrement'])), {}, {
+  var props$18 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$7), pick$1(props$1c, ['labelIncrement', 'labelDecrement'])), {}, {
     // ID of label element
     ariaLabelledby: makeProp(PROP_TYPE_STRING),
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
+    footerTag: makeProp(PROP_TYPE_STRING, 'footer'),
+    headerTag: makeProp(PROP_TYPE_STRING, 'header'),
     hidden: makeProp(PROP_TYPE_BOOLEAN, false),
     hideHeader: makeProp(PROP_TYPE_BOOLEAN, false),
     // Explicitly force 12 or 24 hour time
@@ -16410,10 +16512,10 @@
 
   var BTime = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TIME,
-    mixins: [idMixin, modelMixin$c, normalizeSlotMixin],
-    props: props$1d,
+    mixins: [idMixin, modelMixin$7, normalizeSlotMixin],
+    props: props$18,
     data: function data() {
-      var parsed = parseHMS(this[MODEL_PROP_NAME$c] || '');
+      var parsed = parseHMS(this[MODEL_PROP_NAME$7] || '');
       return {
         // Spin button models
         modelHours: parsed.hours,
@@ -16572,7 +16674,7 @@
         };
       }
     },
-    watch: (_watch$c = {}, _defineProperty(_watch$c, MODEL_PROP_NAME$c, function (newValue, oldValue) {
+    watch: (_watch$8 = {}, _defineProperty(_watch$8, MODEL_PROP_NAME$7, function (newValue, oldValue) {
       if (newValue !== oldValue && !looseEqual(parseHMS(newValue), parseHMS(this.computedHMS))) {
         var _parseHMS = parseHMS(newValue),
             hours = _parseHMS.hours,
@@ -16585,15 +16687,15 @@
         this.modelSeconds = seconds;
         this.modelAmpm = ampm;
       }
-    }), _defineProperty(_watch$c, "computedHMS", function computedHMS(newValue, oldValue) {
+    }), _defineProperty(_watch$8, "computedHMS", function computedHMS(newValue, oldValue) {
       if (newValue !== oldValue) {
-        this.$emit(MODEL_EVENT_NAME$c, newValue);
+        this.$emit(MODEL_EVENT_NAME$7, newValue);
       }
-    }), _defineProperty(_watch$c, "context", function context(newValue, oldValue) {
+    }), _defineProperty(_watch$8, "context", function context(newValue, oldValue) {
       if (!looseEqual(newValue, oldValue)) {
         this.$emit(EVENT_NAME_CONTEXT, newValue);
       }
-    }), _defineProperty(_watch$c, "modelAmpm", function modelAmpm(newValue, oldValue) {
+    }), _defineProperty(_watch$8, "modelAmpm", function modelAmpm(newValue, oldValue) {
       var _this = this;
 
       if (newValue !== oldValue) {
@@ -16608,11 +16710,11 @@
           }
         });
       }
-    }), _defineProperty(_watch$c, "modelHours", function modelHours(newHours, oldHours) {
+    }), _defineProperty(_watch$8, "modelHours", function modelHours(newHours, oldHours) {
       if (newHours !== oldHours) {
         this.modelAmpm = newHours > 11 ? 1 : 0;
       }
-    }), _watch$c),
+    }), _watch$8),
     created: function created() {
       var _this2 = this;
 
@@ -16723,14 +16825,21 @@
     render: function render(h) {
       var _this4 = this;
 
+      // If hidden, we just render a placeholder comment
+
       /* istanbul ignore if */
       if (this.hidden) {
-        // If hidden, we just render a placeholder comment
         return h();
       }
 
-      var valueId = this.valueId;
-      var computedAriaLabelledby = this.computedAriaLabelledby;
+      var disabled = this.disabled,
+          readonly = this.readonly,
+          locale = this.computedLocale,
+          ariaLabelledby = this.computedAriaLabelledby,
+          labelIncrement = this.labelIncrement,
+          labelDecrement = this.labelDecrement,
+          valueId = this.valueId,
+          focusHandler = this.focus;
       var spinIds = []; // Helper method to render a spinbutton
 
       var makeSpinbutton = function makeSpinbutton(handler, key, classes) {
@@ -16739,16 +16848,16 @@
         spinIds.push(id);
         return h(BFormSpinbutton, {
           class: classes,
-          props: _objectSpread2({
+          props: _objectSpread2$3({
             id: id,
             placeholder: '--',
             vertical: true,
             required: true,
-            disabled: _this4.disabled,
-            readonly: _this4.readonly,
-            locale: _this4.computedLocale,
-            labelIncrement: _this4.labelIncrement,
-            labelDecrement: _this4.labelDecrement,
+            disabled: disabled,
+            readonly: readonly,
+            locale: locale,
+            labelIncrement: labelIncrement,
+            labelDecrement: labelDecrement,
             wrap: true,
             ariaControls: valueId,
             min: 0
@@ -16772,7 +16881,7 @@
         return h('div', {
           staticClass: 'd-flex flex-column',
           class: {
-            'text-muted': _this4.disabled || _this4.readonly
+            'text-muted': disabled || readonly
           },
           attrs: {
             'aria-hidden': 'true'
@@ -16844,8 +16953,8 @@
         staticClass: 'd-flex align-items-center justify-content-center mx-auto',
         attrs: {
           role: 'group',
-          tabindex: this.disabled || this.readonly ? null : '-1',
-          'aria-labelledby': computedAriaLabelledby
+          tabindex: disabled || readonly ? null : '-1',
+          'aria-labelledby': ariaLabelledby
         },
         on: {
           keydown: this.onSpinLeftRight,
@@ -16853,7 +16962,7 @@
           /* istanbul ignore next */
           function click(event) {
             if (event.target === event.currentTarget) {
-              _this4.focus();
+              focusHandler();
             }
           }
         }
@@ -16862,63 +16971,62 @@
       var $value = h('output', {
         staticClass: 'form-control form-control-sm text-center',
         class: {
-          disabled: this.disabled || this.readonly
+          disabled: disabled || readonly
         },
         attrs: {
           id: valueId,
           role: 'status',
           for: spinIds.filter(identity).join(' ') || null,
-          tabindex: this.disabled ? null : '-1',
+          tabindex: disabled ? null : '-1',
           'aria-live': this.isLive ? 'polite' : 'off',
           'aria-atomic': 'true'
         },
         on: {
           // Transfer focus/click to focus hours spinner
-          click: this.focus,
-          focus: this.focus
+          click: focusHandler,
+          focus: focusHandler
         }
       }, [h('bdi', this.formattedTimeString), this.computedHMS ? h('span', {
         staticClass: 'sr-only'
       }, " (".concat(this.labelSelected, ") ")) : '']);
-      var $header = h('header', {
+      var $header = h(this.headerTag, {
         staticClass: 'b-time-header',
         class: {
           'sr-only': this.hideHeader
         }
-      }, [$value]); // Optional bottom slot
-
-      var $slot = this.normalizeSlot();
-      $slot = $slot ? h('footer', {
+      }, [$value]);
+      var $content = this.normalizeSlot();
+      var $footer = $content ? h(this.footerTag, {
         staticClass: 'b-time-footer'
-      }, $slot) : h();
+      }, $content) : h();
       return h('div', {
         staticClass: 'b-time d-inline-flex flex-column text-center',
         attrs: {
           role: 'group',
           lang: this.computedLang || null,
-          'aria-labelledby': computedAriaLabelledby || null,
-          'aria-disabled': this.disabled ? 'true' : null,
-          'aria-readonly': this.readonly && !this.disabled ? 'true' : null
+          'aria-labelledby': ariaLabelledby || null,
+          'aria-disabled': disabled ? 'true' : null,
+          'aria-readonly': readonly && !disabled ? 'true' : null
         }
-      }, [$header, $spinners, $slot]);
+      }, [$header, $spinners, $footer]);
     }
   });
 
-  var _watch$d;
+  var _watch$7;
 
-  var _makeModelMixin$e = makeModelMixin('value', {
+  var _makeModelMixin$6 = makeModelMixin('value', {
     type: PROP_TYPE_STRING,
     defaultValue: ''
   }),
-      modelMixin$d = _makeModelMixin$e.mixin,
-      modelProps$d = _makeModelMixin$e.props,
-      MODEL_PROP_NAME$d = _makeModelMixin$e.prop,
-      MODEL_EVENT_NAME$d = _makeModelMixin$e.event; // --- Props ---
+      modelMixin$6 = _makeModelMixin$6.mixin,
+      modelProps$6 = _makeModelMixin$6.props,
+      MODEL_PROP_NAME$6 = _makeModelMixin$6.prop,
+      MODEL_EVENT_NAME$6 = _makeModelMixin$6.event; // --- Props ---
 
 
-  var timeProps = omit(props$1d, ['hidden', 'id', 'value']);
-  var formBtnLabelControlProps$1 = omit(props$Z, ['formattedValue', 'id', 'lang', 'rtl', 'value']);
-  var props$1e = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$d), timeProps), formBtnLabelControlProps$1), {}, {
+  var timeProps = omit(props$18, ['hidden', 'id', 'value']);
+  var formBtnLabelControlProps = omit(props$1o, ['formattedValue', 'id', 'lang', 'rtl', 'value']);
+  var props$17 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$6), timeProps), formBtnLabelControlProps), {}, {
     closeButtonVariant: makeProp(PROP_TYPE_STRING, 'outline-secondary'),
     labelCloseButton: makeProp(PROP_TYPE_STRING, 'Close'),
     labelNowButton: makeProp(PROP_TYPE_STRING, 'Select now'),
@@ -16934,12 +17042,12 @@
 
   var BFormTimepicker = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_FORM_TIMEPICKER,
-    mixins: [idMixin, modelMixin$d],
-    props: props$1e,
+    mixins: [idMixin, modelMixin$6],
+    props: props$17,
     data: function data() {
       return {
         // We always use `HH:mm:ss` value internally
-        localHMS: this[MODEL_PROP_NAME$d] || '',
+        localHMS: this[MODEL_PROP_NAME$6] || '',
         // Context data from BTime
         localLocale: null,
         isRTL: false,
@@ -16953,16 +17061,16 @@
         return (this.localLocale || '').replace(/-u-.*$/i, '') || null;
       }
     },
-    watch: (_watch$d = {}, _defineProperty(_watch$d, MODEL_PROP_NAME$d, function (newValue) {
+    watch: (_watch$7 = {}, _defineProperty(_watch$7, MODEL_PROP_NAME$6, function (newValue) {
       this.localHMS = newValue || '';
-    }), _defineProperty(_watch$d, "localHMS", function localHMS(newValue) {
+    }), _defineProperty(_watch$7, "localHMS", function localHMS(newValue) {
       // We only update the v-model value when the timepicker
       // is open, to prevent cursor jumps when bound to a
       // text input in button only mode
       if (this.isVisible) {
-        this.$emit(MODEL_EVENT_NAME$d, newValue || '');
+        this.$emit(MODEL_EVENT_NAME$6, newValue || '');
       }
-    }), _watch$d),
+    }), _watch$7),
     methods: {
       // Public methods
       focus: function focus() {
@@ -17129,7 +17237,7 @@
 
       var $time = h(BTime, {
         staticClass: 'b-form-time-control',
-        props: _objectSpread2(_objectSpread2({}, pluckProps(timeProps, $props)), {}, {
+        props: _objectSpread2$3(_objectSpread2$3({}, pluckProps(timeProps, $props)), {}, {
           value: localHMS,
           hidden: !this.isVisible
         }),
@@ -17141,7 +17249,7 @@
       }, $footer);
       return h(BVFormBtnLabelControl, {
         staticClass: 'b-form-timepicker',
-        props: _objectSpread2(_objectSpread2({}, pluckProps(formBtnLabelControlProps$1, $props)), {}, {
+        props: _objectSpread2$3(_objectSpread2$3({}, pluckProps(formBtnLabelControlProps, $props)), {}, {
           id: this.safeId(),
           value: localHMS,
           formattedValue: localHMS ? this.formattedValue : '',
@@ -17174,7 +17282,7 @@
     }
   });
 
-  var props$1f = makePropsConfigurable({
+  var props$16 = makePropsConfigurable({
     tag: makeProp(PROP_TYPE_STRING, 'div')
   }, NAME_INPUT_GROUP_TEXT); // --- Main component ---
   // @vue/component
@@ -17182,7 +17290,7 @@
   var BInputGroupText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP_TEXT,
     functional: true,
-    props: props$1f,
+    props: props$16,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -17193,7 +17301,7 @@
     }
   });
 
-  var props$1g = makePropsConfigurable({
+  var props$15 = makePropsConfigurable({
     append: makeProp(PROP_TYPE_BOOLEAN, false),
     id: makeProp(PROP_TYPE_STRING),
     isText: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -17204,7 +17312,7 @@
   var BInputGroupAddon = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP_ADDON,
     functional: true,
-    props: props$1g,
+    props: props$15,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -17222,47 +17330,47 @@
     }
   });
 
-  var props$1h = makePropsConfigurable(omit(props$1g, ['append']), NAME_INPUT_GROUP_APPEND); // --- Main component ---
+  var props$14 = makePropsConfigurable(omit(props$15, ['append']), NAME_INPUT_GROUP_APPEND); // --- Main component ---
   // @vue/component
 
   var BInputGroupAppend = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP_APPEND,
     functional: true,
-    props: props$1h,
+    props: props$14,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
       // Pass all our data down to child, and set `append` to `true`
       return h(BInputGroupAddon, a(data, {
-        props: _objectSpread2(_objectSpread2({}, props), {}, {
+        props: _objectSpread2$3(_objectSpread2$3({}, props), {}, {
           append: true
         })
       }), children);
     }
   });
 
-  var props$1i = makePropsConfigurable(omit(props$1g, ['append']), NAME_INPUT_GROUP_PREPEND); // --- Main component ---
+  var props$13 = makePropsConfigurable(omit(props$15, ['append']), NAME_INPUT_GROUP_PREPEND); // --- Main component ---
   // @vue/component
 
   var BInputGroupPrepend = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP_PREPEND,
     functional: true,
-    props: props$1i,
+    props: props$13,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
           children = _ref.children;
       // Pass all our data down to child, and set `append` to `true`
       return h(BInputGroupAddon, a(data, {
-        props: _objectSpread2(_objectSpread2({}, props), {}, {
+        props: _objectSpread2$3(_objectSpread2$3({}, props), {}, {
           append: false
         })
       }), children);
     }
   });
 
-  var props$1j = makePropsConfigurable({
+  var props$12 = makePropsConfigurable({
     append: makeProp(PROP_TYPE_STRING),
     appendHtml: makeProp(PROP_TYPE_STRING),
     id: makeProp(PROP_TYPE_STRING),
@@ -17276,7 +17384,7 @@
   var BInputGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_INPUT_GROUP,
     functional: true,
-    props: props$1j,
+    props: props$12,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -17329,7 +17437,7 @@
     }
   });
 
-  var props$1k = makePropsConfigurable({
+  var props$11 = makePropsConfigurable({
     // String breakpoint name new in Bootstrap v4.4.x
     fluid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
     tag: makeProp(PROP_TYPE_STRING, 'div')
@@ -17339,7 +17447,7 @@
   var BContainer = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_CONTAINER,
     functional: true,
-    props: props$1k,
+    props: props$11,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -17354,7 +17462,7 @@
     }
   });
 
-  var props$1l = makePropsConfigurable({
+  var props$10 = makePropsConfigurable({
     bgVariant: makeProp(PROP_TYPE_STRING),
     borderVariant: makeProp(PROP_TYPE_STRING),
     containerFluid: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
@@ -17374,7 +17482,7 @@
   var BJumbotron = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_JUMBOTRON,
     functional: true,
-    props: props$1l,
+    props: props$10,
     render: function render(h, _ref) {
       var _class2;
 
@@ -17443,7 +17551,7 @@
   // Memoized function for better performance on generating class names
 
   var computeRowColsClass = memoize(function (breakpoint, cols) {
-    cols = trim(toString$1(cols));
+    cols = trim(toString(cols));
     return cols ? lowerCase(['row-cols', breakpoint, cols].filter(identity).join('-')) : null;
   }); // Get the breakpoint name from the `rowCols` prop name
   // Memoized function for better performance on extracting breakpoint names
@@ -17456,7 +17564,7 @@
   var rowColsPropList = []; // --- Props ---
   // Prop generator for lazy generation of props
 
-  var generateProps$2 = function generateProps() {
+  var generateProps = function generateProps() {
     // i.e. 'row-cols-2', 'row-cols-md-4', 'row-cols-xl-6', ...
     var rowColsProps = getBreakpointsUpCached().reduce(function (props, breakpoint) {
       props[suffixPropName(breakpoint, 'cols')] = makeProp(PROP_TYPE_NUMBER_STRING);
@@ -17465,7 +17573,7 @@
 
     rowColsPropList = keys(rowColsProps); // Return the generated props
 
-    return makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, rowColsProps), {}, {
+    return makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, rowColsProps), {}, {
       alignContent: makeProp(PROP_TYPE_STRING, null, function (value) {
         return arrayIncludes(concat(COMMON_ALIGNMENT, 'between', 'around', 'stretch'), value);
       }),
@@ -17492,7 +17600,7 @@
       // then they become a non-getter afterwards
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get#Smart_self-overwriting_lazy_getters
       delete this.props;
-      this.props = generateProps$2();
+      this.props = generateProps();
       return this.props;
     },
 
@@ -17539,7 +17647,7 @@
     }
   });
 
-  var props$1m = makePropsConfigurable({
+  var props$$ = makePropsConfigurable({
     flush: makeProp(PROP_TYPE_BOOLEAN, false),
     horizontal: makeProp(PROP_TYPE_BOOLEAN_STRING, false),
     tag: makeProp(PROP_TYPE_STRING, 'div')
@@ -17549,7 +17657,7 @@
   var BListGroup = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_LIST_GROUP,
     functional: true,
-    props: props$1m,
+    props: props$$,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -17569,10 +17677,10 @@
 
   var actionTags = ['a', 'router-link', 'button', 'b-link']; // --- Props ---
 
-  var linkProps$4 = omit(props$6, ['event', 'routerTag']);
-  delete linkProps$4.href.default;
-  delete linkProps$4.to.default;
-  var props$1n = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$4), {}, {
+  var linkProps$3 = omit(props$2f, ['event', 'routerTag']);
+  delete linkProps$3.href.default;
+  delete linkProps$3.to.default;
+  var props$_ = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, linkProps$3), {}, {
     action: makeProp(PROP_TYPE_BOOLEAN, false),
     button: makeProp(PROP_TYPE_BOOLEAN, false),
     tag: makeProp(PROP_TYPE_STRING, 'div'),
@@ -17583,7 +17691,7 @@
   var BListGroupItem = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_LIST_GROUP_ITEM,
     functional: true,
-    props: props$1n,
+    props: props$_,
     render: function render(h, _ref) {
       var _class;
 
@@ -17594,7 +17702,7 @@
           variant = props.variant,
           active = props.active,
           disabled = props.disabled;
-      var link = isLink(props);
+      var link = isLink$1(props);
       var tag = button ? 'button' : !link ? props.tag : BLink;
       var action = !!(props.action || link || button || arrayIncludes(actionTags, props.tag));
       var attrs = {};
@@ -17611,7 +17719,7 @@
           attrs.disabled = true;
         }
       } else {
-        itemProps = pluckProps(linkProps$4, props);
+        itemProps = pluckProps(linkProps$3, props);
       }
 
       return h(tag, a(data, {
@@ -17630,7 +17738,7 @@
     }
   });
 
-  var props$1o = makePropsConfigurable({
+  var props$Z = makePropsConfigurable({
     right: makeProp(PROP_TYPE_BOOLEAN, false),
     tag: makeProp(PROP_TYPE_STRING, 'div'),
     verticalAlign: makeProp(PROP_TYPE_STRING, 'top')
@@ -17640,7 +17748,7 @@
   var BMediaAside = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_MEDIA_ASIDE,
     functional: true,
-    props: props$1o,
+    props: props$Z,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -17658,7 +17766,7 @@
     }
   });
 
-  var props$1p = makePropsConfigurable({
+  var props$Y = makePropsConfigurable({
     tag: makeProp(PROP_TYPE_STRING, 'div')
   }, NAME_MEDIA_BODY); // --- Main component ---
   // @vue/component
@@ -17666,7 +17774,7 @@
   var BMediaBody = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_MEDIA_BODY,
     functional: true,
-    props: props$1p,
+    props: props$Y,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -17677,7 +17785,7 @@
     }
   });
 
-  var props$1q = makePropsConfigurable({
+  var props$X = makePropsConfigurable({
     noBody: makeProp(PROP_TYPE_BOOLEAN, false),
     rightAlign: makeProp(PROP_TYPE_BOOLEAN, false),
     tag: makeProp(PROP_TYPE_STRING, 'div'),
@@ -17688,7 +17796,7 @@
   var BMedia = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_MEDIA,
     functional: true,
-    props: props$1q,
+    props: props$X,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -17731,111 +17839,116 @@
     }
   });
 
-  var PROP$1 = '$_bv_documentHandlers_'; // --- Mixin ---
+  var PROP$1 = '$_documentListeners'; // --- Mixin ---
   // @vue/component
 
   var listenOnDocumentMixin = Vue__default['default'].extend({
     created: function created() {
+      // Define non-reactive property
+      // Object of arrays, keyed by event name,
+      // where value is an array of callbacks
+      this[PROP$1] = {};
+    },
+    beforeDestroy: function beforeDestroy() {
       var _this = this;
 
-      /* istanbul ignore next */
-      if (!IS_BROWSER) {
-        return;
-      } // Declare non-reactive property
-      // Object of arrays, keyed by event name,
-      // where value is an array of handlers
-      // Prop will be defined on client only
-
-
-      this[PROP$1] = {}; // Set up our beforeDestroy handler (client only)
-
-      this.$once(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
-        var items = _this[PROP$1] || {}; // Immediately delete this[PROP] to prevent the
-        // listenOn/Off methods from running (which may occur
-        // due to requestAnimationFrame/transition delays)
-
-        delete _this[PROP$1]; // Remove all registered event handlers
-
-        keys(items).forEach(function (eventName) {
-          var handlers = items[eventName] || [];
-          handlers.forEach(function (handler) {
-            return eventOff(document, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          });
+      // Unregister all registered listeners
+      keys(this[PROP$1] || {}).forEach(function (event) {
+        _this[PROP$1][event].forEach(function (callback) {
+          _this.listenOffDocument(event, callback);
         });
       });
+      this[PROP$1] = null;
     },
     methods: {
-      listenDocument: function listenDocument(on, eventName, handler) {
-        on ? this.listenOnDocument(eventName, handler) : this.listenOffDocument(eventName, handler);
-      },
-      listenOnDocument: function listenOnDocument(eventName, handler) {
-        if (this[PROP$1] && isString(eventName) && isFunction(handler)) {
-          this[PROP$1][eventName] = this[PROP$1][eventName] || [];
+      registerDocumentListener: function registerDocumentListener(event, callback) {
+        if (this[PROP$1]) {
+          this[PROP$1][event] = this[PROP$1][event] || [];
 
-          if (!arrayIncludes(this[PROP$1][eventName], handler)) {
-            this[PROP$1][eventName].push(handler);
-            eventOn(document, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
+          if (!arrayIncludes(this[PROP$1][event], callback)) {
+            this[PROP$1][event].push(callback);
           }
         }
       },
-      listenOffDocument: function listenOffDocument(eventName, handler) {
-        if (this[PROP$1] && isString(eventName) && isFunction(handler)) {
-          eventOff(document, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          this[PROP$1][eventName] = (this[PROP$1][eventName] || []).filter(function (h) {
-            return h !== handler;
+      unregisterDocumentListener: function unregisterDocumentListener(event, callback) {
+        if (this[PROP$1] && this[PROP$1][event]) {
+          this[PROP$1][event] = this[PROP$1][event].filter(function (cb) {
+            return cb !== callback;
           });
         }
+      },
+      listenDocument: function listenDocument(on, event, callback) {
+        on ? this.listenOnDocument(event, callback) : this.listenOffDocument(event, callback);
+      },
+      listenOnDocument: function listenOnDocument(event, callback) {
+        if (IS_BROWSER) {
+          eventOn(document, event, callback, EVENT_OPTIONS_NO_CAPTURE);
+          this.registerDocumentListener(event, callback);
+        }
+      },
+      listenOffDocument: function listenOffDocument(event, callback) {
+        if (IS_BROWSER) {
+          eventOff(document, event, callback, EVENT_OPTIONS_NO_CAPTURE);
+        }
+
+        this.unregisterDocumentListener(event, callback);
       }
     }
   });
 
-  var PROP$2 = '$_bv_windowHandlers_'; // --- Mixin ---
+  var PROP = '$_windowListeners'; // --- Mixin ---
   // @vue/component
 
   var listenOnWindowMixin = Vue__default['default'].extend({
-    beforeCreate: function beforeCreate() {
-      // Declare non-reactive property
+    created: function created() {
+      // Define non-reactive property
       // Object of arrays, keyed by event name,
-      // where value is an array of handlers
-      this[PROP$2] = {};
+      // where value is an array of callbacks
+      this[PROP] = {};
     },
     beforeDestroy: function beforeDestroy() {
-      if (IS_BROWSER) {
-        var items = this[PROP$2]; // Immediately delete this[PROP] to prevent the
-        // listenOn/Off methods from running (which may occur
-        // due to requestAnimationFrame delays)
+      var _this = this;
 
-        delete this[PROP$2]; // Remove all registered event handlers
-
-        keys(items).forEach(function (eventName) {
-          var handlers = items[eventName] || [];
-          handlers.forEach(function (handler) {
-            return eventOff(window, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          });
+      // Unregister all registered listeners
+      keys(this[PROP] || {}).forEach(function (event) {
+        _this[PROP][event].forEach(function (callback) {
+          _this.listenOffWindow(event, callback);
         });
-      }
+      });
+      this[PROP] = null;
     },
     methods: {
-      listenWindow: function listenWindow(on, eventName, handler) {
-        on ? this.listenOnWindow(eventName, handler) : this.listenOffWindow(eventName, handler);
-      },
-      listenOnWindow: function listenOnWindow(eventName, handler) {
-        if (IS_BROWSER && this[PROP$2] && isString(eventName) && isFunction(handler)) {
-          this[PROP$2][eventName] = this[PROP$2][eventName] || [];
+      registerWindowListener: function registerWindowListener(event, callback) {
+        if (this[PROP]) {
+          this[PROP][event] = this[PROP][event] || [];
 
-          if (!arrayIncludes(this[PROP$2][eventName], handler)) {
-            this[PROP$2][eventName].push(handler);
-            eventOn(window, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
+          if (!arrayIncludes(this[PROP][event], callback)) {
+            this[PROP][event].push(callback);
           }
         }
       },
-      listenOffWindow: function listenOffWindow(eventName, handler) {
-        if (IS_BROWSER && this[PROP$2] && isString(eventName) && isFunction(handler)) {
-          eventOff(window, eventName, handler, EVENT_OPTIONS_NO_CAPTURE);
-          this[PROP$2][eventName] = (this[PROP$2][eventName] || []).filter(function (h) {
-            return h !== handler;
+      unregisterWindowListener: function unregisterWindowListener(event, callback) {
+        if (this[PROP] && this[PROP][event]) {
+          this[PROP][event] = this[PROP][event].filter(function (cb) {
+            return cb !== callback;
           });
         }
+      },
+      listenWindow: function listenWindow(on, event, callback) {
+        on ? this.listenOnWindow(event, callback) : this.listenOffWindow(event, callback);
+      },
+      listenOnWindow: function listenOnWindow(event, callback) {
+        if (IS_BROWSER) {
+          eventOn(window, event, callback, EVENT_OPTIONS_NO_CAPTURE);
+          this.registerWindowListener(event, callback);
+        }
+      },
+      listenOffWindow: function listenOffWindow(event, callback) {
+        if (IS_BROWSER) {
+          eventOff(window, event, callback, EVENT_OPTIONS_NO_CAPTURE);
+        }
+
+        this.unregisterWindowListener(event, callback);
       }
     }
   });
@@ -17892,7 +18005,7 @@
     },
     render: function render(h) {
       var updatedNodes = this.updatedNodes;
-      var $nodes = isFunction(updatedNodes) ? updatedNodes({}) : updatedNodes;
+      var $nodes = isFunction$1(updatedNodes) ? updatedNodes({}) : updatedNodes;
       $nodes = concat($nodes).filter(identity);
 
       if ($nodes && $nodes.length > 0 && !$nodes[0].text) {
@@ -17905,7 +18018,7 @@
     }
   }); // --- Props ---
 
-  var props$1r = {
+  var props$W = {
     // String: CSS selector,
     // HTMLElement: Element reference
     // Mainly needed for tooltips/popovers inside modals
@@ -17919,7 +18032,7 @@
   var BVTransporter = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TRANSPORTER,
     mixins: [normalizeSlotMixin],
-    props: props$1r,
+    props: props$W,
     watch: {
       disabled: {
         immediate: true,
@@ -18044,7 +18157,7 @@
     _createClass(BvModalEvent, null, [{
       key: "Defaults",
       get: function get() {
-        return _objectSpread2(_objectSpread2({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this)), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, _get(_getPrototypeOf(BvModalEvent), "Defaults", this)), {}, {
           trigger: null
         });
       }
@@ -18114,15 +18227,9 @@
     methods: {
       // Public methods
       registerModal: function registerModal(modal) {
-        var _this2 = this;
-
         // Register the modal if not already registered
         if (modal && this.modals.indexOf(modal) === -1) {
-          // Add modal to modals array
           this.modals.push(modal);
-          modal.$once(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
-            _this2.unregisterModal(modal);
-          });
         }
       },
       unregisterModal: function unregisterModal(modal) {
@@ -18132,13 +18239,13 @@
           // Remove modal from modals array
           this.modals.splice(index, 1); // Reset the modal's data
 
-          if (!(modal._isBeingDestroyed || modal._isDestroyed)) {
+          if (!modal._isBeingDestroyed && !modal._isDestroyed) {
             this.resetModal(modal);
           }
         }
       },
       getBaseZIndex: function getBaseZIndex() {
-        if (isNull(this.baseZIndex) && IS_BROWSER) {
+        if (IS_BROWSER && isNull(this.baseZIndex)) {
           // Create a temporary `div.modal-backdrop` to get computed z-index
           var div = document.createElement('div');
           addClass(div, 'modal-backdrop');
@@ -18152,7 +18259,7 @@
         return this.baseZIndex || DEFAULT_ZINDEX;
       },
       getScrollbarWidth: function getScrollbarWidth() {
-        if (isNull(this.scrollbarWidth) && IS_BROWSER) {
+        if (IS_BROWSER && isNull(this.scrollbarWidth)) {
           // Create a temporary `div.measure-scrollbar` to get computed z-index
           var div = document.createElement('div');
           addClass(div, 'modal-scrollbar-measure');
@@ -18165,7 +18272,7 @@
       },
       // Private methods
       updateModals: function updateModals(modals) {
-        var _this3 = this;
+        var _this2 = this;
 
         var baseZIndex = this.getBaseZIndex();
         var scrollbarWidth = this.getScrollbarWidth();
@@ -18173,8 +18280,8 @@
           // We update data values on each modal
           modal.zIndex = baseZIndex + index;
           modal.scrollbarWidth = scrollbarWidth;
-          modal.isTop = index === _this3.modals.length - 1;
-          modal.isBodyOverflowing = _this3.isBodyOverflowing;
+          modal.isTop = index === _this2.modals.length - 1;
+          modal.isBodyOverflowing = _this2.isBodyOverflowing;
         });
       },
       resetModal: function resetModal(modal) {
@@ -18280,15 +18387,15 @@
 
   var modalManager = new ModalManager();
 
-  var _makeModelMixin$f = makeModelMixin('visible', {
+  var _makeModelMixin$5 = makeModelMixin('visible', {
     type: PROP_TYPE_BOOLEAN,
     defaultValue: false,
     event: EVENT_NAME_CHANGE
   }),
-      modelMixin$e = _makeModelMixin$f.mixin,
-      modelProps$e = _makeModelMixin$f.props,
-      MODEL_PROP_NAME$e = _makeModelMixin$f.prop,
-      MODEL_EVENT_NAME$e = _makeModelMixin$f.event;
+      modelMixin$5 = _makeModelMixin$5.mixin,
+      modelProps$5 = _makeModelMixin$5.props,
+      MODEL_PROP_NAME$5 = _makeModelMixin$5.prop,
+      MODEL_EVENT_NAME$5 = _makeModelMixin$5.event;
 
   var TRIGGER_BACKDROP = 'backdrop';
   var TRIGGER_ESC = 'esc';
@@ -18309,7 +18416,7 @@
     attributeFilter: ['style', 'class']
   }; // --- Props ---
 
-  var props$1s = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$e), {}, {
+  var props$V = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$5), {}, {
     ariaLabel: makeProp(PROP_TYPE_STRING),
     autoFocusButton: makeProp(PROP_TYPE_STRING, null,
     /* istanbul ignore next */
@@ -18331,6 +18438,7 @@
     footerBgVariant: makeProp(PROP_TYPE_STRING),
     footerBorderVariant: makeProp(PROP_TYPE_STRING),
     footerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    footerTag: makeProp(PROP_TYPE_STRING, 'footer'),
     footerTextVariant: makeProp(PROP_TYPE_STRING),
     headerBgVariant: makeProp(PROP_TYPE_STRING),
     headerBorderVariant: makeProp(PROP_TYPE_STRING),
@@ -18338,6 +18446,7 @@
     headerCloseContent: makeProp(PROP_TYPE_STRING, '&times;'),
     headerCloseLabel: makeProp(PROP_TYPE_STRING, 'Close'),
     headerCloseVariant: makeProp(PROP_TYPE_STRING),
+    headerTag: makeProp(PROP_TYPE_STRING, 'header'),
     headerTextVariant: makeProp(PROP_TYPE_STRING),
     // TODO: Rename to `noBackdrop` and deprecate `hideBackdrop`
     hideBackdrop: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -18375,9 +18484,9 @@
 
   var BModal = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_MODAL,
-    mixins: [attrsMixin, idMixin, modelMixin$e, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$5, listenOnDocumentMixin, listenOnRootMixin, listenOnWindowMixin, normalizeSlotMixin, scopedStyleMixin],
     inheritAttrs: false,
-    props: props$1s,
+    props: props$V,
     data: function data() {
       return {
         isHidden: true,
@@ -18494,7 +18603,7 @@
         // If the parent has a scoped style attribute, and the modal
         // is portalled, add the scoped attribute to the modal wrapper
         var scopedStyleAttrs = !this.static ? this.scopedStyleAttrs : {};
-        return _objectSpread2(_objectSpread2(_objectSpread2({}, scopedStyleAttrs), this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, scopedStyleAttrs), this.bvAttrs), {}, {
           id: this.modalOuterId
         });
       },
@@ -18513,7 +18622,7 @@
         };
       }
     },
-    watch: _defineProperty({}, MODEL_PROP_NAME$e, function (newValue, oldValue) {
+    watch: _defineProperty({}, MODEL_PROP_NAME$5, function (newValue, oldValue) {
       if (newValue !== oldValue) {
         this[newValue ? 'show' : 'hide']();
       }
@@ -18535,12 +18644,13 @@
 
       this.listenOnRoot(getRootEventName(NAME_MODAL, EVENT_NAME_SHOW), this.modalListener); // Initially show modal?
 
-      if (this[MODEL_PROP_NAME$e] === true) {
+      if (this[MODEL_PROP_NAME$5] === true) {
         this.$nextTick(this.show);
       }
     },
     beforeDestroy: function beforeDestroy() {
       // Ensure everything is back to normal
+      modalManager.unregisterModal(this);
       this.setObserver(false);
 
       if (this.isVisible) {
@@ -18561,14 +18671,14 @@
       },
       // Private method to update the v-model
       updateModel: function updateModel(value) {
-        if (value !== this[MODEL_PROP_NAME$e]) {
-          this.$emit(MODEL_EVENT_NAME$e, value);
+        if (value !== this[MODEL_PROP_NAME$5]) {
+          this.$emit(MODEL_EVENT_NAME$5, value);
         }
       },
       // Private method to create a BvModalEvent object
       buildEvent: function buildEvent(type) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        return new BvModalEvent(type, _objectSpread2(_objectSpread2({
+        return new BvModalEvent(type, _objectSpread2$3(_objectSpread2$3({
           // Default options
           cancelable: false,
           target: this.$refs.modal || this.$el || null,
@@ -18604,12 +18714,12 @@
         this.isOpening = true; // Set the element to return focus to when closed
 
         this.$_returnFocus = this.$_returnFocus || this.getActiveElement();
-        var showEvt = this.buildEvent(EVENT_NAME_SHOW, {
+        var showEvent = this.buildEvent(EVENT_NAME_SHOW, {
           cancelable: true
         });
-        this.emitEvent(showEvt); // Don't show if canceled
+        this.emitEvent(showEvent); // Don't show if canceled
 
-        if (showEvt.defaultPrevented || this.isVisible) {
+        if (showEvent.defaultPrevented || this.isVisible) {
           this.isOpening = false; // Ensure the v-model reflects the current state
 
           this.updateModel(false);
@@ -18629,22 +18739,22 @@
         }
 
         this.isClosing = true;
-        var hideEvt = this.buildEvent(EVENT_NAME_HIDE, {
+        var hideEvent = this.buildEvent(EVENT_NAME_HIDE, {
           cancelable: trigger !== TRIGGER_FORCE,
           trigger: trigger || null
         }); // We emit specific event for one of the three built-in buttons
 
         if (trigger === BUTTON_OK) {
-          this.$emit(EVENT_NAME_OK, hideEvt);
+          this.$emit(EVENT_NAME_OK, hideEvent);
         } else if (trigger === BUTTON_CANCEL) {
-          this.$emit(EVENT_NAME_CANCEL, hideEvt);
+          this.$emit(EVENT_NAME_CANCEL, hideEvent);
         } else if (trigger === BUTTON_CLOSE) {
-          this.$emit(EVENT_NAME_CLOSE, hideEvt);
+          this.$emit(EVENT_NAME_CLOSE, hideEvent);
         }
 
-        this.emitEvent(hideEvt); // Hide if not canceled
+        this.emitEvent(hideEvent); // Hide if not canceled
 
-        if (hideEvt.defaultPrevented || !this.isVisible) {
+        if (hideEvent.defaultPrevented || !this.isVisible) {
           this.isClosing = false; // Ensure v-model reflects current state
 
           this.updateModel(true);
@@ -19002,7 +19112,7 @@
             this.normalizeSlot(SLOT_NAME_MODAL_TITLE, this.slotScope)), $closeButton];
           }
 
-          $header = h('header', {
+          $header = h(this.headerTag, {
             staticClass: 'modal-header',
             class: this.headerClasses,
             attrs: {
@@ -19065,7 +19175,7 @@
             $modalFooter = [$cancelButton, $okButton];
           }
 
-          $footer = h('footer', {
+          $footer = h(this.footerTag, {
             staticClass: 'modal-footer',
             class: this.footerClasses,
             attrs: {
@@ -19221,7 +19331,7 @@
     }
   };
 
-  var bind$1 = function bind(el, binding, vnode) {
+  var bind = function bind(el, binding, vnode) {
     var target = getTarget(binding);
     var trigger = getTriggerElement(el);
 
@@ -19258,7 +19368,7 @@
     }
   };
 
-  var unbind$1 = function unbind(el) {
+  var unbind = function unbind(el) {
     var oldProp = el[PROPERTY] || {};
     var trigger = oldProp.trigger;
     var handler = oldProp.handler;
@@ -19273,15 +19383,15 @@
     delete el[PROPERTY];
   };
 
-  var componentUpdated$1 = function componentUpdated(el, binding, vnode) {
+  var componentUpdated = function componentUpdated(el, binding, vnode) {
     var oldProp = el[PROPERTY] || {};
     var target = getTarget(binding);
     var trigger = getTriggerElement(el);
 
     if (target !== oldProp.target || trigger !== oldProp.trigger) {
       // We bind and rebind if the target or trigger changes
-      unbind$1(el);
-      bind$1(el, binding, vnode);
+      unbind(el);
+      bind(el, binding, vnode);
     } // If trigger element is not a button, ensure `role="button"`
     // is still set for accessibility
 
@@ -19296,24 +19406,24 @@
 
 
   var VBModal = {
-    inserted: componentUpdated$1,
+    inserted: componentUpdated,
     updated: updated,
-    componentUpdated: componentUpdated$1,
-    unbind: unbind$1
+    componentUpdated: componentUpdated,
+    unbind: unbind
   };
 
   var PROP_NAME$1 = '$bvModal';
-  var PROP_NAME_PRIV = '_bv__modal'; // Base modal props that are allowed
+  var PROP_NAME_PRIV$1 = '_bv__modal'; // Base modal props that are allowed
   // Some may be ignored or overridden on some message boxes
   // Prop ID is allowed, but really only should be used for testing
   // We need to add it in explicitly as it comes from the `idMixin`
 
-  var BASE_PROPS = ['id'].concat(_toConsumableArray(keys(omit(props$1s, ['busy', 'lazy', 'noStacking', 'static', 'visible'])))); // Fallback event resolver (returns undefined)
+  var BASE_PROPS$1 = ['id'].concat(_toConsumableArray$1(keys(omit(props$V, ['busy', 'lazy', 'noStacking', 'static', 'visible'])))); // Fallback event resolver (returns undefined)
 
   var defaultResolver = function defaultResolver() {}; // Map prop names to modal slot names
 
 
-  var propsToSlots = {
+  var propsToSlots$1 = {
     msgBoxContent: 'default',
     title: 'modal-title',
     okTitle: 'modal-ok',
@@ -19321,8 +19431,8 @@
   }; // --- Helper methods ---
   // Method to filter only recognized props that are not undefined
 
-  var filterOptions = function filterOptions(options) {
-    return BASE_PROPS.reduce(function (memo, key) {
+  var filterOptions$1 = function filterOptions(options) {
+    return BASE_PROPS$1.reduce(function (memo, key) {
       if (!isUndefined(options[key])) {
         memo[key] = options[key];
       }
@@ -19332,7 +19442,7 @@
   }; // Method to install `$bvModal` VM injection
 
 
-  var plugin = function plugin(Vue) {
+  var plugin$1 = function plugin(Vue) {
     // Create a private sub-component that extends BModal
     // which self-destructs after hidden
     // @vue/component
@@ -19393,11 +19503,11 @@
         // And it helps to ensure `BMsgBox` is destroyed when parent is destroyed
         parent: $parent,
         // Preset the prop values
-        propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions(getComponentConfig(NAME_MODAL))), {}, {
+        propsData: _objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, filterOptions$1(getComponentConfig(NAME_MODAL))), {}, {
           // Defaults that user can override
           hideHeaderClose: true,
           hideHeader: !(props.title || props.titleHtml)
-        }, omit(props, keys(propsToSlots))), {}, {
+        }, omit(props, keys(propsToSlots$1))), {}, {
           // Props that can't be overridden
           lazy: false,
           busy: false,
@@ -19407,11 +19517,11 @@
         })
       }); // Convert certain props to scoped slots
 
-      keys(propsToSlots).forEach(function (prop) {
+      keys(propsToSlots$1).forEach(function (prop) {
         if (!isUndefined(props[prop])) {
           // Can be a string, or array of VNodes.
           // Alternatively, user can use HTML version of prop to pass an HTML string.
-          msgBox.$slots[propsToSlots[prop]] = concat(props[prop]);
+          msgBox.$slots[propsToSlots$1[prop]] = concat(props[prop]);
         }
       }); // Return a promise that resolves when hidden, or rejects on destroyed
 
@@ -19423,11 +19533,11 @@
             reject(new Error('BootstrapVue MsgBox destroyed before resolve'));
           }
         });
-        msgBox.$on(EVENT_NAME_HIDE, function (bvModalEvt) {
-          if (!bvModalEvt.defaultPrevented) {
-            var result = resolver(bvModalEvt); // If resolver didn't cancel hide, we resolve
+        msgBox.$on(EVENT_NAME_HIDE, function (bvModalEvent) {
+          if (!bvModalEvent.defaultPrevented) {
+            var result = resolver(bvModalEvent); // If resolver didn't cancel hide, we resolve
 
-            if (!bvModalEvt.defaultPrevented) {
+            if (!bvModalEvent.defaultPrevented) {
               resolved = true;
               resolve(result);
             }
@@ -19446,12 +19556,12 @@
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
       var resolver = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-      if (!content || warnNoPromiseSupport(PROP_NAME$1) || warnNotClient(PROP_NAME$1) || !isFunction(resolver)) {
+      if (!content || warnNoPromiseSupport(PROP_NAME$1) || warnNotClient(PROP_NAME$1) || !isFunction$1(resolver)) {
         /* istanbul ignore next */
         return;
       }
 
-      return asyncMsgBox($parent, _objectSpread2(_objectSpread2({}, filterOptions(options)), {}, {
+      return asyncMsgBox($parent, _objectSpread2$3(_objectSpread2$3({}, filterOptions$1(options)), {}, {
         msgBoxContent: content
       }), resolver);
     }; // BvModal instance class
@@ -19512,7 +19622,7 @@
           var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
           // Pick the modal props we support from options
-          var props = _objectSpread2(_objectSpread2({}, options), {}, {
+          var props = _objectSpread2$3(_objectSpread2$3({}, options), {}, {
             // Add in overrides and our content prop
             okOnly: true,
             okDisabled: false,
@@ -19533,7 +19643,7 @@
           var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
           // Set the modal props we support from options
-          var props = _objectSpread2(_objectSpread2({}, options), {}, {
+          var props = _objectSpread2$3(_objectSpread2$3({}, options), {}, {
             // Add in overrides and our content prop
             okOnly: false,
             okDisabled: false,
@@ -19541,8 +19651,8 @@
             hideFooter: false
           });
 
-          return makeMsgBox(this._vm, message, props, function (bvModalEvt) {
-            var trigger = bvModalEvt.trigger;
+          return makeMsgBox(this._vm, message, props, function (bvModalEvent) {
+            var trigger = bvModalEvent.trigger;
             return trigger === 'ok' ? true : trigger === 'cancel' ? false : null;
           });
         }
@@ -19556,20 +19666,20 @@
       beforeCreate: function beforeCreate() {
         // Because we need access to `$root` for `$emits`, and VM for parenting,
         // we have to create a fresh instance of `BvModal` for each VM
-        this[PROP_NAME_PRIV] = new BvModal(this);
+        this[PROP_NAME_PRIV$1] = new BvModal(this);
       }
     }); // Define our read-only `$bvModal` instance property
     // Placed in an if just in case in HMR mode
 
     if (!hasOwnProperty(Vue.prototype, PROP_NAME$1)) {
-      defineProperty(Vue.prototype, PROP_NAME$1, {
+      defineProperty$1(Vue.prototype, PROP_NAME$1, {
         get: function get() {
           /* istanbul ignore next */
-          if (!this || !this[PROP_NAME_PRIV]) {
+          if (!this || !this[PROP_NAME_PRIV$1]) {
             warn("\"".concat(PROP_NAME$1, "\" must be accessed from a Vue instance \"this\" context."), NAME_MODAL);
           }
 
-          return this[PROP_NAME_PRIV];
+          return this[PROP_NAME_PRIV$1];
         }
       });
     }
@@ -19577,7 +19687,7 @@
 
   var BVModalPlugin = /*#__PURE__*/pluginFactory({
     plugins: {
-      plugin: plugin
+      plugin: plugin$1
     }
   });
 
@@ -19594,13 +19704,13 @@
     }
   });
 
-  var computeJustifyContent = function computeJustifyContent(value) {
+  var computeJustifyContent$1 = function computeJustifyContent(value) {
     value = value === 'left' ? 'start' : value === 'right' ? 'end' : value;
     return "justify-content-".concat(value);
   }; // --- Props ---
 
 
-  var props$1t = makePropsConfigurable({
+  var props$U = makePropsConfigurable({
     align: makeProp(PROP_TYPE_STRING),
     // Set to `true` if placing in a card header
     cardHeader: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -19617,7 +19727,7 @@
   var BNav = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV,
     functional: true,
-    props: props$1t,
+    props: props$U,
     render: function render(h, _ref) {
       var _class;
 
@@ -19639,13 +19749,13 @@
           'flex-column': vertical,
           'nav-fill': !vertical && props.fill,
           'nav-justified': !vertical && props.justified
-        }, _defineProperty(_class, computeJustifyContent(align), !vertical && align), _defineProperty(_class, "small", props.small), _class)
+        }, _defineProperty(_class, computeJustifyContent$1(align), !vertical && align), _defineProperty(_class, "small", props.small), _class)
       }), children);
     }
   });
 
-  var linkProps$5 = omit(props$6, ['event', 'routerTag']);
-  var props$1u = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$5), {}, {
+  var linkProps$2 = omit(props$2f, ['event', 'routerTag']);
+  var props$T = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, linkProps$2), {}, {
     linkAttrs: makeProp(PROP_TYPE_OBJECT, {}),
     linkClasses: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
   })), NAME_NAV_ITEM); // --- Main component ---
@@ -19654,7 +19764,7 @@
   var BNavItem = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV_ITEM,
     functional: true,
-    props: props$1u,
+    props: props$T,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19666,19 +19776,19 @@
         staticClass: 'nav-link',
         class: props.linkClasses,
         attrs: props.linkAttrs,
-        props: pluckProps(linkProps$5, props),
+        props: pluckProps(linkProps$2, props),
         on: listeners
       }, children)]);
     }
   });
 
-  var props$1v = {}; // --- Main component ---
+  var props$S = {}; // --- Main component ---
   // @vue/component
 
   var BNavText = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV_TEXT,
     functional: true,
-    props: props$1v,
+    props: props$S,
     render: function render(h, _ref) {
       var data = _ref.data,
           children = _ref.children;
@@ -19688,8 +19798,8 @@
     }
   });
 
-  var formProps = omit(props$F, ['inline']);
-  var props$1w = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, formProps), {}, {
+  var formProps = omit(props$1I, ['inline']);
+  var props$R = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, formProps), {}, {
     formClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
   })), NAME_NAV_FORM); // --- Main component ---
   // @vue/component
@@ -19697,7 +19807,7 @@
   var BNavForm = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV_FORM,
     functional: true,
-    props: props$1w,
+    props: props$R,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19705,7 +19815,7 @@
           listeners = _ref.listeners;
       var $form = h(BForm, {
         class: props.formClass,
-        props: _objectSpread2(_objectSpread2({}, pluckProps(formProps, props)), {}, {
+        props: _objectSpread2$3(_objectSpread2$3({}, pluckProps(formProps, props)), {}, {
           inline: true
         }),
         attrs: data.attrs,
@@ -19717,16 +19827,19 @@
     }
   });
 
-  var props$1x = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$g), pick(props$A, [].concat(_toConsumableArray(keys(props$z)), ['html', 'lazy', 'menuClass', 'noCaret', 'role', 'text', 'toggleClass'])))), NAME_NAV_ITEM_DROPDOWN); // --- Main component ---
+  var props$Q = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$25), pick$1(props$1N, [].concat(_toConsumableArray$1(keys(props$1O)), ['html', 'lazy', 'menuClass', 'noCaret', 'role', 'text', 'toggleClass'])))), NAME_NAV_ITEM_DROPDOWN); // --- Main component ---
   // @vue/component
 
   var BNavItemDropdown = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAV_ITEM_DROPDOWN,
     mixins: [idMixin, dropdownMixin, normalizeSlotMixin],
-    props: props$1x,
+    props: props$Q,
     computed: {
       toggleId: function toggleId() {
         return this.safeId('_BV_toggle_');
+      },
+      menuId: function menuId() {
+        return this.safeId('_BV_toggle_menu_');
       },
       dropdownClasses: function dropdownClasses() {
         return [this.directionClass, this.boundaryClass, {
@@ -19747,6 +19860,7 @@
     },
     render: function render(h) {
       var toggleId = this.toggleId,
+          menuId = this.menuId,
           visible = this.visible,
           hide = this.hide;
       var $toggle = h(BLink, {
@@ -19760,7 +19874,8 @@
           id: toggleId,
           role: 'button',
           'aria-haspopup': 'true',
-          'aria-expanded': visible ? 'true' : 'false'
+          'aria-expanded': visible ? 'true' : 'false',
+          'aria-controls': menuId
         },
         on: {
           mousedown: this.onMousedown,
@@ -19778,7 +19893,8 @@
         class: this.menuClasses,
         attrs: {
           tabindex: '-1',
-          'aria-labelledby': toggleId
+          'aria-labelledby': toggleId,
+          id: menuId
         },
         on: {
           keydown: this.onKeydown // Handle UP, DOWN and ESC
@@ -19814,7 +19930,7 @@
     }
   });
 
-  var props$1y = makePropsConfigurable({
+  var props$P = makePropsConfigurable({
     fixed: makeProp(PROP_TYPE_STRING),
     print: makeProp(PROP_TYPE_BOOLEAN, false),
     sticky: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -19833,7 +19949,7 @@
         bvNavbar: this
       };
     },
-    props: props$1y,
+    props: props$P,
     computed: {
       breakpointClass: function breakpointClass() {
         var toggleable = this.toggleable;
@@ -19869,19 +19985,19 @@
     }
   });
 
-  var computeJustifyContent$1 = function computeJustifyContent(value) {
+  var computeJustifyContent = function computeJustifyContent(value) {
     value = value === 'left' ? 'start' : value === 'right' ? 'end' : value;
     return "justify-content-".concat(value);
   }; // --- Props ---
 
 
-  var props$1z = makePropsConfigurable(pick(props$1t, ['tag', 'fill', 'justified', 'align', 'small']), NAME_NAVBAR_NAV); // --- Main component ---
+  var props$O = makePropsConfigurable(pick$1(props$U, ['tag', 'fill', 'justified', 'align', 'small']), NAME_NAVBAR_NAV); // --- Main component ---
   // @vue/component
 
   var BNavbarNav = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAVBAR_NAV,
     functional: true,
-    props: props$1z,
+    props: props$O,
     render: function render(h, _ref) {
       var _class;
 
@@ -19894,15 +20010,15 @@
         class: (_class = {
           'nav-fill': props.fill,
           'nav-justified': props.justified
-        }, _defineProperty(_class, computeJustifyContent$1(align), align), _defineProperty(_class, "small", props.small), _class)
+        }, _defineProperty(_class, computeJustifyContent(align), align), _defineProperty(_class, "small", props.small), _class)
       }), children);
     }
   });
 
-  var linkProps$6 = omit(props$6, ['event', 'routerTag']);
-  linkProps$6.href.default = undefined;
-  linkProps$6.to.default = undefined;
-  var props$1A = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, linkProps$6), {}, {
+  var linkProps$1 = omit(props$2f, ['event', 'routerTag']);
+  linkProps$1.href.default = undefined;
+  linkProps$1.to.default = undefined;
+  var props$N = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, linkProps$1), {}, {
     tag: makeProp(PROP_TYPE_STRING, 'div')
   })), NAME_NAVBAR_BRAND); // --- Main component ---
   // @vue/component
@@ -19910,7 +20026,7 @@
   var BNavbarBrand = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_NAVBAR_BRAND,
     functional: true,
-    props: props$1A,
+    props: props$N,
     render: function render(h, _ref) {
       var props = _ref.props,
           data = _ref.data,
@@ -19919,16 +20035,16 @@
       var tag = isLink ? BLink : props.tag;
       return h(tag, a(data, {
         staticClass: 'navbar-brand',
-        props: isLink ? pluckProps(linkProps$6, props) : {}
+        props: isLink ? pluckProps(linkProps$1, props) : {}
       }), children);
     }
   });
 
-  var CLASS_NAME$2 = 'navbar-toggler';
-  var ROOT_EVENT_NAME_STATE$2 = getRootEventName(NAME_COLLAPSE, 'state');
-  var ROOT_EVENT_NAME_SYNC_STATE$2 = getRootEventName(NAME_COLLAPSE, 'sync-state'); // --- Props ---
+  var CLASS_NAME$1 = 'navbar-toggler';
+  var ROOT_EVENT_NAME_STATE$1 = getRootEventName(NAME_COLLAPSE, 'state');
+  var ROOT_EVENT_NAME_SYNC_STATE$1 = getRootEventName(NAME_COLLAPSE, 'sync-state'); // --- Props ---
 
-  var props$1B = makePropsConfigurable({
+  var props$M = makePropsConfigurable({
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
     label: makeProp(PROP_TYPE_STRING, 'Toggle navigation'),
     target: makeProp(PROP_TYPE_ARRAY_STRING, undefined, true) // Required
@@ -19942,15 +20058,15 @@
       VBToggle: VBToggle
     },
     mixins: [listenOnRootMixin, normalizeSlotMixin],
-    props: props$1B,
+    props: props$M,
     data: function data() {
       return {
         toggleState: false
       };
     },
     created: function created() {
-      this.listenOnRoot(ROOT_EVENT_NAME_STATE$2, this.handleStateEvt);
-      this.listenOnRoot(ROOT_EVENT_NAME_SYNC_STATE$2, this.handleStateEvt);
+      this.listenOnRoot(ROOT_EVENT_NAME_STATE$1, this.handleStateEvent);
+      this.listenOnRoot(ROOT_EVENT_NAME_SYNC_STATE$1, this.handleStateEvent);
     },
     methods: {
       onClick: function onClick(event) {
@@ -19959,7 +20075,7 @@
           this.$emit(EVENT_NAME_CLICK, event);
         }
       },
-      handleStateEvt: function handleStateEvt(id, state) {
+      handleStateEvent: function handleStateEvent(id, state) {
         // We listen for state events so that we can pass the
         // boolean expanded state to the default scoped slot
         if (id === this.target) {
@@ -19970,7 +20086,7 @@
     render: function render(h) {
       var disabled = this.disabled;
       return h('button', {
-        staticClass: CLASS_NAME$2,
+        staticClass: CLASS_NAME$1,
         class: {
           disabled: disabled
         },
@@ -19989,7 +20105,7 @@
       }, [this.normalizeSlot(SLOT_NAME_DEFAULT, {
         expanded: this.toggleState
       }) || h('span', {
-        staticClass: "".concat(CLASS_NAME$2, "-icon")
+        staticClass: "".concat(CLASS_NAME$1, "-icon")
       })]);
     }
   });
@@ -20009,7 +20125,7 @@
     }
   });
 
-  var props$1C = makePropsConfigurable({
+  var props$L = makePropsConfigurable({
     label: makeProp(PROP_TYPE_STRING),
     role: makeProp(PROP_TYPE_STRING, 'status'),
     small: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -20022,7 +20138,7 @@
   var BSpinner = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SPINNER,
     functional: true,
-    props: props$1C,
+    props: props$L,
     render: function render(h, _ref) {
       var _class;
 
@@ -20057,7 +20173,7 @@
     right: 0
   }; // --- Props ---
 
-  var props$1D = makePropsConfigurable({
+  var props$K = makePropsConfigurable({
     // Alternative to variant, allowing a specific
     // CSS color to be applied to the overlay
     bgColor: makeProp(PROP_TYPE_STRING),
@@ -20087,7 +20203,7 @@
   var BOverlay = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_OVERLAY,
     mixins: [normalizeSlotMixin],
-    props: props$1D,
+    props: props$K,
     computed: {
       computedRounded: function computedRounded() {
         var rounded = this.rounded;
@@ -20133,7 +20249,7 @@
         var $background = h('div', {
           staticClass: 'position-absolute',
           class: [this.computedVariant, this.computedRounded],
-          style: _objectSpread2(_objectSpread2({}, POSITION_COVER), {}, {
+          style: _objectSpread2$3(_objectSpread2$3({}, POSITION_COVER), {}, {
             opacity: this.opacity,
             backgroundColor: this.bgColor || null,
             backdropFilter: this.blur ? "blur(".concat(this.blur, ")") : null
@@ -20143,7 +20259,7 @@
           staticClass: 'position-absolute',
           style: this.noCenter ?
           /* istanbul ignore next */
-          _objectSpread2({}, POSITION_COVER) : {
+          _objectSpread2$3({}, POSITION_COVER) : {
             top: '50%',
             left: '50%',
             transform: 'translateX(-50%) translateY(-50%)'
@@ -20155,7 +20271,7 @@
             'position-absolute': !noWrap || noWrap && !fixed,
             'position-fixed': noWrap && fixed
           },
-          style: _objectSpread2(_objectSpread2({}, POSITION_COVER), {}, {
+          style: _objectSpread2$3(_objectSpread2$3({}, POSITION_COVER), {}, {
             zIndex: this.zIndex || 10
           }),
           on: {
@@ -20202,11 +20318,11 @@
     }
   });
 
-  var _watch$e;
+  var _watch$6;
   // for `<b-pagination>` and `<b-pagination-nav>`
   // --- Constants ---
 
-  var _makeModelMixin$g = makeModelMixin('value', {
+  var _makeModelMixin$4 = makeModelMixin('value', {
     type: PROP_TYPE_BOOLEAN_NUMBER_STRING,
     defaultValue: null,
 
@@ -20220,10 +20336,10 @@
       return true;
     }
   }),
-      modelMixin$f = _makeModelMixin$g.mixin,
-      modelProps$f = _makeModelMixin$g.props,
-      MODEL_PROP_NAME$f = _makeModelMixin$g.prop,
-      MODEL_EVENT_NAME$f = _makeModelMixin$g.event;
+      modelMixin$4 = _makeModelMixin$4.mixin,
+      modelProps$4 = _makeModelMixin$4.props,
+      MODEL_PROP_NAME$4 = _makeModelMixin$4.prop,
+      MODEL_EVENT_NAME$4 = _makeModelMixin$4.event;
 
   var ELLIPSIS_THRESHOLD = 3; // Default # of buttons limit
 
@@ -20266,7 +20382,7 @@
   }; // --- Props ---
 
 
-  var props$1E = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, modelProps$f), {}, {
+  var props$J = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, modelProps$4), {}, {
     align: makeProp(PROP_TYPE_STRING, 'left'),
     ariaLabel: makeProp(PROP_TYPE_STRING, 'Pagination'),
     disabled: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -20310,12 +20426,12 @@
   })), 'pagination'); // --- Mixin ---
   // @vue/component
 
-  var paginationMixin = Vue__default['default'].extend({
-    mixins: [modelMixin$f, normalizeSlotMixin],
-    props: props$1E,
+  var paginationMixin$1 = Vue__default['default'].extend({
+    mixins: [modelMixin$4, normalizeSlotMixin],
+    props: props$J,
     data: function data() {
       // `-1` signifies no page initially selected
-      var currentPage = toInteger(this[MODEL_PROP_NAME$f], 0);
+      var currentPage = toInteger(this[MODEL_PROP_NAME$4], 0);
       currentPage = currentPage > 0 ? currentPage : -1;
       return {
         currentPage: currentPage,
@@ -20476,20 +20592,20 @@
         return pages;
       }
     },
-    watch: (_watch$e = {}, _defineProperty(_watch$e, MODEL_PROP_NAME$f, function (newValue, oldValue) {
+    watch: (_watch$6 = {}, _defineProperty(_watch$6, MODEL_PROP_NAME$4, function (newValue, oldValue) {
       if (newValue !== oldValue) {
         this.currentPage = sanitizeCurrentPage(newValue, this.localNumberOfPages);
       }
-    }), _defineProperty(_watch$e, "currentPage", function currentPage(newValue, oldValue) {
+    }), _defineProperty(_watch$6, "currentPage", function currentPage(newValue, oldValue) {
       if (newValue !== oldValue) {
         // Emit `null` if no page selected
-        this.$emit(MODEL_EVENT_NAME$f, newValue > 0 ? newValue : null);
+        this.$emit(MODEL_EVENT_NAME$4, newValue > 0 ? newValue : null);
       }
-    }), _defineProperty(_watch$e, "limit", function limit(newValue, oldValue) {
+    }), _defineProperty(_watch$6, "limit", function limit(newValue, oldValue) {
       if (newValue !== oldValue) {
         this.localLimit = sanitizeLimit(newValue);
       }
-    }), _watch$e),
+    }), _watch$6),
     created: function created() {
       var _this = this;
 
@@ -20629,7 +20745,7 @@
           page: pageNumber,
           index: pageNumber - 1
         };
-        var $btnContent = _this7.normalizeSlot(btnSlot, scope) || toString$1(btnText) || h();
+        var $btnContent = _this7.normalizeSlot(btnSlot, scope) || toString(btnText) || h();
         var $inner = h(isDisabled ? 'span' : isNav ? BLink : 'button', {
           staticClass: 'page-link',
           class: {
@@ -20677,7 +20793,7 @@
           key: "ellipsis-".concat(isLast ? 'last' : 'first')
         }, [h('span', {
           staticClass: 'page-link'
-        }, [_this7.normalizeSlot(SLOT_NAME_ELLIPSIS_TEXT) || toString$1(_this7.ellipsisText) || h()])]);
+        }, [_this7.normalizeSlot(SLOT_NAME_ELLIPSIS_TEXT) || toString(_this7.ellipsisText) || h()])]);
       }; // Page button factory
 
 
@@ -20693,7 +20809,7 @@
           'aria-controls': _this7.ariaControls || null,
           'aria-label': hasPropFunction(labelPage) ?
           /* istanbul ignore next */
-          labelPage(pageNumber) : "".concat(isFunction(labelPage) ? labelPage() : labelPage, " ").concat(pageNumber),
+          labelPage(pageNumber) : "".concat(isFunction$1(labelPage) ? labelPage() : labelPage, " ").concat(pageNumber),
           'aria-checked': isNav ? null : active ? 'true' : 'false',
           'aria-current': isNav && active ? 'page' : null,
           'aria-posinset': isNav ? null : pageNumber,
@@ -20701,7 +20817,7 @@
           // ARIA "roving tabindex" method (except in `isNav` mode)
           tabindex: isNav ? null : tabIndex
         };
-        var btnContent = toString$1(_this7.makePage(pageNumber));
+        var btnContent = toString(_this7.makePage(pageNumber));
         var scope = {
           page: pageNumber,
           index: pageNumber - 1,
@@ -20821,7 +20937,7 @@
   }; // --- Props ---
 
 
-  var props$1F = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$1E), {}, {
+  var props$I = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$J), {}, {
     ariaControls: makeProp(PROP_TYPE_STRING),
     perPage: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_PER_PAGE),
     totalRows: makeProp(PROP_TYPE_NUMBER_STRING, DEFAULT_TOTAL_ROWS)
@@ -20831,8 +20947,8 @@
   var BPagination = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_PAGINATION,
     // The render function is brought in via the `paginationMixin`
-    mixins: [paginationMixin],
-    props: props$1F,
+    mixins: [paginationMixin$1],
+    props: props$I,
     computed: {
       numberOfPages: function numberOfPages() {
         var result = mathCeil(sanitizeTotalRows(this.totalRows) / sanitizePerPage(this.perPage));
@@ -20869,7 +20985,7 @@
       // Set the initial page count
       this.localNumberOfPages = this.numberOfPages; // Set the initial page value
 
-      var currentPage = toInteger(this[MODEL_PROP_NAME$f], 0);
+      var currentPage = toInteger(this[MODEL_PROP_NAME$4], 0);
 
       if (currentPage > 0) {
         this.currentPage = currentPage;
@@ -20893,14 +21009,14 @@
 
         var target = event.target; // Emit a user-cancelable `page-click` event
 
-        var clickEvt = new BvEvent(EVENT_NAME_PAGE_CLICK, {
+        var clickEvent = new BvEvent(EVENT_NAME_PAGE_CLICK, {
           cancelable: true,
           vueTarget: this,
           target: target
         });
-        this.$emit(clickEvt.type, clickEvt, pageNumber);
+        this.$emit(clickEvent.type, clickEvent, pageNumber);
 
-        if (clickEvt.defaultPrevented) {
+        if (clickEvent.defaultPrevented) {
           return;
         } // Update the `v-model`
 
@@ -20941,9 +21057,9 @@
     return mathMax(toInteger(value, 0), 1);
   }; // --- Props ---
 
-  var _linkProps = omit(props$6, ['event', 'routerTag']);
+  var _linkProps = omit(props$2f, ['event', 'routerTag']);
 
-  var props$1G = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$1E), _linkProps), {}, {
+  var props$H = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$J), _linkProps), {}, {
     baseUrl: makeProp(PROP_TYPE_STRING, '/'),
     linkGen: makeProp(PROP_TYPE_FUNCTION),
     // Disable auto page number detection if `true`
@@ -20970,8 +21086,8 @@
   var BPaginationNav = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_PAGINATION_NAV,
     // The render function is brought in via the pagination mixin
-    mixins: [paginationMixin],
-    props: props$1G,
+    mixins: [paginationMixin$1],
+    props: props$H,
     computed: {
       // Used by render function to trigger wrapping in '<nav>' element
       isNav: function isNav() {
@@ -21040,14 +21156,14 @@
 
         var target = event.currentTarget || event.target; // Emit a user-cancelable `page-click` event
 
-        var clickEvt = new BvEvent(EVENT_NAME_PAGE_CLICK, {
+        var clickEvent = new BvEvent(EVENT_NAME_PAGE_CLICK, {
           cancelable: true,
           vueTarget: this,
           target: target
         });
-        this.$emit(clickEvt.type, clickEvt, pageNumber);
+        this.$emit(clickEvent.type, clickEvent, pageNumber);
 
-        if (clickEvt.defaultPrevented) {
+        if (clickEvent.defaultPrevented) {
           return;
         } // Update the `v-model`
         // Done in in requestAF() to allow browser to complete the
@@ -21073,7 +21189,7 @@
             link: this.useRouter ? {
               path: link
             } : link,
-            text: toString$1(pageNumber)
+            text: toString(pageNumber)
           };
         }
 
@@ -21087,12 +21203,12 @@
               path: _link
             } : _link,
             // Make sure text has a value
-            text: toString$1(info.text || pageNumber)
+            text: toString(info.text || pageNumber)
           };
         } else {
           return {
-            link: toString$1(info),
-            text: toString$1(pageNumber)
+            link: toString(info),
+            text: toString(pageNumber)
           };
         }
       },
@@ -21274,7 +21390,7 @@
     LEFTBOTTOM: +1
   }; // --- Props ---
 
-  var props$1H = {
+  var props$G = {
     // The minimum distance (in `px`) from the edge of the
     // tooltip/popover that the arrow can be positioned
     arrowPadding: makeProp(PROP_TYPE_NUMBER_STRING, 6),
@@ -21293,7 +21409,7 @@
 
   var BVPopper = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_POPPER,
-    props: props$1H,
+    props: props$G,
     data: function data() {
       return {
         // reactive props set by parent
@@ -21481,7 +21597,7 @@
     }
   });
 
-  var props$1I = {
+  var props$F = {
     // Used only by the directive versions
     html: makeProp(PROP_TYPE_BOOLEAN, false),
     // Other non-reactive (while open) props are pulled in from BVPopper
@@ -21493,7 +21609,7 @@
     name: NAME_TOOLTIP_TEMPLATE,
     extends: BVPopper,
     mixins: [scopedStyleMixin],
-    props: props$1I,
+    props: props$F,
     data: function data() {
       // We use data, rather than props to ensure reactivity
       // Parent component will directly set this data
@@ -21523,7 +21639,7 @@
       },
       templateAttributes: function templateAttributes() {
         var id = this.id;
-        return _objectSpread2(_objectSpread2({}, this.$parent.$parent.$attrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.$parent.$parent.$attrs), {}, {
           id: id,
           role: 'tooltip',
           tabindex: '-1'
@@ -21561,9 +21677,9 @@
       renderTemplate: function renderTemplate(h) {
         var title = this.title; // Title can be a scoped slot function
 
-        var $title = isFunction(title) ? title({}) : title; // Directive versions only
+        var $title = isFunction$1(title) ? title({}) : title; // Directive versions only
 
-        var domProps = this.html && !isFunction(title) ? {
+        var domProps = this.html && !isFunction$1(title) ? {
           innerHTML: title
         } : {};
         return h('div', {
@@ -21649,7 +21765,7 @@
     name: NAME_TOOLTIP_HELPER,
     mixins: [listenOnRootMixin],
     data: function data() {
-      return _objectSpread2(_objectSpread2({}, templateData), {}, {
+      return _objectSpread2$3(_objectSpread2$3({}, templateData), {}, {
         // State management data
         activeTrigger: {
           // manual: false,
@@ -21962,14 +22078,14 @@
 
         this.localShow = true; // Create a cancelable BvEvent
 
-        var showEvt = this.buildEvent(EVENT_NAME_SHOW, {
+        var showEvent = this.buildEvent(EVENT_NAME_SHOW, {
           cancelable: true
         });
-        this.emitEvent(showEvt); // Don't show if event cancelled
+        this.emitEvent(showEvent); // Don't show if event cancelled
 
         /* istanbul ignore if */
 
-        if (showEvt.defaultPrevented) {
+        if (showEvent.defaultPrevented) {
           // Destroy the template (if for some reason it was created)
           this.destroyTemplate();
           return;
@@ -21995,13 +22111,13 @@
         // We disable cancelling if `force` is true
 
 
-        var hideEvt = this.buildEvent(EVENT_NAME_HIDE, {
+        var hideEvent = this.buildEvent(EVENT_NAME_HIDE, {
           cancelable: !force
         });
-        this.emitEvent(hideEvt);
+        this.emitEvent(hideEvent);
         /* istanbul ignore if: ignore for now */
 
-        if (hideEvt.defaultPrevented) {
+        if (hideEvent.defaultPrevented) {
           // Don't hide if event cancelled
           return;
         } // Tell the template to hide
@@ -22080,7 +22196,7 @@
 
         if (isString(target)) {
           target = getById(target.replace(/^#/, ''));
-        } else if (isFunction(target)) {
+        } else if (isFunction$1(target)) {
           target = target();
         } else if (target) {
           target = target.$el || target;
@@ -22212,7 +22328,7 @@
       buildEvent: function buildEvent(type) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         // Defaults to a non-cancellable event
-        return new BvEvent(type, _objectSpread2({
+        return new BvEvent(type, _objectSpread2$3({
           cancelable: false,
           target: this.getTarget(),
           relatedTarget: this.getTemplateElement() || null,
@@ -22247,7 +22363,7 @@
             eventOn(el, 'focusin', _this6.handleEvent, EVENT_OPTIONS_NO_CAPTURE);
             eventOn(el, 'focusout', _this6.handleEvent, EVENT_OPTIONS_NO_CAPTURE);
           } else if (trigger === 'blur') {
-            // Used to close $tip when element looses focus
+            // Used to close $tip when element loses focus
 
             /* istanbul ignore next */
             eventOn(el, 'focusout', _this6.handleEvent, EVENT_OPTIONS_NO_CAPTURE);
@@ -22303,10 +22419,11 @@
 
         this.clearVisibilityInterval();
         var target = this.getTarget();
-        var tip = this.getTemplateElement();
 
         if (on) {
           this.$_visibleInterval = setInterval(function () {
+            var tip = _this8.getTemplateElement();
+
             if (tip && _this8.localShow && (!target.parentNode || !isVisible(target))) {
               // Target element is no longer visible or not in DOM, so force-hide the tooltip
               _this8.forceHide();
@@ -22554,14 +22671,14 @@
     }
   });
 
-  var _makePropsConfigurabl, _watch$f;
+  var _makePropsConfigurabl, _watch$5;
 
   var MODEL_PROP_NAME_ENABLED = 'disabled';
   var MODEL_EVENT_NAME_ENABLED = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_ENABLED;
-  var MODEL_PROP_NAME_SHOW$1 = 'show';
-  var MODEL_EVENT_NAME_SHOW$1 = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SHOW$1; // --- Props ---
+  var MODEL_PROP_NAME_SHOW = 'show';
+  var MODEL_EVENT_NAME_SHOW = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SHOW; // --- Props ---
 
-  var props$1J = makePropsConfigurable((_makePropsConfigurabl = {
+  var props$E = makePropsConfigurable((_makePropsConfigurabl = {
     // String: scrollParent, window, or viewport
     // Element: element reference
     // Object: Vue component
@@ -22573,17 +22690,17 @@
     container: makeProp([HTMLElement, PROP_TYPE_OBJECT, PROP_TYPE_STRING]),
     customClass: makeProp(PROP_TYPE_STRING),
     delay: makeProp(PROP_TYPE_NUMBER_OBJECT_STRING, 50)
-  }, _defineProperty(_makePropsConfigurabl, MODEL_PROP_NAME_ENABLED, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "fallbackPlacement", makeProp(PROP_TYPE_ARRAY_STRING, 'flip')), _defineProperty(_makePropsConfigurabl, "id", makeProp(PROP_TYPE_STRING)), _defineProperty(_makePropsConfigurabl, "noFade", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "noninteractive", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "offset", makeProp(PROP_TYPE_NUMBER_STRING, 0)), _defineProperty(_makePropsConfigurabl, "placement", makeProp(PROP_TYPE_STRING, 'top')), _defineProperty(_makePropsConfigurabl, MODEL_PROP_NAME_SHOW$1, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "target", makeProp([HTMLElement, SVGElement, PROP_TYPE_FUNCTION, PROP_TYPE_OBJECT, PROP_TYPE_STRING], undefined, true)), _defineProperty(_makePropsConfigurabl, "title", makeProp(PROP_TYPE_STRING)), _defineProperty(_makePropsConfigurabl, "triggers", makeProp(PROP_TYPE_ARRAY_STRING, 'hover focus')), _defineProperty(_makePropsConfigurabl, "variant", makeProp(PROP_TYPE_STRING)), _makePropsConfigurabl), NAME_TOOLTIP); // --- Main component ---
+  }, _defineProperty(_makePropsConfigurabl, MODEL_PROP_NAME_ENABLED, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "fallbackPlacement", makeProp(PROP_TYPE_ARRAY_STRING, 'flip')), _defineProperty(_makePropsConfigurabl, "id", makeProp(PROP_TYPE_STRING)), _defineProperty(_makePropsConfigurabl, "noFade", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "noninteractive", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "offset", makeProp(PROP_TYPE_NUMBER_STRING, 0)), _defineProperty(_makePropsConfigurabl, "placement", makeProp(PROP_TYPE_STRING, 'top')), _defineProperty(_makePropsConfigurabl, MODEL_PROP_NAME_SHOW, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_makePropsConfigurabl, "target", makeProp([HTMLElement, SVGElement, PROP_TYPE_FUNCTION, PROP_TYPE_OBJECT, PROP_TYPE_STRING], undefined, true)), _defineProperty(_makePropsConfigurabl, "title", makeProp(PROP_TYPE_STRING)), _defineProperty(_makePropsConfigurabl, "triggers", makeProp(PROP_TYPE_ARRAY_STRING, 'hover focus')), _defineProperty(_makePropsConfigurabl, "variant", makeProp(PROP_TYPE_STRING)), _makePropsConfigurabl), NAME_TOOLTIP); // --- Main component ---
   // @vue/component
 
   var BTooltip = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TOOLTIP,
     mixins: [normalizeSlotMixin],
     inheritAttrs: false,
-    props: props$1J,
+    props: props$E,
     data: function data() {
       return {
-        localShow: this[MODEL_PROP_NAME_SHOW$1],
+        localShow: this[MODEL_PROP_NAME_SHOW],
         localTitle: '',
         localContent: ''
       };
@@ -22591,11 +22708,11 @@
     computed: {
       // Data that will be passed to the template and popper
       templateData: function templateData() {
-        return _objectSpread2({
+        return _objectSpread2$3({
           title: this.localTitle,
           content: this.localContent,
           interactive: !this.noninteractive
-        }, pick(this.$props, ['boundary', 'boundaryPadding', 'container', 'customClass', 'delay', 'fallbackPlacement', 'id', 'noFade', 'offset', 'placement', 'target', 'target', 'triggers', 'variant', MODEL_PROP_NAME_ENABLED]));
+        }, pick$1(this.$props, ['boundary', 'boundaryPadding', 'container', 'customClass', 'delay', 'fallbackPlacement', 'id', 'noFade', 'offset', 'placement', 'target', 'target', 'triggers', 'variant', MODEL_PROP_NAME_ENABLED]));
       },
       // Used to watch for changes to the title and content props
       templateTitleContent: function templateTitleContent() {
@@ -22607,7 +22724,7 @@
         };
       }
     },
-    watch: (_watch$f = {}, _defineProperty(_watch$f, MODEL_PROP_NAME_SHOW$1, function (newValue, oldValue) {
+    watch: (_watch$5 = {}, _defineProperty(_watch$5, MODEL_PROP_NAME_SHOW, function (newValue, oldValue) {
       if (newValue !== oldValue && newValue !== this.localShow && this.$_toolpop) {
         if (newValue) {
           this.$_toolpop.show();
@@ -22616,16 +22733,16 @@
           this.$_toolpop.forceHide();
         }
       }
-    }), _defineProperty(_watch$f, MODEL_PROP_NAME_ENABLED, function (newValue) {
+    }), _defineProperty(_watch$5, MODEL_PROP_NAME_ENABLED, function (newValue) {
       if (newValue) {
         this.doDisable();
       } else {
         this.doEnable();
       }
-    }), _defineProperty(_watch$f, "localShow", function localShow(newValue) {
+    }), _defineProperty(_watch$5, "localShow", function localShow(newValue) {
       // TODO: May need to be done in a `$nextTick()`
-      this.$emit(MODEL_EVENT_NAME_SHOW$1, newValue);
-    }), _defineProperty(_watch$f, "templateData", function templateData() {
+      this.$emit(MODEL_EVENT_NAME_SHOW, newValue);
+    }), _defineProperty(_watch$5, "templateData", function templateData() {
       var _this = this;
 
       this.$nextTick(function () {
@@ -22633,9 +22750,9 @@
           _this.$_toolpop.updateData(_this.templateData);
         }
       });
-    }), _defineProperty(_watch$f, "templateTitleContent", function templateTitleContent() {
+    }), _defineProperty(_watch$5, "templateTitleContent", function templateTitleContent() {
       this.$nextTick(this.updateContent);
-    }), _watch$f),
+    }), _watch$5),
     created: function created() {
       // Create private non-reactive props
       this.$_toolpop = null;
@@ -22813,13 +22930,13 @@
         var title = this.title,
             content = this.content; // Title and content could be a scoped slot function
 
-        var $title = isFunction(title) ? title({}) : title;
-        var $content = isFunction(content) ? content({}) : content; // Directive usage only
+        var $title = isFunction$1(title) ? title({}) : title;
+        var $content = isFunction$1(content) ? content({}) : content; // Directive usage only
 
-        var titleDomProps = this.html && !isFunction(title) ? {
+        var titleDomProps = this.html && !isFunction$1(title) ? {
           innerHTML: title
         } : {};
-        var contentDomProps = this.html && !isFunction(content) ? {
+        var contentDomProps = this.html && !isFunction$1(content) ? {
           innerHTML: content
         } : {};
         return h('div', {
@@ -22864,7 +22981,7 @@
     }
   });
 
-  var props$1K = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$1J), {}, {
+  var props$D = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$E), {}, {
     content: makeProp(PROP_TYPE_STRING),
     placement: makeProp(PROP_TYPE_STRING, 'right'),
     triggers: makeProp(PROP_TYPE_ARRAY_STRING, EVENT_NAME_CLICK)
@@ -22875,7 +22992,7 @@
     name: NAME_POPOVER,
     extends: BTooltip,
     inheritAttrs: false,
-    props: props$1K,
+    props: props$D,
     methods: {
       getComponent: function getComponent() {
         // Overridden by BPopover
@@ -22895,9 +23012,9 @@
 
   var BV_POPOVER = '__BV_Popover__'; // Default trigger
 
-  var DefaultTrigger = 'click'; // Valid event triggers
+  var DefaultTrigger$1 = 'click'; // Valid event triggers
 
-  var validTriggers = {
+  var validTriggers$1 = {
     focus: true,
     hover: true,
     click: true,
@@ -22905,19 +23022,19 @@
     manual: true
   }; // Directive modifier test regular expressions. Pre-compile for performance
 
-  var htmlRE = /^html$/i;
-  var noFadeRE = /^nofade$/i;
-  var placementRE = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/i;
-  var boundaryRE = /^(window|viewport|scrollParent)$/i;
-  var delayRE = /^d\d+$/i;
-  var delayShowRE = /^ds\d+$/i;
-  var delayHideRE = /^dh\d+$/i;
-  var offsetRE = /^o-?\d+$/i;
-  var variantRE = /^v-.+$/i;
-  var spacesRE = /\s+/; // Build a Popover config based on bindings (if any)
+  var htmlRE$1 = /^html$/i;
+  var noFadeRE$1 = /^nofade$/i;
+  var placementRE$1 = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/i;
+  var boundaryRE$1 = /^(window|viewport|scrollParent)$/i;
+  var delayRE$1 = /^d\d+$/i;
+  var delayShowRE$1 = /^ds\d+$/i;
+  var delayHideRE$1 = /^dh\d+$/i;
+  var offsetRE$2 = /^o-?\d+$/i;
+  var variantRE$1 = /^v-.+$/i;
+  var spacesRE$1 = /\s+/; // Build a Popover config based on bindings (if any)
   // Arguments and modifiers take precedence over passed value config object
 
-  var parseBindings = function parseBindings(bindings, vnode)
+  var parseBindings$2 = function parseBindings(bindings, vnode)
   /* istanbul ignore next: not easy to test */
   {
     // We start out with a basic config
@@ -22945,12 +23062,12 @@
     if (isString(bindings.value) || isNumber(bindings.value)) {
       // Value is popover content (html optionally supported)
       config.content = bindings.value;
-    } else if (isFunction(bindings.value)) {
+    } else if (isFunction$1(bindings.value)) {
       // Content generator function
       config.content = bindings.value;
     } else if (isPlainObject(bindings.value)) {
       // Value is config object, so merge
-      config = _objectSpread2(_objectSpread2({}, config), bindings.value);
+      config = _objectSpread2$3(_objectSpread2$3({}, config), bindings.value);
     } // If argument, assume element ID of container element
 
 
@@ -22977,34 +23094,34 @@
 
 
     keys(bindings.modifiers).forEach(function (mod) {
-      if (htmlRE.test(mod)) {
+      if (htmlRE$1.test(mod)) {
         // Title/content allows HTML
         config.html = true;
-      } else if (noFadeRE.test(mod)) {
+      } else if (noFadeRE$1.test(mod)) {
         // No animation
         config.animation = false;
-      } else if (placementRE.test(mod)) {
+      } else if (placementRE$1.test(mod)) {
         // Placement of popover
         config.placement = mod;
-      } else if (boundaryRE.test(mod)) {
+      } else if (boundaryRE$1.test(mod)) {
         // Boundary of popover
         mod = mod === 'scrollparent' ? 'scrollParent' : mod;
         config.boundary = mod;
-      } else if (delayRE.test(mod)) {
+      } else if (delayRE$1.test(mod)) {
         // Delay value
         var delay = toInteger(mod.slice(1), 0);
         config.delay.show = delay;
         config.delay.hide = delay;
-      } else if (delayShowRE.test(mod)) {
+      } else if (delayShowRE$1.test(mod)) {
         // Delay show value
         config.delay.show = toInteger(mod.slice(2), 0);
-      } else if (delayHideRE.test(mod)) {
+      } else if (delayHideRE$1.test(mod)) {
         // Delay hide value
         config.delay.hide = toInteger(mod.slice(2), 0);
-      } else if (offsetRE.test(mod)) {
+      } else if (offsetRE$2.test(mod)) {
         // Offset value, negative allowed
         config.offset = toInteger(mod.slice(1), 0);
-      } else if (variantRE.test(mod)) {
+      } else if (variantRE$1.test(mod)) {
         // Variant
         config.variant = mod.slice(2) || null;
       }
@@ -23013,8 +23130,8 @@
 
     var selectedTriggers = {}; // Parse current config object trigger
 
-    concat(config.trigger || '').filter(identity).join(' ').trim().toLowerCase().split(spacesRE).forEach(function (trigger) {
-      if (validTriggers[trigger]) {
+    concat(config.trigger || '').filter(identity).join(' ').trim().toLowerCase().split(spacesRE$1).forEach(function (trigger) {
+      if (validTriggers$1[trigger]) {
         selectedTriggers[trigger] = true;
       }
     }); // Parse modifiers for triggers
@@ -23022,7 +23139,7 @@
     keys(bindings.modifiers).forEach(function (mod) {
       mod = mod.toLowerCase();
 
-      if (validTriggers[mod]) {
+      if (validTriggers$1[mod]) {
         // If modifier is a valid trigger
         selectedTriggers[mod] = true;
       }
@@ -23037,7 +23154,7 @@
 
     if (!config.trigger) {
       // Use default trigger
-      config.trigger = DefaultTrigger;
+      config.trigger = DefaultTrigger$1;
     }
 
     return config;
@@ -23050,7 +23167,7 @@
       return;
     }
 
-    var config = parseBindings(bindings, vnode);
+    var config = parseBindings$2(bindings, vnode);
 
     if (!el[BV_POPOVER]) {
       var $parent = vnode.context;
@@ -23067,11 +23184,11 @@
         // and content if they are functions
         var data = {};
 
-        if (isFunction(config.title)) {
+        if (isFunction$1(config.title)) {
           data.title = config.title(el);
         }
 
-        if (isFunction(config.content)) {
+        if (isFunction$1(config.content)) {
           data.content = config.content(el);
         }
 
@@ -23110,7 +23227,7 @@
         // We only pass data properties that have changed
         if (data[prop] !== oldData[prop]) {
           // If title/content is a function, we execute it here
-          newData[prop] = (prop === 'title' || prop === 'content') && isFunction(data[prop]) ?
+          newData[prop] = (prop === 'title' || prop === 'content') && isFunction$1(data[prop]) ?
           /* istanbul ignore next */
           data[prop](el) : data[prop];
         }
@@ -23162,7 +23279,7 @@
     }
   });
 
-  var props$1L = makePropsConfigurable({
+  var props$C = makePropsConfigurable({
     animated: makeProp(PROP_TYPE_BOOLEAN, null),
     label: makeProp(PROP_TYPE_STRING),
     labelHtml: makeProp(PROP_TYPE_STRING),
@@ -23188,7 +23305,7 @@
         }
       }
     },
-    props: props$1L,
+    props: props$C,
     computed: {
       progressBarClasses: function progressBarClasses() {
         var computedAnimated = this.computedAnimated,
@@ -23265,7 +23382,7 @@
         attrs: {
           role: 'progressbar',
           'aria-valuemin': '0',
-          'aria-valuemax': toString$1(this.computedMax),
+          'aria-valuemax': toString(this.computedMax),
           'aria-valuenow': toFixed(computedValue, computedPrecision)
         },
         domProps: domProps
@@ -23273,8 +23390,8 @@
     }
   });
 
-  var progressBarProps = omit(props$1L, ['label', 'labelHtml']);
-  var props$1M = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, progressBarProps), {}, {
+  var progressBarProps = omit(props$C, ['label', 'labelHtml']);
+  var props$B = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, progressBarProps), {}, {
     animated: makeProp(PROP_TYPE_BOOLEAN, false),
     height: makeProp(PROP_TYPE_STRING),
     max: makeProp(PROP_TYPE_NUMBER_STRING, 100),
@@ -23293,7 +23410,7 @@
         bvProgress: this
       };
     },
-    props: props$1M,
+    props: props$B,
     computed: {
       progressHeight: function progressHeight() {
         return {
@@ -23324,26 +23441,26 @@
     }
   });
 
-  var _watch$g;
+  var _watch$4;
 
-  var CLASS_NAME$3 = 'b-sidebar';
-  var ROOT_ACTION_EVENT_NAME_REQUEST_STATE$2 = getRootActionEventName(NAME_COLLAPSE, 'request-state');
-  var ROOT_ACTION_EVENT_NAME_TOGGLE$2 = getRootActionEventName(NAME_COLLAPSE, 'toggle');
-  var ROOT_EVENT_NAME_STATE$3 = getRootEventName(NAME_COLLAPSE, 'state');
-  var ROOT_EVENT_NAME_SYNC_STATE$3 = getRootEventName(NAME_COLLAPSE, 'sync-state');
+  var CLASS_NAME = 'b-sidebar';
+  var ROOT_ACTION_EVENT_NAME_REQUEST_STATE = getRootActionEventName(NAME_COLLAPSE, 'request-state');
+  var ROOT_ACTION_EVENT_NAME_TOGGLE = getRootActionEventName(NAME_COLLAPSE, 'toggle');
+  var ROOT_EVENT_NAME_STATE = getRootEventName(NAME_COLLAPSE, 'state');
+  var ROOT_EVENT_NAME_SYNC_STATE = getRootEventName(NAME_COLLAPSE, 'sync-state');
 
-  var _makeModelMixin$h = makeModelMixin('visible', {
+  var _makeModelMixin$3 = makeModelMixin('visible', {
     type: PROP_TYPE_BOOLEAN,
     defaultValue: false,
     event: EVENT_NAME_CHANGE
   }),
-      modelMixin$g = _makeModelMixin$h.mixin,
-      modelProps$g = _makeModelMixin$h.props,
-      MODEL_PROP_NAME$g = _makeModelMixin$h.prop,
-      MODEL_EVENT_NAME$g = _makeModelMixin$h.event; // --- Props ---
+      modelMixin$3 = _makeModelMixin$3.mixin,
+      modelProps$3 = _makeModelMixin$3.props,
+      MODEL_PROP_NAME$3 = _makeModelMixin$3.prop,
+      MODEL_EVENT_NAME$3 = _makeModelMixin$3.event; // --- Props ---
 
 
-  var props$1N = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$g), {}, {
+  var props$A = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$3), {}, {
     ariaLabel: makeProp(PROP_TYPE_STRING),
     ariaLabelledby: makeProp(PROP_TYPE_STRING),
     // If `true`, shows a basic backdrop
@@ -23354,7 +23471,9 @@
     // `aria-label` for close button
     closeLabel: makeProp(PROP_TYPE_STRING),
     footerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    footerTag: makeProp(PROP_TYPE_STRING, 'footer'),
     headerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    headerTag: makeProp(PROP_TYPE_STRING, 'header'),
     lazy: makeProp(PROP_TYPE_BOOLEAN, false),
     noCloseOnBackdrop: makeProp(PROP_TYPE_BOOLEAN, false),
     noCloseOnEsc: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -23421,8 +23540,8 @@
       $content = ctx.right ? [$close, $title] : [$title, $close];
     }
 
-    return h('header', {
-      staticClass: "".concat(CLASS_NAME$3, "-header"),
+    return h(ctx.headerTag, {
+      staticClass: "".concat(CLASS_NAME, "-header"),
       class: ctx.headerClass,
       key: 'header'
     }, $content);
@@ -23430,7 +23549,7 @@
 
   var renderBody = function renderBody(h, ctx) {
     return h('div', {
-      staticClass: "".concat(CLASS_NAME$3, "-body"),
+      staticClass: "".concat(CLASS_NAME, "-body"),
       class: ctx.bodyClass,
       key: 'body'
     }, [ctx.normalizeSlot(SLOT_NAME_DEFAULT, ctx.slotScope)]);
@@ -23443,8 +23562,8 @@
       return h();
     }
 
-    return h('footer', {
-      staticClass: "".concat(CLASS_NAME$3, "-footer"),
+    return h(ctx.footerTag, {
+      staticClass: "".concat(CLASS_NAME, "-footer"),
       class: ctx.footerClass,
       key: 'footer'
     }, [$footer]);
@@ -23485,11 +23604,11 @@
 
   var BSidebar = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SIDEBAR,
-    mixins: [attrsMixin, idMixin, modelMixin$g, listenOnRootMixin, normalizeSlotMixin],
+    mixins: [attrsMixin, idMixin, modelMixin$3, listenOnRootMixin, normalizeSlotMixin],
     inheritAttrs: false,
-    props: props$1N,
+    props: props$A,
     data: function data() {
-      var visible = !!this[MODEL_PROP_NAME$g];
+      var visible = !!this[MODEL_PROP_NAME$3];
       return {
         // Internal `v-model` state
         localShow: visible,
@@ -23532,7 +23651,7 @@
         return this.hasTitle ? this.safeId('__title__') : null;
       },
       computedAttrs: function computedAttrs() {
-        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvAttrs), {}, {
           id: this.safeId(),
           tabindex: '-1',
           role: 'dialog',
@@ -23543,23 +23662,23 @@
         });
       }
     },
-    watch: (_watch$g = {}, _defineProperty(_watch$g, MODEL_PROP_NAME$g, function (newValue, oldValue) {
+    watch: (_watch$4 = {}, _defineProperty(_watch$4, MODEL_PROP_NAME$3, function (newValue, oldValue) {
       if (newValue !== oldValue) {
         this.localShow = newValue;
       }
-    }), _defineProperty(_watch$g, "localShow", function localShow(newValue, oldValue) {
+    }), _defineProperty(_watch$4, "localShow", function localShow(newValue, oldValue) {
       if (newValue !== oldValue) {
         this.emitState(newValue);
-        this.$emit(MODEL_EVENT_NAME$g, newValue);
+        this.$emit(MODEL_EVENT_NAME$3, newValue);
       }
-    }), _defineProperty(_watch$g, "$route", function $route() {
+    }), _defineProperty(_watch$4, "$route", function $route() {
       var newValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var oldValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       if (!this.noCloseOnRouteChange && newValue.fullPath !== oldValue.fullPath) {
         this.hide();
       }
-    }), _watch$g),
+    }), _watch$4),
     created: function created() {
       // Define non-reactive properties
       this.$_returnFocusEl = null;
@@ -23568,8 +23687,8 @@
       var _this = this;
 
       // Add `$root` listeners
-      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_TOGGLE$2, this.handleToggle);
-      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_REQUEST_STATE$2, this.handleSync); // Send out a gratuitous state event to ensure toggle button is synced
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_TOGGLE, this.handleToggle);
+      this.listenOnRoot(ROOT_ACTION_EVENT_NAME_REQUEST_STATE, this.handleSync); // Send out a gratuitous state event to ensure toggle button is synced
 
       this.$nextTick(function () {
         _this.emitState(_this.localShow);
@@ -23590,11 +23709,11 @@
       },
       emitState: function emitState() {
         var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.localShow;
-        this.emitOnRoot(ROOT_EVENT_NAME_STATE$3, this.safeId(), state);
+        this.emitOnRoot(ROOT_EVENT_NAME_STATE, this.safeId(), state);
       },
       emitSync: function emitSync() {
         var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.localShow;
-        this.emitOnRoot(ROOT_EVENT_NAME_SYNC_STATE$3, this.safeId(), state);
+        this.emitOnRoot(ROOT_EVENT_NAME_SYNC_STATE, this.safeId(), state);
       },
       handleToggle: function handleToggle(id) {
         // Note `safeId()` can be null until after mount
@@ -23672,10 +23791,10 @@
           localShow = this.localShow;
       var shadow = this.shadow === '' ? true : this.shadow;
       var $sidebar = h(this.tag, {
-        staticClass: CLASS_NAME$3,
+        staticClass: CLASS_NAME,
         class: [(_ref = {
           shadow: shadow === true
-        }, _defineProperty(_ref, "shadow-".concat(shadow), shadow && shadow !== true), _defineProperty(_ref, "".concat(CLASS_NAME$3, "-right"), this.right), _defineProperty(_ref, "bg-".concat(bgVariant), bgVariant), _defineProperty(_ref, "text-".concat(textVariant), textVariant), _ref), this.sidebarClass],
+        }, _defineProperty(_ref, "shadow-".concat(shadow), shadow && shadow !== true), _defineProperty(_ref, "".concat(CLASS_NAME, "-right"), this.right), _defineProperty(_ref, "bg-".concat(bgVariant), bgVariant), _defineProperty(_ref, "text-".concat(textVariant), textVariant), _ref), this.sidebarClass],
         style: {
           width: width
         },
@@ -23745,7 +23864,7 @@
     }
   });
 
-  var props$1O = makePropsConfigurable({
+  var props$z = makePropsConfigurable({
     animation: makeProp(PROP_TYPE_STRING, 'wave'),
     height: makeProp(PROP_TYPE_STRING),
     size: makeProp(PROP_TYPE_STRING),
@@ -23758,7 +23877,7 @@
   var BSkeleton = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON,
     functional: true,
-    props: props$1O,
+    props: props$z,
     render: function render(h, _ref) {
       var _class;
 
@@ -23778,9 +23897,9 @@
     }
   });
 
-  var props$1P = makePropsConfigurable(omit(props$4, ['content', 'stacked']), NAME_ICONSTACK); // --- Main component ---
+  makePropsConfigurable(omit(props$2h, ['content', 'stacked']), NAME_ICONSTACK); // --- Main component ---
 
-  var props$1Q = makePropsConfigurable({
+  var props$y = makePropsConfigurable({
     animation: makeProp(PROP_TYPE_STRING, 'wave'),
     icon: makeProp(PROP_TYPE_STRING),
     iconProps: makeProp(PROP_TYPE_OBJECT, {})
@@ -23790,25 +23909,26 @@
   var BSkeletonIcon = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON_ICON,
     functional: true,
-    props: props$1Q,
+    props: props$y,
     render: function render(h, _ref) {
-      var props = _ref.props;
+      var data = _ref.data,
+          props = _ref.props;
       var icon = props.icon,
           animation = props.animation;
       var $icon = h(BIcon, {
         staticClass: 'b-skeleton-icon',
-        props: _objectSpread2(_objectSpread2({}, props.iconProps), {}, {
+        props: _objectSpread2$3(_objectSpread2$3({}, props.iconProps), {}, {
           icon: icon
         })
       });
-      return h('div', {
+      return h('div', a(data, {
         staticClass: 'b-skeleton-icon-wrapper position-relative d-inline-block overflow-hidden',
         class: _defineProperty({}, "b-skeleton-animate-".concat(animation), animation)
-      }, [$icon]);
+      }), [$icon]);
     }
   });
 
-  var props$1R = makePropsConfigurable({
+  var props$x = makePropsConfigurable({
     animation: makeProp(PROP_TYPE_STRING),
     aspect: makeProp(PROP_TYPE_STRING, '16:9'),
     cardImg: makeProp(PROP_TYPE_STRING),
@@ -23822,16 +23942,17 @@
   var BSkeletonImg = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON_IMG,
     functional: true,
-    props: props$1R,
+    props: props$x,
     render: function render(h, _ref) {
-      var props = _ref.props;
+      var data = _ref.data,
+          props = _ref.props;
       var aspect = props.aspect,
           width = props.width,
           height = props.height,
           animation = props.animation,
           variant = props.variant,
           cardImg = props.cardImg;
-      var $img = h(BSkeleton, {
+      var $img = h(BSkeleton, a(data, {
         props: {
           type: 'img',
           width: width,
@@ -23840,7 +23961,7 @@
           variant: variant
         },
         class: _defineProperty({}, "card-img-".concat(cardImg), cardImg)
-      });
+      }));
       return props.noAspect ? $img : h(BAspect, {
         props: {
           aspect: aspect
@@ -23870,7 +23991,7 @@
   var LIGHT = 'light';
   var DARK = 'dark'; // --- Props ---
 
-  var props$1S = makePropsConfigurable({
+  var props$w = makePropsConfigurable({
     variant: makeProp(PROP_TYPE_STRING)
   }, NAME_TR); // --- Main component ---
   // TODO:
@@ -23896,7 +24017,7 @@
       }
     },
     inheritAttrs: false,
-    props: props$1S,
+    props: props$w,
     computed: {
       // Sniffed by `<b-td>` / `<b-th>`
       inTbody: function inTbody() {
@@ -23957,7 +24078,7 @@
         return [variant ? "".concat(this.isRowDark ? 'bg' : 'table', "-").concat(variant) : null];
       },
       trAttrs: function trAttrs() {
-        return _objectSpread2({
+        return _objectSpread2$3({
           role: 'row'
         }, this.bvAttrs);
       }
@@ -23972,11 +24093,11 @@
     }
   });
 
-  var props$1T = {}; // --- Mixin ---
+  var props$v = {}; // --- Mixin ---
   // @vue/component
 
   var bottomRowMixin = Vue__default['default'].extend({
-    props: props$1T,
+    props: props$v,
     methods: {
       renderBottomRow: function renderBottomRow() {
         var fields = this.computedFields,
@@ -23992,10 +24113,10 @@
 
         return h(BTr, {
           staticClass: 'b-table-bottom-row',
-          class: [isFunction(tbodyTrClass) ?
+          class: [isFunction$1(tbodyTrClass) ?
           /* istanbul ignore next */
           tbodyTrClass(null, 'row-bottom') : tbodyTrClass],
-          attrs: isFunction(tbodyTrAttr) ?
+          attrs: isFunction$1(tbodyTrAttr) ?
           /* istanbul ignore next */
           tbodyTrAttr(null, 'row-bottom') : tbodyTrAttr,
           key: 'b-bottom-row'
@@ -24021,7 +24142,7 @@
   }; // --- Props ---
 
 
-  var props$1U = makePropsConfigurable({
+  var props$u = makePropsConfigurable({
     colspan: makeProp(PROP_TYPE_NUMBER_STRING, null, spanValidator),
     rowspan: makeProp(PROP_TYPE_NUMBER_STRING, null, spanValidator),
     stackedHeading: makeProp(PROP_TYPE_STRING),
@@ -24047,7 +24168,7 @@
       }
     },
     inheritAttrs: false,
-    props: props$1U,
+    props: props$u,
     computed: {
       // Overridden by `<b-th>`
       tag: function tag() {
@@ -24150,7 +24271,7 @@
           scope = rowspan > 0 ? 'rowgroup' : 'row';
         }
 
-        return _objectSpread2(_objectSpread2({
+        return _objectSpread2$3(_objectSpread2$3({
           colspan: colspan,
           rowspan: rowspan,
           role: role,
@@ -24160,7 +24281,7 @@
           // stacked mode (if a stacked heading label is provided)
           'data-label': this.isStackedCell && !isUndefinedOrNull(stackedHeading) ?
           /* istanbul ignore next */
-          toString$1(stackedHeading) : null
+          toString(stackedHeading) : null
         });
       }
     },
@@ -24178,11 +24299,11 @@
   var MODEL_PROP_NAME_BUSY = 'busy';
   var MODEL_EVENT_NAME_BUSY = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_BUSY; // --- Props ---
 
-  var props$1V = _defineProperty({}, MODEL_PROP_NAME_BUSY, makeProp(PROP_TYPE_BOOLEAN, false)); // --- Mixin ---
+  var props$t = _defineProperty({}, MODEL_PROP_NAME_BUSY, makeProp(PROP_TYPE_BOOLEAN, false)); // --- Mixin ---
   // @vue/component
 
   var busyMixin = Vue__default['default'].extend({
-    props: props$1V,
+    props: props$t,
     data: function data() {
       return {
         localBusy: false
@@ -24220,10 +24341,10 @@
         if (this.computedBusy && this.hasNormalizedSlot(SLOT_NAME_TABLE_BUSY)) {
           return h(BTr, {
             staticClass: 'b-table-busy-slot',
-            class: [isFunction(tbodyTrClass) ?
+            class: [isFunction$1(tbodyTrClass) ?
             /* istanbul ignore next */
             tbodyTrClass(null, SLOT_NAME_TABLE_BUSY) : tbodyTrClass],
-            attrs: isFunction(tbodyTrAttr) ?
+            attrs: isFunction$1(tbodyTrAttr) ?
             /* istanbul ignore next */
             tbodyTrAttr(null, SLOT_NAME_TABLE_BUSY) : tbodyTrAttr,
             key: 'table-busy-slot'
@@ -24241,7 +24362,7 @@
     }
   });
 
-  var props$1W = {
+  var props$s = {
     caption: makeProp(PROP_TYPE_STRING),
     captionHtml: makeProp(PROP_TYPE_STRING) // `caption-top` is part of table-render mixin (styling)
     // captionTop: makeProp(PROP_TYPE_BOOLEAN, false)
@@ -24250,7 +24371,7 @@
   // @vue/component
 
   var captionMixin = Vue__default['default'].extend({
-    props: props$1W,
+    props: props$s,
     computed: {
       captionId: function captionId() {
         return this.isStacked ? this.safeId('_caption_') : null;
@@ -24280,7 +24401,7 @@
     }
   });
 
-  var props$1X = {}; // --- Mixin ---
+  var props$r = {}; // --- Mixin ---
   // @vue/component
 
   var colgroupMixin = Vue__default['default'].extend({
@@ -24304,7 +24425,7 @@
     }
   });
 
-  var props$1Y = {
+  var props$q = {
     emptyFilteredHtml: makeProp(PROP_TYPE_STRING),
     emptyFilteredText: makeProp(PROP_TYPE_STRING, 'There are no records matching your request'),
     emptyHtml: makeProp(PROP_TYPE_STRING),
@@ -24314,7 +24435,7 @@
   // @vue/component
 
   var emptyMixin = Vue__default['default'].extend({
-    props: props$1Y,
+    props: props$q,
     methods: {
       renderEmpty: function renderEmpty() {
         var items = this.computedItems;
@@ -24359,10 +24480,10 @@
           }, [$empty])]);
           $empty = h(BTr, {
             staticClass: 'b-table-empty-row',
-            class: [isFunction(tbodyTrClass) ?
+            class: [isFunction$1(tbodyTrClass) ?
             /* istanbul ignore next */
             tbodyTrClass(null, 'row-empty') : tbodyTrClass],
-            attrs: isFunction(tbodyTrAttr) ?
+            attrs: isFunction$1(tbodyTrAttr) ?
             /* istanbul ignore next */
             tbodyTrAttr(null, 'row-empty') : tbodyTrAttr,
             key: isFiltered ? 'b-empty-filtered-row' : 'b-empty-row'
@@ -24403,7 +24524,7 @@
       .join(' ');
     }
 
-    return toString$1(value);
+    return toString(value);
   };
 
   // Constants used by table helpers
@@ -24413,7 +24534,7 @@
   // stringification and filter events
 
   var IGNORED_FIELD_KEYS = [FIELD_KEY_CELL_VARIANT, FIELD_KEY_ROW_VARIANT, FIELD_KEY_SHOW_DETAILS].reduce(function (result, key) {
-    return _objectSpread2(_objectSpread2({}, result), {}, _defineProperty({}, key, true));
+    return _objectSpread2$3(_objectSpread2$3({}, result), {}, _defineProperty({}, key, true));
   }, {}); // Filter CSS selector for click/dblclick/etc. events
   // If any of these selectors match the clicked element, we ignore the event
 
@@ -24429,13 +24550,13 @@
     var formattedRow = keys(fieldsObj).reduce(function (result, key) {
       var field = fieldsObj[key];
       var filterByFormatted = field.filterByFormatted;
-      var formatter = isFunction(filterByFormatted) ?
+      var formatter = isFunction$1(filterByFormatted) ?
       /* istanbul ignore next */
       filterByFormatted : filterByFormatted ?
       /* istanbul ignore next */
       field.formatter : null;
 
-      if (isFunction(formatter)) {
+      if (isFunction$1(formatter)) {
         result[key] = formatter(row[key], key, row);
       }
 
@@ -24448,7 +24569,7 @@
     var allowedKeys = keys(formattedRow).filter(function (key) {
       return !IGNORED_FIELD_KEYS[key] && !(isArray(ignoreFields) && ignoreFields.length > 0 && arrayIncludes(ignoreFields, key)) && !(isArray(includeFields) && includeFields.length > 0 && !arrayIncludes(includeFields, key));
     });
-    return pick(formattedRow, allowedKeys);
+    return pick$1(formattedRow, allowedKeys);
   };
 
   // TODO: Add option to stringify `scopedSlot` items
@@ -24461,8 +24582,8 @@
 
   var DEBOUNCE_DEPRECATED_MSG = 'Prop "filter-debounce" is deprecated. Use the debounce feature of "<b-form-input>" instead.'; // --- Props ---
 
-  var props$1Z = {
-    filter: makeProp([].concat(_toConsumableArray(PROP_TYPE_ARRAY_OBJECT_STRING), [PROP_TYPE_REG_EXP])),
+  var props$p = {
+    filter: makeProp([].concat(_toConsumableArray$1(PROP_TYPE_ARRAY_OBJECT_STRING), [PROP_TYPE_REG_EXP])),
     filterDebounce: makeProp(PROP_TYPE_NUMBER_STRING, 0, function (value) {
       return RX_DIGITS.test(String(value));
     }),
@@ -24473,7 +24594,7 @@
   // @vue/component
 
   var filteringMixin = Vue__default['default'].extend({
-    props: props$1Z,
+    props: props$p,
     data: function data() {
       return {
         // Flag for displaying which empty slot to show and some event triggering
@@ -24641,7 +24762,7 @@
         // Rather than directly grabbing `this.computedLocalFilterFn` or `this.filterFunction`
         // we have it passed, so that the caller computed prop will be reactive to changes
         // in the original filter-function (as this routine is a method)
-        if (!filterFn || !isFunction(filterFn) || !criteria || looseEqual(criteria, []) || looseEqual(criteria, {})) {
+        if (!filterFn || !isFunction$1(filterFn) || !criteria || looseEqual(criteria, []) || looseEqual(criteria, {})) {
           return null;
         } // Build the wrapped filter test function, passing the criteria to the provided function
 
@@ -24711,7 +24832,7 @@
         key: key,
         label: value
       };
-    } else if (isFunction(value)) {
+    } else if (isFunction$1(value)) {
       // Formatter shortcut
       field = {
         key: key,
@@ -24786,28 +24907,28 @@
     });
   };
 
-  var _makeModelMixin$i = makeModelMixin('value', {
+  var _makeModelMixin$2 = makeModelMixin('value', {
     type: PROP_TYPE_ARRAY,
     defaultValue: []
   }),
-      modelMixin$h = _makeModelMixin$i.mixin,
-      modelProps$h = _makeModelMixin$i.props,
-      MODEL_PROP_NAME$h = _makeModelMixin$i.prop,
-      MODEL_EVENT_NAME$h = _makeModelMixin$i.event;
+      modelMixin$2 = _makeModelMixin$2.mixin,
+      modelProps$2 = _makeModelMixin$2.props,
+      MODEL_PROP_NAME$2 = _makeModelMixin$2.prop,
+      MODEL_EVENT_NAME$2 = _makeModelMixin$2.event;
 
-  var props$1_ = sortKeys(_objectSpread2(_objectSpread2({}, modelProps$h), {}, _defineProperty({
+  var props$o = sortKeys(_objectSpread2$3(_objectSpread2$3({}, modelProps$2), {}, _defineProperty({
     fields: makeProp(PROP_TYPE_ARRAY, null),
     // Provider mixin adds in `Function` type
     items: makeProp(PROP_TYPE_ARRAY, []),
     // Primary key for record
     // If provided the value in each row must be unique!
     primaryKey: makeProp(PROP_TYPE_STRING)
-  }, MODEL_PROP_NAME$h, makeProp(PROP_TYPE_ARRAY, [])))); // --- Mixin ---
+  }, MODEL_PROP_NAME$2, makeProp(PROP_TYPE_ARRAY, [])))); // --- Mixin ---
   // @vue/component
 
   var itemsMixin = Vue__default['default'].extend({
-    mixins: [modelMixin$h],
-    props: props$1_,
+    mixins: [modelMixin$2],
+    props: props$o,
     data: function data() {
       var items = this.items;
       return {
@@ -24836,9 +24957,9 @@
             // Normalize formatter to a function ref or `undefined`
             var formatter = f.formatter;
 
-            if (isString(formatter) && isFunction($parent[formatter])) {
+            if (isString(formatter) && isFunction$1($parent[formatter])) {
               formatter = $parent[formatter];
-            } else if (!isFunction(formatter)) {
+            } else if (!isFunction$1(formatter)) {
               /* istanbul ignore next */
               formatter = undefined;
             } // Return formatter function or `undefined` if none
@@ -24876,7 +24997,7 @@
       // Watch for changes on `computedItems` and update the `v-model`
       computedItems: function computedItems(newValue, oldValue) {
         if (!looseEqual(newValue, oldValue)) {
-          this.$emit(MODEL_EVENT_NAME$h, newValue);
+          this.$emit(MODEL_EVENT_NAME$2, newValue);
         }
       },
       // Watch for context changes
@@ -24889,7 +25010,7 @@
     },
     mounted: function mounted() {
       // Initially update the `v-model` of displayed items
-      this.$emit(MODEL_EVENT_NAME$h, this.computedItems);
+      this.$emit(MODEL_EVENT_NAME$2, this.computedItems);
     },
     methods: {
       // Method to get the formatter method for a given field key
@@ -24902,14 +25023,14 @@
     }
   });
 
-  var props$1$ = {
+  var props$n = {
     currentPage: makeProp(PROP_TYPE_NUMBER_STRING, 1),
     perPage: makeProp(PROP_TYPE_NUMBER_STRING, 0)
   }; // --- Mixin ---
   // @vue/component
 
-  var paginationMixin$1 = Vue__default['default'].extend({
-    props: props$1$,
+  var paginationMixin = Vue__default['default'].extend({
+    props: props$n,
     computed: {
       localPaging: function localPaging() {
         return this.hasProvider ? !!this.noProviderPaging : true;
@@ -24933,7 +25054,7 @@
   var ROOT_EVENT_NAME_REFRESHED = getRootEventName(NAME_TABLE, EVENT_NAME_REFRESHED);
   var ROOT_ACTION_EVENT_NAME_REFRESH = getRootActionEventName(NAME_TABLE, EVENT_NAME_REFRESH); // --- Props ---
 
-  var props$20 = {
+  var props$m = {
     // Passed to the context object
     // Not used by `<b-table>` directly
     apiUrl: makeProp(PROP_TYPE_STRING),
@@ -24947,10 +25068,10 @@
 
   var providerMixin = Vue__default['default'].extend({
     mixins: [listenOnRootMixin],
-    props: props$20,
+    props: props$m,
     computed: {
       hasProvider: function hasProvider() {
-        return isFunction(this.items);
+        return isFunction$1(this.items);
       },
       providerTriggerContext: function providerTriggerContext() {
         // Used to trigger the provider function via a watcher. Only the fields that
@@ -24988,7 +25109,7 @@
       // Provider update triggering
       items: function items(newValue) {
         // If a new provider has been specified, trigger an update
-        if (this.hasProvider || isFunction(newValue)) {
+        if (this.hasProvider || isFunction$1(newValue)) {
           this.$nextTick(this._providerUpdate);
         }
       },
@@ -25109,9 +25230,10 @@
     }
   });
 
-  var SELECT_MODES = ['range', 'multi', 'single']; // --- Props ---
+  var SELECT_MODES = ['range', 'multi', 'single'];
+  var ROLE_GRID = 'grid'; // --- Props ---
 
-  var props$21 = {
+  var props$l = {
     // Disable use of click handlers for row selection
     noSelectOnClick: makeProp(PROP_TYPE_BOOLEAN, false),
     selectMode: makeProp(PROP_TYPE_STRING, 'multi', function (value) {
@@ -25123,7 +25245,7 @@
   // @vue/component
 
   var selectableMixin = Vue__default['default'].extend({
-    props: props$21,
+    props: props$l,
     data: function data() {
       return {
         selectedRows: [],
@@ -25156,11 +25278,17 @@
         }, _defineProperty(_ref, "b-table-select-".concat(this.selectMode), isSelectable), _defineProperty(_ref, 'b-table-selecting', this.selectableHasSelection), _defineProperty(_ref, 'b-table-selectable-no-click', isSelectable && !this.hasSelectableRowClick), _ref;
       },
       selectableTableAttrs: function selectableTableAttrs() {
+        if (!this.isSelectable) {
+          return {};
+        }
+
+        var role = this.bvAttrs.role || ROLE_GRID;
         return {
+          role: role,
           // TODO:
-          //   Should this attribute not be included when no-select-on-click is set
+          //   Should this attribute not be included when `no-select-on-click` is set
           //   since this attribute implies keyboard navigation?
-          'aria-multiselectable': !this.isSelectable ? null : this.selectableIsMultiSelect ? 'true' : 'false'
+          'aria-multiselectable': role === ROLE_GRID ? toString(this.selectableIsMultiSelect) : null
         };
       }
     },
@@ -25307,7 +25435,7 @@
               selected = true;
             }
 
-            this.selectedLastRow = selected ? index : -1;
+            if (selected) this.selectedLastRow = index;
           }
         }
 
@@ -25334,7 +25462,7 @@
    * @param {function} sort compare function
    * @return {array}
    */
-  var stableSort = function stableSort(array, compareFn) {
+  var stableSort$1 = function stableSort(array, compareFn) {
     // Using `.bind(compareFn)` on the wrapped anonymous function improves
     // performance by avoiding the function call setup. We don't use an arrow
     // function here as it binds `this` to the `stableSort` context rather than
@@ -25353,7 +25481,7 @@
       return '';
     }
 
-    if (isNumeric(value)) {
+    if (isNumeric$1(value)) {
       return toFloat(value, value);
     }
 
@@ -25386,7 +25514,7 @@
     var aa = get(a, sortBy, null);
     var bb = get(b, sortBy, null); // Apply user-provided formatter
 
-    if (isFunction(formatter)) {
+    if (isFunction$1(formatter)) {
       aa = formatter(aa, sortBy, a);
       bb = formatter(bb, sortBy, b);
     } // Internally normalize value
@@ -25413,7 +25541,7 @@
     return stringifyObjectValues(aa).localeCompare(stringifyObjectValues(bb), locale, localeOptions);
   };
 
-  var _props, _watch$h;
+  var _props, _watch$3;
 
   var MODEL_PROP_NAME_SORT_BY = 'sortBy';
   var MODEL_EVENT_NAME_SORT_BY = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_SORT_BY;
@@ -25424,10 +25552,10 @@
   var SORT_DIRECTION_LAST = 'last';
   var SORT_DIRECTIONS = [SORT_DIRECTION_ASC, SORT_DIRECTION_DESC, SORT_DIRECTION_LAST]; // --- Props ---
 
-  var props$22 = (_props = {
-    labelSortAsc: makeProp(PROP_TYPE_STRING, 'Click to sort Ascending'),
+  var props$k = (_props = {
+    labelSortAsc: makeProp(PROP_TYPE_STRING, 'Click to sort ascending'),
     labelSortClear: makeProp(PROP_TYPE_STRING, 'Click to clear sorting'),
-    labelSortDesc: makeProp(PROP_TYPE_STRING, 'Click to sort Descending'),
+    labelSortDesc: makeProp(PROP_TYPE_STRING, 'Click to sort descending'),
     noFooterSorting: makeProp(PROP_TYPE_BOOLEAN, false),
     noLocalSorting: makeProp(PROP_TYPE_BOOLEAN, false),
     // Another prop that should have had a better name
@@ -25443,7 +25571,7 @@
   // @vue/component
 
   var sortingMixin = Vue__default['default'].extend({
-    props: props$22,
+    props: props$k,
     data: function data() {
       return {
         localSortBy: this[MODEL_PROP_NAME_SORT_BY] || '',
@@ -25470,21 +25598,21 @@
             localSorting = this.localSorting;
         var items = (this.filteredItems || this.localItems || []).slice();
 
-        var localeOptions = _objectSpread2(_objectSpread2({}, this.sortCompareOptions), {}, {
+        var localeOptions = _objectSpread2$3(_objectSpread2$3({}, this.sortCompareOptions), {}, {
           usage: 'sort'
         });
 
         if (sortBy && localSorting) {
           var field = this.computedFieldsObj[sortBy] || {};
           var sortByFormatted = field.sortByFormatted;
-          var formatter = isFunction(sortByFormatted) ?
+          var formatter = isFunction$1(sortByFormatted) ?
           /* istanbul ignore next */
           sortByFormatted : sortByFormatted ? this.getFieldFormatter(sortBy) : undefined; // `stableSort` returns a new array, and leaves the original array intact
 
-          return stableSort(items, function (a, b) {
+          return stableSort$1(items, function (a, b) {
             var result = null; // Call user provided `sortCompare` routine first
 
-            if (isFunction(sortCompare)) {
+            if (isFunction$1(sortCompare)) {
               // TODO:
               //   Change the `sortCompare` signature to the one of `defaultSortCompare`
               //   with the next major version bump
@@ -25511,7 +25639,7 @@
         return items;
       }
     },
-    watch: (_watch$h = {
+    watch: (_watch$3 = {
       /* istanbul ignore next: pain in the butt to test */
       isSortable: function isSortable(newValue) {
         if (newValue) {
@@ -25522,30 +25650,30 @@
           this.$off(EVENT_NAME_HEAD_CLICKED, this.handleSort);
         }
       }
-    }, _defineProperty(_watch$h, MODEL_PROP_NAME_SORT_DESC, function (newValue) {
+    }, _defineProperty(_watch$3, MODEL_PROP_NAME_SORT_DESC, function (newValue) {
       /* istanbul ignore next */
       if (newValue === this.localSortDesc) {
         return;
       }
 
       this.localSortDesc = newValue || false;
-    }), _defineProperty(_watch$h, MODEL_PROP_NAME_SORT_BY, function (newValue) {
+    }), _defineProperty(_watch$3, MODEL_PROP_NAME_SORT_BY, function (newValue) {
       /* istanbul ignore next */
       if (newValue === this.localSortBy) {
         return;
       }
 
       this.localSortBy = newValue || '';
-    }), _defineProperty(_watch$h, "localSortDesc", function localSortDesc(newValue, oldValue) {
+    }), _defineProperty(_watch$3, "localSortDesc", function localSortDesc(newValue, oldValue) {
       // Emit update to sort-desc.sync
       if (newValue !== oldValue) {
         this.$emit(MODEL_EVENT_NAME_SORT_DESC, newValue);
       }
-    }), _defineProperty(_watch$h, "localSortBy", function localSortBy(newValue, oldValue) {
+    }), _defineProperty(_watch$3, "localSortBy", function localSortBy(newValue, oldValue) {
       if (newValue !== oldValue) {
         this.$emit(MODEL_EVENT_NAME_SORT_BY, newValue);
       }
-    }), _watch$h),
+    }), _watch$3),
     created: function created() {
       if (this.isSortable) {
         this.$on(EVENT_NAME_HEAD_CLICKED, this.handleSort);
@@ -25613,52 +25741,65 @@
         };
       },
       sortTheadThAttrs: function sortTheadThAttrs(key, field, isFoot) {
-        if (!this.isSortable || isFoot && this.noFooterSorting) {
+        var _field$sortKey;
+
+        var isSortable = this.isSortable,
+            noFooterSorting = this.noFooterSorting,
+            localSortDesc = this.localSortDesc,
+            localSortBy = this.localSortBy,
+            localSorting = this.localSorting;
+
+        if (!isSortable || isFoot && noFooterSorting) {
           // No attributes if not a sortable table
           return {};
         }
 
-        var sortable = field.sortable; // Assemble the aria-sort attribute value
+        var sortable = field.sortable;
+        var sortKey = !localSorting ? (_field$sortKey = field.sortKey) !== null && _field$sortKey !== void 0 ? _field$sortKey : key : key; // Assemble the aria-sort attribute value
 
-        var ariaSort = sortable && this.localSortBy === key ? this.localSortDesc ? 'descending' : 'ascending' : sortable ? 'none' : null; // Return the attribute
+        var ariaSort = sortable && localSortBy === sortKey ? localSortDesc ? 'descending' : 'ascending' : sortable ? 'none' : null; // Return the attribute
 
         return {
           'aria-sort': ariaSort
         };
       },
+      // A label to be placed in an `.sr-only` element in the header cell
       sortTheadThLabel: function sortTheadThLabel(key, field, isFoot) {
-        // A label to be placed in an `.sr-only` element in the header cell
+        // No label if not a sortable table
         if (!this.isSortable || isFoot && this.noFooterSorting) {
-          // No label if not a sortable table
           return null;
         }
 
-        var sortable = field.sortable; // The correctness of these labels is very important for screen-reader users.
+        var localSortBy = this.localSortBy,
+            localSortDesc = this.localSortDesc,
+            labelSortAsc = this.labelSortAsc,
+            labelSortDesc = this.labelSortDesc;
+        var sortable = field.sortable; // The correctness of these labels is very important for screen reader users
 
         var labelSorting = '';
 
         if (sortable) {
-          if (this.localSortBy === key) {
-            // currently sorted sortable column.
-            labelSorting = this.localSortDesc ? this.labelSortAsc : this.labelSortDesc;
+          if (localSortBy === key) {
+            // Currently sorted sortable column
+            labelSorting = localSortDesc ? labelSortAsc : labelSortDesc;
           } else {
-            // Not currently sorted sortable column.
+            // Not currently sorted sortable column
             // Not using nested ternary's here for clarity/readability
-            // Default for ariaLabel
-            labelSorting = this.localSortDesc ? this.labelSortDesc : this.labelSortAsc; // Handle sortDirection setting
+            // Default for `aria-label`
+            labelSorting = localSortDesc ? labelSortDesc : labelSortAsc; // Handle `sortDirection` setting
 
             var sortDirection = this.sortDirection || field.sortDirection;
 
             if (sortDirection === SORT_DIRECTION_ASC) {
-              labelSorting = this.labelSortAsc;
+              labelSorting = labelSortAsc;
             } else if (sortDirection === SORT_DIRECTION_DESC) {
-              labelSorting = this.labelSortDesc;
+              labelSorting = labelSortDesc;
             }
           }
         } else if (!this.noSortReset) {
           // Non sortable column
-          labelSorting = this.localSortBy ? this.labelSortClear : '';
-        } // Return the sr-only sort label or null if no label
+          labelSorting = localSortBy ? this.labelSortClear : '';
+        } // Return the `.sr-only` sort label or `null` if no label
 
 
         return trim(labelSorting) || null;
@@ -25666,13 +25807,13 @@
     }
   });
 
-  var props$23 = {
+  var props$j = {
     stacked: makeProp(PROP_TYPE_BOOLEAN_STRING, false)
   }; // --- Mixin ---
   // @vue/component
 
   var stackedMixin = Vue__default['default'].extend({
-    props: props$23,
+    props: props$j,
     computed: {
       isStacked: function isStacked() {
         var stacked = this.stacked; // `true` when always stacked, or returns breakpoint specified
@@ -25694,7 +25835,7 @@
   // Includes all main table styling options
   // --- Props ---
 
-  var props$24 = {
+  var props$i = {
     bordered: makeProp(PROP_TYPE_BOOLEAN, false),
     borderless: makeProp(PROP_TYPE_BOOLEAN, false),
     captionTop: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -25723,7 +25864,7 @@
     // Don't place attributes on root element automatically,
     // as table could be wrapped in responsive `<div>`
     inheritAttrs: false,
-    props: props$24,
+    props: props$i,
     computed: {
       // Layout related computed props
       isResponsive: function isResponsive() {
@@ -25773,20 +25914,20 @@
             fields = this.computedFields,
             selectableTableAttrs = this.selectableTableAttrs;
         var ariaAttrs = this.isTableSimple ? {} : {
-          'aria-busy': this.computedBusy ? 'true' : 'false',
-          'aria-colcount': toString$1(fields.length),
+          'aria-busy': toString(this.computedBusy),
+          'aria-colcount': toString(fields.length),
           // Preserve user supplied `aria-describedby`, if provided
           'aria-describedby': this.bvAttrs['aria-describedby'] || this.$refs.caption ? this.captionId : null
         };
-        var rowCount = items && filteredItems && filteredItems.length > items.length ? toString$1(filteredItems.length) : null;
-        return _objectSpread2(_objectSpread2(_objectSpread2({
+        var rowCount = items && filteredItems && filteredItems.length > items.length ? toString(filteredItems.length) : null;
+        return _objectSpread2$3(_objectSpread2$3(_objectSpread2$3({
           // We set `aria-rowcount` before merging in `$attrs`,
           // in case user has supplied their own
           'aria-rowcount': rowCount
         }, this.bvAttrs), {}, {
           // Now we can override any `$attrs` here
           id: this.safeId(),
-          role: 'table'
+          role: this.bvAttrs.role || 'table'
         }, ariaAttrs), selectableTableAttrs);
       }
     },
@@ -25830,7 +25971,7 @@
     }
   });
 
-  var props$25 = makePropsConfigurable({
+  var props$h = makePropsConfigurable({
     tbodyTransitionHandlers: makeProp(PROP_TYPE_OBJECT),
     tbodyTransitionProps: makeProp(PROP_TYPE_OBJECT)
   }, NAME_TBODY); // --- Main component ---
@@ -25858,7 +25999,7 @@
       }
     },
     inheritAttrs: false,
-    props: props$25,
+    props: props$h,
     computed: {
       // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isTbody: function isTbody() {
@@ -25895,13 +26036,13 @@
         return this.tbodyTransitionProps || this.tbodyTransitionHandlers;
       },
       tbodyAttrs: function tbodyAttrs() {
-        return _objectSpread2({
+        return _objectSpread2$3({
           role: 'rowgroup'
         }, this.bvAttrs);
       },
       tbodyProps: function tbodyProps() {
         var tbodyTransitionProps = this.tbodyTransitionProps;
-        return tbodyTransitionProps ? _objectSpread2(_objectSpread2({}, tbodyTransitionProps), {}, {
+        return tbodyTransitionProps ? _objectSpread2$3(_objectSpread2$3({}, tbodyTransitionProps), {}, {
           tag: 'tbody'
         }) : {};
       }
@@ -25978,7 +26119,7 @@
     sel.containsNode(el, true) : false;
   };
 
-  var props$26 = makePropsConfigurable(props$1U, NAME_TH); // --- Main component ---
+  var props$g = makePropsConfigurable(props$u, NAME_TH); // --- Main component ---
   // TODO:
   //   In Bootstrap v5, we won't need "sniffing" as table element variants properly inherit
   //   to the child elements, so this can be converted to a functional component
@@ -25987,7 +26128,7 @@
   var BTh = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TH,
     extends: BTd,
-    props: props$26,
+    props: props$g,
     computed: {
       tag: function tag() {
         return 'th';
@@ -25995,15 +26136,15 @@
     }
   });
 
-  var props$27 = {
+  var props$f = {
     detailsTdClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     tbodyTrAttr: makeProp(PROP_TYPE_OBJECT_FUNCTION),
-    tbodyTrClass: makeProp([].concat(_toConsumableArray(PROP_TYPE_ARRAY_OBJECT_STRING), [PROP_TYPE_FUNCTION]))
+    tbodyTrClass: makeProp([].concat(_toConsumableArray$1(PROP_TYPE_ARRAY_OBJECT_STRING), [PROP_TYPE_FUNCTION]))
   }; // --- Mixin ---
   // @vue/component
 
   var tbodyRowMixin = Vue__default['default'].extend({
-    props: props$27,
+    props: props$f,
     methods: {
       // Methods for computing classes, attributes and styles for table cells
       getTdValues: function getTdValues(item, key, tdValue, defaultValue) {
@@ -26012,9 +26153,9 @@
         if (tdValue) {
           var value = get(item, key, '');
 
-          if (isFunction(tdValue)) {
+          if (isFunction$1(tdValue)) {
             return tdValue(value, key, item);
-          } else if (isString(tdValue) && isFunction($parent[tdValue])) {
+          } else if (isString(tdValue) && isFunction$1($parent[tdValue])) {
             return $parent[tdValue](value, key, item);
           }
 
@@ -26029,9 +26170,9 @@
         if (thValue) {
           var value = get(item, key, '');
 
-          if (isFunction(thValue)) {
+          if (isFunction$1(thValue)) {
             return thValue(value, key, item, type);
-          } else if (isString(thValue) && isFunction($parent[thValue])) {
+          } else if (isString(thValue) && isFunction$1($parent[thValue])) {
             return $parent[thValue](value, key, item, type);
           }
 
@@ -26046,7 +26187,7 @@
         var formatter = this.getFieldFormatter(key);
         var value = get(item, key, null);
 
-        if (isFunction(formatter)) {
+        if (isFunction$1(formatter)) {
           value = formatter(value, key, item);
         }
 
@@ -26066,16 +26207,16 @@
       // Row event handlers
       rowHovered: function rowHovered(event) {
         // `mouseenter` handler (non-bubbling)
-        // `this.tbodyRowEvtStopped` from tbody mixin
-        if (!this.tbodyRowEvtStopped(event)) {
+        // `this.tbodyRowEventStopped` from tbody mixin
+        if (!this.tbodyRowEventStopped(event)) {
           // `this.emitTbodyRowEvent` from tbody mixin
           this.emitTbodyRowEvent(EVENT_NAME_ROW_HOVERED, event);
         }
       },
       rowUnhovered: function rowUnhovered(event) {
         // `mouseleave` handler (non-bubbling)
-        // `this.tbodyRowEvtStopped` from tbody mixin
-        if (!this.tbodyRowEvtStopped(event)) {
+        // `this.tbodyRowEventStopped` from tbody mixin
+        if (!this.tbodyRowEventStopped(event)) {
           // `this.emitTbodyRowEvent` from tbody mixin
           this.emitTbodyRowEvent(EVENT_NAME_ROW_UNHOVERED, event);
         }
@@ -26104,7 +26245,7 @@
           //   So we could change this to: `row-${rowIndex}-cell-${key}`
           class: [field.class ? field.class : '', this.getTdValues(item, key, field.tdClass, '')],
           props: {},
-          attrs: _objectSpread2({
+          attrs: _objectSpread2$3({
             'aria-colindex': String(colIndex + 1)
           }, isRowHeader ? this.getThValues(item, key, field.thAttr, 'row', {}) : this.getTdValues(item, key, field.tdAttr, {})),
           key: "row-".concat(rowIndex, "-cell-").concat(colIndex, "-").concat(key)
@@ -26120,7 +26261,7 @@
         } else {
           // Using native TD or TH element, so we need to
           // add in the attributes and variant class
-          data.attrs['data-label'] = isStacked && !isUndefinedOrNull(label) ? toString$1(label) : null;
+          data.attrs['data-label'] = isStacked && !isUndefinedOrNull(label) ? toString(label) : null;
           data.attrs.role = isRowHeader ? 'rowheader' : 'cell';
           data.attrs.scope = isRowHeader ? 'row' : null; // Add in the variant class
 
@@ -26161,7 +26302,7 @@
 
 
         var slotName = this.$_bodyFieldSlotNameCache[key];
-        var $childNodes = slotName ? this.normalizeSlot(slotName, slotScope) : toString$1(formatted);
+        var $childNodes = slotName ? this.normalizeSlot(slotName, slotScope) : toString(formatted);
 
         if (this.isStacked) {
           // We wrap in a DIV to ensure rendered as a single cell when visually stacked!
@@ -26207,8 +26348,8 @@
         // See: https://github.com/bootstrap-vue/bootstrap-vue/issues/2410
 
 
-        var primaryKeyValue = toString$1(get(item, primaryKey)) || null;
-        var rowKey = primaryKeyValue || toString$1(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
+        var primaryKeyValue = toString(get(item, primaryKey)) || null;
+        var rowKey = primaryKeyValue || toString(rowIndex); // If primary key is provided, use it to generate a unique ID on each tbody > tr
         // In the format of '{tableId}__row_{primaryKeyValue}'
 
         var rowId = primaryKeyValue ? this.safeId("_row_".concat(primaryKeyValue)) : null; // Selectable classes and attributes
@@ -26216,8 +26357,8 @@
         var selectableClasses = this.selectableRowClasses ? this.selectableRowClasses(rowIndex) : {};
         var selectableAttrs = this.selectableRowAttrs ? this.selectableRowAttrs(rowIndex) : {}; // Additional classes and attributes
 
-        var userTrClasses = isFunction(tbodyTrClass) ? tbodyTrClass(item, 'row') : tbodyTrClass;
-        var userTrAttrs = isFunction(tbodyTrAttr) ?
+        var userTrClasses = isFunction$1(tbodyTrClass) ? tbodyTrClass(item, 'row') : tbodyTrClass;
+        var userTrAttrs = isFunction$1(tbodyTrAttr) ?
         /* istanbul ignore next */
         tbodyTrAttr(item, 'row') : tbodyTrAttr; // Add the item row
 
@@ -26226,7 +26367,7 @@
           props: {
             variant: item[FIELD_KEY_ROW_VARIANT] || null
           },
-          attrs: _objectSpread2(_objectSpread2({
+          attrs: _objectSpread2$3(_objectSpread2$3({
             id: rowId
           }, userTrAttrs), {}, {
             // Users cannot override the following attributes
@@ -26289,10 +26430,10 @@
           } // Add the actual details row
 
 
-          var userDetailsTrClasses = isFunction(this.tbodyTrClass) ?
+          var userDetailsTrClasses = isFunction$1(this.tbodyTrClass) ?
           /* istanbul ignore next */
           this.tbodyTrClass(item, SLOT_NAME_ROW_DETAILS) : this.tbodyTrClass;
-          var userDetailsTrAttrs = isFunction(this.tbodyTrAttr) ?
+          var userDetailsTrAttrs = isFunction$1(this.tbodyTrAttr) ?
           /* istanbul ignore next */
           this.tbodyTrAttr(item, SLOT_NAME_ROW_DETAILS) : this.tbodyTrAttr;
           $rows.push(h(BTr, {
@@ -26301,7 +26442,7 @@
             props: {
               variant: item[FIELD_KEY_ROW_VARIANT] || null
             },
-            attrs: _objectSpread2(_objectSpread2({}, userDetailsTrAttrs), {}, {
+            attrs: _objectSpread2$3(_objectSpread2$3({}, userDetailsTrAttrs), {}, {
               // Users cannot override the following attributes
               id: detailsId,
               tabindex: '-1'
@@ -26329,14 +26470,14 @@
   }; // --- Props ---
 
 
-  var props$28 = sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$25), props$27), {}, {
+  var props$e = sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$h), props$f), {}, {
     tbodyClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)
   })); // --- Mixin ---
   // @vue/component
 
   var tbodyMixin = Vue__default['default'].extend({
     mixins: [tbodyRowMixin],
-    props: props$28,
+    props: props$e,
     beforeDestroy: function beforeDestroy() {
       this.$_bodyFieldSlotNameCache = null;
     },
@@ -26380,7 +26521,7 @@
           }
         }
       },
-      tbodyRowEvtStopped: function tbodyRowEvtStopped(event) {
+      tbodyRowEventStopped: function tbodyRowEventStopped(event) {
         return this.stopIfBusy && this.stopIfBusy(event);
       },
       // Delegated row event handlers
@@ -26389,7 +26530,7 @@
         var target = event.target,
             keyCode = event.keyCode;
 
-        if (this.tbodyRowEvtStopped(event) || target.tagName !== 'TR' || !isActiveElement(target) || target.tabIndex !== 0) {
+        if (this.tbodyRowEventStopped(event) || target.tagName !== 'TR' || !isActiveElement(target) || target.tabIndex !== 0) {
           // Early exit if not an item row TR
           return;
         }
@@ -26424,26 +26565,28 @@
         }
       },
       onTBodyRowClicked: function onTBodyRowClicked(event) {
-        // Don't emit event when the table is busy, the user clicked
+        var $refs = this.$refs;
+        var tbody = $refs.tbody ? $refs.tbody.$el || $refs.tbody : null; // Don't emit event when the table is busy, the user clicked
         // on a non-disabled control or is selecting text
-        if (this.tbodyRowEvtStopped(event) || filterEvent(event) || textSelectionActive(this.$el)) {
+
+        if (this.tbodyRowEventStopped(event) || filterEvent(event) || textSelectionActive(tbody || this.$el)) {
           return;
         }
 
         this.emitTbodyRowEvent(EVENT_NAME_ROW_CLICKED, event);
       },
       onTbodyRowMiddleMouseRowClicked: function onTbodyRowMiddleMouseRowClicked(event) {
-        if (!this.tbodyRowEvtStopped(event) && event.which === 2) {
+        if (!this.tbodyRowEventStopped(event) && event.which === 2) {
           this.emitTbodyRowEvent(EVENT_NAME_ROW_MIDDLE_CLICKED, event);
         }
       },
       onTbodyRowContextmenu: function onTbodyRowContextmenu(event) {
-        if (!this.tbodyRowEvtStopped(event)) {
+        if (!this.tbodyRowEventStopped(event)) {
           this.emitTbodyRowEvent(EVENT_NAME_ROW_CONTEXTMENU, event);
         }
       },
       onTbodyRowDblClicked: function onTbodyRowDblClicked(event) {
-        if (!this.tbodyRowEvtStopped(event) && !filterEvent(event)) {
+        if (!this.tbodyRowEventStopped(event) && !filterEvent(event)) {
           this.emitTbodyRowEvent(EVENT_NAME_ROW_DBLCLICKED, event);
         }
       },
@@ -26525,7 +26668,7 @@
 
         var $tbody = h(BTbody, {
           class: this.tbodyClass || null,
-          props: pluckProps(props$25, this.$props),
+          props: pluckProps(props$h, this.$props),
           // BTbody transfers all native event listeners to the root element
           // TODO: Only set the handlers if the table is not busy
           on: handlers,
@@ -26537,7 +26680,7 @@
     }
   });
 
-  var props$29 = makePropsConfigurable({
+  var props$d = makePropsConfigurable({
     // Supported values: 'lite', 'dark', or null
     footVariant: makeProp(PROP_TYPE_STRING)
   }, NAME_TFOOT); // --- Main component ---
@@ -26565,7 +26708,7 @@
       }
     },
     inheritAttrs: false,
-    props: props$29,
+    props: props$d,
     computed: {
       // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isTfoot: function isTfoot() {
@@ -26602,7 +26745,7 @@
         return [this.footVariant ? "thead-".concat(this.footVariant) : null];
       },
       tfootAttrs: function tfootAttrs() {
-        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvAttrs), {}, {
           role: 'rowgroup'
         });
       }
@@ -26617,7 +26760,7 @@
     }
   });
 
-  var props$2a = {
+  var props$c = {
     footClone: makeProp(PROP_TYPE_BOOLEAN, false),
     // Any Bootstrap theme variant (or custom)
     // Falls back to `headRowVariant`
@@ -26630,7 +26773,7 @@
   // @vue/component
 
   var tfootMixin = Vue__default['default'].extend({
-    props: props$2a,
+    props: props$c,
     methods: {
       renderTFootCustom: function renderTFootCustom() {
         var h = this.$createElement;
@@ -26658,7 +26801,7 @@
     }
   });
 
-  var props$2b = makePropsConfigurable({
+  var props$b = makePropsConfigurable({
     // Also sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
     // Supported values: 'lite', 'dark', or `null`
     headVariant: makeProp(PROP_TYPE_STRING)
@@ -26687,7 +26830,7 @@
       }
     },
     inheritAttrs: false,
-    props: props$2b,
+    props: props$b,
     computed: {
       // Sniffed by `<b-tr>` / `<b-td>` / `<b-th>`
       isThead: function isThead() {
@@ -26726,7 +26869,7 @@
         return [this.headVariant ? "thead-".concat(this.headVariant) : null];
       },
       theadAttrs: function theadAttrs() {
-        return _objectSpread2({
+        return _objectSpread2$3({
           role: 'rowgroup'
         }, this.bvAttrs);
       }
@@ -26750,7 +26893,7 @@
   }; // --- Props ---
 
 
-  var props$2c = {
+  var props$a = {
     // Any Bootstrap theme variant (or custom)
     headRowVariant: makeProp(PROP_TYPE_STRING),
     // 'light', 'dark' or `null` (or custom)
@@ -26761,7 +26904,7 @@
   // @vue/component
 
   var theadMixin = Vue__default['default'].extend({
-    props: props$2c,
+    props: props$a,
     methods: {
       fieldClasses: function fieldClasses(field) {
         // Header field (<th>) classes
@@ -26843,13 +26986,17 @@
           var sortClass = isSortable ? _this.sortTheadThClasses(key, field, isFoot) : null;
           var sortLabel = isSortable ? _this.sortTheadThLabel(key, field, isFoot) : null;
           var data = {
-            class: [_this.fieldClasses(field), sortClass],
+            class: [{
+              // We need to make the header cell relative when we have
+              // a `.sr-only` sort label to work around overflow issues
+              'position-relative': sortLabel
+            }, _this.fieldClasses(field), sortClass],
             props: {
               variant: variant,
               stickyColumn: stickyColumn
             },
             style: field.thStyle || {},
-            attrs: _objectSpread2(_objectSpread2({
+            attrs: _objectSpread2$3(_objectSpread2$3({
               // We only add a `tabindex` of `0` if there is a head-clicked listener
               // and the current field is sortable
               tabindex: hasHeadClickListener && field.sortable ? '0' : null,
@@ -26869,7 +27016,7 @@
           var slotNames = [getHeadSlotName(key), getHeadSlotName(key.toLowerCase()), getHeadSlotName()]; // Footer will fallback to header slot names
 
           if (isFoot) {
-            slotNames = [getFootSlotName(key), getFootSlotName(key.toLowerCase()), getFootSlotName()].concat(_toConsumableArray(slotNames));
+            slotNames = [getFootSlotName(key), getFootSlotName(key.toLowerCase()), getFootSlotName()].concat(_toConsumableArray$1(slotNames));
           }
 
           var scope = {
@@ -26935,7 +27082,7 @@
     }
   });
 
-  var props$2d = {}; // --- Mixin ---
+  var props$9 = {}; // --- Mixin ---
   // @vue/component
 
   var topRowMixin = Vue__default['default'].extend({
@@ -26954,8 +27101,8 @@
 
         return h(BTr, {
           staticClass: 'b-table-top-row',
-          class: [isFunction(tbodyTrClass) ? tbodyTrClass(null, 'row-top') : tbodyTrClass],
-          attrs: isFunction(tbodyTrAttr) ? tbodyTrAttr(null, 'row-top') : tbodyTrAttr,
+          class: [isFunction$1(tbodyTrClass) ? tbodyTrClass(null, 'row-top') : tbodyTrClass],
+          attrs: isFunction$1(tbodyTrAttr) ? tbodyTrAttr(null, 'row-top') : tbodyTrAttr,
           key: 'b-top-row'
         }, [this.normalizeSlot(SLOT_NAME_TOP_ROW, {
           columns: fields.length,
@@ -26965,7 +27112,7 @@
     }
   });
 
-  var props$2e = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$1T), props$1V), props$1W), props$1X), props$1Y), props$1Z), props$1_), props$1$), props$20), props$21), props$22), props$23), props$24), props$28), props$2a), props$2c), props$2d)), NAME_TABLE); // --- Main component ---
+  var props$8 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$v), props$t), props$s), props$r), props$q), props$p), props$o), props$n), props$m), props$l), props$k), props$j), props$i), props$e), props$c), props$a), props$9)), NAME_TABLE); // --- Main component ---
   // @vue/component
 
   var BTable = /*#__PURE__*/Vue__default['default'].extend({
@@ -26975,12 +27122,12 @@
     mixins: [// General mixins
     attrsMixin, hasListenerMixin, idMixin, normalizeSlotMixin, // Required table mixins
     itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Table features mixins
-    stackedMixin, filteringMixin, sortingMixin, paginationMixin$1, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin],
-    props: props$2e // Render function is provided by `tableRendererMixin`
+    stackedMixin, filteringMixin, sortingMixin, paginationMixin, captionMixin, colgroupMixin, selectableMixin, emptyMixin, topRowMixin, bottomRowMixin, busyMixin, providerMixin],
+    props: props$8 // Render function is provided by `tableRendererMixin`
 
   });
 
-  var props$2f = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$1W), props$1X), props$1_), props$23), props$24), props$28), props$2a), props$2c)), NAME_TABLE_LITE); // --- Main component ---
+  var props$7 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$s), props$r), props$o), props$j), props$i), props$e), props$c), props$a)), NAME_TABLE_LITE); // --- Main component ---
   // @vue/component
 
   var BTableLite = /*#__PURE__*/Vue__default['default'].extend({
@@ -26992,11 +27139,11 @@
     itemsMixin, tableRendererMixin, stackedMixin, theadMixin, tfootMixin, tbodyMixin, // Table features mixins
     // These are pretty lightweight, and are useful for lightweight tables
     captionMixin, colgroupMixin],
-    props: props$2f // Render function is provided by `tableRendererMixin`
+    props: props$7 // Render function is provided by `tableRendererMixin`
 
   });
 
-  var props$2g = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), props$23), props$24)), NAME_TABLE_SIMPLE); // --- Main component ---
+  var props$6 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), props$j), props$i)), NAME_TABLE_SIMPLE); // --- Main component ---
   // @vue/component
 
   var BTableSimple = /*#__PURE__*/Vue__default['default'].extend({
@@ -27009,7 +27156,7 @@
     // Stacked requires extra handling by users via
     // the table cell `stacked-heading` prop
     stackedMixin],
-    props: props$2g,
+    props: props$6,
     computed: {
       isTableSimple: function isTableSimple() {
         return true;
@@ -27049,7 +27196,7 @@
   }; // --- Props ---
 
 
-  var props$2h = makePropsConfigurable({
+  var props$5 = makePropsConfigurable({
     animation: makeProp(PROP_TYPE_STRING),
     columns: makeProp(PROP_TYPE_NUMBER, 5, isPositiveNumber),
     hideHeader: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -27062,9 +27209,10 @@
   var BSkeletonTable = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON_TABLE,
     functional: true,
-    props: props$2h,
+    props: props$5,
     render: function render(h, _ref) {
-      var props = _ref.props;
+      var data = _ref.data,
+          props = _ref.props;
       var animation = props.animation,
           columns = props.columns;
       var $th = h('th', [h(BSkeleton, {
@@ -27083,13 +27231,13 @@
       var $tbody = h('tbody', createArray(props.rows, $tdTr));
       var $thead = !props.hideHeader ? h('thead', [$thTr]) : h();
       var $tfoot = props.showFooter ? h('tfoot', [$thTr]) : h();
-      return h(BTableSimple, {
-        props: _objectSpread2({}, props.tableProps)
-      }, [$thead, $tbody, $tfoot]);
+      return h(BTableSimple, a(data, {
+        props: _objectSpread2$3({}, props.tableProps)
+      }), [$thead, $tbody, $tfoot]);
     }
   });
 
-  var props$2i = makePropsConfigurable({
+  var props$4 = makePropsConfigurable({
     loading: makeProp(PROP_TYPE_BOOLEAN, false)
   }, NAME_SKELETON_WRAPPER); // --- Main component ---
   // @vue/component
@@ -27097,7 +27245,7 @@
   var BSkeletonWrapper = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_SKELETON_WRAPPER,
     functional: true,
-    props: props$2i,
+    props: props$4,
     render: function render(h, _ref) {
       var data = _ref.data,
           props = _ref.props,
@@ -27139,15 +27287,15 @@
     }
   });
 
-  var _watch$i;
+  var _watch$2;
 
-  var _makeModelMixin$j = makeModelMixin('value', {
+  var _makeModelMixin$1 = makeModelMixin('value', {
     type: PROP_TYPE_NUMBER
   }),
-      modelMixin$i = _makeModelMixin$j.mixin,
-      modelProps$i = _makeModelMixin$j.props,
-      MODEL_PROP_NAME$i = _makeModelMixin$j.prop,
-      MODEL_EVENT_NAME$i = _makeModelMixin$j.event; // --- Helper methods ---
+      modelMixin$1 = _makeModelMixin$1.mixin,
+      modelProps$1 = _makeModelMixin$1.props,
+      MODEL_PROP_NAME$1 = _makeModelMixin$1.prop,
+      MODEL_EVENT_NAME$1 = _makeModelMixin$1.event; // --- Helper methods ---
   // Filter function to filter out disabled tabs
 
 
@@ -27182,7 +27330,7 @@
       focus: function focus() {
         attemptFocus(this.$refs.link);
       },
-      handleEvt: function handleEvt(event) {
+      handleEvent: function handleEvent(event) {
         /* istanbul ignore next */
         if (this.tab.disabled) {
           return;
@@ -27229,7 +27377,7 @@
           setSize = this.setSize,
           posInSet = this.posInSet,
           controls = this.controls,
-          handleEvt = this.handleEvt;
+          handleEvent = this.handleEvent;
       var _this$tab = this.tab,
           title = _this$tab.title,
           localActive = _this$tab.localActive,
@@ -27247,7 +27395,7 @@
         props: {
           disabled: disabled
         },
-        attrs: _objectSpread2(_objectSpread2({}, titleLinkAttributes), {}, {
+        attrs: _objectSpread2$3(_objectSpread2$3({}, titleLinkAttributes), {}, {
           id: id,
           role: 'tab',
           // Roving tab index when keynav enabled
@@ -27258,8 +27406,8 @@
           'aria-controls': controls
         }),
         on: {
-          click: handleEvt,
-          keydown: handleEvt
+          click: handleEvent,
+          keydown: handleEvent
         },
         ref: 'link'
       }, [this.tab.normalizeSlot(SLOT_NAME_TITLE) || title]);
@@ -27273,8 +27421,8 @@
     }
   }); // --- Props ---
 
-  var navProps = omit(props$1t, ['tabs', 'isNavBar', 'cardHeader']);
-  var props$2j = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$i), navProps), {}, {
+  var navProps = omit(props$U, ['tabs', 'isNavBar', 'cardHeader']);
+  var props$3 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps$1), navProps), {}, {
     // Only applied to the currently active `<b-nav-item>`
     activeNavItemClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     // Only applied to the currently active `<b-tab>`
@@ -27297,17 +27445,17 @@
 
   var BTabs = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TABS,
-    mixins: [idMixin, modelMixin$i, normalizeSlotMixin],
+    mixins: [idMixin, modelMixin$1, normalizeSlotMixin],
     provide: function provide() {
       return {
         bvTabs: this
       };
     },
-    props: props$2j,
+    props: props$3,
     data: function data() {
       return {
         // Index of current tab
-        currentTab: toInteger(this[MODEL_PROP_NAME$i], -1),
+        currentTab: toInteger(this[MODEL_PROP_NAME$1], -1),
         // Array of direct child `<b-tab>` instances, in DOM order
         tabs: [],
         // Array of child instances registered (for triggering reactive updates)
@@ -27329,7 +27477,7 @@
         return [].concat(classes, [this.navClass]);
       }
     },
-    watch: (_watch$i = {}, _defineProperty(_watch$i, MODEL_PROP_NAME$i, function (newValue, oldValue) {
+    watch: (_watch$2 = {}, _defineProperty(_watch$2, MODEL_PROP_NAME$1, function (newValue, oldValue) {
       if (newValue !== oldValue) {
         newValue = toInteger(newValue, -1);
         oldValue = toInteger(oldValue, 0);
@@ -27346,7 +27494,7 @@
           }
         }
       }
-    }), _defineProperty(_watch$i, "currentTab", function currentTab(newValue) {
+    }), _defineProperty(_watch$2, "currentTab", function currentTab(newValue) {
       var index = -1; // Ensure only one tab is active at most
 
       this.tabs.forEach(function ($tab, i) {
@@ -27358,8 +27506,8 @@
         }
       }); // Update the v-model
 
-      this.$emit(MODEL_EVENT_NAME$i, index);
-    }), _defineProperty(_watch$i, "tabs", function tabs(newValue, oldValue) {
+      this.$emit(MODEL_EVENT_NAME$1, index);
+    }), _defineProperty(_watch$2, "tabs", function tabs(newValue, oldValue) {
       var _this = this;
 
       // We use `_uid` instead of `safeId()`, as the later is changed in a `$nextTick()`
@@ -27376,9 +27524,9 @@
           _this.$emit(EVENT_NAME_CHANGED, newValue.slice(), oldValue.slice());
         });
       }
-    }), _defineProperty(_watch$i, "registeredTabs", function registeredTabs() {
+    }), _defineProperty(_watch$2, "registeredTabs", function registeredTabs() {
       this.updateTabs();
-    }), _watch$i),
+    }), _watch$2),
     created: function created() {
       // Create private non-reactive props
       this.$_observer = null;
@@ -27453,7 +27601,7 @@
         // which will be an empty array before mount
 
 
-        return stableSort($tabs, function (a, b) {
+        return stableSort$1($tabs, function (a, b) {
           return order.indexOf(a.safeId()) - order.indexOf(b.safeId());
         });
       },
@@ -27533,8 +27681,8 @@
         /* istanbul ignore next: should rarely happen */
 
 
-        if (!result && this[MODEL_PROP_NAME$i] !== currentTab) {
-          this.$emit(MODEL_EVENT_NAME$i, currentTab);
+        if (!result && this[MODEL_PROP_NAME$1] !== currentTab) {
+          this.$emit(MODEL_EVENT_NAME$1, currentTab);
         }
 
         return result;
@@ -27739,12 +27887,12 @@
     }
   });
 
-  var _objectSpread2$3, _watch$j;
+  var _objectSpread2, _watch$1;
 
   var MODEL_PROP_NAME_ACTIVE = 'active';
   var MODEL_EVENT_NAME_ACTIVE = MODEL_EVENT_NAME_PREFIX + MODEL_PROP_NAME_ACTIVE; // --- Props ---
 
-  var props$2k = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2({}, props$g), {}, (_objectSpread2$3 = {}, _defineProperty(_objectSpread2$3, MODEL_PROP_NAME_ACTIVE, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$3, "buttonId", makeProp(PROP_TYPE_STRING)), _defineProperty(_objectSpread2$3, "disabled", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$3, "lazy", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$3, "noBody", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2$3, "tag", makeProp(PROP_TYPE_STRING, 'div')), _defineProperty(_objectSpread2$3, "title", makeProp(PROP_TYPE_STRING)), _defineProperty(_objectSpread2$3, "titleItemClass", makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)), _defineProperty(_objectSpread2$3, "titleLinkAttributes", makeProp(PROP_TYPE_OBJECT)), _defineProperty(_objectSpread2$3, "titleLinkClass", makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)), _objectSpread2$3))), NAME_TAB); // --- Main component ---
+  var props$2 = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3({}, props$25), {}, (_objectSpread2 = {}, _defineProperty(_objectSpread2, MODEL_PROP_NAME_ACTIVE, makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2, "buttonId", makeProp(PROP_TYPE_STRING)), _defineProperty(_objectSpread2, "disabled", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2, "lazy", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2, "noBody", makeProp(PROP_TYPE_BOOLEAN, false)), _defineProperty(_objectSpread2, "tag", makeProp(PROP_TYPE_STRING, 'div')), _defineProperty(_objectSpread2, "title", makeProp(PROP_TYPE_STRING)), _defineProperty(_objectSpread2, "titleItemClass", makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)), _defineProperty(_objectSpread2, "titleLinkAttributes", makeProp(PROP_TYPE_OBJECT)), _defineProperty(_objectSpread2, "titleLinkClass", makeProp(PROP_TYPE_ARRAY_OBJECT_STRING)), _objectSpread2))), NAME_TAB); // --- Main component ---
   // @vue/component
 
   var BTab = /*#__PURE__*/Vue__default['default'].extend({
@@ -27757,7 +27905,7 @@
         }
       }
     },
-    props: props$2k,
+    props: props$2,
     data: function data() {
       return {
         localActive: this[MODEL_PROP_NAME_ACTIVE] && !this.disabled
@@ -27788,7 +27936,7 @@
         return this.bvTabs.lazy || this.lazy;
       }
     },
-    watch: (_watch$j = {}, _defineProperty(_watch$j, MODEL_PROP_NAME_ACTIVE, function (newValue, oldValue) {
+    watch: (_watch$1 = {}, _defineProperty(_watch$1, MODEL_PROP_NAME_ACTIVE, function (newValue, oldValue) {
       if (newValue !== oldValue) {
         if (newValue) {
           // If activated post mount
@@ -27802,7 +27950,7 @@
           }
         }
       }
-    }), _defineProperty(_watch$j, "disabled", function disabled(newValue, oldValue) {
+    }), _defineProperty(_watch$1, "disabled", function disabled(newValue, oldValue) {
       if (newValue !== oldValue) {
         var firstTab = this.bvTabs.firstTab;
 
@@ -27811,10 +27959,10 @@
           firstTab();
         }
       }
-    }), _defineProperty(_watch$j, "localActive", function localActive(newValue) {
+    }), _defineProperty(_watch$1, "localActive", function localActive(newValue) {
       // Make `active` prop work with `.sync` modifier
       this.$emit(MODEL_EVENT_NAME_ACTIVE, newValue);
-    }), _watch$j),
+    }), _watch$1),
     mounted: function mounted() {
       // Inform `<b-tabs>` of our presence
       this.registerTab();
@@ -27902,25 +28050,25 @@
     }
   });
 
-  function _typeof$1(obj) {
+  function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof$1 = function (obj) {
+      _typeof = function (obj) {
         return typeof obj;
       };
     } else {
-      _typeof$1 = function (obj) {
+      _typeof = function (obj) {
         return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
       };
     }
 
-    return _typeof$1(obj);
+    return _typeof(obj);
   }
 
-  function _toConsumableArray$1(arr) {
-    return _arrayWithoutHoles$1(arr) || _iterableToArray$1(arr) || _nonIterableSpread$1();
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
   }
 
-  function _arrayWithoutHoles$1(arr) {
+  function _arrayWithoutHoles(arr) {
     if (Array.isArray(arr)) {
       for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
 
@@ -27928,17 +28076,17 @@
     }
   }
 
-  function _iterableToArray$1(iter) {
+  function _iterableToArray(iter) {
     if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
   }
 
-  function _nonIterableSpread$1() {
+  function _nonIterableSpread() {
     throw new TypeError("Invalid attempt to spread non-iterable instance");
   }
 
   var inBrowser = typeof window !== 'undefined';
   function freeze(item) {
-    if (Array.isArray(item) || _typeof$1(item) === 'object') {
+    if (Array.isArray(item) || _typeof(item) === 'object') {
       return Object.freeze(item);
     }
 
@@ -27952,7 +28100,7 @@
       return passengers.concat(newPassengers);
     }, []);
   }
-  function stableSort$1(array, compareFn) {
+  function stableSort(array, compareFn) {
     return array.map(function (v, idx) {
       return [idx, v];
     }).sort(function (a, b) {
@@ -27961,7 +28109,7 @@
       return c[1];
     });
   }
-  function pick$1(obj, keys) {
+  function pick(obj, keys) {
     return keys.reduce(function (acc, key) {
       if (obj.hasOwnProperty(key)) {
         acc[key] = obj[key];
@@ -28014,7 +28162,7 @@
           newTransports[currentIndex] = newTransport;
         }
 
-        this.transports[to] = stableSort$1(newTransports, function (a, b) {
+        this.transports[to] = stableSort(newTransports, function (a, b) {
           return a.order - b.order;
         });
       },
@@ -28178,7 +28326,7 @@
           var transport = {
             from: this.name,
             to: this.to,
-            passengers: _toConsumableArray$1(slotContent),
+            passengers: _toConsumableArray(slotContent),
             order: this.order
           };
           wormhole.open(transport);
@@ -28324,7 +28472,7 @@
   var _id$1 = 0;
   var portalProps = ['disabled', 'name', 'order', 'slim', 'slotProps', 'tag', 'to'];
   var targetProps = ['multiple', 'transition'];
-  var MountingPortal = Vue__default['default'].extend({
+  Vue__default['default'].extend({
     name: 'MountingPortal',
     inheritAttrs: false,
     props: {
@@ -28427,7 +28575,7 @@
       // we have to rename a few of them
 
 
-      var _props = pick$1(this.$props, targetProps);
+      var _props = pick(this.$props, targetProps);
 
       _props.slim = this.targetSlim;
       _props.tag = this.targetTag;
@@ -28457,7 +28605,7 @@
 
 
       if (!this.$scopedSlots.manual) {
-        var props = pick$1(this.$props, portalProps);
+        var props = pick(this.$props, portalProps);
         return h(Portal, {
           props: props,
           attrs: this.$attrs,
@@ -28518,7 +28666,7 @@
     }
   }); // --- Props ---
 
-  var props$2l = makePropsConfigurable({
+  var props$1 = makePropsConfigurable({
     // Allowed: 'true' or 'false' or `null`
     ariaAtomic: makeProp(PROP_TYPE_STRING),
     ariaLive: makeProp(PROP_TYPE_STRING),
@@ -28532,7 +28680,7 @@
   var BToaster = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TOASTER,
     mixins: [listenOnRootMixin],
-    props: props$2l,
+    props: props$1,
     data: function data() {
       return {
         // We don't render on SSR or if a an existing target found
@@ -28543,8 +28691,6 @@
       };
     },
     beforeMount: function beforeMount() {
-      var _this2 = this;
-
       var name = this.name;
       this.staticName = name;
       /* istanbul ignore if */
@@ -28554,11 +28700,13 @@
         this.dead = true;
       } else {
         this.doRender = true;
-        this.$once(HOOK_EVENT_NAME_BEFORE_DESTROY, function () {
-          // Let toasts made with `this.$bvToast.toast()` know that this toaster
-          // is being destroyed and should should also destroy/hide themselves
-          _this2.emitOnRoot(getRootEventName(NAME_TOASTER, EVENT_NAME_DESTROYED), name);
-        });
+      }
+    },
+    beforeDestroy: function beforeDestroy() {
+      // Let toasts made with `this.$bvToast.toast()` know that this toaster
+      // is being destroyed and should should also destroy/hide themselves
+      if (this.doRender) {
+        this.emitOnRoot(getRootEventName(NAME_TOASTER, EVENT_NAME_DESTROYED), this.name);
       }
     },
     destroyed: function destroyed() {
@@ -28606,26 +28754,27 @@
     }
   });
 
-  var _watch$k;
+  var _watch;
 
-  var _makeModelMixin$k = makeModelMixin('visible', {
+  var _makeModelMixin = makeModelMixin('visible', {
     type: PROP_TYPE_BOOLEAN,
     defaultValue: false,
     event: EVENT_NAME_CHANGE
   }),
-      modelMixin$j = _makeModelMixin$k.mixin,
-      modelProps$j = _makeModelMixin$k.props,
-      MODEL_PROP_NAME$j = _makeModelMixin$k.prop,
-      MODEL_EVENT_NAME$j = _makeModelMixin$k.event;
+      modelMixin = _makeModelMixin.mixin,
+      modelProps = _makeModelMixin.props,
+      MODEL_PROP_NAME = _makeModelMixin.prop,
+      MODEL_EVENT_NAME = _makeModelMixin.event;
 
   var MIN_DURATION = 1000; // --- Props ---
 
-  var linkProps$7 = pick(props$6, ['href', 'to']);
-  var props$2m = makePropsConfigurable(sortKeys(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, props$g), modelProps$j), linkProps$7), {}, {
+  var linkProps = pick$1(props$2f, ['href', 'to']);
+  var props = makePropsConfigurable(sortKeys(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, props$25), modelProps), linkProps), {}, {
     appendToast: makeProp(PROP_TYPE_BOOLEAN, false),
     autoHideDelay: makeProp(PROP_TYPE_NUMBER_STRING, 5000),
     bodyClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
     headerClass: makeProp(PROP_TYPE_ARRAY_OBJECT_STRING),
+    headerTag: makeProp(PROP_TYPE_STRING, 'header'),
     // Switches role to 'status' and aria-live to 'polite'
     isStatus: makeProp(PROP_TYPE_BOOLEAN, false),
     noAutoHide: makeProp(PROP_TYPE_BOOLEAN, false),
@@ -28644,9 +28793,9 @@
 
   var BToast = /*#__PURE__*/Vue__default['default'].extend({
     name: NAME_TOAST,
-    mixins: [attrsMixin, idMixin, modelMixin$j, listenOnRootMixin, normalizeSlotMixin, scopedStyleMixin],
+    mixins: [attrsMixin, idMixin, modelMixin, listenOnRootMixin, normalizeSlotMixin, scopedStyleMixin],
     inheritAttrs: false,
-    props: props$2m,
+    props: props,
     data: function data() {
       return {
         isMounted: false,
@@ -28691,28 +28840,28 @@
         };
       },
       computedAttrs: function computedAttrs() {
-        return _objectSpread2(_objectSpread2({}, this.bvAttrs), {}, {
+        return _objectSpread2$3(_objectSpread2$3({}, this.bvAttrs), {}, {
           id: this.safeId(),
           tabindex: '0'
         });
       }
     },
-    watch: (_watch$k = {}, _defineProperty(_watch$k, MODEL_PROP_NAME$j, function (newValue) {
+    watch: (_watch = {}, _defineProperty(_watch, MODEL_PROP_NAME, function (newValue) {
       this[newValue ? 'show' : 'hide']();
-    }), _defineProperty(_watch$k, "localShow", function localShow(newValue) {
-      if (newValue !== this[MODEL_PROP_NAME$j]) {
-        this.$emit(MODEL_EVENT_NAME$j, newValue);
+    }), _defineProperty(_watch, "localShow", function localShow(newValue) {
+      if (newValue !== this[MODEL_PROP_NAME]) {
+        this.$emit(MODEL_EVENT_NAME, newValue);
       }
-    }), _defineProperty(_watch$k, "toaster", function toaster() {
+    }), _defineProperty(_watch, "toaster", function toaster() {
       // If toaster target changed, make sure toaster exists
       this.$nextTick(this.ensureToaster);
-    }), _defineProperty(_watch$k, "static", function _static(newValue) {
+    }), _defineProperty(_watch, "static", function _static(newValue) {
       // If static changes to true, and the toast is showing,
       // ensure the toaster target exists
       if (newValue && this.localShow) {
         this.ensureToaster();
       }
-    }), _watch$k),
+    }), _watch),
     created: function created() {
       // Create private non-reactive props
       this.$_dismissTimer = null;
@@ -28722,7 +28871,7 @@
 
       this.isMounted = true;
       this.$nextTick(function () {
-        if (_this[MODEL_PROP_NAME$j]) {
+        if (_this[MODEL_PROP_NAME]) {
           requestAF(function () {
             _this.show();
           });
@@ -28759,8 +28908,8 @@
 
         if (!this.localShow) {
           this.ensureToaster();
-          var showEvt = this.buildEvent(EVENT_NAME_SHOW);
-          this.emitEvent(showEvt);
+          var showEvent = this.buildEvent(EVENT_NAME_SHOW);
+          this.emitEvent(showEvent);
           this.dismissStarted = this.resumeDismiss = 0;
           this.order = Date.now() * (this.appendToast ? 1 : -1);
           this.isHiding = false;
@@ -28778,8 +28927,8 @@
         var _this3 = this;
 
         if (this.localShow) {
-          var hideEvt = this.buildEvent(EVENT_NAME_HIDE);
-          this.emitEvent(hideEvt);
+          var hideEvent = this.buildEvent(EVENT_NAME_HIDE);
+          this.emitEvent(hideEvent);
           this.setHoverHandler(false);
           this.dismissStarted = this.resumeDismiss = 0;
           this.clearDismissTimer();
@@ -28791,7 +28940,7 @@
       },
       buildEvent: function buildEvent(type) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-        return new BvEvent(type, _objectSpread2(_objectSpread2({
+        return new BvEvent(type, _objectSpread2$3(_objectSpread2$3({
           cancelable: false,
           target: this.$el || null,
           relatedTarget: null
@@ -28880,8 +29029,8 @@
       },
       onAfterEnter: function onAfterEnter() {
         this.isTransitioning = false;
-        var hiddenEvt = this.buildEvent(EVENT_NAME_SHOWN);
-        this.emitEvent(hiddenEvt);
+        var hiddenEvent = this.buildEvent(EVENT_NAME_SHOWN);
+        this.emitEvent(hiddenEvent);
         this.startDismissTimer();
         this.setHoverHandler(true);
       },
@@ -28892,8 +29041,8 @@
         this.isTransitioning = false;
         this.order = 0;
         this.resumeDismiss = this.dismissStarted = 0;
-        var hiddenEvt = this.buildEvent(EVENT_NAME_HIDDEN);
-        this.emitEvent(hiddenEvt);
+        var hiddenEvent = this.buildEvent(EVENT_NAME_HIDDEN);
+        this.emitEvent(hiddenEvent);
         this.doRender = false;
       },
       // Render helper for generating the toast
@@ -28902,7 +29051,7 @@
 
         var title = this.title,
             slotScope = this.slotScope;
-        var link = isLink(this);
+        var link = isLink$1(this);
         var $headerContent = [];
         var $title = this.normalizeSlot(SLOT_NAME_TOAST_TITLE, slotScope);
 
@@ -28928,7 +29077,7 @@
         var $header = h();
 
         if ($headerContent.length > 0) {
-          $header = h('header', {
+          $header = h(this.headerTag, {
             staticClass: 'toast-header',
             class: this.headerClass
           }, $headerContent);
@@ -28937,7 +29086,7 @@
         var $body = h(link ? BLink : 'div', {
           staticClass: 'toast-body',
           class: this.bodyClass,
-          props: link ? pluckProps(linkProps$7, this) : {},
+          props: link ? pluckProps(linkProps, this) : {},
           on: link ? {
             click: this.onLinkClick
           } : {}
@@ -28964,7 +29113,7 @@
       var $toast = h('div', {
         staticClass: 'b-toast',
         class: this.toastClasses,
-        attrs: _objectSpread2(_objectSpread2({}, isStatic ? {} : this.scopedStyleAttrs), {}, {
+        attrs: _objectSpread2$3(_objectSpread2$3({}, isStatic ? {} : this.scopedStyleAttrs), {}, {
           id: this.safeId('_toast_outer'),
           role: isHiding ? null : isStatus ? 'status' : 'alert',
           'aria-live': isHiding ? null : isStatus ? 'polite' : 'assertive',
@@ -28990,22 +29139,22 @@
     }
   });
 
-  var PROP_NAME$2 = '$bvToast';
-  var PROP_NAME_PRIV$1 = '_bv__toast'; // Base toast props that are allowed
+  var PROP_NAME = '$bvToast';
+  var PROP_NAME_PRIV = '_bv__toast'; // Base toast props that are allowed
   // Some may be ignored or overridden on some message boxes
   // Prop ID is allowed, but really only should be used for testing
   // We need to add it in explicitly as it comes from the `idMixin`
 
-  var BASE_PROPS$1 = ['id'].concat(_toConsumableArray(keys(omit(props$2m, ['static', 'visible'])))); // Map prop names to toast slot names
+  var BASE_PROPS = ['id'].concat(_toConsumableArray$1(keys(omit(props, ['static', 'visible'])))); // Map prop names to toast slot names
 
-  var propsToSlots$1 = {
+  var propsToSlots = {
     toastContent: 'default',
     title: 'toast-title'
   }; // --- Helper methods ---
   // Method to filter only recognized props that are not undefined
 
-  var filterOptions$1 = function filterOptions(options) {
-    return BASE_PROPS$1.reduce(function (memo, key) {
+  var filterOptions = function filterOptions(options) {
+    return BASE_PROPS.reduce(function (memo, key) {
       if (!isUndefined(options[key])) {
         memo[key] = options[key];
       }
@@ -29015,7 +29164,7 @@
   }; // Method to install `$bvToast` VM injection
 
 
-  var plugin$1 = function plugin(Vue) {
+  var plugin = function plugin(Vue) {
     // Create a private sub-component constructor that
     // extends BToast and self-destructs after hidden
     // @vue/component
@@ -29065,7 +29214,7 @@
     }); // Private method to generate the on-demand toast
 
     var makeToast = function makeToast(props, $parent) {
-      if (warnNotClient(PROP_NAME$2)) {
+      if (warnNotClient(PROP_NAME)) {
         /* istanbul ignore next */
         return;
       } // Create an instance of `BVToastPop` component
@@ -29075,14 +29224,14 @@
         // We set parent as the local VM so these toasts can emit events on the
         // app `$root`, and it ensures `BToast` is destroyed when parent is destroyed
         parent: $parent,
-        propsData: _objectSpread2(_objectSpread2(_objectSpread2({}, filterOptions$1(getComponentConfig(NAME_TOAST))), omit(props, keys(propsToSlots$1))), {}, {
+        propsData: _objectSpread2$3(_objectSpread2$3(_objectSpread2$3({}, filterOptions(getComponentConfig(NAME_TOAST))), omit(props, keys(propsToSlots))), {}, {
           // Props that can't be overridden
           static: false,
           visible: true
         })
       }); // Convert certain props to slots
 
-      keys(propsToSlots$1).forEach(function (prop) {
+      keys(propsToSlots).forEach(function (prop) {
         var value = props[prop];
 
         if (!isUndefined(value)) {
@@ -29094,7 +29243,7 @@
             }, value)];
           }
 
-          toast.$slots[propsToSlots$1[prop]] = concat(value);
+          toast.$slots[propsToSlots[prop]] = concat(value);
         }
       }); // Create a mount point (a DIV) and mount it (which triggers the show)
 
@@ -29127,12 +29276,12 @@
         value: function toast(content) {
           var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-          if (!content || warnNotClient(PROP_NAME$2)) {
+          if (!content || warnNotClient(PROP_NAME)) {
             /* istanbul ignore next */
             return;
           }
 
-          makeToast(_objectSpread2(_objectSpread2({}, filterOptions$1(options)), {}, {
+          makeToast(_objectSpread2$3(_objectSpread2$3({}, filterOptions(options)), {}, {
             toastContent: content
           }), this._vm);
         } // shows a `<b-toast>` component with the specified ID
@@ -29162,20 +29311,20 @@
       beforeCreate: function beforeCreate() {
         // Because we need access to `$root` for `$emits`, and VM for parenting,
         // we have to create a fresh instance of `BvToast` for each VM
-        this[PROP_NAME_PRIV$1] = new BvToast(this);
+        this[PROP_NAME_PRIV] = new BvToast(this);
       }
     }); // Define our read-only `$bvToast` instance property
     // Placed in an if just in case in HMR mode
 
-    if (!hasOwnProperty(Vue.prototype, PROP_NAME$2)) {
-      defineProperty(Vue.prototype, PROP_NAME$2, {
+    if (!hasOwnProperty(Vue.prototype, PROP_NAME)) {
+      defineProperty$1(Vue.prototype, PROP_NAME, {
         get: function get() {
           /* istanbul ignore next */
-          if (!this || !this[PROP_NAME_PRIV$1]) {
-            warn("\"".concat(PROP_NAME$2, "\" must be accessed from a Vue instance \"this\" context."), NAME_TOAST);
+          if (!this || !this[PROP_NAME_PRIV]) {
+            warn("\"".concat(PROP_NAME, "\" must be accessed from a Vue instance \"this\" context."), NAME_TOAST);
           }
 
-          return this[PROP_NAME_PRIV$1];
+          return this[PROP_NAME_PRIV];
         }
       });
     }
@@ -29183,7 +29332,7 @@
 
   var BVToastPlugin = /*#__PURE__*/pluginFactory({
     plugins: {
-      plugin: plugin$1
+      plugin: plugin
     }
   });
 
@@ -29200,9 +29349,9 @@
 
   var BV_TOOLTIP = '__BV_Tooltip__'; // Default trigger
 
-  var DefaultTrigger$1 = 'hover focus'; // Valid event triggers
+  var DefaultTrigger = 'hover focus'; // Valid event triggers
 
-  var validTriggers$1 = {
+  var validTriggers = {
     focus: true,
     hover: true,
     click: true,
@@ -29210,17 +29359,17 @@
     manual: true
   }; // Directive modifier test regular expressions. Pre-compile for performance
 
-  var htmlRE$1 = /^html$/i;
+  var htmlRE = /^html$/i;
   var noninteractiveRE = /^noninteractive$/i;
-  var noFadeRE$1 = /^nofade$/i;
-  var placementRE$1 = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/i;
-  var boundaryRE$1 = /^(window|viewport|scrollParent)$/i;
-  var delayRE$1 = /^d\d+$/i;
-  var delayShowRE$1 = /^ds\d+$/i;
-  var delayHideRE$1 = /^dh\d+$/i;
+  var noFadeRE = /^nofade$/i;
+  var placementRE = /^(auto|top(left|right)?|bottom(left|right)?|left(top|bottom)?|right(top|bottom)?)$/i;
+  var boundaryRE = /^(window|viewport|scrollParent)$/i;
+  var delayRE = /^d\d+$/i;
+  var delayShowRE = /^ds\d+$/i;
+  var delayHideRE = /^dh\d+$/i;
   var offsetRE$1 = /^o-?\d+$/i;
-  var variantRE$1 = /^v-.+$/i;
-  var spacesRE$1 = /\s+/; // Build a Tooltip config based on bindings (if any)
+  var variantRE = /^v-.+$/i;
+  var spacesRE = /\s+/; // Build a Tooltip config based on bindings (if any)
   // Arguments and modifiers take precedence over passed value config object
 
   var parseBindings$1 = function parseBindings(bindings, vnode)
@@ -29251,12 +29400,12 @@
     if (isString(bindings.value) || isNumber(bindings.value)) {
       // Value is tooltip content (HTML optionally supported)
       config.title = bindings.value;
-    } else if (isFunction(bindings.value)) {
+    } else if (isFunction$1(bindings.value)) {
       // Title generator function
       config.title = bindings.value;
     } else if (isPlainObject(bindings.value)) {
       // Value is config object, so merge
-      config = _objectSpread2(_objectSpread2({}, config), bindings.value);
+      config = _objectSpread2$3(_objectSpread2$3({}, config), bindings.value);
     } // If title is not provided, try title attribute
 
 
@@ -29283,37 +29432,37 @@
 
 
     keys(bindings.modifiers).forEach(function (mod) {
-      if (htmlRE$1.test(mod)) {
+      if (htmlRE.test(mod)) {
         // Title allows HTML
         config.html = true;
       } else if (noninteractiveRE.test(mod)) {
         // Noninteractive
         config.interactive = false;
-      } else if (noFadeRE$1.test(mod)) {
+      } else if (noFadeRE.test(mod)) {
         // No animation
         config.animation = false;
-      } else if (placementRE$1.test(mod)) {
+      } else if (placementRE.test(mod)) {
         // Placement of tooltip
         config.placement = mod;
-      } else if (boundaryRE$1.test(mod)) {
+      } else if (boundaryRE.test(mod)) {
         // Boundary of tooltip
         mod = mod === 'scrollparent' ? 'scrollParent' : mod;
         config.boundary = mod;
-      } else if (delayRE$1.test(mod)) {
+      } else if (delayRE.test(mod)) {
         // Delay value
         var delay = toInteger(mod.slice(1), 0);
         config.delay.show = delay;
         config.delay.hide = delay;
-      } else if (delayShowRE$1.test(mod)) {
+      } else if (delayShowRE.test(mod)) {
         // Delay show value
         config.delay.show = toInteger(mod.slice(2), 0);
-      } else if (delayHideRE$1.test(mod)) {
+      } else if (delayHideRE.test(mod)) {
         // Delay hide value
         config.delay.hide = toInteger(mod.slice(2), 0);
       } else if (offsetRE$1.test(mod)) {
         // Offset value, negative allowed
         config.offset = toInteger(mod.slice(1), 0);
-      } else if (variantRE$1.test(mod)) {
+      } else if (variantRE.test(mod)) {
         // Variant
         config.variant = mod.slice(2) || null;
       }
@@ -29322,8 +29471,8 @@
 
     var selectedTriggers = {}; // Parse current config object trigger
 
-    concat(config.trigger || '').filter(identity).join(' ').trim().toLowerCase().split(spacesRE$1).forEach(function (trigger) {
-      if (validTriggers$1[trigger]) {
+    concat(config.trigger || '').filter(identity).join(' ').trim().toLowerCase().split(spacesRE).forEach(function (trigger) {
+      if (validTriggers[trigger]) {
         selectedTriggers[trigger] = true;
       }
     }); // Parse modifiers for triggers
@@ -29331,7 +29480,7 @@
     keys(bindings.modifiers).forEach(function (mod) {
       mod = mod.toLowerCase();
 
-      if (validTriggers$1[mod]) {
+      if (validTriggers[mod]) {
         // If modifier is a valid trigger
         selectedTriggers[mod] = true;
       }
@@ -29346,7 +29495,7 @@
 
     if (!config.trigger) {
       // Use default trigger
-      config.trigger = DefaultTrigger$1;
+      config.trigger = DefaultTrigger;
     } // Return the config
 
 
@@ -29374,7 +29523,7 @@
       /* istanbul ignore next: for now */
       {
         // Before showing the tooltip, we update the title if it is a function
-        if (isFunction(config.title)) {
+        if (isFunction$1(config.title)) {
           el[BV_TOOLTIP].updateData({
             title: config.title(el)
           });
@@ -29411,7 +29560,7 @@
         // We only pass data properties that have changed
         if (data[prop] !== oldData[prop]) {
           // if title is a function, we execute it here
-          newData[prop] = prop === 'title' && isFunction(data[prop]) ? data[prop](el) : data[prop];
+          newData[prop] = prop === 'title' && isFunction$1(data[prop]) ? data[prop](el) : data[prop];
         }
       });
       el[BV_TOOLTIP].updateData(newData);
@@ -29558,16 +29707,16 @@
     throttle: 'number'
   }; // Transition Events
 
-  var TransitionEndEvents$1 = ['webkitTransitionEnd', 'transitionend', 'otransitionend', 'oTransitionEnd'];
+  var TransitionEndEvents = ['webkitTransitionEnd', 'transitionend', 'otransitionend', 'oTransitionEnd'];
   /*
    * Utility Methods
    */
   // Better var type detection
 
-  var toType$1 = function toType(obj)
+  var toType = function toType(obj)
   /* istanbul ignore next: not easy to test */
   {
-    return toString(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+    return toString$1(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
   }; // Check config properties for expected types
 
   /* istanbul ignore next */
@@ -29580,7 +29729,7 @@
       if (hasOwnProperty(configTypes, property)) {
         var expectedTypes = configTypes[property];
         var value = config[property];
-        var valueType = value && isElement(value) ? 'element' : toType$1(value); // handle Vue instances
+        var valueType = value && isElement(value) ? 'element' : toType(value); // handle Vue instances
 
         valueType = value && value._isVue ? 'component' : valueType;
 
@@ -29600,11 +29749,11 @@
   /* istanbul ignore next: not easy to test */
 
 
-  var BVScrollSpy
+  var BVScrollspy
   /* istanbul ignore next: not easy to test */
   = /*#__PURE__*/function () {
-    function BVScrollSpy(element, config, $root) {
-      _classCallCheck(this, BVScrollSpy);
+    function BVScrollspy(element, config, $root) {
+      _classCallCheck(this, BVScrollspy);
 
       // The element we activate links in
       this.$el = element;
@@ -29622,7 +29771,7 @@
       this.updateConfig(config);
     }
 
-    _createClass(BVScrollSpy, [{
+    _createClass(BVScrollspy, [{
       key: "updateConfig",
       value: function updateConfig(config, $root) {
         if (this.$scroller) {
@@ -29631,7 +29780,7 @@
           this.$scroller = null;
         }
 
-        var cfg = _objectSpread2(_objectSpread2({}, this.constructor.Default), config);
+        var cfg = _objectSpread2$3(_objectSpread2$3({}, this.constructor.Default), config);
 
         if ($root) {
           this.$root = $root;
@@ -29678,7 +29827,7 @@
         eventOn(window, 'scroll', this, EVENT_OPTIONS_NO_CAPTURE);
         eventOn(window, 'resize', this, EVENT_OPTIONS_NO_CAPTURE);
         eventOn(window, 'orientationchange', this, EVENT_OPTIONS_NO_CAPTURE);
-        TransitionEndEvents$1.forEach(function (eventName) {
+        TransitionEndEvents.forEach(function (eventName) {
           eventOn(window, eventName, _this, EVENT_OPTIONS_NO_CAPTURE);
         });
         this.setObservers(true); // Schedule a refresh
@@ -29700,7 +29849,7 @@
         eventOff(window, 'scroll', this, EVENT_OPTIONS_NO_CAPTURE);
         eventOff(window, 'resize', this, EVENT_OPTIONS_NO_CAPTURE);
         eventOff(window, 'orientationchange', this, EVENT_OPTIONS_NO_CAPTURE);
-        TransitionEndEvents$1.forEach(function (eventName) {
+        TransitionEndEvents.forEach(function (eventName) {
           eventOff(window, eventName, _this2, EVENT_OPTIONS_NO_CAPTURE);
         });
       }
@@ -29779,7 +29928,7 @@
 
         var autoMethod = scroller !== scroller.window ? METHOD_POSITION : METHOD_OFFSET;
         var method = this.$config.method === 'auto' ? autoMethod : this.$config.method;
-        var methodFn = method === METHOD_POSITION ? position : offset;
+        var methodFn = method === METHOD_POSITION ? position : offset$1;
         var offsetBase = method === METHOD_POSITION ? this.getScrollTop() : 0;
         this.$offsets = [];
         this.$targets = [];
@@ -30008,18 +30157,18 @@
       }
     }]);
 
-    return BVScrollSpy;
+    return BVScrollspy;
   }();
 
-  var BV_SCROLLSPY = '__BV_ScrollSpy__'; // Pre-compiled regular expressions
+  var BV_SCROLLSPY = '__BV_Scrollspy__'; // Pre-compiled regular expressions
 
   var onlyDigitsRE = /^\d+$/;
-  var offsetRE$2 = /^(auto|position|offset)$/; // Build a ScrollSpy config based on bindings (if any)
+  var offsetRE = /^(auto|position|offset)$/; // Build a Scrollspy config based on bindings (if any)
   // Arguments and modifiers take precedence over passed value config object
 
   /* istanbul ignore next: not easy to test */
 
-  var parseBindings$2 = function parseBindings(bindings)
+  var parseBindings = function parseBindings(bindings)
   /* istanbul ignore next: not easy to test */
   {
     var config = {}; // If argument, assume element ID
@@ -30035,7 +30184,7 @@
       if (onlyDigitsRE.test(mod)) {
         // Offset value
         config.offset = toInteger(mod, 0);
-      } else if (offsetRE$2.test(mod)) {
+      } else if (offsetRE.test(mod)) {
         // Offset method
         config.method = mod;
       }
@@ -30051,14 +30200,14 @@
       // Value is config object
       // Filter the object based on our supported config options
       keys(bindings.value).filter(function (k) {
-        return !!BVScrollSpy.DefaultType[k];
+        return !!BVScrollspy.DefaultType[k];
       }).forEach(function (k) {
         config[k] = bindings.value[k];
       });
     }
 
     return config;
-  }; // Add or update ScrollSpy on our element
+  }; // Add or update Scrollspy on our element
 
 
   var applyScrollspy = function applyScrollspy(el, bindings, vnode)
@@ -30069,14 +30218,14 @@
       return;
     }
 
-    var config = parseBindings$2(bindings);
+    var config = parseBindings(bindings);
 
     if (el[BV_SCROLLSPY]) {
       el[BV_SCROLLSPY].updateConfig(config, vnode.context.$root);
     } else {
-      el[BV_SCROLLSPY] = new BVScrollSpy(el, config, vnode.context.$root);
+      el[BV_SCROLLSPY] = new BVScrollspy(el, config, vnode.context.$root);
     }
-  }; // Remove ScrollSpy on our element
+  }; // Remove Scrollspy on our element
 
   /* istanbul ignore next: not easy to test */
 
@@ -30150,7 +30299,7 @@
     }
   });
 
-  var NAME$2 = 'BootstrapVue'; // --- BootstrapVue installer ---
+  var NAME = 'BootstrapVue'; // --- BootstrapVue installer ---
 
   var install = /*#__PURE__*/installFactory({
     plugins: {
@@ -30161,7 +30310,7 @@
 
   var BootstrapVue = /*#__PURE__*/{
     install: install,
-    NAME: NAME$2
+    NAME: NAME
   }; // --- Named exports for BvConfigPlugin ---
 
   // Main entry point for the browser build
