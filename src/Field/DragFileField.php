@@ -62,7 +62,7 @@ class DragFileField extends FileField
         $attrs['data-max-size'] = $this->maxSize();
 
         // Fix accept
-        if (trim($attrs['accept'])) {
+        if (trim((string) $attrs['accept'])) {
             $attrs['accept'] = Collection::explode(',', $attrs['accept'])
                 ->map('trim')
                 ->map(function ($type) {
