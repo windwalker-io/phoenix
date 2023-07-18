@@ -30,6 +30,7 @@ use Windwalker\Utilities\Arr;
  *
  * @since  1.0
  */
+#[\AllowDynamicProperties]
 class GridHelper
 {
     /**
